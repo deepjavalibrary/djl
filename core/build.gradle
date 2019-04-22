@@ -42,6 +42,25 @@ jar {
 task jnarator(dependsOn: ":jnarator:jar") {
     doLast {
         File jnaGenerator = project(":jnarator").jar.outputs.files.singleFile
+        String mxnetHome = System.getProperty("MXNET_DIR")
+        if (mxnetHome == null) {
+            mxnetHome = System.getenv("MXNET_DIR")
+            if (mxnetHome == null) {
+                File rootDir = new File("${rootProject.projectDir}/../");
+                File file = new File(rootDir, "include/mxnet/c_api.h");
+                if (!file.exists()) {
+                    file = new File(rootDir, "incubator-mxnet/include/mxnet/c_api.h");
+                    if (!file.exists()) {
+                        file = new File(rootDir, "mxnet/include/mxnet/c_api.h");
+                        if (!file.exists()) {
+                            throw new GradleException("Please specify MXNET_DIR explictly in environment vairable or System properties.")
+                        }
+                    }
+                }
+                mxnetHome = file.getParentFile().getParentFile().getParentFile().getAbsolutePath();
+            }
+        }
+
         javaexec {
             main = "-jar"
             args = [
@@ -55,9 +74,9 @@ task jnarator(dependsOn: ":jnarator:jar") {
                     "-m",
                     "${project.projectDir}/src/main/jna/mapping.properties",
                     "-f",
-                    "${rootProject.projectDir}/../include/mxnet/c_api.h",
-                    "${rootProject.projectDir}/../include/nnvm/c_api.h",
-                    "${rootProject.projectDir}/../include/mxnet/c_predict_api.h"
+                    "${mxnetHome}/include/mxnet/c_api.h",
+                    "${mxnetHome}/include/nnvm/c_api.h",
+                    "${mxnetHome}/include/mxnet/c_predict_api.h"
             ]
         }
     }
