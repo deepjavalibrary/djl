@@ -1,0 +1,58 @@
+allprojects {
+    group 'org.apache.mxnet'
+    version = '1.0'
+
+    repositories {
+        jcenter()
+    }
+
+    apply plugin: 'idea'
+    idea {
+        module {
+            outputDir = file('build/classes/java/main')
+            testOutputDir = file('build/classes/java/test')
+            // inheritOutputDirs = true
+        }
+    }
+}
+
+def javaProjects() {
+    return subprojects.findAll();
+}
+
+configure(javaProjects()) {
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    defaultTasks 'jar'
+
+	apply from: file("${rootProject.projectDir}/tools/gradle/formatter.gradle")
+	apply from: file("${rootProject.projectDir}/tools/gradle/check.gradle")
+
+    test {
+        useTestNG() {
+            // suiteXmlFiles << new File(rootDir, "testng.xml") //This is how to add custom testng.xml
+        }
+
+        testLogging {
+            showStandardStreams = true
+            events "passed", "skipped", "failed", "standardOut", "standardError"
+        }
+    }
+    test.finalizedBy(project.tasks.jacocoTestReport)
+
+    compileJava {
+        options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static" << "-Werror"
+    }
+
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    minimum = 0.75
+                }
+            }
+        }
+    }
+}

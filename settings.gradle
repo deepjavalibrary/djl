@@ -1,0 +1,4 @@
+rootProject.name = 'mxnet'
+include 'core'
+include 'jnarator'
+
