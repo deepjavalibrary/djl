@@ -1,0 +1,25 @@
+plugins {
+    id 'antlr'
+}
+
+dependencies {
+    antlr "org.antlr:antlr4:${antlr_version}"
+
+    compile "commons-cli:commons-cli:${commons_cli_version}"
+    compile "commons-io:commons-io:${commons_io_version}"
+    compile "org.antlr:antlr4-runtime:${antlr_version}"
+    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
+
+    testCompile "org.testng:testng:${testng_version}"
+}
+
+checkstyleMain.source = 'src/main/java'
+pmdMain.source = 'src/main/java'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.apache.mxnet.jnarator.Main'
+    }
+    includeEmptyDirs = false
+    from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+}
