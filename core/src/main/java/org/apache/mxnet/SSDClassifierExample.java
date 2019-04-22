@@ -21,7 +21,6 @@ import com.sun.jna.Native;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.image.Image;
@@ -36,6 +35,7 @@ import org.apache.mxnet.types.DataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("PMD.SystemPrintln")
 public final class SSDClassifierExample {
 
     private static final Logger logger = LoggerFactory.getLogger(SSDClassifierExample.class);
@@ -56,61 +56,33 @@ public final class SSDClassifierExample {
         }
     }
 
-    private static List<List<List<ObjectDetectorOutput>>> runObjectDetectionBatch(
-            String pathPrefix, String inputImageDir, Context context) throws IOException {
-        Shape inputShape = new Shape(1, 3, 512, 512);
-        DataDesc dataDesc = new DataDesc("data", inputShape, DataType.FLOAT32, "NCHW");
-
-        try (ResourceAllocator alloc = new ResourceAllocator()) {
-            MxModel model = MxModel.loadSavedModel(alloc, pathPrefix, 0);
-            ObjectDetector objDet = new ObjectDetector(alloc, context, model, dataDesc);
-
-            // Loading batch of images from the directory path
-            List<List<String>> batchFiles = generateBatches(inputImageDir, 20);
-            List<List<List<ObjectDetectorOutput>>> outputList = new ArrayList<>();
-
-            for (List<String> batchFile : batchFiles) {
-                List<BufferedImage> imgList = Image.loadInputBatch(batchFile);
-                // Running inference on batch of images loaded in previous step
-                List<List<ObjectDetectorOutput>> tmp = objDet.detect(imgList, 5);
-                outputList.add(tmp);
-            }
-            return outputList;
-        }
-    }
-
-    private static List<List<String>> generateBatches(String inputImageDirPath, int batchSize) {
-        File dir = new File(inputImageDirPath);
-
-        List<List<String>> output = new ArrayList<>();
-        List<String> batch = new ArrayList<>();
-        File[] files = dir.listFiles();
-        if (files != null) {
-            for (File imgFile : files) {
-                batch.add(imgFile.getPath());
-                if (batch.size() == batchSize) {
-                    output.add(batch);
-                    batch = new ArrayList<>();
-                }
-            }
-        }
-        if (batch.size() > 0) {
-            output.add(batch);
-        }
-        return output;
-    }
-
     public static void main(String[] args) {
         Native.setProtected(true);
         if (!Native.isProtected()) {
             System.out.println("Protection not supported.");
         }
-        System.setProperty("jna.library.path", "/Users/lufen/source/mxnet/lib");
-        // System.setProperty("jna.library.path", "/usr/local/lib/python2.7/site-packages/mxnet");
+        String userHome = System.getProperty("user.home");
+        String jnaLib = System.getProperty("jna.library.path");
+        if (jnaLib == null) {
+            if (new File(userHome, "/source/mxnet/release/libmxnet.so").exists()) {
+                System.setProperty("jna.library.path", userHome + "/source/mxnet/release");
+            } else if (new File("/usr/local/lib/python2.7/site-packages/mxnet/libmxnet.so")
+                    .exists()) {
+                System.setProperty(
+                        "jna.library.path", "/usr/local/lib/python2.7/site-packages/mxnet");
+            } else if (new File("/usr/local/lib/python3.7/site-packages/mxnet/libmxnet.so")
+                    .exists()) {
+                System.setProperty(
+                        "jna.library.path", "/usr/local/lib/python3.7/site-packages/mxnet");
+            } else {
+                System.err.println(
+                        "Please use -Djna.library.path= to specify libmxnet.so file location.");
+                return;
+            }
+        }
 
-        String modelPathPrefix = "/Users/lufen/source/ptest/squeezenet_v1.1";
-        String inputImagePath = "/Users/lufen/sample/kitten.jpg";
-        String inputDir = "/Users/lufen/sample/";
+        String modelPathPrefix = userHome + "/source/ptest/squeezenet_v1.1";
+        String inputImagePath = userHome + "/source/ptest/kitten.jpg";
 
         Context context = Context.getDefaultContext();
 
@@ -139,11 +111,9 @@ public final class SSDClassifierExample {
 
         sb.append("Class: ")
                 .append(output.getClassName())
-                .append('\n')
-                .append("Probability: ")
+                .append("\nProbability: ")
                 .append(output.getProbability())
-                .append('\n')
-                .append("Coordinate: ");
+                .append("\nCoordinate: ");
         List<Float> coord =
                 Arrays.asList(
                         output.getXMin() * width,

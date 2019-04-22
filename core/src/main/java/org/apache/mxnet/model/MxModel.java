@@ -27,8 +27,12 @@ import org.apache.mxnet.Context;
 import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.types.DataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MxModel implements AutoCloseable {
+
+    private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
     private static final String[] EMPTY = new String[0];
 
@@ -195,11 +199,11 @@ public class MxModel implements AutoCloseable {
             ListIterator<String> it = output.listIterator();
             while (it.hasNext()) {
                 String synsetLemma = it.next();
-                it.set(synsetLemma.substring(synsetLemma.indexOf(" ") + 1));
+                it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
             }
-            return output.toArray(new String[0]);
+            return output.toArray(new String[0]); // NOPMD
         } catch (IOException e) {
-            System.err.println("Error opening synset file " + synsetFile + ": " + e);
+            logger.warn("Error opening synset file " + synsetFile, e);
         }
         return null;
     }

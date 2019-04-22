@@ -83,7 +83,7 @@ public class NdArray extends NativeResource {
                 null,
                 shape,
                 DataType.FLOAT32,
-                JnaUtils.createNdArray(context, shape, dataType, shape.dimension(), false));
+                JnaUtils.createNdArray(context, shape, dataType, shape.dimension(), delay));
     }
 
     public DataType getDataType() {
@@ -254,7 +254,7 @@ public class NdArray extends NativeResource {
     }
 
     public String dump() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append("ND: ")
                 .append(getShape())
                 .append(' ')

@@ -40,6 +40,7 @@ import org.apache.mxnet.model.ResourceAllocator;
 import org.apache.mxnet.model.Shape;
 import org.apache.mxnet.types.DataType;
 
+@SuppressWarnings("PMD.SystemPrintln")
 public final class ModuleApiTesting {
 
     private ModuleApiTesting() {}
@@ -87,7 +88,7 @@ public final class ModuleApiTesting {
             FloatBuffer data = Image.toDirectBuffer(image);
 
             long init = System.nanoTime();
-            System.out.println("Loading native library: " + MxnetLibrary.JNA_LIBRARY_NAME);
+            System.out.println("Loading native library: " + MxnetLibrary.JNA_NATIVE_LIB.getName());
             long loaded = System.nanoTime();
             System.out.printf("loadlibrary = %.3f ms.%n", (loaded - init) / 1000000f);
 

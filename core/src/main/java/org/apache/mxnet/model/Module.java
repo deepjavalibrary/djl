@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class Module implements AutoCloseable {
 
-    private static final Logger logger = LoggerFactory.getLogger(Module.class);
+    static final Logger logger = LoggerFactory.getLogger(Module.class);
 
     private MxExecutor[] executors;
     private boolean forTraining;

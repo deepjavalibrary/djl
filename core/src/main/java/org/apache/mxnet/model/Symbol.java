@@ -236,7 +236,7 @@ public class Symbol extends NativeResource {
                 sharedArgNames.add(arg);
             }
         }
-        String[] sharedArgParams = sharedArgNames.toArray(new String[0]);
+        String[] sharedArgParams = sharedArgNames.toArray(new String[0]); // NOPMD
 
         IntBuffer sharedBufferLen = IntBuffer.allocate(1);
         sharedBufferLen.put(0, 0);

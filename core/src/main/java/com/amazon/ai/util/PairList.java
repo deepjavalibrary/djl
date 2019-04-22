@@ -33,7 +33,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
 
     @SuppressWarnings("unchecked")
     public PairList(List<K> keys, List<V> values) {
-        this((K[]) keys.toArray(), (V[]) values.toArray());
+        this((K[]) keys.toArray(), (V[]) values.toArray()); // NOPMD
     }
 
     public int size() {
