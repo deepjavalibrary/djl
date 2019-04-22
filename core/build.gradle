@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "commons-cli:commons-cli:${commons_cli_version}"
+    compile "net.java.dev.jna:jna:${jna_version}"
+    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
+
+    testCompile "org.testng:testng:${testng_version}"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'build/generated-src']
+        }
+    }
+}
+
+checkstyleMain.source = 'src/main/java'
+pmdMain.source = 'src/main/java'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.apache.mxnet.ModuleApiTesting'
+    }
+    includeEmptyDirs = false
+    from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+
+    exclude "META-INF/maven/**"
+    exclude "META-INF/INDEX.LIST"
+    exclude "META-INF/MANIFEST*"
+    exclude "META-INF//LICENSE*"
+    exclude "META-INF//NOTICE*"
+}
+
+task jnarator(dependsOn: ":jnarator:jar") {
+    doLast {
+        File jnaGenerator = project(":jnarator").jar.outputs.files.singleFile
+        javaexec {
+            main = "-jar"
+            args = [
+                    jnaGenerator.absolutePath,
+                    "-l",
+                    "mxnet",
+                    "-p",
+                    "org.apache.mxnet.jna",
+                    "-o",
+                    "${project.buildDir}/generated-src",
+                    "-m",
+                    "${project.projectDir}/src/main/jna/mapping.properties",
+                    "-f",
+                    "${rootProject.projectDir}/../include/mxnet/c_api.h",
+                    "${rootProject.projectDir}/../include/nnvm/c_api.h",
+                    "${rootProject.projectDir}/../include/mxnet/c_predict_api.h"
+            ]
+        }
+    }
+}
+compileJava.dependsOn(jnarator)
