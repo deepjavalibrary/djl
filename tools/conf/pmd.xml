@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ruleset name="pmd"
+        xmlns="http://pmd.sf.net/ruleset/1.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+        xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+    <description>Java Rule in PMD</description>
+
+    <!--
+    <rule ref="rulesets/java/android.xml"/>
+    <rule ref="rulesets/java/codesize.xml"/>
+    <rule ref="rulesets/java/comments.xml"/>
+    <rule ref="rulesets/java/coupling.xml"/>
+    <rule ref="rulesets/java/j2ee.xml"/>
+    <rule ref="rulesets/java/junit.xml"/>
+    <rule ref="rulesets/java/logging-jakarta-commons.xml"/>
+    <rule ref="rulesets/java/sunsecure.xml"/>
+    <rule ref="rulesets/java/typeresolution.xml"/>
+    -->
+
+    <rule ref="rulesets/java/basic.xml">
+        <exclude name="AvoidUsingHardCodedIP"/>
+        <exclude name="CollapsibleIfStatements"/>
+        <exclude name="JumbledIncrementer"/>
+        <exclude name="OverrideBothEqualsAndHashcode"/>
+    </rule>
+
+    <rule ref="rulesets/java/braces.xml"/>
+
+    <rule ref="rulesets/java/clone.xml">
+        <exclude name="CloneMethodMustImplementCloneable"/>
+    </rule>
+
+    <rule ref="rulesets/java/controversial.xml/DoNotCallGarbageCollectionExplicitly"/>
+
+    <rule ref="rulesets/java/design.xml">
+        <exclude name="ConstantsInInterface"/>
+        <exclude name="AvoidDeeplyNestedIfStmts"/>
+        <exclude name="AvoidInstanceofChecksInCatchClause"/>
+        <exclude name="AvoidReassigningParameters"/>
+        <exclude name="AvoidSynchronizedAtMethodLevel"/>
+        <exclude name="CloseResource"/>
+        <exclude name="CompareObjectsWithEquals"/>
+        <exclude name="ConfusingTernary"/>
+        <exclude name="DefaultLabelNotLastInSwitchStmt"/>
+        <exclude name="EmptyMethodInAbstractClassShouldBeAbstract"/>
+        <exclude name="GodClass"/>
+        <exclude name="ImmutableField"/>
+        <exclude name="MissingBreakInSwitch"/>
+        <exclude name="NonCaseLabelInSwitchStatement"/>
+        <exclude name="NonStaticInitializer"/>
+        <exclude name="ReturnEmptyArrayRatherThanNull"/>
+        <exclude name="SimpleDateFormatNeedsLocale"/>
+        <exclude name="SwitchDensity"/>
+        <exclude name="TooFewBranchesForASwitchStatement"/>
+        <exclude name="UncommentedEmptyConstructor"/>
+        <exclude name="UncommentedEmptyMethodBody"/>
+        <exclude name="UseLocaleWithCaseConversions"/>
+        <exclude name="UseVarargs"/>
+    </rule>
+
+    <rule ref="rulesets/java/empty.xml">
+        <exclude name="EmptyCatchBlock"/>
+        <exclude name="EmptyIfStmt"/>
+    </rule>
+
+    <rule ref="rulesets/java/finalizers.xml"/>
+
+    <rule ref="rulesets/java/imports.xml"/>
+
+    <rule ref="rulesets/java/javabeans.xml/MissingSerialVersionUID"/>
+
+    <rule ref="rulesets/java/logging-java.xml">
+        <exclude name="GuardLogStatementJavaUtil"/>
+        <exclude name="LoggerIsNotStaticFinal"/>
+        <exclude name="MoreThanOneLogger"/>
+        <exclude name="InvalidSlf4jMessageFormat"/>
+    </rule>
+
+    <rule ref="rulesets/java/migrating.xml">
+        <exclude name="JUnit4SuitesShouldUseSuiteAnnotation"/>
+        <exclude name="JUnit4TestShouldUseAfterAnnotation"/>
+        <exclude name="JUnit4TestShouldUseBeforeAnnotation"/>
+        <exclude name="JUnit4TestShouldUseTestAnnotation"/>
+        <exclude name="JUnitUseExpected"/>
+    </rule>
+
+    <rule ref="rulesets/java/naming.xml">
+        <exclude name="AbstractNaming"/>
+        <exclude name="AvoidFieldNameMatchingMethodName"/>
+        <exclude name="AvoidFieldNameMatchingTypeName"/>
+        <exclude name="BooleanGetMethodName"/>
+        <exclude name="LongVariable"/>
+        <exclude name="MethodNamingConventions"/>
+        <exclude name="ShortClassName"/>
+        <exclude name="ShortMethodName"/>
+        <exclude name="ShortVariable"/>
+        <exclude name="VariableNamingConventions"/>
+    </rule>
+
+    <rule ref="rulesets/java/optimizations.xml">
+        <exclude name="AddEmptyString"/>
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
+        <exclude name="LocalVariableCouldBeFinal"/>
+        <exclude name="MethodArgumentCouldBeFinal"/>
+        <exclude name="PrematureDeclaration"/>
+        <exclude name="SimplifyStartsWith"/>
+        <exclude name="UseArrayListInsteadOfVector"/>
+    </rule>
+
+    <rule ref="rulesets/java/strictexception.xml">
+        <exclude name="AvoidCatchingGenericException"/>
+        <exclude name="AvoidCatchingThrowable"/>
+        <exclude name="AvoidThrowingNullPointerException"/>
+    </rule>
+
+    <rule ref="rulesets/java/strings.xml">
+        <exclude name="AvoidDuplicateLiterals"/>
+        <exclude name="ConsecutiveAppendsShouldReuse"/>
+        <exclude name="InefficientStringBuffering"/>
+        <exclude name="UseEqualsToCompareStrings"/>
+    </rule>
+
+    <rule ref="rulesets/java/unnecessary.xml">
+        <exclude name="UnnecessaryConversionTemporary"/>
+        <exclude name="UselessParentheses"/>
+        <exclude name="UnnecessaryModifier"/>
+    </rule>
+
+    <rule ref="rulesets/java/unusedcode.xml">
+        <exclude name="UnusedPrivateMethod"/>
+    </rule>
+</ruleset>

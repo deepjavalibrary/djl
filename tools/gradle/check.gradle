@@ -1,0 +1,59 @@
+apply plugin: 'findbugs'
+findbugs {
+    excludeFilter = file("${rootProject.projectDir}/tools/conf/findbugs-exclude.xml")
+    ignoreFailures = false
+    findbugsTest.enabled = true
+}
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+apply plugin: 'pmd'
+pmd {
+    ignoreFailures = false
+    pmdTest.enabled = false
+    ruleSets = [] // workaround pmd gradle plugin bug
+    ruleSetFiles = files("${rootProject.projectDir}/tools/conf/pmd.xml")
+}
+tasks.withType(Pmd){
+    reports{
+        xml.enabled=true
+        html.enabled=true
+    }
+}
+
+apply plugin: 'checkstyle'
+checkstyle {
+    toolVersion = '7.1.2'
+    ignoreFailures = false
+    checkstyleTest.enabled = true
+    configProperties = [ "checkstyle.suppressions.file" : file("${rootProject.projectDir}/tools/conf/suppressions.xml")]
+    configFile = file("${rootProject.projectDir}/tools/conf/checkstyle.xml")
+}
+checkstyleMain {
+    classpath += configurations.compile
+}
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+apply plugin: "jacoco"
+jacoco {
+    toolVersion = "0.8.1"
+}
+jacocoTestReport {
+    group = "Reporting"
+    reports {
+        xml.enabled true
+        csv.enabled false
+    }
+}
+
+check.dependsOn jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification
