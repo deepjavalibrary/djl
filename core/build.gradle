@@ -8,6 +8,7 @@ repositories {
 
 dependencies {
     compile "commons-cli:commons-cli:${commons_cli_version}"
+    compile "commons-io:commons-io:${commons_io_version}"
     compile "net.java.dev.jna:jna:${jna_version}"
     compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
 

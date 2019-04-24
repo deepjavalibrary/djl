@@ -17,7 +17,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.io.File;
 import java.io.IOException;
-import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import org.apache.mxnet.Context;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.types.DataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,22 +66,9 @@ public class MxModel implements AutoCloseable {
         String stateFile = String.format("%s-%04d.states", prefix, epoch);
         File synsetFile = new File(new File(paramFile).getParentFile(), "synset.txt");
 
-        IntBuffer outSize = IntBuffer.wrap(new int[1]);
-        IntBuffer nameSize = IntBuffer.wrap(new int[1]);
-        PointerByReference ref = new PointerByReference();
-        PointerByReference nameRef = new PointerByReference();
-        JnaUtils.checkCall(
-                MxnetLibrary.INSTANCE.MXNDArrayLoad(paramFile, outSize, ref, nameSize, nameRef));
-
-        int ndArrayCount = outSize.get();
-        int nameCount = nameSize.get();
-        if (ndArrayCount != nameCount) {
-            throw new IllegalStateException(
-                    "Mismatch between names and arrays in checkpoint file: " + paramFile);
-        }
-
-        String[] names = nameRef.getValue().getStringArray(0, nameCount);
-        Pointer[] handles = ref.getValue().getPointerArray(0, nameCount);
+        PointerByReference namesRef = new PointerByReference();
+        Pointer[] handles = JnaUtils.loadNdArray(paramFile, namesRef);
+        String[] names = namesRef.getValue().getStringArray(0, handles.length);
 
         Context context = Context.cpu();
 
@@ -91,7 +76,7 @@ public class MxModel implements AutoCloseable {
         List<String> auxParamNames = new ArrayList<>();
         List<NdArray> argParamData = new ArrayList<>();
         List<NdArray> auxParamData = new ArrayList<>();
-        for (int i = 0; i < nameCount; ++i) {
+        for (int i = 0; i < names.length; ++i) {
             String[] pair = names[i].split(":", 2);
             if ("arg".equals(pair[0])) {
                 argParamNames.add(pair[1]);

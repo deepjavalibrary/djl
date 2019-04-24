@@ -26,7 +26,6 @@ import java.util.Map;
 import org.apache.mxnet.Context;
 import org.apache.mxnet.jna.FunctionInfo;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.jna.PointerArray;
 import org.apache.mxnet.types.DataType;
 import org.apache.mxnet.types.StorageType;
@@ -149,15 +148,15 @@ public class NdArray extends NativeResource {
     }
 
     public void waitToRead() {
-        JnaUtils.checkCall(MxnetLibrary.INSTANCE.MXNDArrayWaitToRead(getHandle()));
+        JnaUtils.waitToRead(getHandle());
     }
 
     public void waitToWrite() {
-        JnaUtils.checkCall(MxnetLibrary.INSTANCE.MXNDArrayWaitToWrite(getHandle()));
+        JnaUtils.waitToWrite(getHandle());
     }
 
     public void waitAll() {
-        JnaUtils.checkCall(MxnetLibrary.INSTANCE.MXNDArrayWaitAll());
+        JnaUtils.waitAll();
     }
 
     public NdArray argsort(int axis, boolean isAscend) {

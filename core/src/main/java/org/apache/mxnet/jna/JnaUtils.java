@@ -39,6 +39,7 @@ import org.apache.mxnet.model.DataDesc;
 import org.apache.mxnet.model.NdArray;
 import org.apache.mxnet.model.ResourceAllocator;
 import org.apache.mxnet.model.Shape;
+import org.apache.mxnet.model.Symbol;
 import org.apache.mxnet.types.DataType;
 import org.apache.mxnet.types.StorageType;
 
@@ -48,15 +49,17 @@ public final class JnaUtils {
         "_contrib_", "_linalg_", "_sparse_", "_image_", "_random_"
     };
 
+    private static final MxnetLibrary LIB = LibUtils.loadLibrary();
+
     private JnaUtils() {}
 
     /////////////////////////////////
     // MXNet information
     /////////////////////////////////
 
-    public static int getVersion(IntBuffer out) {
+    public static int getVersion() {
         IntBuffer version = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXGetVersion(version));
+        checkCall(LIB.MXGetVersion(version));
 
         return version.get();
     }
@@ -65,7 +68,7 @@ public final class JnaUtils {
         IntBuffer outSize = IntBuffer.allocate(1);
         PointerByReference outArray = new PointerByReference();
 
-        checkCall(MxnetLibrary.INSTANCE.MXListAllOpNames(outSize, outArray));
+        checkCall(LIB.MXListAllOpNames(outSize, outArray));
 
         int size = outSize.get();
         Pointer[] pointers = outArray.getValue().getPointerArray(0, size);
@@ -83,7 +86,7 @@ public final class JnaUtils {
 
         for (String opName : opNames) {
             PointerByReference ref = new PointerByReference();
-            checkCall(MxnetLibrary.INSTANCE.NNGetOpHandle(opName, ref));
+            checkCall(LIB.NNGetOpHandle(opName, ref));
 
             String functionName = getOpNamePrefix(opName);
 
@@ -104,7 +107,7 @@ public final class JnaUtils {
         String[] returnType = new String[1];
 
         checkCall(
-                MxnetLibrary.INSTANCE.MXSymbolGetAtomicSymbolInfo(
+                LIB.MXSymbolGetAtomicSymbolInfo(
                         handle,
                         nameRef,
                         description,
@@ -156,7 +159,7 @@ public final class JnaUtils {
 
     public static int getGpuCount() {
         IntBuffer count = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXGetGPUCount(count));
+        checkCall(LIB.MXGetGPUCount(count));
 
         return count.get();
     }
@@ -168,18 +171,18 @@ public final class JnaUtils {
         LongBuffer freeMem = LongBuffer.wrap(ret, 0, 1);
         LongBuffer totalMem = LongBuffer.wrap(ret, 1, 1);
 
-        checkCall(MxnetLibrary.INSTANCE.MXGetGPUMemoryInformation64(deviceId, freeMem, totalMem));
+        checkCall(LIB.MXGetGPUMemoryInformation64(deviceId, freeMem, totalMem));
 
         return ret;
     }
 
     public static void setOmpThreads(int threads) {
-        checkCall(MxnetLibrary.INSTANCE.MXSetNumOMPThreads(threads));
+        checkCall(LIB.MXSetNumOMPThreads(threads));
     }
 
     public static int setBulkSize(int bulkSize) {
         IntBuffer prevBulkSize = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXEngineSetBulkSize(bulkSize, prevBulkSize));
+        checkCall(LIB.MXEngineSetBulkSize(bulkSize, prevBulkSize));
 
         return prevBulkSize.get();
     }
@@ -189,17 +192,16 @@ public final class JnaUtils {
     /////////////////////////////////
 
     public static int randomSeed(int seed) {
-        return MxnetLibrary.INSTANCE.MXRandomSeed(seed);
+        return LIB.MXRandomSeed(seed);
     }
 
     public static int randomSeed(int seed, Context context) {
         Context.DeviceType type = context.getDeviceType();
-        return MxnetLibrary.INSTANCE.MXRandomSeedContext(
-                seed, type.getType(), context.getDeviceId());
+        return LIB.MXRandomSeedContext(seed, type.getType(), context.getDeviceId());
     }
 
     public static void notifyShutdown() {
-        checkCall(MxnetLibrary.INSTANCE.MXNotifyShutdown());
+        checkCall(LIB.MXNotifyShutdown());
     }
 
     /////////////////////////////////
@@ -259,7 +261,7 @@ public final class JnaUtils {
 
     public static Pointer createNdArray() {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayCreateNone(ref));
+        checkCall(LIB.MXNDArrayCreateNone(ref));
 
         return ref.getValue();
     }
@@ -272,7 +274,7 @@ public final class JnaUtils {
 
         PointerByReference ref = new PointerByReference();
         checkCall(
-                MxnetLibrary.INSTANCE.MXNDArrayCreateEx(
+                LIB.MXNDArrayCreateEx(
                         shape.getShape(), size, deviceType, deviceId, delay, dtype.ordinal(), ref));
 
         return ref.getValue();
@@ -283,60 +285,65 @@ public final class JnaUtils {
         memory.write(0, buf, offset, size);
 
         PointerByReference ref = new PointerByReference();
-        checkCall(
-                MxnetLibrary.INSTANCE.MXNDArrayLoadFromRawBytes(memory, new NativeSize(size), ref));
+        checkCall(LIB.MXNDArrayLoadFromRawBytes(memory, new NativeSize(size), ref));
 
         return ref.getValue();
     }
 
     public static void saveNdArray(String file, Pointer[] ndArrays, String[] keys) {
         PointerArray array = new PointerArray(ndArrays);
-        checkCall(MxnetLibrary.INSTANCE.MXNDArraySave(file, ndArrays.length, array, keys));
+        checkCall(LIB.MXNDArraySave(file, ndArrays.length, array, keys));
     }
 
-    public static Pointer[] loadNdArray(String file) {
+    public static Pointer[] loadNdArray(String file, PointerByReference namesRef) {
         IntBuffer size = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         IntBuffer namesSize = IntBuffer.allocate(1);
-        PointerByReference namesRef = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayLoad(file, size, ref, namesSize, namesRef));
+        checkCall(LIB.MXNDArrayLoad(file, size, ref, namesSize, namesRef));
 
-        return ref.getValue().getPointerArray(0, size.get());
+        int ndArrayCount = size.get();
+        int nameCount = namesSize.get();
+        if (ndArrayCount != nameCount) {
+            throw new IllegalStateException(
+                    "Mismatch between names and arrays in checkpoint file: " + file);
+        }
+
+        return ref.getValue().getPointerArray(0, ndArrayCount);
     }
 
     public static ByteBuffer readBytes(Pointer ndArray) {
         NativeSizeByReference size = new NativeSizeByReference();
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXNDArraySaveRawBytes(ndArray, size, ref));
+        checkCall(LIB.MXNDArraySaveRawBytes(ndArray, size, ref));
 
         return ref.getValue().getByteBuffer(0, size.getValue().longValue());
     }
 
     public static void freeNdArray(Pointer ndArray) {
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayFree(ndArray));
+        checkCall(LIB.MXNDArrayFree(ndArray));
     }
 
     public static void waitToRead(Pointer ndArray) {
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayWaitToRead(ndArray));
+        checkCall(LIB.MXNDArrayWaitToRead(ndArray));
     }
 
     public static void waitToWrite(Pointer ndArray) {
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayWaitToWrite(ndArray));
+        checkCall(LIB.MXNDArrayWaitToWrite(ndArray));
     }
 
     public static void waitAll() {
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayWaitAll());
+        checkCall(LIB.MXNDArrayWaitAll());
     }
 
     public static void syncCopyToCPU(Pointer ndArray, Pointer data, int len) {
         NativeSize size = new NativeSize(len);
-        checkCall(MxnetLibrary.INSTANCE.MXNDArraySyncCopyToCPU(ndArray, data, size));
+        checkCall(LIB.MXNDArraySyncCopyToCPU(ndArray, data, size));
     }
 
     public static void syncCopyFromCPU(Pointer ndArray, Buffer data) {
         NativeSize size = new NativeSize(data.remaining());
         Pointer pointer = Native.getDirectBufferPointer(data);
-        checkCall(MxnetLibrary.INSTANCE.MXNDArraySyncCopyFromCPU(ndArray, pointer, size));
+        checkCall(LIB.MXNDArraySyncCopyFromCPU(ndArray, pointer, size));
     }
 
     public static void imperativeInvoke(
@@ -358,70 +365,70 @@ public final class JnaUtils {
         size.put(0, 1);
 
         checkCall(
-                MxnetLibrary.INSTANCE.MXImperativeInvoke(
+                LIB.MXImperativeInvoke(
                         function, 1, inputs, size, destRef, keys.length, keys, values));
     }
 
     public static StorageType getStorageType(Pointer ndArray) {
         IntBuffer type = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayGetStorageType(ndArray, type));
+        checkCall(LIB.MXNDArrayGetStorageType(ndArray, type));
         return StorageType.fromValue(type.get());
     }
 
     public static Context getContext(Pointer ndArray) {
         IntBuffer deviceType = IntBuffer.allocate(1);
         IntBuffer deviceId = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayGetContext(ndArray, deviceType, deviceId));
+        checkCall(LIB.MXNDArrayGetContext(ndArray, deviceType, deviceId));
         return new Context(Context.DeviceType.fromValue(deviceType.get(0)), deviceId.get(0));
     }
 
     public static Shape getShape(Pointer ndArray) {
         IntBuffer dim = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayGetShape(ndArray, dim, ref));
+        checkCall(LIB.MXNDArrayGetShape(ndArray, dim, ref));
         int[] shape = ref.getValue().getIntArray(0, dim.get());
         return new Shape(shape);
     }
 
     public static DataType getDataType(Pointer ndArray) {
         IntBuffer dataType = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayGetDType(ndArray, dataType));
+        checkCall(LIB.MXNDArrayGetDType(ndArray, dataType));
         return DataType.values()[dataType.get()];
     }
 
     public static DataType getAuxType(Pointer ndArray, int index) {
         IntBuffer dataType = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayGetAuxType(ndArray, index, dataType));
+        checkCall(LIB.MXNDArrayGetAuxType(ndArray, index, dataType));
         return DataType.values()[dataType.get()];
     }
 
     public static Pointer getAuxNdArray(Pointer ndArray, int index) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayGetAuxNDArray(ndArray, index, ref));
+        checkCall(LIB.MXNDArrayGetAuxNDArray(ndArray, index, ref));
         return ref.getValue();
     }
 
     public static Pointer getDataNdArray(Pointer ndArray) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayGetDataNDArray(ndArray, ref));
+        checkCall(LIB.MXNDArrayGetDataNDArray(ndArray, ref));
         return ref.getValue();
     }
 
     public static Pointer getGrad(Pointer ndArray) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayGetGrad(ndArray, ref));
+        checkCall(LIB.MXNDArrayGetGrad(ndArray, ref));
         return ref.getValue();
     }
 
     public static Pointer ndArrayAt(Pointer ndArray, int index) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXNDArrayAt(ndArray, index, ref));
+        checkCall(LIB.MXNDArrayAt(ndArray, index, ref));
         return ref.getValue();
     }
 
     public static Pointer slice(Pointer ndArray, int begin, int end) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXNDArraySlice(ndArray, begin, end, ref));
+        checkCall(LIB.MXNDArraySlice(ndArray, begin, end, ref));
         return ref.getValue();
     }
 
@@ -525,7 +532,7 @@ public final class JnaUtils {
 
     public static Pointer getSymbolOutput(Pointer symbol, int index) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolGetOutput(symbol, index, ref));
+        checkCall(LIB.MXSymbolGetOutput(symbol, index, ref));
         return ref.getValue();
     }
 
@@ -533,41 +540,41 @@ public final class JnaUtils {
         IntBuffer size = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
 
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolListOutputs(symbol, size, ref));
+        checkCall(LIB.MXSymbolListOutputs(symbol, size, ref));
 
         return toStringArray(ref, size.get());
     }
 
     public static String symbolToJson(Pointer symbol) {
         String[] out = new String[1];
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolSaveToJSON(symbol, out));
+        checkCall(LIB.MXSymbolSaveToJSON(symbol, out));
         return out[0];
     }
 
     public static void freeSymbol(Pointer symbol) {
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolFree(symbol));
+        checkCall(LIB.MXSymbolFree(symbol));
     }
 
     public static void saveSymbol(Pointer symbol, String path) {
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolSaveToFile(symbol, path));
+        checkCall(LIB.MXSymbolSaveToFile(symbol, path));
     }
 
     public static Pointer copySymbol(Pointer symbol) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolCopy(symbol, ref));
+        checkCall(LIB.MXSymbolCopy(symbol, ref));
         return ref.getValue();
     }
 
     public static String getSymbolDebugString(Pointer symbol) {
         String[] out = new String[1];
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolPrint(symbol, out));
+        checkCall(LIB.MXSymbolPrint(symbol, out));
         return out[0];
     }
 
     public static String getSymbolName(Pointer symbol) {
         String[] out = new String[1];
         IntBuffer success = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolGetName(symbol, out, success));
+        checkCall(LIB.MXSymbolGetName(symbol, out, success));
         if (success.get() == 1) {
             return out[0];
         }
@@ -577,7 +584,7 @@ public final class JnaUtils {
     public static String getSymbolAttr(Pointer symbol, String key) {
         String[] out = new String[1];
         IntBuffer success = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolGetAttr(symbol, key, out, success));
+        checkCall(LIB.MXSymbolGetAttr(symbol, key, out, success));
         if (success.get() == 1) {
             return out[0];
         }
@@ -585,14 +592,14 @@ public final class JnaUtils {
     }
 
     public static void setSymbolAttr(Pointer symbol, String key, String value) {
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolSetAttr(symbol, key, value));
+        checkCall(LIB.MXSymbolSetAttr(symbol, key, value));
     }
 
     public static PairList<String, String> listSymbolAttr(Pointer symbol) {
         IntBuffer size = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
 
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolListAttr(symbol, size, ref));
+        checkCall(LIB.MXSymbolListAttr(symbol, size, ref));
 
         return toPairList(ref, size.get());
     }
@@ -601,7 +608,7 @@ public final class JnaUtils {
         IntBuffer size = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
 
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolListAttrShallow(symbol, size, ref));
+        checkCall(LIB.MXSymbolListAttrShallow(symbol, size, ref));
 
         return toPairList(ref, size.get());
     }
@@ -610,26 +617,26 @@ public final class JnaUtils {
         IntBuffer size = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
 
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolListArguments(symbol, size, ref));
+        checkCall(LIB.MXSymbolListArguments(symbol, size, ref));
 
         return toStringArray(ref, size.get());
     }
 
     public static int getSymbolNumOutputs(Pointer symbol) {
         IntBuffer size = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolGetNumOutputs(symbol, size));
+        checkCall(LIB.MXSymbolGetNumOutputs(symbol, size));
         return size.get();
     }
 
     public static Pointer getSymbolInternals(Pointer symbol) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolGetInternals(symbol, ref));
+        checkCall(LIB.MXSymbolGetInternals(symbol, ref));
         return ref.getValue();
     }
 
     public static String getSymbolChildren(Pointer symbol) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolGetChildren(symbol, ref));
+        checkCall(LIB.MXSymbolGetChildren(symbol, ref));
         return ref.getValue().getString(0);
     }
 
@@ -637,7 +644,7 @@ public final class JnaUtils {
         IntBuffer size = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
 
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolListAuxiliaryStates(symbol, size, ref));
+        checkCall(LIB.MXSymbolListAuxiliaryStates(symbol, size, ref));
 
         return toStringArray(ref, size.get());
     }
@@ -646,7 +653,7 @@ public final class JnaUtils {
         IntBuffer outSize = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
 
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolListAtomicSymbolCreators(outSize, ref));
+        checkCall(LIB.MXSymbolListAtomicSymbolCreators(outSize, ref));
 
         int size = outSize.get();
         return ref.getValue().getPointerArray(0, size);
@@ -654,21 +661,21 @@ public final class JnaUtils {
 
     public static String getAtomicSymbolName(Pointer symbol) {
         String[] ret = new String[1];
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolGetAtomicSymbolName(symbol, ret));
+        checkCall(LIB.MXSymbolGetAtomicSymbolName(symbol, ret));
         return ret[0];
     }
 
     public static String getInputSymbols(Pointer symbol) {
         IntBuffer size = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolGetInputSymbols(symbol, ref, size));
+        checkCall(LIB.MXSymbolGetInputSymbols(symbol, ref, size));
         return ref.getValue().getString(0);
     }
 
     public static String cutSubgraph(Pointer symbol) {
         IntBuffer inputSize = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolCutSubgraph(symbol, ref, inputSize));
+        checkCall(LIB.MXSymbolCutSubgraph(symbol, ref, inputSize));
         return ref.getValue().getString(0);
     }
 
@@ -682,7 +689,7 @@ public final class JnaUtils {
         String[] keyVarNumArgs = new String[1];
         String[] returnType = new String[1];
         checkCall(
-                MxnetLibrary.INSTANCE.MXSymbolGetAtomicSymbolInfo(
+                LIB.MXSymbolGetAtomicSymbolInfo(
                         symbol,
                         nameRef,
                         description,
@@ -696,48 +703,46 @@ public final class JnaUtils {
 
     public static Pointer createAtomicSymbol(Pointer symbol, String[] keys, String[] values) {
         PointerByReference ref = new PointerByReference();
-        checkCall(
-                MxnetLibrary.INSTANCE.MXSymbolCreateAtomicSymbol(
-                        symbol, keys.length, keys, values, ref));
+        checkCall(LIB.MXSymbolCreateAtomicSymbol(symbol, keys.length, keys, values, ref));
         return ref.getValue();
     }
 
     public static Pointer createVariable(String name) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolCreateVariable(name, ref));
+        checkCall(LIB.MXSymbolCreateVariable(name, ref));
         return ref.getValue();
     }
 
     public static Pointer createGroup(int numOfSymbols, Pointer symbols) {
         PointerByReference symbolsRef = new PointerByReference(symbols);
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolCreateGroup(numOfSymbols, symbolsRef, ref));
+        checkCall(LIB.MXSymbolCreateGroup(numOfSymbols, symbolsRef, ref));
         return ref.getValue();
     }
 
     public static Pointer createSymbolFromFile(String path) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolCreateFromFile(path, ref));
+        checkCall(LIB.MXSymbolCreateFromFile(path, ref));
         return ref.getValue();
     }
 
     public static Pointer createSymbolFromJson(String json) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolCreateFromJSON(json, ref));
+        checkCall(LIB.MXSymbolCreateFromJSON(json, ref));
         return ref.getValue();
     }
 
     public static Pointer compose(Pointer symbol, String name, String[] keys) {
         PointerByReference ref = new PointerByReference();
 
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolCompose(symbol, name, keys.length, keys, ref));
+        checkCall(LIB.MXSymbolCompose(symbol, name, keys.length, keys, ref));
         return ref.getValue();
     }
 
     public static Pointer grad(Pointer symbol, String name, int numWrt, String[] wrt) {
         PointerByReference ref = new PointerByReference();
 
-        checkCall(MxnetLibrary.INSTANCE.MXSymbolCompose(symbol, name, numWrt, wrt, ref));
+        checkCall(LIB.MXSymbolCompose(symbol, name, numWrt, wrt, ref));
         return ref.getValue();
     }
 
@@ -756,7 +761,7 @@ public final class JnaUtils {
         IntBuffer complete = IntBuffer.allocate(1);
 
         checkCall(
-                MxnetLibrary.INSTANCE.MXSymbolInferShape(
+                LIB.MXSymbolInferShape(
                         symbol,
                         keys.length,
                         keys,
@@ -793,7 +798,7 @@ public final class JnaUtils {
         IntBuffer complete = IntBuffer.allocate(1);
 
         checkCall(
-                MxnetLibrary.INSTANCE.MXSymbolInferShapePartial(
+                LIB.MXSymbolInferShapePartial(
                         symbol,
                         numArgs,
                         keys,
@@ -826,7 +831,7 @@ public final class JnaUtils {
         IntBuffer complete = IntBuffer.allocate(1);
 
         checkCall(
-                MxnetLibrary.INSTANCE.MXSymbolInferType(
+                LIB.MXSymbolInferType(
                         symbol,
                         keys.length,
                         keys,
@@ -852,7 +857,7 @@ public final class JnaUtils {
             byte calibQuantize) {
         PointerByReference ref = new PointerByReference();
         checkCall(
-                MxnetLibrary.INSTANCE.MXQuantizeSymbol(
+                LIB.MXQuantizeSymbol(
                         symbol,
                         ref,
                         excludedSymbols.length,
@@ -871,14 +876,14 @@ public final class JnaUtils {
             FloatBuffer highQuantiles) {
         PointerByReference ref = new PointerByReference();
         checkCall(
-                MxnetLibrary.INSTANCE.MXSetCalibTableToQuantizedSymbol(
+                LIB.MXSetCalibTableToQuantizedSymbol(
                         symbol, layerNames.length, layerNames, lowQuantiles, highQuantiles, ref));
         return ref.getValue();
     }
 
     public static Pointer genBackendSubgraph(Pointer symbol, String backend) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXGenBackendSubgraph(symbol, backend, ref));
+        checkCall(LIB.MXGenBackendSubgraph(symbol, backend, ref));
         return ref.getValue();
     }
 
@@ -887,36 +892,35 @@ public final class JnaUtils {
     /////////////////////////////////
 
     public static void freeExecutor(Pointer executor) {
-        checkCall(MxnetLibrary.INSTANCE.MXExecutorFree(executor));
+        checkCall(LIB.MXExecutorFree(executor));
     }
 
     public static String getExecutorDebugString(Pointer executor) {
         String[] ret = new String[1];
-        checkCall(MxnetLibrary.INSTANCE.MXExecutorPrint(executor, ret));
+        checkCall(LIB.MXExecutorPrint(executor, ret));
         return ret[0];
     }
 
     public static void forward(Pointer executor, boolean isTrain) {
-        checkCall(MxnetLibrary.INSTANCE.MXExecutorForward(executor, isTrain ? 1 : 0));
+        checkCall(LIB.MXExecutorForward(executor, isTrain ? 1 : 0));
     }
 
     public static Pointer backward(Pointer executor, int length) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXExecutorBackward(executor, length, ref));
+        checkCall(LIB.MXExecutorBackward(executor, length, ref));
         return ref.getValue();
     }
 
     public static Pointer backwardEx(Pointer executor, int length, boolean isTrain) {
         PointerByReference ref = new PointerByReference();
-        checkCall(
-                MxnetLibrary.INSTANCE.MXExecutorBackwardEx(executor, length, ref, isTrain ? 1 : 0));
+        checkCall(LIB.MXExecutorBackwardEx(executor, length, ref, isTrain ? 1 : 0));
         return ref.getValue();
     }
 
     public static NdArray[] getExecutorOutputs(ResourceAllocator alloc, Pointer executor) {
         IntBuffer outSize = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXExecutorOutputs(executor, outSize, ref));
+        checkCall(LIB.MXExecutorOutputs(executor, outSize, ref));
         int size = outSize.get();
         Pointer[] pointers = ref.getValue().getPointerArray(0, size);
         NdArray[] ndArrays = new NdArray[size];
@@ -924,6 +928,76 @@ public final class JnaUtils {
             ndArrays[i] = new NdArray(alloc, pointers[i]);
         }
         return ndArrays;
+    }
+
+    public static Pointer bindExecutorSimple(
+            Symbol symbol,
+            Context context,
+            String[] g2cKeys,
+            int[] g2cDeviceTypes,
+            int[] g2cDeviceIds,
+            String[] argParams,
+            String[] argParamGradReqs,
+            String[] inputArgNames,
+            IntBuffer inputShapeData,
+            IntBuffer inputShapeIdx,
+            String[] inputDataTypeNames,
+            int[] inputDataTypes,
+            String[] inputStorageTypeNames,
+            int[] inputStorageTypes,
+            String[] sharedArgParams,
+            IntBuffer sharedBufferLen,
+            String[] sharedBufferNames,
+            PointerByReference sharedBufferHandles,
+            PointerByReference updatedSharedBufferNames,
+            PointerByReference updatedSharedBufferHandles,
+            IntBuffer numInArgs,
+            PointerByReference inArgs,
+            PointerByReference argGrads,
+            IntBuffer numAuxStates,
+            PointerByReference auxStates) {
+        int deviceId = context.getDeviceId();
+        int deviceType = context.getDeviceType().getType();
+
+        PointerByReference ref = new PointerByReference();
+
+        checkCall(
+                LIB.MXExecutorSimpleBind(
+                        symbol.getHandle(),
+                        deviceType,
+                        deviceId,
+                        g2cKeys == null ? 0 : g2cKeys.length,
+                        g2cKeys,
+                        g2cDeviceTypes,
+                        g2cDeviceIds,
+                        argParams.length,
+                        argParams,
+                        argParamGradReqs,
+                        inputArgNames.length,
+                        inputArgNames,
+                        inputShapeData.array(),
+                        inputShapeIdx.array(),
+                        inputDataTypeNames.length,
+                        inputDataTypeNames,
+                        inputDataTypes,
+                        inputStorageTypeNames == null ? 0 : inputStorageTypeNames.length,
+                        inputStorageTypeNames,
+                        inputStorageTypes,
+                        sharedArgParams.length,
+                        sharedArgParams,
+                        sharedBufferLen,
+                        sharedBufferNames,
+                        sharedBufferHandles,
+                        updatedSharedBufferNames,
+                        updatedSharedBufferHandles,
+                        numInArgs,
+                        inArgs,
+                        argGrads,
+                        numAuxStates,
+                        auxStates,
+                        null,
+                        ref));
+        return ref.getValue();
     }
 
     public static Pointer bindExecutor(
@@ -936,7 +1010,7 @@ public final class JnaUtils {
         PointerByReference auxStates = new PointerByReference();
         PointerByReference ref = new PointerByReference();
         checkCall(
-                MxnetLibrary.INSTANCE.MXExecutorBind(
+                LIB.MXExecutorBind(
                         executor,
                         deviceType,
                         deviceId,
@@ -966,7 +1040,7 @@ public final class JnaUtils {
         PointerByReference auxStates = new PointerByReference();
         PointerByReference ref = new PointerByReference();
         checkCall(
-                MxnetLibrary.INSTANCE.MXExecutorBindX(
+                LIB.MXExecutorBindX(
                         executor,
                         deviceType,
                         deviceId,
@@ -1001,7 +1075,7 @@ public final class JnaUtils {
         PointerByReference auxStates = new PointerByReference();
         PointerByReference ref = new PointerByReference();
         checkCall(
-                MxnetLibrary.INSTANCE.MXExecutorBindEX(
+                LIB.MXExecutorBindEX(
                         executor,
                         deviceType,
                         deviceId,
@@ -1040,7 +1114,7 @@ public final class JnaUtils {
         int deviceType = context.getDeviceType().getType();
         PointerByReference ref = new PointerByReference();
         checkCall(
-                MxnetLibrary.INSTANCE.MXExecutorReshape(
+                LIB.MXExecutorReshape(
                         partialShaping ? 1 : 0,
                         allowUpSizing ? 1 : 0,
                         deviceType,
@@ -1065,7 +1139,7 @@ public final class JnaUtils {
 
     public static Pointer getOptimizedSymbol(Pointer executor) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXExecutorGetOptimizedSymbol(executor, ref));
+        checkCall(LIB.MXExecutorGetOptimizedSymbol(executor, ref));
         return ref.getValue();
     }
 
@@ -1073,9 +1147,7 @@ public final class JnaUtils {
             Pointer executor,
             MxnetLibrary.ExecutorMonitorCallback callback,
             Pointer callbackHandle) {
-        checkCall(
-                MxnetLibrary.INSTANCE.MXExecutorSetMonitorCallback(
-                        executor, callback, callbackHandle));
+        checkCall(LIB.MXExecutorSetMonitorCallback(executor, callback, callbackHandle));
     }
 
     /////////////////////////////////
@@ -1085,13 +1157,13 @@ public final class JnaUtils {
     public static Pointer[] listDataIters() {
         IntBuffer outSize = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXListDataIters(outSize, ref));
+        checkCall(LIB.MXListDataIters(outSize, ref));
         return ref.getValue().getPointerArray(0, outSize.get());
     }
 
     public static Pointer createIter(Pointer iter, String[] keys, String[] values) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXDataIterCreateIter(iter, keys.length, keys, values, ref));
+        checkCall(LIB.MXDataIterCreateIter(iter, keys.length, keys, values, ref));
         return ref.getValue();
     }
 
@@ -1103,47 +1175,47 @@ public final class JnaUtils {
         PointerByReference argTypes = new PointerByReference();
         PointerByReference argDesc = new PointerByReference();
         checkCall(
-                MxnetLibrary.INSTANCE.MXDataIterGetIterInfo(
+                LIB.MXDataIterGetIterInfo(
                         iter, name, description, numArgs, argNames, argTypes, argDesc));
         return name[0];
     }
 
     public static void freeDataIter(Pointer iter) {
-        checkCall(MxnetLibrary.INSTANCE.MXDataIterFree(iter));
+        checkCall(LIB.MXDataIterFree(iter));
     }
 
     public static int next(Pointer iter) {
         IntBuffer ret = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXDataIterNext(iter, ret));
+        checkCall(LIB.MXDataIterNext(iter, ret));
         return ret.get();
     }
 
     public static void beforeFirst(Pointer iter) {
-        checkCall(MxnetLibrary.INSTANCE.MXDataIterBeforeFirst(iter));
+        checkCall(LIB.MXDataIterBeforeFirst(iter));
     }
 
     public static Pointer getData(Pointer iter) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXDataIterGetData(iter, ref));
+        checkCall(LIB.MXDataIterGetData(iter, ref));
         return ref.getValue();
     }
 
     public static Pointer getIndex(Pointer iter) {
         LongBuffer outSize = LongBuffer.wrap(new long[1]);
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXDataIterGetIndex(iter, ref, outSize));
+        checkCall(LIB.MXDataIterGetIndex(iter, ref, outSize));
         return ref.getValue();
     }
 
     public static int getPadNum(Pointer iter) {
         IntBuffer outSize = IntBuffer.allocate(1);
-        checkCall(MxnetLibrary.INSTANCE.MXDataIterGetPadNum(iter, outSize));
+        checkCall(LIB.MXDataIterGetPadNum(iter, outSize));
         return outSize.get();
     }
 
     public static String getDataIterLabel(Pointer iter) {
         PointerByReference ref = new PointerByReference();
-        checkCall(MxnetLibrary.INSTANCE.MXDataIterGetLabel(iter, ref));
+        checkCall(LIB.MXDataIterGetLabel(iter, ref));
         return ref.getValue().getString(0);
     }
 
@@ -1313,7 +1385,7 @@ public final class JnaUtils {
 
         PointerByReference ref = new PointerByReference();
         checkCall(
-                MxnetLibrary.INSTANCE.MXPredCreate(
+                LIB.MXPredCreate(
                         symbol,
                         Native.getDirectBufferPointer(parameter),
                         parameter.remaining(),
@@ -1329,35 +1401,34 @@ public final class JnaUtils {
     }
 
     public static void setPredictorInput(Pointer predictor, String inputName, FloatBuffer data) {
-        checkCall(
-                MxnetLibrary.INSTANCE.MXPredSetInput(predictor, inputName, data, data.remaining()));
+        checkCall(LIB.MXPredSetInput(predictor, inputName, data, data.remaining()));
     }
 
     public static void predictorForward(Pointer predictor) {
-        checkCall(MxnetLibrary.INSTANCE.MXPredForward(predictor));
+        checkCall(LIB.MXPredForward(predictor));
     }
 
     public static FloatBuffer getPredictorOutput(Pointer predictor) {
         PointerByReference shapeRef = new PointerByReference();
         IntBuffer size = IntBuffer.allocate(1);
 
-        checkCall(MxnetLibrary.INSTANCE.MXPredGetOutputShape(predictor, 0, shapeRef, size));
+        checkCall(LIB.MXPredGetOutputShape(predictor, 0, shapeRef, size));
 
         int count = size.get();
         Shape shape = new Shape(shapeRef.getValue().getIntArray(0, count));
 
         FloatBuffer data = FloatBuffer.allocate(shape.product());
-        checkCall(MxnetLibrary.INSTANCE.MXPredGetOutput(predictor, 0, data, data.remaining()));
+        checkCall(LIB.MXPredGetOutput(predictor, 0, data, data.remaining()));
 
         return data;
     }
 
     public static void freePredictor(Pointer predictor) {
-        checkCall(MxnetLibrary.INSTANCE.MXPredFree(predictor));
+        checkCall(LIB.MXPredFree(predictor));
     }
 
     public static void freeNdArrayList(Pointer ndList) {
-        checkCall(MxnetLibrary.INSTANCE.MXNDListFree(ndList));
+        checkCall(LIB.MXNDListFree(ndList));
     }
 
     public static void checkCall(int ret) {
@@ -1367,7 +1438,7 @@ public final class JnaUtils {
     }
 
     private static String getLastError() {
-        return MxnetLibrary.INSTANCE.MXGetLastError();
+        return LIB.MXGetLastError();
     }
 
     public static List<String> readLines(File file) throws IOException {

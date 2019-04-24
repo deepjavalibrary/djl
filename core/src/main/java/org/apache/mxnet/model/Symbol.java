@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.mxnet.Context;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.types.DataType;
 import org.apache.mxnet.types.GradReq;
 import org.apache.mxnet.types.StorageType;
@@ -246,9 +245,6 @@ public class Symbol extends NativeResource {
         for (int i = 0; i < contexts.size(); ++i) {
             Context context = contexts.get(i);
 
-            int deviceId = context.getDeviceId();
-            int deviceType = context.getDeviceType().getType();
-
             PointerByReference updatedSharedBufferNames = new PointerByReference();
             PointerByReference updatedSharedBufferHandles = new PointerByReference();
 
@@ -257,31 +253,23 @@ public class Symbol extends NativeResource {
             PointerByReference argGrads = new PointerByReference();
             IntBuffer numAuxStates = IntBuffer.allocate(1);
             PointerByReference auxStates = new PointerByReference();
-            PointerByReference ref = new PointerByReference();
 
-            JnaUtils.checkCall(
-                    MxnetLibrary.INSTANCE.MXExecutorSimpleBind(
-                            getHandle(),
-                            deviceType,
-                            deviceId,
-                            g2cKeys == null ? 0 : g2cKeys.length,
+            Pointer pointer =
+                    JnaUtils.bindExecutorSimple(
+                            this,
+                            context,
                             g2cKeys,
                             g2cDeviceTypes,
                             g2cDeviceIds,
-                            argParams.length,
                             argParams,
                             argParamGradReqs,
-                            inputArgNames.length,
                             inputArgNames,
-                            inputShapeData.array(),
-                            inputShapeIdx.array(),
-                            inputDataTypeNames.length,
+                            inputShapeData,
+                            inputShapeIdx,
                             inputDataTypeNames,
                             inputDataTypes,
-                            inputStorageTypeNames == null ? 0 : inputStorageTypeNames.length,
                             inputStorageTypeNames,
                             inputStorageTypes,
-                            sharedArgParams.length,
                             sharedArgParams,
                             sharedBufferLen,
                             sharedBufferNames,
@@ -292,9 +280,7 @@ public class Symbol extends NativeResource {
                             inArgs,
                             argGrads,
                             numAuxStates,
-                            auxStates,
-                            null,
-                            ref));
+                            auxStates);
 
             // update shared buffer
             int updatedSize = sharedBufferLen.get(0);
@@ -350,7 +336,6 @@ public class Symbol extends NativeResource {
                 }
             }
 
-            Pointer pointer = ref.getValue();
             NdArray[] out = JnaUtils.getExecutorOutputs(alloc, pointer);
 
             executors[i] =

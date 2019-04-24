@@ -19,7 +19,6 @@ package org.apache.mxnet;
 
 import com.sun.jna.Native;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +26,7 @@ import org.apache.mxnet.image.Image;
 import org.apache.mxnet.inferernce.ObjectDetector;
 import org.apache.mxnet.inferernce.ObjectDetectorOutput;
 import org.apache.mxnet.jna.JnaException;
+import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.model.DataDesc;
 import org.apache.mxnet.model.MxModel;
 import org.apache.mxnet.model.ResourceAllocator;
@@ -61,26 +61,12 @@ public final class SSDClassifierExample {
         if (!Native.isProtected()) {
             System.out.println("Protection not supported.");
         }
-        String userHome = System.getProperty("user.home");
-        String jnaLib = System.getProperty("jna.library.path");
-        if (jnaLib == null) {
-            if (new File(userHome, "/source/mxnet/release/libmxnet.so").exists()) {
-                System.setProperty("jna.library.path", userHome + "/source/mxnet/release");
-            } else if (new File("/usr/local/lib/python2.7/site-packages/mxnet/libmxnet.so")
-                    .exists()) {
-                System.setProperty(
-                        "jna.library.path", "/usr/local/lib/python2.7/site-packages/mxnet");
-            } else if (new File("/usr/local/lib/python3.7/site-packages/mxnet/libmxnet.so")
-                    .exists()) {
-                System.setProperty(
-                        "jna.library.path", "/usr/local/lib/python3.7/site-packages/mxnet");
-            } else {
-                System.err.println(
-                        "Please use -Djna.library.path= to specify libmxnet.so file location.");
-                return;
-            }
-        }
+        long init = System.nanoTime();
+        System.out.println("Loading native library: " + JnaUtils.getVersion());
+        long loaded = System.nanoTime();
+        System.out.printf("loadlibrary = %.3f ms.%n", (loaded - init) / 1000000f);
 
+        String userHome = System.getProperty("user.home");
         String modelPathPrefix = userHome + "/source/ptest/squeezenet_v1.1";
         String inputImagePath = userHome + "/source/ptest/kitten.jpg";
 

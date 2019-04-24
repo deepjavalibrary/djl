@@ -31,7 +31,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.image.Image;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.model.DataDesc;
 import org.apache.mxnet.model.MxModel;
 import org.apache.mxnet.model.Shape;
@@ -48,26 +47,6 @@ public final class PredictApiTesting {
             DefaultParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args, null, false);
             Arguments arguments = new Arguments(cmd);
-
-            String userHome = System.getProperty("user.home");
-            String jnaLib = System.getProperty("jna.library.path");
-            if (jnaLib == null) {
-                if (new File(userHome, "/source/mxnet/release/libmxnet.so").exists()) {
-                    System.setProperty("jna.library.path", userHome + "/source/mxnet/release");
-                } else if (new File("/usr/local/lib/python2.7/site-packages/mxnet/libmxnet.so")
-                        .exists()) {
-                    System.setProperty(
-                            "jna.library.path", "/usr/local/lib/python2.7/site-packages/mxnet");
-                } else if (new File("/usr/local/lib/python3.7/site-packages/mxnet/libmxnet.so")
-                        .exists()) {
-                    System.setProperty(
-                            "jna.library.path", "/usr/local/lib/python3.7/site-packages/mxnet");
-                } else {
-                    System.err.println(
-                            "Please use -Djna.library.path= to specify libmxnet.so file location.");
-                    return;
-                }
-            }
 
             String modelDir = arguments.getModelDir();
             String modelName = arguments.getModelName();
@@ -97,7 +76,7 @@ public final class PredictApiTesting {
             FloatBuffer data = Image.toDirectBuffer(image);
 
             long init = System.nanoTime();
-            System.out.println("Loading native library: " + MxnetLibrary.JNA_NATIVE_LIB.getName());
+            System.out.println("Loading native library: " + JnaUtils.getVersion());
             long loaded = System.nanoTime();
             System.out.printf("loadlibrary = %.3f ms.%n", (loaded - init) / 1000000f);
 
