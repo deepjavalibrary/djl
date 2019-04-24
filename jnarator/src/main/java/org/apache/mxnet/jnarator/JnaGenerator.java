@@ -202,8 +202,6 @@ public class JnaGenerator {
 
             writer.append("import com.sun.jna.Callback;\n");
             writer.append("import com.sun.jna.Library;\n");
-            writer.append("import com.sun.jna.Native;\n");
-            writer.append("import com.sun.jna.NativeLibrary;\n");
             writer.append("import com.sun.jna.Pointer;\n");
             writer.append("import com.sun.jna.ptr.PointerByReference;\n");
             writer.append("import java.nio.ByteBuffer;\n");
@@ -212,12 +210,6 @@ public class JnaGenerator {
             writer.append("import java.nio.LongBuffer;\n");
 
             writer.append("\npublic interface ").append(className).append(" extends Library {\n\n");
-            writer.append("    String JNA_LIBRARY_NAME = \"").append(libName).append("\";\n");
-            writer.append(
-                    "    NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(JNA_LIBRARY_NAME);\n");
-            writer.append("    MxnetLibrary INSTANCE = (").append(className);
-            writer.append(") Native.loadLibrary(JNA_LIBRARY_NAME, ");
-            writer.append(className).append(".class);\n");
 
             for (Map.Entry<String, List<String>> entry : enumMap.entrySet()) {
                 String name = entry.getKey();
