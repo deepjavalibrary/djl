@@ -46,6 +46,10 @@ configure(javaProjects()) {
         options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static" << "-Werror"
     }
 
+    compileTestJava {
+        options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static" << "-Werror"
+    }
+
     jacocoTestCoverageVerification {
         violationRules {
             rule {
