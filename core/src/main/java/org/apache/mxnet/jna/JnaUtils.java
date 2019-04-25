@@ -96,7 +96,8 @@ public final class JnaUtils {
         return map;
     }
 
-    public static FunctionInfo getFunctionByName(String name, String functionName, Pointer handle) {
+    private static FunctionInfo getFunctionByName(
+            String name, String functionName, Pointer handle) {
         String[] nameRef = new String[] {name};
         String[] description = new String[1];
         IntBuffer numArgs = IntBuffer.allocate(1);
@@ -165,6 +166,10 @@ public final class JnaUtils {
     }
 
     public static long[] getGpuMemory(Context context) {
+        if (context.getDeviceType() != Context.DeviceType.GPU) {
+            throw new IllegalArgumentException("Only GPU context is allowed.");
+        }
+
         int deviceId = context.getDeviceId();
         long[] ret = new long[2];
 
