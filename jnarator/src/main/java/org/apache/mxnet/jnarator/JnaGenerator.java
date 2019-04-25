@@ -117,7 +117,7 @@ public class JnaGenerator {
                 writer.append("    }\n");
 
                 writer.append("\n    @Override\n");
-                writer.append("    protected List<?> getFieldOrder() {\n");
+                writer.append("    protected List<String> getFieldOrder() {\n");
                 switch (fieldNames.size()) {
                     case 0:
                         writer.append("        return Collections.emptyList();\n");

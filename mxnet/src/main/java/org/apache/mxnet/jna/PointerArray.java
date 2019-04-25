@@ -13,15 +13,16 @@
 package org.apache.mxnet.jna;
 
 import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 public class PointerArray extends Memory {
 
     public PointerArray(Pointer... arg) {
-        super(Pointer.SIZE * (arg.length + 1));
+        super(Native.POINTER_SIZE * (arg.length + 1));
         for (int i = 0; i < arg.length; i++) {
-            setPointer(i * Pointer.SIZE, arg[i]);
+            setPointer(i * Native.POINTER_SIZE, arg[i]);
         }
-        setPointer(Pointer.SIZE * arg.length, null);
+        setPointer(Native.POINTER_SIZE * arg.length, null);
     }
 }

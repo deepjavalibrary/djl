@@ -54,7 +54,7 @@ final class LibUtils {
         }
         logger.debug("Loading mxnet library from: {}", libName);
 
-        return (MxnetLibrary) Native.loadLibrary(libName, MxnetLibrary.class);
+        return Native.load(libName, MxnetLibrary.class);
     }
 
     private static synchronized String findLibraryInClasspath() {
