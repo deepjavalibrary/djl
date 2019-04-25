@@ -2,7 +2,7 @@ dependencies {
     compile "commons-cli:commons-cli:${commons_cli_version}"
     compile "commons-io:commons-io:${commons_io_version}"
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
-    compile project(":core")
+    compile project(":mxnet")
 
     testCompile "org.testng:testng:${testng_version}"
 }
@@ -19,4 +19,9 @@ jar {
     exclude "META-INF/MANIFEST*"
     exclude "META-INF//LICENSE*"
     exclude "META-INF//NOTICE*"
+}
+
+task copyDependencies(type: Copy) {
+    into "build/dependencies"
+    from configurations.runtime
 }

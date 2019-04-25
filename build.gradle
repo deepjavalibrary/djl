@@ -1,5 +1,5 @@
 allprojects {
-    group 'org.apache.mxnet'
+    group 'com.amazonaws.joule'
     version = '1.0'
 
     repositories {

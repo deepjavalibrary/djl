@@ -1,4 +1,5 @@
-rootProject.name = 'mxnet'
-include 'core'
+rootProject.name = 'joule'
+include 'api'
+include 'mxnet'
 include 'jnarator'
 include 'example'
