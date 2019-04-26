@@ -12,7 +12,7 @@
  */
 package org.apache.mxnet.inferernce;
 
-import org.apache.mxnet.model.NdArray;
+import org.apache.mxnet.engine.NdArray;
 
 public interface Predictor {
 

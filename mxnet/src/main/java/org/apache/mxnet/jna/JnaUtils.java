@@ -35,11 +35,11 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import org.apache.mxnet.Context;
-import org.apache.mxnet.model.DataDesc;
-import org.apache.mxnet.model.NdArray;
-import org.apache.mxnet.model.ResourceAllocator;
-import org.apache.mxnet.model.Shape;
-import org.apache.mxnet.model.Symbol;
+import org.apache.mxnet.engine.DataDesc;
+import org.apache.mxnet.engine.NdArray;
+import org.apache.mxnet.engine.ResourceAllocator;
+import org.apache.mxnet.engine.Shape;
+import org.apache.mxnet.engine.Symbol;
 import org.apache.mxnet.types.DataType;
 import org.apache.mxnet.types.StorageType;
 

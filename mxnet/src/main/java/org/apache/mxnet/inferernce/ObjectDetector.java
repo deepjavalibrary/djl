@@ -20,13 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.mxnet.Context;
+import org.apache.mxnet.engine.DataDesc;
+import org.apache.mxnet.engine.Module;
+import org.apache.mxnet.engine.MxModel;
+import org.apache.mxnet.engine.NdArray;
+import org.apache.mxnet.engine.ResourceAllocator;
+import org.apache.mxnet.engine.Shape;
 import org.apache.mxnet.image.Image;
-import org.apache.mxnet.model.DataDesc;
-import org.apache.mxnet.model.Module;
-import org.apache.mxnet.model.MxModel;
-import org.apache.mxnet.model.NdArray;
-import org.apache.mxnet.model.ResourceAllocator;
-import org.apache.mxnet.model.Shape;
 
 public class ObjectDetector implements Predictor {
 

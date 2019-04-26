@@ -29,14 +29,14 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.mxnet.engine.DataDesc;
+import org.apache.mxnet.engine.Module;
+import org.apache.mxnet.engine.MxModel;
+import org.apache.mxnet.engine.NdArray;
+import org.apache.mxnet.engine.ResourceAllocator;
+import org.apache.mxnet.engine.Shape;
 import org.apache.mxnet.image.Image;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.model.DataDesc;
-import org.apache.mxnet.model.Module;
-import org.apache.mxnet.model.MxModel;
-import org.apache.mxnet.model.NdArray;
-import org.apache.mxnet.model.ResourceAllocator;
-import org.apache.mxnet.model.Shape;
 import org.apache.mxnet.types.DataType;
 
 @SuppressWarnings("PMD.SystemPrintln")
