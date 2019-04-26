@@ -4,4 +4,3 @@ dependencies {
     testCompile "org.testng:testng:${testng_version}"
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
 }
-

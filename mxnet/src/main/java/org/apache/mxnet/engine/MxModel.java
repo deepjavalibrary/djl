@@ -12,6 +12,11 @@
  */
 package org.apache.mxnet.engine;
 
+import com.amazon.ai.Block;
+import com.amazon.ai.Context;
+import com.amazon.ai.Model;
+import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
@@ -22,13 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import org.apache.mxnet.Context;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.types.DataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MxModel implements AutoCloseable {
+public class MxModel implements Model, AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
@@ -190,6 +193,21 @@ public class MxModel implements AutoCloseable {
         } catch (IOException e) {
             logger.warn("Error opening synset file " + synsetFile, e);
         }
+        return null;
+    }
+
+    @Override
+    public Block getNetwork() {
+        return null;
+    }
+
+    @Override
+    public String[] getLabels() {
+        return labelNames;
+    }
+
+    @Override
+    public Shape getOutputShape() {
         return null;
     }
 }

@@ -12,12 +12,13 @@
  */
 package org.apache.mxnet.engine;
 
+import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.util.Utils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.apache.mxnet.Context;
-import org.apache.mxnet.types.GradReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

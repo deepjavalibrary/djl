@@ -12,6 +12,11 @@
  */
 package org.apache.mxnet.jna;
 
+import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.Shape;
+import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -34,14 +39,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import org.apache.mxnet.Context;
-import org.apache.mxnet.engine.DataDesc;
+import org.apache.mxnet.engine.DeviceType;
 import org.apache.mxnet.engine.NdArray;
 import org.apache.mxnet.engine.ResourceAllocator;
-import org.apache.mxnet.engine.Shape;
 import org.apache.mxnet.engine.Symbol;
-import org.apache.mxnet.types.DataType;
-import org.apache.mxnet.types.StorageType;
 
 public final class JnaUtils {
 
@@ -166,7 +167,7 @@ public final class JnaUtils {
     }
 
     public static long[] getGpuMemory(Context context) {
-        if (context.getDeviceType() != Context.DeviceType.GPU) {
+        if (!Context.gpu().getDeviceType().equals(context.getDeviceType())) {
             throw new IllegalArgumentException("Only GPU context is allowed.");
         }
 
@@ -201,8 +202,8 @@ public final class JnaUtils {
     }
 
     public static int randomSeed(int seed, Context context) {
-        Context.DeviceType type = context.getDeviceType();
-        return LIB.MXRandomSeedContext(seed, type.getType(), context.getDeviceId());
+        int deviceType = DeviceType.toDeviceType(context);
+        return LIB.MXRandomSeedContext(seed, deviceType, context.getDeviceId());
     }
 
     public static void notifyShutdown() {
@@ -273,7 +274,7 @@ public final class JnaUtils {
 
     public static Pointer createNdArray(
             Context context, Shape shape, DataType dtype, int size, boolean delayedAlloc) {
-        int deviceType = context.getDeviceType().getType();
+        int deviceType = DeviceType.toDeviceType(context);
         int deviceId = context.getDeviceId();
         int delay = delayedAlloc ? 1 : 0;
 
@@ -374,17 +375,17 @@ public final class JnaUtils {
                         function, 1, inputs, size, destRef, keys.length, keys, values));
     }
 
-    public static StorageType getStorageType(Pointer ndArray) {
+    public static SparseFormat getStorageType(Pointer ndArray) {
         IntBuffer type = IntBuffer.allocate(1);
         checkCall(LIB.MXNDArrayGetStorageType(ndArray, type));
-        return StorageType.fromValue(type.get());
+        return SparseFormat.fromValue(type.get());
     }
 
     public static Context getContext(Pointer ndArray) {
         IntBuffer deviceType = IntBuffer.allocate(1);
         IntBuffer deviceId = IntBuffer.allocate(1);
         checkCall(LIB.MXNDArrayGetContext(ndArray, deviceType, deviceId));
-        return new Context(Context.DeviceType.fromValue(deviceType.get(0)), deviceId.get(0));
+        return new Context(DeviceType.fromDeviceType(deviceType.get(0)), deviceId.get(0));
     }
 
     public static Shape getShape(Pointer ndArray) {
@@ -962,7 +963,7 @@ public final class JnaUtils {
             IntBuffer numAuxStates,
             PointerByReference auxStates) {
         int deviceId = context.getDeviceId();
-        int deviceType = context.getDeviceType().getType();
+        int deviceType = DeviceType.toDeviceType(context);
 
         PointerByReference ref = new PointerByReference();
 
@@ -1008,7 +1009,7 @@ public final class JnaUtils {
     public static Pointer bindExecutor(
             Pointer executor, Context context, int len, int auxStatesLen) {
         int deviceId = context.getDeviceId();
-        int deviceType = context.getDeviceType().getType();
+        int deviceType = DeviceType.toDeviceType(context);
         PointerByReference inArgs = new PointerByReference();
         PointerByReference argGradStore = new PointerByReference();
         IntBuffer gradReqType = IntBuffer.allocate(1);
@@ -1038,7 +1039,7 @@ public final class JnaUtils {
             int[] deviceTypes,
             int[] deviceIds) {
         int deviceId = context.getDeviceId();
-        int deviceType = context.getDeviceType().getType();
+        int deviceType = DeviceType.toDeviceType(context);
         PointerByReference inArgs = new PointerByReference();
         PointerByReference argGradStore = new PointerByReference();
         IntBuffer gradReqType = IntBuffer.allocate(1);
@@ -1073,7 +1074,7 @@ public final class JnaUtils {
             int[] deviceIds,
             Pointer sharedExecutor) {
         int deviceId = context.getDeviceId();
-        int deviceType = context.getDeviceType().getType();
+        int deviceType = DeviceType.toDeviceType(context);
         PointerByReference inArgs = new PointerByReference();
         PointerByReference argGradStore = new PointerByReference();
         IntBuffer gradReqType = IntBuffer.allocate(1);
@@ -1116,7 +1117,7 @@ public final class JnaUtils {
             PointerByReference auxStates,
             Pointer sharedExecutor) {
         int deviceId = context.getDeviceId();
-        int deviceType = context.getDeviceType().getType();
+        int deviceType = DeviceType.toDeviceType(context);
         PointerByReference ref = new PointerByReference();
         checkCall(
                 LIB.MXExecutorReshape(
@@ -1394,7 +1395,7 @@ public final class JnaUtils {
                         symbol,
                         Native.getDirectBufferPointer(parameter),
                         parameter.remaining(),
-                        context.getDeviceType().getType(),
+                        DeviceType.toDeviceType(context),
                         context.getDeviceId(),
                         1,
                         inputNames,

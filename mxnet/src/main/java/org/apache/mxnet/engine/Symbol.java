@@ -12,6 +12,11 @@
  */
 package org.apache.mxnet.engine;
 
+import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.GradReq;
+import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
@@ -21,11 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.apache.mxnet.Context;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.types.DataType;
-import org.apache.mxnet.types.GradReq;
-import org.apache.mxnet.types.StorageType;
 
 public class Symbol extends NativeResource {
 
@@ -159,7 +160,7 @@ public class Symbol extends NativeResource {
             String[] stateNames,
             GradReq gradReq,
             Map<String, Context> g2cMap,
-            Map<String, StorageType> stypeMap) {
+            Map<String, SparseFormat> stypeMap) {
         MxExecutor[] executors = new MxExecutor[contexts.size()];
 
         // each argParams have a gradReq value
@@ -179,7 +180,7 @@ public class Symbol extends NativeResource {
             for (Map.Entry<String, Context> entry : g2cMap.entrySet()) {
                 g2cKeys[k] = entry.getKey();
                 Context ctx = entry.getValue();
-                g2cDeviceTypes[k] = ctx.getDeviceType().getType();
+                g2cDeviceTypes[k] = DeviceType.toDeviceType(ctx);
                 g2cDeviceIds[k] = ctx.getDeviceId();
                 ++k;
             }
@@ -219,7 +220,7 @@ public class Symbol extends NativeResource {
             inputStorageTypes = new int[inputStorageTypeNames.length];
 
             k = 0;
-            for (Map.Entry<String, StorageType> entry : stypeMap.entrySet()) {
+            for (Map.Entry<String, SparseFormat> entry : stypeMap.entrySet()) {
                 inputStorageTypeNames[k] = entry.getKey();
                 inputStorageTypes[k] = entry.getValue().getValue();
                 ++k;

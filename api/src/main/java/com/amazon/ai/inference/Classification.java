@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,39 +10,23 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.inferernce;
+package com.amazon.ai.inference;
 
-public class ObjectDetectorOutput {
+public class Classification {
 
     private String className;
-    private float[] args;
+    private double probability;
 
-    public ObjectDetectorOutput(String className, float[] args) {
+    public Classification(String className, double probability) {
         this.className = className;
-        this.args = args;
+        this.probability = probability;
     }
 
     public String getClassName() {
         return className;
     }
 
-    public float getProbability() {
-        return args[0];
-    }
-
-    public float getXMin() {
-        return args[1];
-    }
-
-    public float getXMax() {
-        return args[2];
-    }
-
-    public float getYMin() {
-        return args[3];
-    }
-
-    public float getYMax() {
-        return args[4];
+    public double getProbability() {
+        return probability;
     }
 }

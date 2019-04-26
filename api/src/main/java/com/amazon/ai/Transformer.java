@@ -12,9 +12,11 @@
  */
 package com.amazon.ai;
 
-public interface Transformer {
+import com.amazon.ai.ndarray.NDArray;
 
-    Tensor preprocess(Tensor tensor);
+public interface Transformer<I, O> {
 
-    Tensor postprocess(Tensor tensor);
+    NDArray processInput(I input);
+
+    O processOutput(NDArray array);
 }

@@ -36,6 +36,7 @@ public final class TestHelper {
             throws IOException, ClassNotFoundException {
         List<Class<?>> list = getClasses(baseClass);
         for (Class<?> clazz : list) {
+            System.out.println(clazz.getName());
             Object obj = null;
             if (clazz.isEnum()) {
                 obj = clazz.getEnumConstants()[0];
@@ -62,6 +63,7 @@ public final class TestHelper {
             Method[] methods = clazz.getMethods();
             for (Method method : methods) {
                 String methodName = method.getName();
+                System.out.println(clazz.getName() + "." + methodName);
                 int parameterCount = method.getParameterCount();
                 try {
                     if (parameterCount == 0
@@ -103,7 +105,11 @@ public final class TestHelper {
                 fileName = fileName.substring(0, fileName.lastIndexOf("."));
                 fileName = fileName.replace(File.separatorChar, '.');
 
-                classList.add(Class.forName(fileName));
+                try {
+                    classList.add(Class.forName(fileName));
+                } catch (ExceptionInInitializerError ignore) {
+                    // ignore
+                }
             }
         } else if (path.toLowerCase().endsWith(".jar")) {
             try (JarFile jarFile = new JarFile(path)) {
@@ -114,7 +120,11 @@ public final class TestHelper {
                     if (fileName.endsWith(".class")) {
                         fileName = fileName.substring(0, fileName.lastIndexOf("."));
                         fileName = fileName.replace('/', '.');
-                        classList.add(Class.forName(fileName));
+                        try {
+                            classList.add(Class.forName(fileName));
+                        } catch (ExceptionInInitializerError ignore) {
+                            // ignore
+                        }
                     }
                 }
             }

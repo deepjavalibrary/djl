@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.image;
+package com.amazon.ai.image;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -19,16 +19,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import javax.imageio.ImageIO;
 
-public final class Image {
+public final class Images {
 
-    private Image() {}
+    private Images() {}
 
-    public static BufferedImage loadImageFromFile(String path) throws IOException {
-        return ImageIO.read(new File(path));
+    public static BufferedImage loadImageFromFile(File file) throws IOException {
+        return ImageIO.read(file);
     }
 
     public static BufferedImage reshapeImage(BufferedImage image, int newWidth, int newHeight) {
@@ -41,15 +39,7 @@ public final class Image {
         return resizedImage;
     }
 
-    public static List<BufferedImage> loadInputBatch(List<String> images) throws IOException {
-        List<BufferedImage> list = new ArrayList<>(images.size());
-        for (String path : images) {
-            list.add(loadImageFromFile(path));
-        }
-        return list;
-    }
-
-    public static FloatBuffer toDirectBuffer(BufferedImage image) {
+    public static FloatBuffer toFloatBuffer(BufferedImage image) {
         // Get height and width of the image
         int width = image.getWidth();
         int height = image.getHeight();

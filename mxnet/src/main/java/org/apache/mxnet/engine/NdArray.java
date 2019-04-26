@@ -12,6 +12,10 @@
  */
 package org.apache.mxnet.engine;
 
+import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.Shape;
+import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
@@ -23,12 +27,9 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Map;
-import org.apache.mxnet.Context;
 import org.apache.mxnet.jna.FunctionInfo;
 import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.jna.PointerArray;
-import org.apache.mxnet.types.DataType;
-import org.apache.mxnet.types.StorageType;
 
 public class NdArray extends NativeResource {
 
@@ -40,7 +41,7 @@ public class NdArray extends NativeResource {
     private static final String LF = System.getProperty("line.separator");
 
     private Context context;
-    private StorageType storageType;
+    private SparseFormat storageType;
     private DataType dataType;
     private Shape shape;
 
@@ -51,7 +52,7 @@ public class NdArray extends NativeResource {
     public NdArray(
             ResourceAllocator alloc,
             Context context,
-            StorageType storageType,
+            SparseFormat storageType,
             Shape shape,
             DataType dataType,
             Pointer handle) {
@@ -106,7 +107,7 @@ public class NdArray extends NativeResource {
         return shape;
     }
 
-    public StorageType getStorageType() {
+    public SparseFormat getStorageType() {
         if (storageType == null) {
             storageType = JnaUtils.getStorageType(getHandle());
         }

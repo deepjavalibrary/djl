@@ -10,11 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.inferernce;
+package com.amazon.ai.inference;
 
-import org.apache.mxnet.engine.NdArray;
+public interface BoundingBox {
 
-public interface Predictor {
-
-    NdArray[] predict(NdArray... ndArrays);
+    Rectangle getBounds();
 }

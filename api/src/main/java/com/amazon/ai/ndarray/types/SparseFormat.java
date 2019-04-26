@@ -10,9 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.types;
+package com.amazon.ai.ndarray.types;
 
-public enum StorageType {
+public enum SparseFormat {
     UNDEFINED("undefined", -1),
     DEFAULT("default", 0),
     ROW_SPARSE("row_sparse", 1),
@@ -21,13 +21,13 @@ public enum StorageType {
     private String type;
     private int value;
 
-    StorageType(String type, int value) {
+    SparseFormat(String type, int value) {
         this.type = type;
         this.value = value;
     }
 
-    public static StorageType fromValue(int value) {
-        for (StorageType t : values()) {
+    public static SparseFormat fromValue(int value) {
+        for (SparseFormat t : values()) {
             if (value == t.getValue()) {
                 return t;
             }

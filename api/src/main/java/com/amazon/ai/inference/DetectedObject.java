@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,6 +10,18 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package com.amazon.ai;
+package com.amazon.ai.inference;
 
-public interface Estimator {}
+public class DetectedObject extends Classification {
+
+    private BoundingBox boundingBox;
+
+    public DetectedObject(String className, double probability, BoundingBox boundingBox) {
+        super(className, probability);
+        this.boundingBox = boundingBox;
+    }
+
+    public BoundingBox getBoundingBox() {
+        return boundingBox;
+    }
+}

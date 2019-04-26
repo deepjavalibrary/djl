@@ -12,4 +12,4 @@
  */
 package com.amazon.ai;
 
-public class Layer {}
+public interface Profiler {}

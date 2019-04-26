@@ -12,6 +12,11 @@
  */
 package org.apache.mxnet;
 
+import com.amazon.ai.Context;
+import com.amazon.ai.image.Images;
+import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.Shape;
 import com.sun.jna.Pointer;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -29,12 +34,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.mxnet.engine.DataDesc;
 import org.apache.mxnet.engine.MxModel;
-import org.apache.mxnet.engine.Shape;
-import org.apache.mxnet.image.Image;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.types.DataType;
 
 @SuppressWarnings("PMD.SystemPrintln")
 public final class PredictApiTesting {
@@ -69,11 +70,13 @@ public final class PredictApiTesting {
             String[] synset = MxModel.loadSynset(synsetFile);
 
             Shape inputShape = new Shape(1, 3, 224, 224);
-            DataDesc dataDesc = new DataDesc("data", inputShape, DataType.FLOAT32, "NCHW");
+            DataDesc dataDesc =
+                    new DataDesc(
+                            Context.defaultContext(), "data", inputShape, DataType.FLOAT32, "NCHW");
 
-            BufferedImage img = Image.loadImageFromFile(imageFile);
-            BufferedImage image = Image.reshapeImage(img, 224, 224);
-            FloatBuffer data = Image.toDirectBuffer(image);
+            BufferedImage img = Images.loadImageFromFile(new File(imageFile));
+            BufferedImage image = Images.reshapeImage(img, 224, 224);
+            FloatBuffer data = Images.toFloatBuffer(image);
 
             long init = System.nanoTime();
             System.out.println("Loading native library: " + JnaUtils.getVersion());
@@ -103,7 +106,7 @@ public final class PredictApiTesting {
             DataDesc dataDesc,
             String[] synset,
             int iteration) {
-        Context context = Context.getDefaultContext();
+        Context context = Context.defaultContext();
 
         long init = System.nanoTime();
         Pointer predictor = JnaUtils.createPredictor(symbolJson, param, context, dataDesc);

@@ -10,13 +10,22 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package com.amazon.ai;
+package com.amazon.ai.ndarray;
 
-public class Graph {
+import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.Shape;
+import com.amazon.ai.ndarray.types.SparseFormat;
 
-    public void call(Tensor tensor) {}
+public interface NDFactory {
 
-    public Tensor getOutput() {
-        return null;
-    }
+    NDArray create(
+            Context context,
+            Shape shape,
+            DataType dataType,
+            SparseFormat storageType,
+            boolean delay);
+
+    NDArray create(DataDesc dataDesc);
 }

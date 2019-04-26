@@ -12,27 +12,13 @@
  */
 package com.amazon.ai;
 
-import com.amazon.ai.util.PairList;
-import java.io.File;
-import java.io.IOException;
+import com.amazon.ai.ndarray.types.Shape;
 
 public interface Model {
 
-    Graph getGraph();
+    Block getNetwork();
 
-    PairList<String, Parameter> getParameters();
+    String[] getLabels();
 
-    void setParameters(PairList<String, Parameter> parameters);
-
-    void updateParameters(PairList<String, Parameter> parameters);
-
-    PairList<String, Parameter> getAuxParameters();
-
-    void setAuxParameters(PairList<String, Parameter> parameters);
-
-    HyperParameter getHyperParameter();
-
-    void setHyperParameter(HyperParameter hpo);
-
-    void save(File outputDir, String name, int epoch) throws IOException;
+    Shape getOutputShape();
 }

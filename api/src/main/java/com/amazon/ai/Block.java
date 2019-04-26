@@ -12,4 +12,20 @@
  */
 package com.amazon.ai;
 
-public class Tensor {}
+import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.types.Shape;
+
+public interface Block {
+
+    void forward();
+
+    void backward();
+
+    Shape getInputShape();
+
+    void setInput(NDArray array);
+
+    NDArray getOutput();
+
+    byte[] getEncoded();
+}

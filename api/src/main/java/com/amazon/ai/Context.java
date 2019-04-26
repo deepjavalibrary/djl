@@ -12,4 +12,51 @@
  */
 package com.amazon.ai;
 
-public class Context {}
+import com.amazon.ai.engine.Engine;
+
+public class Context {
+
+    private static final Context CPU = new Context("CPU", 0);
+    private static final Context GPU = new Context("GPU", 0);
+
+    private String deviceType;
+    private int deviceId;
+
+    public Context(String deviceType, int deviceId) {
+        this.deviceType = deviceType;
+        this.deviceId = deviceId;
+    }
+
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    public int getDeviceId() {
+        return deviceId;
+    }
+
+    @Override
+    public String toString() {
+        return deviceType + '(' + deviceId + ')';
+    }
+
+    public static Context cpu() {
+        return CPU;
+    }
+
+    public static Context cpu(int deviceId) {
+        return new Context("CPU", deviceId);
+    }
+
+    public static Context gpu() {
+        return GPU;
+    }
+
+    public static Context gpu(int deviceId) {
+        return new Context("GPU", deviceId);
+    }
+
+    public static Context defaultContext() {
+        return Engine.getInstance().defaultContext();
+    }
+}

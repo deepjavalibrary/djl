@@ -17,21 +17,27 @@
 
 package org.apache.mxnet;
 
+import com.amazon.ai.Context;
+import com.amazon.ai.image.Images;
+import com.amazon.ai.inference.BoundingBox;
+import com.amazon.ai.inference.DetectedObject;
+import com.amazon.ai.inference.ImageTransformer;
+import com.amazon.ai.inference.ObjectDetector;
+import com.amazon.ai.inference.Rectangle;
+import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.Shape;
 import com.sun.jna.Native;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.mxnet.engine.DataDesc;
 import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.ResourceAllocator;
-import org.apache.mxnet.engine.Shape;
-import org.apache.mxnet.image.Image;
-import org.apache.mxnet.inferernce.ObjectDetector;
-import org.apache.mxnet.inferernce.ObjectDetectorOutput;
 import org.apache.mxnet.jna.JnaException;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.types.DataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,17 +48,18 @@ public final class SSDClassifierExample {
 
     private SSDClassifierExample() {}
 
-    private static List<ObjectDetectorOutput> runObjectDetectionSingle(
+    private static List<DetectedObject> runObjectDetectionSingle(
             String pathPrefix, String inputImagePath, Context context) throws IOException {
         Shape inputShape = new Shape(1, 3, 224, 224);
-        DataDesc dataDesc = new DataDesc("data", inputShape, DataType.FLOAT32, "NCHW");
-        BufferedImage img = Image.loadImageFromFile(inputImagePath);
+        DataDesc dataDesc = new DataDesc(context, "data", inputShape, DataType.FLOAT32, "NCHW");
+        BufferedImage img = Images.loadImageFromFile(new File(inputImagePath));
 
         try (ResourceAllocator alloc = new ResourceAllocator()) {
             MxModel model = MxModel.loadSavedModel(alloc, pathPrefix, 0);
-            ObjectDetector objDet = new ObjectDetector(alloc, context, model, dataDesc);
+            ImageTransformer<List<DetectedObject>> transformer = new SampleTransformer(dataDesc);
+            ObjectDetector objDet = new ObjectDetector(model, transformer);
 
-            return objDet.detect(img, 7);
+            return objDet.detect(img);
         }
     }
 
@@ -70,17 +77,17 @@ public final class SSDClassifierExample {
         String modelPathPrefix = userHome + "/source/ptest/squeezenet_v1.1";
         String inputImagePath = userHome + "/source/ptest/kitten.jpg";
 
-        Context context = Context.getDefaultContext();
+        Context context = Context.defaultContext();
 
         try {
             Shape inputShape = new Shape(1, 3, 224, 224);
 
             StringBuilder outputStr = new StringBuilder("\n");
 
-            List<ObjectDetectorOutput> output =
+            List<DetectedObject> output =
                     runObjectDetectionSingle(modelPathPrefix, inputImagePath, context);
 
-            for (ObjectDetectorOutput i : output) {
+            for (DetectedObject i : output) {
                 dumpOutput(i, outputStr, inputShape);
             }
             logger.info(outputStr.toString());
@@ -91,7 +98,7 @@ public final class SSDClassifierExample {
         System.exit(0);
     }
 
-    private static void dumpOutput(ObjectDetectorOutput output, StringBuilder sb, Shape shape) {
+    private static void dumpOutput(DetectedObject output, StringBuilder sb, Shape shape) {
         int width = shape.get(2);
         int height = shape.get(3);
 
@@ -100,21 +107,37 @@ public final class SSDClassifierExample {
                 .append("\nProbability: ")
                 .append(output.getProbability())
                 .append("\nCoordinate: ");
-        List<Float> coord =
-                Arrays.asList(
-                        output.getXMin() * width,
-                        output.getXMax() * height,
-                        output.getYMin() * width,
-                        output.getYMax() * height);
-        boolean first = true;
-        for (float c : coord) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(", ");
+        BoundingBox boundingBox = output.getBoundingBox();
+        if (boundingBox != null) {
+            Rectangle rect = boundingBox.getBounds();
+            List<Double> coord =
+                    Arrays.asList(
+                            rect.getX() * width,
+                            rect.getY() * height,
+                            (rect.getX() + rect.getWidth()) * width,
+                            (rect.getY() + rect.getHeight()) * height);
+            boolean first = true;
+            for (double c : coord) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(", ");
+                }
+                sb.append(c);
             }
-            sb.append(c);
         }
         sb.append('\n');
+    }
+
+    private static final class SampleTransformer extends ImageTransformer<List<DetectedObject>> {
+
+        public SampleTransformer(DataDesc dataDesc) {
+            super(dataDesc);
+        }
+
+        @Override
+        public List<DetectedObject> processOutput(NDArray array) {
+            return null;
+        }
     }
 }

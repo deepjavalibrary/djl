@@ -12,7 +12,7 @@
  */
 package org.apache.mxnet.jna;
 
-import org.apache.mxnet.Context;
+import com.amazon.ai.Context;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

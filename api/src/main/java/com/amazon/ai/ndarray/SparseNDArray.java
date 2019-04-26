@@ -10,22 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.types;
+package com.amazon.ai.ndarray;
 
-public enum Layout {
-    UNDEFINED("__undefined__"),
-    NCHW("NCHW"),
-    NTC("NTC"),
-    NT("NT"),
-    N("N");
-
-    private String value;
-
-    Layout(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-}
+public class SparseNDArray {}

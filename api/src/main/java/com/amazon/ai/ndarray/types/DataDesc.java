@@ -10,23 +10,28 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.engine;
+package com.amazon.ai.ndarray.types;
 
-import org.apache.mxnet.types.DataType;
-import org.apache.mxnet.types.Layout;
+import com.amazon.ai.Context;
 
 public class DataDesc {
 
+    private Context context;
     private String name;
     private Shape shape;
     private DataType dataType;
     private String layout;
 
-    public DataDesc(String name, Shape shape, DataType dataType, String layout) {
+    public DataDesc(Context context, String name, Shape shape, DataType dataType, String layout) {
+        this.context = context;
         this.name = name;
         this.shape = shape;
         this.dataType = dataType;
         this.layout = layout;
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     public String getName() {
