@@ -10,58 +10,23 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package com.amazon.ai.inference;
+package com.amazon.ai.image;
 
-public class Rectangle implements BoundingBox {
+public class Point {
 
     private double x;
     private double y;
-    private double width;
-    private double height;
 
-    public Rectangle() {}
-
-    public Rectangle(double x, double y, double width, double height) {
+    public Point(double x, double y) {
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-
-    @Override
-    public Rectangle getBounds() {
-        return this;
     }
 
     public double getX() {
         return x;
     }
 
-    public void setX(double x) {
-        this.x = x;
-    }
-
     public double getY() {
         return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public void setWidth(double width) {
-        this.width = width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
     }
 }

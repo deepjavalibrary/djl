@@ -12,6 +12,8 @@
  */
 package com.amazon.ai.inference;
 
+import com.amazon.ai.image.BoundingBox;
+
 public class DetectedObject extends Classification {
 
     private BoundingBox boundingBox;

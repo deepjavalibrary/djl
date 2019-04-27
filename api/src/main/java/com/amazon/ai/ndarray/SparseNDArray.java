@@ -12,4 +12,4 @@
  */
 package com.amazon.ai.ndarray;
 
-public class SparseNDArray {}
+public interface SparseNDArray extends NDArray {}

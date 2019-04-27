@@ -18,12 +18,12 @@
 package org.apache.mxnet;
 
 import com.amazon.ai.Context;
+import com.amazon.ai.image.BoundingBox;
 import com.amazon.ai.image.Images;
-import com.amazon.ai.inference.BoundingBox;
+import com.amazon.ai.image.Rectangle;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.ImageTransformer;
 import com.amazon.ai.inference.ObjectDetector;
-import com.amazon.ai.inference.Rectangle;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;

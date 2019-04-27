@@ -36,7 +36,6 @@ public final class TestHelper {
             throws IOException, ClassNotFoundException {
         List<Class<?>> list = getClasses(baseClass);
         for (Class<?> clazz : list) {
-            System.out.println(clazz.getName());
             Object obj = null;
             if (clazz.isEnum()) {
                 obj = clazz.getEnumConstants()[0];
@@ -63,7 +62,6 @@ public final class TestHelper {
             Method[] methods = clazz.getMethods();
             for (Method method : methods) {
                 String methodName = method.getName();
-                System.out.println(clazz.getName() + "." + methodName);
                 int parameterCount = method.getParameterCount();
                 try {
                     if (parameterCount == 0

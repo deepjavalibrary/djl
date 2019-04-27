@@ -21,19 +21,21 @@ import java.util.List;
 public class Classifier<T> {
 
     protected Predictor predictor;
-    protected Transformer<T, List<Classification>> transformer;
+    protected Transformer<T, List<? extends Classification>> transformer;
 
-    public Classifier(Model model, Transformer<T, List<Classification>> transformer) {
+    public Classifier(Model model, Transformer<T, List<? extends Classification>> transformer) {
         this(model, transformer, Context.defaultContext());
     }
 
     public Classifier(
-            Model model, Transformer<T, List<Classification>> transformer, Context context) {
+            Model model,
+            Transformer<T, List<? extends Classification>> transformer,
+            Context context) {
         this.predictor = Predictor.newInstance(model, context);
         this.transformer = transformer;
     }
 
-    public List<Classification> classify(T input) {
+    public List<? extends Classification> classify(T input) {
         try (NDArray array = transformer.processInput(input);
                 NDArray result = predictor.predict(array)) {
             return transformer.processOutput(result);
