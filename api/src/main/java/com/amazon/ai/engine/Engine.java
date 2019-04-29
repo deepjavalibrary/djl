@@ -39,7 +39,7 @@ public abstract class Engine {
         }
 
         if (list.isEmpty()) {
-            throw new IllegalStateException("No deep learning engine found in class path.");
+            throw new EngineException("No deep learning engine found in class path.");
         }
 
         if (list.size() > 1) {
