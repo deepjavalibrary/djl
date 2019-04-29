@@ -16,26 +16,22 @@ import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Transformer;
 import com.amazon.ai.ndarray.NDArray;
-import java.util.List;
 
-public class Classifier<T> {
+public class Classifier<I, O> {
 
     protected Predictor predictor;
-    protected Transformer<T, List<? extends Classification>> transformer;
+    protected Transformer<I, O> transformer;
 
-    public Classifier(Model model, Transformer<T, List<? extends Classification>> transformer) {
+    public Classifier(Model model, Transformer<I, O> transformer) {
         this(model, transformer, Context.defaultContext());
     }
 
-    public Classifier(
-            Model model,
-            Transformer<T, List<? extends Classification>> transformer,
-            Context context) {
+    public Classifier(Model model, Transformer<I, O> transformer, Context context) {
         this.predictor = Predictor.newInstance(model, context);
         this.transformer = transformer;
     }
 
-    public List<? extends Classification> classify(T input) {
+    public O classify(I input) {
         try (NDArray array = transformer.processInput(input);
                 NDArray result = predictor.predict(array)) {
             return transformer.processOutput(result);

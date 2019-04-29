@@ -16,51 +16,25 @@ import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Transformer;
 import com.amazon.ai.ndarray.NDArray;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
-import javax.imageio.ImageIO;
 
-public class ObjectDetector {
+public class ObjectDetector<I, O> {
 
     private Predictor predictor;
-    protected Transformer<BufferedImage, List<DetectedObject>> transformer;
+    protected Transformer<I, O> transformer;
 
-    public ObjectDetector(
-            Model model, Transformer<BufferedImage, List<DetectedObject>> transformer) {
+    public ObjectDetector(Model model, Transformer<I, O> transformer) {
         this(model, transformer, Context.defaultContext());
     }
 
-    public ObjectDetector(
-            Model model,
-            Transformer<BufferedImage, List<DetectedObject>> transformer,
-            Context context) {
+    public ObjectDetector(Model model, Transformer<I, O> transformer, Context context) {
         this.predictor = Predictor.newInstance(model, context);
         this.transformer = transformer;
     }
 
-    public List<DetectedObject> detect(BufferedImage image) {
-        try (NDArray array = transformer.processInput(image);
+    public O detect(I input) {
+        try (NDArray array = transformer.processInput(input);
                 NDArray result = predictor.predict(array)) {
             return transformer.processOutput(result);
         }
-    }
-
-    public List<DetectedObject> detect(URL input) throws IOException {
-        BufferedImage image = ImageIO.read(input);
-        return detect(image);
-    }
-
-    public List<DetectedObject> detect(InputStream input) throws IOException {
-        BufferedImage image = ImageIO.read(input);
-        return detect(image);
-    }
-
-    public List<DetectedObject> detect(File input) throws IOException {
-        BufferedImage image = ImageIO.read(input);
-        return detect(image);
     }
 }

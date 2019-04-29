@@ -18,6 +18,9 @@
 package org.apache.mxnet;
 
 import com.amazon.ai.Context;
+import com.amazon.ai.Model;
+import com.amazon.ai.ModelFactory;
+import com.amazon.ai.engine.Engine;
 import com.amazon.ai.image.BoundingBox;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.image.Rectangle;
@@ -28,16 +31,11 @@ import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
-import com.sun.jna.Native;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.mxnet.engine.MxModel;
-import org.apache.mxnet.engine.ResourceAllocator;
-import org.apache.mxnet.jna.JnaException;
-import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,28 +46,23 @@ public final class SSDClassifierExample {
 
     private SSDClassifierExample() {}
 
-    private static List<DetectedObject> runObjectDetectionSingle(
+    private static List<DetectedObject> detect(
             String pathPrefix, String inputImagePath, Context context) throws IOException {
         Shape inputShape = new Shape(1, 3, 224, 224);
         DataDesc dataDesc = new DataDesc(context, "data", inputShape, DataType.FLOAT32, "NCHW");
         BufferedImage img = Images.loadImageFromFile(new File(inputImagePath));
 
-        try (ResourceAllocator alloc = new ResourceAllocator()) {
-            MxModel model = MxModel.loadSavedModel(alloc, pathPrefix, 0);
-            ImageTransformer<List<DetectedObject>> transformer = new SampleTransformer(dataDesc);
-            ObjectDetector objDet = new ObjectDetector(model, transformer);
+        Model model = ModelFactory.loadModel(pathPrefix);
+        SampleTransformer transformer = new SampleTransformer(dataDesc);
+        ObjectDetector<BufferedImage, List<DetectedObject>> objDet =
+                new ObjectDetector<>(model, transformer);
 
-            return objDet.detect(img);
-        }
+        return objDet.detect(img);
     }
 
     public static void main(String[] args) {
-        Native.setProtected(true);
-        if (!Native.isProtected()) {
-            System.out.println("Protection not supported.");
-        }
         long init = System.nanoTime();
-        System.out.println("Loading native library: " + JnaUtils.getVersion());
+        System.out.println("Loading native library: " + Engine.getInstance().getVersion());
         long loaded = System.nanoTime();
         System.out.printf("loadlibrary = %.3f ms.%n", (loaded - init) / 1000000f);
 
@@ -84,14 +77,13 @@ public final class SSDClassifierExample {
 
             StringBuilder outputStr = new StringBuilder("\n");
 
-            List<DetectedObject> output =
-                    runObjectDetectionSingle(modelPathPrefix, inputImagePath, context);
+            List<DetectedObject> output = detect(modelPathPrefix, inputImagePath, context);
 
             for (DetectedObject i : output) {
                 dumpOutput(i, outputStr, inputShape);
             }
             logger.info(outputStr.toString());
-        } catch (IOException | JnaException e) {
+        } catch (IOException e) {
             logger.error("", e);
             System.exit(-1);
         }
