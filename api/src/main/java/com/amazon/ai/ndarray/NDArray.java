@@ -71,7 +71,11 @@ public interface NDArray extends Serializable, AutoCloseable {
      */
     int stride(int dimension);
 
-    /** Element wise stride */
+    /**
+     * Element wise stride
+     *
+     * @return the element-wise stride for the array
+     */
     int elementWiseStride();
 
     /**
@@ -137,6 +141,7 @@ public interface NDArray extends Serializable, AutoCloseable {
      * ndarray
      *
      * @param arr the elements to assign
+     * @param condition Condition to apply
      * @return this
      */
     NDArray assignIf(NDArray arr, Condition condition);
@@ -265,12 +270,16 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Returns the binary NDArray with value true where this array's entries are infinite, or false
      * where they are not infinite
+     *
+     * @return the binary array with value true if the array are infinite.
      */
     NDArray isInfinite();
 
     /**
      * Returns the binary NDArray with value true where this array's entries are NaN, or false where
      * they are not infinite
+     *
+     * @return the binary array with value true if the array are NaN.
      */
     NDArray isNaN();
 
@@ -759,13 +768,28 @@ public interface NDArray extends Serializable, AutoCloseable {
      */
     NDArray getScalar(long i);
 
-    /** Returns the square of the Euclidean distance. */
+    /**
+     * Returns the square of the Euclidean distance.
+     *
+     * @param other the other array to measure squared distance
+     * @return squared distance
+     */
     double squaredDistance(NDArray other);
 
-    /** Returns the (euclidean) distance. */
+    /**
+     * Returns the (euclidean) distance.
+     *
+     * @param other the other array to measure distance
+     * @return distance
+     */
     double distance2(NDArray other);
 
-    /** Returns the (1-norm) distance. */
+    /**
+     * Returns the (1-norm) distance.
+     *
+     * @param other the other array to measure distance
+     * @return distance
+     */
     double distance1(NDArray other);
 
     /**
@@ -1332,6 +1356,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Standard deviation of an NDArray along a dimension
      *
+     * @param biasCorrected If true: bias corrected standard deviation. False: not bias corrected
      * @param dimension the dimension to getScalar the std along
      * @return the standard deviation along a particular dimension
      */
@@ -1372,6 +1397,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Returns the overall mean of this NDArray
      *
+     * @param result the result array
      * @param dimension the dimension to getScalar the mean along
      * @return the mean along the specified dimension of this NDArray
      */
@@ -1456,7 +1482,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Returns the overall min of this NDArray
      *
-     * @param dimension the dimension to getScalar the mean along
+     * @param dimension the dimension to getScalar the min along
      * @return the mean along the specified dimension of this NDArray
      */
     NDArray min(int... dimension);
@@ -1464,6 +1490,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Returns minimum (absolute) value in this NDArray, along the specified dimensions
      *
+     * @param dimension the dimension to getScalar the absolute min along
      * @return Minimum absolute value
      */
     NDArray amin(int... dimension);
@@ -1540,6 +1567,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Returns entropy value for this NDArray along specified dimension(s)
      *
+     * @param dimension the dimension to return the entropy for
      * @return NDArray NDArray
      */
     NDArray entropy(int... dimension);
@@ -1547,6 +1575,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Returns entropy value for this NDArray along specified dimension(s)
      *
+     * @param dimension the dimension to return the shannonEntropy for
      * @return NDArray
      */
     NDArray shannonEntropy(int... dimension);
@@ -1554,6 +1583,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Returns entropy value for this NDArray along specified dimension(s)
      *
+     * @param dimension the dimension to return the logEntropy for
      * @return NDArray
      */
     NDArray logEntropy(int... dimension);
@@ -1626,6 +1656,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Returns a flattened version (row vector) of this NDArray
      *
+     * @param order the order of the new array
      * @return a flattened version (row vector) of this NDArray
      */
     NDArray ravel(char order);
@@ -1688,6 +1719,7 @@ public interface NDArray extends Serializable, AutoCloseable {
      * Reshapes the NDArray (can't change the length of the NDArray). Typically this will be a view,
      * unless reshaping without copying is impossible.
      *
+     * @param order the order of the new array
      * @param newShape the new shape of the NDArray
      * @return the reshaped NDArray
      */
@@ -1699,6 +1731,7 @@ public interface NDArray extends Serializable, AutoCloseable {
      * Reshapes the NDArray (can't change the length of the NDArray). Typically this will be a view,
      * unless reshaping without copying is impossible.
      *
+     * @param order the order of the new array
      * @param rows the rows of the matrix
      * @param columns the columns of the matrix
      * @return the reshaped NDArray
@@ -1782,11 +1815,11 @@ public interface NDArray extends Serializable, AutoCloseable {
      *
      * <p>A few examples of patterns and their effect:
      *
-     * <p>('x') -> make a 0d (scalar) into a 1d vector (0, 1) -> identity for 2d vectors (1, 0) ->
-     * inverts the first and second dimensions ('x', 0) -> make a row out of a 1d vector (N to 1xN)
-     * (0, 'x') -> make a column out of a 1d vector (N to Nx1) (2, 0, 1) -> AxBxC to CxAxB (0, 'x',
-     * 1) -> AxB to Ax1xB (1, 'x', 0) -> AxB to Bx1xA (1,) -> This remove dimensions 0. It must be a
-     * broadcastable dimension (1xA to A)
+     * <p>('x') -&gt; make a 0d (scalar) into a 1d vector (0, 1) -&gt; identity for 2d vectors (1,
+     * 0) -&gt; inverts the first and second dimensions ('x', 0) -&gt; make a row out of a 1d vector
+     * (N to 1xN) (0, 'x') -&gt; make a column out of a 1d vector (N to Nx1) (2, 0, 1) -&gt; AxBxC
+     * to CxAxB (0, 'x', 1) -&gt; AxB to Ax1xB (1, 'x', 0) -&gt; AxB to Bx1xA (1,) -&gt; This remove
+     * dimensions 0. It must be a broadcastable dimension (1xA to A)
      *
      * @param rearrange the dimensions to swap to
      * @param newOrder the new order (think permute)
@@ -1924,6 +1957,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * Broadcasts this NDArray to be the specified shape
      *
+     * @param result the result array
      * @return the broadcasted NDArray
      */
     NDArray broadcast(NDArray result);
@@ -1938,7 +1972,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * This method checks 2 NDArrays equality with given eps
      *
-     * @param o
+     * @param o object to compare with
      * @param eps Epsilon value to use for the quality operation
      * @return NDArray NDArray
      */
@@ -1981,8 +2015,8 @@ public interface NDArray extends Serializable, AutoCloseable {
     NDArray remainder(Number denominator);
 
     /**
-     * @param denominator
-     * @param result
+     * @param denominator the denominator as a scalar
+     * @param result the result array
      * @return NDArray NDArray
      */
     NDArray remainder(Number denominator, NDArray result);
@@ -1990,7 +2024,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * In place remainder
      *
-     * @param denominator
+     * @param denominator the denominator as a scalar
      * @return NDArray NDArray
      */
     NDArray remainderi(NDArray denominator);
@@ -1998,7 +2032,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * In place remainder
      *
-     * @param denominator
+     * @param denominator the denominator as a scalar
      * @return NDArray NDArray
      */
     NDArray remainderi(Number denominator);
@@ -2014,14 +2048,14 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * remainder of division
      *
-     * @param denominator the
+     * @param denominator the denominator as a scalar
      * @param result the result array
      * @return NDArray NDArray
      */
     NDArray fmod(NDArray denominator, NDArray result);
 
     /**
-     * @param denominator
+     * @param denominator the denominator as a scalar
      * @return NDArray NDArray
      */
     NDArray fmod(Number denominator);
@@ -2031,7 +2065,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * In place fmod
      *
-     * @param denominator
+     * @param denominator the denominator as a scalar
      * @return NDArray NDArray
      */
     NDArray fmodi(NDArray denominator);
@@ -2039,7 +2073,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * In place fmod
      *
-     * @param denominator
+     * @param denominator the denominator as a scalar
      * @return NDArray NDArray
      */
     NDArray fmodi(Number denominator);
@@ -2092,7 +2126,7 @@ public interface NDArray extends Serializable, AutoCloseable {
     /**
      * This method returns median along given dimension(s)
      *
-     * @param dimension
+     * @param dimension Dimension along which to perform the median operation
      * @return Median along specified dimensions
      */
     NDArray median(int... dimension);
@@ -2106,9 +2140,13 @@ public interface NDArray extends Serializable, AutoCloseable {
      */
     NDArray percentile(Number percentile, int... dimension);
 
-    /** ------------ Sparse methods ------------ */
+    // ------------ Sparse methods ------------
 
-    /** Return a dense representation of the sparse NDArray */
+    /**
+     * Return a dense representation of the sparse NDArray
+     *
+     * @return NDArray NDArray
+     */
     NDArray toDense();
 
     /**
