@@ -12,11 +12,11 @@
  */
 package com.amazon.ai;
 
-import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDList;
 
 public interface Transformer<I, O> {
 
-    NDArray processInput(I input);
+    NDList processInput(I input);
 
-    O processOutput(NDArray array);
+    O processOutput(NDList array);
 }

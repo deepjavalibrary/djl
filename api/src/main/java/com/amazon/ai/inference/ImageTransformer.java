@@ -17,6 +17,7 @@ import com.amazon.ai.engine.Engine;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
+import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
@@ -30,14 +31,14 @@ public abstract class ImageTransformer<T> implements Transformer<BufferedImage, 
     }
 
     @Override
-    public NDArray processInput(BufferedImage input) {
+    public NDList processInput(BufferedImage input) {
         FloatBuffer buffer = Images.toFloatBuffer(input);
         NDFactory factory = Engine.getInstance().getNDFactory();
 
         NDArray array = factory.create(dataDesc);
         array.set(buffer);
 
-        return normalize(array);
+        return new NDList(normalize(array));
     }
 
     protected NDArray normalize(NDArray array) {
