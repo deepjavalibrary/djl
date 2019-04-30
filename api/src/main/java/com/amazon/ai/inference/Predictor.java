@@ -16,28 +16,17 @@ import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Transformer;
 import com.amazon.ai.engine.Engine;
-import com.amazon.ai.ndarray.NDArray;
 
-public class Predictor<I, O> {
+public interface Predictor<I, O> {
 
-    protected Predictor<NDArray, NDArray> predictor;
-    protected Transformer<I, O> transformer;
-
-    public Predictor(Model model, Transformer<I, O> transformer) {
-        this(model, transformer, Context.defaultContext());
+    static <I, O> Predictor<I, O> newInstance(Model model, Transformer<I, O> transformer) {
+        return newInstance(model, transformer, Context.defaultContext());
     }
 
-    public Predictor(Model model, Transformer<I, O> transformer, Context context) {
-        predictor = Engine.getInstance().newPredictor(model, context);
-        this.transformer = transformer;
+    static <I, O> Predictor<I, O> newInstance(
+            Model model, Transformer<I, O> transformer, Context context) {
+        return Engine.getInstance().newPredictor(model, transformer, context);
     }
 
-    protected Predictor() {}
-
-    public O predict(I input) {
-        try (NDArray array = transformer.processInput(input);
-                NDArray result = predictor.predict(array)) {
-            return transformer.processOutput(result);
-        }
-    }
+    O predict(I input);
 }

@@ -19,7 +19,6 @@ package org.apache.mxnet;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
-import com.amazon.ai.ModelFactory;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.image.BoundingBox;
 import com.amazon.ai.image.Images;
@@ -52,7 +51,7 @@ public final class SSDClassifierExample {
         DataDesc dataDesc = new DataDesc(context, "data", inputShape, DataType.FLOAT32, "NCHW");
         BufferedImage img = Images.loadImageFromFile(new File(inputImagePath));
 
-        Model model = ModelFactory.loadModel(pathPrefix);
+        Model model = Model.loadModel(pathPrefix);
         SampleTransformer transformer = new SampleTransformer(dataDesc);
         ObjectDetector<BufferedImage, List<DetectedObject>> objDet =
                 new ObjectDetector<>(model, transformer);

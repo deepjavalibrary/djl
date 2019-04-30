@@ -25,7 +25,7 @@ public class Classifier<I, O> {
     }
 
     public Classifier(Model model, Transformer<I, O> transformer, Context context) {
-        this.predictor = new Predictor<>(model, transformer, context);
+        this.predictor = Predictor.newInstance(model, transformer, context);
     }
 
     public O classify(I input) {

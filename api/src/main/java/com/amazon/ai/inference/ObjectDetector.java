@@ -25,7 +25,7 @@ public class ObjectDetector<I, O> {
     }
 
     public ObjectDetector(Model model, Transformer<I, O> transformer, Context context) {
-        this.predictor = new Predictor<>(model, transformer, context);
+        this.predictor = Predictor.newInstance(model, transformer, context);
     }
 
     public O detect(I input) {

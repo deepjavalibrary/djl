@@ -12,9 +12,33 @@
  */
 package com.amazon.ai;
 
+import com.amazon.ai.engine.Engine;
 import com.amazon.ai.ndarray.types.Shape;
+import java.io.File;
 
 public interface Model {
+
+    static Model loadModel(String modelPath) {
+        return loadModel(modelPath, -1);
+    }
+
+    static Model loadModel(String modelPath, int epoch) {
+        File file = new File(modelPath);
+        String modelName = file.getName();
+        return loadModel(file, modelName, -1);
+    }
+
+    static Model loadModel(File modelPath) {
+        return loadModel(modelPath, modelPath.getName(), -1);
+    }
+
+    static Model loadModel(File modelPath, String modelName) {
+        return loadModel(modelPath, modelPath.getName(), -1);
+    }
+
+    static Model loadModel(File modelPath, String modelName, int epoch) {
+        return Engine.getInstance().loadModel(modelPath, modelName, epoch);
+    }
 
     Block getNetwork();
 

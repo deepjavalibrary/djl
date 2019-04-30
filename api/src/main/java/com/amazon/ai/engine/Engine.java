@@ -15,8 +15,8 @@ package com.amazon.ai.engine;
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Profiler;
+import com.amazon.ai.Transformer;
 import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.training.Trainer;
 import java.io.File;
@@ -62,7 +62,8 @@ public abstract class Engine {
 
     public abstract Model loadModel(File modelPath, String modelName, int epoch);
 
-    public abstract Predictor<NDArray, NDArray> newPredictor(Model model, Context context);
+    public abstract <I, O> Predictor<I, O> newPredictor(
+            Model model, Transformer<I, O> transformer, Context context);
 
     public abstract Trainer newTrainer(Model model, Context context);
 
