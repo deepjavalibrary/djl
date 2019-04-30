@@ -12,43 +12,32 @@
  */
 package com.amazon.ai.inference;
 
-import com.amazon.ai.Block;
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
+import com.amazon.ai.Transformer;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.ndarray.NDArray;
 
-public class Predictor {
+public class Predictor<I, O> {
 
-    protected Model model;
-    protected Context context;
+    protected Predictor<NDArray, NDArray> predictor;
+    protected Transformer<I, O> transformer;
 
-    public static Predictor newInstance(Model model) {
-        return newInstance(model, Context.defaultContext());
+    public Predictor(Model model, Transformer<I, O> transformer) {
+        this(model, transformer, Context.defaultContext());
     }
 
-    public static Predictor newInstance(Model model, Context context) {
-        return Engine.getInstance().newPredictor(model, context);
+    public Predictor(Model model, Transformer<I, O> transformer, Context context) {
+        predictor = Engine.getInstance().newPredictor(model, context);
+        this.transformer = transformer;
     }
 
-    public Predictor(Model model, Context context) {
-        this.model = model;
-        this.context = context;
-    }
+    protected Predictor() {}
 
-    public Model getModel() {
-        return model;
-    }
-
-    public Context getContext() {
-        return context;
-    }
-
-    public NDArray predict(NDArray array) {
-        Block network = model.getNetwork();
-        network.setInput(array);
-        network.forward();
-
-        return network.getOutput();
+    public O predict(I input) {
+        try (NDArray array = transformer.processInput(input);
+                NDArray result = predictor.predict(array)) {
+            return transformer.processOutput(result);
+        }
     }
 }

@@ -12,10 +12,13 @@
  */
 package org.apache.mxnet.engine;
 
+import com.amazon.ai.Block;
 import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.GradReq;
+import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
@@ -28,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.mxnet.jna.JnaUtils;
 
-public class Symbol extends NativeResource {
+public class Symbol extends NativeResource implements Block {
 
     private String[] argParams;
     private String[] auxParams;
@@ -292,22 +295,22 @@ public class Symbol extends NativeResource {
                         updatedSharedBufferNames.getValue().getStringArray(0, updatedSize);
             }
 
-            Map<String, NdArray> argParamMap = model.getArgParams().toMap();
+            Map<String, MxNDArray> argParamMap = model.getArgParams().toMap();
 
             // get output for current executor's in_args, arg_grads, and aux_states
             int inArgSize = numInArgs.get(0);
             Pointer[] inArgsPointers = inArgs.getValue().getPointerArray(0, inArgSize);
             Pointer[] gradPointers = argGrads.getValue().getPointerArray(0, inArgSize);
-            NdArray[] argArray = new NdArray[inArgSize];
-            NdArray[] gradArray = new NdArray[inArgSize];
-            NdArray[] dataArray = new NdArray[inputArgNames.length];
+            MxNDArray[] argArray = new MxNDArray[inArgSize];
+            MxNDArray[] gradArray = new MxNDArray[inArgSize];
+            MxNDArray[] dataArray = new MxNDArray[inputArgNames.length];
             int dataIdx = 0;
             for (int j = 0; j < inArgSize; ++j) {
-                argArray[j] = new NdArray(alloc, inArgsPointers[j]);
+                argArray[j] = new MxNDArray(alloc, inArgsPointers[j]);
 
                 String paramName = argParams[j];
 
-                NdArray param = argParamMap.get(paramName);
+                MxNDArray param = argParamMap.get(paramName);
                 if (param == null) {
                     if (Utils.contains(inputArgNames, paramName)) {
                         dataArray[dataIdx++] = argArray[j];
@@ -317,19 +320,19 @@ public class Symbol extends NativeResource {
                 }
 
                 if (gradPointers[j] != null) {
-                    gradArray[j] = new NdArray(alloc, gradPointers[j]);
+                    gradArray[j] = new MxNDArray(alloc, gradPointers[j]);
                 }
             }
 
             int auxStatesSize = numAuxStates.get();
-            NdArray[] auxArray = new NdArray[auxStatesSize];
+            MxNDArray[] auxArray = new MxNDArray[auxStatesSize];
             if (auxStatesSize > 0) {
-                Map<String, NdArray> auxParamMap = model.getAuxParams().toMap();
+                Map<String, MxNDArray> auxParamMap = model.getAuxParams().toMap();
                 Pointer[] pointers = auxStates.getValue().getPointerArray(0, auxStatesSize);
                 for (int j = 0; j < auxStatesSize; ++j) {
-                    auxArray[j] = new NdArray(alloc, pointers[j]);
+                    auxArray[j] = new MxNDArray(alloc, pointers[j]);
 
-                    NdArray param = auxParamMap.get(auxParams[j]);
+                    MxNDArray param = auxParamMap.get(auxParams[j]);
                     if (param == null) {
                         throw new IllegalStateException("aux parameter not found: " + auxParams[j]);
                     }
@@ -337,7 +340,7 @@ public class Symbol extends NativeResource {
                 }
             }
 
-            NdArray[] out = JnaUtils.getExecutorOutputs(alloc, pointer);
+            MxNDArray[] out = JnaUtils.getExecutorOutputs(alloc, pointer);
 
             executors[i] =
                     new MxExecutor(alloc, pointer, argArray, auxArray, dataArray, out, gradArray);
@@ -358,5 +361,34 @@ public class Symbol extends NativeResource {
         if (alloc != null) {
             alloc.detach(this);
         }
+    }
+
+    @Override
+    public void forward() {}
+
+    @Override
+    public void backward() {}
+
+    @Override
+    public Shape getInputShape() {
+        return null;
+    }
+
+    @Override
+    public Shape getOutputShape() {
+        return null;
+    }
+
+    @Override
+    public void setInput(NDArray array) {}
+
+    @Override
+    public NDArray getOutput() {
+        return null;
+    }
+
+    @Override
+    public byte[] getEncoded() {
+        return new byte[0];
     }
 }

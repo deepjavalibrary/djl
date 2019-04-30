@@ -34,27 +34,27 @@ public class Module implements AutoCloseable {
         this.forTraining = forTraining;
     }
 
-    public void forward(NdArray[] ndArrays) {
+    public void forward(MxNDArray[] ndArrays) {
         for (MxExecutor executor : executors) {
             executor.forward(ndArrays, forTraining);
         }
     }
 
-    public NdArray[] getOutputs() {
+    public MxNDArray[] getOutputs() {
         if (executors.length == 1) {
             return executors[0].getOutputs();
         }
 
         int count = 0;
         for (MxExecutor executor : executors) {
-            NdArray[] out = executor.getOutputs();
+            MxNDArray[] out = executor.getOutputs();
             count += out.length;
         }
 
-        NdArray[] ret = new NdArray[count];
+        MxNDArray[] ret = new MxNDArray[count];
         int index = 0;
         for (MxExecutor executor : executors) {
-            NdArray[] out = executor.getOutputs();
+            MxNDArray[] out = executor.getOutputs();
             System.arraycopy(out, 0, ret, index, out.length);
             index += out.length;
         }

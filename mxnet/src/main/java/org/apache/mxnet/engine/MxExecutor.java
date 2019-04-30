@@ -17,20 +17,20 @@ import org.apache.mxnet.jna.JnaUtils;
 
 public class MxExecutor extends NativeResource {
 
-    private NdArray[] argArray;
-    private NdArray[] auxArray;
-    private NdArray[] dataArray;
-    private NdArray[] outputs;
-    private NdArray[] gradArray;
+    private MxNDArray[] argArray;
+    private MxNDArray[] auxArray;
+    private MxNDArray[] dataArray;
+    private MxNDArray[] outputs;
+    private MxNDArray[] gradArray;
 
     MxExecutor(
             ResourceAllocator alloc,
             Pointer pointer,
-            NdArray[] argArray,
-            NdArray[] auxArray,
-            NdArray[] dataArray,
-            NdArray[] outputs,
-            NdArray[] gradArray) {
+            MxNDArray[] argArray,
+            MxNDArray[] auxArray,
+            MxNDArray[] dataArray,
+            MxNDArray[] outputs,
+            MxNDArray[] gradArray) {
         super(alloc, pointer);
         this.argArray = argArray;
         this.auxArray = auxArray;
@@ -39,14 +39,14 @@ public class MxExecutor extends NativeResource {
         this.gradArray = gradArray;
     }
 
-    public void forward(NdArray[] ndArrays, boolean forTraining) {
+    public void forward(MxNDArray[] ndArrays, boolean forTraining) {
         for (int i = 0; i < ndArrays.length; ++i) {
             ndArrays[i].copyTo(dataArray[i]);
         }
         JnaUtils.forward(getHandle(), forTraining);
     }
 
-    public NdArray[] getOutputs() {
+    public MxNDArray[] getOutputs() {
         return outputs;
     }
 
@@ -70,19 +70,19 @@ public class MxExecutor extends NativeResource {
         if (alloc != null) {
             alloc.detach(this);
         }
-        for (NdArray ndArray : argArray) {
+        for (MxNDArray ndArray : argArray) {
             ndArray.close();
         }
-        for (NdArray ndArray : auxArray) {
+        for (MxNDArray ndArray : auxArray) {
             ndArray.close();
         }
-        for (NdArray ndArray : dataArray) {
+        for (MxNDArray ndArray : dataArray) {
             ndArray.close();
         }
-        for (NdArray ndArray : outputs) {
+        for (MxNDArray ndArray : outputs) {
             ndArray.close();
         }
-        for (NdArray ndArray : gradArray) {
+        for (MxNDArray ndArray : gradArray) {
             if (ndArray != null) {
                 ndArray.close();
             }

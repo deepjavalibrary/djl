@@ -15,26 +15,20 @@ package com.amazon.ai.inference;
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Transformer;
-import com.amazon.ai.ndarray.NDArray;
 
 public class ObjectDetector<I, O> {
 
-    private Predictor predictor;
-    protected Transformer<I, O> transformer;
+    private Predictor<I, O> predictor;
 
     public ObjectDetector(Model model, Transformer<I, O> transformer) {
         this(model, transformer, Context.defaultContext());
     }
 
     public ObjectDetector(Model model, Transformer<I, O> transformer, Context context) {
-        this.predictor = Predictor.newInstance(model, context);
-        this.transformer = transformer;
+        this.predictor = new Predictor<>(model, transformer, context);
     }
 
     public O detect(I input) {
-        try (NDArray array = transformer.processInput(input);
-                NDArray result = predictor.predict(array)) {
-            return transformer.processOutput(result);
-        }
+        return predictor.predict(input);
     }
 }

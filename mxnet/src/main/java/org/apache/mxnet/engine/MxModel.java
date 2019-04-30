@@ -38,16 +38,17 @@ public class MxModel implements Model, AutoCloseable {
     private static final String[] EMPTY = new String[0];
 
     private Symbol symbol;
-    private PairList<String, NdArray> argParams;
-    private PairList<String, NdArray> auxParams;
+    private PairList<String, MxNDArray> argParams;
+    private PairList<String, MxNDArray> auxParams;
     private String[] synset;
     private String[] labelNames;
+    private String[] dataNames;
     private String[] optimizerStates;
 
     MxModel(
             Symbol symbol,
-            PairList<String, NdArray> argParams,
-            PairList<String, NdArray> auxParams,
+            PairList<String, MxNDArray> argParams,
+            PairList<String, MxNDArray> auxParams,
             String[] synset,
             String[] optimizerStates) {
         this.symbol = symbol;
@@ -58,11 +59,11 @@ public class MxModel implements Model, AutoCloseable {
         labelNames = new String[] {"softmax_label"};
     }
 
-    public static MxModel loadSavedModel(String prefix, int epoch) throws IOException {
-        return loadSavedModel(null, prefix, epoch);
+    public static MxModel loadModel(String prefix, int epoch) throws IOException {
+        return loadModel(null, prefix, epoch);
     }
 
-    public static MxModel loadSavedModel(ResourceAllocator alloc, String prefix, int epoch)
+    public static MxModel loadModel(ResourceAllocator alloc, String prefix, int epoch)
             throws IOException {
         Symbol symbol = Symbol.load(alloc, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
@@ -77,24 +78,24 @@ public class MxModel implements Model, AutoCloseable {
 
         List<String> argParamNames = new ArrayList<>();
         List<String> auxParamNames = new ArrayList<>();
-        List<NdArray> argParamData = new ArrayList<>();
-        List<NdArray> auxParamData = new ArrayList<>();
+        List<MxNDArray> argParamData = new ArrayList<>();
+        List<MxNDArray> auxParamData = new ArrayList<>();
         for (int i = 0; i < names.length; ++i) {
             String[] pair = names[i].split(":", 2);
             if ("arg".equals(pair[0])) {
                 argParamNames.add(pair[1]);
                 argParamData.add(
-                        new NdArray(alloc, context, null, null, DataType.FLOAT32, handles[i]));
+                        new MxNDArray(alloc, context, null, null, DataType.FLOAT32, handles[i]));
             } else if ("aux".equals(pair[0])) {
                 auxParamNames.add(pair[1]);
                 auxParamData.add(
-                        new NdArray(alloc, context, null, null, DataType.FLOAT32, handles[i]));
+                        new MxNDArray(alloc, context, null, null, DataType.FLOAT32, handles[i]));
             } else {
                 throw new IllegalStateException("Unknown parameter: " + pair[0]);
             }
         }
-        PairList<String, NdArray> argParams = new PairList<>(argParamNames, argParamData);
-        PairList<String, NdArray> auxParams = new PairList<>(auxParamNames, auxParamData);
+        PairList<String, MxNDArray> argParams = new PairList<>(argParamNames, argParamData);
+        PairList<String, MxNDArray> auxParams = new PairList<>(auxParamNames, auxParamData);
 
         String[] synset = loadSynset(synsetFile);
         String[] stateNames = JnaUtils.readLines(new File(stateFile)).toArray(new String[0]);
@@ -108,11 +109,11 @@ public class MxModel implements Model, AutoCloseable {
         return symbol;
     }
 
-    public PairList<String, NdArray> getArgParams() {
+    public PairList<String, MxNDArray> getArgParams() {
         return argParams;
     }
 
-    public PairList<String, NdArray> getAuxParams() {
+    public PairList<String, MxNDArray> getAuxParams() {
         return auxParams;
     }
 
@@ -123,6 +124,16 @@ public class MxModel implements Model, AutoCloseable {
         return synset;
     }
 
+    @Override
+    public String[] getDataNames() {
+        return dataNames;
+    }
+
+    @Override
+    public void setDataNames(String... dataNames) {
+        this.dataNames = dataNames;
+    }
+
     public String[] getLabelNames() {
         if (labelNames == null) {
             return EMPTY;
@@ -130,7 +141,7 @@ public class MxModel implements Model, AutoCloseable {
         return labelNames;
     }
 
-    public void setLabelNames(String[] labelNames) {
+    public void setLabelNames(String... labelNames) {
         this.labelNames = labelNames;
     }
 
@@ -146,20 +157,20 @@ public class MxModel implements Model, AutoCloseable {
             String prefix,
             int epoch,
             Symbol symbol,
-            Map<String, NdArray> argParams,
-            Map<String, NdArray> auxParams) {
+            Map<String, MxNDArray> argParams,
+            Map<String, MxNDArray> auxParams) {
         symbol.save(prefix + "-symbol.json");
         String paramName = String.format("%s-%04d.params", prefix, epoch);
 
         Pointer[] pointers = new Pointer[argParams.size() + auxParams.size()];
         String[] keys = new String[pointers.length];
         int i = 0;
-        for (Map.Entry<String, NdArray> entry : argParams.entrySet()) {
+        for (Map.Entry<String, MxNDArray> entry : argParams.entrySet()) {
             keys[i] = "arg:" + entry.getKey();
             pointers[i] = entry.getValue().getHandle();
             ++i;
         }
-        for (Map.Entry<String, NdArray> entry : auxParams.entrySet()) {
+        for (Map.Entry<String, MxNDArray> entry : auxParams.entrySet()) {
             keys[i] = "aux:" + entry.getKey();
             pointers[i] = entry.getValue().getHandle();
             ++i;
@@ -173,10 +184,10 @@ public class MxModel implements Model, AutoCloseable {
     @Override
     public void close() {
         symbol.close();
-        for (NdArray nd : argParams.values()) {
+        for (MxNDArray nd : argParams.values()) {
             nd.close();
         }
-        for (NdArray nd : auxParams.values()) {
+        for (MxNDArray nd : auxParams.values()) {
             nd.close();
         }
     }
@@ -207,7 +218,12 @@ public class MxModel implements Model, AutoCloseable {
     }
 
     @Override
+    public Shape getInputShape() {
+        return symbol.getInputShape();
+    }
+
+    @Override
     public Shape getOutputShape() {
-        return null;
+        return symbol.getOutputShape();
     }
 }

@@ -37,7 +37,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.engine.Module;
 import org.apache.mxnet.engine.MxModel;
-import org.apache.mxnet.engine.NdArray;
+import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.ResourceAllocator;
 import org.apache.mxnet.jna.JnaUtils;
 
@@ -103,7 +103,7 @@ public final class ModuleApiTesting {
         Shape inputShape = dataDesc.getShape();
 
         try (ResourceAllocator alloc = new ResourceAllocator()) {
-            MxModel model = MxModel.loadSavedModel(alloc, modelPathPrefix, 0);
+            MxModel model = MxModel.loadModel(alloc, modelPathPrefix, 0);
 
             long init = System.nanoTime();
             Module.Builder builder = new Module.Builder(context, model, dataDescs, false);
@@ -116,23 +116,23 @@ public final class ModuleApiTesting {
                 long begin = System.nanoTime();
 
                 try (ResourceAllocator alloc1 = new ResourceAllocator()) {
-                    NdArray ndArray = new NdArray(alloc1, context, inputShape);
+                    MxNDArray ndArray = new MxNDArray(alloc1, context, inputShape);
                     ndArray.set(data);
 
-                    NdArray[] input = new NdArray[] {ndArray};
+                    MxNDArray[] input = new MxNDArray[] {ndArray};
 
                     module.forward(input);
 
-                    NdArray[] ret = module.getOutputs();
-                    for (NdArray nd : ret) {
+                    MxNDArray[] ret = module.getOutputs();
+                    for (MxNDArray nd : ret) {
                         nd.waitAll();
                     }
 
                     long inference = System.nanoTime();
                     inferenceTime.add(inference - begin);
 
-                    NdArray sorted = ret[0].argsort(-1, false);
-                    NdArray top = sorted.slice(0, 1);
+                    MxNDArray sorted = ret[0].argsort(-1, false);
+                    MxNDArray top = sorted.slice(0, 1);
 
                     float[] indices = top.toFloatArray();
                     String className = model.getSynset()[(int) indices[0]];

@@ -10,25 +10,29 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package com.amazon.ai.inference;
+package org.apache.mxnet.engine;
 
+import com.amazon.ai.Block;
 import com.amazon.ai.Context;
-import com.amazon.ai.Model;
-import com.amazon.ai.Transformer;
+import com.amazon.ai.inference.Predictor;
+import com.amazon.ai.ndarray.NDArray;
 
-public class Classifier<I, O> {
+public class MxPredictor extends Predictor<NDArray, NDArray> {
 
-    private Predictor<I, O> predictor;
+    private MxModel model;
+    private Context context;
+    private Module module;
 
-    public Classifier(Model model, Transformer<I, O> transformer) {
-        this(model, transformer, Context.defaultContext());
+    MxPredictor(MxModel model, Context context) {
+        this.model = model;
+        this.context = context;
     }
 
-    public Classifier(Model model, Transformer<I, O> transformer, Context context) {
-        this.predictor = new Predictor<>(model, transformer, context);
-    }
-
-    public O classify(I input) {
-        return predictor.predict(input);
+    @Override
+    public NDArray predict(NDArray input) {
+        Block network = model.getNetwork();
+        network.setInput(input);
+        network.forward();
+        return network.getOutput();
     }
 }

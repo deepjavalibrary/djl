@@ -18,7 +18,13 @@ public interface Model {
 
     Block getNetwork();
 
-    String[] getLabels();
+    Shape getInputShape();
 
     Shape getOutputShape();
+
+    String[] getLabels();
+
+    String[] getDataNames();
+
+    void setDataNames(String... names);
 }

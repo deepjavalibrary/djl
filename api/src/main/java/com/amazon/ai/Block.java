@@ -23,6 +23,8 @@ public interface Block {
 
     Shape getInputShape();
 
+    Shape getOutputShape();
+
     void setInput(NDArray array);
 
     NDArray getOutput();

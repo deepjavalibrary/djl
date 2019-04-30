@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import org.apache.mxnet.engine.DeviceType;
-import org.apache.mxnet.engine.NdArray;
+import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.ResourceAllocator;
 import org.apache.mxnet.engine.Symbol;
 
@@ -923,15 +923,15 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
-    public static NdArray[] getExecutorOutputs(ResourceAllocator alloc, Pointer executor) {
+    public static MxNDArray[] getExecutorOutputs(ResourceAllocator alloc, Pointer executor) {
         IntBuffer outSize = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXExecutorOutputs(executor, outSize, ref));
         int size = outSize.get();
         Pointer[] pointers = ref.getValue().getPointerArray(0, size);
-        NdArray[] ndArrays = new NdArray[size];
+        MxNDArray[] ndArrays = new MxNDArray[size];
         for (int i = 0; i < size; ++i) {
-            ndArrays[i] = new NdArray(alloc, pointers[i]);
+            ndArrays[i] = new MxNDArray(alloc, pointers[i]);
         }
         return ndArrays;
     }
