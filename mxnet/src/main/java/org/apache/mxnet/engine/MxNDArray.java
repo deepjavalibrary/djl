@@ -14,7 +14,9 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
@@ -22,7 +24,6 @@ import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -97,7 +98,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     @Override
-    public void encode(OutputStream os) throws IOException {}
+    public void encode(OutputStream os) {}
 
     public DataType getDataType() {
         if (dataType == null) {
@@ -120,11 +121,22 @@ public class MxNDArray extends NativeResource implements NDArray {
         return shape;
     }
 
-    public SparseFormat getStorageType() {
+    public SparseFormat getSparseFormat() {
         if (storageType == null) {
             storageType = JnaUtils.getStorageType(getHandle());
         }
         return storageType;
+    }
+
+    @Override
+    public Layout getLayout() {
+        return Layout.UNDEFINED;
+    }
+
+    @Override
+    public DataDesc getDataDescriptor() {
+        return new DataDesc(
+                getShape(), getDataType(), null, getLayout(), getContext(), getSparseFormat());
     }
 
     public void set(Buffer data) {

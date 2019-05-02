@@ -13,42 +13,40 @@
 package com.amazon.ai;
 
 import com.amazon.ai.engine.Engine;
-import com.amazon.ai.ndarray.types.Shape;
+import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.DataType;
 import java.io.File;
+import java.io.IOException;
 
 public interface Model {
 
-    static Model loadModel(String modelPath) {
+    static Model loadModel(String modelPath) throws IOException {
         return loadModel(modelPath, -1);
     }
 
-    static Model loadModel(String modelPath, int epoch) {
+    static Model loadModel(String modelPath, int epoch) throws IOException {
         File file = new File(modelPath);
         String modelName = file.getName();
         return loadModel(file, modelName, -1);
     }
 
-    static Model loadModel(File modelPath) {
+    static Model loadModel(File modelPath) throws IOException {
         return loadModel(modelPath, modelPath.getName(), -1);
     }
 
-    static Model loadModel(File modelPath, String modelName) {
+    static Model loadModel(File modelPath, String modelName) throws IOException {
         return loadModel(modelPath, modelPath.getName(), -1);
     }
 
-    static Model loadModel(File modelPath, String modelName, int epoch) {
+    static Model loadModel(File modelPath, String modelName, int epoch) throws IOException {
         return Engine.getInstance().loadModel(modelPath, modelName, epoch);
     }
 
-    Block getNetwork();
+    DataDesc[] describeInput();
 
-    Shape getInputShape();
+    DataDesc[] describeOutput();
 
-    Shape getOutputShape();
+    String[] getSynset();
 
-    String[] getLabels();
-
-    String[] getDataNames();
-
-    void setDataNames(String... names);
+    Model cast(DataType dataType);
 }

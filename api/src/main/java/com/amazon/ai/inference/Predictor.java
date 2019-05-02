@@ -17,7 +17,7 @@ import com.amazon.ai.Model;
 import com.amazon.ai.Transformer;
 import com.amazon.ai.engine.Engine;
 
-public interface Predictor<I, O> {
+public interface Predictor<I, O> extends AutoCloseable {
 
     static <I, O> Predictor<I, O> newInstance(Model model, Transformer<I, O> transformer) {
         return newInstance(model, transformer, Context.defaultContext());
@@ -29,4 +29,7 @@ public interface Predictor<I, O> {
     }
 
     O predict(I input);
+
+    @Override
+    void close();
 }

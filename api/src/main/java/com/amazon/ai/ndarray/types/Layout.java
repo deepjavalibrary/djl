@@ -28,4 +28,13 @@ public enum Layout {
     public String getValue() {
         return value;
     }
+
+    public static Layout fromValue(String value) {
+        for (Layout layout : values()) {
+            if (layout.value.equals(value)) {
+                return layout;
+            }
+        }
+        throw new IllegalArgumentException("Invalid layout value: " + value);
+    }
 }

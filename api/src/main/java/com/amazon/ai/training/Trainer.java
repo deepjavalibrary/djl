@@ -12,66 +12,31 @@
  */
 package com.amazon.ai.training;
 
-import com.amazon.ai.Block;
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.engine.Engine;
-import com.amazon.ai.ndarray.NDArray;
 
-public class Trainer {
+public interface Trainer {
 
-    private Model model;
-    private Estimator estimator;
-    private Optimizer optimizer;
-    private ModelSaver modelSaver;
-
-    public static Trainer newInstance(Model model) {
+    static Trainer newInstance(Model model) {
         return newInstance(model, Context.defaultContext());
     }
 
-    public static Trainer newInstance(Model model, Context context) {
+    static Trainer newInstance(Model model, Context context) {
         return Engine.getInstance().newTrainer(model, context);
     }
 
-    public Trainer(Model model) {
-        this.model = model;
-    }
+    Estimator getEstimator();
 
-    public Estimator getEstimator() {
-        return estimator;
-    }
+    void setEstimator(Estimator estimator);
 
-    public void setEstimator(Estimator estimator) {
-        this.estimator = estimator;
-    }
+    Optimizer getOptimizer();
 
-    public Optimizer getOptimizer() {
-        return optimizer;
-    }
+    void setOptimizer(Optimizer optimizer);
 
-    public void setOptimizer(Optimizer optimizer) {
-        this.optimizer = optimizer;
-    }
+    ModelSaver getModelSaver();
 
-    public ModelSaver getModelSaver() {
-        return modelSaver;
-    }
+    void setModelSaver(ModelSaver modelSaver);
 
-    public void setModelSaver(ModelSaver modelSaver) {
-        this.modelSaver = modelSaver;
-    }
-
-    public NDArray train(NDArray array) {
-        Block graph = model.getNetwork();
-        graph.setInput(array);
-        graph.forward();
-
-        array = graph.getOutput();
-
-        return array;
-    }
-
-    public void checkpoint() {
-        modelSaver.save(model);
-    }
+    void checkpoint();
 }

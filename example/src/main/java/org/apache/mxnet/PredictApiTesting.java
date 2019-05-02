@@ -70,9 +70,7 @@ public final class PredictApiTesting {
             String[] synset = MxModel.loadSynset(synsetFile);
 
             Shape inputShape = new Shape(1, 3, 224, 224);
-            DataDesc dataDesc =
-                    new DataDesc(
-                            Context.defaultContext(), "data", inputShape, DataType.FLOAT32, "NCHW");
+            DataDesc dataDesc = new DataDesc(inputShape, DataType.FLOAT32, "data");
 
             BufferedImage img = Images.loadImageFromFile(new File(imageFile));
             BufferedImage image = Images.reshapeImage(img, 224, 224);

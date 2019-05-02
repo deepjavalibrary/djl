@@ -15,12 +15,19 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Profiler;
+import com.amazon.ai.Transformer;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.training.Trainer;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.apache.mxnet.jna.JnaUtils;
 
 public class MxEngine extends Engine {
 
@@ -33,22 +40,56 @@ public class MxEngine extends Engine {
 
     @Override
     public Context defaultContext() {
-        return null;
+        if (getGpuCount() > 0) {
+            return Context.gpu(0);
+        }
+        return Context.cpu();
     }
 
     @Override
     public String getVersion() {
-        return null;
+        int version = JnaUtils.getVersion();
+        int major = version / 10000;
+        int minor = version / 100 - major * 10;
+        int patch = version % 100;
+
+        return major + "." + minor + '.' + patch;
     }
 
     @Override
-    public Model loadModel(File modelPath, String modelName, int epoch) {
-        return null;
+    public Model loadModel(File modelPath, String modelName, int epoch) throws IOException {
+        File modelDir;
+        if (modelPath.isDirectory()) {
+            modelDir = modelPath;
+        } else {
+            modelDir = modelPath.getParentFile();
+        }
+        String modelPrefix = new File(modelDir, modelName).getAbsolutePath();
+        if (epoch == -1) {
+            final Pattern pattern = Pattern.compile(Pattern.quote(modelName) + "-(\\d{4}).params");
+            List<Integer> checkpoints =
+                    Files.walk(modelDir.toPath(), 1)
+                            .map(
+                                    p -> {
+                                        Matcher m = pattern.matcher(p.toFile().getName());
+                                        if (m.matches()) {
+                                            return Integer.parseInt(m.group(1));
+                                        }
+                                        return null;
+                                    })
+                            .filter(e -> e != null)
+                            .sorted()
+                            .collect(Collectors.toList());
+            epoch = checkpoints.get(checkpoints.size() - 1);
+        }
+
+        return MxModel.loadModel(modelPrefix, epoch);
     }
 
     @Override
-    public Predictor<NDArray, NDArray> newPredictor(Model model, Context context) {
-        return new MxPredictor((MxModel) model, context);
+    public <I, O> Predictor<I, O> newPredictor(
+            Model model, Transformer<I, O> transformer, Context context) {
+        return new MxPredictor<>((MxModel) model, transformer, context);
     }
 
     @Override
@@ -61,6 +102,6 @@ public class MxEngine extends Engine {
 
     @Override
     public NDFactory getNDFactory() {
-        return null;
+        return new MxNDFactory();
     }
 }

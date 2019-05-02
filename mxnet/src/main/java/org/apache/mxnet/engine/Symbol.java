@@ -16,8 +16,8 @@ import com.amazon.ai.Block;
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.GradReq;
+import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
@@ -69,7 +69,7 @@ public class Symbol extends NativeResource implements Block {
             outputLayouts = new ArrayList<>();
             for (String argName : getArgParams()) {
                 try (Symbol symbol = get(argName)) {
-                    String layout = symbol.getAttribute("__layout__");
+                    Layout layout = Layout.fromValue(symbol.getAttribute("__layout__"));
                     outputLayouts.add(DataDesc.getBatchAxis(layout));
                 }
             }
@@ -116,15 +116,6 @@ public class Symbol extends NativeResource implements Block {
         return new Symbol(alloc, pointer);
     }
 
-    public void inferType(DataType... args) {
-        String[] types = new String[args.length];
-        int i = 0;
-        for (DataType type : args) {
-            types[i++] = type.getType();
-        }
-        JnaUtils.inferType(getHandle(), types);
-    }
-
     public String debugStr() {
         return JnaUtils.getSymbolDebugString(getHandle());
     }
@@ -158,7 +149,6 @@ public class Symbol extends NativeResource implements Block {
     public MxExecutor[] simpleBind(
             MxModel model,
             List<Context> contexts,
-            List<DataDesc> dataDescriptors,
             String[] labelNames,
             String[] stateNames,
             GradReq gradReq,
@@ -190,11 +180,12 @@ public class Symbol extends NativeResource implements Block {
         }
 
         // Prepare input data related parameters
+        DataDesc[] dataDescriptors = model.describeInput();
         int size = 0;
         for (DataDesc desc : dataDescriptors) {
             size += desc.getShape().getShape().length;
         }
-        String[] inputArgNames = new String[dataDescriptors.size()];
+        String[] inputArgNames = new String[dataDescriptors.length];
         String[] inputDataTypeNames = new String[inputArgNames.length];
         int[] inputDataTypes = new int[inputArgNames.length];
 

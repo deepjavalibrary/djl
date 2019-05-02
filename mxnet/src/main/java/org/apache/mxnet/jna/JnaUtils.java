@@ -752,7 +752,7 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
-    public static Pointer inferShape(Pointer symbol, String[] keys) {
+    public static Shape[] inferShape(Pointer symbol, String[] keys) {
         IntBuffer argIndex = IntBuffer.allocate(1);
         IntBuffer argShapeData = IntBuffer.allocate(1);
         IntBuffer inShapeSize = IntBuffer.allocate(1);
@@ -784,44 +784,9 @@ public final class JnaUtils {
                         auxShapeData,
                         complete));
         if (complete.get() == 1) {
-            return outShapeData.getValue();
-        }
-        return null;
-    }
+            Shape[] ret = new Shape[keys.length];
 
-    public static Pointer inferShapePartial(Pointer symbol, int numArgs, String[] keys) {
-        IntBuffer argIndex = IntBuffer.allocate(1);
-        IntBuffer argShapeData = IntBuffer.allocate(1);
-        IntBuffer inShapeSize = IntBuffer.allocate(1);
-        PointerByReference inShapeNDim = new PointerByReference();
-        PointerByReference inShapeData = new PointerByReference();
-        IntBuffer outShapeSize = IntBuffer.allocate(1);
-        PointerByReference outShapeNDim = new PointerByReference();
-        PointerByReference outShapeData = new PointerByReference();
-        IntBuffer auxShapeSize = IntBuffer.allocate(1);
-        PointerByReference auxShapeNDim = new PointerByReference();
-        PointerByReference auxShapeData = new PointerByReference();
-        IntBuffer complete = IntBuffer.allocate(1);
-
-        checkCall(
-                LIB.MXSymbolInferShapePartial(
-                        symbol,
-                        numArgs,
-                        keys,
-                        argIndex.array(),
-                        argShapeData.array(),
-                        inShapeSize,
-                        inShapeNDim,
-                        inShapeData,
-                        outShapeSize,
-                        outShapeNDim,
-                        outShapeData,
-                        auxShapeSize,
-                        auxShapeNDim,
-                        auxShapeData,
-                        complete));
-        if (complete.get() == 1) {
-            return outShapeData.getValue();
+            return ret;
         }
         return null;
     }

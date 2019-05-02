@@ -12,6 +12,8 @@
  */
 package org.apache.mxnet.engine;
 
+import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDList;
 import com.sun.jna.Pointer;
 import org.apache.mxnet.jna.JnaUtils;
 
@@ -39,15 +41,16 @@ public class MxExecutor extends NativeResource {
         this.gradArray = gradArray;
     }
 
-    public void forward(MxNDArray[] ndArrays, boolean forTraining) {
-        for (int i = 0; i < ndArrays.length; ++i) {
-            ndArrays[i].copyTo(dataArray[i]);
+    public void forward(NDList ndList, boolean forTraining) {
+        int i = 0;
+        for (NDArray array : ndList) {
+            array.copyTo(dataArray[i++]);
         }
         JnaUtils.forward(getHandle(), forTraining);
     }
 
-    public MxNDArray[] getOutputs() {
-        return outputs;
+    public NDList getOutputs() {
+        return new NDList(outputs);
     }
 
     public long getExecutedBytes() {

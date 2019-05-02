@@ -12,12 +12,12 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Block;
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
+import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.util.PairList;
+import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.io.File;
@@ -42,8 +42,9 @@ public class MxModel implements Model, AutoCloseable {
     private PairList<String, MxNDArray> auxParams;
     private String[] synset;
     private String[] labelNames;
-    private String[] dataNames;
     private String[] optimizerStates;
+    private String[] fixedParameters;
+    private DataDesc[] inputData;
 
     MxModel(
             Symbol symbol,
@@ -117,21 +118,13 @@ public class MxModel implements Model, AutoCloseable {
         return auxParams;
     }
 
-    public String[] getSynset() {
-        if (synset == null) {
-            return EMPTY;
-        }
-        return synset;
+    public void setDataNames(DataDesc... inputData) {
+        this.inputData = inputData;
     }
 
     @Override
-    public String[] getDataNames() {
-        return dataNames;
-    }
-
-    @Override
-    public void setDataNames(String... dataNames) {
-        this.dataNames = dataNames;
+    public Model cast(DataType dataType) {
+        return null;
     }
 
     public String[] getLabelNames() {
@@ -142,6 +135,7 @@ public class MxModel implements Model, AutoCloseable {
     }
 
     public void setLabelNames(String... labelNames) {
+        validate(labelNames, "label", false);
         this.labelNames = labelNames;
     }
 
@@ -150,7 +144,17 @@ public class MxModel implements Model, AutoCloseable {
     }
 
     public void setOptimizerStates(String[] optimizerStates) {
+        validate(optimizerStates, "state", true);
         this.optimizerStates = optimizerStates;
+    }
+
+    public String[] getFixedParameters() {
+        return fixedParameters;
+    }
+
+    public void setFixedParameters(String[] fixedParameters) {
+        validate(fixedParameters, "fixed_param", true);
+        this.fixedParameters = fixedParameters;
     }
 
     public void saveCheckpoint(
@@ -208,22 +212,37 @@ public class MxModel implements Model, AutoCloseable {
     }
 
     @Override
-    public Block getNetwork() {
+    public String[] getSynset() {
+        return synset;
+    }
+
+    @Override
+    public DataDesc[] describeInput() {
+        return inputData;
+    }
+
+    @Override
+    public DataDesc[] describeOutput() {
         return null;
     }
 
-    @Override
-    public String[] getLabels() {
-        return labelNames;
-    }
+    private void validate(String[] names, String typeName, boolean required) {
+        if (names == null || names.length == 0) {
+            return;
+        }
 
-    @Override
-    public Shape getInputShape() {
-        return symbol.getInputShape();
-    }
-
-    @Override
-    public Shape getOutputShape() {
-        return symbol.getOutputShape();
+        String[] args = symbol.getArgParams();
+        for (String name : names) {
+            if (!Utils.contains(args, name)) {
+                String msg =
+                        String.format(
+                                "Input %s_%s is not found in symbol.list_arguments().",
+                                typeName, name);
+                if (required) {
+                    throw new IllegalArgumentException(msg);
+                }
+                logger.warn(msg);
+            }
+        }
     }
 }

@@ -13,7 +13,9 @@
 package com.amazon.ai.ndarray;
 
 import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,6 +42,10 @@ public interface NDArray extends Serializable, AutoCloseable {
     Context getContext();
 
     Shape getShape();
+
+    Layout getLayout();
+
+    DataDesc getDataDescriptor();
 
     void set(Buffer data);
 

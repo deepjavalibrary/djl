@@ -18,7 +18,6 @@
 package org.apache.mxnet;
 
 import com.amazon.ai.Context;
-import com.amazon.ai.Model;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.image.BoundingBox;
 import com.amazon.ai.image.Images;
@@ -26,15 +25,15 @@ import com.amazon.ai.image.Rectangle;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.ImageTransformer;
 import com.amazon.ai.inference.ObjectDetector;
-import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.mxnet.engine.MxModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,11 +46,12 @@ public final class SSDClassifierExample {
 
     private static List<DetectedObject> detect(
             String pathPrefix, String inputImagePath, Context context) throws IOException {
-        Shape inputShape = new Shape(1, 3, 224, 224);
-        DataDesc dataDesc = new DataDesc(context, "data", inputShape, DataType.FLOAT32, "NCHW");
         BufferedImage img = Images.loadImageFromFile(new File(inputImagePath));
 
-        Model model = Model.loadModel(pathPrefix);
+        MxModel model = MxModel.loadModel(pathPrefix, 0);
+        DataDesc dataDesc = new DataDesc(new Shape(1, 3, 224, 224), "data");
+        model.setDataNames(dataDesc);
+
         SampleTransformer transformer = new SampleTransformer(dataDesc);
         ObjectDetector<BufferedImage, List<DetectedObject>> objDet =
                 new ObjectDetector<>(model, transformer);
@@ -127,7 +127,7 @@ public final class SSDClassifierExample {
         }
 
         @Override
-        public List<DetectedObject> processOutput(NDArray array) {
+        public List<DetectedObject> processOutput(NDList array) {
             return null;
         }
     }

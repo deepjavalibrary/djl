@@ -20,6 +20,7 @@ import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.training.Trainer;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -47,7 +48,9 @@ public abstract class Engine {
             logger.warn("More than one deep learning engines found.");
         }
 
-        return list.get(0).getEngine();
+        Engine engine = list.get(0).getEngine();
+        logger.info("Loading ML engine from: {}", engine.getClass());
+        return engine;
     }
 
     public static Engine getInstance() {
@@ -60,7 +63,7 @@ public abstract class Engine {
 
     public abstract String getVersion();
 
-    public abstract Model loadModel(File modelPath, String modelName, int epoch);
+    public abstract Model loadModel(File modelPath, String modelName, int epoch) throws IOException;
 
     public abstract <I, O> Predictor<I, O> newPredictor(
             Model model, Transformer<I, O> transformer, Context context);

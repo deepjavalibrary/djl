@@ -13,11 +13,9 @@
 package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.GradReq;
-import com.amazon.ai.util.Utils;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,39 +32,32 @@ public class Module implements AutoCloseable {
         this.forTraining = forTraining;
     }
 
-    public void forward(MxNDArray[] ndArrays) {
+    public NDList forward(NDList ndList) {
         for (MxExecutor executor : executors) {
-            executor.forward(ndArrays, forTraining);
+            executor.forward(ndList, forTraining);
         }
+        return getOutputs();
     }
 
-    public MxNDArray[] getOutputs() {
+    public NDList getOutputs() {
         if (executors.length == 1) {
-            return executors[0].getOutputs();
+            return new CloseShieldNDList(executors[0].getOutputs());
         }
 
-        int count = 0;
+        NDList ret = new CloseShieldNDList();
         for (MxExecutor executor : executors) {
-            MxNDArray[] out = executor.getOutputs();
-            count += out.length;
-        }
-
-        MxNDArray[] ret = new MxNDArray[count];
-        int index = 0;
-        for (MxExecutor executor : executors) {
-            MxNDArray[] out = executor.getOutputs();
-            System.arraycopy(out, 0, ret, index, out.length);
-            index += out.length;
+            NDList out = executor.getOutputs();
+            ret.addAll(out);
         }
         return ret;
     }
 
-    public static Builder forTraining(Context context, MxModel model, List<DataDesc> descriptors) {
-        return new Builder(context, model, descriptors, true);
+    public static Builder forTraining(Context context, MxModel model) {
+        return new Builder(context, model, true);
     }
 
-    public static Builder forInference(Context context, MxModel model, List<DataDesc> descriptors) {
-        return new Builder(context, model, descriptors, true);
+    public static Builder forInference(Context context, MxModel model) {
+        return new Builder(context, model, true);
     }
 
     @Override
@@ -78,28 +69,20 @@ public class Module implements AutoCloseable {
 
     public static final class Builder {
 
-        private List<Context> contexts;
+        private Context context;
         private MxModel model;
-        private List<DataDesc> descriptors;
         private boolean forTraining;
         private GradReq gradReq;
 
-        private String[] fixedParameters;
         private Map<String, Context> contextMap;
 
-        public Builder(
-                Context context, MxModel model, List<DataDesc> descriptors, boolean forTraining) {
-            this.contexts = Collections.singletonList(context);
+        public Builder(Context context, MxModel model, boolean forTraining) {
+            this.context = context;
             this.model = model;
-            this.descriptors = descriptors;
             this.forTraining = forTraining;
 
             gradReq = forTraining ? GradReq.WRITE : GradReq.NULL;
             contextMap = Collections.emptyMap();
-        }
-
-        public void setFixedParameters(String[] fixedParameters) {
-            this.fixedParameters = fixedParameters;
         }
 
         public void setContextMap(Map<String, Context> contextMap) {
@@ -111,15 +94,7 @@ public class Module implements AutoCloseable {
         }
 
         public Module build(ResourceAllocator alloc) {
-            String[] dataNames = new String[descriptors.size()];
-            for (int i = 0; i < descriptors.size(); ++i) {
-                dataNames[i] = descriptors.get(i).getName();
-            }
-            validate(dataNames, "data", true);
-            validate(model.getLabelNames(), "label", false);
             if (forTraining) {
-                validate(model.getOptimizerStates(), "state", true);
-                validate(fixedParameters, "fixed_param", true);
                 if (gradReq == null) {
                     gradReq = GradReq.WRITE;
                 }
@@ -131,8 +106,7 @@ public class Module implements AutoCloseable {
             MxExecutor[] executors =
                     symbol.simpleBind(
                             model,
-                            contexts,
-                            descriptors,
+                            Collections.singletonList(context),
                             labelNames,
                             stateNames,
                             gradReq,
@@ -149,25 +123,17 @@ public class Module implements AutoCloseable {
 
             return new Module(executors, forTraining);
         }
+    }
 
-        private void validate(String[] names, String typeName, boolean required) {
-            if (names == null || names.length == 0) {
-                return;
-            }
+    private static final class CloseShieldNDList extends NDList {
 
-            String[] args = model.getSymbol().getArgParams();
-            for (String name : names) {
-                if (!Utils.contains(args, name)) {
-                    String msg =
-                            String.format(
-                                    "Input %s_%s is not found in symbol.list_arguments().",
-                                    typeName, name);
-                    if (required) {
-                        throw new IllegalArgumentException(msg);
-                    }
-                    logger.warn(msg);
-                }
-            }
+        public CloseShieldNDList() {}
+
+        public CloseShieldNDList(NDList other) {
+            super(other);
         }
+
+        @Override
+        public void close() {}
     }
 }

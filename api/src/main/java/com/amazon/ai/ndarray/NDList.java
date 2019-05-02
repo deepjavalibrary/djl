@@ -17,9 +17,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class NDList implements Iterable<NDArray> {
+public class NDList implements Iterable<NDArray>, AutoCloseable {
 
-    private List<NDArray> list;
+    protected List<NDArray> list;
 
     /** Constructs an empty list. */
     public NDList() {
@@ -40,11 +40,29 @@ public class NDList implements Iterable<NDArray> {
         this.list = Arrays.asList(arrays);
     }
 
+    public NDList(NDList arrays) {
+        this.list = arrays.list;
+    }
+
+    public NDArray[] toArray() {
+        return list.toArray(new NDArray[0]);
+    }
+
+    /**
+     * Returns the number of NDArray in this list. If this list contains more than
+     * <tt>Integer.MAX_VALUE</tt> NDArrays, returns <tt>Integer.MAX_VALUE</tt>.
+     *
+     * @return the number of NDArrays in this list
+     */
+    public int size() {
+        return list.size();
+    }
+
     /**
      * Returns the NDArray at the specified position in this list.
      *
      * @param index index of the NDArray to return
-     * @return the element at the specified position in this list
+     * @return the NDArray at the specified position in this list
      * @throws IndexOutOfBoundsException if the index is out of range (<tt>index &lt; 0 || index
      *     &gt;= size()</tt>)
      */
@@ -55,28 +73,66 @@ public class NDList implements Iterable<NDArray> {
     /**
      * Appends the specified NDArray to the end of this list (optional operation).
      *
-     * <p>Lists that support this operation may place limitations on what elements may be added to
-     * this list. In particular, some lists will refuse to add null elements, and others will impose
-     * restrictions on the type of elements that may be added. List classes should clearly specify
-     * in their documentation any restrictions on what elements may be added.
+     * <p>Lists that support this operation may place limitations on what NDArrays may be added to
+     * this list. In particular, some lists will refuse to add null NDArrays, and others will impose
+     * restrictions on the type of NDArrays that may be added. List classes should clearly specify
+     * in their documentation any restrictions on what NDArrays may be added.
      *
-     * @param array element to be appended to this list
+     * @param array NDArray to be appended to this list
      * @return <tt>true</tt> if this array is successfully added
      * @throws UnsupportedOperationException if the <tt>add</tt> operation is not supported by this
      *     list
-     * @throws ClassCastException if the class of the specified element prevents it from being added
+     * @throws ClassCastException if the class of the specified NDArray prevents it from being added
      *     to this list
-     * @throws NullPointerException if the specified element is null and this list does not permit
-     *     null elements
-     * @throws IllegalArgumentException if some property of this element prevents it from being
+     * @throws NullPointerException if the specified NDArray is null and this list does not permit
+     *     null NDArrays
+     * @throws IllegalArgumentException if some property of this NDArray prevents it from being
      *     added to this list
      */
     public boolean add(NDArray array) {
         return list.add(array);
     }
 
+    /**
+     * Appends all of the NDArray in the specified collection to the end of this list, in the order
+     * that they are returned by the specified collection's iterator (optional operation). The
+     * behavior of this operation is undefined if the specified collection is modified while the
+     * operation is in progress. (Note that this will occur if the specified collection is this
+     * list, and it's nonempty.)
+     *
+     * @param other NDList containing NDArray to be added to this list
+     * @return <tt>true</tt> if this list changed as a result of the call
+     * @throws UnsupportedOperationException if the <tt>addAll</tt> operation is not supported by
+     *     this list
+     * @throws ClassCastException if the class of a NDArray of the specified collection prevents it
+     *     from being added to this list
+     * @throws NullPointerException if the specified collection contains one or more null NDArray
+     *     and this list does not permit null NDArrays, or if the specified collection is null
+     * @throws IllegalArgumentException if some property of an NDArray of the specified collection
+     *     prevents it from being added to this list
+     */
+    public void addAll(NDList other) {
+        list.addAll(other.list);
+    }
+
+    /**
+     * Returns an iterator over the NDArrays in this list in proper sequence.
+     *
+     * @return an iterator over the NDArrays in this list in proper sequence
+     */
     @Override
     public Iterator<NDArray> iterator() {
         return list.iterator();
+    }
+
+    /**
+     * Closes this resource, relinquishing any underlying resources. This method is invoked
+     * automatically on objects managed by the {@code try}-with-resources statement.
+     */
+    @Override
+    public void close() {
+        for (NDArray array : list) {
+            array.close();
+        }
     }
 }

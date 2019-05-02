@@ -19,8 +19,9 @@ package org.apache.mxnet;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.image.Images;
+import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -61,11 +62,6 @@ public final class ModuleApiTesting {
 
             System.out.println("ModuleApiTesting: iteration: " + iteration);
 
-            Shape inputShape = new Shape(1, 3, 224, 224);
-            DataDesc dataDesc =
-                    new DataDesc(
-                            Context.defaultContext(), "data", inputShape, DataType.FLOAT32, "NCHW");
-
             BufferedImage img = Images.loadImageFromFile(new File(imageFile));
             BufferedImage image = Images.reshapeImage(img, 224, 224);
             FloatBuffer data = Images.toFloatBuffer(image);
@@ -77,7 +73,7 @@ public final class ModuleApiTesting {
 
             while (!duration.isNegative()) {
                 long begin = System.currentTimeMillis();
-                predict(modelDir, modelName, data, dataDesc, iteration);
+                predict(modelDir, modelName, data, iteration);
                 long delta = System.currentTimeMillis() - begin;
                 duration = duration.minus(Duration.ofMillis(delta));
             }
@@ -92,21 +88,19 @@ public final class ModuleApiTesting {
         }
     }
 
-    private static void predict(
-            String modelDir, String modelName, FloatBuffer data, DataDesc dataDesc, int iteration)
+    private static void predict(String modelDir, String modelName, FloatBuffer data, int iteration)
             throws IOException {
         Context context = Context.defaultContext();
 
         String modelPathPrefix = modelDir + '/' + modelName;
 
-        List<DataDesc> dataDescs = Collections.singletonList(dataDesc);
-        Shape inputShape = dataDesc.getShape();
-
         try (ResourceAllocator alloc = new ResourceAllocator()) {
             MxModel model = MxModel.loadModel(alloc, modelPathPrefix, 0);
+            DataDesc dataDesc = new DataDesc(new Shape(1, 3, 224, 224), "data");
+            model.setDataNames(dataDesc);
 
             long init = System.nanoTime();
-            Module.Builder builder = new Module.Builder(context, model, dataDescs, false);
+            Module.Builder builder = new Module.Builder(context, model, false);
             Module module = builder.build(alloc);
             long loadModel = System.nanoTime();
             System.out.printf("bind model  = %.3f ms.%n", (loadModel - init) / 1000000f);
@@ -116,23 +110,22 @@ public final class ModuleApiTesting {
                 long begin = System.nanoTime();
 
                 try (ResourceAllocator alloc1 = new ResourceAllocator()) {
-                    MxNDArray ndArray = new MxNDArray(alloc1, context, inputShape);
+                    MxNDArray ndArray = new MxNDArray(alloc1, context, dataDesc.getShape());
                     ndArray.set(data);
 
-                    MxNDArray[] input = new MxNDArray[] {ndArray};
-
+                    NDList input = new NDList(ndArray);
                     module.forward(input);
 
-                    MxNDArray[] ret = module.getOutputs();
-                    for (MxNDArray nd : ret) {
+                    NDList ret = module.getOutputs();
+                    for (NDArray nd : ret) {
                         nd.waitAll();
                     }
 
                     long inference = System.nanoTime();
                     inferenceTime.add(inference - begin);
 
-                    MxNDArray sorted = ret[0].argsort(-1, false);
-                    MxNDArray top = sorted.slice(0, 1);
+                    NDArray sorted = ret.get(0).argsort(-1, false);
+                    NDArray top = sorted.slice(0, 1);
 
                     float[] indices = top.toFloatArray();
                     String className = model.getSynset()[(int) indices[0]];
