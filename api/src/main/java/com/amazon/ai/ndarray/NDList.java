@@ -45,7 +45,7 @@ public class NDList implements Iterable<NDArray>, AutoCloseable {
     }
 
     public NDArray[] toArray() {
-        return list.toArray(new NDArray[0]);
+        return list.toArray(new NDArray[0]); // NOPMD
     }
 
     /**

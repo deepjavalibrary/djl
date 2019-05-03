@@ -176,7 +176,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         FunctionInfo functionInfo = OPS.get("_copyto");
 
-        MxNDArray array = (MxNDArray)ndArray;
+        MxNDArray array = (MxNDArray) ndArray;
 
         PointerByReference ref = new PointerByReference(new PointerArray(array.getHandle()));
         functionInfo.invoke(getHandle(), ref, null);

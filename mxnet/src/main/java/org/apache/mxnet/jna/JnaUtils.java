@@ -785,8 +785,8 @@ public final class JnaUtils {
                         complete));
         if (complete.get() == 1) {
             Shape[] ret = new Shape[keys.length];
-
-            return ret;
+            // TODO: add implementation
+            return ret; // NOPMD
         }
         return null;
     }

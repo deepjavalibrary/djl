@@ -13,27 +13,31 @@
 package com.amazon.ai.inference;
 
 import com.amazon.ai.Transformer;
-import com.amazon.ai.engine.Engine;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 
 public abstract class ImageTransformer<T> implements Transformer<BufferedImage, T> {
 
-    private DataDesc dataDesc;
+    private NDFactory factory;
 
-    public ImageTransformer(DataDesc dataDesc) {
-        this.dataDesc = dataDesc;
+    public ImageTransformer(NDFactory factory) {
+        this.factory = factory;
     }
 
     @Override
     public NDList processInput(BufferedImage input) {
+        int w = input.getWidth();
+        int h = input.getHeight();
+        Shape shape = new Shape(1, 3, h, w);
+        DataDesc dataDesc = new DataDesc(shape);
+
         FloatBuffer buffer = Images.toFloatBuffer(input);
-        NDFactory factory = Engine.getInstance().getNDFactory();
 
         NDArray array = factory.create(dataDesc);
         array.set(buffer);

@@ -16,6 +16,7 @@ import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Transformer;
 import com.amazon.ai.engine.Engine;
+import com.amazon.ai.ndarray.NDFactory;
 
 public interface Predictor<I, O> extends AutoCloseable {
 
@@ -27,6 +28,8 @@ public interface Predictor<I, O> extends AutoCloseable {
             Model model, Transformer<I, O> transformer, Context context) {
         return Engine.getInstance().newPredictor(model, transformer, context);
     }
+
+    NDFactory getNDFactory();
 
     O predict(I input);
 

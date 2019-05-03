@@ -19,14 +19,11 @@ import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.nio.Buffer;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 
-public interface NDArray extends Serializable, AutoCloseable {
-
-    long serialVersionUID = 6603384152749567654L;
+public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the encoding format of the NDArray, or null.

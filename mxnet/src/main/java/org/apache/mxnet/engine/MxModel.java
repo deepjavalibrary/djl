@@ -208,7 +208,7 @@ public class MxModel implements Model, AutoCloseable {
         } catch (IOException e) {
             logger.warn("Error opening synset file " + synsetFile, e);
         }
-        return null;
+        return EMPTY;
     }
 
     @Override

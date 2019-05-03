@@ -15,7 +15,10 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Context;
 import com.amazon.ai.Transformer;
 import com.amazon.ai.inference.Predictor;
+import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.ndarray.types.DataDesc;
 
 public class MxPredictor<I, O> implements Predictor<I, O>, AutoCloseable {
 
@@ -23,15 +26,16 @@ public class MxPredictor<I, O> implements Predictor<I, O>, AutoCloseable {
     private Transformer<I, O> transformer;
     private Context context;
     private Module module;
-    private ResourceAllocator alloc;
+    private MxNDFactory factory;
+    private DataDesc[] dataDesc;
 
     MxPredictor(MxModel model, Transformer<I, O> transformer, Context context) {
         this.model = model;
         this.transformer = transformer;
         this.context = context;
-        alloc = new ResourceAllocator();
+        factory = new MxNDFactory();
         Module.Builder builder = new Module.Builder(context, model, false);
-        module = builder.build(alloc);
+        module = builder.build(factory);
     }
 
     @Override
@@ -40,6 +44,11 @@ public class MxPredictor<I, O> implements Predictor<I, O>, AutoCloseable {
                 NDList result = forward(ndList)) {
             return transformer.processOutput(result);
         }
+    }
+
+    @Override
+    public NDFactory getNDFactory() {
+        return factory;
     }
 
     public MxModel getModel() {
@@ -56,10 +65,32 @@ public class MxPredictor<I, O> implements Predictor<I, O>, AutoCloseable {
         return module.forward(ndList);
     }
 
-    private void rebindIfNeeded(NDList ndList) {}
+    private void rebindIfNeeded(NDList ndList) {
+        if (dataDesc == null) {
+            dataDesc = new DataDesc[ndList.size()];
+        } else {
+            if (dataDesc.length != ndList.size()) {
+                throw new IllegalArgumentException(
+                        "Unpected input size: " + dataDesc.length + ", expected: " + ndList.size());
+            }
+
+            for (int i = 0; i < dataDesc.length; ++i) {
+                DataDesc actuall = ndList.get(i).getDataDescriptor();
+                if (!actuall.getShape().equals(dataDesc[i].getShape())) {
+                    // TODO: rebind module
+                    return;
+                }
+            }
+        }
+
+        for (int i = 0; i < dataDesc.length; ++i) {
+            NDArray array = ndList.get(i);
+            dataDesc[i] = array.getDataDescriptor();
+        }
+    }
 
     @Override
     public void close() {
-        alloc.close();
+        factory.close();
     }
 }
