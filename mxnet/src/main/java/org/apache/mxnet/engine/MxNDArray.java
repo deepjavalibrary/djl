@@ -139,6 +139,7 @@ public class MxNDArray extends NativeResource implements NDArray {
                 getShape(), getDataType(), null, getLayout(), getContext(), getSparseFormat());
     }
 
+    @Override
     public void set(Buffer data) {
         if (data.remaining() != shape.product()) {
             throw new IllegalArgumentException(
@@ -150,20 +151,23 @@ public class MxNDArray extends NativeResource implements NDArray {
         JnaUtils.syncCopyFromCPU(getHandle(), data);
     }
 
+    @Override
     public MxNDArray at(int index) {
         Pointer pointer = JnaUtils.ndArrayAt(getHandle(), index);
         return new MxNDArray(alloc, pointer);
     }
 
+    @Override
     public MxNDArray slice(int begin, int end) {
         Pointer pointer = JnaUtils.slice(getHandle(), begin, end);
         return new MxNDArray(alloc, pointer);
     }
 
     @Override
-    public void copyTo(NDArray array) {}
-
-    public void copyTo(MxNDArray ndArray) {
+    public void copyTo(NDArray ndArray) {
+        if (!(ndArray instanceof MxNDArray)) {
+            throw new IllegalArgumentException("Only MxNDArray is supported.");
+        }
         Shape inShape = getShape();
         Shape destShape = ndArray.getShape();
         if (!Arrays.equals(inShape.getShape(), destShape.getShape())) {
@@ -172,22 +176,28 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         FunctionInfo functionInfo = OPS.get("_copyto");
 
-        PointerByReference ref = new PointerByReference(new PointerArray(ndArray.getHandle()));
+        MxNDArray array = (MxNDArray)ndArray;
+
+        PointerByReference ref = new PointerByReference(new PointerArray(array.getHandle()));
         functionInfo.invoke(getHandle(), ref, null);
     }
 
+    @Override
     public void waitToRead() {
         JnaUtils.waitToRead(getHandle());
     }
 
+    @Override
     public void waitToWrite() {
         JnaUtils.waitToWrite(getHandle());
     }
 
+    @Override
     public void waitAll() {
         JnaUtils.waitAll();
     }
 
+    @Override
     public MxNDArray argsort(int axis, boolean isAscend) {
         FunctionInfo functionInfo = OPS.get("argsort");
         String[] keys = new String[] {"axis", "is_ascend"};
