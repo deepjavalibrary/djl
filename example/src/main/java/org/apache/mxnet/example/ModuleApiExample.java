@@ -15,84 +15,47 @@
  * limitations under the License.
  */
 
-package org.apache.mxnet;
+package org.apache.mxnet.example;
 
 import com.amazon.ai.Context;
+import com.amazon.ai.example.util.AbstractExample;
+import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.engine.Module;
 import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.ResourceAllocator;
-import org.apache.mxnet.jna.JnaUtils;
+import org.slf4j.Logger;
 
-@SuppressWarnings("PMD.SystemPrintln")
-public final class ModuleApiTesting {
+public final class ModuleApiExample extends AbstractExample {
 
-    private ModuleApiTesting() {}
+    private static final Logger logger = LogUtils.getLogger(ModuleApiExample.class);
+
+    private ModuleApiExample() {}
 
     public static void main(String[] args) {
-        Options options = Arguments.getOptions();
-        try {
-            DefaultParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args, null, false);
-            Arguments arguments = new Arguments(cmd);
-
-            String modelDir = arguments.getModelDir();
-            String modelName = arguments.getModelName();
-            String imageFile = arguments.getImageFile();
-            Duration duration = Duration.ofMinutes(arguments.getDuration());
-            int iteration = arguments.getIteration();
-
-            System.out.println("ModuleApiTesting: iteration: " + iteration);
-
-            BufferedImage img = Images.loadImageFromFile(new File(imageFile));
-            BufferedImage image = Images.reshapeImage(img, 224, 224);
-            FloatBuffer data = Images.toFloatBuffer(image);
-
-            long init = System.nanoTime();
-            System.out.println("Loading native library: " + JnaUtils.getVersion());
-            long loaded = System.nanoTime();
-            System.out.printf("loadlibrary = %.3f ms.%n", (loaded - init) / 1000000f);
-
-            while (!duration.isNegative()) {
-                long begin = System.currentTimeMillis();
-                predict(modelDir, modelName, data, iteration);
-                long delta = System.currentTimeMillis() - begin;
-                duration = duration.minus(Duration.ofMillis(delta));
-            }
-
-        } catch (ParseException e) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.setLeftPadding(1);
-            formatter.setWidth(120);
-            formatter.printHelp(e.getMessage(), options);
-        } catch (Throwable t) {
-            t.printStackTrace(); // NOPMD
-        }
+        new ModuleApiExample().runExample(args);
     }
 
-    private static void predict(String modelDir, String modelName, FloatBuffer data, int iteration)
+    @Override
+    public void predict(String modelDir, String modelName, BufferedImage img, int iteration)
             throws IOException {
         Context context = Context.defaultContext();
 
         String modelPathPrefix = modelDir + '/' + modelName;
+
+        BufferedImage image = Images.reshapeImage(img, 224, 224);
+        FloatBuffer data = Images.toFloatBuffer(image);
 
         try (ResourceAllocator alloc = new ResourceAllocator()) {
             MxModel model = MxModel.loadModel(alloc, modelPathPrefix, 0);
@@ -103,7 +66,7 @@ public final class ModuleApiTesting {
             Module.Builder builder = new Module.Builder(context, model, false);
             Module module = builder.build(alloc);
             long loadModel = System.nanoTime();
-            System.out.printf("bind model  = %.3f ms.%n", (loadModel - init) / 1000000f);
+            logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
 
             List<Long> inferenceTime = new ArrayList<>(iteration);
             for (int i = 0; i < iteration; ++i) {
@@ -127,11 +90,10 @@ public final class ModuleApiTesting {
                     NDArray sorted = ret.get(0).argsort(-1, false);
                     NDArray top = sorted.slice(0, 1);
 
-                    float[] indices = top.toFloatArray();
-                    String className = model.getSynset()[(int) indices[0]];
-
                     if (i == 0) {
-                        System.out.printf("Result: %s%n", className);
+                        float[] indices = top.toFloatArray();
+                        String className = model.getSynset()[(int) indices[0]];
+                        logger.info(String.format("Result: %s", className));
                     }
                 }
             }
@@ -141,7 +103,7 @@ public final class ModuleApiTesting {
             float p50 = inferenceTime.get(iteration / 2) / 1000000f;
             float p90 = inferenceTime.get(iteration * 9 / 10) / 1000000f;
 
-            System.out.printf("inference P50: %.3f ms, P90: %.3f ms%n", p50, p90);
+            logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
         }
     }
 }

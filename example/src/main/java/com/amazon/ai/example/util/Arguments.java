@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package org.apache.mxnet;
+package com.amazon.ai.example.util;
 
 import java.io.File;
 import org.apache.commons.cli.CommandLine;
@@ -19,7 +19,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-class Arguments {
+public class Arguments {
 
     private String modelDir;
     private String modelName;

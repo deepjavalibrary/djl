@@ -10,12 +10,13 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet;
+package com.amazon.ai.example;
 
-import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Transformer;
 import com.amazon.ai.engine.Engine;
+import com.amazon.ai.example.util.AbstractExample;
+import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.Predictor;
@@ -25,69 +26,27 @@ import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.engine.MxModel;
-import org.apache.mxnet.jna.JnaUtils;
+import org.slf4j.Logger;
 
-public final class JouleInferenceExample {
+public final class GenericInferenceExample extends AbstractExample {
 
-    private JouleInferenceExample() {}
+    private static final Logger logger = LogUtils.getLogger(GenericInferenceExample.class);
+
+    private GenericInferenceExample() {}
 
     public static void main(String[] args) {
-        Options options = Arguments.getOptions();
-        try {
-            DefaultParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args, null, false);
-            Arguments arguments = new Arguments(cmd);
-
-            String modelDir = arguments.getModelDir();
-            String modelName = arguments.getModelName();
-            String imageFile = arguments.getImageFile();
-            Duration duration = Duration.ofMinutes(arguments.getDuration());
-            int iteration = arguments.getIteration();
-
-            System.out.println("ModuleApiTesting: iteration: " + iteration);
-
-            BufferedImage img = Images.loadImageFromFile(new File(imageFile));
-            BufferedImage image = Images.reshapeImage(img, 224, 224);
-            FloatBuffer data = Images.toFloatBuffer(image);
-
-            long init = System.nanoTime();
-            System.out.println("Loading native library: " + JnaUtils.getVersion());
-            long loaded = System.nanoTime();
-            System.out.printf("loadlibrary = %.3f ms.%n", (loaded - init) / 1000000f);
-
-            while (!duration.isNegative()) {
-                long begin = System.currentTimeMillis();
-                predict(modelDir, modelName, data, iteration);
-                long delta = System.currentTimeMillis() - begin;
-                duration = duration.minus(Duration.ofMillis(delta));
-            }
-        } catch (ParseException e) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.setLeftPadding(1);
-            formatter.setWidth(120);
-            formatter.printHelp(e.getMessage(), options);
-        } catch (Throwable t) {
-            t.printStackTrace(); // NOPMD
-        }
+        new GenericInferenceExample().runExample(args);
     }
 
-    private static void predict(String modelDir, String modelName, FloatBuffer data, int iteration)
+    @Override
+    public void predict(String modelDir, String modelName, BufferedImage img, int iteration)
             throws IOException {
-        Context context = Context.defaultContext();
-
         String modelPathPrefix = modelDir + '/' + modelName;
 
         Model model = Model.loadModel(modelPathPrefix, 0);
@@ -95,13 +54,16 @@ public final class JouleInferenceExample {
         DataDesc dataDesc = new DataDesc(new Shape(1, 3, 224, 224), "data");
         ((MxModel) model).setDataNames(dataDesc);
 
-        SampleTransformer transformer = new SampleTransformer(model, 5);
+        BufferedImage image = Images.reshapeImage(img, 224, 224);
+        FloatBuffer data = Images.toFloatBuffer(image);
+
+        GenericTransformer transformer = new GenericTransformer(model, 5);
 
         long init = System.nanoTime();
         try (Predictor<FloatBuffer, List<DetectedObject>> predictor =
                 Predictor.newInstance(model, transformer)) {
             long loadModel = System.nanoTime();
-            System.out.printf("bind model  = %.3f ms.%n", (loadModel - init) / 1000000f);
+            logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
 
             List<Long> inferenceTime = new ArrayList<>(iteration);
             for (int i = 0; i < iteration; ++i) {
@@ -110,7 +72,7 @@ public final class JouleInferenceExample {
                 inferenceTime.add(transformer.getInferenceTime());
 
                 if (i == 0) {
-                    System.out.printf("Result: %s%n", result.get(0).getClassName());
+                    logger.info(String.format("Result: %s", result.get(0).getClassName()));
                 }
             }
 
@@ -119,11 +81,11 @@ public final class JouleInferenceExample {
             float p50 = inferenceTime.get(iteration / 2) / 1000000f;
             float p90 = inferenceTime.get(iteration * 9 / 10) / 1000000f;
 
-            System.out.printf("inference P50: %.3f ms, P90: %.3f ms%n", p50, p90);
+            logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
         }
     }
 
-    private static final class SampleTransformer
+    private static final class GenericTransformer
             implements Transformer<FloatBuffer, List<DetectedObject>> {
 
         private Model model;
@@ -133,7 +95,7 @@ public final class JouleInferenceExample {
         private long begin;
         private long end;
 
-        public SampleTransformer(Model model, int topK) {
+        public GenericTransformer(Model model, int topK) {
             this.model = model;
             this.topK = topK;
             factory = Engine.getInstance().getNDFactory();
@@ -152,6 +114,9 @@ public final class JouleInferenceExample {
 
         @Override
         public List<DetectedObject> processOutput(NDList list) {
+            for (NDArray array : list) {
+                array.waitAll();
+            }
             end = System.nanoTime();
 
             NDArray array = list.get(0);
