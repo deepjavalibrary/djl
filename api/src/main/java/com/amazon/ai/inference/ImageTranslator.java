@@ -12,7 +12,7 @@
  */
 package com.amazon.ai.inference;
 
-import com.amazon.ai.Transformer;
+import com.amazon.ai.Translator;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
@@ -21,7 +21,7 @@ import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 
-public abstract class ImageTransformer<T> implements Transformer<BufferedImage, T> {
+public abstract class ImageTranslator<T> implements Translator<BufferedImage, T> {
 
     @Override
     public NDList processInput(Predictor<?, ?> predictor, BufferedImage input) {

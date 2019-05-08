@@ -13,7 +13,7 @@
 package com.amazon.ai.example;
 
 import com.amazon.ai.Model;
-import com.amazon.ai.Transformer;
+import com.amazon.ai.Translator;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.image.Images;
@@ -55,7 +55,7 @@ public final class GenericInferenceExample extends AbstractExample {
         BufferedImage image = Images.reshapeImage(img, 224, 224);
         FloatBuffer data = Images.toFloatBuffer(image);
 
-        GenericTransformer transformer = new GenericTransformer(5);
+        GenericTranslator transformer = new GenericTranslator(5);
 
         long init = System.nanoTime();
         try (Predictor<FloatBuffer, List<DetectedObject>> predictor =
@@ -83,15 +83,15 @@ public final class GenericInferenceExample extends AbstractExample {
         }
     }
 
-    private static final class GenericTransformer
-            implements Transformer<FloatBuffer, List<DetectedObject>> {
+    private static final class GenericTranslator
+            implements Translator<FloatBuffer, List<DetectedObject>> {
 
         private int topK;
 
         private long begin;
         private long end;
 
-        public GenericTransformer(int topK) {
+        public GenericTranslator(int topK) {
             this.topK = topK;
         }
 

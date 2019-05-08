@@ -13,7 +13,7 @@
 package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
-import com.amazon.ai.Transformer;
+import com.amazon.ai.Translator;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
@@ -22,12 +22,12 @@ import com.amazon.ai.ndarray.types.DataDesc;
 public class MxPredictor<I, O> extends MxNDFactory implements Predictor<I, O> {
 
     private MxModel model;
-    private Transformer<I, O> transformer;
+    private Translator<I, O> transformer;
     private Context context;
     private Module module;
     private DataDesc[] dataDesc;
 
-    MxPredictor(MxModel model, Transformer<I, O> transformer, Context context) {
+    MxPredictor(MxModel model, Translator<I, O> transformer, Context context) {
         super(context);
         this.model = model;
         this.transformer = transformer;

@@ -15,7 +15,7 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Profiler;
-import com.amazon.ai.Transformer;
+import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDFactory;
@@ -88,7 +88,7 @@ public class MxEngine extends Engine {
 
     @Override
     public <I, O> Predictor<I, O> newPredictor(
-            Model model, Transformer<I, O> transformer, Context context) {
+            Model model, Translator<I, O> transformer, Context context) {
         return new MxPredictor<>((MxModel) model, transformer, context);
     }
 

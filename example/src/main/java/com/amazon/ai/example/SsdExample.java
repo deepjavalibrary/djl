@@ -21,7 +21,7 @@ import com.amazon.ai.Model;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.inference.DetectedObject;
-import com.amazon.ai.inference.ImageTransformer;
+import com.amazon.ai.inference.ImageTranslator;
 import com.amazon.ai.inference.ObjectDetector;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDArray;
@@ -56,7 +56,7 @@ public final class SsdExample extends AbstractExample {
         DataDesc dataDesc = new DataDesc(new Shape(1, 3, 224, 224), "data");
         ((MxModel) model).setDataNames(dataDesc);
 
-        SsdTransformer transformer = new SsdTransformer(5);
+        SsdTranslator transformer = new SsdTranslator(5);
 
         long init = System.nanoTime();
         try (ObjectDetector<BufferedImage, List<DetectedObject>> ssd =
@@ -84,14 +84,14 @@ public final class SsdExample extends AbstractExample {
         }
     }
 
-    private static final class SsdTransformer extends ImageTransformer<List<DetectedObject>> {
+    private static final class SsdTranslator extends ImageTranslator<List<DetectedObject>> {
 
         private int topK;
 
         private long begin;
         private long end;
 
-        public SsdTransformer(int topK) {
+        public SsdTranslator(int topK) {
             this.topK = topK;
         }
 

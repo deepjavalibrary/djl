@@ -14,17 +14,17 @@ package com.amazon.ai.inference;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
-import com.amazon.ai.Transformer;
+import com.amazon.ai.Translator;
 
 public class Classifier<I, O> {
 
     private Predictor<I, O> predictor;
 
-    public Classifier(Model model, Transformer<I, O> transformer) {
+    public Classifier(Model model, Translator<I, O> transformer) {
         this(model, transformer, Context.defaultContext());
     }
 
-    public Classifier(Model model, Transformer<I, O> transformer, Context context) {
+    public Classifier(Model model, Translator<I, O> transformer, Context context) {
         this.predictor = Predictor.newInstance(model, transformer, context);
     }
 

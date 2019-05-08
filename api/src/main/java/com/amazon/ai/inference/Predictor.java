@@ -14,18 +14,18 @@ package com.amazon.ai.inference;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
-import com.amazon.ai.Transformer;
+import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.ndarray.NDFactory;
 
 public interface Predictor<I, O> extends NDFactory {
 
-    static <I, O> Predictor<I, O> newInstance(Model model, Transformer<I, O> transformer) {
+    static <I, O> Predictor<I, O> newInstance(Model model, Translator<I, O> transformer) {
         return newInstance(model, transformer, Context.defaultContext());
     }
 
     static <I, O> Predictor<I, O> newInstance(
-            Model model, Transformer<I, O> transformer, Context context) {
+            Model model, Translator<I, O> transformer, Context context) {
         return Engine.getInstance().newPredictor(model, transformer, context);
     }
 

@@ -15,7 +15,7 @@ package com.amazon.ai;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDList;
 
-public interface Transformer<I, O> {
+public interface Translator<I, O> {
 
     NDList processInput(Predictor<?, ?> predictor, I input);
 

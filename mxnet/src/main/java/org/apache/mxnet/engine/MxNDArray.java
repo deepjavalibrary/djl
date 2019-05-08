@@ -74,12 +74,12 @@ public class MxNDArray extends NativeResource implements NDArray {
         this(null, context, shape, DataType.FLOAT32, false);
     }
 
-    public MxNDArray(MxResourceAllocator alloc, Context context, Shape shape) {
+    public MxNDArray(ResourceAllocator alloc, Context context, Shape shape) {
         this(alloc, context, shape, DataType.FLOAT32, false);
     }
 
     public MxNDArray(
-            MxResourceAllocator alloc,
+            ResourceAllocator alloc,
             Context context,
             Shape shape,
             DataType dataType,
