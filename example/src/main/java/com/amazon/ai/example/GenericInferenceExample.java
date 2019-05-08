@@ -14,14 +14,12 @@ package com.amazon.ai.example;
 
 import com.amazon.ai.Model;
 import com.amazon.ai.Transformer;
-import com.amazon.ai.engine.Engine;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
@@ -57,7 +55,7 @@ public final class GenericInferenceExample extends AbstractExample {
         BufferedImage image = Images.reshapeImage(img, 224, 224);
         FloatBuffer data = Images.toFloatBuffer(image);
 
-        GenericTransformer transformer = new GenericTransformer(model, 5);
+        GenericTransformer transformer = new GenericTransformer(5);
 
         long init = System.nanoTime();
         try (Predictor<FloatBuffer, List<DetectedObject>> predictor =
@@ -88,22 +86,19 @@ public final class GenericInferenceExample extends AbstractExample {
     private static final class GenericTransformer
             implements Transformer<FloatBuffer, List<DetectedObject>> {
 
-        private Model model;
         private int topK;
-        private NDFactory factory;
 
         private long begin;
         private long end;
 
-        public GenericTransformer(Model model, int topK) {
-            this.model = model;
+        public GenericTransformer(int topK) {
             this.topK = topK;
-            factory = Engine.getInstance().getNDFactory();
         }
 
         @Override
-        public NDList processInput(FloatBuffer input) {
-            NDArray array = factory.create(model.describeInput()[0]);
+        public NDList processInput(Predictor<?, ?> predictor, FloatBuffer input) {
+            Model model = predictor.getModel();
+            NDArray array = predictor.create(model.describeInput()[0]);
             array.set(input);
 
             NDList list = new NDList(array);
@@ -113,26 +108,25 @@ public final class GenericInferenceExample extends AbstractExample {
         }
 
         @Override
-        public List<DetectedObject> processOutput(NDList list) {
+        public List<DetectedObject> processOutput(Predictor<?, ?> predictor, NDList list) {
             for (NDArray array : list) {
                 array.waitAll();
             }
             end = System.nanoTime();
+
+            Model model = predictor.getModel();
 
             NDArray array = list.get(0);
 
             int length = array.getShape().head();
             length = Math.min(length, topK);
             List<DetectedObject> ret = new ArrayList<>(length);
-            try (NDArray nd = array.at(0)) {
-                NDArray sorted = nd.argsort(-1, false);
-                NDArray top = sorted.slice(0, topK);
+            try (NDArray nd = array.at(0);
+                    NDArray sorted = nd.argsort(-1, false);
+                    NDArray top = sorted.slice(0, topK)) {
 
                 float[] probabilities = nd.toFloatArray();
                 float[] indices = top.toFloatArray();
-
-                sorted.close();
-                top.close();
 
                 for (int i = 0; i < topK; ++i) {
                     int index = (int) indices[i];

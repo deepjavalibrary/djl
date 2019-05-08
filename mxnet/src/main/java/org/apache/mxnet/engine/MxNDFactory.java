@@ -19,8 +19,19 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
+import com.sun.jna.Pointer;
 
-public class MxNDFactory extends ResourceAllocator implements NDFactory {
+public class MxNDFactory extends MxResourceAllocator implements NDFactory {
+
+    private Context context;
+
+    public MxNDFactory() {
+        this(Context.defaultContext());
+    }
+
+    public MxNDFactory(Context context) {
+        this.context = context;
+    }
 
     @Override
     public NDArray create(
@@ -40,5 +51,9 @@ public class MxNDFactory extends ResourceAllocator implements NDFactory {
                 dataDesc.getDataType(),
                 SparseFormat.DEFAULT,
                 false);
+    }
+
+    public MxNDArray create(Pointer handle) {
+        return new MxNDArray(this, context, SparseFormat.DEFAULT, null, DataType.FLOAT32, handle);
     }
 }

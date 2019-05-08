@@ -18,14 +18,13 @@
 package com.amazon.ai.example;
 
 import com.amazon.ai.Model;
-import com.amazon.ai.engine.Engine;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.ImageTransformer;
 import com.amazon.ai.inference.ObjectDetector;
+import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
@@ -57,8 +56,7 @@ public final class SsdExample extends AbstractExample {
         DataDesc dataDesc = new DataDesc(new Shape(1, 3, 224, 224), "data");
         ((MxModel) model).setDataNames(dataDesc);
 
-        NDFactory factory = Engine.getInstance().getNDFactory();
-        SsdTransformer transformer = new SsdTransformer(factory, model, 5);
+        SsdTransformer transformer = new SsdTransformer(5);
 
         long init = System.nanoTime();
         try (ObjectDetector<BufferedImage, List<DetectedObject>> ssd =
@@ -88,34 +86,33 @@ public final class SsdExample extends AbstractExample {
 
     private static final class SsdTransformer extends ImageTransformer<List<DetectedObject>> {
 
-        private Model model;
         private int topK;
 
         private long begin;
         private long end;
 
-        public SsdTransformer(NDFactory factory, Model model, int topK) {
-            super(factory);
-            this.model = model;
+        public SsdTransformer(int topK) {
             this.topK = topK;
         }
 
         @Override
-        public NDList processInput(BufferedImage input) {
+        public NDList processInput(Predictor<?, ?> predictor, BufferedImage input) {
             BufferedImage image = Images.reshapeImage(input, 224, 224);
 
-            NDList list = super.processInput(image);
+            NDList list = super.processInput(predictor, image);
             begin = System.nanoTime();
 
             return list;
         }
 
         @Override
-        public List<DetectedObject> processOutput(NDList list) {
+        public List<DetectedObject> processOutput(Predictor<?, ?> predictor, NDList list) {
             for (NDArray array : list) {
                 array.waitAll();
             }
             end = System.nanoTime();
+
+            Model model = predictor.getModel();
 
             NDArray array = list.get(0);
 

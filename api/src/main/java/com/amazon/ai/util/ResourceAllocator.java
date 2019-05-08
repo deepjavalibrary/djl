@@ -10,23 +10,13 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package com.amazon.ai.ndarray;
+package com.amazon.ai.util;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.util.ResourceAllocator;
+public interface ResourceAllocator extends AutoCloseable {
 
-public interface NDFactory extends ResourceAllocator {
+    void attach(AutoCloseable resource);
 
-    NDArray create(
-            Context context,
-            Shape shape,
-            DataType dataType,
-            SparseFormat storageType,
-            boolean delay);
+    void detach(AutoCloseable resource);
 
-    NDArray create(DataDesc dataDesc);
+    void close();
 }

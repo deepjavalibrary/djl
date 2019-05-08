@@ -73,4 +73,6 @@ public abstract class Engine {
     public abstract void setProfiler(Profiler profiler);
 
     public abstract NDFactory getNDFactory();
+
+    public abstract NDFactory getNDFactory(Context context);
 }

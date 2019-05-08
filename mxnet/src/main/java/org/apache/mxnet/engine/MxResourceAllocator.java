@@ -12,33 +12,38 @@
  */
 package org.apache.mxnet.engine;
 
+import com.amazon.ai.util.ResourceAllocator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ResourceAllocator implements java.io.Closeable {
+public class MxResourceAllocator implements ResourceAllocator {
 
-    private Map<NativeResource, NativeResource> resources;
+    private Map<AutoCloseable, AutoCloseable> resources;
 
-    public ResourceAllocator() {
+    public MxResourceAllocator() {
         resources = new ConcurrentHashMap<>();
     }
 
-    public synchronized void attach(NativeResource resource) {
+    public synchronized void attach(AutoCloseable resource) {
         resources.put(resource, resource);
     }
 
-    public synchronized void detach(NativeResource resource) {
+    public synchronized void detach(AutoCloseable resource) {
         resources.remove(resource);
     }
 
-    public synchronized void detach(NativeResource resource, boolean close) {
+    public synchronized void detach(AutoCloseable resource, boolean close) {
         resources.remove(resource);
     }
 
     @Override
     public synchronized void close() {
-        for (NativeResource resource : resources.keySet()) {
-            resource.close();
+        for (AutoCloseable resource : resources.keySet()) {
+            try {
+                resource.close();
+            } catch (Exception ignore) {
+                // ignore
+            }
         }
         resources = null;
     }

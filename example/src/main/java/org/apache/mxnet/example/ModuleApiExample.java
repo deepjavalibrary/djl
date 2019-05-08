@@ -34,7 +34,8 @@ import java.util.List;
 import org.apache.mxnet.engine.Module;
 import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDArray;
-import org.apache.mxnet.engine.ResourceAllocator;
+import org.apache.mxnet.engine.MxNDFactory;
+import org.apache.mxnet.engine.MxResourceAllocator;
 import org.slf4j.Logger;
 
 public final class ModuleApiExample extends AbstractExample {
@@ -57,14 +58,14 @@ public final class ModuleApiExample extends AbstractExample {
         BufferedImage image = Images.reshapeImage(img, 224, 224);
         FloatBuffer data = Images.toFloatBuffer(image);
 
-        try (ResourceAllocator alloc = new ResourceAllocator()) {
-            MxModel model = MxModel.loadModel(alloc, modelPathPrefix, 0);
+        try (MxNDFactory factory = new MxNDFactory()) {
+            MxModel model = MxModel.loadModel(factory, modelPathPrefix, 0);
             DataDesc dataDesc = new DataDesc(new Shape(1, 3, 224, 224), "data");
             model.setDataNames(dataDesc);
 
             long init = System.nanoTime();
             Module.Builder builder = new Module.Builder(context, model, false);
-            Module module = builder.build(alloc);
+            Module module = builder.build(factory);
             long loadModel = System.nanoTime();
             logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
 
@@ -72,7 +73,7 @@ public final class ModuleApiExample extends AbstractExample {
             for (int i = 0; i < iteration; ++i) {
                 long begin = System.nanoTime();
 
-                try (ResourceAllocator alloc1 = new ResourceAllocator()) {
+                try (MxResourceAllocator alloc1 = new MxResourceAllocator()) {
                     MxNDArray ndArray = new MxNDArray(alloc1, context, dataDesc.getShape());
                     ndArray.set(data);
 

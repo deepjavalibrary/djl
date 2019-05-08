@@ -12,11 +12,12 @@
  */
 package com.amazon.ai;
 
+import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDList;
 
 public interface Transformer<I, O> {
 
-    NDList processInput(I input);
+    NDList processInput(Predictor<?, ?> predictor, I input);
 
-    O processOutput(NDList array);
+    O processOutput(Predictor<?, ?> predictor, NDList array);
 }

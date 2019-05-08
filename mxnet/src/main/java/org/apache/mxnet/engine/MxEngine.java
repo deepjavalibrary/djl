@@ -104,4 +104,9 @@ public class MxEngine extends Engine {
     public NDFactory getNDFactory() {
         return new MxNDFactory();
     }
+
+    @Override
+    public NDFactory getNDFactory(Context context) {
+        return new MxNDFactory(context);
+    }
 }

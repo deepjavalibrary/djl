@@ -14,6 +14,7 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.util.ResourceAllocator;
 import com.sun.jna.Pointer;
 import org.apache.mxnet.jna.JnaUtils;
 

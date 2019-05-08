@@ -16,45 +16,40 @@ import com.amazon.ai.Context;
 import com.amazon.ai.Transformer;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 
-public class MxPredictor<I, O> implements Predictor<I, O>, AutoCloseable {
+public class MxPredictor<I, O> extends MxNDFactory implements Predictor<I, O> {
 
     private MxModel model;
     private Transformer<I, O> transformer;
     private Context context;
     private Module module;
-    private MxNDFactory factory;
     private DataDesc[] dataDesc;
 
     MxPredictor(MxModel model, Transformer<I, O> transformer, Context context) {
+        super(context);
         this.model = model;
         this.transformer = transformer;
         this.context = context;
-        factory = new MxNDFactory();
         Module.Builder builder = new Module.Builder(context, model, false);
-        module = builder.build(factory);
+        module = builder.build(this);
     }
 
     @Override
     public O predict(I input) {
-        try (NDList ndList = transformer.processInput(input);
+        try (NDList ndList = transformer.processInput(this, input);
                 NDList result = forward(ndList)) {
-            return transformer.processOutput(result);
+            return transformer.processOutput(this, result);
         }
     }
 
     @Override
-    public NDFactory getNDFactory() {
-        return factory;
-    }
-
     public MxModel getModel() {
         return model;
     }
 
+    @Override
     public Context getContext() {
         return context;
     }
@@ -91,6 +86,7 @@ public class MxPredictor<I, O> implements Predictor<I, O>, AutoCloseable {
 
     @Override
     public void close() {
-        factory.close();
+        super.close();
+        module.close();
     }
 }

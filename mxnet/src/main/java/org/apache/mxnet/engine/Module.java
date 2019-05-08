@@ -93,7 +93,7 @@ public class Module implements AutoCloseable {
             this.gradReq = gradReq;
         }
 
-        public Module build(ResourceAllocator alloc) {
+        public Module build(MxResourceAllocator alloc) {
             if (forTraining) {
                 if (gradReq == null) {
                     gradReq = GradReq.WRITE;

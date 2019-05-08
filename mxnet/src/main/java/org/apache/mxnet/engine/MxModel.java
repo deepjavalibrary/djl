@@ -14,6 +14,8 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
+import com.amazon.ai.engine.Engine;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.util.PairList;
@@ -61,12 +63,12 @@ public class MxModel implements Model, AutoCloseable {
     }
 
     public static MxModel loadModel(String prefix, int epoch) throws IOException {
-        return loadModel(null, prefix, epoch);
+        return loadModel(Engine.getInstance().getNDFactory(), prefix, epoch);
     }
 
-    public static MxModel loadModel(ResourceAllocator alloc, String prefix, int epoch)
+    public static MxModel loadModel(NDFactory factory, String prefix, int epoch)
             throws IOException {
-        Symbol symbol = Symbol.load(alloc, prefix + "-symbol.json");
+        Symbol symbol = Symbol.load(factory, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
         String stateFile = String.format("%s-%04d.states", prefix, epoch);
         File synsetFile = new File(new File(paramFile).getParentFile(), "synset.txt");
@@ -86,11 +88,11 @@ public class MxModel implements Model, AutoCloseable {
             if ("arg".equals(pair[0])) {
                 argParamNames.add(pair[1]);
                 argParamData.add(
-                        new MxNDArray(alloc, context, null, null, DataType.FLOAT32, handles[i]));
+                        new MxNDArray(factory, context, null, null, DataType.FLOAT32, handles[i]));
             } else if ("aux".equals(pair[0])) {
                 auxParamNames.add(pair[1]);
                 auxParamData.add(
-                        new MxNDArray(alloc, context, null, null, DataType.FLOAT32, handles[i]));
+                        new MxNDArray(factory, context, null, null, DataType.FLOAT32, handles[i]));
             } else {
                 throw new IllegalStateException("Unknown parameter: " + pair[0]);
             }

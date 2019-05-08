@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.engine;
 
+import com.amazon.ai.util.ResourceAllocator;
 import com.sun.jna.Pointer;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;

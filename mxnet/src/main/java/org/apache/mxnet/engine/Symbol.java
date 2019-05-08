@@ -15,6 +15,7 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Block;
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
@@ -38,15 +39,15 @@ public class Symbol extends NativeResource implements Block {
     private String[] outputs;
     private List<Integer> outputLayouts;
 
-    Symbol(ResourceAllocator alloc, Pointer pointer) {
-        super(alloc, pointer);
+    Symbol(NDFactory factory, Pointer pointer) {
+        super(factory, pointer);
         argParams = JnaUtils.listSymbolArguments(getHandle());
         auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }
 
-    public static Symbol load(ResourceAllocator alloc, String path) {
+    public static Symbol load(NDFactory factory, String path) {
         Pointer pointer = JnaUtils.createSymbolFromFile(path);
-        return new Symbol(alloc, pointer);
+        return new Symbol(factory, pointer);
     }
 
     public String[] getArgParams() {
@@ -99,7 +100,7 @@ public class Symbol extends NativeResource implements Block {
 
     public Symbol get(int index) {
         Pointer pointer = JnaUtils.getSymbolOutput(getHandle(), index);
-        return new Symbol(alloc, pointer);
+        return new Symbol(getNDFactory(), pointer);
     }
 
     public Symbol get(String name) {
@@ -113,7 +114,7 @@ public class Symbol extends NativeResource implements Block {
 
     public Symbol getInternals() {
         Pointer pointer = JnaUtils.getSymbolInternals(getHandle());
-        return new Symbol(alloc, pointer);
+        return new Symbol(getNDFactory(), pointer);
     }
 
     public String debugStr() {
@@ -139,7 +140,7 @@ public class Symbol extends NativeResource implements Block {
     }
 
     public Symbol compose(String name, String[] keys) {
-        return new Symbol(alloc, JnaUtils.compose(getHandle(), name, keys));
+        return new Symbol(getNDFactory(), JnaUtils.compose(getHandle(), name, keys));
     }
 
     public void compose(String name, Map<String, String> symbols) {
@@ -331,7 +332,7 @@ public class Symbol extends NativeResource implements Block {
                 }
             }
 
-            MxNDArray[] out = JnaUtils.getExecutorOutputs(alloc, pointer);
+            MxNDArray[] out = JnaUtils.getExecutorOutputs((MxNDFactory) alloc, pointer);
 
             executors[i] =
                     new MxExecutor(alloc, pointer, argArray, auxArray, dataArray, out, gradArray);
@@ -381,5 +382,9 @@ public class Symbol extends NativeResource implements Block {
     @Override
     public byte[] getEncoded() {
         return new byte[0];
+    }
+
+    public MxNDFactory getNDFactory() {
+        return (MxNDFactory) alloc;
     }
 }

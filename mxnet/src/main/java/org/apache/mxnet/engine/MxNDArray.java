@@ -20,6 +20,7 @@ import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
+import com.amazon.ai.util.ResourceAllocator;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -47,18 +48,18 @@ public class MxNDArray extends NativeResource implements NDArray {
     private static final String LF = System.getProperty("line.separator");
 
     private Context context;
-    private SparseFormat storageType;
+    private SparseFormat sparseFormat;
     private DataType dataType;
     private Shape shape;
 
-    public MxNDArray(ResourceAllocator alloc, Pointer handle) {
+    MxNDArray(ResourceAllocator alloc, Pointer handle) {
         super(alloc, handle);
     }
 
-    public MxNDArray(
+    MxNDArray(
             ResourceAllocator alloc,
             Context context,
-            SparseFormat storageType,
+            SparseFormat sparseFormat,
             Shape shape,
             DataType dataType,
             Pointer handle) {
@@ -66,19 +67,19 @@ public class MxNDArray extends NativeResource implements NDArray {
         this.context = context;
         this.dataType = dataType;
         this.shape = shape;
-        this.storageType = storageType;
+        this.sparseFormat = sparseFormat;
     }
 
     public MxNDArray(Context context, Shape shape) {
         this(null, context, shape, DataType.FLOAT32, false);
     }
 
-    public MxNDArray(ResourceAllocator alloc, Context context, Shape shape) {
+    public MxNDArray(MxResourceAllocator alloc, Context context, Shape shape) {
         this(alloc, context, shape, DataType.FLOAT32, false);
     }
 
     public MxNDArray(
-            ResourceAllocator alloc,
+            MxResourceAllocator alloc,
             Context context,
             Shape shape,
             DataType dataType,
@@ -86,7 +87,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         this(
                 alloc,
                 context,
-                null,
+                SparseFormat.DEFAULT,
                 shape,
                 DataType.FLOAT32,
                 JnaUtils.createNdArray(context, shape, dataType, shape.dimension(), delay));
@@ -122,10 +123,10 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     public SparseFormat getSparseFormat() {
-        if (storageType == null) {
-            storageType = JnaUtils.getStorageType(getHandle());
+        if (sparseFormat == null) {
+            sparseFormat = JnaUtils.getStorageType(getHandle());
         }
-        return storageType;
+        return sparseFormat;
     }
 
     @Override
