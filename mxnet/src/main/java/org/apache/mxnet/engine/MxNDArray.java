@@ -153,6 +153,20 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     @Override
+    public void set(float[] data) {
+        set(FloatBuffer.wrap(data));
+    }
+
+    @Override
+    public void set(List<Float> data) {
+        float[] output = new float[data.size()];
+        for (int i = 0; i < output.length; i++) {
+            output[i] = data.get(i);
+        }
+        set(output);
+    }
+
+    @Override
     public MxNDArray at(int index) {
         Pointer pointer = JnaUtils.ndArrayAt(getHandle(), index);
         return new MxNDArray(alloc, pointer);

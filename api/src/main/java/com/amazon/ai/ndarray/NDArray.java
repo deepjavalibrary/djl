@@ -46,6 +46,10 @@ public interface NDArray extends AutoCloseable {
 
     void set(Buffer data);
 
+    void set(float[] data);
+
+    void set(List<Float> data);
+
     NDArray at(int index);
 
     NDArray slice(int begin, int end);
