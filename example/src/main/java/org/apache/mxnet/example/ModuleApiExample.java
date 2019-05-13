@@ -35,7 +35,6 @@ import org.apache.mxnet.engine.Module;
 import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
-import org.apache.mxnet.engine.MxResourceAllocator;
 import org.slf4j.Logger;
 
 public final class ModuleApiExample extends AbstractExample {
@@ -73,29 +72,27 @@ public final class ModuleApiExample extends AbstractExample {
             for (int i = 0; i < iteration; ++i) {
                 long begin = System.nanoTime();
 
-                try (MxResourceAllocator alloc1 = new MxResourceAllocator()) {
-                    MxNDArray ndArray = new MxNDArray(alloc1, context, dataDesc.getShape());
-                    ndArray.set(data);
+                MxNDArray ndArray = factory.create(dataDesc);
+                ndArray.set(data);
 
-                    NDList input = new NDList(ndArray);
-                    module.forward(input);
+                NDList input = new NDList(ndArray);
+                module.forward(input);
 
-                    NDList ret = module.getOutputs();
-                    for (NDArray nd : ret) {
-                        nd.waitAll();
-                    }
+                NDList ret = module.getOutputs();
+                for (NDArray nd : ret) {
+                    nd.waitAll();
+                }
 
-                    long inference = System.nanoTime();
-                    inferenceTime.add(inference - begin);
+                long inference = System.nanoTime();
+                inferenceTime.add(inference - begin);
 
-                    NDArray sorted = ret.get(0).argsort(-1, false);
-                    NDArray top = sorted.slice(0, 1);
+                NDArray sorted = ret.get(0).argsort(-1, false);
+                NDArray top = sorted.slice(0, 1);
 
-                    if (i == 0) {
-                        float[] indices = top.toFloatArray();
-                        String className = model.getSynset()[(int) indices[0]];
-                        logger.info(String.format("Result: %s", className));
-                    }
+                if (i == 0) {
+                    float[] indices = top.toFloatArray();
+                    String className = model.getSynset()[(int) indices[0]];
+                    logger.info(String.format("Result: %s", className));
                 }
             }
 

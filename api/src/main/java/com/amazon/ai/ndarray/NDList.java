@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class NDList implements Iterable<NDArray>, AutoCloseable {
+public class NDList implements Iterable<NDArray> {
 
     protected List<NDArray> list;
 
@@ -123,16 +123,5 @@ public class NDList implements Iterable<NDArray>, AutoCloseable {
     @Override
     public Iterator<NDArray> iterator() {
         return list.iterator();
-    }
-
-    /**
-     * Closes this resource, relinquishing any underlying resources. This method is invoked
-     * automatically on objects managed by the {@code try}-with-resources statement.
-     */
-    @Override
-    public void close() {
-        for (NDArray array : list) {
-            array.close();
-        }
     }
 }

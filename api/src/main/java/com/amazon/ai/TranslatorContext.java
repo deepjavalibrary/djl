@@ -12,11 +12,11 @@
  */
 package com.amazon.ai;
 
-import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.ndarray.NDFactory;
 
-public interface Translator<I, O> {
+public interface TranslatorContext extends NDFactory {
 
-    NDList processInput(TranslatorContext ctx, I input);
+    Model getModel();
 
-    O processOutput(TranslatorContext ctx, NDList list);
+    Context getContext();
 }

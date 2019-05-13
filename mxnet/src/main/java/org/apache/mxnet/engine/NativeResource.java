@@ -12,7 +12,6 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.util.ResourceAllocator;
 import com.sun.jna.Pointer;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
@@ -23,15 +22,10 @@ public abstract class NativeResource implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(NativeResource.class);
 
     protected final AtomicReference<Pointer> handle;
-    protected final ResourceAllocator alloc;
     private Exception exception;
 
-    protected NativeResource(ResourceAllocator alloc, Pointer pointer) {
-        this.alloc = alloc;
+    protected NativeResource(Pointer pointer) {
         this.handle = new AtomicReference<>(pointer);
-        if (alloc != null) {
-            alloc.attach(this);
-        }
         if (logger.isDebugEnabled()) {
             exception = new Exception();
         }

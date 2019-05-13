@@ -14,8 +14,6 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
-import com.amazon.ai.engine.Engine;
-import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.util.PairList;
@@ -63,10 +61,10 @@ public class MxModel implements Model, AutoCloseable {
     }
 
     public static MxModel loadModel(String prefix, int epoch) throws IOException {
-        return loadModel(Engine.getInstance().getNDFactory(), prefix, epoch);
+        return loadModel(new MxNDFactory(), prefix, epoch);
     }
 
-    public static MxModel loadModel(NDFactory factory, String prefix, int epoch)
+    public static MxModel loadModel(MxNDFactory factory, String prefix, int epoch)
             throws IOException {
         Symbol symbol = Symbol.load(factory, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);

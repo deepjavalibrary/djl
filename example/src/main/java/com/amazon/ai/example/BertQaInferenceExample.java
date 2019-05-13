@@ -15,6 +15,7 @@ package com.amazon.ai.example;
 
 import com.amazon.ai.Model;
 import com.amazon.ai.Translator;
+import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.example.util.Arguments;
 import com.amazon.ai.example.util.BertDataParser;
@@ -112,7 +113,8 @@ public class BertQaInferenceExample {
         new BertQaInferenceExample().runExample(args);
     }
 
-    private static class QAInput {
+    private static final class QAInput {
+
         String question;
         String answer;
         int seqLength;
@@ -124,7 +126,8 @@ public class BertQaInferenceExample {
         }
     }
 
-    private static class QAOutput {
+    private static final class QAOutput {
+
         String answer;
 
         QAOutput(String answer) {
@@ -142,7 +145,7 @@ public class BertQaInferenceExample {
         }
 
         @Override
-        public NDList processInput(Predictor<?, ?> predictor, QAInput input) {
+        public NDList processInput(TranslatorContext ctx, QAInput input) {
             // pre-processing - tokenize sentence
             List<String> tokenQ = util.tokenizer(input.question.toLowerCase());
             List<String> tokenA = util.tokenizer(input.answer.toLowerCase());
@@ -150,16 +153,16 @@ public class BertQaInferenceExample {
             List<Float> tokenTypes = util.getTokenTypes(tokenQ, tokenA, input.seqLength);
             tokens = util.formTokens(tokenQ, tokenA, input.seqLength);
             List<Integer> indexes = util.token2idx(tokens);
-            List<Float> indexesFloat = new ArrayList<>();
+            List<Float> indexesFloat = new ArrayList<>(indexes.size());
             for (int integer : indexes) {
                 indexesFloat.add((float) integer);
             }
             // Start building model
-            Model model = predictor.getModel();
+            Model model = ctx.getModel();
             DataDesc[] dataDescs = model.describeInput();
-            predictor.create(dataDescs[0]);
-            NDList list = new NDList();
-            Arrays.stream(dataDescs).forEach(ele -> list.add(predictor.create(ele)));
+            ctx.create(dataDescs[0]);
+            NDList list = new NDList(3);
+            Arrays.stream(dataDescs).forEach(ele -> list.add(ctx.create(ele)));
 
             list.get(0).set(indexesFloat);
             list.get(1).set(tokenTypes);
@@ -168,18 +171,8 @@ public class BertQaInferenceExample {
             return list;
         }
 
-        private static int argmax(float[] prob) {
-            int maxIdx = 0;
-            for (int i = 0; i < prob.length; i++) {
-                if (prob[maxIdx] < prob[i]) {
-                    maxIdx = i;
-                }
-            }
-            return maxIdx;
-        }
-
         @Override
-        public QAOutput processOutput(Predictor<?, ?> predictor, NDList list) {
+        public QAOutput processOutput(TranslatorContext ctx, NDList list) {
             NDArray array = list.get(0);
             NDArray[] output = array.split(2, 2, null);
             // Get the formatted logits result
@@ -191,6 +184,16 @@ public class BertQaInferenceExample {
             int startIdx = argmax(startProb);
             int endIdx = argmax(endProb);
             return new QAOutput(tokens.subList(startIdx, endIdx + 1).toString());
+        }
+
+        private static int argmax(float[] prob) {
+            int maxIdx = 0;
+            for (int i = 0; i < prob.length; i++) {
+                if (prob[maxIdx] < prob[i]) {
+                    maxIdx = i;
+                }
+            }
+            return maxIdx;
         }
     }
 }

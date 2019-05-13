@@ -13,7 +13,6 @@
 package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
@@ -34,7 +33,7 @@ public class MxNDFactory extends MxResourceAllocator implements NDFactory {
     }
 
     @Override
-    public NDArray create(
+    public MxNDArray create(
             Context context,
             Shape shape,
             DataType dataType,
@@ -44,7 +43,7 @@ public class MxNDFactory extends MxResourceAllocator implements NDFactory {
     }
 
     @Override
-    public NDArray create(DataDesc dataDesc) {
+    public MxNDArray create(DataDesc dataDesc) {
         return create(
                 dataDesc.getOrDefault(),
                 dataDesc.getShape(),

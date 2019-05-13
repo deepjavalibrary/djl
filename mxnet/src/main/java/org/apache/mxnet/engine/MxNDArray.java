@@ -14,13 +14,13 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
-import com.amazon.ai.util.ResourceAllocator;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -52,19 +52,21 @@ public class MxNDArray extends NativeResource implements NDArray {
     private SparseFormat sparseFormat;
     private DataType dataType;
     private Shape shape;
+    private NDFactory factory;
 
-    MxNDArray(ResourceAllocator alloc, Pointer handle) {
-        super(alloc, handle);
+    MxNDArray(NDFactory factory, Pointer handle) {
+        this(factory, null, null, null, null, handle);
     }
 
     MxNDArray(
-            ResourceAllocator alloc,
+            NDFactory factory,
             Context context,
             SparseFormat sparseFormat,
             Shape shape,
             DataType dataType,
             Pointer handle) {
-        super(alloc, handle);
+        super(handle);
+        this.factory = factory;
         this.context = context;
         this.dataType = dataType;
         this.shape = shape;
@@ -75,18 +77,14 @@ public class MxNDArray extends NativeResource implements NDArray {
         this(null, context, shape, DataType.FLOAT32, false);
     }
 
-    public MxNDArray(ResourceAllocator alloc, Context context, Shape shape) {
-        this(alloc, context, shape, DataType.FLOAT32, false);
+    public MxNDArray(NDFactory factory, Context context, Shape shape) {
+        this(factory, context, shape, DataType.FLOAT32, false);
     }
 
     public MxNDArray(
-            ResourceAllocator alloc,
-            Context context,
-            Shape shape,
-            DataType dataType,
-            boolean delay) {
+            NDFactory factory, Context context, Shape shape, DataType dataType, boolean delay) {
         this(
-                alloc,
+                factory,
                 context,
                 SparseFormat.DEFAULT,
                 shape,
@@ -168,13 +166,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public MxNDArray at(int index) {
         Pointer pointer = JnaUtils.ndArrayAt(getHandle(), index);
-        return new MxNDArray(alloc, pointer);
+        return new MxNDArray(factory, pointer);
     }
 
     @Override
     public MxNDArray slice(int begin, int end) {
         Pointer pointer = JnaUtils.slice(getHandle(), begin, end);
-        return new MxNDArray(alloc, pointer);
+        return new MxNDArray(factory, pointer);
     }
 
     @Override
@@ -224,7 +222,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         functionInfo.invoke(getHandle(), ref, params);
 
-        return new MxNDArray(alloc, ref.getValue().getPointerArray(0, 1)[0]);
+        return new MxNDArray(factory, ref.getValue().getPointerArray(0, 1)[0]);
     }
 
     @Override
@@ -247,7 +245,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         functionInfo.invoke(getHandle(), ref, params);
 
-        return new MxNDArray(alloc, ref.getValue().getPointerArray(0, 1)[0]);
+        return new MxNDArray(factory, ref.getValue().getPointerArray(0, 1)[0]);
     }
 
     @Override
@@ -274,7 +272,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
         MxNDArray[] output = new MxNDArray[numOutputs];
         for (int i = 0; i < numOutputs; i++) {
-            output[i] = new MxNDArray(alloc, ptrArray[i]);
+            output[i] = new MxNDArray(factory, ptrArray[i]);
         }
         return output;
     }
@@ -1354,7 +1352,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray reshape(long... newShape) {
         Pointer pointer = JnaUtils.reshape(getHandle(), newShape, false);
-        return new MxNDArray(alloc, pointer);
+        return new MxNDArray(factory, pointer);
     }
 
     @Override
@@ -1775,9 +1773,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
             JnaUtils.freeNdArray(pointer);
-        }
-        if (alloc != null) {
-            alloc.detach(this);
         }
     }
 }

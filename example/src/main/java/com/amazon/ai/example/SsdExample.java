@@ -18,12 +18,12 @@
 package com.amazon.ai.example;
 
 import com.amazon.ai.Model;
+import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.ImageTranslator;
 import com.amazon.ai.inference.ObjectDetector;
-import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
@@ -96,23 +96,23 @@ public final class SsdExample extends AbstractExample {
         }
 
         @Override
-        public NDList processInput(Predictor<?, ?> predictor, BufferedImage input) {
+        public NDList processInput(TranslatorContext ctx, BufferedImage input) {
             BufferedImage image = Images.reshapeImage(input, 224, 224);
 
-            NDList list = super.processInput(predictor, image);
+            NDList list = super.processInput(ctx, image);
             begin = System.nanoTime();
 
             return list;
         }
 
         @Override
-        public List<DetectedObject> processOutput(Predictor<?, ?> predictor, NDList list) {
+        public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list) {
             for (NDArray array : list) {
                 array.waitAll();
             }
             end = System.nanoTime();
 
-            Model model = predictor.getModel();
+            Model model = ctx.getModel();
 
             NDArray array = list.get(0);
 

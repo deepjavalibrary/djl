@@ -42,10 +42,10 @@ public class Module implements AutoCloseable {
 
     public NDList getOutputs() {
         if (executors.length == 1) {
-            return new CloseShieldNDList(executors[0].getOutputs());
+            return executors[0].getOutputs();
         }
 
-        NDList ret = new CloseShieldNDList();
+        NDList ret = new NDList();
         for (MxExecutor executor : executors) {
             NDList out = executor.getOutputs();
             ret.addAll(out);
@@ -124,17 +124,5 @@ public class Module implements AutoCloseable {
 
             return new Module(executors, forTraining);
         }
-    }
-
-    private static final class CloseShieldNDList extends NDList {
-
-        public CloseShieldNDList() {}
-
-        public CloseShieldNDList(NDList other) {
-            super(other);
-        }
-
-        @Override
-        public void close() {}
     }
 }

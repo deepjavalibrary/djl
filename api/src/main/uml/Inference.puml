@@ -1,0 +1,72 @@
+@startuml
+class Context {
+	-String deviceType
+	-int deiceId
+}
+
+class DataDesc {
+	-Context context
+	-Shape shape
+	-DataType dataType
+	-SparseFormat sparseFormat
+}
+
+interface Model {
+    +DataDesc[] describeInput()
+    +DataDesc[] describeOutput()
+    +Model cast(DataType dataType);
+    +String[] getLabels()
+    +void save(File modelPath, String modelName, int epoch)
+	.. static Factory methods ..
+    +Model loadModel(String modelPath)
+    +Model loadModel(File modelPath)
+    +Model loadModel(String modelPath, int epoch)
+    +Model loadModel(File modelPath, String modelName)
+    +Model loadModel(File modelPath, String modelName, int epoch)
+}
+
+interface Translator<I, O> {
+    +NDArray[] processInput(I input)
+    +O processOutput(NDArray[] array)
+}
+
+interface Predictor<I, O> {
+    +O predict(I input)
+}
+
+class Classifier<I, O> {
+    -Predictor<I, O> predictor
+    +O classify(I input)
+}
+
+class ObjectDetector<I, O> {
+    -Predictor<I, O> predictor
+    +O detect(I input)
+}
+
+interface NDFactory {
+    +NDArray create(Context context, ...);
+    +NDArray create(DataDesc dataDesc, boolean delay);
+}
+
+interface NDArray {
+    +byte[] getEncoded()
+    +void encode(OutputStream os) throws IOException
+    +DataDesc getDataDescriptore()
+    +void set(Buffer data)
+    +NDArray at(int index)
+	.. other storage methods ..
+    +more
+}
+
+Model -right-> DataDesc
+Model o-down- Predictor : aggregation
+Predictor -right-o Context : aggregation
+Predictor -right-> Translator : uses
+Translator -right-> NDArray : uses
+Predictor o-down- Classifier : aggregation
+Predictor o-down- ObjectDetector : aggregation
+NDFactory -left-> NDArray
+NDArray -down-o DataDesc
+
+@enduml

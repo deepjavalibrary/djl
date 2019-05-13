@@ -13,7 +13,9 @@
 package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
+import com.amazon.ai.Model;
 import com.amazon.ai.Translator;
+import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
@@ -21,9 +23,9 @@ import com.amazon.ai.ndarray.types.DataDesc;
 
 public class MxPredictor<I, O> extends MxNDFactory implements Predictor<I, O> {
 
-    private MxModel model;
+    MxModel model;
     private Translator<I, O> transformer;
-    private Context context;
+    Context context;
     private Module module;
     private DataDesc[] dataDesc;
 
@@ -38,20 +40,12 @@ public class MxPredictor<I, O> extends MxNDFactory implements Predictor<I, O> {
 
     @Override
     public O predict(I input) {
-        try (NDList ndList = transformer.processInput(this, input);
-                NDList result = forward(ndList)) {
-            return transformer.processOutput(this, result);
+        try (PredictorContext inputCtx = new PredictorContext();
+                PredictorContext outputCtx = new PredictorContext()) {
+            NDList ndList = transformer.processInput(inputCtx, input);
+            NDList result = forward(ndList);
+            return transformer.processOutput(outputCtx, result);
         }
-    }
-
-    @Override
-    public MxModel getModel() {
-        return model;
-    }
-
-    @Override
-    public Context getContext() {
-        return context;
     }
 
     private NDList forward(NDList ndList) {
@@ -88,5 +82,18 @@ public class MxPredictor<I, O> extends MxNDFactory implements Predictor<I, O> {
     public void close() {
         super.close();
         module.close();
+    }
+
+    private class PredictorContext extends MxNDFactory implements TranslatorContext {
+
+        @Override
+        public Model getModel() {
+            return model;
+        }
+
+        @Override
+        public Context getContext() {
+            return context;
+        }
     }
 }

@@ -17,16 +17,21 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.util.ResourceAllocator;
 
-public interface NDFactory extends ResourceAllocator {
+public interface NDFactory extends AutoCloseable {
 
     NDArray create(
             Context context,
             Shape shape,
             DataType dataType,
-            SparseFormat storageType,
+            SparseFormat sparseFormat,
             boolean delay);
 
     NDArray create(DataDesc dataDesc);
+
+    void attach(AutoCloseable resource);
+
+    void detach(AutoCloseable resource);
+
+    void close();
 }

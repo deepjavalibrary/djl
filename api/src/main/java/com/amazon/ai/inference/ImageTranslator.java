@@ -13,6 +13,7 @@
 package com.amazon.ai.inference;
 
 import com.amazon.ai.Translator;
+import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
@@ -24,7 +25,7 @@ import java.nio.FloatBuffer;
 public abstract class ImageTranslator<T> implements Translator<BufferedImage, T> {
 
     @Override
-    public NDList processInput(Predictor<?, ?> predictor, BufferedImage input) {
+    public NDList processInput(TranslatorContext ctx, BufferedImage input) {
         int w = input.getWidth();
         int h = input.getHeight();
         Shape shape = new Shape(1, 3, h, w);
@@ -32,7 +33,7 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
 
         FloatBuffer buffer = Images.toFloatBuffer(input);
 
-        NDArray array = predictor.create(dataDesc);
+        NDArray array = ctx.create(dataDesc);
         array.set(buffer);
 
         return new NDList(normalize(array));

@@ -14,6 +14,7 @@ package com.amazon.ai.example;
 
 import com.amazon.ai.Model;
 import com.amazon.ai.Translator;
+import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.image.Images;
@@ -96,9 +97,9 @@ public final class GenericInferenceExample extends AbstractExample {
         }
 
         @Override
-        public NDList processInput(Predictor<?, ?> predictor, FloatBuffer input) {
-            Model model = predictor.getModel();
-            NDArray array = predictor.create(model.describeInput()[0]);
+        public NDList processInput(TranslatorContext ctx, FloatBuffer input) {
+            Model model = ctx.getModel();
+            NDArray array = ctx.create(model.describeInput()[0]);
             array.set(input);
 
             NDList list = new NDList(array);
@@ -108,33 +109,31 @@ public final class GenericInferenceExample extends AbstractExample {
         }
 
         @Override
-        public List<DetectedObject> processOutput(Predictor<?, ?> predictor, NDList list) {
+        public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list) {
             for (NDArray array : list) {
                 array.waitAll();
             }
             end = System.nanoTime();
 
-            Model model = predictor.getModel();
+            Model model = ctx.getModel();
 
             NDArray array = list.get(0);
 
             int length = array.getShape().head();
             length = Math.min(length, topK);
             List<DetectedObject> ret = new ArrayList<>(length);
-            try (NDArray nd = array.at(0);
-                    NDArray sorted = nd.argsort(-1, false);
-                    NDArray top = sorted.slice(0, topK)) {
+            NDArray nd = array.at(0);
+            NDArray sorted = nd.argsort(-1, false);
+            NDArray top = sorted.slice(0, topK);
 
-                float[] probabilities = nd.toFloatArray();
-                float[] indices = top.toFloatArray();
+            float[] probabilities = nd.toFloatArray();
+            float[] indices = top.toFloatArray();
 
-                for (int i = 0; i < topK; ++i) {
-                    int index = (int) indices[i];
-                    String className = model.getSynset()[index];
-                    DetectedObject output =
-                            new DetectedObject(className, probabilities[index], null);
-                    ret.add(output);
-                }
+            for (int i = 0; i < topK; ++i) {
+                int index = (int) indices[i];
+                String className = model.getSynset()[index];
+                DetectedObject output = new DetectedObject(className, probabilities[index], null);
+                ret.add(output);
             }
             return ret;
         }

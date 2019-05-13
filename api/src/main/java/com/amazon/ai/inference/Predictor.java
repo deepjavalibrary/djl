@@ -31,10 +31,6 @@ public interface Predictor<I, O> extends NDFactory {
 
     O predict(I input);
 
-    Model getModel();
-
-    Context getContext();
-
     @Override
     void close();
 }

@@ -14,7 +14,6 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.util.ResourceAllocator;
 import com.sun.jna.Pointer;
 import org.apache.mxnet.jna.JnaUtils;
 
@@ -27,14 +26,13 @@ public class MxExecutor extends NativeResource {
     private MxNDArray[] gradArray;
 
     MxExecutor(
-            ResourceAllocator alloc,
             Pointer pointer,
             MxNDArray[] argArray,
             MxNDArray[] auxArray,
             MxNDArray[] dataArray,
             MxNDArray[] outputs,
             MxNDArray[] gradArray) {
-        super(alloc, pointer);
+        super(pointer);
         this.argArray = argArray;
         this.auxArray = auxArray;
         this.dataArray = dataArray;
@@ -70,9 +68,6 @@ public class MxExecutor extends NativeResource {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
             JnaUtils.freeExecutor(pointer);
-        }
-        if (alloc != null) {
-            alloc.detach(this);
         }
         for (MxNDArray ndArray : argArray) {
             ndArray.close();

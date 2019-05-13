@@ -15,7 +15,6 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Block;
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
@@ -38,14 +37,16 @@ public class Symbol extends NativeResource implements Block {
     private String[] auxParams;
     private String[] outputs;
     private List<Integer> outputLayouts;
+    private MxNDFactory factory;
 
-    Symbol(NDFactory factory, Pointer pointer) {
-        super(factory, pointer);
+    Symbol(MxNDFactory factory, Pointer pointer) {
+        super(pointer);
+        this.factory = factory;
         argParams = JnaUtils.listSymbolArguments(getHandle());
         auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }
 
-    public static Symbol load(NDFactory factory, String path) {
+    public static Symbol load(MxNDFactory factory, String path) {
         Pointer pointer = JnaUtils.createSymbolFromFile(path);
         return new Symbol(factory, pointer);
     }
@@ -297,7 +298,7 @@ public class Symbol extends NativeResource implements Block {
             MxNDArray[] gradArray = new MxNDArray[inArgSize];
             MxNDArray[] dataArray = new MxNDArray[inputArgNames.length];
             for (int j = 0; j < inArgSize; ++j) {
-                argArray[j] = new MxNDArray(alloc, inArgsPointers[j]);
+                argArray[j] = new MxNDArray(factory, inArgsPointers[j]);
 
                 String paramName = argParams[j];
 
@@ -312,7 +313,7 @@ public class Symbol extends NativeResource implements Block {
                 }
 
                 if (gradPointers[j] != null) {
-                    gradArray[j] = new MxNDArray(alloc, gradPointers[j]);
+                    gradArray[j] = new MxNDArray(factory, gradPointers[j]);
                 }
             }
 
@@ -322,7 +323,7 @@ public class Symbol extends NativeResource implements Block {
                 Map<String, MxNDArray> auxParamMap = model.getAuxParams().toMap();
                 Pointer[] pointers = auxStates.getValue().getPointerArray(0, auxStatesSize);
                 for (int j = 0; j < auxStatesSize; ++j) {
-                    auxArray[j] = new MxNDArray(alloc, pointers[j]);
+                    auxArray[j] = new MxNDArray(factory, pointers[j]);
 
                     MxNDArray param = auxParamMap.get(auxParams[j]);
                     if (param == null) {
@@ -332,10 +333,9 @@ public class Symbol extends NativeResource implements Block {
                 }
             }
 
-            MxNDArray[] out = JnaUtils.getExecutorOutputs((MxNDFactory) alloc, pointer);
+            MxNDArray[] out = JnaUtils.getExecutorOutputs(factory, pointer);
 
-            executors[i] =
-                    new MxExecutor(alloc, pointer, argArray, auxArray, dataArray, out, gradArray);
+            executors[i] = new MxExecutor(pointer, argArray, auxArray, dataArray, out, gradArray);
         }
         return executors;
     }
@@ -349,9 +349,6 @@ public class Symbol extends NativeResource implements Block {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
             JnaUtils.freeSymbol(pointer);
-        }
-        if (alloc != null) {
-            alloc.detach(this);
         }
     }
 
@@ -385,6 +382,6 @@ public class Symbol extends NativeResource implements Block {
     }
 
     public MxNDFactory getNDFactory() {
-        return (MxNDFactory) alloc;
+        return factory;
     }
 }
