@@ -30,6 +30,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -153,16 +154,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     @Override
-    public void set(float[] data) {
-        set(FloatBuffer.wrap(data));
-    }
-
-    @Override
     public void set(List<Float> data) {
-        float[] output = new float[data.size()];
-        for (int i = 0; i < output.length; i++) {
-            output[i] = data.get(i);
+        int size = data.size();
+        FloatBuffer output = ByteBuffer.allocateDirect(size * 4).asFloatBuffer();
+        for (Float v : data) {
+            output.put(v);
         }
+        output.rewind();
         set(output);
     }
 
@@ -225,6 +223,54 @@ public class MxNDArray extends NativeResource implements NDArray {
         functionInfo.invoke(getHandle(), ref, params);
 
         return new MxNDArray(alloc, ref.getValue().getPointerArray(0, 1)[0]);
+    }
+
+    @Override
+    public MxNDArray softmax(Integer axis, Double temperature) {
+        FunctionInfo functionInfo = OPS.get("softmax");
+        List<String> keys = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        if (axis != null) {
+            keys.add("axis");
+            values.add(String.valueOf(axis));
+        }
+        if (temperature != null) {
+            keys.add("temperature");
+            values.add(String.valueOf(temperature));
+        }
+        PairList<String, String> params = new PairList<>(keys, values);
+        PointerByReference ref = new PointerByReference();
+
+        functionInfo.invoke(getHandle(), ref, params);
+
+        return new MxNDArray(alloc, ref.getValue().getPointerArray(0, 1)[0]);
+    }
+
+    @Override
+    public MxNDArray[] split(int numOutputs, Integer axis, Boolean squeezeAxis) {
+        FunctionInfo functionInfo = OPS.get("split");
+        List<String> keys = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        keys.add("num_outputs");
+        values.add(String.valueOf(numOutputs));
+        if (axis != null) {
+            keys.add("axis");
+            values.add(String.valueOf(axis));
+        }
+        if (squeezeAxis != null) {
+            keys.add("squeeze_axis");
+            values.add(String.valueOf(squeezeAxis));
+        }
+        PairList<String, String> params = new PairList<>(keys, values);
+        PointerByReference ref = new PointerByReference();
+
+        functionInfo.invoke(getHandle(), ref, params);
+        Pointer[] ptrArray = ref.getValue().getPointerArray(0, 1);
+        MxNDArray[] output = new MxNDArray[ptrArray.length];
+        for (int i = 0; i < ptrArray.length; i++) {
+            output[i] = new MxNDArray(alloc, ptrArray[i]);
+        }
+        return output;
     }
 
     @Override
@@ -1301,7 +1347,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray reshape(long... newShape) {
-        return null;
+        Pointer pointer = JnaUtils.reshape(getHandle(), newShape, false);
+        return new MxNDArray(alloc, pointer);
     }
 
     @Override
@@ -1311,7 +1358,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray reshape(long rows, long columns) {
-        return null;
+        return reshape(rows, columns);
     }
 
     @Override

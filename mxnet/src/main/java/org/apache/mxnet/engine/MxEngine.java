@@ -50,7 +50,7 @@ public class MxEngine extends Engine {
     public String getVersion() {
         int version = JnaUtils.getVersion();
         int major = version / 10000;
-        int minor = version / 100 - major * 10;
+        int minor = version / 100 - major * 100;
         int patch = version % 100;
 
         return major + "." + minor + '.' + patch;

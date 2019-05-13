@@ -46,8 +46,6 @@ public interface NDArray extends AutoCloseable {
 
     void set(Buffer data);
 
-    void set(float[] data);
-
     void set(List<Float> data);
 
     NDArray at(int index);
@@ -63,6 +61,10 @@ public interface NDArray extends AutoCloseable {
     void waitAll();
 
     NDArray argsort(int axis, boolean isAscend);
+
+    NDArray softmax(Integer axis, Double temperature);
+
+    NDArray[] split(int numOutputs, Integer axis, Boolean squeezeAxis);
 
     boolean isSparse();
 
