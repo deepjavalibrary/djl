@@ -59,6 +59,10 @@ public class Symbol extends NativeResource implements Block {
         return auxParams;
     }
 
+    public String[] getAllNames() {
+        return JnaUtils.listSymbolNames(getHandle());
+    }
+
     public String[] getOutputs() {
         if (outputs == null) {
             outputs = JnaUtils.listSymbolOutputs(getHandle());

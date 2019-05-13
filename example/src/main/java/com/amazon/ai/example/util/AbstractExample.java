@@ -23,6 +23,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
 public abstract class AbstractExample {
@@ -50,6 +51,7 @@ public abstract class AbstractExample {
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
+            JnaUtils.getAllOpNames();
             long loaded = System.nanoTime();
             logger.info(
                     String.format(

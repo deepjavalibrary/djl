@@ -63,7 +63,6 @@ public class BertQaInferenceExample {
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
-            Thread.sleep(2000);
             Set<String> set = JnaUtils.getAllOpNames();
             logger.info(set.toString());
             long loaded = System.nanoTime();

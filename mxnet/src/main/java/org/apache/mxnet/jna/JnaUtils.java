@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import org.apache.mxnet.engine.DeviceType;
+import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 import org.apache.mxnet.engine.Symbol;
 
@@ -628,6 +629,15 @@ public final class JnaUtils {
         checkCall(LIB.MXSymbolListAttrShallow(symbol, size, ref));
 
         return toPairList(ref, size.get());
+    }
+
+    public static String[] listSymbolNames(Pointer symbol) {
+        IntBuffer size = IntBuffer.allocate(1);
+        PointerByReference ref = new PointerByReference();
+
+        checkCall(LIB.NNSymbolListInputNames(symbol, 0, size, ref));
+
+        return toStringArray(ref, size.get());
     }
 
     public static String[] listSymbolArguments(Pointer symbol) {
@@ -1354,6 +1364,55 @@ public final class JnaUtils {
     */
 
     //////////////////////////////////
+    // cached Op
+    //////////////////////////////////
+
+    /**
+     * Method to create the cached op Flags: data_indices : [0, 2, 4] Used to label where the data
+     * goes param_indices : [1, 3] Used to label where the param goes
+     *
+     * @param symbol
+     * @param flags
+     * @return
+     */
+    public static Pointer createCachedOp(Symbol symbol, PairList<String, String> flags) {
+        Pointer symbolHandle = symbol.getHandle();
+        PointerByReference ref = new PointerByReference();
+        checkCall(
+                LIB.MXCreateCachedOpEx(
+                        symbolHandle,
+                        flags.size(),
+                        flags.keys(EMPTY_ARRAY),
+                        flags.values(EMPTY_ARRAY),
+                        ref));
+        return ref.getValue();
+    }
+
+    public static void freeCachedOp(Pointer handle) {
+        checkCall(LIB.MXFreeCachedOp(handle));
+    }
+
+    public static MxNDArray[] cachedOpInvoke(
+            MxNDFactory factory, Pointer cachedOpHandle, MxNDArray[] inputs) {
+        Pointer[] inputHandles = new Pointer[inputs.length];
+        for (int i = 0; i < inputs.length; i++) {
+            inputHandles[i] = inputs[i].getHandle();
+        }
+        PointerArray array = new PointerArray(inputHandles);
+        // PointerByReference ptr = new PointerByReference(array);
+        IntBuffer buf = IntBuffer.allocate(1);
+        PointerByReference ref = new PointerByReference();
+        checkCall(LIB.MXInvokeCachedOp(cachedOpHandle, inputs.length, array, buf, ref));
+        int numOutputs = buf.get();
+        Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
+        MxNDArray[] output = new MxNDArray[numOutputs];
+        for (int i = 0; i < numOutputs; i++) {
+            output[i] = factory.create(ptrArray[i]);
+        }
+        return output;
+    }
+
+    //////////////////////////////////
     // c_predict_api
     //////////////////////////////////
 
@@ -1364,7 +1423,6 @@ public final class JnaUtils {
 
         IntBuffer inputShapeIdx = IntBuffer.wrap(new int[] {0, 4});
         IntBuffer inputShapeData = IntBuffer.wrap(shape.getShape());
-
         PointerByReference ref = new PointerByReference();
         checkCall(
                 LIB.MXPredCreate(
