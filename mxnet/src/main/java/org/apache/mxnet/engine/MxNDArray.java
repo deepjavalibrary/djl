@@ -156,9 +156,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public void set(List<Float> data) {
         int size = data.size();
-        FloatBuffer output = ByteBuffer.allocateDirect(size * 4)
-                .order(ByteOrder.LITTLE_ENDIAN)
-                .asFloatBuffer();
+        FloatBuffer output =
+                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
         for (Float v : data) {
             output.put(v);
         }
@@ -187,8 +186,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         Shape destShape = ndArray.getShape();
         if (!Arrays.equals(inShape.getShape(), destShape.getShape())) {
             throw new IllegalArgumentException(
-                    String.format("shape are diff. Required: %s, Actual %s",
-                            destShape, inShape));
+                    String.format("shape are diff. Required: %s, Actual %s", destShape, inShape));
         }
 
         FunctionInfo functionInfo = OPS.get("_copyto");
@@ -1363,7 +1361,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray reshape(int[] shape) {
         return null;
     }
-
 
     @Override
     public NDArray transpose() {

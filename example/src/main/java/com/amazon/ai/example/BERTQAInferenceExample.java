@@ -26,22 +26,24 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
-import org.apache.commons.cli.*;
-import org.apache.mxnet.engine.MxModel;
-import org.apache.mxnet.jna.JnaUtils;
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.mxnet.engine.MxModel;
+import org.apache.mxnet.jna.JnaUtils;
+import org.slf4j.Logger;
 
 public class BERTQAInferenceExample {
     private static Logger logger = LogUtils.getLogger(BERTQAInferenceExample.class);
 
-
-    public void runExample(String[] args) {
+    private void runExample(String[] args) {
         Options options = Arguments.getOptions();
         try {
             DefaultParser parser = new DefaultParser();
@@ -59,7 +61,7 @@ public class BERTQAInferenceExample {
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
             Thread.sleep(2000);
-            Set<String> set =  JnaUtils.getAllOpNames();
+            Set<String> set = JnaUtils.getAllOpNames();
             logger.info(set.toString());
             long loaded = System.nanoTime();
             logger.info(
@@ -76,29 +78,32 @@ public class BERTQAInferenceExample {
         } catch (Throwable t) {
             logger.error("Unexpected error", t);
         }
-
     }
 
-    public void predict(String modelDir, String modelName, BertDataParser parser, QAInput input)
-    throws IOException {
+    private void predict(String modelDir, String modelName, BertDataParser parser, QAInput input)
+            throws IOException {
         String modelPathPrefix = modelDir + '/' + modelName;
 
         Model model = Model.loadModel(modelPathPrefix, 2);
 
-        DataDesc dataDescs[] = new DataDesc[]{
-                new DataDesc(new Shape(1, input.seqLength), DataType.FLOAT32, "data0", Layout.NT),
-                new DataDesc(new Shape(1, input.seqLength), DataType.FLOAT32, "data1", Layout.NT),
-                new DataDesc(new Shape(1), DataType.FLOAT32, "data2", Layout.NT),
-        };
+        DataDesc[] dataDescs =
+                new DataDesc[] {
+                    new DataDesc(
+                            new Shape(1, input.seqLength), DataType.FLOAT32, "data0", Layout.NT),
+                    new DataDesc(
+                            new Shape(1, input.seqLength), DataType.FLOAT32, "data1", Layout.NT),
+                    new DataDesc(new Shape(1), DataType.FLOAT32, "data2", Layout.NT),
+                };
 
         ((MxModel) model).setDataNames(dataDescs);
 
         GenericTranslator translator = new GenericTranslator(parser);
-        try (Predictor<QAInput, QAOutput> predictor =
-                     Predictor.newInstance(model, translator)) {
+        try (Predictor<QAInput, QAOutput> predictor = Predictor.newInstance(model, translator)) {
             QAOutput output = predictor.predict(input);
-            logger.info(String.format("\nQuestion: %s\nParagraph: %s\nAnswer: %s",
-                    input.Q, input.A, output.A));
+            logger.info(
+                    String.format(
+                            "%nQuestion: %s%nParagraph: %s%nAnswer: %s",
+                            input.question, input.answer, output.answer));
         }
     }
 
@@ -107,22 +112,22 @@ public class BERTQAInferenceExample {
     }
 
     private static class QAInput {
-        String Q;
-        String A;
+        String question;
+        String answer;
         int seqLength;
 
-        public QAInput(String Q, String A, int seqLength) {
-            this.Q = Q;
-            this.A = A;
+        QAInput(String question, String answer, int seqLength) {
+            this.question = question;
+            this.answer = answer;
             this.seqLength = seqLength;
         }
     }
 
     private static class QAOutput {
-        String A;
+        String answer;
 
-        public  QAOutput(String A) {
-            this.A = A;
+        QAOutput(String answer) {
+            this.answer = answer;
         }
     }
 
@@ -131,42 +136,37 @@ public class BERTQAInferenceExample {
         private BertDataParser util;
         private List<String> tokens;
 
-        public GenericTranslator(BertDataParser parser) { this.util = parser; }
+        GenericTranslator(BertDataParser parser) {
+            this.util = parser;
+        }
 
         @Override
         public NDList processInput(Predictor<?, ?> predictor, QAInput input) {
             // pre-processing - tokenize sentence
-            List<String> tokenQ = util.tokenizer(input.Q.toLowerCase());
-            List<String> tokenA = util.tokenizer(input.A.toLowerCase());
+            List<String> tokenQ = util.tokenizer(input.question.toLowerCase());
+            List<String> tokenA = util.tokenizer(input.answer.toLowerCase());
             int validLength = tokenQ.size() + tokenA.size();
-            logger.debug(String.format("\nTokenQ size: %d\nTokenA size: %d\nValid length: %d",
-                    tokenQ.size(), tokenA.size(), validLength));
-            // generate token types [0000...1111....0000]
-            List<Float> QAEmbedded = new ArrayList<>();
-            QAEmbedded = util.pad(QAEmbedded, 0f, tokenQ.size() + 2);
-            QAEmbedded.addAll(util.pad(new ArrayList<>(), 1f, tokenA.size()));
-            List<Float> tokenTypes = util.pad(QAEmbedded, 0f, input.seqLength);
+            List<Float> qaEmbedded = new ArrayList<>();
+            qaEmbedded = util.pad(qaEmbedded, 0f, tokenQ.size() + 2);
+            qaEmbedded.addAll(util.pad(new ArrayList<>(), 1f, tokenA.size()));
+            List<Float> tokenTypes = util.pad(qaEmbedded, 0f, input.seqLength);
             // make BERT pre-processing standard
             tokenQ.add("[SEP]");
             tokenQ.add(0, "[CLS]");
             tokenA.add("[SEP]");
             tokenQ.addAll(tokenA);
             tokens = util.pad(tokenQ, "[PAD]", input.seqLength);
-            logger.debug("Pre-processed tokens: " + Arrays.toString(tokenQ.toArray()));
-            // pre-processing - token to index translation
             List<Integer> indexes = util.token2idx(tokens);
             List<Float> indexesFloat = new ArrayList<>();
             for (int integer : indexes) {
                 indexesFloat.add((float) integer);
             }
             Model model = predictor.getModel();
-            DataDesc dataDescs[] = model.describeInput();
+            DataDesc[] dataDescs = model.describeInput();
             predictor.create(dataDescs[0]);
             NDList list = new NDList();
             Arrays.stream(dataDescs).forEach(ele -> list.add(predictor.create(ele)));
 
-            logger.debug(String.format("\nindexFloat: %s\ntokenTypes: %s\nvalidLength: %s",
-                    indexesFloat, tokenTypes, validLength));
             list.get(0).set(indexesFloat);
             list.get(1).set(tokenTypes);
             list.get(2).set(Arrays.asList((float) validLength));
@@ -177,7 +177,9 @@ public class BERTQAInferenceExample {
         private static int argmax(float[] prob) {
             int maxIdx = 0;
             for (int i = 0; i < prob.length; i++) {
-                if (prob[maxIdx] < prob[i]) maxIdx = i;
+                if (prob[maxIdx] < prob[i]) {
+                    maxIdx = i;
+                }
             }
             return maxIdx;
         }
@@ -185,7 +187,6 @@ public class BERTQAInferenceExample {
         @Override
         public QAOutput processOutput(Predictor<?, ?> predictor, NDList list) {
             NDArray array = list.get(0);
-            logger.debug(Arrays.toString(array.toFloatArray()));
             NDArray[] output = array.split(2, 2, null);
             // Get the formatted logits result
             NDArray startLogits = output[0].reshape(0, -3);

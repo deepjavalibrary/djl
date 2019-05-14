@@ -155,12 +155,19 @@ public class Arguments {
         return iteration;
     }
 
-    public String getQuestion() { return question; }
+    public String getQuestion() {
+        return question;
+    }
 
-    public String getAnswer() { return answer; }
+    public String getAnswer() {
+        return answer;
+    }
 
-    public int getSeqLength() { return seqLength; };
+    public int getSeqLength() {
+        return seqLength;
+    }
 
-    public String getVocabulary() { return vocabulary; }
-
+    public String getVocabulary() {
+        return vocabulary;
+    }
 }
