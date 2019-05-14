@@ -139,7 +139,7 @@ public class BERTQAInferenceExample {
             List<String> tokenQ = util.tokenizer(input.Q.toLowerCase());
             List<String> tokenA = util.tokenizer(input.A.toLowerCase());
             int validLength = tokenQ.size() + tokenA.size();
-            logger.info(String.format("\nTokenQ size: %d\nTokenA size: %d\nValid length: %d",
+            logger.debug(String.format("\nTokenQ size: %d\nTokenA size: %d\nValid length: %d",
                     tokenQ.size(), tokenA.size(), validLength));
             // generate token types [0000...1111....0000]
             List<Float> QAEmbedded = new ArrayList<>();
@@ -152,7 +152,7 @@ public class BERTQAInferenceExample {
             tokenA.add("[SEP]");
             tokenQ.addAll(tokenA);
             tokens = util.pad(tokenQ, "[PAD]", input.seqLength);
-            logger.info("Pre-processed tokens: " + Arrays.toString(tokenQ.toArray()));
+            logger.debug("Pre-processed tokens: " + Arrays.toString(tokenQ.toArray()));
             // pre-processing - token to index translation
             List<Integer> indexes = util.token2idx(tokens);
             List<Float> indexesFloat = new ArrayList<>();
@@ -165,7 +165,7 @@ public class BERTQAInferenceExample {
             NDList list = new NDList();
             Arrays.stream(dataDescs).forEach(ele -> list.add(predictor.create(ele)));
 
-            logger.info(String.format("\nindexFloat: %s\ntokenTypes: %s\nvalidLength: %s",
+            logger.debug(String.format("\nindexFloat: %s\ntokenTypes: %s\nvalidLength: %s",
                     indexesFloat, tokenTypes, validLength));
             list.get(0).set(indexesFloat);
             list.get(1).set(tokenTypes);
@@ -185,8 +185,8 @@ public class BERTQAInferenceExample {
         @Override
         public QAOutput processOutput(Predictor<?, ?> predictor, NDList list) {
             NDArray array = list.get(0);
-            System.out.println(Arrays.toString(array.toFloatArray()));
-            NDArray[] output = array.split(2, null, null);
+            logger.debug(Arrays.toString(array.toFloatArray()));
+            NDArray[] output = array.split(2, 2, null);
             // Get the formatted logits result
             NDArray startLogits = output[0].reshape(0, -3);
             NDArray endLogits = output[1].reshape(0, -3);

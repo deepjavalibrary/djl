@@ -156,7 +156,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public void set(List<Float> data) {
         int size = data.size();
-        FloatBuffer output = ByteBuffer.allocateDirect(size * 4).asFloatBuffer();
+        FloatBuffer output = ByteBuffer.allocateDirect(size * 4)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .asFloatBuffer();
         for (Float v : data) {
             output.put(v);
         }
