@@ -184,7 +184,9 @@ public class MxNDArray extends NativeResource implements NDArray {
         Shape inShape = getShape();
         Shape destShape = ndArray.getShape();
         if (!Arrays.equals(inShape.getShape(), destShape.getShape())) {
-            throw new IllegalArgumentException("shape are diff.");
+            throw new IllegalArgumentException(
+                    String.format("shape are diff. Required: %s, Actual %s",
+                            destShape, inShape));
         }
 
         FunctionInfo functionInfo = OPS.get("_copyto");
@@ -238,7 +240,9 @@ public class MxNDArray extends NativeResource implements NDArray {
             keys.add("temperature");
             values.add(String.valueOf(temperature));
         }
-        PairList<String, String> params = new PairList<>(keys, values);
+        String[] keyArr = keys.toArray(new String[0]);
+        String[] valArr = values.toArray(new String[0]);
+        PairList<String, String> params = new PairList<>(keyArr, valArr);
         PointerByReference ref = new PointerByReference();
 
         functionInfo.invoke(getHandle(), ref, params);
@@ -261,13 +265,15 @@ public class MxNDArray extends NativeResource implements NDArray {
             keys.add("squeeze_axis");
             values.add(String.valueOf(squeezeAxis));
         }
-        PairList<String, String> params = new PairList<>(keys, values);
+        String[] keyArr = keys.toArray(new String[0]);
+        String[] valueArr = values.toArray(new String[0]);
+        PairList<String, String> params = new PairList<>(keyArr, valueArr);
         PointerByReference ref = new PointerByReference();
 
         functionInfo.invoke(getHandle(), ref, params);
-        Pointer[] ptrArray = ref.getValue().getPointerArray(0, 1);
-        MxNDArray[] output = new MxNDArray[ptrArray.length];
-        for (int i = 0; i < ptrArray.length; i++) {
+        Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
+        MxNDArray[] output = new MxNDArray[numOutputs];
+        for (int i = 0; i < numOutputs; i++) {
             output[i] = new MxNDArray(alloc, ptrArray[i]);
         }
         return output;
@@ -1356,10 +1362,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         return null;
     }
 
-    @Override
-    public NDArray reshape(long rows, long columns) {
-        return reshape(rows, columns);
-    }
 
     @Override
     public NDArray transpose() {

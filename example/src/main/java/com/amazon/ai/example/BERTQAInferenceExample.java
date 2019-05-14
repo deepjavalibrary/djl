@@ -28,12 +28,14 @@ import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import org.apache.commons.cli.*;
 import org.apache.mxnet.engine.MxModel;
+import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class BERTQAInferenceExample {
     private static Logger logger = LogUtils.getLogger(BERTQAInferenceExample.class);
@@ -56,12 +58,13 @@ public class BERTQAInferenceExample {
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
+            Thread.sleep(2000);
+            Set<String> set =  JnaUtils.getAllOpNames();
+            logger.info(set.toString());
             long loaded = System.nanoTime();
             logger.info(
                     String.format(
                             "Load library %s in %.3f ms.", version, (loaded - init) / 1000000f));
-
-
 
             predict(modelDir, modelName, util, new QAInput(question, answer, seqLength));
 
@@ -85,7 +88,7 @@ public class BERTQAInferenceExample {
         DataDesc dataDescs[] = new DataDesc[]{
                 new DataDesc(new Shape(1, input.seqLength), DataType.FLOAT32, "data0", Layout.NT),
                 new DataDesc(new Shape(1, input.seqLength), DataType.FLOAT32, "data1", Layout.NT),
-                new DataDesc(new Shape(1), DataType.FLOAT32, "data2", Layout.NT)
+                new DataDesc(new Shape(1), DataType.FLOAT32, "data2", Layout.NT),
         };
 
         ((MxModel) model).setDataNames(dataDescs);
@@ -136,12 +139,12 @@ public class BERTQAInferenceExample {
             List<String> tokenQ = util.tokenizer(input.Q.toLowerCase());
             List<String> tokenA = util.tokenizer(input.A.toLowerCase());
             int validLength = tokenQ.size() + tokenA.size();
-            logger.info("Valid length: " + validLength);
+            logger.info(String.format("\nTokenQ size: %d\nTokenA size: %d\nValid length: %d",
+                    tokenQ.size(), tokenA.size(), validLength));
             // generate token types [0000...1111....0000]
             List<Float> QAEmbedded = new ArrayList<>();
-            util.pad(QAEmbedded, 0f, tokenQ.size()).addAll(
-                    util.pad(new ArrayList<Float>(), 1f, tokenA.size())
-            );
+            QAEmbedded = util.pad(QAEmbedded, 0f, tokenQ.size() + 2);
+            QAEmbedded.addAll(util.pad(new ArrayList<>(), 1f, tokenA.size()));
             List<Float> tokenTypes = util.pad(QAEmbedded, 0f, input.seqLength);
             // make BERT pre-processing standard
             tokenQ.add("[SEP]");
@@ -162,6 +165,8 @@ public class BERTQAInferenceExample {
             NDList list = new NDList();
             Arrays.stream(dataDescs).forEach(ele -> list.add(predictor.create(ele)));
 
+            logger.info(String.format("\nindexFloat: %s\ntokenTypes: %s\nvalidLength: %s",
+                    indexesFloat, tokenTypes, validLength));
             list.get(0).set(indexesFloat);
             list.get(1).set(tokenTypes);
             list.get(2).set(Arrays.asList((float) validLength));
@@ -180,6 +185,7 @@ public class BERTQAInferenceExample {
         @Override
         public QAOutput processOutput(Predictor<?, ?> predictor, NDList list) {
             NDArray array = list.get(0);
+            System.out.println(Arrays.toString(array.toFloatArray()));
             NDArray[] output = array.split(2, null, null);
             // Get the formatted logits result
             NDArray startLogits = output[0].reshape(0, -3);

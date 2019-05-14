@@ -1759,16 +1759,6 @@ public interface NDArray extends AutoCloseable {
     NDArray reshape(int[] shape);
 
     /**
-     * Reshapes the NDArray (can't change the length of the NDArray). Typically this will be a view,
-     * unless reshaping without copying is impossible.
-     *
-     * @param rows the rows of the matrix
-     * @param columns the columns of the matrix
-     * @return the reshaped NDArray
-     */
-    NDArray reshape(long rows, long columns);
-
-    /**
      * Flip the rows and columns of a matrix
      *
      * @return the flipped rows and columns of a matrix

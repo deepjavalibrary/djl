@@ -296,7 +296,6 @@ public class Symbol extends NativeResource implements Block {
             MxNDArray[] argArray = new MxNDArray[inArgSize];
             MxNDArray[] gradArray = new MxNDArray[inArgSize];
             MxNDArray[] dataArray = new MxNDArray[inputArgNames.length];
-            int dataIdx = 0;
             for (int j = 0; j < inArgSize; ++j) {
                 argArray[j] = new MxNDArray(alloc, inArgsPointers[j]);
 
@@ -304,8 +303,9 @@ public class Symbol extends NativeResource implements Block {
 
                 MxNDArray param = argParamMap.get(paramName);
                 if (param == null) {
-                    if (Utils.contains(inputArgNames, paramName)) {
-                        dataArray[dataIdx++] = argArray[j];
+                    int dataIdx = Utils.indexOf(inputArgNames, paramName);
+                    if (dataIdx >= 0) {
+                        dataArray[dataIdx] = argArray[j];
                     }
                 } else {
                     param.copyTo(argArray[j]);
