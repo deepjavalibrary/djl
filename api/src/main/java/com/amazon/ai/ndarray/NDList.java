@@ -45,7 +45,7 @@ public class NDList implements Iterable<NDArray> {
     }
 
     public NDArray[] toArray() {
-        return list.toArray(new NDArray[0]); // NOPMD
+        return list.toArray(new NDArray[0]);
     }
 
     /**

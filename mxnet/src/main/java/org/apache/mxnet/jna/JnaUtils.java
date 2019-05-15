@@ -52,6 +52,8 @@ public final class JnaUtils {
 
     private static final MxnetLibrary LIB = LibUtils.loadLibrary();
 
+    public static final String[] EMPTY_ARRAY = new String[0];
+
     private JnaUtils() {}
 
     /////////////////////////////////
@@ -361,11 +363,11 @@ public final class JnaUtils {
         String[] keys;
         String[] values;
         if (params == null) {
-            keys = new String[0];
-            values = new String[0];
+            keys = EMPTY_ARRAY;
+            values = EMPTY_ARRAY;
         } else {
-            keys = params.keys();
-            values = params.values();
+            keys = params.keys(EMPTY_ARRAY);
+            values = params.values(EMPTY_ARRAY);
         }
         IntBuffer size = IntBuffer.allocate(1);
         size.put(0, 1);

@@ -145,7 +145,7 @@ public class Symbol extends NativeResource implements Block {
     }
 
     public void compose(String name, Map<String, String> symbols) {
-        JnaUtils.compose(getHandle(), name, symbols.values().toArray(new String[0]));
+        JnaUtils.compose(getHandle(), name, symbols.values().toArray(JnaUtils.EMPTY_ARRAY));
     }
 
     public MxExecutor[] simpleBind(
@@ -232,7 +232,7 @@ public class Symbol extends NativeResource implements Block {
                 sharedArgNames.add(arg);
             }
         }
-        String[] sharedArgParams = sharedArgNames.toArray(new String[0]); // NOPMD
+        String[] sharedArgParams = sharedArgNames.toArray(JnaUtils.EMPTY_ARRAY);
 
         IntBuffer sharedBufferLen = IntBuffer.allocate(1);
         sharedBufferLen.put(0, 0);

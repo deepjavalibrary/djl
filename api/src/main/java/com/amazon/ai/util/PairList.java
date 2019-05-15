@@ -52,11 +52,11 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         return values[index];
     }
 
-    public K[] keys() {
+    public K[] keys(K[] target) {
         return keys;
     }
 
-    public V[] values() {
+    public V[] values(V[] target) {
         return values;
     }
 
@@ -148,13 +148,19 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         }
 
         @Override
-        public S[] keys() {
-            return null;
+        public S[] keys(S[] target) {
+            if (target.length > 0) {
+                target[0] = null;
+            }
+            return target;
         }
 
         @Override
-        public T[] values() {
-            return null;
+        public T[] values(T[] target) {
+            if (target.length > 0) {
+                target[0] = null;
+            }
+            return target;
         }
     }
 }

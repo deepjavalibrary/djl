@@ -35,8 +35,6 @@ public class MxModel implements Model, AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
-    private static final String[] EMPTY = new String[0];
-
     private Symbol symbol;
     private PairList<String, MxNDArray> argParams;
     private PairList<String, MxNDArray> auxParams;
@@ -99,7 +97,7 @@ public class MxModel implements Model, AutoCloseable {
         PairList<String, MxNDArray> auxParams = PairList.fromList(auxParamNames, auxParamData);
 
         String[] synset = loadSynset(synsetFile);
-        String[] stateNames = JnaUtils.readLines(new File(stateFile)).toArray(new String[0]);
+        String[] stateNames = JnaUtils.readLines(new File(stateFile)).toArray(JnaUtils.EMPTY_ARRAY);
 
         JnaUtils.waitAll();
 
@@ -129,7 +127,7 @@ public class MxModel implements Model, AutoCloseable {
 
     public String[] getLabelNames() {
         if (labelNames == null) {
-            return EMPTY;
+            return JnaUtils.EMPTY_ARRAY;
         }
         return labelNames;
     }
@@ -188,11 +186,14 @@ public class MxModel implements Model, AutoCloseable {
     @Override
     public void close() {
         symbol.close();
-        for (MxNDArray nd : argParams.values()) {
-            nd.close();
+
+        for (int i = 0; i < argParams.size(); ++i) {
+            MxNDArray array = argParams.valueAt(i);
+            array.close();
         }
-        for (MxNDArray nd : auxParams.values()) {
-            nd.close();
+        for (int i = 0; i < auxParams.size(); ++i) {
+            MxNDArray array = auxParams.valueAt(i);
+            array.close();
         }
     }
 
@@ -204,11 +205,11 @@ public class MxModel implements Model, AutoCloseable {
                 String synsetLemma = it.next();
                 it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
             }
-            return output.toArray(new String[0]); // NOPMD
+            return output.toArray(JnaUtils.EMPTY_ARRAY);
         } catch (IOException e) {
             logger.warn("Error opening synset file " + synsetFile, e);
         }
-        return EMPTY;
+        return JnaUtils.EMPTY_ARRAY;
     }
 
     @Override
