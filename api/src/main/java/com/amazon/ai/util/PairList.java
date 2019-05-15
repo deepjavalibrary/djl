@@ -140,12 +140,21 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    private static final class EmptyList extends PairList {
+    private static final class EmptyList<S, T> extends PairList<S, T> {
 
         @SuppressWarnings("unchecked")
         public EmptyList() {
-            super(new Object[0], new Object[0]);
+            super((S[]) new Object[0], (T[]) new Object[0]);
+        }
+
+        @Override
+        public S[] keys() {
+            return null;
+        }
+
+        @Override
+        public T[] values() {
+            return null;
         }
     }
 }
