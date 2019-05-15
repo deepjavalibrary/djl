@@ -49,6 +49,7 @@
         <exclude name="MissingBreakInSwitch"/>
         <exclude name="NonCaseLabelInSwitchStatement"/>
         <exclude name="NonStaticInitializer"/>
+        <exclude name="OptimizableToArrayCall"/>
         <exclude name="ReturnEmptyArrayRatherThanNull"/>
         <exclude name="SimpleDateFormatNeedsLocale"/>
         <exclude name="SwitchDensity"/>
