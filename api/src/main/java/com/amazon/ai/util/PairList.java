@@ -12,13 +12,18 @@
  */
 package com.amazon.ai.util;
 
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 public class PairList<K, V> implements Iterable<Pair<K, V>> {
+
+    @SuppressWarnings("rawtypes")
+    private static final PairList EMPTY_LIST = new EmptyList();
 
     private final K[] keys;
     private final V[] values;
@@ -29,11 +34,6 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         }
         this.keys = keys;
         this.values = values;
-    }
-
-    @SuppressWarnings("unchecked")
-    public PairList(List<K> keys, List<V> values) {
-        this((K[]) keys.toArray(), (V[]) values.toArray()); // NOPMD
     }
 
     public int size() {
@@ -66,14 +66,41 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <S, T> PairList<S, T> fromMap(Map<S, T> map) {
-        if (map == null) {
-            return null;
+    public static <S, T> PairList<S, T> fromList(List<S> keys, List<T> values) {
+        int size = keys.size();
+        if (size != values.size()) {
+            throw new IllegalArgumentException("key value size mismatch.");
         }
-        S[] keys = (S[]) new Object[map.size()];
-        T[] values = (T[]) new Object[map.size()];
+        if (size == 0) {
+            return EMPTY_LIST;
+        }
+
+        Class<?> keyType = keys.get(0).getClass();
+        Class<?> valueType = values.get(0).getClass();
+        S[] keyArray = (S[]) Array.newInstance(keyType, size);
+        T[] valueArray = (T[]) Array.newInstance(valueType, size);
+        for (int i = 0; i < size; ++i) {
+            keyArray[i] = keys.get(i);
+            valueArray[i] = values.get(i);
+        }
+        return new PairList<>(keyArray, valueArray);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <S, T> PairList<S, T> fromMap(Map<S, T> map) {
+        if (map == null || map.isEmpty()) {
+            return EMPTY_LIST;
+        }
+
+        Set<Map.Entry<S, T>> entries = map.entrySet();
+        Map.Entry<S, T> first = entries.iterator().next();
+        Class<?> keyType = first.getKey().getClass();
+        Class<?> valueType = first.getKey().getClass();
+
+        S[] keys = (S[]) Array.newInstance(keyType, map.size());
+        T[] values = (T[]) Array.newInstance(valueType, map.size());
         int i = 0;
-        for (Map.Entry<S, T> entry : map.entrySet()) {
+        for (Map.Entry<S, T> entry : entries) {
             keys[i] = entry.getKey();
             values[i] = entry.getValue();
             ++i;
@@ -110,6 +137,15 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
             }
 
             return get(cursor++);
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static final class EmptyList extends PairList {
+
+        @SuppressWarnings("unchecked")
+        public EmptyList() {
+            super(new Object[0], new Object[0]);
         }
     }
 }

@@ -238,9 +238,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             keys.add("temperature");
             values.add(String.valueOf(temperature));
         }
-        String[] keyArr = keys.toArray(new String[0]);
-        String[] valArr = values.toArray(new String[0]);
-        PairList<String, String> params = new PairList<>(keyArr, valArr);
+        PairList<String, String> params = PairList.fromList(keys, values);
         PointerByReference ref = new PointerByReference();
 
         functionInfo.invoke(getHandle(), ref, params);
@@ -263,9 +261,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             keys.add("squeeze_axis");
             values.add(String.valueOf(squeezeAxis));
         }
-        String[] keyArr = keys.toArray(new String[0]);
-        String[] valueArr = values.toArray(new String[0]);
-        PairList<String, String> params = new PairList<>(keyArr, valueArr);
+        PairList<String, String> params = PairList.fromList(keys, values);
         PointerByReference ref = new PointerByReference();
 
         functionInfo.invoke(getHandle(), ref, params);

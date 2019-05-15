@@ -95,8 +95,8 @@ public class MxModel implements Model, AutoCloseable {
                 throw new IllegalStateException("Unknown parameter: " + pair[0]);
             }
         }
-        PairList<String, MxNDArray> argParams = new PairList<>(argParamNames, argParamData);
-        PairList<String, MxNDArray> auxParams = new PairList<>(auxParamNames, auxParamData);
+        PairList<String, MxNDArray> argParams = PairList.fromList(argParamNames, argParamData);
+        PairList<String, MxNDArray> auxParams = PairList.fromList(auxParamNames, auxParamData);
 
         String[] synset = loadSynset(synsetFile);
         String[] stateNames = JnaUtils.readLines(new File(stateFile)).toArray(new String[0]);
