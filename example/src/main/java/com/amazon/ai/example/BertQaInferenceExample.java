@@ -29,6 +29,7 @@ import com.amazon.ai.ndarray.types.Shape;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.cli.CommandLine;
@@ -40,8 +41,8 @@ import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
-public class BERTQAInferenceExample {
-    private static Logger logger = LogUtils.getLogger(BERTQAInferenceExample.class);
+public class BertQaInferenceExample {
+    private static Logger logger = LogUtils.getLogger(BertQaInferenceExample.class);
 
     private void runExample(String[] args) {
         Options options = Arguments.getOptions();
@@ -108,7 +109,7 @@ public class BERTQAInferenceExample {
     }
 
     public static void main(String[] args) {
-        new BERTQAInferenceExample().runExample(args);
+        new BertQaInferenceExample().runExample(args);
     }
 
     private static class QAInput {
@@ -146,21 +147,14 @@ public class BERTQAInferenceExample {
             List<String> tokenQ = util.tokenizer(input.question.toLowerCase());
             List<String> tokenA = util.tokenizer(input.answer.toLowerCase());
             int validLength = tokenQ.size() + tokenA.size();
-            List<Float> qaEmbedded = new ArrayList<>();
-            qaEmbedded = util.pad(qaEmbedded, 0f, tokenQ.size() + 2);
-            qaEmbedded.addAll(util.pad(new ArrayList<>(), 1f, tokenA.size()));
-            List<Float> tokenTypes = util.pad(qaEmbedded, 0f, input.seqLength);
-            // make BERT pre-processing standard
-            tokenQ.add("[SEP]");
-            tokenQ.add(0, "[CLS]");
-            tokenA.add("[SEP]");
-            tokenQ.addAll(tokenA);
-            tokens = util.pad(tokenQ, "[PAD]", input.seqLength);
+            List<Float> tokenTypes = util.getTokenTypes(tokenQ, tokenA, input.seqLength);
+            tokens = util.formTokens(tokenQ, tokenA, input.seqLength);
             List<Integer> indexes = util.token2idx(tokens);
             List<Float> indexesFloat = new ArrayList<>();
             for (int integer : indexes) {
                 indexesFloat.add((float) integer);
             }
+            // Start building model
             Model model = predictor.getModel();
             DataDesc[] dataDescs = model.describeInput();
             predictor.create(dataDescs[0]);
@@ -169,7 +163,7 @@ public class BERTQAInferenceExample {
 
             list.get(0).set(indexesFloat);
             list.get(1).set(tokenTypes);
-            list.get(2).set(Arrays.asList((float) validLength));
+            list.get(2).set(Collections.singletonList((float) validLength));
 
             return list;
         }
