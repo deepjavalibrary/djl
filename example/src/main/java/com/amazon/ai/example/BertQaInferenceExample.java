@@ -36,6 +36,7 @@ import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.engine.MxModel;
@@ -46,11 +47,11 @@ public class BertQaInferenceExample {
     private static Logger logger = LogUtils.getLogger(BertQaInferenceExample.class);
 
     private void runExample(String[] args) {
-        Options options = Arguments.getOptions();
+        Options options = BertArguments.getOptions();
         try {
             DefaultParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args, null, false);
-            Arguments arguments = new Arguments(cmd);
+            BertArguments arguments = new BertArguments(cmd);
 
             String modelDir = arguments.getModelDir();
             String modelName = arguments.getModelName();
@@ -58,7 +59,7 @@ public class BertQaInferenceExample {
             String answer = arguments.getAnswer();
             int seqLength = arguments.getSeqLength();
             String vocabulary = modelDir + "/" + arguments.getVocabulary();
-            BertDataParser util = new BertDataParser(vocabulary);
+            BertDataParser util = BertDataParser.parse(vocabulary);
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
@@ -100,12 +101,13 @@ public class BertQaInferenceExample {
         ((MxModel) model).setDataNames(dataDescs);
 
         GenericTranslator translator = new GenericTranslator(parser);
-        try (Predictor<QAInput, QAOutput> predictor = Predictor.newInstance(model, translator)) {
-            QAOutput output = predictor.predict(input);
+        try (Predictor<QAInput, String> predictor = Predictor.newInstance(model, translator)) {
+            String answer = predictor.predict(input);
             logger.info(
-                    String.format(
-                            "%nQuestion: %s%nParagraph: %s%nAnswer: %s",
-                            input.question, input.answer, output.answer));
+                    "Question: {}\nParagraph: {}\nAnswer: {}",
+                    input.question,
+                    input.answer,
+                    answer);
         }
     }
 
@@ -126,33 +128,24 @@ public class BertQaInferenceExample {
         }
     }
 
-    private static final class QAOutput {
+    private static final class GenericTranslator implements Translator<QAInput, String> {
 
-        String answer;
-
-        QAOutput(String answer) {
-            this.answer = answer;
-        }
-    }
-
-    private static final class GenericTranslator implements Translator<QAInput, QAOutput> {
-
-        private BertDataParser util;
+        private BertDataParser parser;
         private List<String> tokens;
 
         GenericTranslator(BertDataParser parser) {
-            this.util = parser;
+            this.parser = parser;
         }
 
         @Override
         public NDList processInput(TranslatorContext ctx, QAInput input) {
             // pre-processing - tokenize sentence
-            List<String> tokenQ = util.tokenizer(input.question.toLowerCase());
-            List<String> tokenA = util.tokenizer(input.answer.toLowerCase());
+            List<String> tokenQ = BertDataParser.tokenizer(input.question.toLowerCase());
+            List<String> tokenA = BertDataParser.tokenizer(input.answer.toLowerCase());
             int validLength = tokenQ.size() + tokenA.size();
-            List<Float> tokenTypes = util.getTokenTypes(tokenQ, tokenA, input.seqLength);
-            tokens = util.formTokens(tokenQ, tokenA, input.seqLength);
-            List<Integer> indexes = util.token2idx(tokens);
+            List<Float> tokenTypes = BertDataParser.getTokenTypes(tokenQ, tokenA, input.seqLength);
+            tokens = BertDataParser.formTokens(tokenQ, tokenA, input.seqLength);
+            List<Integer> indexes = parser.token2idx(tokens);
             List<Float> indexesFloat = new ArrayList<>(indexes.size());
             for (int integer : indexes) {
                 indexesFloat.add((float) integer);
@@ -172,7 +165,7 @@ public class BertQaInferenceExample {
         }
 
         @Override
-        public QAOutput processOutput(TranslatorContext ctx, NDList list) {
+        public String processOutput(TranslatorContext ctx, NDList list) {
             NDArray array = list.get(0);
             NDArray[] output = array.split(2, 2, null);
             // Get the formatted logits result
@@ -183,7 +176,7 @@ public class BertQaInferenceExample {
             float[] endProb = endLogits.softmax(null, null).toFloatArray();
             int startIdx = argmax(startProb);
             int endIdx = argmax(endProb);
-            return new QAOutput(tokens.subList(startIdx, endIdx + 1).toString());
+            return tokens.subList(startIdx, endIdx + 1).toString();
         }
 
         private static int argmax(float[] prob) {
@@ -194,6 +187,79 @@ public class BertQaInferenceExample {
                 }
             }
             return maxIdx;
+        }
+    }
+
+    public static final class BertArguments extends Arguments {
+
+        private String question;
+        private String answer;
+        private int seqLength;
+        private String vocabulary;
+
+        public BertArguments(CommandLine cmd) {
+            super(cmd);
+            if (cmd.hasOption("question")) {
+                question = cmd.getOptionValue("question");
+            }
+            if (cmd.hasOption("answer")) {
+                answer = cmd.getOptionValue("answer");
+            }
+            if (cmd.hasOption("sequenceLength")) {
+                seqLength = Integer.parseInt(cmd.getOptionValue("sequenceLength"));
+            }
+            if (cmd.hasOption("vocabulary")) {
+                vocabulary = cmd.getOptionValue("vocabulary");
+            }
+        }
+
+        public static Options getOptions() {
+            Options options = Arguments.getOptions();
+            options.addOption(
+                    Option.builder("q")
+                            .longOpt("question")
+                            .hasArg()
+                            .argName("QUESTION")
+                            .desc("Question of the model")
+                            .build());
+            options.addOption(
+                    Option.builder("a")
+                            .longOpt("answer")
+                            .hasArg()
+                            .argName("ANSWER")
+                            .desc("Answer paragraph of the model")
+                            .build());
+            options.addOption(
+                    Option.builder("sl")
+                            .longOpt("sequenceLength")
+                            .hasArg()
+                            .argName("SEQUENCELENGTH")
+                            .desc("Sequence Length of the paragraph")
+                            .build());
+            options.addOption(
+                    Option.builder("v")
+                            .longOpt("vocabulary")
+                            .hasArg()
+                            .argName("VOCABULARY")
+                            .desc("Vocabulary of the model")
+                            .build());
+            return options;
+        }
+
+        public String getQuestion() {
+            return question;
+        }
+
+        public String getAnswer() {
+            return answer;
+        }
+
+        public int getSeqLength() {
+            return seqLength;
+        }
+
+        public String getVocabulary() {
+            return vocabulary;
         }
     }
 }

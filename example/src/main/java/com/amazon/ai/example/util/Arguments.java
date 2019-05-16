@@ -26,10 +26,6 @@ public class Arguments {
     private String imageFile;
     private int duration;
     private int iteration = 1000;
-    private String question;
-    private String answer;
-    private int seqLength;
-    private String vocabulary;
 
     public Arguments(CommandLine cmd) {
         modelDir = cmd.getOptionValue("model-dir");
@@ -42,18 +38,6 @@ public class Arguments {
         }
         if (cmd.hasOption("iteration")) {
             iteration = Integer.parseInt(cmd.getOptionValue("iteration"));
-        }
-        if (cmd.hasOption("question")) {
-            question = cmd.getOptionValue("question");
-        }
-        if (cmd.hasOption("answer")) {
-            answer = cmd.getOptionValue("answer");
-        }
-        if (cmd.hasOption("sequenceLength")) {
-            seqLength = Integer.parseInt(cmd.getOptionValue("sequenceLength"));
-        }
-        if (cmd.hasOption("vocabulary")) {
-            vocabulary = cmd.getOptionValue("vocabulary");
         }
     }
 
@@ -96,34 +80,6 @@ public class Arguments {
                         .argName("ITERATION")
                         .desc("Number of iterations in each test.")
                         .build());
-        options.addOption(
-                Option.builder("q")
-                        .longOpt("question")
-                        .hasArg()
-                        .argName("QUESTION")
-                        .desc("Question of the model")
-                        .build());
-        options.addOption(
-                Option.builder("a")
-                        .longOpt("answer")
-                        .hasArg()
-                        .argName("ANSWER")
-                        .desc("Answer paragraph of the model")
-                        .build());
-        options.addOption(
-                Option.builder("sl")
-                        .longOpt("sequenceLength")
-                        .hasArg()
-                        .argName("SEQUENCELENGTH")
-                        .desc("Sequence Length of the paragraph")
-                        .build());
-        options.addOption(
-                Option.builder("v")
-                        .longOpt("vocabulary")
-                        .hasArg()
-                        .argName("VOCABULARY")
-                        .desc("Vocabulary of the model")
-                        .build());
         return options;
     }
 
@@ -153,21 +109,5 @@ public class Arguments {
 
     public int getIteration() {
         return iteration;
-    }
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public int getSeqLength() {
-        return seqLength;
-    }
-
-    public String getVocabulary() {
-        return vocabulary;
     }
 }

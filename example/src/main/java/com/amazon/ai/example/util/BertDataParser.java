@@ -1,14 +1,18 @@
 package com.amazon.ai.example.util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This is the Utility for pre-processing the data for Bert Model You can use this utility to parse
@@ -16,22 +20,25 @@ import java.util.Map;
  */
 public class BertDataParser {
 
+    private static final Gson GSON = new GsonBuilder().create();
+    private static final Pattern PATTERN = Pattern.compile("(\\S+?)([.,?!])?(\\s+|$)");
+
+    @SerializedName("token_to_idx")
     private Map<String, Integer> token2idx;
+
+    @SerializedName("idx_to_token")
     private List<String> idx2token;
 
     /**
      * Parse the Vocabulary to JSON files [PAD], [CLS], [SEP], [MASK], [UNK] are reserved tokens
      *
      * @param jsonFile the filePath of the vocab.json
-     * @throws IOException
+     * @throws IOException if failed read from file
      */
-    public BertDataParser(String jsonFile) throws IOException {
-        Gson gson = new Gson();
-        VocabularyInfo vocab =
-                gson.fromJson(
-                        Files.newBufferedReader(new File(jsonFile).toPath()), VocabularyInfo.class);
-        token2idx = vocab.token2idx;
-        idx2token = vocab.idx2token;
+    public static BertDataParser parse(String jsonFile) throws IOException {
+        try (Reader reader = Files.newBufferedReader(new File(jsonFile).toPath())) {
+            return GSON.fromJson(reader, BertDataParser.class);
+        }
     }
 
     /**
@@ -41,20 +48,19 @@ public class BertDataParser {
      * @param input The input string
      * @return List of tokens
      */
-    public List<String> tokenizer(String input) {
-        String[] step1 = input.split("\\s+");
-        List<String> finalResult = new LinkedList<>();
-        for (String item : step1) {
-            if (item.length() != 0) {
-                if ((item + "a").split("[.,?!]+").length > 1) {
-                    finalResult.add(item.substring(0, item.length() - 1));
-                    finalResult.add(item.substring(item.length() - 1));
-                } else {
-                    finalResult.add(item);
-                }
+    public static List<String> tokenizer(String input) {
+        List<String> ret = new LinkedList<>();
+
+        Matcher m = PATTERN.matcher(input);
+        while (m.find()) {
+            ret.add(m.group(1));
+            String token = m.group(2);
+            if (token != null) {
+                ret.add(token);
             }
         }
-        return finalResult;
+
+        return ret;
     }
 
     /**
@@ -65,12 +71,13 @@ public class BertDataParser {
      * @param num total length after padding
      * @return List of padded tokens
      */
-    public <E> List<E> pad(List<E> tokens, E padItem, int num) {
+    public static <E> List<E> pad(List<E> tokens, E padItem, int num) {
         if (tokens.size() >= num) {
             return tokens;
         }
-        List<E> padded = new LinkedList<>(tokens);
-        for (int i = 0; i < num - tokens.size(); i++) {
+        List<E> padded = new ArrayList<>(num);
+        padded.addAll(tokens);
+        for (int i = tokens.size(); i < num; ++i) {
             padded.add(padItem);
         }
         return padded;
@@ -84,7 +91,8 @@ public class BertDataParser {
      * @param seqLength sequence length
      * @return List of tokenTypes
      */
-    public List<Float> getTokenTypes(List<String> question, List<String> answer, int seqLength) {
+    public static List<Float> getTokenTypes(
+            List<String> question, List<String> answer, int seqLength) {
         List<Float> qaEmbedded = new ArrayList<>();
         qaEmbedded = pad(qaEmbedded, 0f, question.size() + 2);
         qaEmbedded.addAll(pad(new ArrayList<>(), 1f, answer.size()));
@@ -99,7 +107,8 @@ public class BertDataParser {
      * @param seqLength sequence length
      * @return List of tokenTypes
      */
-    public List<String> formTokens(List<String> question, List<String> answer, int seqLength) {
+    public static List<String> formTokens(
+            List<String> question, List<String> answer, int seqLength) {
         // make BERT pre-processing standard
         List<String> tokens = new ArrayList<>(question);
         tokens.add("[SEP]");
@@ -140,13 +149,5 @@ public class BertDataParser {
             tokens.add(idx2token.get(index));
         }
         return tokens;
-    }
-
-    private class VocabularyInfo {
-        @SerializedName("token_to_idx")
-        private Map<String, Integer> token2idx;
-
-        @SerializedName("idx_to_token")
-        private List<String> idx2token;
     }
 }
