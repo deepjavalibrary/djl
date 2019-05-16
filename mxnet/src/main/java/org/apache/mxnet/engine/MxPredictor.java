@@ -18,24 +18,26 @@ import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 
-public class MxPredictor<I, O> extends MxNDFactory implements Predictor<I, O> {
+public class MxPredictor<I, O> implements Predictor<I, O> {
 
     MxModel model;
     private Translator<I, O> transformer;
     Context context;
     private Module module;
     private DataDesc[] dataDesc;
+    NDFactory factory;
 
     MxPredictor(MxModel model, Translator<I, O> transformer, Context context) {
-        super(context);
+        this.factory = MxNDFactory.SYSTEM_FACTORY.newSubFactory(context);
         this.model = model;
         this.transformer = transformer;
         this.context = context;
         Module.Builder builder = new Module.Builder(context, model, false);
-        module = builder.build(this);
+        module = builder.build();
     }
 
     @Override
@@ -80,11 +82,17 @@ public class MxPredictor<I, O> extends MxNDFactory implements Predictor<I, O> {
 
     @Override
     public void close() {
-        super.close();
         module.close();
+        factory.close();
     }
 
-    private class PredictorContext extends MxNDFactory implements TranslatorContext {
+    private class PredictorContext implements TranslatorContext {
+
+        private NDFactory ctxFactory;
+
+        public PredictorContext() {
+            ctxFactory = factory.newSubFactory();
+        }
 
         @Override
         public Model getModel() {
@@ -94,6 +102,16 @@ public class MxPredictor<I, O> extends MxNDFactory implements Predictor<I, O> {
         @Override
         public Context getContext() {
             return context;
+        }
+
+        @Override
+        public NDFactory getNDFactory() {
+            return ctxFactory;
+        }
+
+        @Override
+        public void close() {
+            ctxFactory.close();
         }
     }
 }

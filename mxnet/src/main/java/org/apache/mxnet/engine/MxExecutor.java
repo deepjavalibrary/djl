@@ -19,19 +19,19 @@ import org.apache.mxnet.jna.JnaUtils;
 
 public class MxExecutor extends NativeResource {
 
-    private MxNDArray[] argArray;
-    private MxNDArray[] auxArray;
-    private MxNDArray[] dataArray;
-    private MxNDArray[] outputs;
-    private MxNDArray[] gradArray;
+    private NDArray[] argArray;
+    private NDArray[] auxArray;
+    private NDArray[] dataArray;
+    private NDArray[] outputs;
+    private NDArray[] gradArray;
 
     MxExecutor(
             Pointer pointer,
-            MxNDArray[] argArray,
-            MxNDArray[] auxArray,
-            MxNDArray[] dataArray,
-            MxNDArray[] outputs,
-            MxNDArray[] gradArray) {
+            NDArray[] argArray,
+            NDArray[] auxArray,
+            NDArray[] dataArray,
+            NDArray[] outputs,
+            NDArray[] gradArray) {
         super(pointer);
         this.argArray = argArray;
         this.auxArray = auxArray;
@@ -69,19 +69,19 @@ public class MxExecutor extends NativeResource {
         if (pointer != null) {
             JnaUtils.freeExecutor(pointer);
         }
-        for (MxNDArray ndArray : argArray) {
+        for (NDArray ndArray : argArray) {
             ndArray.close();
         }
-        for (MxNDArray ndArray : auxArray) {
+        for (NDArray ndArray : auxArray) {
             ndArray.close();
         }
-        for (MxNDArray ndArray : dataArray) {
+
+        // dataArray is just a pointer to argArray, no need to close
+
+        for (NDArray ndArray : outputs) {
             ndArray.close();
         }
-        for (MxNDArray ndArray : outputs) {
-            ndArray.close();
-        }
-        for (MxNDArray ndArray : gradArray) {
+        for (NDArray ndArray : gradArray) {
             if (ndArray != null) {
                 ndArray.close();
             }

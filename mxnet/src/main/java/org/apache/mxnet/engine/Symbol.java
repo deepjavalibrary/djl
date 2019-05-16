@@ -101,7 +101,7 @@ public class Symbol extends NativeResource implements Block {
 
     public Symbol get(int index) {
         Pointer pointer = JnaUtils.getSymbolOutput(getHandle(), index);
-        return new Symbol(getNDFactory(), pointer);
+        return new Symbol(factory, pointer);
     }
 
     public Symbol get(String name) {
@@ -115,7 +115,7 @@ public class Symbol extends NativeResource implements Block {
 
     public Symbol getInternals() {
         Pointer pointer = JnaUtils.getSymbolInternals(getHandle());
-        return new Symbol(getNDFactory(), pointer);
+        return new Symbol(factory, pointer);
     }
 
     public String debugStr() {
@@ -141,7 +141,7 @@ public class Symbol extends NativeResource implements Block {
     }
 
     public Symbol compose(String name, String[] keys) {
-        return new Symbol(getNDFactory(), JnaUtils.compose(getHandle(), name, keys));
+        return new Symbol(factory, JnaUtils.compose(getHandle(), name, keys));
     }
 
     public void compose(String name, Map<String, String> symbols) {
@@ -298,7 +298,7 @@ public class Symbol extends NativeResource implements Block {
             MxNDArray[] gradArray = new MxNDArray[inArgSize];
             MxNDArray[] dataArray = new MxNDArray[inputArgNames.length];
             for (int j = 0; j < inArgSize; ++j) {
-                argArray[j] = new MxNDArray(factory, inArgsPointers[j]);
+                argArray[j] = factory.create(inArgsPointers[j]);
 
                 String paramName = argParams[j];
 
@@ -313,7 +313,7 @@ public class Symbol extends NativeResource implements Block {
                 }
 
                 if (gradPointers[j] != null) {
-                    gradArray[j] = new MxNDArray(factory, gradPointers[j]);
+                    gradArray[j] = factory.create(gradPointers[j]);
                 }
             }
 
@@ -323,9 +323,9 @@ public class Symbol extends NativeResource implements Block {
                 Map<String, MxNDArray> auxParamMap = model.getAuxParams().toMap();
                 Pointer[] pointers = auxStates.getValue().getPointerArray(0, auxStatesSize);
                 for (int j = 0; j < auxStatesSize; ++j) {
-                    auxArray[j] = new MxNDArray(factory, pointers[j]);
+                    auxArray[j] = factory.create(pointers[j]);
 
-                    MxNDArray param = auxParamMap.get(auxParams[j]);
+                    NDArray param = auxParamMap.get(auxParams[j]);
                     if (param == null) {
                         throw new IllegalStateException("aux parameter not found: " + auxParams[j]);
                     }
@@ -333,7 +333,7 @@ public class Symbol extends NativeResource implements Block {
                 }
             }
 
-            MxNDArray[] out = JnaUtils.getExecutorOutputs(factory, pointer);
+            NDArray[] out = JnaUtils.getExecutorOutputs(factory, pointer);
 
             executors[i] = new MxExecutor(pointer, argArray, auxArray, dataArray, out, gradArray);
         }
@@ -379,9 +379,5 @@ public class Symbol extends NativeResource implements Block {
     @Override
     public byte[] getEncoded() {
         return new byte[0];
-    }
-
-    public MxNDFactory getNDFactory() {
-        return factory;
     }
 }

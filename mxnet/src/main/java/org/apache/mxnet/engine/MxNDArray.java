@@ -14,7 +14,6 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Layout;
@@ -52,14 +51,10 @@ public class MxNDArray extends NativeResource implements NDArray {
     private SparseFormat sparseFormat;
     private DataType dataType;
     private Shape shape;
-    private NDFactory factory;
-
-    MxNDArray(NDFactory factory, Pointer handle) {
-        this(factory, null, null, null, null, handle);
-    }
+    private MxNDFactory factory;
 
     MxNDArray(
-            NDFactory factory,
+            MxNDFactory factory,
             Context context,
             SparseFormat sparseFormat,
             Shape shape,
@@ -73,16 +68,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         this.sparseFormat = sparseFormat;
     }
 
-    public MxNDArray(Context context, Shape shape) {
-        this(null, context, shape, DataType.FLOAT32, false);
-    }
-
-    public MxNDArray(NDFactory factory, Context context, Shape shape) {
-        this(factory, context, shape, DataType.FLOAT32, false);
-    }
-
-    public MxNDArray(
-            NDFactory factory, Context context, Shape shape, DataType dataType, boolean delay) {
+    MxNDArray(MxNDFactory factory, Context context, Shape shape, DataType dataType, boolean delay) {
         this(
                 factory,
                 context,
@@ -99,6 +85,17 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public void encode(OutputStream os) {}
+
+    public void detach() {
+        factory.detach(this);
+        factory = MxNDFactory.SYSTEM_FACTORY;
+    }
+
+    public void attach(MxNDFactory factory) {
+        detach();
+        this.factory = factory;
+        factory.attach(this);
+    }
 
     public DataType getDataType() {
         if (dataType == null) {
@@ -166,13 +163,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public MxNDArray at(int index) {
         Pointer pointer = JnaUtils.ndArrayAt(getHandle(), index);
-        return new MxNDArray(factory, pointer);
+        return factory.create(pointer);
     }
 
     @Override
     public MxNDArray slice(int begin, int end) {
         Pointer pointer = JnaUtils.slice(getHandle(), begin, end);
-        return new MxNDArray(factory, pointer);
+        return factory.create(pointer);
     }
 
     @Override
@@ -222,7 +219,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         functionInfo.invoke(getHandle(), ref, params);
 
-        return new MxNDArray(factory, ref.getValue().getPointerArray(0, 1)[0]);
+        return factory.create(ref.getValue().getPointerArray(0, 1)[0]);
     }
 
     @Override
@@ -243,7 +240,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         functionInfo.invoke(getHandle(), ref, params);
 
-        return new MxNDArray(factory, ref.getValue().getPointerArray(0, 1)[0]);
+        return factory.create(ref.getValue().getPointerArray(0, 1)[0]);
     }
 
     @Override
@@ -268,7 +265,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
         MxNDArray[] output = new MxNDArray[numOutputs];
         for (int i = 0; i < numOutputs; i++) {
-            output[i] = new MxNDArray(factory, ptrArray[i]);
+            output[i] = factory.create(ptrArray[i]);
         }
         return output;
     }
@@ -1348,7 +1345,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray reshape(long... newShape) {
         Pointer pointer = JnaUtils.reshape(getHandle(), newShape, false);
-        return new MxNDArray(factory, pointer);
+        return factory.create(pointer);
     }
 
     @Override
@@ -1769,6 +1766,8 @@ public class MxNDArray extends NativeResource implements NDArray {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
             JnaUtils.freeNdArray(pointer);
+            detach();
+            factory = null;
         }
     }
 }

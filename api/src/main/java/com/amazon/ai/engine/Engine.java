@@ -17,7 +17,6 @@ import com.amazon.ai.Model;
 import com.amazon.ai.Profiler;
 import com.amazon.ai.Translator;
 import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.training.Trainer;
 import java.io.File;
 import java.io.IOException;
@@ -71,8 +70,4 @@ public abstract class Engine {
     public abstract Trainer newTrainer(Model model, Context context);
 
     public abstract void setProfiler(Profiler profiler);
-
-    public abstract NDFactory getNDFactory();
-
-    public abstract NDFactory getNDFactory(Context context);
 }

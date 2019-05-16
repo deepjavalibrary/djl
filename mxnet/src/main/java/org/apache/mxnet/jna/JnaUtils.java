@@ -13,6 +13,7 @@
 package org.apache.mxnet.jna;
 
 import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
@@ -40,7 +41,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import org.apache.mxnet.engine.DeviceType;
-import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 import org.apache.mxnet.engine.Symbol;
 
@@ -899,13 +899,13 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
-    public static MxNDArray[] getExecutorOutputs(MxNDFactory factory, Pointer executor) {
+    public static NDArray[] getExecutorOutputs(MxNDFactory factory, Pointer executor) {
         IntBuffer outSize = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXExecutorOutputs(executor, outSize, ref));
         int size = outSize.get();
         Pointer[] pointers = ref.getValue().getPointerArray(0, size);
-        MxNDArray[] ndArrays = new MxNDArray[size];
+        NDArray[] ndArrays = new NDArray[size];
         for (int i = 0; i < size; ++i) {
             ndArrays[i] = factory.create(pointers[i]);
         }

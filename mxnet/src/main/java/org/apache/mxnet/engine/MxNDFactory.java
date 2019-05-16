@@ -19,17 +19,21 @@ import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.sun.jna.Pointer;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class MxNDFactory extends MxResourceAllocator implements NDFactory {
+public class MxNDFactory implements NDFactory {
 
+    public static final MxNDFactory SYSTEM_FACTORY = new SystemFactory();
+
+    private NDFactory parent;
     private Context context;
+    private Map<AutoCloseable, AutoCloseable> resources;
 
-    public MxNDFactory() {
-        this(Context.defaultContext());
-    }
-
-    public MxNDFactory(Context context) {
+    private MxNDFactory(NDFactory parent, Context context) {
+        this.parent = parent;
         this.context = context;
+        resources = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -39,7 +43,9 @@ public class MxNDFactory extends MxResourceAllocator implements NDFactory {
             DataType dataType,
             SparseFormat sparseFormat,
             boolean delay) {
-        return new MxNDArray(this, context, shape, dataType, delay);
+        MxNDArray array = new MxNDArray(this, context, shape, dataType, delay);
+        resources.put(array, array);
+        return array;
     }
 
     @Override
@@ -53,6 +59,62 @@ public class MxNDFactory extends MxResourceAllocator implements NDFactory {
     }
 
     public MxNDArray create(Pointer handle) {
-        return new MxNDArray(this, context, SparseFormat.DEFAULT, null, DataType.FLOAT32, handle);
+        MxNDArray array =
+                new MxNDArray(this, context, SparseFormat.DEFAULT, null, DataType.FLOAT32, handle);
+        resources.put(array, array);
+        return array;
+    }
+
+    @Override
+    public NDFactory getParentFactory() {
+        return parent;
+    }
+
+    @Override
+    public MxNDFactory newSubFactory() {
+        return newSubFactory(context);
+    }
+
+    @Override
+    public MxNDFactory newSubFactory(Context context) {
+        MxNDFactory factory = new MxNDFactory(this, context);
+        resources.put(factory, factory);
+        return factory;
+    }
+
+    @Override
+    public synchronized void attach(AutoCloseable resource) {
+        resources.put(resource, resource);
+    }
+
+    @Override
+    public synchronized void detach(AutoCloseable resource) {
+        resources.remove(resource);
+    }
+
+    @Override
+    public synchronized void close() {
+        for (AutoCloseable resource : resources.keySet()) {
+            try {
+                resource.close();
+            } catch (Exception ignore) {
+                // ignore
+            }
+        }
+        resources = null;
+        parent.detach(this);
+    }
+
+    private static final class SystemFactory extends MxNDFactory {
+
+        SystemFactory() {
+            super(null, Context.defaultContext());
+        }
+
+        @Override
+        public synchronized void attach(AutoCloseable resource) {}
+
+        @Override
+        public synchronized void detach(AutoCloseable resource) {}
     }
 }

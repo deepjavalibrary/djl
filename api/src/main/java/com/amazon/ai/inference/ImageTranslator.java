@@ -33,7 +33,7 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
 
         FloatBuffer buffer = Images.toFloatBuffer(input);
 
-        NDArray array = ctx.create(dataDesc);
+        NDArray array = ctx.getNDFactory().create(dataDesc);
         array.set(buffer);
 
         return new NDList(normalize(array));

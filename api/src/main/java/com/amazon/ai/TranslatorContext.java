@@ -14,9 +14,13 @@ package com.amazon.ai;
 
 import com.amazon.ai.ndarray.NDFactory;
 
-public interface TranslatorContext extends NDFactory {
+public interface TranslatorContext extends AutoCloseable {
 
     Model getModel();
 
     Context getContext();
+
+    NDFactory getNDFactory();
+
+    public void close();
 }

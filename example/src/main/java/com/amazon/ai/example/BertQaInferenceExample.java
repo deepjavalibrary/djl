@@ -22,10 +22,10 @@ import com.amazon.ai.example.util.BertDataParser;
 import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,27 +87,20 @@ public class BertQaInferenceExample {
             throws IOException {
         String modelPathPrefix = modelDir + '/' + modelName;
 
-        Model model = Model.loadModel(modelPathPrefix, 2);
+        Model model = Model.loadModel(modelPathPrefix);
 
-        DataDesc[] dataDescs =
-                new DataDesc[] {
-                    new DataDesc(
-                            new Shape(1, input.seqLength), DataType.FLOAT32, "data0", Layout.NT),
-                    new DataDesc(
-                            new Shape(1, input.seqLength), DataType.FLOAT32, "data1", Layout.NT),
-                    new DataDesc(new Shape(1), DataType.FLOAT32, "data2", Layout.NT),
-                };
-
-        ((MxModel) model).setDataNames(dataDescs);
+        int seqLength = input.getSeqLength();
+        DataDesc data0 = new DataDesc(new Shape(1, seqLength), DataType.FLOAT32, "data0");
+        DataDesc data1 = new DataDesc(new Shape(1, seqLength), DataType.FLOAT32, "data1");
+        DataDesc data2 = new DataDesc(new Shape(1), DataType.FLOAT32, "data2");
+        ((MxModel) model).setDataNames(data0, data1, data2);
 
         GenericTranslator translator = new GenericTranslator(parser);
         try (Predictor<QAInput, String> predictor = Predictor.newInstance(model, translator)) {
             String answer = predictor.predict(input);
-            logger.info(
-                    "Question: {}\nParagraph: {}\nAnswer: {}",
-                    input.question,
-                    input.answer,
-                    answer);
+            logger.info("Question: {}", input.getQuestion());
+            logger.info("Paragraph: {}", input.getAnswer());
+            logger.info("Answer: {}", answer);
         }
     }
 
@@ -117,14 +110,26 @@ public class BertQaInferenceExample {
 
     private static final class QAInput {
 
-        String question;
-        String answer;
-        int seqLength;
+        private String question;
+        private String answer;
+        private int seqLength;
 
         QAInput(String question, String answer, int seqLength) {
             this.question = question;
             this.answer = answer;
             this.seqLength = seqLength;
+        }
+
+        public String getQuestion() {
+            return question;
+        }
+
+        public String getAnswer() {
+            return answer;
+        }
+
+        public int getSeqLength() {
+            return seqLength;
         }
     }
 
@@ -140,11 +145,12 @@ public class BertQaInferenceExample {
         @Override
         public NDList processInput(TranslatorContext ctx, QAInput input) {
             // pre-processing - tokenize sentence
-            List<String> tokenQ = BertDataParser.tokenizer(input.question.toLowerCase());
-            List<String> tokenA = BertDataParser.tokenizer(input.answer.toLowerCase());
+            List<String> tokenQ = BertDataParser.tokenizer(input.getQuestion().toLowerCase());
+            List<String> tokenA = BertDataParser.tokenizer(input.getAnswer().toLowerCase());
             int validLength = tokenQ.size() + tokenA.size();
-            List<Float> tokenTypes = BertDataParser.getTokenTypes(tokenQ, tokenA, input.seqLength);
-            tokens = BertDataParser.formTokens(tokenQ, tokenA, input.seqLength);
+            List<Float> tokenTypes =
+                    BertDataParser.getTokenTypes(tokenQ, tokenA, input.getSeqLength());
+            tokens = BertDataParser.formTokens(tokenQ, tokenA, input.getSeqLength());
             List<Integer> indexes = parser.token2idx(tokens);
             List<Float> indexesFloat = new ArrayList<>(indexes.size());
             for (int integer : indexes) {
@@ -153,9 +159,10 @@ public class BertQaInferenceExample {
             // Start building model
             Model model = ctx.getModel();
             DataDesc[] dataDescs = model.describeInput();
-            ctx.create(dataDescs[0]);
+            NDFactory factory = ctx.getNDFactory();
+            factory.create(dataDescs[0]);
             NDList list = new NDList(3);
-            Arrays.stream(dataDescs).forEach(ele -> list.add(ctx.create(ele)));
+            Arrays.stream(dataDescs).forEach(ele -> list.add(factory.create(ele)));
 
             list.get(0).set(indexesFloat);
             list.get(1).set(tokenTypes);

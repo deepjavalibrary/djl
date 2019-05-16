@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import org.apache.mxnet.engine.Module;
 import org.apache.mxnet.engine.MxModel;
-import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 import org.slf4j.Logger;
 
@@ -57,14 +56,14 @@ public final class ModuleApiExample extends AbstractExample {
         BufferedImage image = Images.reshapeImage(img, 224, 224);
         FloatBuffer data = Images.toFloatBuffer(image);
 
-        try (MxNDFactory factory = new MxNDFactory()) {
+        try (MxNDFactory factory = MxNDFactory.SYSTEM_FACTORY.newSubFactory()) {
             MxModel model = MxModel.loadModel(factory, modelPathPrefix, 0);
             DataDesc dataDesc = new DataDesc(new Shape(1, 3, 224, 224), "data");
             model.setDataNames(dataDesc);
 
             long init = System.nanoTime();
             Module.Builder builder = new Module.Builder(context, model, false);
-            Module module = builder.build(factory);
+            Module module = builder.build();
             long loadModel = System.nanoTime();
             logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
 
@@ -72,7 +71,7 @@ public final class ModuleApiExample extends AbstractExample {
             for (int i = 0; i < iteration; ++i) {
                 long begin = System.nanoTime();
 
-                MxNDArray ndArray = factory.create(dataDesc);
+                NDArray ndArray = factory.create(dataDesc);
                 ndArray.set(data);
 
                 NDList input = new NDList(ndArray);

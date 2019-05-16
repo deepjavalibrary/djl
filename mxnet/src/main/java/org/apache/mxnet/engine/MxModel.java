@@ -12,7 +12,6 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
@@ -59,7 +58,7 @@ public class MxModel implements Model, AutoCloseable {
     }
 
     public static MxModel loadModel(String prefix, int epoch) throws IOException {
-        return loadModel(new MxNDFactory(), prefix, epoch);
+        return loadModel(MxNDFactory.SYSTEM_FACTORY, prefix, epoch);
     }
 
     public static MxModel loadModel(MxNDFactory factory, String prefix, int epoch)
@@ -73,8 +72,6 @@ public class MxModel implements Model, AutoCloseable {
         Pointer[] handles = JnaUtils.loadNdArray(paramFile, namesRef);
         String[] names = namesRef.getValue().getStringArray(0, handles.length);
 
-        Context context = Context.cpu();
-
         List<String> argParamNames = new ArrayList<>();
         List<String> auxParamNames = new ArrayList<>();
         List<MxNDArray> argParamData = new ArrayList<>();
@@ -83,12 +80,10 @@ public class MxModel implements Model, AutoCloseable {
             String[] pair = names[i].split(":", 2);
             if ("arg".equals(pair[0])) {
                 argParamNames.add(pair[1]);
-                argParamData.add(
-                        new MxNDArray(factory, context, null, null, DataType.FLOAT32, handles[i]));
+                argParamData.add(factory.create(handles[i]));
             } else if ("aux".equals(pair[0])) {
                 auxParamNames.add(pair[1]);
-                auxParamData.add(
-                        new MxNDArray(factory, context, null, null, DataType.FLOAT32, handles[i]));
+                auxParamData.add(factory.create(handles[i]));
             } else {
                 throw new IllegalStateException("Unknown parameter: " + pair[0]);
             }

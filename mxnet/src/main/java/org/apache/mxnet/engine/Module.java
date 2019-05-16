@@ -15,7 +15,6 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.GradReq;
-import com.amazon.ai.util.ResourceAllocator;
 import java.util.Collections;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -94,7 +93,7 @@ public class Module implements AutoCloseable {
             this.gradReq = gradReq;
         }
 
-        public Module build(ResourceAllocator alloc) {
+        public Module build() {
             if (forTraining) {
                 if (gradReq == null) {
                     gradReq = GradReq.WRITE;

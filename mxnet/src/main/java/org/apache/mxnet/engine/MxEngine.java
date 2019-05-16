@@ -18,7 +18,6 @@ import com.amazon.ai.Profiler;
 import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.training.Trainer;
 import java.io.File;
 import java.io.IOException;
@@ -99,14 +98,4 @@ public class MxEngine extends Engine {
 
     @Override
     public void setProfiler(Profiler profiler) {}
-
-    @Override
-    public NDFactory getNDFactory() {
-        return new MxNDFactory();
-    }
-
-    @Override
-    public NDFactory getNDFactory(Context context) {
-        return new MxNDFactory(context);
-    }
 }

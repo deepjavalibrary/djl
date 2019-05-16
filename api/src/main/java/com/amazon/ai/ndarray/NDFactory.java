@@ -29,6 +29,12 @@ public interface NDFactory extends AutoCloseable {
 
     NDArray create(DataDesc dataDesc);
 
+    NDFactory getParentFactory();
+
+    NDFactory newSubFactory();
+
+    NDFactory newSubFactory(Context context);
+
     void attach(AutoCloseable resource);
 
     void detach(AutoCloseable resource);

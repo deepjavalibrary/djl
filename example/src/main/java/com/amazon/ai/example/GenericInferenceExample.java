@@ -99,7 +99,7 @@ public final class GenericInferenceExample extends AbstractExample {
         @Override
         public NDList processInput(TranslatorContext ctx, FloatBuffer input) {
             Model model = ctx.getModel();
-            NDArray array = ctx.create(model.describeInput()[0]);
+            NDArray array = ctx.getNDFactory().create(model.describeInput()[0]);
             array.set(input);
 
             NDList list = new NDList(array);
