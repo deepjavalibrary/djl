@@ -22,5 +22,5 @@ public interface TranslatorContext extends AutoCloseable {
 
     NDFactory getNDFactory();
 
-    public void close();
+    void close();
 }

@@ -112,9 +112,12 @@ public class MxNDFactory implements NDFactory {
         }
 
         @Override
-        public synchronized void attach(AutoCloseable resource) {}
+        public void attach(AutoCloseable resource) {}
 
         @Override
-        public synchronized void detach(AutoCloseable resource) {}
+        public void detach(AutoCloseable resource) {}
+
+        @Override
+        public void close() {}
     }
 }
