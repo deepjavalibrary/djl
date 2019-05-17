@@ -26,12 +26,19 @@ interface Model {
 }
 
 interface Translator<I, O> {
-    +NDArray[] processInput(I input)
-    +O processOutput(NDArray[] array)
+    +NDArray[] processInput(TranslatorContext ctx, I input)
+    +O processOutput(TranslatorContext ctx, NDArray[] array)
 }
 
 interface Predictor<I, O> {
     +O predict(I input)
+}
+
+interface TranslatorContext {
+    +Model getModel()
+    +Context getContext()
+    +NDFactory getNDFactory()
+    +void close()
 }
 
 class Classifier<I, O> {
@@ -64,6 +71,7 @@ Model o-down- Predictor : aggregation
 Predictor -right-o Context : aggregation
 Predictor -right-> Translator : uses
 Translator -right-> NDArray : uses
+Translator --> TranslatorContext : uses
 Predictor o-down- Classifier : aggregation
 Predictor o-down- ObjectDetector : aggregation
 NDFactory -left-> NDArray
