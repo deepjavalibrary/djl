@@ -1,0 +1,62 @@
+@startuml
+class MxModel {
+    -NxNDFactory factory;
+    -Symbol
+    +void close()
+}
+
+class MxPredictor<I, O> {
+    -NDFactory factory;
+    +void close()
+}
+
+class TranslatorContext {
+    +NDFactory ctxFactory;
+    +void close()
+}
+
+class MxNDFactory {
+    -NxNDFactory parent;
+    +MxNDArray create(Pointer);
+    MxNDFactory newSubFactory()
+    MxNDFactory newSubFactory(Context context)
+    void attach(AutoCloseable resource)
+    void detach(AutoCloseable resource)
+    +void close()
+}
+
+class MxNDArray {
+    -NDFactory factory;
+    -Pointer
+    void attach(MxNDFactory factory)
+    void detach()
+    +void close()
+}
+
+class NativeResource {
+    -Pointer
+    +void close()
+}
+
+class Symbol {
+    -Pointer
+    -NDFactory factory;
+    -MxNDArray array
+    +void close()
+}
+
+MxModel o-- Symbol : aggregation
+MxModel o-- MxNDFactory : aggregation
+Symbol o-right- MxNDArray : aggregation
+
+MxNDArray --|> NativeResource : extends
+Symbol --|> NativeResource : extends
+
+
+MxNDArray o-right- MxNDFactory : aggregation
+MxPredictor o-up- MxNDFactory : aggregation
+TranslatorContext o-up- MxNDFactory : aggregation
+
+
+
+@enduml

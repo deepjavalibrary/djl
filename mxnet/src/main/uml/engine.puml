@@ -1,0 +1,54 @@
+@startuml
+interface Model {
+}
+
+class MxModel {
+}
+
+class Engine {
+    +Model loadModel(File modelPath, String modelName, int epoch)
+    +Predictor newPredictor(Model, Translator, Context)
+    +Trainer newTrainer(Model model, Context context)
+    + getInstance()
+	.. more ..
+    +int getGpuCount()
+    +Context defaultContext()
+    +getVersion()
+}
+
+class MxEngine {
+}
+
+class EngineProvider {
+    +Engine getEngine()
+}
+
+class MxEngineProvider {
+    +Engine getEngine()
+}
+
+interface Predictor<I, O> {
+    +O predict(I input)
+}
+
+interface MxPredictor<I, O> {
+    +O predict(I input)
+}
+
+interface Trainer<I, O> {
+}
+
+interface MxTrainer<I, O> {
+}
+
+MxModel -up-|> Model : implements
+MxEngine -left-|> Engine : inherit
+MxEngineProvider -left-|> EngineProvider : implements
+MxPredictor -up-|> Predictor : implements
+MxTrainer -up-|> Trainer : implements
+EngineProvider --> Engine : create
+Engine --> Model
+Engine --> Predictor
+Engine --> Trainer
+
+@enduml
