@@ -10,6 +10,9 @@ import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.apache.mxnet.engine.CachedOp;
 import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDFactory;
@@ -38,8 +41,33 @@ public final class CachedOpExample extends AbstractExample {
             nd.set(data);
 
             // Inference Logic
+            long init = System.nanoTime();
             CachedOp op = CachedOp.loadModel(factory, modelPathPrefix, 0);
+            long loadModel = System.nanoTime();
+            logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
+            List<Long> inferenceTime = new ArrayList<>(iteration);
+            long firstInfStart = System.nanoTime();
             NDList result = op.forward(new NDList(nd, sfLabel));
+            result.get(0).waitToRead();
+            long firstInfEnd = System.nanoTime();
+            logger.info("First Inference: " + (firstInfEnd - firstInfStart) / 1000000f + " ms");
+            for (int i = 0; i < iteration; ++i) {
+                long begin = System.nanoTime();
+                result = op.forward(new NDList(nd, sfLabel));
+                result.get(0).waitToRead();
+                long inference = System.nanoTime();
+                inferenceTime.add(inference - begin);
+                logger.info("Time cost: " + (inference - begin) / 1000000f + " ms");
+            }
+            Collections.sort(inferenceTime);
+
+            float p50 = inferenceTime.get(iteration / 2) / 1000000f;
+            float p90 = inferenceTime.get(iteration * 9 / 10) / 1000000f;
+            float p99 = inferenceTime.get(iteration * 99 / 100) / 1000000f;
+
+            logger.info(
+                    String.format(
+                            "inference P50: %.3f ms, P90: %.3f ms, P99 %.3f ms", p50, p90, p99));
             // Post Processing
             NDArray sorted = result.get(0).argsort(-1, false);
             float[] top = sorted.slice(0, 1).toFloatArray();
