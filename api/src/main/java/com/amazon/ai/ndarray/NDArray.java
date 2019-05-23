@@ -54,6 +54,8 @@ public interface NDArray extends AutoCloseable {
 
     void copyTo(NDArray array);
 
+    NDArray asInContext(Context ctx, boolean copy);
+
     void waitToRead();
 
     void waitToWrite();

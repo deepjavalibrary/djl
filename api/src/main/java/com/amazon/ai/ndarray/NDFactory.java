@@ -31,6 +31,8 @@ public interface NDFactory extends AutoCloseable {
 
     NDFactory getParentFactory();
 
+    Context getContext();
+
     NDFactory newSubFactory();
 
     NDFactory newSubFactory(Context context);

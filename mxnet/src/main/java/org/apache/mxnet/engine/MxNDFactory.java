@@ -52,6 +52,11 @@ public class MxNDFactory implements NDFactory {
     }
 
     @Override
+    public Context getContext() {
+        return context;
+    }
+
+    @Override
     public MxNDArray create(DataDesc dataDesc) {
         return create(
                 dataDesc.getContext(),
@@ -63,7 +68,7 @@ public class MxNDFactory implements NDFactory {
 
     public MxNDArray create(Pointer handle) {
         MxNDArray array =
-                new MxNDArray(this, context, SparseFormat.DEFAULT, null, DataType.FLOAT32, handle);
+                new MxNDArray(this, null, SparseFormat.DEFAULT, null, DataType.FLOAT32, handle);
         resources.put(array, array);
         return array;
     }

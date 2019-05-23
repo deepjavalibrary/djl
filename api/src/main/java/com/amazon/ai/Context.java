@@ -13,6 +13,7 @@
 package com.amazon.ai;
 
 import com.amazon.ai.engine.Engine;
+import java.util.Objects;
 
 public class Context {
 
@@ -38,6 +39,23 @@ public class Context {
     @Override
     public String toString() {
         return deviceType + '(' + deviceId + ')';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Context context = (Context) o;
+        return deviceId == context.deviceId && Objects.equals(deviceType, context.deviceType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(deviceType, deviceId);
     }
 
     public static Context cpu() {

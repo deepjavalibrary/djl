@@ -12,9 +12,7 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
@@ -61,8 +59,6 @@ public class CachedOp extends NativeResource {
             String paramName = paramNamesRaw[i].split(":")[1];
             paramNameToHandle.put(paramName, handles[i]);
         }
-        // TODO: Change the Context to non-determined
-        Context context = Context.cpu();
         // prepare the cachedOp element
         String[] inputNames = new String[allNameLength - paramLength];
         MxNDArray[] inputNDArray = new MxNDArray[allNameLength];
@@ -77,8 +73,7 @@ public class CachedOp extends NativeResource {
                 paramIndices[paramLoc] = idx;
                 Pointer handle = paramNameToHandle.get(allNames[idx]);
                 // TODO: Change the DataType to non-determined
-                inputNDArray[idx] =
-                        new MxNDArray(factory, context, null, null, DataType.FLOAT32, handle);
+                inputNDArray[idx] = factory.create(handle).asInContext(factory.getContext(), true);
                 paramLoc++;
             } else {
                 inputNames[dataLoc] = allNames[idx];

@@ -193,6 +193,16 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     @Override
+    public MxNDArray asInContext(Context ctx, boolean copy) {
+        if (ctx.equals(getContext()) && !copy) {
+            return this;
+        }
+        MxNDArray nd = new MxNDArray(factory, ctx, getShape(), getDataType(), false);
+        copyTo(nd);
+        return nd;
+    }
+
+    @Override
     public void waitToRead() {
         JnaUtils.waitToRead(getHandle());
     }
