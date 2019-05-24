@@ -62,13 +62,6 @@ public class DataDesc {
         return context;
     }
 
-    public Context getOrDefault() {
-        if (context == null) {
-            return Context.defaultContext();
-        }
-        return context;
-    }
-
     public void setContext(Context context) {
         this.context = context;
     }

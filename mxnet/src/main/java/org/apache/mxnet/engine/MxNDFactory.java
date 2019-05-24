@@ -43,6 +43,9 @@ public class MxNDFactory implements NDFactory {
             DataType dataType,
             SparseFormat sparseFormat,
             boolean delay) {
+        if (context == null) {
+            context = this.context;
+        }
         MxNDArray array = new MxNDArray(this, context, shape, dataType, delay);
         resources.put(array, array);
         return array;
@@ -51,7 +54,7 @@ public class MxNDFactory implements NDFactory {
     @Override
     public MxNDArray create(DataDesc dataDesc) {
         return create(
-                dataDesc.getOrDefault(),
+                dataDesc.getContext(),
                 dataDesc.getShape(),
                 dataDesc.getDataType(),
                 SparseFormat.DEFAULT,

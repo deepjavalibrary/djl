@@ -34,7 +34,7 @@ public class MxEngine extends Engine {
 
     @Override
     public int getGpuCount() {
-        return 0;
+        return JnaUtils.getGpuCount();
     }
 
     @Override
