@@ -82,10 +82,11 @@ public class CachedOp extends NativeResource {
             }
         }
         // Creating CachedOp
-        String[] keys = new String[] {"data_indices", "param_indices"};
+        String[] keys = new String[] {"data_indices", "param_indices", "static_alloc", "static_shape"};
         String[] values =
                 new String[] {
                     Arrays.toString(dataIndices), Arrays.toString(paramIndices),
+                        "1", "1"
                 };
         if (logger.isDebugEnabled()) {
             logger.debug("keys: {}", Arrays.toString(keys));
