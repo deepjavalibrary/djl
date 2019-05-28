@@ -15,8 +15,9 @@ package com.amazon.ai.inference;
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Translator;
+import com.amazon.ai.metric.Metrics;
 
-public class Classifier<I, O> {
+public class Classifier<I, O> implements AutoCloseable {
 
     private Predictor<I, O> predictor;
 
@@ -30,5 +31,14 @@ public class Classifier<I, O> {
 
     public O classify(I input) {
         return predictor.predict(input);
+    }
+
+    public void setMetrics(Metrics metrics) {
+        predictor.setMetrics(metrics);
+    }
+
+    @Override
+    public void close() {
+        predictor.close();
     }
 }

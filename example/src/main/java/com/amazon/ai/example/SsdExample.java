@@ -24,6 +24,7 @@ import com.amazon.ai.image.Images;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.ImageTranslator;
 import com.amazon.ai.inference.ObjectDetector;
+import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
@@ -31,7 +32,6 @@ import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.apache.mxnet.engine.MxModel;
 import org.slf4j.Logger;
@@ -57,28 +57,25 @@ public final class SsdExample extends AbstractExample {
         ((MxModel) model).setDataNames(dataDesc);
 
         SsdTranslator transformer = new SsdTranslator(5);
+        Metrics metrics = new Metrics();
 
         long init = System.nanoTime();
         try (ObjectDetector<BufferedImage, List<DetectedObject>> ssd =
                 new ObjectDetector<>(model, transformer)) {
+            ssd.setMetrics(metrics);
+
             long loadModel = System.nanoTime();
             logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
 
-            List<Long> inferenceTime = new ArrayList<>(iteration);
             for (int i = 0; i < iteration; ++i) {
                 List<DetectedObject> result = ssd.detect(img);
-
-                inferenceTime.add(transformer.getInferenceTime());
-
                 if (i == 0) {
                     logger.info(String.format("Result: %s", result.get(0).getClassName()));
                 }
             }
 
-            Collections.sort(inferenceTime);
-
-            float p50 = inferenceTime.get(iteration / 2) / 1000000f;
-            float p90 = inferenceTime.get(iteration * 9 / 10) / 1000000f;
+            float p50 = metrics.percentile("Inference", 50).getValue() / 1000000f;
+            float p90 = metrics.percentile("Inference", 90).getValue() / 1000000f;
 
             logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
         }
@@ -88,9 +85,6 @@ public final class SsdExample extends AbstractExample {
 
         private int topK;
 
-        private long begin;
-        private long end;
-
         public SsdTranslator(int topK) {
             this.topK = topK;
         }
@@ -98,22 +92,12 @@ public final class SsdExample extends AbstractExample {
         @Override
         public NDList processInput(TranslatorContext ctx, BufferedImage input) {
             BufferedImage image = Images.reshapeImage(input, 224, 224);
-
-            NDList list = super.processInput(ctx, image);
-            begin = System.nanoTime();
-
-            return list;
+            return super.processInput(ctx, image);
         }
 
         @Override
         public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list) {
-            for (NDArray array : list) {
-                array.waitAll();
-            }
-            end = System.nanoTime();
-
             Model model = ctx.getModel();
-
             NDArray array = list.get(0);
 
             int length = array.getShape().head();
@@ -138,10 +122,6 @@ public final class SsdExample extends AbstractExample {
                 }
             }
             return ret;
-        }
-
-        public long getInferenceTime() {
-            return end - begin;
         }
     }
 }

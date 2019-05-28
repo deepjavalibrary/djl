@@ -15,6 +15,7 @@ package com.amazon.ai.inference;
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Translator;
+import com.amazon.ai.metric.Metrics;
 
 public class ObjectDetector<I, O> implements AutoCloseable {
 
@@ -30,6 +31,10 @@ public class ObjectDetector<I, O> implements AutoCloseable {
 
     public O detect(I input) {
         return predictor.predict(input);
+    }
+
+    public void setMetrics(Metrics metrics) {
+        predictor.setMetrics(metrics);
     }
 
     @Override

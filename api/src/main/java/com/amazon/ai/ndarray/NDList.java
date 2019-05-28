@@ -124,4 +124,10 @@ public class NDList implements Iterable<NDArray> {
     public Iterator<NDArray> iterator() {
         return list.iterator();
     }
+
+    public void waitToRead() {
+        for (NDArray array : this) {
+            array.waitToRead();
+        }
+    }
 }

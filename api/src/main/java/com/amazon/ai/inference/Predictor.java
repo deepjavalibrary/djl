@@ -16,6 +16,7 @@ import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
+import com.amazon.ai.metric.Metrics;
 
 public interface Predictor<I, O> extends AutoCloseable {
 
@@ -29,6 +30,8 @@ public interface Predictor<I, O> extends AutoCloseable {
     }
 
     O predict(I input);
+
+    void setMetrics(Metrics metrics);
 
     @Override
     void close();

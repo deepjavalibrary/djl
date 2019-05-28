@@ -17,6 +17,8 @@ import com.amazon.ai.Model;
 import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.inference.Predictor;
+import com.amazon.ai.metric.Metric;
+import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
@@ -30,6 +32,8 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     private Module module;
     private DataDesc[] dataDesc;
     NDFactory factory;
+    Metrics metrics;
+    private long timestamp;
 
     MxPredictor(MxModel model, Translator<I, O> transformer, Context context) {
         this.factory = MxNDFactory.SYSTEM_FACTORY.newSubFactory(context);
@@ -38,16 +42,30 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         this.context = context;
         Module.Builder builder = new Module.Builder(context, model, false);
         module = builder.build();
+        metrics = new Metrics();
     }
 
     @Override
     public O predict(I input) {
+        timestamp = System.nanoTime();
+
         try (PredictorContext inputCtx = new PredictorContext();
                 PredictorContext outputCtx = new PredictorContext()) {
             NDList ndList = transformer.processInput(inputCtx, input);
+            preprocessEnd();
+
             NDList result = forward(ndList);
+            forwardEnd(result);
+
             return transformer.processOutput(outputCtx, result);
+        } finally {
+            postProcessEnd();
         }
+    }
+
+    @Override
+    public void setMetrics(Metrics metrics) {
+        this.metrics = metrics;
     }
 
     private NDList forward(NDList ndList) {
@@ -62,7 +80,10 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         } else {
             if (dataDesc.length != ndList.size()) {
                 throw new IllegalArgumentException(
-                        "Unpected input size: " + dataDesc.length + ", expected: " + ndList.size());
+                        "Unexpected input size: "
+                                + dataDesc.length
+                                + ", expected: "
+                                + ndList.size());
             }
 
             for (int i = 0; i < dataDesc.length; ++i) {
@@ -77,6 +98,35 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         for (int i = 0; i < dataDesc.length; ++i) {
             NDArray array = ndList.get(i);
             dataDesc[i] = array.getDataDescriptor();
+        }
+    }
+
+    private void preprocessEnd() {
+        if (metrics != null) {
+            long tmp = System.nanoTime();
+            long duration = tmp - timestamp;
+            timestamp = tmp;
+            metrics.addMetric(new Metric("Preprocess", duration, "nano"));
+        }
+    }
+
+    private void forwardEnd(NDList list) {
+        if (metrics != null) {
+            // JnaUtils.waitAll();
+            list.waitToRead();
+            long tmp = System.nanoTime();
+            long duration = tmp - timestamp;
+            timestamp = tmp;
+            metrics.addMetric(new Metric("Inference", duration, "nano"));
+        }
+    }
+
+    private void postProcessEnd() {
+        if (metrics != null) {
+            long tmp = System.nanoTime();
+            long duration = tmp - timestamp;
+            timestamp = tmp;
+            metrics.addMetric(new Metric("Postprocess", duration, "nano"));
         }
     }
 
@@ -107,6 +157,11 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         @Override
         public NDFactory getNDFactory() {
             return ctxFactory;
+        }
+
+        @Override
+        public Metrics getMetrics() {
+            return metrics;
         }
 
         @Override

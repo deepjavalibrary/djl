@@ -21,6 +21,7 @@ import com.amazon.ai.example.util.Arguments;
 import com.amazon.ai.example.util.BertDataParser;
 import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.inference.Predictor;
+import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
@@ -28,6 +29,7 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,6 +46,7 @@ import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
 public class BertQaInferenceExample {
+
     private static Logger logger = LogUtils.getLogger(BertQaInferenceExample.class);
 
     private void runExample(String[] args) {
@@ -58,8 +61,14 @@ public class BertQaInferenceExample {
             String question = arguments.getQuestion();
             String answer = arguments.getAnswer();
             int seqLength = arguments.getSeqLength();
+            Duration duration = Duration.ofMinutes(arguments.getDuration());
+            int iteration = arguments.getIteration();
+
+            logger.info("Running {}, iteration: {}", getClass().getSimpleName(), iteration);
+
             String vocabulary = modelDir + "/" + arguments.getVocabulary();
             BertDataParser util = BertDataParser.parse(vocabulary);
+            QAInput input = new QAInput(question, answer, seqLength);
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
@@ -70,8 +79,12 @@ public class BertQaInferenceExample {
                     String.format(
                             "Load library %s in %.3f ms.", version, (loaded - init) / 1000000f));
 
-            predict(modelDir, modelName, util, new QAInput(question, answer, seqLength));
-
+            while (!duration.isNegative()) {
+                long begin = System.currentTimeMillis();
+                predict(modelDir, modelName, util, input, iteration);
+                long delta = System.currentTimeMillis() - begin;
+                duration = duration.minus(Duration.ofMillis(delta));
+            }
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.setLeftPadding(1);
@@ -82,7 +95,8 @@ public class BertQaInferenceExample {
         }
     }
 
-    private void predict(String modelDir, String modelName, BertDataParser parser, QAInput input)
+    private void predict(
+            String modelDir, String modelName, BertDataParser parser, QAInput input, int iteration)
             throws IOException {
         String modelPathPrefix = modelDir + '/' + modelName;
 
@@ -94,12 +108,26 @@ public class BertQaInferenceExample {
         DataDesc data2 = new DataDesc(new Shape(1), DataType.FLOAT32, "data2");
         ((MxModel) model).setDataNames(data0, data1, data2);
 
+        logger.info("Question: {}", input.getQuestion());
+        logger.info("Paragraph: {}", input.getAnswer());
+
         GenericTranslator translator = new GenericTranslator(parser);
+        Metrics metrics = new Metrics();
+
         try (Predictor<QAInput, String> predictor = Predictor.newInstance(model, translator)) {
-            String answer = predictor.predict(input);
-            logger.info("Question: {}", input.getQuestion());
-            logger.info("Paragraph: {}", input.getAnswer());
-            logger.info("Answer: {}", answer);
+            predictor.setMetrics(metrics);
+
+            for (int i = 0; i < iteration; ++i) {
+                String answer = predictor.predict(input);
+                if (i == 0) {
+                    logger.info("Answer: {}", answer);
+                }
+            }
+
+            float p50 = metrics.percentile("Inference", 50).getValue() / 1000000f;
+            float p90 = metrics.percentile("Inference", 90).getValue() / 1000000f;
+
+            logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
         }
     }
 

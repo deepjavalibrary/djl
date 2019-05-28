@@ -12,6 +12,7 @@
  */
 package com.amazon.ai;
 
+import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDFactory;
 
 public interface TranslatorContext extends AutoCloseable {
@@ -21,6 +22,8 @@ public interface TranslatorContext extends AutoCloseable {
     Context getContext();
 
     NDFactory getNDFactory();
+
+    Metrics getMetrics();
 
     void close();
 }
