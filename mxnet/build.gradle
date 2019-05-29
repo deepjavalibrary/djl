@@ -36,8 +36,7 @@ task jnarator(dependsOn: ":jnarator:jar") {
                     "${project.projectDir}/src/main/jna/mapping.properties",
                     "-f",
                     "src/main/include/mxnet/c_api.h",
-                    "src/main/include/nnvm/c_api.h",
-                    "src/main/include/mxnet/c_predict_api.h"
+                    "src/main/include/nnvm/c_api.h"
             ]
         }
     }
@@ -64,7 +63,6 @@ task checkHeaderFile() {
 
     def mxnetUrl = "https://raw.githubusercontent.com/apache/incubator-mxnet/master/"
     checkForUpdate("mxnet/c_api.h", "${mxnetUrl}/include/mxnet/c_api.h")
-    checkForUpdate("mxnet/c_predict_api.h", "${mxnetUrl}/include/mxnet/c_predict_api.h")
     def content = new URL("https://github.com/apache/incubator-mxnet/tree/master/3rdparty").text
 
     Pattern pattern = Pattern.compile("href=\"/dmlc/tvm/tree/([a-z0-9]+)\"")

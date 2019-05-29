@@ -14,7 +14,6 @@ package org.apache.mxnet.jna;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
@@ -1410,65 +1409,6 @@ public final class JnaUtils {
             output[i] = factory.create(ptrArray[i]);
         }
         return output;
-    }
-
-    //////////////////////////////////
-    // c_predict_api
-    //////////////////////////////////
-
-    public static Pointer createPredictor(
-            String symbol, ByteBuffer parameter, Context context, DataDesc dataDesc) {
-        String[] inputNames = new String[] {dataDesc.getName()};
-        Shape shape = dataDesc.getShape();
-
-        IntBuffer inputShapeIdx = IntBuffer.wrap(new int[] {0, 4});
-        IntBuffer inputShapeData = IntBuffer.wrap(shape.getShape());
-        PointerByReference ref = new PointerByReference();
-        checkCall(
-                LIB.MXPredCreate(
-                        symbol,
-                        Native.getDirectBufferPointer(parameter),
-                        parameter.remaining(),
-                        DeviceType.toDeviceType(context),
-                        context.getDeviceId(),
-                        1,
-                        inputNames,
-                        inputShapeIdx.array(),
-                        inputShapeData.array(),
-                        ref));
-
-        return ref.getValue();
-    }
-
-    public static void setPredictorInput(Pointer predictor, String inputName, FloatBuffer data) {
-        checkCall(LIB.MXPredSetInput(predictor, inputName, data, data.remaining()));
-    }
-
-    public static void predictorForward(Pointer predictor) {
-        checkCall(LIB.MXPredForward(predictor));
-    }
-
-    public static FloatBuffer getPredictorOutput(Pointer predictor) {
-        PointerByReference shapeRef = new PointerByReference();
-        IntBuffer size = IntBuffer.allocate(1);
-
-        checkCall(LIB.MXPredGetOutputShape(predictor, 0, shapeRef, size));
-
-        int count = size.get();
-        Shape shape = new Shape(shapeRef.getValue().getIntArray(0, count));
-
-        FloatBuffer data = FloatBuffer.allocate(shape.product());
-        checkCall(LIB.MXPredGetOutput(predictor, 0, data, data.remaining()));
-
-        return data;
-    }
-
-    public static void freePredictor(Pointer predictor) {
-        checkCall(LIB.MXPredFree(predictor));
-    }
-
-    public static void freeNdArrayList(Pointer ndList) {
-        checkCall(LIB.MXNDListFree(ndList));
     }
 
     public static void checkCall(int ret) {
