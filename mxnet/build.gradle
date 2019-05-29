@@ -48,9 +48,10 @@ import java.util.regex.Pattern
 
 def checkForUpdate(String path, String url){
     def expected = new URL(url).text
-    def actual = new File("src/main/include/${path}").text
+    def actual = new File("${project.projectDir}/src/main/include/${path}").text
     if (!actual.equals(expected)) {
-        (new File("build/" + path.replaceAll("[/\\\\]", '_'))).text = expected
+        def fileName = path.replaceAll("[/\\\\]", '_')
+        (new File("${project.projectDir}/build/${fileName}")).text = expected
         logger.warn("[\033[31mWARN\033[0m ] Header file has been changed in open source project: ${path}.")
     }
 }

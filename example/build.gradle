@@ -1,3 +1,7 @@
+plugins {
+    id 'application'
+}
+
 dependencies {
     compile "commons-cli:commons-cli:${commons_cli_version}"
     compile "commons-io:commons-io:${commons_io_version}"
@@ -10,7 +14,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.apache.mxnet.ModuleApiTesting'
+        attributes 'Main-Class': "com.amazon.ai.example.GenericInferenceExample"
     }
     includeEmptyDirs = false
     from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
@@ -25,4 +29,8 @@ jar {
 task copyDependencies(type: Copy) {
     into "build/dependencies"
     from configurations.runtime
+}
+
+application {
+    mainClassName = System.getProperty("main", "com.amazon.ai.example.GenericInferenceExample")
 }
