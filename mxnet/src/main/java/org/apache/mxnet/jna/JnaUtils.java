@@ -14,7 +14,6 @@ package org.apache.mxnet.jna;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
@@ -1371,12 +1370,12 @@ public final class JnaUtils {
     //////////////////////////////////
 
     /**
-     * Method to create the cached op Flags: data_indices : [0, 2, 4] Used to label where the data
-     * goes param_indices : [1, 3] Used to label where the param goes
-     *
-     * @param symbol
-     * @param flags
-     * @return
+     * Method to create the cached op Flags:
+     * data_indices : [0, 2, 4] Used to label input location
+     * param_indices : [1, 3] Used to label param location
+     * @param model model that loaded in the backend
+     * @param factory NDFactory to create NDArray
+     * @return CachedOp for inference
      */
     public static CachedOp createCachedOp(MxModel model, MxNDFactory factory) {
         Symbol symbol = model.getSymbol();
@@ -1402,7 +1401,6 @@ public final class JnaUtils {
             if (array != null) {
                 paramIndices[paramLoc] = i;
                 // TODO: Change the DataType to non-determined
-
                 // parameter NDArray in MxModel is always loaded in CPU context,
                 // we have to copy to desired context to execution.
                 // TODO: use array.dup(ctx) instead
@@ -1414,6 +1412,7 @@ public final class JnaUtils {
         }
 
         // Creating CachedOp
+        // static_alloc and static_shape are enabled by default
         String[] keys =
                 new String[] {"data_indices", "param_indices", "static_alloc", "static_shape"};
         String[] values =
@@ -1434,13 +1433,9 @@ public final class JnaUtils {
             MxNDFactory factory, Pointer cachedOpHandle, MxNDArray[] inputs) {
         Pointer[] inputHandles = new Pointer[inputs.length];
         for (int i = 0; i < inputs.length; i++) {
-            if (inputs[i] == null) {
-                inputs[i] = factory.create(new DataDesc(new Shape(1)));
-            }
             inputHandles[i] = inputs[i].getHandle();
         }
         PointerArray array = new PointerArray(inputHandles);
-        // PointerByReference ptr = new PointerByReference(array);
         IntBuffer buf = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXInvokeCachedOp(cachedOpHandle, inputs.length, array, buf, ref));

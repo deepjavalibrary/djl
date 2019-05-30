@@ -14,13 +14,19 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import java.util.Map;
 import org.apache.mxnet.jna.JnaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CachedOp extends NativeResource {
+
+    private static final Logger logger = LoggerFactory.getLogger(CachedOp.class);
 
     private MxNDArray[] inputNDArray;
     private PairList<String, Integer> inputNames;
@@ -43,9 +49,18 @@ public class CachedOp extends NativeResource {
         int index = 0;
         for (Pair<String, NDArray> pair : list) {
             String inputName = pair.getKey();
+            // if inputName not provided, value will follow the default order
             int position = indexOf(inputName, index++);
             // TODO: should we check context of input data?
             inputNDArray[position] = (MxNDArray) pair.getValue();
+        }
+        // check the input, set as Shape(1) by default
+        for (Pair<String, Integer> pair : inputNames) {
+            if (inputNDArray[pair.getValue()] == null) {
+                logger.info("Input " + pair.getKey()
+                        + " not found, set NDArray to Shape(1) by default" );
+                inputNDArray[pair.getValue()] = factory.create(new DataDesc(new Shape(1)));
+            }
         }
         MxNDArray[] result = JnaUtils.cachedOpInvoke(factory, getHandle(), inputNDArray);
         return new NDList(result);
