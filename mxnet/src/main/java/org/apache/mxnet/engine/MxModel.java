@@ -53,11 +53,11 @@ public class MxModel implements Model, AutoCloseable {
         this.optimizerStates = optimizerStates;
     }
 
-    public static MxModel loadModel(String prefix, int epoch) throws IOException {
+    static MxModel loadModel(String prefix, int epoch) throws IOException {
         return loadModel(MxNDFactory.SYSTEM_FACTORY, prefix, epoch);
     }
 
-    public static MxModel loadModel(MxNDFactory factory, String prefix, int epoch)
+    static MxModel loadModel(MxNDFactory factory, String prefix, int epoch)
             throws IOException {
         Symbol symbol = Symbol.load(factory, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
