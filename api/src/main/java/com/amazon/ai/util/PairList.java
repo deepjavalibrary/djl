@@ -91,11 +91,19 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         return values.get(index);
     }
 
-    public K[] keys(K[] target) {
+    public List<K> keys() {
+        return keys;
+    }
+
+    public List<V> values() {
+        return values;
+    }
+
+    public K[] keyArray(K[] target) {
         return keys.toArray(target);
     }
 
-    public V[] values(V[] target) {
+    public V[] valueArray(V[] target) {
         return values.toArray(target);
     }
 
@@ -119,6 +127,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     private class Itr implements Iterator<Pair<K, V>> {
+
         private int cursor;
 
         Itr() {}

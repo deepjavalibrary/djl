@@ -366,8 +366,8 @@ public final class JnaUtils {
             keys = EMPTY_ARRAY;
             values = EMPTY_ARRAY;
         } else {
-            keys = params.keys(EMPTY_ARRAY);
-            values = params.values(EMPTY_ARRAY);
+            keys = params.keyArray(EMPTY_ARRAY);
+            values = params.valueArray(EMPTY_ARRAY);
         }
         IntBuffer size = IntBuffer.allocate(1);
         size.put(0, 1);
@@ -1381,8 +1381,8 @@ public final class JnaUtils {
                 LIB.MXCreateCachedOpEx(
                         symbolHandle,
                         flags.size(),
-                        flags.keys(EMPTY_ARRAY),
-                        flags.values(EMPTY_ARRAY),
+                        flags.keyArray(EMPTY_ARRAY),
+                        flags.valueArray(EMPTY_ARRAY),
                         ref));
         return ref.getValue();
     }

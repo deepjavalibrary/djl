@@ -12,18 +12,16 @@
  */
 package com.amazon.ai.ndarray;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.amazon.ai.util.PairList;
 import java.util.Iterator;
-import java.util.List;
 
 public class NDList implements Iterable<NDArray> {
 
-    protected List<NDArray> list;
+    protected PairList<String, NDArray> list;
 
     /** Constructs an empty list. */
     public NDList() {
-        this.list = new ArrayList<>();
+        this.list = new PairList<>();
     }
 
     /**
@@ -33,19 +31,26 @@ public class NDList implements Iterable<NDArray> {
      * @throws IllegalArgumentException if the specified initial capacity is negative
      */
     public NDList(int initialCapacity) {
-        this.list = new ArrayList<>(initialCapacity);
+        this.list = new PairList<>(initialCapacity);
     }
 
     public NDList(NDArray... arrays) {
-        this.list = Arrays.asList(arrays);
+        this();
+        for (NDArray array : arrays) {
+            list.add(null, array);
+        }
     }
 
     public NDList(NDList arrays) {
         this.list = arrays.list;
     }
 
+    public void add(String name, NDArray array) {
+        list.add(name, array);
+    }
+
     public NDArray[] toArray() {
-        return list.toArray(new NDArray[0]);
+        return list.valueArray(new NDArray[0]);
     }
 
     /**
@@ -67,7 +72,7 @@ public class NDList implements Iterable<NDArray> {
      *     &gt;= size()</tt>)
      */
     public NDArray get(int index) {
-        return list.get(index);
+        return list.valueAt(index);
     }
 
     /**
@@ -79,7 +84,6 @@ public class NDList implements Iterable<NDArray> {
      * in their documentation any restrictions on what NDArrays may be added.
      *
      * @param array NDArray to be appended to this list
-     * @return <tt>true</tt> if this array is successfully added
      * @throws UnsupportedOperationException if the <tt>add</tt> operation is not supported by this
      *     list
      * @throws ClassCastException if the class of the specified NDArray prevents it from being added
@@ -89,8 +93,8 @@ public class NDList implements Iterable<NDArray> {
      * @throws IllegalArgumentException if some property of this NDArray prevents it from being
      *     added to this list
      */
-    public boolean add(NDArray array) {
-        return list.add(array);
+    public void add(NDArray array) {
+        list.add(null, array);
     }
 
     /**
@@ -112,7 +116,9 @@ public class NDList implements Iterable<NDArray> {
      *     prevents it from being added to this list
      */
     public void addAll(NDList other) {
-        list.addAll(other.list);
+        for (NDArray array : other) {
+            list.add(null, array);
+        }
     }
 
     /**
@@ -122,7 +128,7 @@ public class NDList implements Iterable<NDArray> {
      */
     @Override
     public Iterator<NDArray> iterator() {
-        return list.iterator();
+        return list.values().iterator();
     }
 
     public void waitToRead() {
