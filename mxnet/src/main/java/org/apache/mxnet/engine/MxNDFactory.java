@@ -36,6 +36,7 @@ public class MxNDFactory implements NDFactory {
         resources = new ConcurrentHashMap<>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public MxNDArray create(
             Context context,
@@ -51,11 +52,13 @@ public class MxNDFactory implements NDFactory {
         return array;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Context getContext() {
         return context;
     }
 
+    /** {@inheritDoc} */
     @Override
     public MxNDArray create(DataDesc dataDesc) {
         return create(
@@ -73,16 +76,19 @@ public class MxNDFactory implements NDFactory {
         return array;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDFactory getParentFactory() {
         return parent;
     }
 
+    /** {@inheritDoc} */
     @Override
     public MxNDFactory newSubFactory() {
         return newSubFactory(context);
     }
 
+    /** {@inheritDoc} */
     @Override
     public MxNDFactory newSubFactory(Context context) {
         MxNDFactory factory = new MxNDFactory(this, context);
@@ -90,16 +96,19 @@ public class MxNDFactory implements NDFactory {
         return factory;
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void attach(AutoCloseable resource) {
         resources.put(resource, resource);
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void detach(AutoCloseable resource) {
         resources.remove(resource);
     }
 
+    /** {@inheritDoc} */
     @Override
     public synchronized void close() {
         for (AutoCloseable resource : resources.keySet()) {
@@ -119,12 +128,15 @@ public class MxNDFactory implements NDFactory {
             super(null, Context.defaultContext());
         }
 
+        /** {@inheritDoc} */
         @Override
         public void attach(AutoCloseable resource) {}
 
+        /** {@inheritDoc} */
         @Override
         public void detach(AutoCloseable resource) {}
 
+        /** {@inheritDoc} */
         @Override
         public void close() {}
     }

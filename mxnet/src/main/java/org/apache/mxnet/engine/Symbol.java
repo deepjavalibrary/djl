@@ -150,6 +150,7 @@ public class Symbol extends NativeResource implements Block {
         return JnaUtils.symbolToJson(getHandle());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         Pointer pointer = handle.getAndSet(null);
@@ -158,30 +159,37 @@ public class Symbol extends NativeResource implements Block {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void forward() {}
 
+    /** {@inheritDoc} */
     @Override
     public void backward() {}
 
+    /** {@inheritDoc} */
     @Override
     public Shape getInputShape() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getOutputShape() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setInput(NDArray array) {}
 
+    /** {@inheritDoc} */
     @Override
     public NDArray getOutput() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public byte[] getEncoded() {
         return new byte[0];

@@ -51,6 +51,7 @@ public class CachedOp extends NativeResource {
         return new NDList(result);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         JnaUtils.freeCachedOp(getHandle());

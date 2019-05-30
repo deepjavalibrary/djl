@@ -92,6 +92,7 @@ public class MxModel implements Model, AutoCloseable {
         return parameters;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Model cast(DataType dataType) {
         return null;
@@ -143,6 +144,7 @@ public class MxModel implements Model, AutoCloseable {
 
     public void save(File dir, String name, int epoch) {}
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         symbol.close();
@@ -170,11 +172,13 @@ public class MxModel implements Model, AutoCloseable {
         return JnaUtils.EMPTY_ARRAY;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String[] getSynset() {
         return synset;
     }
 
+    /** {@inheritDoc} */
     @Override
     public DataDesc[] describeInput() {
         if (inputData == null) {
@@ -201,6 +205,7 @@ public class MxModel implements Model, AutoCloseable {
         return inputData;
     }
 
+    /** {@inheritDoc} */
     @Override
     public DataDesc[] describeOutput() {
         return null;

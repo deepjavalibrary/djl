@@ -32,11 +32,13 @@ public class MxEngine extends Engine {
 
     MxEngine() {}
 
+    /** {@inheritDoc} */
     @Override
     public int getGpuCount() {
         return JnaUtils.getGpuCount();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Context defaultContext() {
         if (getGpuCount() > 0) {
@@ -45,6 +47,7 @@ public class MxEngine extends Engine {
         return Context.cpu();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getVersion() {
         int version = JnaUtils.getVersion();
@@ -55,6 +58,7 @@ public class MxEngine extends Engine {
         return major + "." + minor + '.' + patch;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Model loadModel(File modelPath, String modelName, int epoch) throws IOException {
         File modelDir;
@@ -85,17 +89,20 @@ public class MxEngine extends Engine {
         return MxModel.loadModel(modelPrefix, epoch);
     }
 
+    /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(
             Model model, Translator<I, O> transformer, Context context) {
         return new MxPredictor<>((MxModel) model, transformer, context);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(Model model, Context context) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setProfiler(Profiler profiler) {}
 }

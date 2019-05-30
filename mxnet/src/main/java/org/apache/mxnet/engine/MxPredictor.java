@@ -42,6 +42,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         metrics = new Metrics();
     }
 
+    /** {@inheritDoc} */
     @Override
     public O predict(I input) {
         timestamp = System.nanoTime();
@@ -60,6 +61,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setMetrics(Metrics metrics) {
         this.metrics = metrics;
@@ -98,6 +100,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         cachedOp.close();
@@ -112,26 +115,31 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
             ctxFactory = factory.newSubFactory();
         }
 
+        /** {@inheritDoc} */
         @Override
         public Model getModel() {
             return model;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Context getContext() {
             return context;
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDFactory getNDFactory() {
             return ctxFactory;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Metrics getMetrics() {
             return metrics;
         }
 
+        /** {@inheritDoc} */
         @Override
         public void close() {
             ctxFactory.close();

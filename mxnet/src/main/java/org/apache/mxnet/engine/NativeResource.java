@@ -39,11 +39,13 @@ public abstract class NativeResource implements AutoCloseable {
         return pointer;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         throw new UnsupportedOperationException("Not implemented.");
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void finalize() throws Throwable {
         if (getHandle() != null) {
