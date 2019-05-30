@@ -15,13 +15,12 @@
  * Contains all the support classes you need from deep learning tasks.
  *
  * <ul>
- * <li>{@code com.amazon.ai.engine.*} – These packages contains.
- * <li>{@code com.amazon.ai.image.*} – These packages contains.
- * <li>{@code com.amazon.ai.inference.*} – These packages contains.
- * <li>{@code com.amazon.ai.metric.*} – These packages contains.
- * <li>{@code com.amazon.ai.ndarray.*} – These packages contains.
- * <li>{@code com.amazon.ai.training.*} – These packages contains.
+ *   <li>{@code com.amazon.ai.engine.*} – These packages contains.
+ *   <li>{@code com.amazon.ai.image.*} – These packages contains.
+ *   <li>{@code com.amazon.ai.inference.*} – These packages contains.
+ *   <li>{@code com.amazon.ai.metric.*} – These packages contains.
+ *   <li>{@code com.amazon.ai.ndarray.*} – These packages contains.
+ *   <li>{@code com.amazon.ai.training.*} – These packages contains.
  * </ul>
- *
  */
 package com.amazon.ai;

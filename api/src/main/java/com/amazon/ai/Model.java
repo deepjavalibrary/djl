@@ -35,7 +35,7 @@ public interface Model {
     }
 
     static Model loadModel(File modelPath, String modelName) throws IOException {
-        return loadModel(modelPath, modelPath.getName(), -1);
+        return loadModel(modelPath, modelName, -1);
     }
 
     static Model loadModel(File modelPath, String modelName, int epoch) throws IOException {

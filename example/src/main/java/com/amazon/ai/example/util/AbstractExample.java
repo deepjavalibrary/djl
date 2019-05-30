@@ -39,7 +39,7 @@ public abstract class AbstractExample {
             CommandLine cmd = parser.parse(options, args, null, false);
             Arguments arguments = new Arguments(cmd);
 
-            String modelDir = arguments.getModelDir();
+            File modelDir = new File(arguments.getModelDir());
             String modelName = arguments.getModelName();
             String imageFile = arguments.getImageFile();
             Duration duration = Duration.ofMinutes(arguments.getDuration());
@@ -86,6 +86,5 @@ public abstract class AbstractExample {
     }
 
     public abstract void predict(
-            String modelDir, String modelName, BufferedImage image, int iteration)
-            throws IOException;
+            File modelDir, String modelName, BufferedImage image, int iteration) throws IOException;
 }

@@ -32,11 +32,9 @@ public final class CachedOpExample extends AbstractExample {
     }
 
     @Override
-    public void predict(String modelDir, String modelName, BufferedImage img, int iteration)
+    public void predict(File modelDir, String modelName, BufferedImage img, int iteration)
             throws IOException {
-        String modelPathPrefix = modelDir + '/' + modelName;
-
-        Model model = Model.loadModel(modelPathPrefix, 0);
+        Model model = Model.loadModel(modelDir, modelName);
 
         // Pre processing
         int topK = 5;
@@ -78,8 +76,7 @@ public final class CachedOpExample extends AbstractExample {
             // Post Processing
             NDArray sorted = result.get(0).argsort(-1, false);
             float[] top = sorted.slice(0, 1).toFloatArray();
-            File synsetFile = new File(new File(modelPathPrefix).getParentFile(), "synset.txt");
-            String[] synset = MxModel.loadSynset(synsetFile);
+            String[] synset = model.getSynset();
             for (int i = 0; i < topK; i++) {
                 String className = synset[(int) top[i]];
                 logger.info(String.format("Class %d: %s", i, className));

@@ -32,11 +32,11 @@ public class BertDataParser {
     /**
      * Parse the Vocabulary to JSON files [PAD], [CLS], [SEP], [MASK], [UNK] are reserved tokens
      *
-     * @param jsonFile the filePath of the vocab.json
+     * @param jsonFile the file of the vocab.json
      * @throws IOException if failed read from file
      */
-    public static BertDataParser parse(String jsonFile) throws IOException {
-        try (Reader reader = Files.newBufferedReader(new File(jsonFile).toPath())) {
+    public static BertDataParser parse(File jsonFile) throws IOException {
+        try (Reader reader = Files.newBufferedReader(jsonFile.toPath())) {
             return GSON.fromJson(reader, BertDataParser.class);
         }
     }

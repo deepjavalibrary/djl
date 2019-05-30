@@ -28,6 +28,7 @@ import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +45,9 @@ public final class SsdExample extends AbstractExample {
         new SsdExample().runExample(args);
     }
 
-    public void predict(String modelDir, String modelName, BufferedImage img, int iteration)
+    public void predict(File modelDir, String modelName, BufferedImage img, int iteration)
             throws IOException {
-        String modelPathPrefix = modelDir + '/' + modelName;
-
-        Model model = Model.loadModel(modelPathPrefix, 0);
+        Model model = Model.loadModel(modelDir, modelName);
 
         SsdTranslator transformer = new SsdTranslator(5, 224, 224);
         Metrics metrics = new Metrics();

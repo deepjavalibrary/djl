@@ -26,6 +26,7 @@ import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -43,21 +44,19 @@ public final class GenericInferenceExample extends AbstractExample {
     }
 
     @Override
-    public void predict(String modelDir, String modelName, BufferedImage img, int iteration)
+    public void predict(File modelDir, String modelName, BufferedImage img, int iteration)
             throws IOException {
-        String modelPathPrefix = modelDir + '/' + modelName;
-
-        Model model = Model.loadModel(modelPathPrefix, 0);
+        Model model = Model.loadModel(modelDir, modelName);
 
         BufferedImage image = Images.reshapeImage(img, 224, 224);
         FloatBuffer data = Images.toFloatBuffer(image);
 
-        GenericTranslator transformer = new GenericTranslator(5, 224, 224);
+        GenericTranslator translator = new GenericTranslator(5, 224, 224);
         Metrics metrics = new Metrics();
 
         long init = System.nanoTime();
         try (Predictor<FloatBuffer, List<DetectedObject>> predictor =
-                Predictor.newInstance(model, transformer)) {
+                Predictor.newInstance(model, translator)) {
 
             predictor.setMetrics(metrics);
 

@@ -27,6 +27,7 @@ import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class BertQaInferenceExample {
             CommandLine cmd = parser.parse(options, args, null, false);
             BertArguments arguments = new BertArguments(cmd);
 
-            String modelDir = arguments.getModelDir();
+            File modelDir = new File(arguments.getModelDir());
             String modelName = arguments.getModelName();
             String question = arguments.getQuestion();
             String answer = arguments.getAnswer();
@@ -63,7 +64,7 @@ public class BertQaInferenceExample {
 
             logger.info("Running {}, iteration: {}", getClass().getSimpleName(), iteration);
 
-            String vocabulary = modelDir + "/" + arguments.getVocabulary();
+            File vocabulary = new File(modelDir, arguments.getVocabulary());
             BertDataParser util = BertDataParser.parse(vocabulary);
             QAInput input = new QAInput(question, answer, seqLength);
 
@@ -93,11 +94,9 @@ public class BertQaInferenceExample {
     }
 
     private void predict(
-            String modelDir, String modelName, BertDataParser parser, QAInput input, int iteration)
+            File modelDir, String modelName, BertDataParser parser, QAInput input, int iteration)
             throws IOException {
-        String modelPathPrefix = modelDir + '/' + modelName;
-
-        Model model = Model.loadModel(modelPathPrefix);
+        Model model = Model.loadModel(modelDir, modelName);
 
         logger.info("Question: {}", input.getQuestion());
         logger.info("Paragraph: {}", input.getAnswer());
