@@ -29,7 +29,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -219,14 +218,13 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public MxNDArray argsort(int axis, boolean isAscend) {
-        FunctionInfo functionInfo = OPS.get("argsort");
-        String[] keys = new String[] {"axis", "is_ascend"};
-        String[] values = new String[2];
-        values[0] = String.valueOf(axis);
-        values[1] = isAscend ? "True" : "False";
-        PairList<String, String> params = new PairList<>(keys, values);
+        PairList<String, String> params = new PairList<>();
+        params.add("axis", String.valueOf(axis));
+        params.add("is_ascend", isAscend ? "True" : "False");
+
         PointerByReference ref = new PointerByReference();
 
+        FunctionInfo functionInfo = OPS.get("argsort");
         functionInfo.invoke(getHandle(), ref, params);
 
         return factory.create(ref.getValue().getPointerArray(0, 1)[0]);
@@ -234,20 +232,17 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public MxNDArray softmax(Integer axis, Double temperature) {
-        FunctionInfo functionInfo = OPS.get("softmax");
-        List<String> keys = new ArrayList<>();
-        List<String> values = new ArrayList<>();
+        PairList<String, String> params = new PairList<>();
         if (axis != null) {
-            keys.add("axis");
-            values.add(String.valueOf(axis));
+            params.add("axis", String.valueOf(axis));
         }
         if (temperature != null) {
-            keys.add("temperature");
-            values.add(String.valueOf(temperature));
+            params.add("temperature", String.valueOf(temperature));
         }
-        PairList<String, String> params = PairList.fromList(keys, values);
+
         PointerByReference ref = new PointerByReference();
 
+        FunctionInfo functionInfo = OPS.get("softmax");
         functionInfo.invoke(getHandle(), ref, params);
 
         return factory.create(ref.getValue().getPointerArray(0, 1)[0]);
@@ -255,22 +250,18 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public MxNDArray[] split(int numOutputs, Integer axis, Boolean squeezeAxis) {
-        FunctionInfo functionInfo = OPS.get("split");
-        List<String> keys = new ArrayList<>();
-        List<String> values = new ArrayList<>();
-        keys.add("num_outputs");
-        values.add(String.valueOf(numOutputs));
+        PairList<String, String> params = new PairList<>();
+        params.add("num_outputs", String.valueOf(numOutputs));
         if (axis != null) {
-            keys.add("axis");
-            values.add(String.valueOf(axis));
+            params.add("axis", String.valueOf(axis));
         }
         if (squeezeAxis != null) {
-            keys.add("squeeze_axis");
-            values.add(String.valueOf(squeezeAxis));
+            params.add("squeeze_axis", String.valueOf(squeezeAxis));
         }
-        PairList<String, String> params = PairList.fromList(keys, values);
+
         PointerByReference ref = new PointerByReference();
 
+        FunctionInfo functionInfo = OPS.get("split");
         functionInfo.invoke(getHandle(), ref, params);
         Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
         MxNDArray[] output = new MxNDArray[numOutputs];

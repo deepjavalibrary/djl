@@ -12,100 +12,96 @@
  */
 package com.amazon.ai.util;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 public class PairList<K, V> implements Iterable<Pair<K, V>> {
 
-    @SuppressWarnings("rawtypes")
-    private static final PairList EMPTY_LIST = new EmptyList();
+    private List<K> keys;
+    private List<V> values;
 
-    private final K[] keys;
-    private final V[] values;
+    /** Constructs an empty <code>PairList</code> with an default initial capacity. */
+    public PairList() {
+        keys = new ArrayList<>();
+        values = new ArrayList<>();
+    }
 
-    public PairList(K[] keys, V[] values) {
-        if (keys.length != values.length) {
+    /**
+     * Constructs an empty <code>PairList</code> with the specified initial capacity.
+     *
+     * @param initialCapacity the initial capacity of the list
+     * @throws IllegalArgumentException if the specified initial capacity is negative
+     */
+    public PairList(int initialCapacity) {
+        keys = new ArrayList<>(initialCapacity);
+        values = new ArrayList<>(initialCapacity);
+    }
+
+    /**
+     * Constructs a <code>PairList</code> containing the elements of the specified keys and values.
+     *
+     * @param keys the key list whose elements are to be placed into this PairList
+     * @param values the value list whose elements are to be placed into this PairList
+     * @throws IllegalArgumentException if the keys and values size are different
+     */
+    public PairList(List<K> keys, List<V> values) {
+        if (keys.size() != values.size()) {
             throw new IllegalArgumentException("key value size mismatch.");
         }
         this.keys = keys;
         this.values = values;
     }
 
+    public PairList(Map<K, V> map) {
+        keys = new ArrayList<>(map.size());
+        values = new ArrayList<>(map.size());
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            keys.add(entry.getKey());
+            values.add(entry.getValue());
+        }
+    }
+
+    public void add(K key, V value) {
+        keys.add(key);
+        values.add(value);
+    }
+
+    public void add(Pair<K, V> pair) {
+        keys.add(pair.getKey());
+        values.add(pair.getValue());
+    }
+
     public int size() {
-        return keys.length;
+        return keys.size();
     }
 
     public Pair<K, V> get(int index) {
-        return new Pair<>(keys[index], values[index]);
+        return new Pair<>(keys.get(index), values.get(index));
     }
 
     public K keyAt(int index) {
-        return keys[index];
+        return keys.get(index);
     }
 
     public V valueAt(int index) {
-        return values[index];
+        return values.get(index);
     }
 
     public K[] keys(K[] target) {
-        return keys;
+        return keys.toArray(target);
     }
 
     public V[] values(V[] target) {
-        return values;
+        return values.toArray(target);
     }
 
     @Override
     public Iterator<Pair<K, V>> iterator() {
         return new Itr();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <S, T> PairList<S, T> fromList(List<S> keys, List<T> values) {
-        int size = keys.size();
-        if (size != values.size()) {
-            throw new IllegalArgumentException("key value size mismatch.");
-        }
-        if (size == 0) {
-            return EMPTY_LIST;
-        }
-
-        Class<?> keyType = keys.get(0).getClass();
-        Class<?> valueType = values.get(0).getClass();
-        S[] keyArray = (S[]) Array.newInstance(keyType, size);
-        T[] valueArray = (T[]) Array.newInstance(valueType, size);
-        for (int i = 0; i < size; ++i) {
-            keyArray[i] = keys.get(i);
-            valueArray[i] = values.get(i);
-        }
-        return new PairList<>(keyArray, valueArray);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <S, T> PairList<S, T> fromMap(Map<S, T> map) {
-        if (map == null || map.isEmpty()) {
-            return EMPTY_LIST;
-        }
-
-        Set<Map.Entry<S, T>> entries = map.entrySet();
-        Map.Entry<S, T> first = entries.iterator().next();
-        Class<?> keyType = first.getKey().getClass();
-        Class<?> valueType = first.getKey().getClass();
-
-        S[] keys = (S[]) Array.newInstance(keyType, map.size());
-        T[] values = (T[]) Array.newInstance(valueType, map.size());
-        int i = 0;
-        for (Map.Entry<S, T> entry : entries) {
-            keys[i] = entry.getKey();
-            values[i] = entry.getValue();
-            ++i;
-        }
-        return new PairList<>(keys, values);
     }
 
     public Map<K, V> toMap() {
@@ -114,9 +110,9 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
 
     public Map<K, V> toMap(boolean checkDuplicate) {
         Map<K, V> map = new HashMap<>();
-        for (int i = 0; i < keys.length; ++i) {
-            if (map.put(keys[i], values[i]) != null && checkDuplicate) {
-                throw new IllegalStateException("Duplicate keys: " + keys[i]);
+        for (int i = 0, size = keys.size(); i < size; ++i) {
+            if (map.put(keys.get(i), values.get(i)) != null && checkDuplicate) {
+                throw new IllegalStateException("Duplicate keys: " + keys.get(i));
             }
         }
         return map;
@@ -137,30 +133,6 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
             }
 
             return get(cursor++);
-        }
-    }
-
-    private static final class EmptyList<S, T> extends PairList<S, T> {
-
-        @SuppressWarnings("unchecked")
-        public EmptyList() {
-            super((S[]) new Object[0], (T[]) new Object[0]);
-        }
-
-        @Override
-        public S[] keys(S[] target) {
-            if (target.length > 0) {
-                target[0] = null;
-            }
-            return target;
-        }
-
-        @Override
-        public T[] values(T[] target) {
-            if (target.length > 0) {
-                target[0] = null;
-            }
-            return target;
         }
     }
 }

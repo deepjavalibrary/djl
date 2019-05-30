@@ -20,11 +20,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.mxnet.jna.JnaUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CachedOp extends NativeResource {
-    private static final Logger logger = LoggerFactory.getLogger(CachedOp.class);
 
     private MxNDArray[] inputNDArray;
     private String[] inputNames;
@@ -81,18 +78,14 @@ public class CachedOp extends NativeResource {
                 dataLoc++;
             }
         }
+
         // Creating CachedOp
-        String[] keys =
-                new String[] {"data_indices", "param_indices", "static_alloc", "static_shape"};
-        String[] values =
-                new String[] {
-                    Arrays.toString(dataIndices), Arrays.toString(paramIndices), "1", "1"
-                };
-        if (logger.isDebugEnabled()) {
-            logger.debug("keys: {}", Arrays.toString(keys));
-            logger.debug("indices: {}", Arrays.toString(values));
-        }
-        PairList<String, String> flags = new PairList<>(keys, values);
+        PairList<String, String> flags = new PairList<>();
+        flags.add("data_indices", Arrays.toString(dataIndices));
+        flags.add("param_indices", Arrays.toString(paramIndices));
+        flags.add("static_alloc", "1");
+        flags.add("static_shape", "1");
+
         Pointer handle = JnaUtils.createCachedOp(symbol, flags);
 
         return new CachedOp(handle, factory, inputNDArray, inputNames, dataIndices);

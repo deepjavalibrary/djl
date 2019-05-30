@@ -22,7 +22,6 @@ import com.sun.jna.ptr.PointerByReference;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -72,24 +71,19 @@ public class MxModel implements Model, AutoCloseable {
         Pointer[] handles = JnaUtils.loadNdArray(paramFile, namesRef);
         String[] names = namesRef.getValue().getStringArray(0, handles.length);
 
-        List<String> argParamNames = new ArrayList<>();
-        List<String> auxParamNames = new ArrayList<>();
-        List<MxNDArray> argParamData = new ArrayList<>();
-        List<MxNDArray> auxParamData = new ArrayList<>();
+        PairList<String, MxNDArray> argParams = new PairList<>();
+        PairList<String, MxNDArray> auxParams = new PairList<>();
         for (int i = 0; i < names.length; ++i) {
             String[] pair = names[i].split(":", 2);
+            MxNDArray array = factory.create(handles[i]);
             if ("arg".equals(pair[0])) {
-                argParamNames.add(pair[1]);
-                argParamData.add(factory.create(handles[i]));
+                argParams.add(pair[1], array);
             } else if ("aux".equals(pair[0])) {
-                auxParamNames.add(pair[1]);
-                auxParamData.add(factory.create(handles[i]));
+                auxParams.add(pair[1], array);
             } else {
                 throw new IllegalStateException("Unknown parameter: " + pair[0]);
             }
         }
-        PairList<String, MxNDArray> argParams = PairList.fromList(argParamNames, argParamData);
-        PairList<String, MxNDArray> auxParams = PairList.fromList(auxParamNames, auxParamData);
 
         String[] synset = loadSynset(synsetFile);
         String[] stateNames = JnaUtils.readLines(new File(stateFile)).toArray(JnaUtils.EMPTY_ARRAY);

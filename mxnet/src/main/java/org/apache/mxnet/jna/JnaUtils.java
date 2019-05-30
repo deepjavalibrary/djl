@@ -1455,12 +1455,12 @@ public final class JnaUtils {
     private static PairList<String, String> toPairList(PointerByReference ref, int size) {
         Pointer[] pointers = ref.getValue().getPointerArray(0, size);
 
-        String[] names = new String[size];
-        String[] values = new String[size];
-        for (int i = 0; i < size; ++i) {
-            String[] pair = pointers[i].getStringArray(0, 2);
-            names[i] = pair[0];
-            values[i] = pair[1];
+        List<String> names = new ArrayList<>(size);
+        List<String> values = new ArrayList<>(size);
+        for (Pointer pointer : pointers) {
+            String[] pair = pointer.getStringArray(0, 2);
+            names.add(pair[0]);
+            values.add(pair[1]);
         }
 
         return new PairList<>(names, values);
