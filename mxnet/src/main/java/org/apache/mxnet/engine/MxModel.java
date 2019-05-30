@@ -15,6 +15,7 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Model;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
@@ -22,6 +23,7 @@ import com.sun.jna.ptr.PointerByReference;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -34,26 +36,21 @@ public class MxModel implements Model, AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
     private Symbol symbol;
-    private PairList<String, MxNDArray> argParams;
-    private PairList<String, MxNDArray> auxParams;
+    private PairList<String, MxNDArray> parameters;
     private String[] synset;
-    private String[] labelNames;
     private String[] optimizerStates;
     private String[] fixedParameters;
     private DataDesc[] inputData;
 
     MxModel(
             Symbol symbol,
-            PairList<String, MxNDArray> argParams,
-            PairList<String, MxNDArray> auxParams,
+            PairList<String, MxNDArray> parameters,
             String[] synset,
             String[] optimizerStates) {
         this.symbol = symbol;
-        this.argParams = argParams;
-        this.auxParams = auxParams;
+        this.parameters = parameters;
         this.synset = synset;
         this.optimizerStates = optimizerStates;
-        labelNames = new String[] {"softmax_label"};
     }
 
     public static MxModel loadModel(String prefix, int epoch) throws IOException {
@@ -71,18 +68,12 @@ public class MxModel implements Model, AutoCloseable {
         Pointer[] handles = JnaUtils.loadNdArray(paramFile, namesRef);
         String[] names = namesRef.getValue().getStringArray(0, handles.length);
 
-        PairList<String, MxNDArray> argParams = new PairList<>();
-        PairList<String, MxNDArray> auxParams = new PairList<>();
+        PairList<String, MxNDArray> parameters = new PairList<>();
+
         for (int i = 0; i < names.length; ++i) {
             String[] pair = names[i].split(":", 2);
             MxNDArray array = factory.create(handles[i]);
-            if ("arg".equals(pair[0])) {
-                argParams.add(pair[1], array);
-            } else if ("aux".equals(pair[0])) {
-                auxParams.add(pair[1], array);
-            } else {
-                throw new IllegalStateException("Unknown parameter: " + pair[0]);
-            }
+            parameters.add(pair[1], array);
         }
 
         String[] synset = loadSynset(synsetFile);
@@ -90,40 +81,20 @@ public class MxModel implements Model, AutoCloseable {
 
         JnaUtils.waitAll();
 
-        return new MxModel(symbol, argParams, auxParams, synset, stateNames);
+        return new MxModel(symbol, parameters, synset, stateNames);
     }
 
     public Symbol getSymbol() {
         return symbol;
     }
 
-    public PairList<String, MxNDArray> getArgParams() {
-        return argParams;
-    }
-
-    public PairList<String, MxNDArray> getAuxParams() {
-        return auxParams;
-    }
-
-    public void setDataNames(DataDesc... inputData) {
-        this.inputData = inputData;
+    public PairList<String, MxNDArray> getParameters() {
+        return parameters;
     }
 
     @Override
     public Model cast(DataType dataType) {
         return null;
-    }
-
-    public String[] getLabelNames() {
-        if (labelNames == null) {
-            return JnaUtils.EMPTY_ARRAY;
-        }
-        return labelNames;
-    }
-
-    public void setLabelNames(String... labelNames) {
-        validate(labelNames, "label", false);
-        this.labelNames = labelNames;
     }
 
     public String[] getOptimizerStates() {
@@ -176,27 +147,25 @@ public class MxModel implements Model, AutoCloseable {
     public void close() {
         symbol.close();
 
-        for (int i = 0; i < argParams.size(); ++i) {
-            MxNDArray array = argParams.valueAt(i);
-            array.close();
-        }
-        for (int i = 0; i < auxParams.size(); ++i) {
-            MxNDArray array = auxParams.valueAt(i);
+        for (int i = 0; i < parameters.size(); ++i) {
+            MxNDArray array = parameters.valueAt(i);
             array.close();
         }
     }
 
     public static String[] loadSynset(File synsetFile) {
-        try {
-            List<String> output = Files.readAllLines(synsetFile.toPath());
-            ListIterator<String> it = output.listIterator();
-            while (it.hasNext()) {
-                String synsetLemma = it.next();
-                it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
+        if (synsetFile.exists()) {
+            try {
+                List<String> output = Files.readAllLines(synsetFile.toPath());
+                ListIterator<String> it = output.listIterator();
+                while (it.hasNext()) {
+                    String synsetLemma = it.next();
+                    it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
+                }
+                return output.toArray(JnaUtils.EMPTY_ARRAY);
+            } catch (IOException e) {
+                logger.warn("Error opening synset file " + synsetFile, e);
             }
-            return output.toArray(JnaUtils.EMPTY_ARRAY);
-        } catch (IOException e) {
-            logger.warn("Error opening synset file " + synsetFile, e);
         }
         return JnaUtils.EMPTY_ARRAY;
     }
@@ -208,6 +177,27 @@ public class MxModel implements Model, AutoCloseable {
 
     @Override
     public DataDesc[] describeInput() {
+        if (inputData == null) {
+            String[] allNames = symbol.getAllNames();
+            Map<String, Integer> map = new HashMap<>(allNames.length * 3 / 2);
+            int index = 0;
+            for (String name : allNames) {
+                map.put(name, index++);
+            }
+            for (String name : parameters.keys()) {
+                map.remove(name);
+            }
+            inputData = new DataDesc[map.size()];
+
+            index = 0;
+            for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                String name = entry.getKey();
+                int position = entry.getValue();
+                inputData[index] = new DataDesc(new Shape(), name);
+                inputData[index].setIndex(position);
+                ++index;
+            }
+        }
         return inputData;
     }
 

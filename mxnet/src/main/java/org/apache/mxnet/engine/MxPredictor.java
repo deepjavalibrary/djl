@@ -19,19 +19,17 @@ import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.metric.Metric;
 import com.amazon.ai.metric.Metrics;
-import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.types.DataDesc;
+import org.apache.mxnet.jna.JnaUtils;
 
 public class MxPredictor<I, O> implements Predictor<I, O> {
 
     MxModel model;
     private Translator<I, O> transformer;
     Context context;
-    private Module module;
-    private DataDesc[] dataDesc;
-    NDFactory factory;
+    private CachedOp cachedOp;
+    MxNDFactory factory;
     Metrics metrics;
     private long timestamp;
 
@@ -40,8 +38,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         this.model = model;
         this.transformer = transformer;
         this.context = context;
-        Module.Builder builder = new Module.Builder(context, model, false);
-        module = builder.build();
+        cachedOp = JnaUtils.createCachedOp(model, factory);
         metrics = new Metrics();
     }
 
@@ -69,36 +66,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     }
 
     private NDList forward(NDList ndList) {
-        rebindIfNeeded(ndList);
-
-        return module.forward(ndList);
-    }
-
-    private void rebindIfNeeded(NDList ndList) {
-        if (dataDesc == null) {
-            dataDesc = new DataDesc[ndList.size()];
-        } else {
-            if (dataDesc.length != ndList.size()) {
-                throw new IllegalArgumentException(
-                        "Unexpected input size: "
-                                + dataDesc.length
-                                + ", expected: "
-                                + ndList.size());
-            }
-
-            for (int i = 0; i < dataDesc.length; ++i) {
-                DataDesc actuall = ndList.get(i).getDataDescriptor();
-                if (!actuall.getShape().equals(dataDesc[i].getShape())) {
-                    // TODO: rebind module
-                    return;
-                }
-            }
-        }
-
-        for (int i = 0; i < dataDesc.length; ++i) {
-            NDArray array = ndList.get(i);
-            dataDesc[i] = array.getDataDescriptor();
-        }
+        return cachedOp.forward(ndList);
     }
 
     private void preprocessEnd() {
@@ -132,7 +100,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
     @Override
     public void close() {
-        module.close();
+        cachedOp.close();
         factory.close();
     }
 

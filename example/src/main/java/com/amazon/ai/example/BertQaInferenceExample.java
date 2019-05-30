@@ -26,12 +26,10 @@ import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -41,7 +39,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
@@ -102,16 +99,10 @@ public class BertQaInferenceExample {
 
         Model model = Model.loadModel(modelPathPrefix);
 
-        int seqLength = input.getSeqLength();
-        DataDesc data0 = new DataDesc(new Shape(1, seqLength), DataType.FLOAT32, "data0");
-        DataDesc data1 = new DataDesc(new Shape(1, seqLength), DataType.FLOAT32, "data1");
-        DataDesc data2 = new DataDesc(new Shape(1), DataType.FLOAT32, "data2");
-        ((MxModel) model).setDataNames(data0, data1, data2);
-
         logger.info("Question: {}", input.getQuestion());
         logger.info("Paragraph: {}", input.getAnswer());
 
-        GenericTranslator translator = new GenericTranslator(parser);
+        BertTranslator translator = new BertTranslator(parser);
         Metrics metrics = new Metrics();
 
         try (Predictor<QAInput, String> predictor = Predictor.newInstance(model, translator)) {
@@ -119,9 +110,7 @@ public class BertQaInferenceExample {
 
             for (int i = 0; i < iteration; ++i) {
                 String answer = predictor.predict(input);
-                if (i == 0) {
-                    logger.info("Answer: {}", answer);
-                }
+                printProgress(iteration, i, answer);
             }
 
             float p50 = metrics.percentile("Inference", 50).getValue() / 1000000f;
@@ -133,6 +122,18 @@ public class BertQaInferenceExample {
 
     public static void main(String[] args) {
         new BertQaInferenceExample().runExample(args);
+    }
+
+    @SuppressWarnings("PMD.SystemPrintln")
+    private void printProgress(int iteration, int index, String message) {
+        if (index == 0) {
+            logger.info(String.format("Answer: %s", message));
+        } else {
+            System.out.print(".");
+            if (index % 80 == 0 || index == iteration - 1) {
+                System.out.println();
+            }
+        }
     }
 
     private static final class QAInput {
@@ -160,12 +161,12 @@ public class BertQaInferenceExample {
         }
     }
 
-    private static final class GenericTranslator implements Translator<QAInput, String> {
+    private static final class BertTranslator implements Translator<QAInput, String> {
 
         private BertDataParser parser;
         private List<String> tokens;
 
-        GenericTranslator(BertDataParser parser) {
+        BertTranslator(BertDataParser parser) {
             this.parser = parser;
         }
 
@@ -183,17 +184,21 @@ public class BertQaInferenceExample {
             for (int integer : indexes) {
                 indexesFloat.add((float) integer);
             }
-            // Start building model
-            Model model = ctx.getModel();
-            DataDesc[] dataDescs = model.describeInput();
-            NDFactory factory = ctx.getNDFactory();
-            factory.create(dataDescs[0]);
-            NDList list = new NDList(3);
-            Arrays.stream(dataDescs).forEach(ele -> list.add(factory.create(ele)));
 
-            list.get(0).set(indexesFloat);
-            list.get(1).set(tokenTypes);
-            list.get(2).set(Collections.singletonList((float) validLength));
+            int seqLength = input.getSeqLength();
+            NDFactory factory = ctx.getNDFactory();
+            NDArray data0 = factory.create(new DataDesc(new Shape(1, seqLength)));
+            NDArray data1 = factory.create(new DataDesc(new Shape(1, seqLength)));
+            NDArray data2 = factory.create(new DataDesc(new Shape(1)));
+
+            data0.set(indexesFloat);
+            data1.set(tokenTypes);
+            data2.set(Collections.singletonList((float) validLength));
+
+            NDList list = new NDList(3);
+            list.add("data0", data0);
+            list.add("data1", data1);
+            list.add("data2", data2);
 
             return list;
         }

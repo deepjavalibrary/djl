@@ -1,5 +1,6 @@
 package org.apache.mxnet.example;
 
+import com.amazon.ai.Model;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.image.Images;
@@ -9,6 +10,7 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,6 +18,7 @@ import java.util.List;
 import org.apache.mxnet.engine.CachedOp;
 import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDFactory;
+import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
 public final class CachedOpExample extends AbstractExample {
@@ -29,8 +32,12 @@ public final class CachedOpExample extends AbstractExample {
     }
 
     @Override
-    public void predict(String modelDir, String modelName, BufferedImage img, int iteration) {
+    public void predict(String modelDir, String modelName, BufferedImage img, int iteration)
+            throws IOException {
         String modelPathPrefix = modelDir + '/' + modelName;
+
+        Model model = Model.loadModel(modelPathPrefix, 0);
+
         // Pre processing
         int topK = 5;
         BufferedImage image = Images.reshapeImage(img, 224, 224);
@@ -42,7 +49,7 @@ public final class CachedOpExample extends AbstractExample {
 
             // Inference Logic
             long init = System.nanoTime();
-            CachedOp op = CachedOp.loadModel(factory, modelPathPrefix, 0);
+            CachedOp op = JnaUtils.createCachedOp((MxModel) model, factory);
             long loadModel = System.nanoTime();
             logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
             List<Long> inferenceTime = new ArrayList<>(iteration);

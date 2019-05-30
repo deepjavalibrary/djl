@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.mxnet.engine.MxModel;
 import org.slf4j.Logger;
 
 public final class GenericInferenceExample extends AbstractExample {
@@ -50,13 +49,10 @@ public final class GenericInferenceExample extends AbstractExample {
 
         Model model = Model.loadModel(modelPathPrefix, 0);
 
-        DataDesc dataDesc = new DataDesc(new Shape(1, 3, 224, 224), "data");
-        ((MxModel) model).setDataNames(dataDesc);
-
         BufferedImage image = Images.reshapeImage(img, 224, 224);
         FloatBuffer data = Images.toFloatBuffer(image);
 
-        GenericTranslator transformer = new GenericTranslator(5);
+        GenericTranslator transformer = new GenericTranslator(5, 224, 224);
         Metrics metrics = new Metrics();
 
         long init = System.nanoTime();
@@ -70,9 +66,7 @@ public final class GenericInferenceExample extends AbstractExample {
 
             for (int i = 0; i < iteration; ++i) {
                 List<DetectedObject> result = predictor.predict(data);
-                if (i == 0) {
-                    logger.info(String.format("Result: %s", result.get(0).getClassName()));
-                }
+                printProgress(iteration, i, result.get(0).getClassName());
             }
 
             float p50 = metrics.percentile("Inference", 50).getValue() / 1000000f;
@@ -86,17 +80,17 @@ public final class GenericInferenceExample extends AbstractExample {
             implements Translator<FloatBuffer, List<DetectedObject>> {
 
         private int topK;
+        private DataDesc dataDesc;
 
-        public GenericTranslator(int topK) {
+        public GenericTranslator(int topK, int imageWidth, int imageHeight) {
             this.topK = topK;
+            dataDesc = new DataDesc(new Shape(1, 3, imageWidth, imageHeight), "data");
         }
 
         @Override
         public NDList processInput(TranslatorContext ctx, FloatBuffer input) {
-            Model model = ctx.getModel();
-            NDArray array = ctx.getNDFactory().create(model.describeInput()[0]);
+            NDArray array = ctx.getNDFactory().create(dataDesc);
             array.set(input);
-
             return new NDList(array);
         }
 

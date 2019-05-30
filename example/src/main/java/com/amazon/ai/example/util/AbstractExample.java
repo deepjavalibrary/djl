@@ -73,6 +73,18 @@ public abstract class AbstractExample {
         }
     }
 
+    @SuppressWarnings("PMD.SystemPrintln")
+    protected void printProgress(int iteration, int index, String message) {
+        if (index == 0) {
+            logger.info(String.format("Result: %s", message));
+        } else {
+            System.out.print(".");
+            if (index % 80 == 0 || index == iteration - 1) {
+                System.out.println();
+            }
+        }
+    }
+
     public abstract void predict(
             String modelDir, String modelName, BufferedImage image, int iteration)
             throws IOException;

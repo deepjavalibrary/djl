@@ -107,6 +107,19 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         return values.toArray(target);
     }
 
+    public V remove(K key) {
+        int index = keys.indexOf(key);
+        if (index == -1) {
+            return null;
+        }
+        keys.remove(index);
+        return values.remove(index);
+    }
+
+    public boolean contains(K key) {
+        return keys.contains(key);
+    }
+
     @Override
     public Iterator<Pair<K, V>> iterator() {
         return new Itr();
@@ -117,8 +130,9 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     public Map<K, V> toMap(boolean checkDuplicate) {
-        Map<K, V> map = new HashMap<>();
-        for (int i = 0, size = keys.size(); i < size; ++i) {
+        int size = keys.size();
+        Map<K, V> map = new HashMap<>(size * 3 / 2);
+        for (int i = 0; i < size; ++i) {
             if (map.put(keys.get(i), values.get(i)) != null && checkDuplicate) {
                 throw new IllegalStateException("Duplicate keys: " + keys.get(i));
             }

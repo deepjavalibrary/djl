@@ -14,6 +14,7 @@ package org.apache.mxnet.jna;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
@@ -32,6 +33,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import org.apache.mxnet.engine.CachedOp;
 import org.apache.mxnet.engine.DeviceType;
+import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 import org.apache.mxnet.engine.Symbol;
@@ -1374,17 +1378,52 @@ public final class JnaUtils {
      * @param flags
      * @return
      */
-    public static Pointer createCachedOp(Symbol symbol, PairList<String, String> flags) {
+    public static CachedOp createCachedOp(MxModel model, MxNDFactory factory) {
+        Symbol symbol = model.getSymbol();
+        PairList<String, MxNDArray> parameters = model.getParameters();
+
+        String[] allNames = symbol.getAllNames();
+
+        // We assume missing parameters are required input, which must be supplied by user.
+        int inputSize = allNames.length - parameters.size();
+        Map<String, MxNDArray> paramMap = parameters.toMap();
+
+        // prepare the cachedOp element
+        PairList<String, Integer> inputs = new PairList<>(inputSize);
+        MxNDArray[] inputNDArray = new MxNDArray[allNames.length];
+
+        int[] paramIndices = new int[parameters.size()];
+
+        // Start forming input array and param indices
+        int paramLoc = 0;
+        for (int i = 0; i < allNames.length; ++i) {
+            String paramName = allNames[i];
+            MxNDArray array = paramMap.get(paramName);
+            if (array != null) {
+                paramIndices[paramLoc] = i;
+                // TODO: Change the DataType to non-determined
+
+                // parameter NDArray in MxModel is always loaded in CPU context,
+                // we have to copy to desired context to execution.
+                // TODO: use array.dup(ctx) instead
+                inputNDArray[i] = array.asInContext(factory.getContext(), true);
+                paramLoc++;
+            } else {
+                inputs.add(paramName, i);
+            }
+        }
+
+        // Creating CachedOp
+        String[] keys =
+                new String[] {"data_indices", "param_indices", "static_alloc", "static_shape"};
+        String[] values =
+                new String[] {inputs.values().toString(), Arrays.toString(paramIndices), "1", "1"};
+
         Pointer symbolHandle = symbol.getHandle();
         PointerByReference ref = new PointerByReference();
-        checkCall(
-                LIB.MXCreateCachedOpEx(
-                        symbolHandle,
-                        flags.size(),
-                        flags.keyArray(EMPTY_ARRAY),
-                        flags.valueArray(EMPTY_ARRAY),
-                        ref));
-        return ref.getValue();
+        checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
+
+        return new CachedOp(ref.getValue(), factory, inputNDArray, inputs);
     }
 
     public static void freeCachedOp(Pointer handle) {
@@ -1395,6 +1434,9 @@ public final class JnaUtils {
             MxNDFactory factory, Pointer cachedOpHandle, MxNDArray[] inputs) {
         Pointer[] inputHandles = new Pointer[inputs.length];
         for (int i = 0; i < inputs.length; i++) {
+            if (inputs[i] == null) {
+                inputs[i] = factory.create(new DataDesc(new Shape(1)));
+            }
             inputHandles[i] = inputs[i].getHandle();
         }
         PointerArray array = new PointerArray(inputHandles);

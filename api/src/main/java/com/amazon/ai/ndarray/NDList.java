@@ -12,10 +12,11 @@
  */
 package com.amazon.ai.ndarray;
 
+import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
 import java.util.Iterator;
 
-public class NDList implements Iterable<NDArray> {
+public class NDList implements Iterable<Pair<String, NDArray>> {
 
     protected PairList<String, NDArray> list;
 
@@ -45,10 +46,6 @@ public class NDList implements Iterable<NDArray> {
         this.list = arrays.list;
     }
 
-    public void add(String name, NDArray array) {
-        list.add(name, array);
-    }
-
     public NDArray[] toArray() {
         return list.valueArray(new NDArray[0]);
     }
@@ -61,6 +58,14 @@ public class NDList implements Iterable<NDArray> {
      */
     public int size() {
         return list.size();
+    }
+
+    public NDArray remove(String name) {
+        return list.remove(name);
+    }
+
+    public boolean contains(String name) {
+        return list.contains(name);
     }
 
     /**
@@ -97,6 +102,10 @@ public class NDList implements Iterable<NDArray> {
         list.add(null, array);
     }
 
+    public void add(String name, NDArray array) {
+        list.add(name, array);
+    }
+
     /**
      * Appends all of the NDArray in the specified collection to the end of this list, in the order
      * that they are returned by the specified collection's iterator (optional operation). The
@@ -105,7 +114,6 @@ public class NDList implements Iterable<NDArray> {
      * list, and it's nonempty.)
      *
      * @param other NDList containing NDArray to be added to this list
-     * @return <tt>true</tt> if this list changed as a result of the call
      * @throws UnsupportedOperationException if the <tt>addAll</tt> operation is not supported by
      *     this list
      * @throws ClassCastException if the class of a NDArray of the specified collection prevents it
@@ -116,8 +124,8 @@ public class NDList implements Iterable<NDArray> {
      *     prevents it from being added to this list
      */
     public void addAll(NDList other) {
-        for (NDArray array : other) {
-            list.add(null, array);
+        for (Pair<String, NDArray> pair : other) {
+            list.add(pair);
         }
     }
 
@@ -127,12 +135,12 @@ public class NDList implements Iterable<NDArray> {
      * @return an iterator over the NDArrays in this list in proper sequence
      */
     @Override
-    public Iterator<NDArray> iterator() {
-        return list.values().iterator();
+    public Iterator<Pair<String, NDArray>> iterator() {
+        return list.iterator();
     }
 
     public void waitToRead() {
-        for (NDArray array : this) {
+        for (NDArray array : list.values()) {
             array.waitToRead();
         }
     }

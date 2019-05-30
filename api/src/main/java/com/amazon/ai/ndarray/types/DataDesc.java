@@ -22,6 +22,7 @@ public class DataDesc {
     private DataType dataType;
     private SparseFormat sparseFormat;
     private Layout layout;
+    private int index;
 
     public DataDesc(Shape shape) {
         this(shape, DataType.FLOAT32, null, Layout.UNDEFINED, null, SparseFormat.DEFAULT);
@@ -104,6 +105,14 @@ public class DataDesc {
 
     public void setLayout(Layout layout) {
         this.layout = layout;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public int getMajorAxis() {

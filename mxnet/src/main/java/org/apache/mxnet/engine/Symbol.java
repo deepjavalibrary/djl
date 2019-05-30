@@ -13,20 +13,14 @@
 package org.apache.mxnet.engine;
 
 import com.amazon.ai.Block;
-import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.mxnet.jna.JnaUtils;
@@ -150,198 +144,6 @@ public class Symbol extends NativeResource implements Block {
 
     public void compose(String name, Map<String, String> symbols) {
         JnaUtils.compose(getHandle(), name, symbols.values().toArray(JnaUtils.EMPTY_ARRAY));
-    }
-
-    public MxExecutor[] simpleBind(
-            MxModel model,
-            List<Context> contexts,
-            String[] labelNames,
-            String[] stateNames,
-            GradReq gradReq,
-            Map<String, Context> g2cMap,
-            Map<String, SparseFormat> stypeMap) {
-        MxExecutor[] executors = new MxExecutor[contexts.size()];
-
-        // each argParams have a gradReq value
-        String[] argParamGradReqs = new String[argParams.length];
-        Arrays.fill(argParamGradReqs, gradReq.getType());
-
-        // g2c
-        String[] g2cKeys = null;
-        int[] g2cDeviceTypes = null;
-        int[] g2cDeviceIds = null;
-        if (g2cMap != null && !g2cMap.isEmpty()) {
-            g2cKeys = new String[g2cMap.size()];
-            g2cDeviceTypes = new int[g2cKeys.length];
-            g2cDeviceIds = new int[g2cKeys.length];
-
-            int k = 0;
-            for (Map.Entry<String, Context> entry : g2cMap.entrySet()) {
-                g2cKeys[k] = entry.getKey();
-                Context ctx = entry.getValue();
-                g2cDeviceTypes[k] = DeviceType.toDeviceType(ctx);
-                g2cDeviceIds[k] = ctx.getDeviceId();
-                ++k;
-            }
-        }
-
-        // Prepare input data related parameters
-        DataDesc[] dataDescriptors = model.describeInput();
-        int size = 0;
-        for (DataDesc desc : dataDescriptors) {
-            size += desc.getShape().getShape().length;
-        }
-        String[] inputArgNames = new String[dataDescriptors.length];
-        String[] inputDataTypeNames = new String[inputArgNames.length];
-        int[] inputDataTypes = new int[inputArgNames.length];
-
-        IntBuffer inputShapeData = IntBuffer.allocate(size);
-        IntBuffer inputShapeIdx = IntBuffer.allocate(inputArgNames.length + 1);
-        inputShapeIdx.put(0);
-        int k = 0;
-        int offset = 0;
-        for (DataDesc desc : dataDescriptors) {
-            inputArgNames[k] = desc.getName();
-            inputDataTypeNames[k] = desc.getName();
-            inputDataTypes[k] = desc.getDataType().ordinal();
-            int[] shape = desc.getShape().getShape();
-            inputShapeData.put(shape);
-            offset += shape.length;
-            inputShapeIdx.put(offset);
-            ++k;
-        }
-        inputShapeData.rewind();
-        inputShapeIdx.rewind();
-
-        String[] inputStorageTypeNames = null;
-        int[] inputStorageTypes = null;
-        if (stypeMap != null && !stypeMap.isEmpty()) {
-            inputStorageTypeNames = new String[stypeMap.size()];
-            inputStorageTypes = new int[inputStorageTypeNames.length];
-
-            k = 0;
-            for (Map.Entry<String, SparseFormat> entry : stypeMap.entrySet()) {
-                inputStorageTypeNames[k] = entry.getKey();
-                inputStorageTypes[k] = entry.getValue().getValue();
-                ++k;
-            }
-        }
-
-        // filter argParams from inputNames, labelNames, and stateNames
-        List<String> sharedArgNames = new ArrayList<>();
-        for (String arg : argParams) {
-            if (!Utils.contains(inputArgNames, arg)
-                    && !Utils.contains(labelNames, arg)
-                    && !Utils.contains(stateNames, arg)) {
-                sharedArgNames.add(arg);
-            }
-        }
-        String[] sharedArgParams = sharedArgNames.toArray(JnaUtils.EMPTY_ARRAY);
-
-        IntBuffer sharedBufferLen = IntBuffer.allocate(1);
-        sharedBufferLen.put(0, 0);
-        String[] sharedBufferNames = new String[0];
-        PointerByReference sharedBufferHandles = new PointerByReference();
-
-        for (int i = 0; i < contexts.size(); ++i) {
-            Context context = contexts.get(i);
-
-            PointerByReference updatedSharedBufferNames = new PointerByReference();
-            PointerByReference updatedSharedBufferHandles = new PointerByReference();
-
-            IntBuffer numInArgs = IntBuffer.allocate(1);
-            PointerByReference inArgs = new PointerByReference();
-            PointerByReference argGrads = new PointerByReference();
-            IntBuffer numAuxStates = IntBuffer.allocate(1);
-            PointerByReference auxStates = new PointerByReference();
-
-            Pointer pointer =
-                    JnaUtils.bindExecutorSimple(
-                            this,
-                            context,
-                            g2cKeys,
-                            g2cDeviceTypes,
-                            g2cDeviceIds,
-                            argParams,
-                            argParamGradReqs,
-                            inputArgNames,
-                            inputShapeData,
-                            inputShapeIdx,
-                            inputDataTypeNames,
-                            inputDataTypes,
-                            inputStorageTypeNames,
-                            inputStorageTypes,
-                            sharedArgParams,
-                            sharedBufferLen,
-                            sharedBufferNames,
-                            sharedBufferHandles,
-                            updatedSharedBufferNames,
-                            updatedSharedBufferHandles,
-                            numInArgs,
-                            inArgs,
-                            argGrads,
-                            numAuxStates,
-                            auxStates);
-
-            // update shared buffer
-            int updatedSize = sharedBufferLen.get(0);
-            if (updatedSize > 0) {
-                Pointer[] updatedPointer =
-                        updatedSharedBufferHandles.getValue().getPointerArray(0, updatedSize);
-                String[] updatedNames =
-                        updatedSharedBufferNames.getValue().getStringArray(0, updatedSize);
-            }
-
-            Map<String, MxNDArray> argParamMap = model.getArgParams().toMap();
-
-            // get output for current executor's in_args, arg_grads, and aux_states
-            int inArgSize = numInArgs.get(0);
-            Pointer[] inArgsPointers = inArgs.getValue().getPointerArray(0, inArgSize);
-            Pointer[] gradPointers = argGrads.getValue().getPointerArray(0, inArgSize);
-            MxNDArray[] argArray = new MxNDArray[inArgSize];
-            MxNDArray[] gradArray = new MxNDArray[inArgSize];
-            MxNDArray[] dataArray = new MxNDArray[inputArgNames.length];
-            for (int j = 0; j < inArgSize; ++j) {
-                argArray[j] = factory.create(inArgsPointers[j]);
-
-                String paramName = argParams[j];
-
-                MxNDArray param = argParamMap.get(paramName);
-                if (param == null) {
-                    int dataIdx = Utils.indexOf(inputArgNames, paramName);
-                    if (dataIdx >= 0) {
-                        dataArray[dataIdx] = argArray[j];
-                    }
-                } else {
-                    param.copyTo(argArray[j]);
-                }
-
-                if (gradPointers[j] != null) {
-                    gradArray[j] = factory.create(gradPointers[j]);
-                }
-            }
-
-            int auxStatesSize = numAuxStates.get();
-            MxNDArray[] auxArray = new MxNDArray[auxStatesSize];
-            if (auxStatesSize > 0) {
-                Map<String, MxNDArray> auxParamMap = model.getAuxParams().toMap();
-                Pointer[] pointers = auxStates.getValue().getPointerArray(0, auxStatesSize);
-                for (int j = 0; j < auxStatesSize; ++j) {
-                    auxArray[j] = factory.create(pointers[j]);
-
-                    NDArray param = auxParamMap.get(auxParams[j]);
-                    if (param == null) {
-                        throw new IllegalStateException("aux parameter not found: " + auxParams[j]);
-                    }
-                    param.copyTo(auxArray[j]);
-                }
-            }
-
-            NDArray[] out = JnaUtils.getExecutorOutputs(factory, pointer);
-
-            executors[i] = new MxExecutor(pointer, argArray, auxArray, dataArray, out, gradArray);
-        }
-        return executors;
     }
 
     public String toJson() {

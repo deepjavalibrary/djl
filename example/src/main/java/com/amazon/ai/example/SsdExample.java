@@ -27,13 +27,10 @@ import com.amazon.ai.inference.ObjectDetector;
 import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.mxnet.engine.MxModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,10 +50,7 @@ public final class SsdExample extends AbstractExample {
 
         Model model = Model.loadModel(modelPathPrefix, 0);
 
-        DataDesc dataDesc = new DataDesc(new Shape(1, 3, 224, 224), "data");
-        ((MxModel) model).setDataNames(dataDesc);
-
-        SsdTranslator transformer = new SsdTranslator(5);
+        SsdTranslator transformer = new SsdTranslator(5, 224, 224);
         Metrics metrics = new Metrics();
 
         long init = System.nanoTime();
@@ -69,9 +63,7 @@ public final class SsdExample extends AbstractExample {
 
             for (int i = 0; i < iteration; ++i) {
                 List<DetectedObject> result = ssd.detect(img);
-                if (i == 0) {
-                    logger.info(String.format("Result: %s", result.get(0).getClassName()));
-                }
+                printProgress(iteration, i, result.get(0).getClassName());
             }
 
             float p50 = metrics.percentile("Inference", 50).getValue() / 1000000f;
@@ -84,14 +76,18 @@ public final class SsdExample extends AbstractExample {
     private static final class SsdTranslator extends ImageTranslator<List<DetectedObject>> {
 
         private int topK;
+        private int imageWidth;
+        private int imageHeight;
 
-        public SsdTranslator(int topK) {
+        public SsdTranslator(int topK, int imageWidth, int imageHeight) {
             this.topK = topK;
+            this.imageWidth = imageWidth;
+            this.imageHeight = imageHeight;
         }
 
         @Override
         public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-            BufferedImage image = Images.reshapeImage(input, 224, 224);
+            BufferedImage image = Images.reshapeImage(input, imageWidth, imageHeight);
             return super.processInput(ctx, image);
         }
 
