@@ -35,7 +35,9 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class LibUtils {
+// CHECKSTYLE:OFF:FinalClass
+@SuppressWarnings("PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal")
+public class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
@@ -166,3 +168,4 @@ final class LibUtils {
         return null;
     }
 }
+// CHECKSTYLE:ON:FinalClass

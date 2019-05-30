@@ -12,14 +12,43 @@
  */
 package org.apache.mxnet.jna;
 
+// CHECKSTYLE:OFF:AvoidStaticImport
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
 import com.amazon.ai.Context;
+import java.nio.IntBuffer;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.IObjectFactory;
+import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 
-public class JnaUtilsTest {
+// CHECKSTYLE:ON:AvoidStaticImport
+
+@PrepareForTest(LibUtils.class)
+public class JnaUtilsTest extends PowerMockTestCase {
 
     @Test
     public void testGetVersion() {
+        mockStatic(LibUtils.class);
+
+        IntBuffer buf = IntBuffer.allocate(1);
+        MxnetLibrary library = Mockito.mock(MxnetLibrary.class);
+        PowerMockito.when(library.MXGetVersion(buf))
+                .thenAnswer(
+                        (Answer<Integer>)
+                                invocation -> {
+                                    Object[] args = invocation.getArguments();
+                                    ((IntBuffer) args[0]).put(0, 10500);
+                                    return 0;
+                                });
+
+        PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
+
         Assert.assertEquals(JnaUtils.getVersion(), 10500);
     }
 
@@ -48,5 +77,10 @@ public class JnaUtilsTest {
         if (JnaUtils.getGpuCount() > 0) {
             JnaUtils.getGpuMemory(Context.gpu(0));
         }
+    }
+
+    @ObjectFactory
+    public IObjectFactory getObjectFactory() {
+        return new org.powermock.modules.testng.PowerMockObjectFactory();
     }
 }
