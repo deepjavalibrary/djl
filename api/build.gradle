@@ -6,5 +6,6 @@ dependencies {
 }
 
 javadoc {
+    title "Joule ${project.version} API"
     exclude "com/amazon/ai/util/**"
 }
