@@ -57,8 +57,10 @@ public class CachedOp extends NativeResource {
         // check the input, set as Shape(1) by default
         for (Pair<String, Integer> pair : inputNames) {
             if (inputNDArray[pair.getValue()] == null) {
-                logger.info("Input " + pair.getKey()
-                        + " not found, set NDArray to Shape(1) by default" );
+                logger.info(
+                        "Input "
+                                + pair.getKey()
+                                + " not found, set NDArray to Shape(1) by default");
                 inputNDArray[pair.getValue()] = factory.create(new DataDesc(new Shape(1)));
             }
         }

@@ -1370,9 +1370,9 @@ public final class JnaUtils {
     //////////////////////////////////
 
     /**
-     * Method to create the cached op Flags:
-     * data_indices : [0, 2, 4] Used to label input location
+     * Method to create the cached op Flags: data_indices : [0, 2, 4] Used to label input location
      * param_indices : [1, 3] Used to label param location
+     *
      * @param model model that loaded in the backend
      * @param factory NDFactory to create NDArray
      * @return CachedOp for inference
