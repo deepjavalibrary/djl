@@ -66,7 +66,7 @@ public interface NDArray extends AutoCloseable {
 
     NDArray softmax(Integer axis, Double temperature);
 
-    NDArray[] split(int numOutputs, Integer axis, Boolean squeezeAxis);
+    NDList split(int numOutputs, Integer axis, Boolean squeezeAxis);
 
     boolean isSparse();
 

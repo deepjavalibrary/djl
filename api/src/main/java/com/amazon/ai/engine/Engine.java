@@ -17,6 +17,7 @@ import com.amazon.ai.Model;
 import com.amazon.ai.Profiler;
 import com.amazon.ai.Translator;
 import com.amazon.ai.inference.Predictor;
+import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
 import java.io.File;
 import java.io.IOException;
@@ -115,6 +116,13 @@ public abstract class Engine {
      */
     public abstract <I, O> Predictor<I, O> newPredictor(
             Model model, Translator<I, O> translator, Context context);
+
+    /**
+     * DO NOT USE THIS!
+     *
+     * @return The index of Neural Network operators to create a Block
+     */
+    public abstract NNIndex getNNIndex();
 
     /**
      * DO NOT USE THIS! use Trainer.newInstance() instead Load the model and create a Trainer to

@@ -18,6 +18,7 @@ import com.amazon.ai.Profiler;
 import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.inference.Predictor;
+import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +28,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
+import org.apache.mxnet.nn.MxNNIndex;
 
 public class MxEngine extends Engine {
+
+    public static final NNIndex NN_INDEX = new MxNNIndex();
 
     MxEngine() {}
 
@@ -96,6 +100,11 @@ public class MxEngine extends Engine {
     }
 
     /** {@inheritDoc} */
+    @Override
+    public NNIndex getNNIndex() {
+        return NN_INDEX;
+    }
+
     @Override
     public <I, O> Predictor<I, O> newPredictor(
             Model model, Translator<I, O> translator, Context context) {

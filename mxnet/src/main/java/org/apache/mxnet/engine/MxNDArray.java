@@ -14,6 +14,7 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Layout;
@@ -23,7 +24,6 @@ import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
 import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import org.apache.mxnet.jna.FunctionInfo;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.jna.PointerArray;
 
 public class MxNDArray extends NativeResource implements NDArray {
 
@@ -196,8 +195,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         MxNDArray array = (MxNDArray) ndArray;
 
-        PointerByReference ref = new PointerByReference(new PointerArray(array.getHandle()));
-        functionInfo.invoke(getHandle(), ref, null);
+        functionInfo.invoke(factory, array, new NDList(array), null);
     }
 
     /** {@inheritDoc} */
@@ -231,22 +229,18 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray argsort(int axis, boolean isAscend) {
+    public NDArray argsort(int axis, boolean isAscend) {
         PairList<String, String> params = new PairList<>();
         params.add("axis", String.valueOf(axis));
         params.add("is_ascend", isAscend ? "True" : "False");
 
-        PointerByReference ref = new PointerByReference();
-
         FunctionInfo functionInfo = OPS.get("argsort");
-        functionInfo.invoke(getHandle(), ref, params);
-
-        return factory.create(ref.getValue().getPointerArray(0, 1)[0]);
+        return functionInfo.invoke(factory, this, params).get(0);
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray softmax(Integer axis, Double temperature) {
+    public NDArray softmax(Integer axis, Double temperature) {
         PairList<String, String> params = new PairList<>();
         if (axis != null) {
             params.add("axis", String.valueOf(axis));
@@ -255,17 +249,13 @@ public class MxNDArray extends NativeResource implements NDArray {
             params.add("temperature", String.valueOf(temperature));
         }
 
-        PointerByReference ref = new PointerByReference();
-
         FunctionInfo functionInfo = OPS.get("softmax");
-        functionInfo.invoke(getHandle(), ref, params);
-
-        return factory.create(ref.getValue().getPointerArray(0, 1)[0]);
+        return functionInfo.invoke(factory, this, params).get(0);
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray[] split(int numOutputs, Integer axis, Boolean squeezeAxis) {
+    public NDList split(int numOutputs, Integer axis, Boolean squeezeAxis) {
         PairList<String, String> params = new PairList<>();
         params.add("num_outputs", String.valueOf(numOutputs));
         if (axis != null) {
@@ -275,16 +265,8 @@ public class MxNDArray extends NativeResource implements NDArray {
             params.add("squeeze_axis", String.valueOf(squeezeAxis));
         }
 
-        PointerByReference ref = new PointerByReference();
-
         FunctionInfo functionInfo = OPS.get("split");
-        functionInfo.invoke(getHandle(), ref, params);
-        Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
-        MxNDArray[] output = new MxNDArray[numOutputs];
-        for (int i = 0; i < numOutputs; i++) {
-            output[i] = factory.create(ptrArray[i]);
-        }
-        return output;
+        return functionInfo.invoke(factory, this, params);
     }
 
     /** {@inheritDoc} */

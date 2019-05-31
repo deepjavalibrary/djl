@@ -357,12 +357,11 @@ public final class JnaUtils {
         checkCall(LIB.MXNDArraySyncCopyFromCPU(ndArray, pointer, size));
     }
 
-    public static void imperativeInvoke(
+    public static int imperativeInvoke(
             Pointer function,
-            Pointer src,
+            PointerArray inputs,
             PointerByReference destRef,
             PairList<String, String> params) {
-        PointerByReference inputs = new PointerByReference(src);
         String[] keys;
         String[] values;
         if (params == null) {
@@ -372,12 +371,20 @@ public final class JnaUtils {
             keys = params.keyArray(EMPTY_ARRAY);
             values = params.valueArray(EMPTY_ARRAY);
         }
-        IntBuffer size = IntBuffer.allocate(1);
-        size.put(0, 1);
+        IntBuffer numOutputs = IntBuffer.allocate(1);
+        numOutputs.put(0, 1);
 
         checkCall(
                 LIB.MXImperativeInvoke(
-                        function, 1, inputs, size, destRef, keys.length, keys, values));
+                        function,
+                        inputs.numElements(),
+                        inputs,
+                        numOutputs,
+                        destRef,
+                        keys.length,
+                        keys,
+                        values));
+        return numOutputs.get(0);
     }
 
     public static SparseFormat getStorageType(Pointer ndArray) {

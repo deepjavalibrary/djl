@@ -18,11 +18,36 @@ import com.sun.jna.Pointer;
 
 public class PointerArray extends Memory {
 
+    private int length;
+
     public PointerArray(Pointer... arg) {
         super(Native.POINTER_SIZE * (arg.length + 1));
+        length = arg.length;
         for (int i = 0; i < arg.length; i++) {
             setPointer(i * Native.POINTER_SIZE, arg[i]);
         }
         setPointer(Native.POINTER_SIZE * arg.length, null);
+    }
+
+    public int numElements() {
+        return length;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        return (o instanceof Pointer)
+                && (((PointerArray) o).numElements() == numElements())
+                && super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() ^ this.numElements();
     }
 }

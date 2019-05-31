@@ -13,21 +13,25 @@
 package com.amazon.ai;
 
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.Shape;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public interface Block {
 
-    void forward();
+    default NDList forward(NDList inputs) {
+        return forward(inputs, Collections.emptyMap());
+    }
+
+    NDList forward(NDList inputs, Map<String, String> args);
 
     void backward();
 
     Shape getInputShape();
 
-    Shape getOutputShape();
-
-    void setInput(NDArray array);
-
-    NDArray getOutput();
+    List<NDArray> getParameters();
 
     byte[] getEncoded();
 }
