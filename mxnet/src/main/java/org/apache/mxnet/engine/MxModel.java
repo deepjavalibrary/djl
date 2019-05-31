@@ -57,8 +57,7 @@ public class MxModel implements Model, AutoCloseable {
         return loadModel(MxNDFactory.SYSTEM_FACTORY, prefix, epoch);
     }
 
-    static MxModel loadModel(MxNDFactory factory, String prefix, int epoch)
-            throws IOException {
+    static MxModel loadModel(MxNDFactory factory, String prefix, int epoch) throws IOException {
         Symbol symbol = Symbol.load(factory, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
         String stateFile = String.format("%s-%04d.states", prefix, epoch);

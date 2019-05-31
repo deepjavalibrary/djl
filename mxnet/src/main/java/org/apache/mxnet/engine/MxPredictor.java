@@ -26,17 +26,17 @@ import org.apache.mxnet.jna.JnaUtils;
 public class MxPredictor<I, O> implements Predictor<I, O> {
 
     MxModel model;
-    private Translator<I, O> transformer;
+    private Translator<I, O> translator;
     Context context;
     private CachedOp cachedOp;
     MxNDFactory factory;
     Metrics metrics;
     private long timestamp;
 
-    MxPredictor(MxModel model, Translator<I, O> transformer, Context context) {
+    MxPredictor(MxModel model, Translator<I, O> translator, Context context) {
         this.factory = MxNDFactory.SYSTEM_FACTORY.newSubFactory(context);
         this.model = model;
-        this.transformer = transformer;
+        this.translator = translator;
         this.context = context;
         cachedOp = JnaUtils.createCachedOp(model, factory);
         metrics = new Metrics();
@@ -49,13 +49,13 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
         try (PredictorContext inputCtx = new PredictorContext();
                 PredictorContext outputCtx = new PredictorContext()) {
-            NDList ndList = transformer.processInput(inputCtx, input);
+            NDList ndList = translator.processInput(inputCtx, input);
             preprocessEnd();
 
             NDList result = forward(ndList);
             forwardEnd(result);
 
-            return transformer.processOutput(outputCtx, result);
+            return translator.processOutput(outputCtx, result);
         } finally {
             postProcessEnd();
         }

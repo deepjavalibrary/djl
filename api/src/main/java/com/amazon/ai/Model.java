@@ -27,7 +27,7 @@ public interface Model {
     static Model loadModel(String modelPath, int epoch) throws IOException {
         File file = new File(modelPath);
         String modelName = file.getName();
-        return loadModel(file, modelName, -1);
+        return loadModel(file, modelName, epoch);
     }
 
     static Model loadModel(File modelPath) throws IOException {

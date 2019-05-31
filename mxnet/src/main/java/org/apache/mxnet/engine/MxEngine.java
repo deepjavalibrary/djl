@@ -34,6 +34,12 @@ public class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public String getEngineName() {
+        return "MXNet";
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public int getGpuCount() {
         return JnaUtils.getGpuCount();
     }
@@ -92,8 +98,8 @@ public class MxEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(
-            Model model, Translator<I, O> transformer, Context context) {
-        return new MxPredictor<>((MxModel) model, transformer, context);
+            Model model, Translator<I, O> translator, Context context) {
+        return new MxPredictor<>((MxModel) model, translator, context);
     }
 
     /** {@inheritDoc} */
