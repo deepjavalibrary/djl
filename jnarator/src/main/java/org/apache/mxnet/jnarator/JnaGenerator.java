@@ -57,6 +57,7 @@ public class JnaGenerator {
         className = AntlrUtils.toCamelCase(libName) + "Library";
     }
 
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     public void writeStructure(Map<String, List<TypeDefine>> structMap) throws IOException {
         for (Map.Entry<String, List<TypeDefine>> entry : structMap.entrySet()) {
             String name = entry.getKey();

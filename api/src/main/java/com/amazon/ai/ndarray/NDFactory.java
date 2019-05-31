@@ -41,5 +41,6 @@ public interface NDFactory extends AutoCloseable {
 
     void detach(AutoCloseable resource);
 
+    @Override
     void close();
 }

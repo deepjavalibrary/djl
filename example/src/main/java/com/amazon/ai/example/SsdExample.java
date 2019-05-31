@@ -45,6 +45,7 @@ public final class SsdExample extends AbstractExample {
         new SsdExample().runExample(args);
     }
 
+    @Override
     public void predict(File modelDir, String modelName, BufferedImage img, int iteration)
             throws IOException {
         Model model = Model.loadModel(modelDir, modelName);

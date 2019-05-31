@@ -30,8 +30,6 @@ public abstract class AbstractExample {
 
     private static final Logger logger = LogUtils.getLogger(AbstractExample.class);
 
-    public AbstractExample() {}
-
     public void runExample(String[] args) {
         Options options = Arguments.getOptions();
         try {

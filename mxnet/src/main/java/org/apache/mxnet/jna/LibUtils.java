@@ -16,7 +16,6 @@ import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +23,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +66,7 @@ public class LibUtils {
             return null;
         }
 
-        File tmp = null;
+        Path tmp = null;
         try (InputStream conf = url.openStream()) {
             Properties prop = new Properties();
             prop.load(conf);
@@ -80,16 +81,16 @@ public class LibUtils {
             if (path.exists()) {
                 return path.getAbsolutePath();
             }
-            tmp = new File(userHome, ".mxnet/cache/tmp");
-            Files.createDirectories(tmp.toPath());
+            tmp = Paths.get(userHome, ".mxnet/cache/tmp");
+            Files.createDirectories(tmp);
             for (String file : files) {
                 String libPath = "/native/lib/" + file;
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath);
-                        OutputStream os = new FileOutputStream(new File(tmp, file))) {
+                        OutputStream os = Files.newOutputStream(tmp.resolve(file))) {
                     IOUtils.copy(is, os);
                 }
             }
-            Files.move(tmp.toPath(), dir.toPath());
+            Files.move(tmp, dir.toPath());
             tmp = null;
             return path.getAbsolutePath();
         } catch (IOException e) {
@@ -97,7 +98,7 @@ public class LibUtils {
             return null;
         } finally {
             if (tmp != null) {
-                FileUtils.deleteQuietly(tmp);
+                FileUtils.deleteQuietly(tmp.toFile());
             }
         }
     }

@@ -97,6 +97,8 @@ public class MxNDArray extends NativeResource implements NDArray {
         factory.attach(this);
     }
 
+    /** {@inheritDoc} */
+    @Override
     public DataType getDataType() {
         if (dataType == null) {
             dataType = JnaUtils.getDataType(getHandle());
@@ -104,6 +106,8 @@ public class MxNDArray extends NativeResource implements NDArray {
         return dataType;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public Context getContext() {
         if (context == null) {
             context = JnaUtils.getContext(getHandle());
@@ -111,6 +115,8 @@ public class MxNDArray extends NativeResource implements NDArray {
         return context;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public Shape getShape() {
         if (shape == null) {
             shape = JnaUtils.getShape(getHandle());
@@ -1036,6 +1042,8 @@ public class MxNDArray extends NativeResource implements NDArray {
         return func;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public float[] toFloatArray() {
         FloatBuffer fb = toByteBuffer().asFloatBuffer();
         float[] ret = new float[fb.remaining()];

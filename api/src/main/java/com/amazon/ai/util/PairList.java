@@ -13,11 +13,11 @@
 package com.amazon.ai.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PairList<K, V> implements Iterable<Pair<K, V>> {
 
@@ -131,7 +131,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
 
     public Map<K, V> toMap(boolean checkDuplicate) {
         int size = keys.size();
-        Map<K, V> map = new HashMap<>(size * 3 / 2);
+        Map<K, V> map = new ConcurrentHashMap<>(size * 3 / 2);
         for (int i = 0; i < size; ++i) {
             if (map.put(keys.get(i), values.get(i)) != null && checkDuplicate) {
                 throw new IllegalStateException("Duplicate keys: " + keys.get(i));
@@ -146,10 +146,12 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
 
         Itr() {}
 
+        @Override
         public boolean hasNext() {
             return cursor < size();
         }
 
+        @Override
         public Pair<K, V> next() {
             if (cursor >= size()) {
                 throw new NoSuchElementException();

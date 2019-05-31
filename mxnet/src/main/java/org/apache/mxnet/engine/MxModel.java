@@ -23,10 +23,10 @@ import com.sun.jna.ptr.PointerByReference;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,7 +182,7 @@ public class MxModel implements Model, AutoCloseable {
     public DataDesc[] describeInput() {
         if (inputData == null) {
             String[] allNames = symbol.getAllNames();
-            Map<String, Integer> map = new HashMap<>(allNames.length * 3 / 2);
+            Map<String, Integer> map = new ConcurrentHashMap<>(allNames.length * 3 / 2);
             int index = 0;
             for (String name : allNames) {
                 map.put(name, index++);

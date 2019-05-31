@@ -13,8 +13,9 @@
 package org.apache.mxnet.jnarator;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -59,7 +60,7 @@ public final class Main {
                     logger.error("mapping file does not exists: " + mappingFile);
                     System.exit(-1); // NOPMD
                 }
-                try (InputStream in = new FileInputStream(mappingFile)) {
+                try (InputStream in = Files.newInputStream(Paths.get(mappingFile))) {
                     mapping.load(in);
                 }
             }

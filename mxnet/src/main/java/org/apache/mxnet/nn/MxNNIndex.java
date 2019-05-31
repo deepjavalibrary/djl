@@ -6,6 +6,9 @@ import com.amazon.ai.nn.core.Linear;
 import org.apache.mxnet.nn.core.MxLinear;
 
 public class MxNNIndex extends NNIndex {
+
+    /** {@inheritDoc} */
+    @Override
     public Linear linear(int units, int inUnits, NDFactory factory) {
         return new MxLinear(units, inUnits, factory);
     }

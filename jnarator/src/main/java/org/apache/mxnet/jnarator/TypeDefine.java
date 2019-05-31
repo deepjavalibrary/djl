@@ -23,8 +23,6 @@ public class TypeDefine {
     private String value;
     private List<Parameter> parameters = new ArrayList<>();
 
-    public TypeDefine() {}
-
     public DataType getDataType() {
         return dataType;
     }
