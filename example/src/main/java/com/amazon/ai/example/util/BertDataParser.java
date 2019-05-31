@@ -30,9 +30,10 @@ public class BertDataParser {
     private List<String> idx2token;
 
     /**
-     * Parse the Vocabulary to JSON files [PAD], [CLS], [SEP], [MASK], [UNK] are reserved tokens
+     * Parse the Vocabulary to JSON files [PAD], [CLS], [SEP], [MASK], [UNK] are reserved tokens.
      *
      * @param jsonFile the file of the vocab.json
+     * @return instance of <code>BertDataParser</code>
      * @throws IOException if failed read from file
      */
     public static BertDataParser parse(File jsonFile) throws IOException {
@@ -64,8 +65,9 @@ public class BertDataParser {
     }
 
     /**
-     * Pad the tokens to the required length
+     * Pad the tokens to the required length.
      *
+     * @param <E> the type of the List
      * @param tokens input tokens
      * @param padItem things to pad at the end
      * @param num total length after padding
