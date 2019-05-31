@@ -57,7 +57,8 @@ public class CachedOp extends NativeResource {
         // check the input, set as Shape(1) by default
         for (Pair<String, Integer> pair : inputNames) {
             if (inputNDArray[pair.getValue()] == null) {
-                logger.info(
+                // TODO: Do we need to set default to the input?
+                logger.warn(
                         "Input "
                                 + pair.getKey()
                                 + " not found, set NDArray to Shape(1) by default");

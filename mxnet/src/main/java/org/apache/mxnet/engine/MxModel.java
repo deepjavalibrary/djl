@@ -16,6 +16,7 @@ import com.amazon.ai.Model;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
+import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
@@ -94,7 +95,15 @@ public class MxModel implements Model, AutoCloseable {
     /** {@inheritDoc} */
     @Override
     public Model cast(DataType dataType) {
-        return null;
+        if (parameters.get(0).getValue().getDataType() == dataType) {
+            logger.info("You are casting the model to its original type!");
+            return this;
+        }
+        PairList<String, MxNDArray> newParam = new PairList<>();
+        for (Pair<String, MxNDArray> pair : parameters) {
+            newParam.add(pair.getKey(), pair.getValue().asType(dataType, true));
+        }
+        return new MxModel(symbol, newParam, synset, optimizerStates);
     }
 
     public String[] getOptimizerStates() {

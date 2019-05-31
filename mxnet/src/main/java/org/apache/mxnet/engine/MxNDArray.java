@@ -217,6 +217,17 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public MxNDArray asType(DataType dtype, boolean copy) {
+        if (dtype.equals(getDataType()) && !copy) {
+            return this;
+        }
+        MxNDArray nd = new MxNDArray(factory, getContext(), getShape(), dtype, false);
+        copyTo(nd);
+        return nd;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void waitToRead() {
         JnaUtils.waitToRead(getHandle());
     }
