@@ -1,17 +1,17 @@
-apply plugin: 'findbugs'
-findbugs {
+apply plugin: "com.github.spotbugs"
+spotbugs {
     excludeFilter = file("${rootProject.projectDir}/tools/conf/findbugs-exclude.xml")
     ignoreFailures = false
-    findbugsTest.enabled = true
+    spotbugsTest.enabled = true
 }
-tasks.withType(FindBugs) {
+tasks.withType(SpotBugsTask) {
     reports {
         xml.enabled false
         html.enabled true
     }
 }
 
-apply plugin: 'pmd'
+apply plugin: "pmd"
 pmd {
     ignoreFailures = false
     pmdTest.enabled = false
@@ -25,9 +25,9 @@ tasks.withType(Pmd){
     }
 }
 
-apply plugin: 'checkstyle'
+apply plugin: "checkstyle"
 checkstyle {
-    toolVersion = '7.1.2'
+    toolVersion = "7.1.2"
     ignoreFailures = false
     checkstyleTest.enabled = true
     configProperties = [ "checkstyle.suppressions.file" : file("${rootProject.projectDir}/tools/conf/suppressions.xml")]
