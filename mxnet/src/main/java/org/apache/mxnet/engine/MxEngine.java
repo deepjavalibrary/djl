@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -90,7 +91,7 @@ public class MxEngine extends Engine {
                                         }
                                         return null;
                                     })
-                            .filter(e -> e != null)
+                            .filter(Objects::nonNull)
                             .sorted()
                             .collect(Collectors.toList());
             epoch = checkpoints.get(checkpoints.size() - 1);

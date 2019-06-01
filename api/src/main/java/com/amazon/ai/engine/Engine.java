@@ -111,7 +111,7 @@ public abstract class Engine {
      * @param translator preprocessing and postprocessing helper class
      * @param context context to work on inference
      * @param <I> Input Object for the Predictor
-     * @param <O> Output Object for the Predicor
+     * @param <O> Output Object for the Predictor
      * @return Predictor
      */
     public abstract <I, O> Predictor<I, O> newPredictor(

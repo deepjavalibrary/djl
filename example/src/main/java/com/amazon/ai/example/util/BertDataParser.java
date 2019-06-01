@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
  * This is the Utility for pre-processing the data for Bert Model You can use this utility to parse
  * Vocabulary JSON into Java Array and Dictionary, clean and tokenize sentences and pad the text
  */
+@SuppressWarnings("unused")
 public class BertDataParser {
 
     private static final Gson GSON = new GsonBuilder().create();

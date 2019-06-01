@@ -59,7 +59,7 @@ interface NDFactory {
 interface NDArray {
     +byte[] getEncoded()
     +void encode(OutputStream os) throws IOException
-    +DataDesc getDataDescriptore()
+    +DataDesc getDataDescriptor()
     +void set(Buffer data)
     +NDArray at(int index)
 	.. other storage methods ..
