@@ -12,7 +12,22 @@
  */
 package com.amazon.ai.engine;
 
+/**
+ * <code>EngineProvider</code> instance manufacture {@link Engine} instance which available in the
+ * system.
+ *
+ * <p>At the initialization time, {@link java.util.ServiceLoader} will search <code>EngineProvider
+ * </code> implementations that available in class path.
+ *
+ * <p>Currently, we only allows one EngineProvider implementation to be loaded at time. For example,
+ * We don't support co-exist of MXNet and Tensorflow providers in the same application.
+ */
 public interface EngineProvider {
 
+    /**
+     * Return the instance of {@link Engine} class that it should bind to.
+     *
+     * @return the instance of {@link Engine}
+     */
     Engine getEngine();
 }

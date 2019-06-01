@@ -81,7 +81,6 @@ public interface Model {
     static Model loadModel(File modelPath, String modelName, int epoch) throws IOException {
         return Engine.getInstance().loadModel(modelPath, modelName, epoch);
     }
-
     /**
      * Get the input descriptor of the model It contains the information that can be extracted from
      * the model, usually name, shape, layout and DataType.

@@ -12,6 +12,7 @@
  */
 package com.amazon.ai.engine;
 
+/** Thrown to indicate that a native error is raised form underlying engine. */
 public class EngineException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

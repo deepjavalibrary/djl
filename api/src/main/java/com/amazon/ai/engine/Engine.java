@@ -27,6 +27,11 @@ import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The <code>Engine</code> interface shadows difference between each deep learning frameworks.
+ *
+ * <p>Any framework specific functionality should be provided through this class.
+ */
 public abstract class Engine {
 
     private static final Logger logger = LoggerFactory.getLogger(Engine.class);
@@ -54,38 +59,40 @@ public abstract class Engine {
     }
 
     /**
-     * Get the name of the Engine
+     * Get the name of the Engine.
      *
-     * @return
+     * @return name of the engine
      */
     public abstract String getEngineName();
 
     /**
-     * Get the initialized Engine
+     * Get the initialized Engine.
      *
-     * @return Engine
+     * @return instance of <code>Engine</code>
      */
     public static Engine getInstance() {
         return ENGINE;
     }
 
     /**
-     * Get the number of GPU in the system
+     * Get the number of GPU in the system.
      *
-     * @return number of GPUs
+     * @return number of GPUs available in the system
      */
     public abstract int getGpuCount();
 
     /**
-     * Default context specified by the system If GPU > 0, then default context is gpu(0) Otherwise,
-     * the context will be cpu()
+     * Returns system default context.
+     *
+     * <p>If the system has GPU available, then default context is {@link
+     * com.amazon.ai.Context#gpu()}, otherwise returns {@link Context#cpu()}
      *
      * @return default context
      */
     public abstract Context defaultContext();
 
     /**
-     * Get the version of the Deep Learning Framework
+     * Get the version of the Deep Learning Framework.
      *
      * @return version number
      */
