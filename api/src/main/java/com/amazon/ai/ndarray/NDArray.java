@@ -59,12 +59,6 @@ public interface NDArray extends AutoCloseable {
 
     NDArray asType(DataType dtype, boolean copy);
 
-    void waitToRead();
-
-    void waitToWrite();
-
-    void waitAll();
-
     NDArray argsort(int axis, boolean isAscend);
 
     NDArray softmax(Integer axis, Double temperature);

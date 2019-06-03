@@ -17,7 +17,7 @@ public class MxLinear extends MxNNBlock implements Linear {
     private NDArray weight;
     private NDArray bias;
 
-    public MxLinear(int units, int inUnits, NDFactory factory) {
+    public MxLinear(NDFactory factory, int units, int inUnits) {
         this.opName = "FullyConnected";
         this.factory = factory;
         this.weight = factory.create(new DataDesc(new Shape(units, inUnits)));

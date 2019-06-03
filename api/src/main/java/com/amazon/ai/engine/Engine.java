@@ -99,9 +99,9 @@ public abstract class Engine {
     public abstract String getVersion();
 
     /**
-     * Try to use {@link Model}.loadModel instead Load the model passed from the model
-     * class Preliminary check on the model path and name to see if the file exist. If the file
-     * exist, will handover to the corresponding Framework model loader
+     * Try to use {@link Model}.loadModel instead Load the model passed from the model class
+     * Preliminary check on the model path and name to see if the file exist. If the file exist,
+     * will handover to the corresponding Framework model loader
      *
      * @param modelPath Directory of the model
      * @param modelName Name/Prefix of the model
@@ -112,8 +112,7 @@ public abstract class Engine {
     public abstract Model loadModel(File modelPath, String modelName, int epoch) throws IOException;
 
     /**
-     * Try to use {@link Predictor}.newInstance instead. Create new predictor with
-     * specific Engine.
+     * Try to use {@link Predictor}.newInstance instead. Create new predictor with specific Engine.
      *
      * @param model the model used for inference
      * @param translator preprocessing and postprocessing helper class
@@ -133,8 +132,8 @@ public abstract class Engine {
     public abstract NNIndex getNNIndex();
 
     /**
-     * Try to use {@link Trainer}.newInstance() instead Load the model and create a
-     * Trainer to starting training process
+     * Try to use {@link Trainer}.newInstance() instead Load the model and create a Trainer to
+     * starting training process
      *
      * @param model the model created to train on
      * @param context the context of training, can be CPU/GPU

@@ -9,7 +9,7 @@ public interface Linear extends Block {
 
     NDArray forward(NDArray data);
 
-    static Linear create(int units, int inUnits, NDFactory factory) {
+    static Linear create(NDFactory factory, int units, int inUnits) {
         return Engine.getInstance().getNNIndex().linear(units, inUnits, factory);
     }
 }

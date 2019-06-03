@@ -50,6 +50,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     private DataType dataType;
     private Shape shape;
     private MxNDFactory factory;
+    private boolean isReady;
 
     MxNDArray(
             MxNDFactory factory,
@@ -64,6 +65,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         this.dataType = dataType;
         this.shape = shape;
         this.sparseFormat = sparseFormat;
+        this.isReady = false;
     }
 
     MxNDArray(MxNDFactory factory, Context context, Shape shape, DataType dataType, boolean delay) {
@@ -147,12 +149,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        if (data.remaining() != shape.product()) {
+        if (data.remaining() != getShape().product()) {
             throw new IllegalArgumentException(
                     "array size ("
                             + data.remaining()
                             + ")do not match the size of NDArray ("
-                            + shape.product());
+                            + getShape().product());
         }
         JnaUtils.syncCopyFromCPU(getHandle(), data);
     }
@@ -160,6 +162,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(List<Float> data) {
+        waitToWrite();
         int size = data.size();
         FloatBuffer output =
                 ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
@@ -227,21 +230,23 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     /** {@inheritDoc} */
-    @Override
     public void waitToRead() {
-        JnaUtils.waitToRead(getHandle());
+        if (!isReady) {
+            JnaUtils.waitToRead(getHandle());
+            isReady = true;
+        }
     }
 
-    /** {@inheritDoc} */
-    @Override
     public void waitToWrite() {
-        JnaUtils.waitToWrite(getHandle());
+        if (!isReady) {
+            JnaUtils.waitToWrite(getHandle());
+            isReady = true;
+        }
     }
 
-    /** {@inheritDoc} */
-    @Override
     public void waitAll() {
-        JnaUtils.waitAll();
+        JnaUtils.waitToRead(getHandle());
+        isReady = true;
     }
 
     /** {@inheritDoc} */

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import org.apache.mxnet.engine.CachedOp;
 import org.apache.mxnet.engine.MxModel;
+import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
@@ -53,13 +54,13 @@ public final class CachedOpExample extends AbstractExample {
             List<Long> inferenceTime = new ArrayList<>(iteration);
             long firstInfStart = System.nanoTime();
             NDList result = op.forward(new NDList(nd, sfLabel));
-            result.get(0).waitToRead();
+            ((MxNDArray) result.get(0)).waitToRead();
             long firstInfEnd = System.nanoTime();
             logger.info("First Inference: " + (firstInfEnd - firstInfStart) / 1000000f + " ms");
             for (int i = 0; i < iteration; ++i) {
                 long begin = System.nanoTime();
                 result = op.forward(new NDList(nd, sfLabel));
-                result.get(0).waitToRead();
+                ((MxNDArray) result.get(0)).waitToRead();
                 long inference = System.nanoTime();
                 inferenceTime.add(inference - begin);
                 logger.info("Time cost: " + (inference - begin) / 1000000f + " ms");

@@ -138,10 +138,4 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
     public Iterator<Pair<String, NDArray>> iterator() {
         return list.iterator();
     }
-
-    public void waitToRead() {
-        for (NDArray array : list.values()) {
-            array.waitToRead();
-        }
-    }
 }

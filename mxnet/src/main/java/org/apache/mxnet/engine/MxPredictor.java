@@ -19,8 +19,10 @@ import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.metric.Metric;
 import com.amazon.ai.metric.Metrics;
+import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.util.Pair;
 import org.apache.mxnet.jna.JnaUtils;
 
 public class MxPredictor<I, O> implements Predictor<I, O> {
@@ -83,7 +85,9 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     private void forwardEnd(NDList list) {
         if (metrics != null) {
             // JnaUtils.waitAll();
-            list.waitToRead();
+            for (Pair<String, NDArray> pair : list) {
+                ((MxNDArray) pair.getValue()).waitToRead();
+            }
             long tmp = System.nanoTime();
             long duration = tmp - timestamp;
             timestamp = tmp;
