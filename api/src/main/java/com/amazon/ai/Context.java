@@ -15,6 +15,13 @@ package com.amazon.ai;
 import com.amazon.ai.engine.Engine;
 import java.util.Objects;
 
+/**
+ * The <code>Model</code> class provides the specified assignment for CPU/GPU processing on the
+ * NDArray
+ *
+ * <p>Users can use this to specify whether to load/compute the NDArray on CPU/GPU with deviceType
+ * and deviceId provided
+ */
 public class Context {
 
     private static final Context CPU = new Context("CPU", 0);
@@ -23,6 +30,13 @@ public class Context {
     private String deviceType;
     private int deviceId;
 
+    /**
+     * Create Context with basic information
+     *
+     * @param deviceType device type user would like to use, typically CPU or GPU
+     * @param deviceId deviceId on the hardware. for example, if you have more GPUs, you can choose
+     *     which GPU to process the NDArray
+     */
     public Context(String deviceType, int deviceId) {
         this.deviceType = deviceType;
         this.deviceId = deviceId;
@@ -74,6 +88,14 @@ public class Context {
         return new Context("GPU", deviceId);
     }
 
+    /**
+     * Get the default context used in Engine
+     *
+     * <p>default type is defined by whether the Deep Learning framework is recognizing GPUs
+     * available on your machine. If there is no GPU avaiable, CPU will be used
+     *
+     * @return {@link Context}
+     */
     public static Context defaultContext() {
         return Engine.getInstance().defaultContext();
     }

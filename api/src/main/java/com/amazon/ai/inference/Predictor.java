@@ -18,6 +18,11 @@ import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.metric.Metrics;
 
+/**
+ * The <code>Predictor</code> interface provides model inference functionality.
+ *
+ * <p>Users can use this to do inference with {@link Model} with {@link Translator} specified
+ */
 public interface Predictor<I, O> extends AutoCloseable {
 
     /**

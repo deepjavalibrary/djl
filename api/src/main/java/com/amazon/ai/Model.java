@@ -18,10 +18,18 @@ import com.amazon.ai.ndarray.types.DataType;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * The <code>Model</code> interface provides model loading functionality.
+ *
+ * <p>Users can use this to load the model and apply it for {@link com.amazon.ai.training.Trainer}
+ * and {@link com.amazon.ai.inference.Predictor} for Training and Inference jobs.
+ */
 public interface Model {
 
     /**
-     * Load model from a String, e.g: ./res-152. Please provide the model name/prefix
+     * Load model from a String, e.g: ./res-152.
+     *
+     * <p>Please provide the model name/prefix
      *
      * @param modelPath Path to the model, include the model name
      * @return {@link Model} object
@@ -32,8 +40,9 @@ public interface Model {
     }
 
     /**
-     * Load the model from a String with epoch provided, e.g ./res-152 2. It will try to find the
-     * model like res-152-0002.param
+     * Load the model from a String with epoch provided, e.g ./res-152 2.
+     *
+     * <p>It will try to find the model like res-152-0002.param
      *
      * @param modelPath Path to the model, include the model name
      * @param epoch number of epoch of the model
@@ -82,16 +91,19 @@ public interface Model {
         return Engine.getInstance().loadModel(modelPath, modelName, epoch);
     }
     /**
-     * Get the input descriptor of the model. It contains the information that can be extracted from
-     * the model, usually name, shape, layout and DataType.
+     * Get the input descriptor of the model.
+     *
+     * <p>It contains the information that can be extracted from the model, usually name, shape,
+     * layout and DataType.
      *
      * @return Array of {@link DataDesc}
      */
     DataDesc[] describeInput();
 
     /**
-     * Get the output descriptor of the model. It contains the output information that can be
-     * obtained from the model
+     * Get the output descriptor of the model.
+     *
+     * <p>It contains the output information that can be obtained from the model
      *
      * @return Array of {@link DataDesc}
      */
@@ -100,8 +112,9 @@ public interface Model {
     String[] getSynset();
 
     /**
-     * Cast the model to support different precision level. For example, you can cast the precision
-     * from Float to Int
+     * Cast the model to support different precision level.
+     *
+     * <p>For example, you can cast the precision from Float to Int
      *
      * @param dataType the target dataType you would like to cast to
      * @return A model with the down casting parameters

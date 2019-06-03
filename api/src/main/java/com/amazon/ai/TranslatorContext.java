@@ -15,14 +15,40 @@ package com.amazon.ai;
 import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDFactory;
 
+/**
+ * The <code>TranslatorContext</code> interface provides toolkit for preprocessing and post
+ * postprocessing functionality.
+ *
+ * <p>Users can use this in {@link Translator} to get Model information and create NDArray
+ */
 public interface TranslatorContext extends AutoCloseable {
 
+    /**
+     * Get the {@link Model} to understand the input/output
+     *
+     * @return {@link Model}
+     */
     Model getModel();
 
+    /**
+     * Get the context information (CPU/GPU)
+     *
+     * @return {@link Context}
+     */
     Context getContext();
 
+    /**
+     * Get the NDFactory to create NDArray
+     *
+     * @return {@link NDFactory}
+     */
     NDFactory getNDFactory();
 
+    /**
+     * Get the Metric tool to do benchmark
+     *
+     * @return {@link Metrics}
+     */
     Metrics getMetrics();
 
     @Override

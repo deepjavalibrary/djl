@@ -99,8 +99,9 @@ public abstract class Engine {
     public abstract String getVersion();
 
     /**
-     * Try to use {@link Model}.loadModel instead Load the model passed from the model class
-     * Preliminary check on the model path and name to see if the file exist. If the file exist,
+     * Try to use {@link Model}.loadModel instead. Load the model passed from the model class.
+     *
+     * <p>Preliminary check on the model path and name to see if the file exist. If the file exist,
      * will handover to the corresponding Framework model loader
      *
      * @param modelPath Directory of the model
