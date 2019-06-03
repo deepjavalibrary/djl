@@ -1380,21 +1380,6 @@ public interface NDArray extends AutoCloseable {
     Number stdNumber(boolean biasCorrected);
 
     /**
-     * Returns the product along a given dimension
-     *
-     * @param dimension the dimension to getScalar the product along
-     * @return the product along the specified dimension
-     */
-    NDArray prod(int... dimension);
-
-    /**
-     * Calculate the product of all values in the array
-     *
-     * @return Product of all values in the array
-     */
-    Number prodNumber();
-
-    /**
      * Returns the overall mean of this NDArray
      *
      * @param dimension the dimension to getScalar the mean along
@@ -1677,22 +1662,6 @@ public interface NDArray extends AutoCloseable {
     long slices();
 
     /**
-     * Get the number of trailing ones in the array shape. For example, a rank 3 array with shape
-     * [10, 1, 1] would return 2 for this method
-     *
-     * @return Number of trailing ones in shape
-     */
-    int getTrailingOnes();
-
-    /**
-     * Get the number of leading ones in the array shape. For example, a rank 3 array with shape [1,
-     * 10, 1] would return value 1 for this method
-     *
-     * @return Number of leading ones in shape
-     */
-    int getLeadingOnes();
-
-    /**
      * Returns the specified slice of this NDArray
      *
      * @param i the index of the slice to return
@@ -1846,83 +1815,6 @@ public interface NDArray extends AutoCloseable {
     NDArray getRow(long i);
 
     /**
-     * Returns the number of columns in this matrix (throws exception if not 2d)
-     *
-     * @return the number of columns in this matrix
-     */
-    int columns();
-
-    /**
-     * Returns the number of rows in this matrix (throws exception if not 2d)
-     *
-     * @return the number of rows in this matrix
-     */
-    int rows();
-
-    /**
-     * Returns true if the number of columns is 1
-     *
-     * @return true if the number of columns is 1
-     */
-    boolean isColumnVector();
-
-    /**
-     * Returns true if the number of rows is 1
-     *
-     * @return true if the number of rows is 1
-     */
-    boolean isRowVector();
-
-    /**
-     * Returns true if the number of columns is 1
-     *
-     * @return true if the number of columns is 1
-     */
-    boolean isColumnVectorOrScalar();
-
-    /**
-     * Returns true if the number of rows is 1
-     *
-     * @return true if the number of rows is 1
-     */
-    boolean isRowVectorOrScalar();
-
-    /**
-     * Returns true if this NDArray is a vector
-     *
-     * @return whether this NDArray is a vector
-     */
-    boolean isVector();
-
-    /**
-     * Returns true if this NDArray is a vector or scalar
-     *
-     * @return whether this NDArray is a vector or scalar
-     */
-    boolean isVectorOrScalar();
-
-    /**
-     * Returns whether the matrix has the same rows and columns
-     *
-     * @return true if the matrix has the same rows and columns false otherwise
-     */
-    boolean isSquare();
-
-    /**
-     * Returns true if this NDArray is a matrix
-     *
-     * @return whether this NDArray is a matrix
-     */
-    boolean isMatrix();
-
-    /**
-     * Returns true if this NDArray is a scalar
-     *
-     * @return whether this NDArray is a scalar
-     */
-    boolean isScalar();
-
-    /**
      * Returns the stride of this NDArray
      *
      * @return the stride of this NDArray
@@ -1942,7 +1834,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return the number of elements in the NDArray
      */
-    long length();
+    long size();
 
     /**
      * Broadcasts this NDArray to be the specified shape

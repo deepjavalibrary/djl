@@ -37,13 +37,34 @@ public class Shape {
     }
 
     /**
-     * Returns size of specific dimensions {@code x}.
+     * Returns size of a specific dimension or several specific dimensions.
      *
-     * @param x dimension
-     * @return size of specific dimensions {@code x}
+     * @param dimensions The dimension or dimensions to find the size of
+     * @return size of specific dimension(s)
+     * @throws IllegalArgumentException thrown if passed an invalid dimension
      */
-    public int get(int x) {
-        return shape[x];
+    public int size(int... dimensions) {
+        int total = 1;
+        for (int d : dimensions) {
+            if (d < 0 || d >= shape.length) {
+                throw new IllegalArgumentException("Invalid dimension " + d);
+            }
+            total *= d;
+        }
+        return total;
+    }
+
+    /**
+     * Returns the total size .
+     *
+     * @return total size
+     */
+    public int size() {
+        int total = 1;
+        for (int v : shape) {
+            total *= v;
+        }
+        return total;
     }
 
     /**
@@ -66,14 +87,6 @@ public class Shape {
         return new Shape(out);
     }
 
-    public int product() {
-        int total = 1;
-        for (int v : shape) {
-            total *= v;
-        }
-        return total;
-    }
-
     public int head() {
         return shape[0];
     }
@@ -91,5 +104,117 @@ public class Shape {
         }
         sb.append(')');
         return sb.toString();
+    }
+
+    /**
+     * Returns the number of trailing ones in the array shape.
+     *
+     * <p>For example, a rank 3 array with shape [10, 1, 1] would return 2 for this method
+     *
+     * @return Number of trailing ones in shape
+     */
+    public int getTrailingOnes() {
+        for (int i = 0; i < shape.length; i++) {
+            if (shape[shape.length - i - 1] != 1) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the number of leading ones in the array shape.
+     *
+     * <p>For example, a rank 3 array with shape [1, 10, 1] would return value 1 for this method
+     *
+     * @return Number of leading ones in shape
+     */
+    public int getLeadingOnes() {
+        for (int i = 0; i < shape.length; i++) {
+            if (shape[i] != 1) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the number of columns in the matrix.
+     *
+     * @return the number of columns in the matrix
+     * @throws IllegalStateException Thrown if not a 2D matrix
+     */
+    public int columns() {
+        if (!isMatrix()) {
+            throw new IllegalStateException("Not a Matrix");
+        }
+        return shape[1];
+    }
+
+    /**
+     * Returns the number of rows in the matrix.
+     *
+     * @return the number of rows in the matrix
+     * @throws IllegalStateException Thrown if not a 2D matrix
+     */
+    public int rows() {
+        if (!isMatrix()) {
+            throw new IllegalStateException("Not a Matrix");
+        }
+        return shape[0];
+    }
+
+    /**
+     * Returns true matrix and the number of columns is 1.
+     *
+     * @return true if matrix and the number of columns is 1
+     */
+    public boolean isColumnVector() {
+        return isMatrix() && columns() == 1 && size() > 1;
+    }
+
+    /**
+     * Returns true if matrix and the number of rows is 1.
+     *
+     * @return true if matrix and the number of rows is 1
+     */
+    public boolean isRowVector() {
+        return isMatrix() && rows() == 1 && size() > 1;
+    }
+
+    /**
+     * Returns true if this NDArray is a vector matrix.
+     *
+     * @return whether this NDArray is a vector matrix
+     */
+    public boolean isVectorMatrix() {
+        return isColumnVector() || isRowVector();
+    }
+
+    /**
+     * Returns whether the matrix has the same rows and columns.
+     *
+     * @return true if the matrix has the same rows and columns false otherwise
+     */
+    public boolean isSquare() {
+        return isMatrix() && columns() == rows();
+    }
+
+    /**
+     * Returns true if the NDArray is a matrix.
+     *
+     * @return whether the NDArray is a matrix
+     */
+    public boolean isMatrix() {
+        return dimension() == 2;
+    }
+
+    /**
+     * Returns true if the NDArray is a scalar.
+     *
+     * @return whether the NDArray is a scalar
+     */
+    public boolean isScalar() {
+        return dimension() == 0;
     }
 }

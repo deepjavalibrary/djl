@@ -159,12 +159,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        if (data.remaining() != getShape().product()) {
+        if (data.remaining() != getShape().size()) {
             throw new IllegalArgumentException(
                     "array size ("
                             + data.remaining()
                             + ")do not match the size of NDArray ("
-                            + getShape().product());
+                            + getShape().size());
         }
         JnaUtils.syncCopyFromCPU(getHandle(), data);
     }
@@ -1283,18 +1283,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray prod(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number prodNumber() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray mean(int... dimension) {
         return null;
     }
@@ -1535,18 +1523,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public int getTrailingOnes() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int getLeadingOnes() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray slice(long i, int dimension) {
         return null;
     }
@@ -1656,72 +1632,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public int columns() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int rows() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isColumnVector() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isRowVector() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isColumnVectorOrScalar() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isRowVectorOrScalar() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isVector() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isVectorOrScalar() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isSquare() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isMatrix() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isScalar() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public long[] stride() {
         return new long[0];
     }
@@ -1729,13 +1639,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public long size(int dimension) {
-        return 0;
+        return shape.size(dimension);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public long length() {
-        return 0;
+    public long size() {
+        return shape.size();
     }
 
     /** {@inheritDoc} */
@@ -1994,7 +1903,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     private ByteBuffer toByteBuffer() {
         Shape sh = getShape();
         DataType dType = getDataType();
-        int product = sh.product();
+        int product = sh.size();
         int len = dType.getNumOfBytes() * product;
         ByteBuffer bb = ByteBuffer.allocateDirect(len);
         Pointer pointer = Native.getDirectBufferPointer(bb);
