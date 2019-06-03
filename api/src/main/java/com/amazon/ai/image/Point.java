@@ -12,20 +12,40 @@
  */
 package com.amazon.ai.image;
 
+/**
+ * A point representing a location in {@code (x,y)} coordinate space, specified in double precision.
+ */
 public class Point {
 
     private double x;
     private double y;
 
+    /**
+     * Constructs and initializes a point at the specified {@code (x,y)} location in the coordinate
+     * space.
+     *
+     * @param x the X coordinate of the newly constructed <code>Point</code>
+     * @param y the Y coordinate of the newly constructed <code>Point</code>
+     */
     public Point(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Returns the X coordinate of this <code>Point</code> in <code>double</code> precision.
+     *
+     * @return the X coordinate of this <code>Point</code>.
+     */
     public double getX() {
         return x;
     }
 
+    /**
+     * Returns the Y coordinate of this <code>Point</code> in <code>double</code> precision.
+     *
+     * @return the Y coordinate of this <code>Point</code>.
+     */
     public double getY() {
         return y;
     }

@@ -12,6 +12,14 @@
  */
 package com.amazon.ai.image;
 
+/**
+ * The <code>PathIterator</code> interface provides the mechanism for objects that implement the
+ * {@link com.amazon.ai.image.BoundingBox BoundingBox} interface to return the geometry of their
+ * boundary by allowing a caller to retrieve the path of that boundary a segment at a time.
+ *
+ * @see com.amazon.ai.image.Rectangle
+ * @see com.amazon.ai.image.BoundingBox
+ */
 public interface PathIterator {
 
     /**

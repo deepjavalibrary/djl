@@ -12,27 +12,51 @@
  */
 package com.amazon.ai.image;
 
+/**
+ * A <code>Rectangle</code> specifies an area in a coordinate space that is enclosed by the <code>
+ * Rectangle</code> object's upper-left point {@link com.amazon.ai.image.Point} in the coordinate
+ * space, its width, and its height.
+ */
 public class Rectangle implements BoundingBox {
 
     Point point;
     double width;
     double height;
 
+    /**
+     * Constructs a new <code>Rectangle</code> whose upper-left corner is specified as {@code (x,y)}
+     * and whose width and height are specified by the arguments of the same name.
+     *
+     * @param x the specified X coordinate
+     * @param y the specified Y coordinate
+     * @param width the width of the <code>Rectangle</code>
+     * @param height the height of the <code>Rectangle</code>
+     */
     public Rectangle(double x, double y, double width, double height) {
         this(new Point(x, y), width, height);
     }
 
+    /**
+     * Constructs a new <code>Rectangle</code> whose upper-left corner is specified as coordinate
+     * {@code point} and whose width and height are specified by the arguments of the same name.
+     *
+     * @param point upper-left corner of the coordinate
+     * @param width the width of the <code>Rectangle</code>
+     * @param height the height of the <code>Rectangle</code>
+     */
     public Rectangle(Point point, double width, double height) {
         this.point = point;
         this.width = width;
         this.height = height;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Rectangle getBounds() {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public PathIterator getPath() {
         return new PathIterator() {
