@@ -14,6 +14,20 @@ package com.amazon.ai.ndarray.types;
 
 import com.amazon.ai.Context;
 
+/**
+ * A data descriptor class encapsulate information of a {@link com.amazon.ai.ndarray.NDArray}.
+ *
+ * <p>The information includes:
+ *
+ * <ul>
+ *   <li>Optional name of the NDArray
+ *   <li>{@link com.amazon.ai.Context}
+ *   <li>{@link com.amazon.ai.ndarray.types.Shape}
+ *   <li>{@link com.amazon.ai.ndarray.types.DataType}
+ *   <li>{@link com.amazon.ai.ndarray.types.SparseFormat}
+ *   <li>{@link com.amazon.ai.ndarray.types.Layout}
+ * </ul>
+ */
 public class DataDesc {
 
     private Context context;
@@ -22,28 +36,72 @@ public class DataDesc {
     private DataType dataType;
     private SparseFormat sparseFormat;
     private Layout layout;
-    private int index;
 
+    /**
+     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape}.
+     *
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public DataDesc(Shape shape) {
         this(shape, DataType.FLOAT32, null, Layout.UNDEFINED, null, SparseFormat.DEFAULT);
     }
 
+    /**
+     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape} and name.
+     *
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param name the name of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public DataDesc(Shape shape, String name) {
         this(shape, DataType.FLOAT32, name, Layout.UNDEFINED, null, SparseFormat.DEFAULT);
     }
 
+    /**
+     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape} and {@link
+     * DataType}.
+     *
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public DataDesc(Shape shape, DataType dataType) {
         this(shape, dataType, null, Layout.UNDEFINED, null, SparseFormat.DEFAULT);
     }
 
+    /**
+     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape}, {@link
+     * DataType} and name.
+     *
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param name the name of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public DataDesc(Shape shape, DataType dataType, String name) {
         this(shape, dataType, name, Layout.UNDEFINED, null, SparseFormat.DEFAULT);
     }
 
+    /**
+     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape}, {@link
+     * DataType} and name.
+     *
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param name the name of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public DataDesc(Shape shape, DataType dataType, String name, Layout layout) {
         this(shape, dataType, name, layout, null, SparseFormat.DEFAULT);
     }
 
+    /**
+     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape}, {@link
+     * DataType}, name, {@link Layout}, {@link Context} and {@link SparseFormat}.
+     *
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param name the name of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param layout the {@link Layout} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param sparseFormat the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public DataDesc(
             Shape shape,
             DataType dataType,
@@ -59,60 +117,112 @@ public class DataDesc {
         this.layout = layout;
     }
 
+    /**
+     * Returns the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @return the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public Context getContext() {
         return context;
     }
 
+    /**
+     * Sets the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public void setContext(Context context) {
         this.context = context;
     }
 
+    /**
+     * Returns the name the name of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @return name the name of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name the name of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @param name the name the name of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @return the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public Shape getShape() {
         return shape;
     }
 
+    /**
+     * Sets the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public void setShape(Shape shape) {
         this.shape = shape;
     }
 
+    /**
+     * Returns the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @return the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public DataType getDataType() {
         return dataType;
     }
 
+    /**
+     * Sets the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
 
+    /**
+     * Returns the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @return the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public SparseFormat getSparseFormat() {
         return sparseFormat;
     }
 
+    /**
+     * Sets the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @param sparseFormat the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public void setSparseFormat(SparseFormat sparseFormat) {
         this.sparseFormat = sparseFormat;
     }
 
+    /**
+     * Returns the {@link Layout} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @return the {@link Layout} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public Layout getLayout() {
         return layout;
     }
 
+    /**
+     * Sets the {@link Layout} of the {@link com.amazon.ai.ndarray.NDArray}.
+     *
+     * @param layout the {@link Layout} of the {@link com.amazon.ai.ndarray.NDArray}
+     */
     public void setLayout(Layout layout) {
         this.layout = layout;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
 
     public int getMajorAxis() {

@@ -12,6 +12,17 @@
  */
 package com.amazon.ai.ndarray.types;
 
+/**
+ * An enum represents Sparse matrix storage formats.
+ *
+ * <ul>
+ *   <li>DEFAULT: No sparse format
+ *   <li>ROW_SPARSE: Row Sparse
+ *   <li>CSR: Compressed Sparse Row
+ * </ul>
+ *
+ * @see <a href="https://software.intel.com/en-us/node/471374">Sparse Matrix Storage Formats</a>
+ */
 public enum SparseFormat {
     UNDEFINED("undefined", -1),
     DEFAULT("default", 0),
@@ -26,6 +37,12 @@ public enum SparseFormat {
         this.value = value;
     }
 
+    /**
+     * Get the <code>SparseFormat</code> from it's integer value.
+     *
+     * @param value integer value of the <code>SparseFormat</code>
+     * @return <code>SparseFormat</code>
+     */
     public static SparseFormat fromValue(int value) {
         for (SparseFormat t : values()) {
             if (value == t.getValue()) {
@@ -35,10 +52,20 @@ public enum SparseFormat {
         throw new IllegalArgumentException("Unknown storage type: " + value);
     }
 
+    /**
+     * Returns <code>SparseFormat</code> name.
+     *
+     * @return <code>SparseFormat</code> name.
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Returns integer value of this <code>SparseFormat</code>.
+     *
+     * @return integer value of this <code>SparseFormat</code>
+     */
     public int getValue() {
         return value;
     }

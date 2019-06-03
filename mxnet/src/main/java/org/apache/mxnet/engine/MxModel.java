@@ -202,12 +202,8 @@ public class MxModel implements Model, AutoCloseable {
             inputData = new DataDesc[map.size()];
 
             index = 0;
-            for (Map.Entry<String, Integer> entry : map.entrySet()) {
-                String name = entry.getKey();
-                int position = entry.getValue();
-                inputData[index] = new DataDesc(new Shape(), name);
-                inputData[index].setIndex(position);
-                ++index;
+            for (String name : map.keySet()) {
+                inputData[index++] = new DataDesc(new Shape(), name);
             }
         }
         return inputData;

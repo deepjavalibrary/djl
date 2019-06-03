@@ -12,6 +12,7 @@
  */
 package com.amazon.ai.ndarray.types;
 
+/** An enum represents underlying {@link com.amazon.ai.ndarray.NDArray}'s data type. */
 public enum DataType {
     FLOAT32("float32", 4),
     FLOAT64("float64", 8),
@@ -30,14 +31,25 @@ public enum DataType {
         this.numOfBytes = numOfBytes;
     }
 
+    /**
+     * Returns number of bytes for each element.
+     *
+     * @return number of bytes for each element
+     */
     public int getNumOfBytes() {
         return numOfBytes;
     }
 
+    /**
+     * Returns name of the data type.
+     *
+     * @return name of the data type
+     */
     public String getType() {
         return type;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return type;

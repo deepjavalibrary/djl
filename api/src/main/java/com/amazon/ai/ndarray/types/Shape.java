@@ -12,22 +12,45 @@
  */
 package com.amazon.ai.ndarray.types;
 
+/** A class presents {@link com.amazon.ai.ndarray.NDArray}'s shape information. */
 public class Shape {
 
     private int[] shape;
 
+    /**
+     * Constructs and initialize a <code>Shape</code> with specified dimension as {@code (int...
+     * shape)}.
+     *
+     * @param shape dimensions of the shape
+     */
     public Shape(int... shape) {
         this.shape = shape;
     }
 
+    /**
+     * Returns dimensions of the <code>Shape</code>.
+     *
+     * @return dimensions of the <code>Shape</code>
+     */
     public int[] getShape() {
         return shape;
     }
 
+    /**
+     * Returns size of specific dimensions {@code x}.
+     *
+     * @param x dimension
+     * @return size of specific dimensions {@code x}
+     */
     public int get(int x) {
         return shape[x];
     }
 
+    /**
+     * Returns number of dimensions of this <code>Shape</code>.
+     *
+     * @return number of dimensions of this <code>Shape</code>.
+     */
     public int dimension() {
         return shape.length;
     }
@@ -55,6 +78,7 @@ public class Shape {
         return shape[0];
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

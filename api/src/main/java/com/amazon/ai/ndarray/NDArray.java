@@ -23,6 +23,7 @@ import java.nio.Buffer;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 
+/** An interface represents n-dimensional array. */
 public interface NDArray extends AutoCloseable {
 
     /**
