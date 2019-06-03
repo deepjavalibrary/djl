@@ -20,17 +20,47 @@ import com.amazon.ai.metric.Metrics;
 
 public interface Predictor<I, O> extends AutoCloseable {
 
-    static <I, O> Predictor<I, O> newInstance(Model model, Translator<I, O> transformer) {
-        return newInstance(model, transformer, Context.defaultContext());
+    /**
+     * Create new Predictor based on the model given
+     *
+     * @param model The model used for inference
+     * @param translator The Object used for preprocessing and post processing
+     * @param <I> Input object for preprocessing
+     * @param <O> Output object come from postprocessing
+     * @return Predictor
+     */
+    static <I, O> Predictor<I, O> newInstance(Model model, Translator<I, O> translator) {
+        return newInstance(model, translator, Context.defaultContext());
     }
 
+    /**
+     * Create new Predictor based on the model given
+     *
+     * @param model the model used for inference
+     * @param translator The Object used for preprocessing and post processing
+     * @param context context used for the inference
+     * @param <I> Input object for preprocessing
+     * @param <O> Output object come from postprocessing
+     * @return
+     */
     static <I, O> Predictor<I, O> newInstance(
-            Model model, Translator<I, O> transformer, Context context) {
-        return Engine.getInstance().newPredictor(model, transformer, context);
+            Model model, Translator<I, O> translator, Context context) {
+        return Engine.getInstance().newPredictor(model, translator, context);
     }
 
+    /**
+     * predict method used for inference
+     *
+     * @param input Input follows the inputObject
+     * @return The Output object defined by user
+     */
     O predict(I input);
 
+    /**
+     * Attach a Metrics param to use for benchmark
+     *
+     * @param metrics the Metrics class
+     */
     void setMetrics(Metrics metrics);
 
     @Override
