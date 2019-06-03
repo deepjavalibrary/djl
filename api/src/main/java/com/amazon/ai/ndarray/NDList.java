@@ -16,11 +16,17 @@ import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
 import java.util.Iterator;
 
+/**
+ * A <code>NDList</code> represents a sequence of {@link NDArray}s.
+ *
+ * <p>Each {@link NDArray} in this list can optionally has a name. User can use name to look up
+ * NDArray in the NDList.
+ */
 public class NDList implements Iterable<Pair<String, NDArray>> {
 
     protected PairList<String, NDArray> list;
 
-    /** Constructs an empty list. */
+    /** Constructs an empty NDList. */
     public NDList() {
         this.list = new PairList<>();
     }
@@ -35,6 +41,11 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
         this.list = new PairList<>(initialCapacity);
     }
 
+    /**
+     * Constructs and initiate NDList with the specified {@link NDArray}s.
+     *
+     * @param arrays {@link NDArray}s
+     */
     public NDList(NDArray... arrays) {
         this();
         for (NDArray array : arrays) {
@@ -42,28 +53,49 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
         }
     }
 
-    public NDList(NDList arrays) {
-        this.list = arrays.list;
-    }
-
+    /**
+     * Return an array of {@link NDArray} in the same order as in the NDList.
+     *
+     * <p>The returning array will loose the name information in the NDList.
+     *
+     * @return an array of {@link NDArray}
+     */
     public NDArray[] toArray() {
         return list.valueArray(new NDArray[0]);
     }
 
     /**
-     * Returns the number of NDArray in this list. If this list contains more than
-     * <tt>Integer.MAX_VALUE</tt> NDArrays, returns <tt>Integer.MAX_VALUE</tt>.
+     * Returns the number of NDArray in this NDList.
      *
-     * @return the number of NDArrays in this list
+     * <p>If this list contains more than <tt>Integer.MAX_VALUE</tt> NDArrays, returns
+     * <tt>Integer.MAX_VALUE</tt>.
+     *
+     * @return the number of NDArrays in this NDList
      */
     public int size() {
         return list.size();
     }
 
+    /**
+     * Removes the first occurrence of the specified element from this NDList, if it is present
+     * (optional operation). If this list does not contain the element, it is unchanged. More
+     * formally, removes the element with the lowest index <tt>i</tt> such that
+     * <tt>(o==null&nbsp;?&nbsp;get(i)==null&nbsp;:&nbsp;o.equals(get(i)))</tt> (if such an element
+     * exists).
+     *
+     * @param name name of the NDArray to be removed from this NDList, if present
+     * @throws UnsupportedOperationException if the <tt>NDList</tt> is read only
+     */
     public NDArray remove(String name) {
         return list.remove(name);
     }
 
+    /**
+     * Returns <tt>true</tt> if this NDList contains NDArray with the specified name.
+     *
+     * @param name name of the NDArray to be removed from this NDList, if present
+     * @return <tt>true</tt> if this list contains the specified element
+     */
     public boolean contains(String name) {
         return list.contains(name);
     }
@@ -81,47 +113,33 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
     }
 
     /**
-     * Appends the specified NDArray to the end of this list (optional operation).
-     *
-     * <p>Lists that support this operation may place limitations on what NDArrays may be added to
-     * this list. In particular, some lists will refuse to add null NDArrays, and others will impose
-     * restrictions on the type of NDArrays that may be added. List classes should clearly specify
-     * in their documentation any restrictions on what NDArrays may be added.
+     * Appends the specified NDArray to the end of this NDList.
      *
      * @param array NDArray to be appended to this list
-     * @throws UnsupportedOperationException if the <tt>add</tt> operation is not supported by this
-     *     list
-     * @throws ClassCastException if the class of the specified NDArray prevents it from being added
-     *     to this list
-     * @throws NullPointerException if the specified NDArray is null and this list does not permit
-     *     null NDArrays
-     * @throws IllegalArgumentException if some property of this NDArray prevents it from being
-     *     added to this list
+     * @throws UnsupportedOperationException if this NDList is read only
+     * @see NDList#add(String, NDArray)
      */
     public void add(NDArray array) {
         list.add(null, array);
     }
 
+    /**
+     * Appends the named NDArray to the end of this NDList.
+     *
+     * @param name optional name of the {@link NDArray}
+     * @param array NDArray to be appended to this list
+     * @throws UnsupportedOperationException if this NDList is read only
+     */
     public void add(String name, NDArray array) {
         list.add(name, array);
     }
 
     /**
-     * Appends all of the NDArray in the specified collection to the end of this list, in the order
-     * that they are returned by the specified collection's iterator (optional operation). The
-     * behavior of this operation is undefined if the specified collection is modified while the
-     * operation is in progress. (Note that this will occur if the specified collection is this
-     * list, and it's nonempty.)
+     * Appends all of the NDArrays in the specified NDList to the end of this NDList, in the order
+     * that they are returned by the specified DNList's iterator.
      *
      * @param other NDList containing NDArray to be added to this list
-     * @throws UnsupportedOperationException if the <tt>addAll</tt> operation is not supported by
-     *     this list
-     * @throws ClassCastException if the class of a NDArray of the specified collection prevents it
-     *     from being added to this list
-     * @throws NullPointerException if the specified collection contains one or more null NDArray
-     *     and this list does not permit null NDArrays, or if the specified collection is null
-     * @throws IllegalArgumentException if some property of an NDArray of the specified collection
-     *     prevents it from being added to this list
+     * @throws UnsupportedOperationException if this NDList is read only
      */
     public void addAll(NDList other) {
         for (Pair<String, NDArray> pair : other) {
