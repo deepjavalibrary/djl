@@ -1829,36 +1829,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public DataType dataType() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isR() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isZ() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isB() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isS() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray castTo(DataType dataType) {
         return null;
     }

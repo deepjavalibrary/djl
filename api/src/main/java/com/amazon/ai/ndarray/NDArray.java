@@ -2060,41 +2060,6 @@ public interface NDArray extends AutoCloseable {
     boolean isEmpty();
 
     /**
-     * This method returns dtype for this NDArray
-     *
-     * @return DataType
-     */
-    DataType dataType();
-
-    /**
-     * This method checks if this NDArray instance is one of Real types
-     *
-     * @return true if data type is floating point, false otherwise
-     */
-    boolean isR();
-
-    /**
-     * This method checks if this NDArray instance is one of integer types
-     *
-     * @return true if this NDArray instance is one of integer types
-     */
-    boolean isZ();
-
-    /**
-     * This method checks if this NDArray instance has boolean type
-     *
-     * @return if this NDArray instance has boolean type
-     */
-    boolean isB();
-
-    /**
-     * This method checks if this NDArray instance has String type
-     *
-     * @return true if this NDArray instance has String type
-     */
-    boolean isS();
-
-    /**
      * This method cast elements of this NDArray to new data type
      *
      * @param dataType <code>DataType</code> to be casted
