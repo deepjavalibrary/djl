@@ -13,6 +13,7 @@
 package com.amazon.ai.test.mock;
 
 import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.Matrix;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
@@ -442,16 +443,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray getColumns(int... columns) {
-        return null;
-    }
-
-    @Override
-    public NDArray getRows(int... rows) {
-        return null;
-    }
-
-    @Override
     public NDArray rdiv(NDArray other) {
         return null;
     }
@@ -517,21 +508,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray putRow(long row, NDArray toPut) {
-        return null;
-    }
-
-    @Override
-    public NDArray putColumn(int column, NDArray toPut) {
-        return null;
-    }
-
-    @Override
-    public NDArray getScalar(long row, long column) {
-        return null;
-    }
-
-    @Override
     public NDArray getScalar(long i) {
         return null;
     }
@@ -567,153 +543,13 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray put(int i, int j, Number element) {
-        return null;
-    }
-
-    @Override
     public NDArray put(int i, NDArray element) {
-        return null;
-    }
-
-    @Override
-    public NDArray diviColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray divColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray diviRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray divRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray rdiviColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray rdivColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray rdiviRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray rdivRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray muliColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray mulColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray muliRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray mulRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray rsubiColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray rsubColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray rsubiRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray rsubRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray subiColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray subColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray subiRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray subRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray addiColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray putiColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray addColumnVector(NDArray columnVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray addiRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray putiRowVector(NDArray rowVector) {
-        return null;
-    }
-
-    @Override
-    public NDArray addRowVector(NDArray rowVector) {
         return null;
     }
 
     @Override
     public NDArray mmul(NDArray other) {
         return null;
-    }
-
-    @Override
-    public double[][] toDoubleMatrix() {
-        return new double[0][];
     }
 
     @Override
@@ -727,11 +563,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public float[][] toFloatMatrix() {
-        return new float[0][];
-    }
-
-    @Override
     public int[] toIntArray() {
         return new int[0];
     }
@@ -739,16 +570,6 @@ public class MockNDArray implements NDArray {
     @Override
     public long[] toLongArray() {
         return new long[0];
-    }
-
-    @Override
-    public long[][] toLongMatrix() {
-        return new long[0][];
-    }
-
-    @Override
-    public int[][] toIntMatrix() {
-        return new int[0][];
     }
 
     @Override
@@ -1102,27 +923,12 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray reshape(char order, int rows, int columns) {
-        return null;
-    }
-
-    @Override
     public NDArray reshape(long... newShape) {
         return null;
     }
 
     @Override
     public NDArray reshape(int[] shape) {
-        return null;
-    }
-
-    @Override
-    public NDArray transpose() {
-        return null;
-    }
-
-    @Override
-    public NDArray transposei() {
         return null;
     }
 
@@ -1138,16 +944,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray transposei(int... dimensions) {
-        return null;
-    }
-
-    @Override
-    public NDArray getColumn(long i) {
-        return null;
-    }
-
-    @Override
-    public NDArray getRow(long i) {
         return null;
     }
 
@@ -1288,6 +1084,11 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray castTo(DataType dataType) {
+        return null;
+    }
+
+    @Override
+    public Matrix asMatrix() {
         return null;
     }
 

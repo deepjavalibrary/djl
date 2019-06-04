@@ -1,15 +1,3 @@
-/*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
- * with the License. A copy of the License is located at
- *
- * http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
- * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
- * and limitations under the License.
- */
 package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
@@ -22,72 +10,264 @@ import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.util.Utils;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.locks.Condition;
-import org.apache.mxnet.jna.FunctionInfo;
-import org.apache.mxnet.jna.JnaUtils;
 
-public class MxNDArray extends NativeResource implements NDArray {
+public class MxMatrix implements Matrix {
 
-    private static final Map<String, FunctionInfo> OPS = JnaUtils.getNdArrayFunctions();
+    private MxNDArray array;
 
-    private static final int MAX_DEPTH = 10;
-    private static final int MAX_PRINT_ROWS = 10;
-    private static final int MAX_PRINT_ITEMS = 20;
-    private static final String LF = System.getProperty("line.separator");
-
-    private Context context;
-    private SparseFormat sparseFormat;
-    private DataType dataType;
-    private Shape shape;
-    private MxNDFactory factory;
-    private boolean isReady;
-
-    MxNDArray(
-            MxNDFactory factory,
-            Context context,
-            SparseFormat sparseFormat,
-            Shape shape,
-            DataType dataType,
-            Pointer handle) {
-        super(handle);
-        this.factory = factory;
-        this.context = context;
-        this.dataType = dataType;
-        this.shape = shape;
-        this.sparseFormat = sparseFormat;
-        this.isReady = false;
+    public MxMatrix(MxNDArray array) {
+        this.array = array;
     }
 
-    MxNDArray(
-            MxNDFactory factory,
-            Context context,
-            SparseFormat sparseFormat,
-            Shape shape,
-            DataType dataType) {
-        this(
-                factory,
-                context,
-                sparseFormat,
-                shape,
-                dataType,
-                JnaUtils.createNdArray(
-                        context,
-                        shape,
-                        dataType,
-                        shape.dimension(),
-                        sparseFormat != SparseFormat.DEFAULT));
+    /** {@inheritDoc} */
+    @Override
+    public NDArray putRow(long row, NDArray toPut) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray putColumn(int column, NDArray toPut) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getScalar(long row, long column) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diviColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray divColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diviRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray divRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rdiviColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rdivColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rdiviRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rdivRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray muliColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mulColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray muliRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mulRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rsubiColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rsubColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rsubiRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rsubRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray subiColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray subColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray subiRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray subRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray addiColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray putiColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray addColumnVector(NDArray columnVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray addiRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray putiRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray addRowVector(NDArray rowVector) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getColumn(long i) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getRow(long i) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getColumns(int... columns) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getRows(int... rows) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray put(int i, int j, Number element) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray reshape(char order, int rows, int columns) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray transpose() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray transposei() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double[][] toDoubleMatrix() {
+        return new double[0][];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public float[][] toFloatMatrix() {
+        return new float[0][];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long[][] toLongMatrix() {
+        return new long[0][];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int[][] toIntMatrix() {
+        return new int[0][];
     }
 
     /** {@inheritDoc} */
@@ -98,261 +278,128 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void encode(OutputStream os) {}
-
-    public void detach() {
-        factory.detach(this);
-        factory = MxNDFactory.SYSTEM_FACTORY;
-    }
-
-    public void attach(MxNDFactory factory) {
-        detach();
-        this.factory = factory;
-        factory.attach(this);
-    }
+    public void encode(OutputStream os) throws IOException {}
 
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
-        if (dataType == null) {
-            dataType = JnaUtils.getDataType(getHandle());
-        }
-        return dataType;
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public Context getContext() {
-        if (context == null) {
-            context = JnaUtils.getContext(getHandle());
-        }
-        return context;
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape getShape() {
-        if (shape == null) {
-            shape = JnaUtils.getShape(getHandle());
-        }
-        return shape;
-    }
-
-    public SparseFormat getSparseFormat() {
-        if (sparseFormat == null) {
-            sparseFormat = JnaUtils.getStorageType(getHandle());
-        }
-        return sparseFormat;
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public Layout getLayout() {
-        return Layout.UNDEFINED;
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public DataDesc getDataDescriptor() {
-        return new DataDesc(
-                getShape(), getDataType(), null, getLayout(), getContext(), getSparseFormat());
+        return array.getDataDescriptor();
     }
 
     /** {@inheritDoc} */
     @Override
-    public void set(Buffer data) {
-        if (data.remaining() != getShape().size()) {
-            throw new IllegalArgumentException(
-                    "array size ("
-                            + data.remaining()
-                            + ")do not match the size of NDArray ("
-                            + getShape().size());
-        }
-        JnaUtils.syncCopyFromCPU(getHandle(), data);
+    public void set(Buffer data) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(List<Float> data) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray at(int index) {
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void set(List<Float> data) {
-        waitToWrite();
-        int size = data.size();
-        FloatBuffer output =
-                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
-        for (Float v : data) {
-            output.put(v);
-        }
-        output.rewind();
-        set(output);
+    public NDArray slice(int begin, int end) {
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray at(int index) {
-        Pointer pointer = JnaUtils.ndArrayAt(getHandle(), index);
-        return factory.create(pointer);
+    public void copyTo(NDArray array) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray asInContext(Context ctx, boolean copy) {
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray slice(int begin, int end) {
-        Pointer pointer = JnaUtils.slice(getHandle(), begin, end);
-        return factory.create(pointer);
+    public NDArray asType(DataType dtype, boolean copy) {
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void copyTo(NDArray ndArray) {
-        if (!(ndArray instanceof MxNDArray)) {
-            throw new IllegalArgumentException("Only MxNDArray is supported.");
-        }
-        Shape inShape = getShape();
-        Shape destShape = ndArray.getShape();
-        if (!Arrays.equals(inShape.getShape(), destShape.getShape())) {
-            throw new IllegalArgumentException(
-                    String.format("shape are diff. Required: %s, Actual %s", destShape, inShape));
-        }
-
-        FunctionInfo functionInfo = OPS.get("_copyto");
-
-        MxNDArray array = (MxNDArray) ndArray;
-
-        functionInfo.invoke(factory, new MxNDArray[] {this}, new MxNDArray[] {array}, null);
-    }
+    public void attachGrad() {}
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray asInContext(Context ctx, boolean copy) {
-        if (ctx.equals(getContext()) && !copy) {
-            return this;
-        }
-        MxNDArray nd = factory.create(ctx, getShape(), getDataType(), getSparseFormat());
-        copyTo(nd);
-        return nd;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public MxNDArray asType(DataType dtype, boolean copy) {
-        if (dtype.equals(getDataType()) && !copy) {
-            return this;
-        }
-        MxNDArray nd = factory.create(getContext(), getShape(), dtype, getSparseFormat());
-        copyTo(nd);
-        return nd;
-    }
-
-    /** {@inheritDoc} */
-    public void waitToRead() {
-        if (!isReady) {
-            JnaUtils.waitToRead(getHandle());
-            isReady = true;
-        }
-    }
-
-    public void waitToWrite() {
-        if (!isReady) {
-            JnaUtils.waitToWrite(getHandle());
-            isReady = true;
-        }
-    }
-
-    public void waitAll() {
-        JnaUtils.waitToRead(getHandle());
-        isReady = true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGrad() {
-        attachGrad(GradReq.WRITE, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
-        MxNDArray grad;
-        if (sparseFormat == null || sparseFormat == sparseFormat.UNDEFINED) {
-            grad = zerosLike();
-        } else {
-            grad = Operators.zeros(factory, shape, context, dataType, sparseFormat);
-        }
-        int gradReqValue = gradReq.getValue();
-        IntBuffer gradReqBuffer = IntBuffer.allocate(1);
-        gradReqBuffer.put(0, gradReqValue);
-        JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward() {
-        backward(null, false, true);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward(boolean retainGraph, boolean isTraining) {
-        backward(null, retainGraph, isTraining);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {
-        Pointer outGradHandle;
-        if (outGrad != null) {
-            MxNDArray outGradND = (MxNDArray) outGrad;
-            outGradHandle = outGradND.getHandle();
-        } else {
-            outGradHandle = null;
-        }
-
-        JnaUtils.autogradBackwardExecute(
-                1,
-                getHandle(),
-                outGradHandle,
-                0,
-                null,
-                retainGraph ? 1 : 0,
-                0,
-                isTraining ? 1 : 0,
-                null,
-                null);
-    }
+    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {}
 
     /** {@inheritDoc} */
     @Override
     public NDArray getGradient() {
-        Pointer pointer = JnaUtils.getGradient(getHandle());
-        return factory.create(pointer);
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
+    public void backward() {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward(boolean retainGraph, boolean isTraining) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {}
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray argsort(int axis, boolean isAscend) {
-        return Operators.argsort(factory, this, axis, isAscend);
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(Integer axis, Double temperature) {
-        return Operators.softmax(factory, this, axis, temperature);
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList split(int numOutputs, Integer axis, Boolean squeezeAxis) {
-        return new NDList(Operators.split(factory, this, numOutputs, axis, squeezeAxis));
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray zerosLike() {
-        return Operators.zerosLike(factory, this);
+    public NDArray zerosLike() {
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray onesLike() {
-        return Operators.onesLike(factory, this);
+    public NDArray onesLike() {
+        return null;
     }
 
     /** {@inheritDoc} */
@@ -859,22 +906,10 @@ public class MxNDArray extends NativeResource implements NDArray {
         return new double[0];
     }
 
-    public FunctionInfo genericNDArrayFunctionInvoke(String opName, Map<String, Object> args) {
-        FunctionInfo func = OPS.get(opName);
-        if (func == null) {
-            throw new UnsupportedOperationException("Unsupported operation: " + opName);
-        }
-
-        return func;
-    }
-
     /** {@inheritDoc} */
     @Override
     public float[] toFloatArray() {
-        FloatBuffer fb = toByteBuffer().asFloatBuffer();
-        float[] ret = new float[fb.remaining()];
-        fb.get(ret);
-        return ret;
+        return new float[0];
     }
 
     /** {@inheritDoc} */
@@ -1312,8 +1347,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray reshape(long... newShape) {
-        Pointer pointer = JnaUtils.reshape(getHandle(), newShape, false);
-        return factory.create(pointer);
+        return null;
     }
 
     /** {@inheritDoc} */
@@ -1343,12 +1377,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public long size(int dimension) {
-        return shape.size(dimension);
+        return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public long size() {
-        return shape.size();
+        return 0;
     }
 
     /** {@inheritDoc} */
@@ -1510,10 +1545,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public Matrix asMatrix() {
-        if (!shape.isMatrix()) {
-            throw new IllegalStateException("NDArray is not a matrix");
-        }
-        return new MxMatrix(this);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -1546,103 +1578,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return null;
     }
 
-    public byte[] toByteArray() {
-        ByteBuffer bb = toByteBuffer();
-        byte[] buf = new byte[bb.remaining()];
-        bb.get(buf);
-        return buf;
-    }
-
-    private ByteBuffer toByteBuffer() {
-        Shape sh = getShape();
-        DataType dType = getDataType();
-        int product = sh.size();
-        int len = dType.getNumOfBytes() * product;
-        ByteBuffer bb = ByteBuffer.allocateDirect(len);
-        Pointer pointer = Native.getDirectBufferPointer(bb);
-        JnaUtils.syncCopyToCPU(getHandle(), pointer, product);
-        bb.order(ByteOrder.LITTLE_ENDIAN);
-        return bb;
-    }
-
-    private void dump(StringBuilder sb, int depth) {
-        Utils.pad(sb, ' ', depth);
-        sb.append('[');
-        int len = getShape().head();
-        if (getShape().dimension() == 1) {
-            float[] arr = toFloatArray();
-            int limit = Math.min(arr.length, MAX_PRINT_ITEMS);
-            for (int i = 0; i < limit; ++i) {
-                if (i > 0) {
-                    sb.append(", ");
-                }
-                switch (getDataType()) {
-                    case FLOAT32:
-                    case FLOAT16:
-                    case FLOAT64:
-                        sb.append(String.format("%.8e", arr[i]));
-                        break;
-                    default:
-                        sb.append((long) arr[i]);
-                        break;
-                }
-            }
-            int remaining = arr.length - limit;
-            if (remaining > 0) {
-                sb.append(", ... ").append(remaining).append(" more");
-            }
-        } else {
-            sb.append(LF);
-            int limit = Math.min(len, MAX_PRINT_ROWS);
-            for (int i = 0; i < limit; ++i) {
-                try (MxNDArray nd = at(i)) {
-                    nd.dump(sb, depth + 1);
-                }
-            }
-            int remaining = len - limit;
-            if (remaining > 0) {
-                Utils.pad(sb, ' ', depth + 1);
-                sb.append("... ").append(remaining).append(" more");
-            }
-            Utils.pad(sb, ' ', depth);
-        }
-        sb.append("],").append(LF);
-    }
-
-    public String dump() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("ND: ")
-                .append(getShape())
-                .append(' ')
-                .append(getContext())
-                .append(' ')
-                .append(getDataType())
-                .append(LF);
-        if (getShape().dimension() < MAX_DEPTH) {
-            dump(sb, 0);
-        } else {
-            sb.append("[ Exceed max print dimension ]");
-        }
-        return sb.toString();
-    }
-
     /** {@inheritDoc} */
     @Override
-    public String toString() {
-        if (Utils.DEBUG) {
-            return dump();
-        }
-        return super.toString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        Pointer pointer = handle.getAndSet(null);
-        if (pointer != null) {
-            JnaUtils.freeNdArray(pointer);
-            detach();
-            factory = null;
-        }
-    }
+    public void close() {}
 }

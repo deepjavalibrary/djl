@@ -707,22 +707,6 @@ public interface NDArray extends AutoCloseable {
     NDArray get(List<List<Integer>> indices);
 
     /**
-     * Returns an NDArray comprised of the specified columns only. Copy operation.
-     *
-     * @param columns Columns to extract out of the current array
-     * @return Array with only the specified columns
-     */
-    NDArray getColumns(int... columns);
-
-    /**
-     * Returns an NDArray comprised of the specified rows only. Copy operation
-     *
-     * @param rows Rose to extract from this array
-     * @return Array with only the specified rows
-     */
-    NDArray getRows(int... rows);
-
-    /**
      * Reverse division, elements wise. i.e., other / this
      *
      * @param other the matrix to divide from
@@ -835,33 +819,6 @@ public interface NDArray extends AutoCloseable {
     NDArray repeat(int dimension, long... repeats);
 
     /**
-     * Insert a row in to this array Will throw an exception if this NDArray is not a matrix
-     *
-     * @param row the row insert into
-     * @param toPut the row to insert
-     * @return this
-     */
-    NDArray putRow(long row, NDArray toPut);
-
-    /**
-     * Insert a column in to this array Will throw an exception if this NDArray is not a matrix
-     *
-     * @param column the column to insert
-     * @param toPut the array to put
-     * @return this
-     */
-    NDArray putColumn(int column, NDArray toPut);
-
-    /**
-     * Returns the element at the specified row/column This will throw an exception if the
-     *
-     * @param row the row of the element to return
-     * @param column the row of the element to return
-     * @return a scalar NDArray of the element at this index
-     */
-    NDArray getScalar(long row, long column);
-
-    /**
      * Returns the element at the specified index
      *
      * @param i the index of the element to return
@@ -929,229 +886,11 @@ public interface NDArray extends AutoCloseable {
     /**
      * Inserts the element at the specified index
      *
-     * @param i the row insert into
-     * @param j the column to insert into
-     * @param element a scalar NDArray
-     * @return a scalar NDArray of the element at this index
-     */
-    NDArray put(int i, int j, Number element);
-
-    /**
-     * Inserts the element at the specified index
-     *
      * @param i the index insert into
      * @param element a scalar NDArray
      * @return a scalar NDArray of the element at this index
      */
     NDArray put(int i, NDArray element);
-
-    /**
-     * In place division of a column vector
-     *
-     * @param columnVector the column vector used for division
-     * @return the result of the division
-     */
-    NDArray diviColumnVector(NDArray columnVector);
-
-    /**
-     * Division of a column vector (copy)
-     *
-     * @param columnVector the column vector used for division
-     * @return the result of the division
-     */
-    NDArray divColumnVector(NDArray columnVector);
-
-    /**
-     * In place division of a row vector
-     *
-     * @param rowVector the row vector used for division
-     * @return the result of the division
-     */
-    NDArray diviRowVector(NDArray rowVector);
-
-    /**
-     * Division of a row vector (copy)
-     *
-     * @param rowVector the row vector used for division
-     * @return the result of the division
-     */
-    NDArray divRowVector(NDArray rowVector);
-
-    /**
-     * In place reverse divison of a column vector
-     *
-     * @param columnVector the column vector used for division
-     * @return the result of the division
-     */
-    NDArray rdiviColumnVector(NDArray columnVector);
-
-    /**
-     * Reverse division of a column vector (copy)
-     *
-     * @param columnVector the column vector used for division
-     * @return the result of the division
-     */
-    NDArray rdivColumnVector(NDArray columnVector);
-
-    /**
-     * In place reverse division of a column vector
-     *
-     * @param rowVector the row vector used for division
-     * @return the result of the division
-     */
-    NDArray rdiviRowVector(NDArray rowVector);
-
-    /**
-     * Reverse division of a column vector (copy)
-     *
-     * @param rowVector the row vector used for division
-     * @return the result of the division
-     */
-    NDArray rdivRowVector(NDArray rowVector);
-
-    /**
-     * In place multiplication of a column vector
-     *
-     * @param columnVector the column vector used for multiplication
-     * @return the result of the multiplication
-     */
-    NDArray muliColumnVector(NDArray columnVector);
-
-    /**
-     * Multiplication of a column vector (copy)
-     *
-     * @param columnVector the column vector used for multiplication
-     * @return the result of the multiplication
-     */
-    NDArray mulColumnVector(NDArray columnVector);
-
-    /**
-     * In place multiplication of a row vector
-     *
-     * @param rowVector the row vector used for multiplication
-     * @return the result of the multiplication
-     */
-    NDArray muliRowVector(NDArray rowVector);
-
-    /**
-     * Multiplication of a row vector (copy)
-     *
-     * @param rowVector the row vector used for multiplication
-     * @return the result of the multiplication
-     */
-    NDArray mulRowVector(NDArray rowVector);
-
-    /**
-     * In place reverse subtraction of a column vector
-     *
-     * @param columnVector the column vector to subtract
-     * @return the result of the subtraction
-     */
-    NDArray rsubiColumnVector(NDArray columnVector);
-
-    /**
-     * Reverse subtraction of a column vector (copy)
-     *
-     * @param columnVector the column vector to subtract
-     * @return the result of the subtraction
-     */
-    NDArray rsubColumnVector(NDArray columnVector);
-
-    /**
-     * In place reverse subtraction of a row vector
-     *
-     * @param rowVector the row vector to subtract
-     * @return the result of the subtraction
-     */
-    NDArray rsubiRowVector(NDArray rowVector);
-
-    /**
-     * Reverse subtraction of a row vector (copy)
-     *
-     * @param rowVector the row vector to subtract
-     * @return the result of the subtraction
-     */
-    NDArray rsubRowVector(NDArray rowVector);
-
-    /**
-     * In place subtraction of a column vector
-     *
-     * @param columnVector the column vector to subtract
-     * @return the result of the subtraction
-     */
-    NDArray subiColumnVector(NDArray columnVector);
-
-    /**
-     * Subtraction of a column vector (copy)
-     *
-     * @param columnVector the column vector to subtract
-     * @return the result of the subtraction
-     */
-    NDArray subColumnVector(NDArray columnVector);
-
-    /**
-     * In place subtraction of a row vector
-     *
-     * @param rowVector the row vector to subtract
-     * @return the result of the subtraction
-     */
-    NDArray subiRowVector(NDArray rowVector);
-
-    /**
-     * Subtraction of a row vector (copy)
-     *
-     * @param rowVector the row vector to subtract
-     * @return the result of the subtraction
-     */
-    NDArray subRowVector(NDArray rowVector);
-
-    /**
-     * In place addition of a column vector
-     *
-     * @param columnVector the column vector to add
-     * @return the result of the addition
-     */
-    NDArray addiColumnVector(NDArray columnVector);
-
-    /**
-     * In place assignment of a column vector
-     *
-     * @param columnVector the column vector to add
-     * @return the result of the addition
-     */
-    NDArray putiColumnVector(NDArray columnVector);
-
-    /**
-     * Addition of a column vector (copy)
-     *
-     * @param columnVector the column vector to add
-     * @return the result of the addition
-     */
-    NDArray addColumnVector(NDArray columnVector);
-
-    /**
-     * In place addition of a row vector
-     *
-     * @param rowVector the row vector to add
-     * @return the result of the addition
-     */
-    NDArray addiRowVector(NDArray rowVector);
-
-    /**
-     * in place assignment of row vector, to each row of this array
-     *
-     * @param rowVector Row vector to put
-     * @return This array, after assigning every road to the specified value
-     */
-    NDArray putiRowVector(NDArray rowVector);
-
-    /**
-     * Addition of a row vector (copy)
-     *
-     * @param rowVector the row vector to add
-     * @return the result of the addition
-     */
-    NDArray addRowVector(NDArray rowVector);
 
     /**
      * Perform a copy matrix multiplication
@@ -1160,15 +899,6 @@ public interface NDArray extends AutoCloseable {
      * @return the result of the matrix multiplication
      */
     NDArray mmul(NDArray other);
-
-    /**
-     * Convert this NDArray to a 2d double matrix. Note that THIS SHOULD NOT BE USED FOR SPEED. This
-     * is mainly used for integrations with other libraries. Due to nd4j's off heap nature, moving
-     * data on heap is very expensive and should not be used if possible.
-     *
-     * @return a copy of this array as a 2d double array
-     */
-    double[][] toDoubleMatrix();
 
     /**
      * Convert this NDArray to a 1d double matrix. Note that THIS SHOULD NOT BE USED FOR SPEED. This
@@ -1189,15 +919,6 @@ public interface NDArray extends AutoCloseable {
     float[] toFloatArray();
 
     /**
-     * Convert this NDArray to a 2d float matrix. Note that THIS SHOULD NOT BE USED FOR SPEED. This
-     * is mainly used for integrations with other libraries. Due to nd4j's off heap nature, moving
-     * data on heap is very expensive and should not be used if possible.
-     *
-     * @return a copy of this array as a 2d float array
-     */
-    float[][] toFloatMatrix();
-
-    /**
      * Convert this NDArray to a 1d int matrix. Note that THIS SHOULD NOT BE USED FOR SPEED. This is
      * mainly used for integrations with other libraries. Due to nd4j's off heap nature, moving data
      * on heap is very expensive and should not be used if possible.
@@ -1207,24 +928,6 @@ public interface NDArray extends AutoCloseable {
     int[] toIntArray();
 
     long[] toLongArray();
-
-    /**
-     * Convert this NDArray to a 2d int matrix. Note that THIS SHOULD NOT BE USED FOR SPEED. This is
-     * mainly used for integrations with other libraries. Due to nd4j's off heap nature, moving data
-     * on heap is very expensive and should not be used if possible.
-     *
-     * @return a copy of this array as a 2d int array
-     */
-    long[][] toLongMatrix();
-
-    /**
-     * Convert this NDArray to a 2d int matrix. Note that THIS SHOULD NOT BE USED FOR SPEED. This is
-     * mainly used for integrations with other libraries. Due to nd4j's off heap nature, moving data
-     * on heap is very expensive and should not be used if possible.
-     *
-     * @return a copy of this array as a 2d int array
-     */
-    int[][] toIntMatrix();
 
     /**
      * Perform an copy matrix multiplication
@@ -1715,17 +1418,17 @@ public interface NDArray extends AutoCloseable {
     NDArray dup();
 
     /**
-     * Returns a flattened version (row vector) of this NDArray
+     * Returns a flattened version of this NDArray
      *
-     * @return a flattened version (row vector) of this NDArray
+     * @return a flattened version of this NDArray
      */
     NDArray ravel();
 
     /**
-     * Returns a flattened version (row vector) of this NDArray
+     * Returns a flattened version of this NDArray
      *
      * @param order the order of the new array
-     * @return a flattened version (row vector) of this NDArray
+     * @return a flattened version of this NDArray
      */
     NDArray ravel(char order);
 
@@ -1762,37 +1465,12 @@ public interface NDArray extends AutoCloseable {
      * Reshapes the NDArray (can't change the length of the NDArray). Typically this will be a view,
      * unless reshaping without copying is impossible.
      *
-     * @param order the order of the new array
-     * @param rows the rows of the matrix
-     * @param columns the columns of the matrix
-     * @return the reshaped NDArray
-     */
-    NDArray reshape(char order, int rows, int columns);
-
-    /**
-     * Reshapes the NDArray (can't change the length of the NDArray). Typically this will be a view,
-     * unless reshaping without copying is impossible.
-     *
      * @param newShape the new shape of the NDArray
      * @return the reshaped NDArray
      */
     NDArray reshape(long... newShape);
 
     NDArray reshape(int[] shape);
-
-    /**
-     * Flip the rows and columns of a matrix
-     *
-     * @return the flipped rows and columns of a matrix
-     */
-    NDArray transpose();
-
-    /**
-     * Flip the rows and columns of a matrix, in-place
-     *
-     * @return the flipped rows and columns of a matrix
-     */
-    NDArray transposei();
 
     /**
      * Mainly here for people coming from numpy. This is equivalent to a call to permute
@@ -1822,22 +1500,6 @@ public interface NDArray extends AutoCloseable {
      * @return the current array
      */
     NDArray transposei(int... dimensions);
-
-    /**
-     * Returns the specified column. Throws an exception if its not a matrix
-     *
-     * @param i the column to getScalar
-     * @return the specified column
-     */
-    NDArray getColumn(long i);
-
-    /**
-     * Returns the specified row. Throws an exception if its not a matrix
-     *
-     * @param i the row to getScalar
-     * @return the specified row
-     */
-    NDArray getRow(long i);
 
     /**
      * Returns the size along a specified dimension
@@ -2056,6 +1718,14 @@ public interface NDArray extends AutoCloseable {
      * @return NDArray
      */
     NDArray castTo(DataType dataType);
+
+    /**
+     * This method converts the array into a 2D Matrix.
+     *
+     * @return This NDArray as Matrix
+     * @throws IllegalStateException Thrown if the NDArray is not a 2D matrix
+     */
+    Matrix asMatrix();
 
     /**
      * This method checks if all elements within this array are non-zero (or true, in case of
