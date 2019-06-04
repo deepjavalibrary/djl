@@ -21,6 +21,7 @@ import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -80,6 +81,16 @@ public abstract class Engine {
      * @return number of GPUs available in the system
      */
     public abstract int getGpuCount();
+
+    /**
+     * Returns {@link MemoryUsage} of specified GPU context.
+     *
+     * @param context the GPU {@link Context} to retrieve
+     * @return {@link MemoryUsage} of specified GPU context
+     * @throws EngineException if operation is not supported
+     * @throws IllegalArgumentException if Context is not GPU context
+     */
+    public abstract MemoryUsage getGpuMemory(Context context);
 
     /**
      * Returns system default context.

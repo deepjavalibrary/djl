@@ -22,6 +22,7 @@ import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
@@ -47,6 +48,14 @@ public class MxEngine extends Engine {
     @Override
     public int getGpuCount() {
         return JnaUtils.getGpuCount();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MemoryUsage getGpuMemory(Context context) {
+        long[] mem = JnaUtils.getGpuMemory(context);
+        long committed = mem[1] - mem[0];
+        return new MemoryUsage(-1, committed, committed, mem[1]);
     }
 
     /** {@inheritDoc} */
