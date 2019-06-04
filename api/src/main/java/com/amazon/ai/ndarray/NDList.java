@@ -78,12 +78,15 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
 
     /**
      * Removes the first occurrence of the specified element from this NDList, if it is present
-     * (optional operation). If this list does not contain the element, it is unchanged. More
-     * formally, removes the element with the lowest index <tt>i</tt> such that
+     * (optional operation).
+     *
+     * <p>If this list does not contain the element, it is unchanged. More formally, removes the
+     * element with the lowest index <tt>i</tt> such that
      * <tt>(o==null&nbsp;?&nbsp;get(i)==null&nbsp;:&nbsp;o.equals(get(i)))</tt> (if such an element
      * exists).
      *
      * @param name name of the NDArray to be removed from this NDList, if present
+     * @return the element which got removed
      * @throws UnsupportedOperationException if the <tt>NDList</tt> is read only
      */
     public NDArray remove(String name) {

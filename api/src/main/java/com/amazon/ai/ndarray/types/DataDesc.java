@@ -81,11 +81,12 @@ public class DataDesc {
 
     /**
      * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape}, {@link
-     * DataType} and name.
+     * DataType}, name and {@link Layout}.
      *
      * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param name the name of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param layout the {@link Layout} of the {@link com.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape, DataType dataType, String name, Layout layout) {
         this(shape, dataType, name, layout, null, SparseFormat.DEFAULT);

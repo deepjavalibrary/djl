@@ -24,7 +24,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MxNDFactory implements NDFactory {
 
-    public static final MxNDFactory SYSTEM_FACTORY = new SystemFactory();
+    /**
+     * A global {@link NDFactory} singleton instance.
+     *
+     * <p>This NDFactory is the root of all the other NDFactories. NDArrays created by this factory
+     * are un-managed, user has to close them manually. Those NDArrays will be released on GC, and
+     * might be run into out of native memory issue.
+     */
+    static final MxNDFactory SYSTEM_FACTORY = new SystemFactory();
 
     private NDFactory parent;
     private Context context;
@@ -39,15 +46,11 @@ public class MxNDFactory implements NDFactory {
     /** {@inheritDoc} */
     @Override
     public MxNDArray create(
-            Context context,
-            Shape shape,
-            DataType dataType,
-            SparseFormat sparseFormat,
-            boolean delay) {
+            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
         if (context == null) {
             context = this.context;
         }
-        MxNDArray array = new MxNDArray(this, context, shape, dataType, delay);
+        MxNDArray array = new MxNDArray(this, context, sparseFormat, shape, dataType);
         resources.put(array, array);
         return array;
     }
@@ -65,8 +68,7 @@ public class MxNDFactory implements NDFactory {
                 dataDesc.getContext(),
                 dataDesc.getShape(),
                 dataDesc.getDataType(),
-                SparseFormat.DEFAULT,
-                false);
+                SparseFormat.DEFAULT);
     }
 
     public MxNDArray create(Pointer handle) {

@@ -68,14 +68,24 @@ public class MxNDArray extends NativeResource implements NDArray {
         this.isReady = false;
     }
 
-    MxNDArray(MxNDFactory factory, Context context, Shape shape, DataType dataType, boolean delay) {
+    MxNDArray(
+            MxNDFactory factory,
+            Context context,
+            SparseFormat sparseFormat,
+            Shape shape,
+            DataType dataType) {
         this(
                 factory,
                 context,
-                SparseFormat.DEFAULT,
+                sparseFormat,
                 shape,
                 DataType.FLOAT32,
-                JnaUtils.createNdArray(context, shape, dataType, shape.dimension(), delay));
+                JnaUtils.createNdArray(
+                        context,
+                        shape,
+                        dataType,
+                        shape.dimension(),
+                        sparseFormat != SparseFormat.DEFAULT));
     }
 
     /** {@inheritDoc} */
@@ -213,7 +223,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (ctx.equals(getContext()) && !copy) {
             return this;
         }
-        MxNDArray nd = new MxNDArray(factory, ctx, getShape(), getDataType(), false);
+        MxNDArray nd = factory.create(ctx, getShape(), getDataType(), getSparseFormat());
         copyTo(nd);
         return nd;
     }
@@ -224,7 +234,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (dtype.equals(getDataType()) && !copy) {
             return this;
         }
-        MxNDArray nd = new MxNDArray(factory, getContext(), getShape(), dtype, false);
+        MxNDArray nd = factory.create(getContext(), getShape(), dtype, getSparseFormat());
         copyTo(nd);
         return nd;
     }

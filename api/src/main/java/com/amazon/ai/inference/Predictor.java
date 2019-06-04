@@ -46,7 +46,7 @@ public interface Predictor<I, O> extends AutoCloseable {
      * @param context context used for the inference
      * @param <I> Input object for preprocessing
      * @param <O> Output object come from postprocessing
-     * @return
+     * @return new instance of <code>Predictor</code>
      */
     static <I, O> Predictor<I, O> newInstance(
             Model model, Translator<I, O> translator, Context context) {
