@@ -14,6 +14,7 @@ package com.amazon.ai.metric;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,22 @@ public class Metrics {
         list.add(metric);
     }
 
+    public void addMetric(String name, Number value) {
+        addMetric(new Metric(name, value));
+    }
+
+    public void addMetric(String name, Number value, String unit) {
+        addMetric(new Metric(name, value, unit));
+    }
+
+    public List<Metric> getMetric(String name) {
+        List<Metric> list = metrics.get(name);
+        if (list == null) {
+            return Collections.emptyList();
+        }
+        return list;
+    }
+
     public Metric percentile(String metricName, int percent) {
         List<Metric> metric = metrics.get(metricName);
         if (metric == null || metrics.isEmpty()) {
@@ -53,7 +70,7 @@ public class Metrics {
             throw new IllegalArgumentException("Metric name not found: " + metricName);
         }
 
-        return metric.stream().collect(Collectors.averagingLong(Metric::getValue));
+        return metric.stream().collect(Collectors.averagingLong(m -> m.getValue().longValue()));
     }
 
     private static final class MetricValueComparator implements Comparator<Metric>, Serializable {
@@ -62,7 +79,12 @@ public class Metrics {
 
         @Override
         public int compare(Metric o1, Metric o2) {
-            return Long.compare(o1.getValue(), o2.getValue());
+            Number n1 = o1.getValue();
+            Number n2 = o2.getValue();
+            if (n1 instanceof Double || n1 instanceof Float) {
+                return Double.compare(n1.doubleValue(), n2.doubleValue());
+            }
+            return Long.compare(n1.longValue(), n2.longValue());
         }
     }
 }

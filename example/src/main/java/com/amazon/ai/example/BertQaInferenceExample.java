@@ -109,8 +109,8 @@ public class BertQaInferenceExample {
                 printProgress(iteration, i, answer);
             }
 
-            float p50 = metrics.percentile("Inference", 50).getValue() / 1000000f;
-            float p90 = metrics.percentile("Inference", 90).getValue() / 1000000f;
+            float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1000000f;
+            float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000000f;
 
             logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
         }

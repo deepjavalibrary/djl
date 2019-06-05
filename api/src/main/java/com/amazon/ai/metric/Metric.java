@@ -15,17 +15,17 @@ package com.amazon.ai.metric;
 public class Metric {
 
     private String metricName;
-    private long value;
+    private Number value;
     private String unit;
     private long timestamp;
 
     public Metric() {}
 
-    public Metric(String metricName, long value) {
+    public Metric(String metricName, Number value) {
         this(metricName, value, "count");
     }
 
-    public Metric(String metricName, long value, String unit) {
+    public Metric(String metricName, Number value, String unit) {
         this.metricName = metricName;
         this.value = value;
         this.unit = unit;
@@ -40,11 +40,11 @@ public class Metric {
         this.metricName = metricName;
     }
 
-    public long getValue() {
+    public Number getValue() {
         return value;
     }
 
-    public void setValue(long value) {
+    public void setValue(Number value) {
         this.value = value;
     }
 

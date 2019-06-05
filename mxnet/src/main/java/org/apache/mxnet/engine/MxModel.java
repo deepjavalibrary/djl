@@ -103,7 +103,7 @@ public class MxModel implements Model, AutoCloseable {
      *
      * <p>The parameter follow the format as: "name : paramWeight"
      *
-     * @return
+     * @return a {@link PairList} of model weights with their name
      */
     public PairList<String, MxNDArray> getParameters() {
         return parameters;

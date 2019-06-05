@@ -18,7 +18,6 @@ import com.amazon.ai.TranslateException;
 import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.metric.Metric;
 import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
@@ -87,7 +86,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
             long tmp = System.nanoTime();
             long duration = tmp - timestamp;
             timestamp = tmp;
-            metrics.addMetric(new Metric("Preprocess", duration, "nano"));
+            metrics.addMetric("Preprocess", duration, "nano");
         }
     }
 
@@ -100,7 +99,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
             long tmp = System.nanoTime();
             long duration = tmp - timestamp;
             timestamp = tmp;
-            metrics.addMetric(new Metric("Inference", duration, "nano"));
+            metrics.addMetric("Inference", duration, "nano");
         }
     }
 
@@ -109,7 +108,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
             long tmp = System.nanoTime();
             long duration = tmp - timestamp;
             timestamp = tmp;
-            metrics.addMetric(new Metric("Postprocess", duration, "nano"));
+            metrics.addMetric("Postprocess", duration, "nano");
         }
     }
 

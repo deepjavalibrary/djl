@@ -17,6 +17,7 @@
 
 package com.amazon.ai.example;
 
+import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.TranslateException;
 import com.amazon.ai.TranslatorContext;
@@ -47,16 +48,21 @@ public final class SsdExample extends AbstractExample {
     }
 
     @Override
-    public void predict(File modelDir, String modelName, BufferedImage img, int iteration)
+    protected void predict(File modelDir, String modelName, BufferedImage img, int iteration)
             throws IOException, TranslateException {
         Model model = Model.loadModel(modelDir, modelName);
 
         SsdTranslator translator = new SsdTranslator(5, 224, 224);
         Metrics metrics = new Metrics();
 
+        // Following context is not not required, default context will be used by Predictor without
+        // passing context to Predictor.newInstance(model, translator)
+        // Change to a specific context if needed.
+        Context context = Context.defaultContext();
+
         long init = System.nanoTime();
         try (ObjectDetector<BufferedImage, List<DetectedObject>> ssd =
-                new ObjectDetector<>(model, translator)) {
+                new ObjectDetector<>(model, translator, context)) {
             ssd.setMetrics(metrics);
 
             long loadModel = System.nanoTime();
@@ -65,10 +71,11 @@ public final class SsdExample extends AbstractExample {
             for (int i = 0; i < iteration; ++i) {
                 List<DetectedObject> result = ssd.detect(img);
                 printProgress(iteration, i, result.get(0).getClassName());
+                collectMemoryInfo(metrics);
             }
 
-            float p50 = metrics.percentile("Inference", 50).getValue() / 1000000f;
-            float p90 = metrics.percentile("Inference", 90).getValue() / 1000000f;
+            float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1000000f;
+            float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000000f;
 
             logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
         }
