@@ -19,8 +19,9 @@ package com.amazon.ai.engine;
  * <p>At the initialization time, {@link java.util.ServiceLoader} will search <code>EngineProvider
  * </code> implementations that available in class path.
  *
- * <p>Currently, we only allows one EngineProvider implementation to be loaded at time. For example,
- * We don't support co-exist of MXNet and Tensorflow providers in the same application.
+ * <p>Engine is designed as a singleton. {@link Engine#getInstance()} will only return first Engine found in class path.
+ * However, user can directly create specific Engine instance (e.g. <code>MxEngine<code>).
+ * For example, If MXNet and TensorFlow providers are found in the same application, only the first one would be loaded.
  */
 public interface EngineProvider {
 

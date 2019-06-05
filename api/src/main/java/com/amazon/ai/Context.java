@@ -16,8 +16,8 @@ import com.amazon.ai.engine.Engine;
 import java.util.Objects;
 
 /**
- * The <code>Model</code> class provides the specified assignment for CPU/GPU processing on the
- * NDArray
+ * The <code>Context</code> class provides the specified assignment for CPU/GPU processing on the
+ * NDArray.
  *
  * <p>Users can use this to specify whether to load/compute the NDArray on CPU/GPU with deviceType
  * and deviceId provided

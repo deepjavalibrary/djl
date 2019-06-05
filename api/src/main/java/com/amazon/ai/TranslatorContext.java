@@ -24,28 +24,28 @@ import com.amazon.ai.ndarray.NDFactory;
 public interface TranslatorContext extends AutoCloseable {
 
     /**
-     * Get the {@link Model} to understand the input/output
+     * Returns the {@link Model} object to understand the input/output.
      *
      * @return {@link Model}
      */
     Model getModel();
 
     /**
-     * Get the context information (CPU/GPU)
+     * Returns the context information.
      *
      * @return {@link Context}
      */
     Context getContext();
 
     /**
-     * Get the NDFactory to create NDArray
+     * Returns the {@link NDFactory} to create {@link com.amazon.ai.ndarray.NDArray}.
      *
      * @return {@link NDFactory}
      */
     NDFactory getNDFactory();
 
     /**
-     * Get the Metric tool to do benchmark
+     * Returns the Metric tool to do benchmark.
      *
      * @return {@link Metrics}
      */

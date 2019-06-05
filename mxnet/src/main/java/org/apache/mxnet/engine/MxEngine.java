@@ -115,6 +115,7 @@ public class MxEngine extends Engine {
         return NN_INDEX;
     }
 
+    /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(
             Model model, Translator<I, O> translator, Context context) {

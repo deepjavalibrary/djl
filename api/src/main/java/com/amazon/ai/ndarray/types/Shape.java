@@ -12,6 +12,8 @@
  */
 package com.amazon.ai.ndarray.types;
 
+import java.util.Arrays;
+
 /** A class presents {@link com.amazon.ai.ndarray.NDArray}'s shape information. */
 public class Shape {
 
@@ -216,5 +218,18 @@ public class Shape {
      */
     public boolean isScalar() {
         return dimension() == 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Shape shape1 = (Shape) o;
+        return Arrays.equals(shape, shape1.shape);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(shape);
     }
 }

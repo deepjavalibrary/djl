@@ -24,6 +24,14 @@ import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The <code>CachedOp</code> class provides the core functionality to execute a graph with MXNet.
+ *
+ * <p>Users are not recommended to interact with this class directly, use {@link
+ * com.amazon.ai.inference.Predictor} instead. CachedOp is an operator that simplify the input by
+ * self-analyzing the input shape such as the batch size. It require minimum input to do inference
+ * since most of the information can be obtained from the model itself.
+ */
 public class CachedOp extends NativeResource {
 
     private static final Logger logger = LoggerFactory.getLogger(CachedOp.class);
@@ -33,6 +41,16 @@ public class CachedOp extends NativeResource {
     private Map<String, Integer> inputNameMap;
     private MxNDFactory factory;
 
+    /**
+     * Create an instance of {@link CachedOp}.
+     *
+     * <p>It can be created by using {@link JnaUtils#createCachedOp(MxModel, MxNDFactory)}
+     *
+     * @param handle The C handle of the CachedOp
+     * @param factory factory used to create NDArray
+     * @param inputNDArray The inputNDArray contains no inputs and all params
+     * @param inputNames input names required by the model and their corresponding location
+     */
     public CachedOp(
             Pointer handle,
             MxNDFactory factory,
@@ -45,6 +63,14 @@ public class CachedOp extends NativeResource {
         this.factory = factory;
     }
 
+    /**
+     * Forwarding method of CachedOp.
+     *
+     * <p>All inputs will be assigned to the empty locations of the inputNDArray
+     *
+     * @param list input in {@link NDList} format
+     * @return result {@link NDList}
+     */
     public NDList forward(NDList list) {
         int index = 0;
         for (Pair<String, NDArray> pair : list) {

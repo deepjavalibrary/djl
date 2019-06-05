@@ -110,10 +110,11 @@ public abstract class Engine {
     public abstract String getVersion();
 
     /**
-     * Try to use {@link Model}.loadModel instead. Load the model passed from the model class.
+     * Load the model passed from the model class.
      *
-     * <p>Preliminary check on the model path and name to see if the file exist. If the file exist,
-     * will handover to the corresponding Framework model loader
+     * <p>We recommend to use {@link Model#loadModel(String, int)}. Preliminary check on the model
+     * path and name to see if the file exist. If the file exist, will handover to the corresponding
+     * Framework model loader
      *
      * @param modelPath Directory of the model
      * @param modelName Name/Prefix of the model
@@ -124,7 +125,9 @@ public abstract class Engine {
     public abstract Model loadModel(File modelPath, String modelName, int epoch) throws IOException;
 
     /**
-     * Try to use {@link Predictor}.newInstance instead. Create new predictor with specific Engine.
+     * Create new predictor with specific Engine.
+     *
+     * <p>Recommend to use {@link Predictor#newInstance(Model, Translator, Context)}.
      *
      * @param model the model used for inference
      * @param translator preprocessing and postprocessing helper class
@@ -153,5 +156,6 @@ public abstract class Engine {
      */
     public abstract Trainer newTrainer(Model model, Context context);
 
+    // TODO: Not Implemented
     public abstract void setProfiler(Profiler profiler);
 }

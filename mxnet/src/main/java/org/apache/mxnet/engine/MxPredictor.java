@@ -26,6 +26,14 @@ import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.util.Pair;
 import org.apache.mxnet.jna.JnaUtils;
 
+/**
+ * <code>MxPredictor</code> is the MXNet implementation of {@link Predictor}.
+ *
+ * <p>MxPredictor contains all methods in the Predictor class and MXNet specific implementations.
+ *
+ * @param <I> Input Object
+ * @param <O> Output Object
+ */
 public class MxPredictor<I, O> implements Predictor<I, O> {
 
     MxModel model;

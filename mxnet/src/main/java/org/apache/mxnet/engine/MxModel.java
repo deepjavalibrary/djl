@@ -31,6 +31,13 @@ import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * <code>MxModel</code> is MXNet implementation of {@link Model}.
+ *
+ * <p>MxModel contains all methods in Model to load and process model. In addition, it provides
+ * MXNet Specific functionality, such as getSymbol to obtain the Symbolic graph and getParameters to
+ * obtain the parameter NDArrays
+ */
 public class MxModel implements Model, AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
@@ -58,6 +65,8 @@ public class MxModel implements Model, AutoCloseable {
     }
 
     static MxModel loadModel(MxNDFactory factory, String prefix, int epoch) throws IOException {
+        // TODO: Find a better solution to get rid of this line
+        JnaUtils.getAllOpNames();
         Symbol symbol = Symbol.load(factory, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
         String stateFile = String.format("%s-%04d.states", prefix, epoch);
@@ -77,15 +86,25 @@ public class MxModel implements Model, AutoCloseable {
 
         String[] stateNames = JnaUtils.readLines(new File(stateFile)).toArray(JnaUtils.EMPTY_ARRAY);
 
-        JnaUtils.waitAll();
-
         return new MxModel(modelDir, symbol, parameters, stateNames);
     }
 
+    /**
+     * Returns the Symbolic graph from the model.
+     *
+     * @return {@link Symbol} object
+     */
     public Symbol getSymbol() {
         return symbol;
     }
 
+    /**
+     * Returns the parameter Pairs from the model.
+     *
+     * <p>The parameter follow the format as: "name : paramWeight"
+     *
+     * @return
+     */
     public PairList<String, MxNDArray> getParameters() {
         return parameters;
     }

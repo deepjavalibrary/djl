@@ -34,14 +34,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
 public class BertQaInferenceExample {
@@ -71,8 +69,6 @@ public class BertQaInferenceExample {
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
-            Set<String> set = JnaUtils.getAllOpNames();
-            logger.info(set.toString());
             long loaded = System.nanoTime();
             logger.info(
                     String.format(

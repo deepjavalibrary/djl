@@ -18,8 +18,8 @@ import com.amazon.ai.ndarray.NDList;
  * The <code>Translator</code> interface provides model preprocessing and postprocessing
  * functionality.
  *
- * <p>Users can use this in {@link com.amazon.ai.inference.Predictor} with Input and Output Object
- * Specified
+ * <p>Users can use this in {@link com.amazon.ai.inference.Predictor} with input and output object
+ * specified
  */
 public interface Translator<I, O> {
 
