@@ -72,7 +72,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>{@link Shape} defines how this NDArray represent in multi-dimension.
      *
-     * @return
+     * @return Returns the {@link Shape} of the NDArray.
      */
     Shape getShape();
 
@@ -103,9 +103,9 @@ public interface NDArray extends AutoCloseable {
     void set(Buffer data);
 
     /**
-     * Set the NDArray value from List<Float>.
+     * Set the NDArray value from a list of float.
      *
-     * @param data List<Float>
+     * @param data list of floats to set
      */
     void set(List<Float> data);
 
@@ -160,59 +160,6 @@ public interface NDArray extends AutoCloseable {
     NDList split(int numOutputs, Integer axis, Boolean squeezeAxis);
 
     boolean isSparse();
-
-    boolean isCompressed();
-
-    void markAsCompressed(boolean reallyCompressed);
-
-    /**
-     * Calculate the stride along a particular dimension
-     *
-     * @param dimension the dimension to get the stride for
-     * @return the stride for a particular dimension
-     */
-    int stride(int dimension);
-
-    /**
-     * Element wise stride
-     *
-     * @return the element-wise stride for the array
-     */
-    int elementWiseStride();
-
-    /**
-     * Returns the number of possible vectors for a given dimension
-     *
-     * @param dimension the dimension to calculate the number of vectors for
-     * @return the number of possible vectors along a dimension
-     */
-    long vectorsAlongDimension(int dimension);
-
-    /**
-     * Returns the vector along a particular dimension
-     *
-     * @param index the index of the vector to getScalar
-     * @param dimension the dimension to getScalar the vector from
-     * @return the vector along a particular dimension
-     */
-    NDArray vectorAlongDimension(int index, int dimension);
-
-    /**
-     * Returns the number of possible vectors for a given dimension
-     *
-     * @param dimension the dimension to calculate the number of vectors for
-     * @return the number of possible vectors along a dimension
-     */
-    long tensorsAlongDimension(int... dimension);
-
-    /**
-     * Returns the vector along a particular dimension
-     *
-     * @param index the index of the vector to getScalar
-     * @param dimension the dimension to getScalar the vector from
-     * @return the vector along a particular dimension
-     */
-    NDArray tensorAlongDimension(int index, int... dimension);
 
     /**
      * Returns the cumulative sum along a dimension. In-place method.
@@ -787,17 +734,6 @@ public interface NDArray extends AutoCloseable {
      * @return the NDArray with the values
      */
     NDArray assign(Number value);
-
-    /**
-     * Returns the linear index of the data in to the array
-     *
-     * @param i the index to getScalar
-     * @return the linear index in to the data
-     */
-    long linearIndex(long i);
-
-    /** @param list a list of NDArray */
-    void sliceVectors(List<NDArray> list);
 
     /**
      * Assigns the given matrix (put) to the specified slice
@@ -1607,14 +1543,6 @@ public interface NDArray extends AutoCloseable {
     NDArray sum(boolean keepDims, int... dimension);
 
     /**
-     * This method takes boolean condition, and returns number of elements matching this condition
-     *
-     * @param condition Condition to calculate matches for
-     * @return Number of elements matching condition
-     */
-    Number scan(Condition condition);
-
-    /**
      * Returns the sum along the last dimension of this NDArray
      *
      * @param result result of this operation will be stored here
@@ -1674,16 +1602,6 @@ public interface NDArray extends AutoCloseable {
      * @return NDArray
      */
     NDArray logEntropy(int... dimension);
-
-    /**
-     * Returns a sub-NDArray.
-     *
-     * @param offsets offset
-     * @param shape shape
-     * @param stride stride
-     * @return NDArray
-     */
-    NDArray subArray(long[] offsets, int[] shape, int[] stride);
 
     /**
      * Returns the elements at the specified indices
@@ -1749,13 +1667,6 @@ public interface NDArray extends AutoCloseable {
     NDArray ravel(char order);
 
     /**
-     * Returns the number of slices in this NDArray
-     *
-     * @return the number of slices in this NDArray
-     */
-    long slices();
-
-    /**
      * Returns the specified slice of this NDArray
      *
      * @param i the index of the slice to return
@@ -1771,20 +1682,6 @@ public interface NDArray extends AutoCloseable {
      * @return the specified slice of this NDArray
      */
     NDArray slice(long i);
-
-    /**
-     * Returns the start of where the NDArray is for the underlying data
-     *
-     * @return the starting offset
-     */
-    long offset();
-
-    /**
-     * Returns the start of where the NDArray is for the original data buffer
-     *
-     * @return NDArray NDArray
-     */
-    long originalOffset();
 
     /**
      * Reshapes the NDArray (can't change the length of the NDArray). Typically this will be a view,
@@ -1844,53 +1741,24 @@ public interface NDArray extends AutoCloseable {
     NDArray swapAxes(int dimension, int with);
 
     /**
-     * See: http://www.mathworks.com/help/matlab/ref/permute.html
+     * Reorders the dimensions in the {@link NDArray}.
      *
-     * @param rearrange the dimensions to swap to
+     * <p>Specify the new order for the axis given. Use -1 to broadcast across a dimension.
+     *
+     * @param dimensions the dimensions to swap to
      * @return the newly permuted array
      */
-    NDArray permute(int... rearrange);
+    NDArray transpose(int... dimensions);
 
     /**
-     * An <b>in-place</b> version of permute. The array shape information (shape, strides) is
-     * modified by this operation (but not the data itself) See:
-     * http://www.mathworks.com/help/matlab/ref/permute.html
+     * Reorders the dimensions in the {@link NDArray} in place.
      *
-     * @param rearrange the dimensions to swap to
+     * <p>Specify the new order for the axis given. Use -1 to broadcast across a dimension.
+     *
+     * @param dimensions the dimensions to swap to
      * @return the current array
      */
-    NDArray permutei(int... rearrange);
-
-    /**
-     * Dimshuffle: an extension of permute that adds the ability to broadcast various dimensions.
-     * This will only accept integers and xs.
-     *
-     * <p>An x indicates a dimension should be broadcasted rather than permuted.
-     *
-     * <p>Examples originally from the theano docs:
-     * http://deeplearning.net/software/theano/library/tensor/basic.html
-     *
-     * <p>Returns a view of this tensor with permuted dimensions. Typically the pattern will include
-     * the integers 0, 1, ... ndim-1, and any number of 'x' characters in dimensions where this
-     * tensor should be broadcasted.
-     *
-     * <p>A few examples of patterns and their effect:
-     *
-     * <p>('x') -&gt; make a 0d (scalar) into a 1d vector (0, 1) -&gt; identity for 2d vectors (1,
-     * 0) -&gt; inverts the first and second dimensions ('x', 0) -&gt; make a row out of a 1d vector
-     * (N to 1xN) (0, 'x') -&gt; make a column out of a 1d vector (N to Nx1) (2, 0, 1) -&gt; AxBxC
-     * to CxAxB (0, 'x', 1) -&gt; AxB to Ax1xB (1, 'x', 0) -&gt; AxB to Bx1xA (1,) -&gt; This remove
-     * dimensions 0. It must be a broadcastable dimension (1xA to A)
-     *
-     * @param rearrange the dimensions to swap to
-     * @param newOrder the new order (think permute)
-     * @param broadCastable (whether the dimension is broadcastable) (must be same length as new
-     *     order)
-     * @return the newly permuted array
-     */
-    NDArray dimShuffle(Object[] rearrange, int[] newOrder, boolean[] broadCastable);
-
-    NDArray dimShuffle(Object[] rearrange, long[] newOrder, boolean[] broadCastable);
+    NDArray transposei(int... dimensions);
 
     /**
      * Returns the specified column. Throws an exception if its not a matrix
@@ -1907,13 +1775,6 @@ public interface NDArray extends AutoCloseable {
      * @return the specified row
      */
     NDArray getRow(long i);
-
-    /**
-     * Returns the stride of this NDArray
-     *
-     * @return the stride of this NDArray
-     */
-    long[] stride();
 
     /**
      * Returns the size along a specified dimension
@@ -2071,28 +1932,6 @@ public interface NDArray extends AutoCloseable {
     NDArray argMax(int... dimension);
 
     /**
-     * This method returns True, if this NDArray instance is attached to some Workspace. False
-     * otherwise.
-     *
-     * @return True if attached to workspace, false otherwise
-     */
-    boolean isAttached();
-
-    /**
-     * This method pulls this NDArray into current Workspace, or optionally detaches if no workspace
-     * is present.<br>
-     * That is:<br>
-     * If current workspace is present/active, NDArray is migrated to it.<br>
-     * If no current workspace is present/active, one of two things occur: 1. If detachOnNoWs arg is
-     * true: if there is no current workspace, NDArray is detached 2. If detachOnNoWs arg is false:
-     * this NDArray is returned as-is (no-op)
-     *
-     * @param detachOnNoWs If true: detach on no WS. If false and no workspace: return this.
-     * @return Migrated NDArray
-     */
-    NDArray migrate(boolean detachOnNoWs);
-
-    /**
      * This method returns percentile value for this NDArray
      *
      * @param percentile target percentile in range of 0..100
@@ -2138,13 +1977,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return nnz
      */
-    int nnz();
-
-    int[] flags();
-
-    int[] hiddenDimensions();
-
-    int[] sparseOffsets();
+    int nonzero();
 
     /**
      * This method returns true if this NDArray is special case: no-value NDArray

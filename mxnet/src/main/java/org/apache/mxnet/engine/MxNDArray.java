@@ -309,52 +309,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isCompressed() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void markAsCompressed(boolean reallyCompressed) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public int stride(int dimension) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int elementWiseStride() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long vectorsAlongDimension(int dimension) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray vectorAlongDimension(int index, int dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long tensorsAlongDimension(int... dimension) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray tensorAlongDimension(int index, int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray cumsumi(int dimension) {
         return null;
     }
@@ -778,16 +732,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray assign(Number value) {
         return null;
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public long linearIndex(long i) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void sliceVectors(List<NDArray> list) {}
 
     /** {@inheritDoc} */
     @Override
@@ -1391,12 +1335,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number scan(Condition condition) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray sum(NDArray result, int... dimension) {
         return null;
     }
@@ -1440,12 +1378,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logEntropy(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subArray(long[] offsets, int[] shape, int[] stride) {
         return null;
     }
 
@@ -1517,12 +1449,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public long slices() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray slice(long i, int dimension) {
         return null;
     }
@@ -1531,18 +1457,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray slice(long i) {
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long offset() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long originalOffset() {
-        return 0;
     }
 
     /** {@inheritDoc} */
@@ -1596,25 +1510,13 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray permute(int... rearrange) {
+    public NDArray transpose(int... dimensions) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray permutei(int... rearrange) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray dimShuffle(Object[] rearrange, int[] newOrder, boolean[] broadCastable) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray dimShuffle(Object[] rearrange, long[] newOrder, boolean[] broadCastable) {
+    public NDArray transposei(int... dimensions) {
         return null;
     }
 
@@ -1628,12 +1530,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray getRow(long i) {
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long[] stride() {
-        return new long[0];
     }
 
     /** {@inheritDoc} */
@@ -1757,18 +1653,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isAttached() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray migrate(boolean detachOnNoWs) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Number percentileNumber(Number percentile) {
         return null;
     }
@@ -1799,26 +1683,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public int nnz() {
+    public int nonzero() {
         return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] flags() {
-        return new int[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] hiddenDimensions() {
-        return new int[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] sparseOffsets() {
-        return new int[0];
     }
 
     /** {@inheritDoc} */
