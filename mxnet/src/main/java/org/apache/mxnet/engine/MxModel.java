@@ -23,9 +23,8 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
-import java.util.ListIterator;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.jna.JnaUtils;
@@ -36,21 +35,21 @@ public class MxModel implements Model, AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
+    private File modelDir;
     private Symbol symbol;
     private PairList<String, MxNDArray> parameters;
-    private String[] synset;
     private String[] optimizerStates;
     private String[] fixedParameters;
     private DataDesc[] inputData;
 
     MxModel(
+            File modelDir,
             Symbol symbol,
             PairList<String, MxNDArray> parameters,
-            String[] synset,
             String[] optimizerStates) {
+        this.modelDir = modelDir;
         this.symbol = symbol;
         this.parameters = parameters;
-        this.synset = synset;
         this.optimizerStates = optimizerStates;
     }
 
@@ -62,7 +61,7 @@ public class MxModel implements Model, AutoCloseable {
         Symbol symbol = Symbol.load(factory, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
         String stateFile = String.format("%s-%04d.states", prefix, epoch);
-        File synsetFile = new File(new File(paramFile).getParentFile(), "synset.txt");
+        File modelDir = new File(paramFile).getParentFile();
 
         PointerByReference namesRef = new PointerByReference();
         Pointer[] handles = JnaUtils.loadNdArray(paramFile, namesRef);
@@ -76,12 +75,11 @@ public class MxModel implements Model, AutoCloseable {
             parameters.add(pair[1], array);
         }
 
-        String[] synset = loadSynset(synsetFile);
         String[] stateNames = JnaUtils.readLines(new File(stateFile)).toArray(JnaUtils.EMPTY_ARRAY);
 
         JnaUtils.waitAll();
 
-        return new MxModel(symbol, parameters, synset, stateNames);
+        return new MxModel(modelDir, symbol, parameters, stateNames);
     }
 
     public Symbol getSymbol() {
@@ -103,7 +101,7 @@ public class MxModel implements Model, AutoCloseable {
         for (Pair<String, MxNDArray> pair : parameters) {
             newParam.add(pair.getKey(), pair.getValue().asType(dataType, true));
         }
-        return new MxModel(symbol, newParam, synset, optimizerStates);
+        return new MxModel(modelDir, symbol, newParam, optimizerStates);
     }
 
     public String[] getOptimizerStates() {
@@ -163,29 +161,6 @@ public class MxModel implements Model, AutoCloseable {
         }
     }
 
-    public static String[] loadSynset(File synsetFile) {
-        if (synsetFile.exists()) {
-            try {
-                List<String> output = Files.readAllLines(synsetFile.toPath());
-                ListIterator<String> it = output.listIterator();
-                while (it.hasNext()) {
-                    String synsetLemma = it.next();
-                    it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
-                }
-                return output.toArray(JnaUtils.EMPTY_ARRAY);
-            } catch (IOException e) {
-                logger.warn("Error opening synset file " + synsetFile, e);
-            }
-        }
-        return JnaUtils.EMPTY_ARRAY;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String[] getSynset() {
-        return synset;
-    }
-
     /** {@inheritDoc} */
     @Override
     public DataDesc[] describeInput() {
@@ -213,6 +188,29 @@ public class MxModel implements Model, AutoCloseable {
     @Override
     public DataDesc[] describeOutput() {
         return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public URL getResource(String artifactName) throws IOException {
+        if (artifactName == null) {
+            throw new IllegalArgumentException("artifactName cannot be null");
+        }
+        File file = new File(modelDir, artifactName);
+        if (file.exists() && file.canRead()) {
+            return file.toURI().toURL();
+        }
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public InputStream getResourceAsStream(String artifactName) throws IOException {
+        URL url = getResource(artifactName);
+        if (url == null) {
+            return null;
+        }
+        return url.openStream();
     }
 
     private void validate(String[] names, String typeName, boolean required) {

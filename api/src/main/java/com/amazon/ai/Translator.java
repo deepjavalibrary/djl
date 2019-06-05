@@ -24,20 +24,22 @@ import com.amazon.ai.ndarray.NDList;
 public interface Translator<I, O> {
 
     /**
-     * Process the input and convert to NDList
+     * Process the input and convert to NDList.
      *
      * @param ctx Toolkit that would help to creating input NDArray
      * @param input Input Object
      * @return {@link NDList}
+     * @throws TranslateException if an error occurs during processing input
      */
-    NDList processInput(TranslatorContext ctx, I input);
+    NDList processInput(TranslatorContext ctx, I input) throws TranslateException;
 
     /**
-     * Process output NDList to the corresponding Output Object
+     * Process output NDList to the corresponding Output Object.
      *
      * @param ctx Toolkit used to do postprocessing
      * @param list Output NDList after inference
-     * @return Ouput Object
+     * @return output object
+     * @throws TranslateException if an error occurs during processing output
      */
-    O processOutput(TranslatorContext ctx, NDList list);
+    O processOutput(TranslatorContext ctx, NDList list) throws TranslateException;
 }

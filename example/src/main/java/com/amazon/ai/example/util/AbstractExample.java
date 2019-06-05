@@ -12,17 +12,23 @@
  */
 package com.amazon.ai.example.util;
 
+import com.amazon.ai.TranslateException;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.image.Images;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
+import java.util.ListIterator;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.IOUtils;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
@@ -83,6 +89,22 @@ public abstract class AbstractExample {
         }
     }
 
+    public static String[] loadSynset(InputStream inputStream) {
+        try {
+            List<String> output = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
+            ListIterator<String> it = output.listIterator();
+            while (it.hasNext()) {
+                String synsetLemma = it.next();
+                it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
+            }
+            return output.toArray(JnaUtils.EMPTY_ARRAY);
+        } catch (IOException e) {
+            logger.warn("Error opening synset file.", e);
+        }
+        return JnaUtils.EMPTY_ARRAY;
+    }
+
     public abstract void predict(
-            File modelDir, String modelName, BufferedImage image, int iteration) throws IOException;
+            File modelDir, String modelName, BufferedImage image, int iteration)
+            throws IOException, TranslateException;
 }

@@ -14,6 +14,7 @@ package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
+import com.amazon.ai.TranslateException;
 import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.inference.Predictor;
@@ -46,7 +47,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
     /** {@inheritDoc} */
     @Override
-    public O predict(I input) {
+    public O predict(I input) throws TranslateException {
         timestamp = System.nanoTime();
 
         try (PredictorContext inputCtx = new PredictorContext();

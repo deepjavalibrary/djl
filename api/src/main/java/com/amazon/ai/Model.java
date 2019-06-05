@@ -17,6 +17,8 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * The <code>Model</code> interface provides model loading functionality.
@@ -109,7 +111,24 @@ public interface Model {
      */
     DataDesc[] describeOutput();
 
-    String[] getSynset();
+    /**
+     * Finds a artifact resource with a given name in the model.
+     *
+     * @param artifactName name of the desired artifact
+     * @return A {@link java.net.URL} object or {@code null} if no artifact with this name is found
+     * @throws IOException if an error occurs during loading resource
+     */
+    URL getResource(String artifactName) throws IOException;
+
+    /**
+     * Finds a artifact resource with a given name in the model.
+     *
+     * @param artifactName name of the desired artifact
+     * @return A {@link java.io.InputStream} object or {@code null} if no resource with this name is
+     *     found
+     * @throws IOException if an error occurs during loading resource
+     */
+    InputStream getResourceAsStream(String artifactName) throws IOException;
 
     /**
      * Cast the model to support different precision level.

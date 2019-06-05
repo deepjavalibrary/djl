@@ -14,6 +14,7 @@ package com.amazon.ai.inference;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
+import com.amazon.ai.TranslateException;
 import com.amazon.ai.Translator;
 import com.amazon.ai.metric.Metrics;
 
@@ -29,7 +30,7 @@ public class ObjectDetector<I, O> implements AutoCloseable {
         this.predictor = Predictor.newInstance(model, transformer, context);
     }
 
-    public O detect(I input) {
+    public O detect(I input) throws TranslateException {
         return predictor.predict(input);
     }
 

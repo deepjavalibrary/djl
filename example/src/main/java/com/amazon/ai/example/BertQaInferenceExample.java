@@ -14,6 +14,7 @@
 package com.amazon.ai.example;
 
 import com.amazon.ai.Model;
+import com.amazon.ai.TranslateException;
 import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.engine.Engine;
@@ -95,7 +96,7 @@ public class BertQaInferenceExample {
 
     private void predict(
             File modelDir, String modelName, BertDataParser parser, QAInput input, int iteration)
-            throws IOException {
+            throws IOException, TranslateException {
         Model model = Model.loadModel(modelDir, modelName);
 
         logger.info("Question: {}", input.getQuestion());

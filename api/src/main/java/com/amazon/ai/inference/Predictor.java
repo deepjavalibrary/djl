@@ -14,6 +14,7 @@ package com.amazon.ai.inference;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.Model;
+import com.amazon.ai.TranslateException;
 import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.metric.Metrics;
@@ -58,8 +59,9 @@ public interface Predictor<I, O> extends AutoCloseable {
      *
      * @param input Input follows the inputObject
      * @return The Output object defined by user
+     * @throws TranslateException if an error occurs during prediction
      */
-    O predict(I input);
+    O predict(I input) throws TranslateException;
 
     /**
      * Attach a Metrics param to use for benchmark

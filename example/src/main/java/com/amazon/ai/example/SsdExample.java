@@ -18,6 +18,7 @@
 package com.amazon.ai.example;
 
 import com.amazon.ai.Model;
+import com.amazon.ai.TranslateException;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.image.Images;
@@ -47,15 +48,15 @@ public final class SsdExample extends AbstractExample {
 
     @Override
     public void predict(File modelDir, String modelName, BufferedImage img, int iteration)
-            throws IOException {
+            throws IOException, TranslateException {
         Model model = Model.loadModel(modelDir, modelName);
 
-        SsdTranslator transformer = new SsdTranslator(5, 224, 224);
+        SsdTranslator translator = new SsdTranslator(5, 224, 224);
         Metrics metrics = new Metrics();
 
         long init = System.nanoTime();
         try (ObjectDetector<BufferedImage, List<DetectedObject>> ssd =
-                new ObjectDetector<>(model, transformer)) {
+                new ObjectDetector<>(model, translator)) {
             ssd.setMetrics(metrics);
 
             long loadModel = System.nanoTime();
@@ -78,6 +79,7 @@ public final class SsdExample extends AbstractExample {
         private int topK;
         private int imageWidth;
         private int imageHeight;
+        private String[] synset;
 
         public SsdTranslator(int topK, int imageWidth, int imageHeight) {
             this.topK = topK;
@@ -92,7 +94,8 @@ public final class SsdExample extends AbstractExample {
         }
 
         @Override
-        public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list) {
+        public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list)
+                throws TranslateException {
             Model model = ctx.getModel();
             NDArray array = list.get(0);
 
@@ -109,13 +112,18 @@ public final class SsdExample extends AbstractExample {
                 sorted.close();
                 top.close();
 
+                if (synset == null) {
+                    synset = loadSynset(model.getResourceAsStream("synset.txt"));
+                }
                 for (int i = 0; i < topK; ++i) {
                     int index = (int) indices[i];
-                    String className = model.getSynset()[index];
+                    String className = synset[index];
                     DetectedObject output =
                             new DetectedObject(className, probabilities[index], null);
                     ret.add(output);
                 }
+            } catch (IOException e) {
+                throw new TranslateException(e);
             }
             return ret;
         }

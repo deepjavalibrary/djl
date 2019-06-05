@@ -13,6 +13,7 @@
 package com.amazon.ai.example;
 
 import com.amazon.ai.Model;
+import com.amazon.ai.TranslateException;
 import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.example.util.AbstractExample;
@@ -45,7 +46,7 @@ public final class GenericInferenceExample extends AbstractExample {
 
     @Override
     public void predict(File modelDir, String modelName, BufferedImage img, int iteration)
-            throws IOException {
+            throws IOException, TranslateException {
         Model model = Model.loadModel(modelDir, modelName);
 
         BufferedImage image = Images.reshapeImage(img, 224, 224);
@@ -80,6 +81,7 @@ public final class GenericInferenceExample extends AbstractExample {
 
         private int topK;
         private DataDesc dataDesc;
+        private String[] synset;
 
         public GenericTranslator(int topK, int imageWidth, int imageHeight) {
             this.topK = topK;
@@ -94,7 +96,8 @@ public final class GenericInferenceExample extends AbstractExample {
         }
 
         @Override
-        public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list) {
+        public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list)
+                throws TranslateException {
             Model model = ctx.getModel();
             NDArray array = list.get(0);
 
@@ -108,9 +111,16 @@ public final class GenericInferenceExample extends AbstractExample {
             float[] probabilities = nd.toFloatArray();
             float[] indices = top.toFloatArray();
 
+            if (synset == null) {
+                try {
+                    synset = loadSynset(model.getResourceAsStream("synset.txt"));
+                } catch (IOException e) {
+                    throw new TranslateException(e);
+                }
+            }
             for (int i = 0; i < topK; ++i) {
                 int index = (int) indices[i];
-                String className = model.getSynset()[index];
+                String className = synset[index];
                 DetectedObject output = new DetectedObject(className, probabilities[index], null);
                 ret.add(output);
             }
