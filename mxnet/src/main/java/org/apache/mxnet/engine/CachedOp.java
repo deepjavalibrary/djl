@@ -72,6 +72,10 @@ public class CachedOp extends NativeResource {
      * @return result {@link NDList}
      */
     public NDList forward(NDList list) {
+        // reset the input field at the beginning
+        for (int location : inputNames.values()) {
+            inputNDArray[location] = null;
+        }
         int index = 0;
         for (Pair<String, NDArray> pair : list) {
             String inputName = pair.getKey();

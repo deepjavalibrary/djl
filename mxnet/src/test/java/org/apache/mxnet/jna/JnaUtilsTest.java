@@ -16,14 +16,13 @@ package org.apache.mxnet.jna;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import com.amazon.ai.Context;
-import java.nio.IntBuffer;
-import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
+import com.amazon.ai.test.MockMxnetLibrary;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
 import org.testng.IObjectFactory;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 
@@ -32,29 +31,21 @@ import org.testng.annotations.Test;
 @PrepareForTest(LibUtils.class)
 public class JnaUtilsTest extends PowerMockTestCase {
 
+    @BeforeMethod
+    public void prepare() {
+        mockStatic(LibUtils.class);
+        MxnetLibrary library = new MockMxnetLibrary();
+        PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
+    }
+
     @Test
     public void testGetVersion() {
-        mockStatic(LibUtils.class);
-
-        IntBuffer buf = IntBuffer.allocate(1);
-        MxnetLibrary library = Mockito.mock(MxnetLibrary.class);
-        PowerMockito.when(library.MXGetVersion(buf))
-                .thenAnswer(
-                        (Answer<Integer>)
-                                invocation -> {
-                                    Object[] args = invocation.getArguments();
-                                    ((IntBuffer) args[0]).put(0, 10500);
-                                    return 0;
-                                });
-
-        PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
-
         Assert.assertEquals(JnaUtils.getVersion(), 10500);
     }
 
     @Test
     public void testGetOpNames() {
-        Assert.assertTrue(JnaUtils.getAllOpNames().size() >= 708);
+        Assert.assertEquals(JnaUtils.getAllOpNames().size(), 1);
     }
 
     @Test

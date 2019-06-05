@@ -222,8 +222,12 @@ public class Shape {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Shape shape1 = (Shape) o;
         return Arrays.equals(shape, shape1.shape);
     }

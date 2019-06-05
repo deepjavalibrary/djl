@@ -214,7 +214,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         MxNDArray array = (MxNDArray) ndArray;
 
-        functionInfo.invoke(factory, array, new NDList(array), null);
+        functionInfo.invoke(factory, this, new NDList(array), null);
     }
 
     /** {@inheritDoc} */
