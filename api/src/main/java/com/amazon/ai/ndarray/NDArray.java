@@ -23,7 +23,13 @@ import java.nio.Buffer;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 
-/** An interface represents n-dimensional array. */
+/**
+ * An interface represents n-dimensional array.
+ *
+ * <p>NDArray is the core data structure for all mathematical computations. An NDArray represents a
+ * multidimensional, fixed-size homogeneous array. It has very close behaviour with python package
+ * Numpy with the addition of efficient computing.
+ */
 public interface NDArray extends AutoCloseable {
 
     /**
@@ -33,30 +39,118 @@ public interface NDArray extends AutoCloseable {
      */
     byte[] getEncoded();
 
+    /**
+     * Encode NDArray to an {@link OutputStream}.
+     *
+     * @param os OutputStream
+     * @throws IOException for writing problems
+     */
     void encode(OutputStream os) throws IOException;
 
+    /**
+     * Returns the {@link DataType} of the NDArray.
+     *
+     * <p>{@link DataType} is a definition of precision level of the NDArray. All values inside the
+     * same NDArray would have the same data type.
+     *
+     * @return {@link DataType}
+     */
     DataType getDataType();
 
+    /**
+     * Returns the {@link Context} of the NDArray.
+     *
+     * <p>{@link Context} class contains the information where this NDArray stored in memory, like
+     * CPU/GPU.
+     *
+     * @return {@link Context}
+     */
     Context getContext();
 
+    /**
+     * Returns the {@link Shape} of the NDArray.
+     *
+     * <p>{@link Shape} defines how this NDArray represent in multi-dimension.
+     *
+     * @return
+     */
     Shape getShape();
 
+    /**
+     * Returns the {@link Layout} of the NDArray.
+     *
+     * <p>{@link Layout} defines the meaning of each dimension in the array.
+     *
+     * @return {@link Layout}
+     */
     Layout getLayout();
 
+    /**
+     * Returns the {@link DataDesc} of the NDArray.
+     *
+     * <p>{@link DataDesc} contains all information about NDArray, including {@link Context}, {@link
+     * DataType}, {@link Shape}, {@link Layout}, {@link com.amazon.ai.ndarray.types.SparseFormat}.
+     *
+     * @return {@link Layout}
+     */
     DataDesc getDataDescriptor();
 
+    /**
+     * Set the NDArray value from {@link Buffer}.
+     *
+     * @param data The input buffered data
+     */
     void set(Buffer data);
 
+    /**
+     * Set the NDArray value from List<Float>.
+     *
+     * @param data List<Float>
+     */
     void set(List<Float> data);
 
+    /**
+     * Get the certain layer from the first dimension of the NDArray.
+     *
+     * @param index the layer index of the first dimension
+     * @return NDArray from the layer
+     */
     NDArray at(int index);
 
+    /**
+     * Getting a segment of the current NDArray.
+     *
+     * <p>The segmentation is only applied to the first dimension of the NDArray
+     *
+     * @param begin The beginning point
+     * @param end the Engine pointer
+     * @return Segmented NDArray
+     */
     NDArray slice(int begin, int end);
 
+    /**
+     * Copy the current NDArray value to the one passed in.
+     *
+     * @param array the NDArray prepared to be copied to
+     */
     void copyTo(NDArray array);
 
+    /**
+     * Converting the NDArray to a different {@link Context}.
+     *
+     * @param ctx {@link Context} that prepared to be set
+     * @param copy set True if you want to return a copy of the Existing NDArray.
+     * @return NDArray with the {@link Context} being set to
+     */
     NDArray asInContext(Context ctx, boolean copy);
 
+    /**
+     * Converting the NDArray to a different {@link DataType}.
+     *
+     * @param dtype {@link DataType} that prepared to be set
+     * @param copy set True if you want to return a copy of the Existing NDArray
+     * @return NDArray with the {@link DataType} being set to
+     */
     NDArray asType(DataType dtype, boolean copy);
 
     NDArray argsort(int axis, boolean isAscend);
@@ -95,7 +189,7 @@ public interface NDArray extends AutoCloseable {
     long vectorsAlongDimension(int dimension);
 
     /**
-     * Get the vector along a particular dimension
+     * Returns the vector along a particular dimension
      *
      * @param index the index of the vector to getScalar
      * @param dimension the dimension to getScalar the vector from
@@ -112,7 +206,7 @@ public interface NDArray extends AutoCloseable {
     long tensorsAlongDimension(int... dimension);
 
     /**
-     * Get the vector along a particular dimension
+     * Returns the vector along a particular dimension
      *
      * @param index the index of the vector to getScalar
      * @param dimension the dimension to getScalar the vector from
@@ -587,7 +681,7 @@ public interface NDArray extends AutoCloseable {
     NDArray putWhere(Number comp, Number put, Condition condition);
 
     /**
-     * Get the elements from this NDArray based on the specified indices
+     * Returns the elements from this NDArray based on the specified indices
      *
      * @param indices an ndaray of the indices to get the elements for
      * @return the elements to get the array for
@@ -595,7 +689,7 @@ public interface NDArray extends AutoCloseable {
     NDArray get(NDArray indices);
 
     /**
-     * Get the elements from this NDArray based on the specified indices
+     * Returns the elements from this NDArray based on the specified indices
      *
      * @param indices an ndaray of the indices to get the elements for
      * @return the elements to get the array for
@@ -603,7 +697,7 @@ public interface NDArray extends AutoCloseable {
     NDArray get(List<List<Integer>> indices);
 
     /**
-     * Get an NDArray comprised of the specified columns only. Copy operation.
+     * Returns an NDArray comprised of the specified columns only. Copy operation.
      *
      * @param columns Columns to extract out of the current array
      * @return Array with only the specified columns
@@ -611,7 +705,7 @@ public interface NDArray extends AutoCloseable {
     NDArray getColumns(int... columns);
 
     /**
-     * Get an NDArray comprised of the specified rows only. Copy operation
+     * Returns an NDArray comprised of the specified rows only. Copy operation
      *
      * @param rows Rose to extract from this array
      * @return Array with only the specified rows
@@ -695,7 +789,7 @@ public interface NDArray extends AutoCloseable {
     NDArray assign(Number value);
 
     /**
-     * Get the linear index of the data in to the array
+     * Returns the linear index of the data in to the array
      *
      * @param i the index to getScalar
      * @return the linear index in to the data
@@ -1602,8 +1696,8 @@ public interface NDArray extends AutoCloseable {
     NDArray getScalar(long... indices);
 
     /**
-     * Get an integer value at the specified indices. Result will be cast to an integer, precision
-     * loss is possible.
+     * Returns an integer value at the specified indices. Result will be cast to an integer,
+     * precision loss is possible.
      *
      * @param indices Indices to get the integer at. Number of indices must match the array rank.
      * @return Integer value at the specified index
@@ -1613,7 +1707,7 @@ public interface NDArray extends AutoCloseable {
     long getLong(long... indices);
 
     /**
-     * Get a double value at the specified indices.
+     * Returns a double value at the specified indices.
      *
      * @param indices Indices to get the double at. Number of indices must match the array rank.
      * @return Double value at the specified index
