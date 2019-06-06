@@ -23,14 +23,18 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.locks.Condition;
+import java.util.Optional;
+import java.util.function.Predicate;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.index.NDIndex;
+import software.amazon.ai.ndarray.index.NDIndexElement;
+import software.amazon.ai.ndarray.index.NDIndexFixed;
+import software.amazon.ai.ndarray.index.NDIndexSlice;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -244,16 +248,96 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray at(int index) {
-        Pointer pointer = JnaUtils.ndArrayAt(getHandle(), index);
-        return factory.create(pointer);
+    public NDArray get(NDIndex index) {
+        if (index.getRank() == 0) {
+            return this;
+        } else if (index.getRank() == 1) {
+            NDIndexElement ie = index.get(0);
+            if (ie instanceof NDIndexFixed) {
+                Pointer pointer = JnaUtils.ndArrayAt(getHandle(), ((NDIndexFixed) ie).getIndex());
+                return factory.create(pointer);
+            } else if (ie instanceof NDIndexSlice) {
+                NDIndexSlice slice = (NDIndexSlice) ie;
+                int min = Optional.ofNullable(slice.getMin()).orElse(0);
+                int max = Optional.ofNullable(slice.getMax()).orElse((int) size(0));
+                if (slice.getStep() != null) {
+                    throw new UnsupportedOperationException(
+                            "Slicing currently does not support step");
+                }
+                Pointer pointer = JnaUtils.slice(getHandle(), min, max);
+                return factory.create(pointer);
+            } else {
+                throw new UnsupportedOperationException(
+                        "get currently supports Fixed and Slice indexes");
+            }
+        } else {
+            throw new UnsupportedOperationException("get currently supports only rank 1");
+        }
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray slice(int begin, int end) {
-        Pointer pointer = JnaUtils.slice(getHandle(), begin, end);
-        return factory.create(pointer);
+    public NDArray getElement(NDIndex index) throws IllegalArgumentException {
+        NDArray value = get(index);
+        if (value.size() != 1) {
+            throw new IllegalArgumentException("The supplied Index does not produce an element");
+        } else {
+            return value;
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long getLong(NDIndex index) throws IllegalArgumentException {
+        return getElement(index).toLongArray()[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double getDouble(NDIndex index) throws IllegalArgumentException {
+        return getElement(index).toDoubleArray()[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public float getFloat(NDIndex index) throws IllegalArgumentException {
+        return getElement(index).toFloatArray()[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray set(NDIndex index, NDArray value) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray set(NDIndex index, Number value) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray seti(NDIndex index, NDArray value) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray seti(NDIndex index, Number value) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
@@ -525,48 +609,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray assign(NDArray arr) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray assignIf(NDArray arr, Condition condition) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray replaceWhere(NDArray arr, Condition condition) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(long value, long... dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(double value, long... dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(float value, long... dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(int value, long... dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray eps(Number other) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -782,86 +824,14 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray match(NDArray comp, Condition condition) {
+    public NDArray createMask(NDIndex index) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray match(Number comp, Condition condition) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getWhere(NDArray comp, Condition condition) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getWhere(Number comp, Condition condition) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhere(NDArray comp, NDArray put, Condition condition) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhere(Number comp, NDArray put, Condition condition) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhereWithMask(NDArray mask, NDArray put) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhereWithMask(NDArray mask, Number put) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhere(Number comp, Number put, Condition condition) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(NDArray indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(List<List<Integer>> indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray assign(Number value) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putSlice(int slice, NDArray put) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cond(Condition condition) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public NDArray createMask(Predicate<Number> predicate) {
+        return null;
     }
 
     /** {@inheritDoc} */
@@ -960,36 +930,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     private int withAxis(int axis) {
         return Math.floorMod(axis, getShape().dimension());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getScalar(long i) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(List<List<Integer>> indices, NDArray element) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(NDArray indices, NDArray element) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(NDArray element, int... indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(int i, NDArray element) {
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
@@ -1220,67 +1160,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getScalar(int... indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getScalar(long... indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long getLong(int... indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long getLong(long... indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDouble(int... indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDouble(long... indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float getFloat(int... indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float getFloat(long... indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray dup() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray slice(long i, int dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray slice(long i) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
@@ -1374,12 +1254,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray broadcast(NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Object element() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
@@ -1681,7 +1555,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             sb.append(LF);
             int limit = Math.min(len, MAX_PRINT_ROWS);
             for (int i = 0; i < limit; ++i) {
-                try (MxNDArray nd = at(i)) {
+                try (MxNDArray nd = (MxNDArray) get(i)) {
                     nd.dump(sb, depth + 1);
                 }
             }

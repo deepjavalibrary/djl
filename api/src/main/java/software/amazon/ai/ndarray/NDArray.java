@@ -16,10 +16,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.locks.Condition;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import software.amazon.ai.Context;
+import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -151,23 +151,128 @@ public interface NDArray extends AutoCloseable {
     void set(byte[] data);
 
     /**
-     * Get the certain layer from the first dimension of the NDArray.
+     * Returns a partial NDArray
      *
-     * @param index the layer index of the first dimension
-     * @return NDArray from the layer
+     * @param index the section of the NDArray to return
+     * @return Returns the partial NDArray
      */
-    NDArray at(int index);
+    NDArray get(NDIndex index);
 
     /**
-     * Getting a segment of the current NDArray.
+     * Returns a partial NDArray.
      *
-     * <p>The segmentation is only applied to the first dimension of the NDArray
-     *
-     * @param begin The beginning point
-     * @param end the Engine pointer
-     * @return Segmented NDArray
+     * @param indices Indices to indicate what to get
+     * @return Returns the partial NDArray
+     * @see NDIndex#NDIndex(String)
      */
-    NDArray slice(int begin, int end);
+    default NDArray get(String indices) {
+        return get(new NDIndex(indices));
+    }
+
+    /**
+     * Returns a partial NDArray.
+     *
+     * @param indices indices with each index corresponding to the dimensions and negative indices
+     *     tarting from the end
+     * @return Returns the partial NDArray
+     */
+    default NDArray get(int... indices) {
+        return get(new NDIndex(indices));
+    }
+
+    /**
+     * Returns a zero dimensional NDArray corresponding to a single element.
+     *
+     * @param index The index of the element to return. Must return only a single element.
+     * @return Returns a zero dimensional NDArray corresponding to the element.
+     * @throws IllegalArgumentException Thrown if the result is not a single element
+     */
+    NDArray getElement(NDIndex index) throws IllegalArgumentException;
+
+    /**
+     * Returns an element from the NDArray.
+     *
+     * @param index The index
+     * @return The element in the specified index as a long
+     * @throws IllegalArgumentException Thrown if the result is not a single element
+     */
+    long getLong(NDIndex index) throws IllegalArgumentException;
+
+    /**
+     * Returns an element from the NDArray.
+     *
+     * @param index The index
+     * @return The element in the specified index as a double
+     * @throws IllegalArgumentException Thrown if the result is not a single element
+     */
+    double getDouble(NDIndex index) throws IllegalArgumentException;
+
+    /**
+     * Returns an element from the NDArray.
+     *
+     * @param index The index
+     * @return The element in the specified index as a float
+     * @throws IllegalArgumentException Thrown if the result is not a single element
+     */
+    float getFloat(NDIndex index) throws IllegalArgumentException;
+
+    /**
+     * Sets the specified index in a new NDArray with the given values.
+     *
+     * @param index The locations to update
+     * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
+     *     index
+     * @return Returns a new NDArray with the updated values
+     */
+    NDArray set(NDIndex index, NDArray value);
+
+    /**
+     * Sets the specified index in a new NDArray with the given value.
+     *
+     * @param index The locations to update
+     * @param value The value to replace with
+     * @return Returns a new NDArray with the updated values
+     */
+    NDArray set(NDIndex index, Number value);
+
+    /**
+     * Sets the specified index in a new NDArray with the given value.
+     *
+     * @param index The single index to update
+     * @param value The value to replace with
+     * @return Returns a new NDArray with the updated value
+     * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
+     */
+    NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException;
+
+    /**
+     * Sets the specified index in the NDArray with the given values.
+     *
+     * @param index The locations to update
+     * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
+     *     index
+     * @return Returns the updated NDArray
+     */
+    NDArray seti(NDIndex index, NDArray value);
+
+    /**
+     * Sets the specified index in the NDArray with the given value.
+     *
+     * @param index The locations to update
+     * @param value The value to replace with
+     * @return Returns the updated NDArray
+     */
+    NDArray seti(NDIndex index, Number value);
+
+    /**
+     * Sets the specified index in the NDArray with the given value.
+     *
+     * @param index The single index to update
+     * @param value The value to replace with
+     * @return Returns the updated NDArray
+     * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
+     */
+    NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException;
 
     /**
      * Copy the current NDArray value to the one passed in.
@@ -440,49 +545,6 @@ public interface NDArray extends AutoCloseable {
     NDArray cumsum();
 
     /**
-     * Assign all of the elements in the given ndarray to this ndarray
-     *
-     * @param arr the elements to assign
-     * @return this
-     */
-    NDArray assign(NDArray arr);
-
-    /**
-     * Assign all elements from given ndarray that are matching given condition, ndarray to this
-     * ndarray
-     *
-     * @param arr the elements to assign
-     * @param condition Condition to apply
-     * @return this
-     */
-    NDArray assignIf(NDArray arr, Condition condition);
-
-    /**
-     * Replaces all elements in this ndarray that are matching give condition, with corresponding
-     * elements from given array
-     *
-     * @param arr Source array
-     * @param condition Condition to apply
-     * @return New array with values conditionally replaced
-     */
-    NDArray replaceWhere(NDArray arr, Condition condition);
-
-    /**
-     * Put the specified value at the specified indices in this array.
-     *
-     * @param value Value to put
-     * @param dimension Dimensions
-     * @return This NDArray
-     */
-    NDArray putScalar(long value, long... dimension);
-
-    NDArray putScalar(double value, long... dimension);
-
-    NDArray putScalar(float value, long... dimension);
-
-    NDArray putScalar(int value, long... dimension);
-
-    /**
      * Returns the binary ndarray for "Epsilon equals" comparison.
      *
      * @param other the number to compare.
@@ -721,131 +783,18 @@ public interface NDArray extends AutoCloseable {
     NDArray addi(NDArray other);
 
     /**
+     * @param index the index of values to set to true
+     * @return new boolean NDArray where values are true if it matches the index
+     */
+    NDArray createMask(NDIndex index);
+
+    /**
      * Return a mask on whether each element matches the given condition.
      *
-     * @param comp the number to compare
-     * @param condition condition
-     * @return NDArray NDArray
+     * @param predicate a predicate to apply to each element of the array
+     * @return new boolean NDArray where values are true if it matches the predicate
      */
-    NDArray match(NDArray comp, Condition condition);
-
-    /**
-     * Returns a mask on whether each element matches the given condition.
-     *
-     * @param comp the NDArray to compare
-     * @param condition condition
-     * @return NDArray NDArray
-     */
-    NDArray match(Number comp, Condition condition);
-
-    /**
-     * Return the element if it fulfills the condition in result array.
-     *
-     * @param comp the comparison array
-     * @param condition the condition to apply
-     * @return the array fulfilling the criteria
-     */
-    NDArray getWhere(NDArray comp, Condition condition);
-
-    /**
-     * Boolean indexing: Return the element if it fulfills the condition in result array
-     *
-     * @param comp the comparison array
-     * @param condition the condition to apply
-     * @return the array fulfilling the criteria
-     */
-    NDArray getWhere(Number comp, Condition condition);
-
-    /**
-     * Assign the element according to the comparison array
-     *
-     * @param comp the comparison array
-     * @param put the elements to put
-     * @param condition the condition for masking on
-     * @return NDArray NDArray
-     */
-    NDArray putWhere(NDArray comp, NDArray put, Condition condition);
-
-    /**
-     * Assign the element according to the comparison array
-     *
-     * @param comp the comparison array
-     * @param put the elements to put
-     * @param condition the condition for masking on
-     * @return NDArray NDArray
-     */
-    NDArray putWhere(Number comp, NDArray put, Condition condition);
-
-    /**
-     * Use a pre computed mask for assigning arrays
-     *
-     * @param mask the mask to use
-     * @param put the array to put
-     * @return the resulting array
-     */
-    NDArray putWhereWithMask(NDArray mask, NDArray put);
-
-    /**
-     * Use a pre computed mask for assigning arrays
-     *
-     * @param mask the mask to use
-     * @param put the array to put
-     * @return the resulting array
-     */
-    NDArray putWhereWithMask(NDArray mask, Number put);
-
-    /**
-     * Assign the element according to the comparison array
-     *
-     * @param comp the comparison array
-     * @param put the elements to put
-     * @param condition the condition for masking on
-     * @return the resulting array
-     */
-    NDArray putWhere(Number comp, Number put, Condition condition);
-
-    /**
-     * Returns the elements from this NDArray based on the specified indices
-     *
-     * @param indices an ndaray of the indices to get the elements for
-     * @return the elements to get the array for
-     */
-    NDArray get(NDArray indices);
-
-    /**
-     * Returns the elements from this NDArray based on the specified indices
-     *
-     * @param indices an ndaray of the indices to get the elements for
-     * @return the elements to get the array for
-     */
-    NDArray get(List<List<Integer>> indices);
-
-    /**
-     * Set all entries of the NDArray to the specified value
-     *
-     * @param value the value to assign
-     * @return the NDArray with the values
-     */
-    NDArray assign(Number value);
-
-    /**
-     * Assigns the given matrix (put) to the specified slice
-     *
-     * @param slice the slice to assign
-     * @param put the slice to applyTransformToDestination
-     * @return this for chainability
-     */
-    NDArray putSlice(int slice, NDArray put);
-
-    /**
-     * Returns a binary NDArray with value 'true' if the element matches the specified condition and
-     * 'false' otherwise
-     *
-     * @param condition Condition to apply
-     * @return Copy of this array with values 0 (condition does not apply), or one (condition
-     *     applies)
-     */
-    NDArray cond(Condition condition);
+    NDArray createMask(Predicate<Number> predicate);
 
     /**
      * Repeat the array in tiles a given number of times.
@@ -920,56 +869,6 @@ public interface NDArray extends AutoCloseable {
      * @return Returns a NDArray that has been tiled
      */
     NDArray repeat(Shape desiredShape);
-
-    /**
-     * Returns the element at the specified index
-     *
-     * @param i the index of the element to return
-     * @return a scalar NDArray of the element at this index
-     */
-    NDArray getScalar(long i);
-
-    /**
-     * Put element in to the indices denoted by the indices NDArray. This is equivalent to:
-     * a[indices] = element
-     *
-     * <p>in numpy.
-     *
-     * @param indices the indices to put
-     * @param element the element array to put
-     * @return this array
-     */
-    NDArray put(List<List<Integer>> indices, NDArray element);
-
-    /**
-     * Put element in to the indices denoted by the indices NDArray. This is equivalent to:
-     * a[indices] = element
-     *
-     * <p>in numpy.
-     *
-     * @param indices the indices to put
-     * @param element the element array to put
-     * @return this array
-     */
-    NDArray put(NDArray indices, NDArray element);
-
-    /**
-     * Inserts the element at the specified index
-     *
-     * @param element a scalar NDArray
-     * @param indices the indices to insert into
-     * @return a scalar NDArray of the element at this index
-     */
-    NDArray put(NDArray element, int... indices);
-
-    /**
-     * Inserts the element at the specified index
-     *
-     * @param i the index insert into
-     * @param element a scalar NDArray
-     * @return a scalar NDArray of the element at this index
-     */
-    NDArray put(int i, NDArray element);
 
     /**
      * Perform a copy matrix multiplication
@@ -1269,69 +1168,11 @@ public interface NDArray extends AutoCloseable {
     NDArray mean(int[] axes, boolean keepDims);
 
     /**
-     * Returns the elements at the specified indices
-     *
-     * @param indices the indices to getScalar
-     * @return the array with the specified elements
-     */
-    NDArray getScalar(int... indices);
-
-    NDArray getScalar(long... indices);
-
-    /**
-     * Returns an integer value at the specified indices. Result will be cast to an integer,
-     * precision loss is possible.
-     *
-     * @param indices Indices to get the integer at. Number of indices must match the array rank.
-     * @return Integer value at the specified index
-     */
-    long getLong(int... indices);
-
-    long getLong(long... indices);
-
-    /**
-     * Returns a double value at the specified indices.
-     *
-     * @param indices Indices to get the double at. Number of indices must match the array rank.
-     * @return Double value at the specified index
-     */
-    double getDouble(int... indices);
-
-    double getDouble(long... indices);
-
-    /**
-     * Returns the elements at the specified indices
-     *
-     * @param indices the indices to getScalar
-     * @return the array with the specified elements
-     */
-    float getFloat(int... indices);
-
-    float getFloat(long... indices);
-
-    /**
      * Returns a copy of this NDArray
      *
      * @return a copy of this NDArray
      */
     NDArray dup();
-
-    /**
-     * Returns the specified slice of this NDArray
-     *
-     * @param i the index of the slice to return
-     * @param dimension the dimension to return the slice for
-     * @return the specified slice of this NDArray
-     */
-    NDArray slice(long i, int dimension);
-
-    /**
-     * Returns the specified slice of this NDArray
-     *
-     * @param i the index of the slice to return
-     * @return the specified slice of this NDArray
-     */
-    NDArray slice(long i);
 
     /**
      * Flattens the array into a 1D NDArray in row-major order.
@@ -1594,13 +1435,6 @@ public interface NDArray extends AutoCloseable {
      * @return the broadcasted NDArray
      */
     NDArray broadcast(NDArray result);
-
-    /**
-     * Returns a scalar (individual element) of a scalar NDArray
-     *
-     * @return the individual item in this NDArray
-     */
-    Object element();
 
     /**
      * This method checks 2 NDArrays equality with given eps

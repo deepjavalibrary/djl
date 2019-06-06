@@ -7,8 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.locks.Condition;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import org.tensorflow.Operation;
 import org.tensorflow.Output;
@@ -19,6 +18,7 @@ import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -168,13 +168,67 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray at(int index) {
+    public NDArray get(NDIndex index) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray slice(int begin, int end) {
+    public NDArray getElement(NDIndex index) throws IllegalArgumentException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long getLong(NDIndex index) throws IllegalArgumentException {
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double getDouble(NDIndex index) throws IllegalArgumentException {
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public float getFloat(NDIndex index) throws IllegalArgumentException {
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray set(NDIndex index, NDArray value) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray set(NDIndex index, Number value) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray seti(NDIndex index, NDArray value) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray seti(NDIndex index, Number value) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException {
         return null;
     }
 
@@ -236,6 +290,7 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray softmax(int[] axes) {
         return null;
@@ -356,48 +411,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray assign(NDArray arr) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray assignIf(NDArray arr, Condition condition) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray replaceWhere(NDArray arr, Condition condition) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(long value, long... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(double value, long... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(float value, long... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(int value, long... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray eps(Number other) {
         return null;
     }
@@ -420,11 +433,13 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean contentEquals(NDArray other) {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
         return false;
@@ -550,26 +565,6 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
-    @Override
-    public NDArray add(Number n) {
-        return null;
-    }
-
-    @Override
-    public NDArray addi(Number n) {
-        return null;
-    }
-
-    @Override
-    public NDArray add(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray addi(NDArray other) {
-        return null;
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDArray mod(Number n) {
@@ -596,85 +591,37 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray match(NDArray comp, Condition condition) {
+    public NDArray add(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray match(Number comp, Condition condition) {
+    public NDArray addi(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getWhere(NDArray comp, Condition condition) {
+    public NDArray add(NDArray other) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getWhere(Number comp, Condition condition) {
+    public NDArray addi(NDArray other) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray putWhere(NDArray comp, NDArray put, Condition condition) {
+    public NDArray createMask(NDIndex index) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray putWhere(Number comp, NDArray put, Condition condition) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhereWithMask(NDArray mask, NDArray put) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhereWithMask(NDArray mask, Number put) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhere(Number comp, Number put, Condition condition) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(NDArray indices) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(List<List<Integer>> indices) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray assign(Number value) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putSlice(int slice, NDArray put) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cond(Condition condition) {
+    public NDArray createMask(Predicate<Number> predicate) {
         return null;
     }
 
@@ -723,36 +670,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray repeat(Shape desiredShape) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getScalar(long i) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(List<List<Integer>> indices, NDArray element) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(NDArray indices, NDArray element) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(NDArray element, int... indices) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(int i, NDArray element) {
         return null;
     }
 
@@ -944,67 +861,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getScalar(int... indices) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getScalar(long... indices) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long getLong(int... indices) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long getLong(long... indices) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDouble(int... indices) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDouble(long... indices) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float getFloat(int... indices) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float getFloat(long... indices) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray dup() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray slice(long i, int dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray slice(long i) {
         return null;
     }
 
@@ -1090,12 +947,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray broadcast(NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Object element() {
         return null;
     }
 
@@ -1201,136 +1052,163 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArrayEx getNDArrayInternal() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray logicalNot() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray abs() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray square() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cbrt() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray floor() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray ceil() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray round() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray trunc() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray exp() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray log() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray log10() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray log2() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sin() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cos() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tan() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray asin() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray acos() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray atan() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray toDegrees() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray toRadians() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sinh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cosh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray asinh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray acosh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray atanh() {
         return null;

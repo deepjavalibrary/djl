@@ -11,6 +11,7 @@ import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -894,9 +895,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         NDArray reshaped = original.reshape(new Shape(2, 3));
         NDArray expected =
                 factory.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, null, new Shape(2, 3));
-        if (!reshaped.contentEquals(expected)) {
-            throw new FailedTestException("Incorrect reshape");
-        }
+        Assertions.assertEquals(reshaped, expected);
     }
 
     @RunAsTest
@@ -904,9 +903,21 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         NDArray original = factory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(2, 2));
         NDArray flattened = original.flatten();
         NDArray expected = factory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(4));
-        if (!flattened.contentEquals(expected)) {
-            throw new FailedTestException("Incorrect flatten");
-        }
+        Assertions.assertEquals(flattened, expected);
+    }
+
+    @RunAsTest
+    public void testGet() throws FailedTestException {
+        NDArray original = factory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(2, 2));
+        Assertions.assertEquals(original.get(new NDIndex()), original);
+
+        NDArray getAt = original.get(0);
+        NDArray getAtExpected = factory.create(new float[] {1f, 2f}, null, new Shape(2));
+        Assertions.assertEquals(getAt, getAtExpected);
+
+        NDArray getSlice = original.get("1:");
+        NDArray getSliceExpected = factory.create(new float[] {3f, 4f}, null, new Shape(1, 2));
+        Assertions.assertEquals(getSlice, getSliceExpected);
     }
 
     @RunAsTest

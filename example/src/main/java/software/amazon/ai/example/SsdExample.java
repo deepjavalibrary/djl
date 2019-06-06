@@ -152,10 +152,10 @@ public final class SsdExample extends AbstractExample {
 
             try {
                 String[] synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
-                NDArray nd = array.at(0);
+                NDArray nd = array.get(0);
                 int length = nd.getShape().head();
                 for (int i = 0; i < length; ++i) {
-                    try (NDArray item = nd.at(i)) {
+                    try (NDArray item = nd.get(i)) {
                         float[] values = item.toFloatArray();
                         int classId = (int) values[0];
                         float probability = values[1];

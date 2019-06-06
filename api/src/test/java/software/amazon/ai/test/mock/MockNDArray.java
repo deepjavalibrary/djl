@@ -15,13 +15,13 @@ package software.amazon.ai.test.mock;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
-import java.util.List;
-import java.util.concurrent.locks.Condition;
+import java.util.function.Predicate;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -89,12 +89,57 @@ public class MockNDArray implements NDArray {
     public void set(byte[] data) {}
 
     @Override
-    public NDArray at(int index) {
+    public NDArray get(NDIndex index) {
         return null;
     }
 
     @Override
-    public NDArray slice(int begin, int end) {
+    public NDArray getElement(NDIndex index) throws IllegalArgumentException {
+        return null;
+    }
+
+    @Override
+    public long getLong(NDIndex index) {
+        return 0;
+    }
+
+    @Override
+    public double getDouble(NDIndex index) {
+        return 0;
+    }
+
+    @Override
+    public float getFloat(NDIndex index) {
+        return 0;
+    }
+
+    @Override
+    public NDArray set(NDIndex index, NDArray value) {
+        return null;
+    }
+
+    @Override
+    public NDArray set(NDIndex index, Number value) {
+        return null;
+    }
+
+    @Override
+    public NDArray setElement(NDIndex index, Number value) {
+        return null;
+    }
+
+    @Override
+    public NDArray seti(NDIndex index, NDArray value) {
+        return null;
+    }
+
+    @Override
+    public NDArray seti(NDIndex index, Number value) {
+        return null;
+    }
+
+    @Override
+    public NDArray setElementi(NDIndex index, Number value) {
         return null;
     }
 
@@ -198,41 +243,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray cumsum() {
-        return null;
-    }
-
-    @Override
-    public NDArray assign(NDArray arr) {
-        return null;
-    }
-
-    @Override
-    public NDArray assignIf(NDArray arr, Condition condition) {
-        return null;
-    }
-
-    @Override
-    public NDArray replaceWhere(NDArray arr, Condition condition) {
-        return null;
-    }
-
-    @Override
-    public NDArray putScalar(long value, long... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray putScalar(double value, long... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray putScalar(float value, long... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray putScalar(int value, long... dimension) {
         return null;
     }
 
@@ -377,11 +387,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray addi(NDArray other) {
-        return null;
-    }
-
-    @Override
     public NDArray mod(Number n) {
         return null;
     }
@@ -402,72 +407,42 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray match(NDArray comp, Condition condition) {
+    public NDArray mmul(NDArray other, NDArray result) {
         return null;
     }
 
     @Override
-    public NDArray match(Number comp, Condition condition) {
+    public NDArray div(NDArray other) {
         return null;
     }
 
     @Override
-    public NDArray getWhere(NDArray comp, Condition condition) {
+    public NDArray mul(NDArray other) {
         return null;
     }
 
     @Override
-    public NDArray getWhere(Number comp, Condition condition) {
+    public NDArray sub(NDArray other) {
         return null;
     }
 
     @Override
-    public NDArray putWhere(NDArray comp, NDArray put, Condition condition) {
+    public NDArray add(NDArray other) {
         return null;
     }
 
     @Override
-    public NDArray putWhere(Number comp, NDArray put, Condition condition) {
+    public NDArray addi(NDArray other) {
         return null;
     }
 
     @Override
-    public NDArray putWhereWithMask(NDArray mask, NDArray put) {
+    public NDArray createMask(NDIndex index) {
         return null;
     }
 
     @Override
-    public NDArray putWhereWithMask(NDArray mask, Number put) {
-        return null;
-    }
-
-    @Override
-    public NDArray putWhere(Number comp, Number put, Condition condition) {
-        return null;
-    }
-
-    @Override
-    public NDArray get(NDArray indices) {
-        return null;
-    }
-
-    @Override
-    public NDArray get(List<List<Integer>> indices) {
-        return null;
-    }
-
-    @Override
-    public NDArray assign(Number value) {
-        return null;
-    }
-
-    @Override
-    public NDArray putSlice(int slice, NDArray put) {
-        return null;
-    }
-
-    @Override
-    public NDArray cond(Condition condition) {
+    public NDArray createMask(Predicate<Number> predicate) {
         return null;
     }
 
@@ -512,31 +487,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray getScalar(long i) {
-        return null;
-    }
-
-    @Override
-    public NDArray put(List<List<Integer>> indices, NDArray element) {
-        return null;
-    }
-
-    @Override
-    public NDArray put(NDArray indices, NDArray element) {
-        return null;
-    }
-
-    @Override
-    public NDArray put(NDArray element, int... indices) {
-        return null;
-    }
-
-    @Override
-    public NDArray put(int i, NDArray element) {
-        return null;
-    }
-
-    @Override
     public NDArray mmul(NDArray other) {
         return null;
     }
@@ -559,31 +509,6 @@ public class MockNDArray implements NDArray {
     @Override
     public long[] toLongArray() {
         return new long[0];
-    }
-
-    @Override
-    public NDArray mmul(NDArray other, NDArray result) {
-        return null;
-    }
-
-    @Override
-    public NDArray div(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray mul(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray sub(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray add(NDArray other) {
-        return null;
     }
 
     @Override
@@ -682,57 +607,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray getScalar(int... indices) {
-        return null;
-    }
-
-    @Override
-    public NDArray getScalar(long... indices) {
-        return null;
-    }
-
-    @Override
-    public long getLong(int... indices) {
-        return 0;
-    }
-
-    @Override
-    public long getLong(long... indices) {
-        return 0;
-    }
-
-    @Override
-    public double getDouble(int... indices) {
-        return 0;
-    }
-
-    @Override
-    public double getDouble(long... indices) {
-        return 0;
-    }
-
-    @Override
-    public float getFloat(int... indices) {
-        return 0;
-    }
-
-    @Override
-    public float getFloat(long... indices) {
-        return 0;
-    }
-
-    @Override
     public NDArray dup() {
-        return null;
-    }
-
-    @Override
-    public NDArray slice(long i, int dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray slice(long i) {
         return null;
     }
 
@@ -808,11 +683,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray broadcast(NDArray result) {
-        return null;
-    }
-
-    @Override
-    public Object element() {
         return null;
     }
 

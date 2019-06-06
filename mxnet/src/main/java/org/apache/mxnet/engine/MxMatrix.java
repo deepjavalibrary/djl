@@ -2,13 +2,13 @@ package org.apache.mxnet.engine;
 
 import java.io.OutputStream;
 import java.nio.Buffer;
-import java.util.List;
-import java.util.concurrent.locks.Condition;
+import java.util.function.Predicate;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -313,26 +313,31 @@ public class MxMatrix implements Matrix {
         array.set(data);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void set(float[] data) {
         array.set(data);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void set(int[] data) {
         array.set(data);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void set(double[] data) {
         array.set(data);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void set(long[] data) {
         array.set(data);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void set(byte[] data) {
         array.set(data);
@@ -340,14 +345,67 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray at(int index) {
-        return array.at(index);
+    public NDArray get(NDIndex index) {
+        return array.get(index);
+    }
+
+    @Override
+    public NDArray getElement(NDIndex index) throws IllegalArgumentException {
+        return array.get(index);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray slice(int begin, int end) {
-        return array.slice(begin, end);
+    public long getLong(NDIndex index) throws IllegalArgumentException {
+        return array.getLong(index);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double getDouble(NDIndex index) throws IllegalArgumentException {
+        return array.getDouble(index);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public float getFloat(NDIndex index) throws IllegalArgumentException {
+        return array.getFloat(index);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray set(NDIndex index, NDArray value) {
+        return array.set(index, value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray set(NDIndex index, Number value) {
+        return array.set(index, value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException {
+        return array.setElement(index, value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray seti(NDIndex index, NDArray value) {
+        return array.seti(index, value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray seti(NDIndex index, Number value) {
+        return array.seti(index, value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException {
+        return array.setElementi(index, value);
     }
 
     /** {@inheritDoc} */
@@ -428,6 +486,7 @@ public class MxMatrix implements Matrix {
         return array.softmax(axes, temperature);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray softmax(int[] axes) {
         return array.softmax(axes);
@@ -445,24 +504,40 @@ public class MxMatrix implements Matrix {
         return array.split(axis, numOutputs);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray add(Number n) {
         return array.add(n);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray addi(Number n) {
         return array.addi(n);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray add(NDArray other) {
         return array.add(other);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray addi(NDArray other) {
         return array.addi(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray createMask(NDIndex index) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray createMask(Predicate<Number> predicate) {
+        return null;
     }
 
     /** {@inheritDoc} */
@@ -507,49 +582,6 @@ public class MxMatrix implements Matrix {
         return array.cumsum();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDArray assign(NDArray arr) {
-        return array.assign(arr);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray assignIf(NDArray arr, Condition condition) {
-        return array.assignIf(arr, condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray replaceWhere(NDArray arr, Condition condition) {
-        return array.replaceWhere(arr, condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(long value, long... dimension) {
-        return array.putScalar(value, dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(double value, long... dimension) {
-        return array.putScalar(value, dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(float value, long... dimension) {
-        return array.putScalar(value, dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putScalar(int value, long... dimension) {
-        return array.putScalar(value, dimension);
-    }
-
-    /** {@inheritDoc} */
     @Override
     public NDArray eps(Number other) {
         return array.eps(other);
@@ -717,90 +749,6 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray match(NDArray comp, Condition condition) {
-        return array.match(comp, condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray match(Number comp, Condition condition) {
-        return array.match(comp, condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getWhere(NDArray comp, Condition condition) {
-        return array.getWhere(comp, condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getWhere(Number comp, Condition condition) {
-        return array.getWhere(comp, condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhere(NDArray comp, NDArray put, Condition condition) {
-        return array.putWhere(comp, put, condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhere(Number comp, NDArray put, Condition condition) {
-        return array.putWhere(comp, put, condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhereWithMask(NDArray mask, NDArray put) {
-        return array.putWhereWithMask(mask, put);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhereWithMask(NDArray mask, Number put) {
-        return array.putWhereWithMask(mask, put);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putWhere(Number comp, Number put, Condition condition) {
-        return array.putWhere(comp, put, condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(NDArray indices) {
-        return array.get(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(List<List<Integer>> indices) {
-        return array.get(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray assign(Number value) {
-        return array.assign(value);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray putSlice(int slice, NDArray put) {
-        return array.putSlice(slice, put);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cond(Condition condition) {
-        return array.cond(condition);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray tile(int repeats) {
         return array.tile(repeats);
     }
@@ -817,7 +765,6 @@ public class MxMatrix implements Matrix {
         return array.repeat(repeats);
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray tile(Shape desiredShape) {
         return array.tile(desiredShape);
@@ -835,49 +782,16 @@ public class MxMatrix implements Matrix {
         return array.repeat(axis, repeats);
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray repeat(int[] repeats) {
         return array.repeat(repeats);
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray repeat(Shape desiredShape) {
         return array.repeat(desiredShape);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getScalar(long i) {
-        return array.getScalar(i);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(List<List<Integer>> indices, NDArray element) {
-        return array.put(indices, element);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(NDArray indices, NDArray element) {
-        return array.put(indices, element);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(NDArray element, int... indices) {
-        return array.put(element, indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray put(int i, NDArray element) {
-        return array.put(i, element);
-    }
-
-    /** {@inheritDoc} */
     @Override
     public NDArray mmul(NDArray other) {
         return array.mmul(other);
@@ -1057,73 +971,11 @@ public class MxMatrix implements Matrix {
         return array.mean(axes, keepDims);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getScalar(int... indices) {
-        return array.getScalar(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getScalar(long... indices) {
-        return array.getScalar(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long getLong(int... indices) {
-        return array.getLong(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long getLong(long... indices) {
-        return array.getLong(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDouble(int... indices) {
-        return array.getDouble(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDouble(long... indices) {
-        return array.getDouble(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float getFloat(int... indices) {
-        return array.getFloat(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float getFloat(long... indices) {
-        return array.getFloat(indices);
-    }
-
-    /** {@inheritDoc} */
     @Override
     public NDArray dup() {
         return array.dup();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDArray slice(long i, int dimension) {
-        return array.slice(i, dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray slice(long i) {
-        return array.slice(i);
-    }
-
-    /** {@inheritDoc} */
     @Override
     public NDArray flatten() {
         return array.flatten();
@@ -1135,7 +987,6 @@ public class MxMatrix implements Matrix {
         return array.reshape(shape);
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray swapAxes(int dimension, int with) {
         return array.swapAxes(dimension, with);
@@ -1207,13 +1058,6 @@ public class MxMatrix implements Matrix {
         return array.broadcast(result);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Object element() {
-        return array.element();
-    }
-
-    /** {@inheritDoc} */
     @Override
     public boolean equalsWithEps(Object o, double eps) {
         return array.equalsWithEps(o, eps);

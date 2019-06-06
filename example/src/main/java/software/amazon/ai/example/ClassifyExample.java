@@ -99,13 +99,13 @@ public final class ClassifyExample extends AbstractExample {
         public List<Classification> processOutput(TranslatorContext ctx, NDList list)
                 throws TranslateException {
             Model model = ctx.getModel();
-            NDArray array = list.get(0).at(0);
+            NDArray array = list.get(0).get(0);
 
             int length = array.getShape().head();
             length = Math.min(length, topK);
             List<Classification> ret = new ArrayList<>(length);
             NDArray sorted = array.argsort(-1, false);
-            NDArray top = sorted.slice(0, topK);
+            NDArray top = sorted.get(":" + topK);
 
             float[] probabilities = array.toFloatArray();
             int[] indices = top.toIntArray();
