@@ -1,10 +1,11 @@
 @startuml
 class Context {
 	-String deviceType
-	-int deiceId
+	-int deviceId
 }
 
 class DataDesc {
+	-String name
 	-Context context
 	-Shape shape
 	-DataType dataType
@@ -12,26 +13,29 @@ class DataDesc {
 }
 
 interface Model {
+    +Block getGraph()
+    +Parameter getParameter()
     +DataDesc[] describeInput()
     +DataDesc[] describeOutput()
-    +Model cast(DataType dataType);
-    +String[] getLabels()
+    +Model cast(DataType dataType)
+    +String[] listArtifacts()
+    +String[] getArtifactNames()
+    +URL getArtifact(String name)
+    +InputStream getArtifactAsStream(String name)
     +void save(File modelPath, String modelName, int epoch)
 	.. static Factory methods ..
-    +Model loadModel(String modelPath)
-    +Model loadModel(File modelPath)
-    +Model loadModel(String modelPath, int epoch)
-    +Model loadModel(File modelPath, String modelName)
     +Model loadModel(File modelPath, String modelName, int epoch)
 }
 
 interface Translator<I, O> {
-    +NDArray[] processInput(TranslatorContext ctx, I input)
-    +O processOutput(TranslatorContext ctx, NDArray[] array)
+    +NDList processInput(TranslatorContext ctx, I input)
+    +O processOutput(TranslatorContext ctx, NDList array)
 }
 
 interface Predictor<I, O> {
     +O predict(I input)
+    +void setMetrics(Metrics metrics)
+    +void close()
 }
 
 interface TranslatorContext {
@@ -53,7 +57,7 @@ class ObjectDetector<I, O> {
 
 interface NDFactory {
     +NDArray create(Context context, ...);
-    +NDArray create(DataDesc dataDesc, boolean delay);
+    +NDArray create(DataDesc dataDesc);
 }
 
 interface NDArray {
