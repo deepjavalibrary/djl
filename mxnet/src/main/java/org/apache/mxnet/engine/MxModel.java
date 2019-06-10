@@ -25,8 +25,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import org.apache.commons.io.FileUtils;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +54,7 @@ public class MxModel implements Model, AutoCloseable {
     private String[] optimizerStates;
     private String[] fixedParameters;
     private DataDesc[] inputData;
+    private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
     MxModel(
             File modelDir,
@@ -211,7 +218,51 @@ public class MxModel implements Model, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public URL getResource(String artifactName) throws IOException {
+    public String[] getArtifactNames() {
+        Collection<File> files = FileUtils.listFiles(modelDir, null, true);
+        List<String> ret = new ArrayList<>(files.size());
+        Path base = modelDir.toPath();
+        for (File f : files) {
+            String fileName = f.getName();
+            if (fileName.endsWith(".params") || fileName.endsWith("-symbol.json")) {
+                // ignore symbol and param files.
+                continue;
+            }
+            Path path = f.toPath();
+            Path relative = base.relativize(path);
+            ret.add(relative.toString());
+        }
+        return ret.toArray(new String[0]);
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException {
+        try {
+            Object artifact =
+                    artifacts.computeIfAbsent(
+                            name,
+                            v -> {
+                                try (InputStream is = getArtifactAsStream(name)) {
+                                    return function.apply(is);
+                                } catch (IOException e) {
+                                    throw new IllegalStateException(e);
+                                }
+                            });
+            return (T) artifact;
+        } catch (RuntimeException e) {
+            Throwable t = e.getCause();
+            if (t instanceof IOException) {
+                throw (IOException) e.getCause();
+            }
+            throw e;
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public URL getArtifact(String artifactName) throws IOException {
         if (artifactName == null) {
             throw new IllegalArgumentException("artifactName cannot be null");
         }
@@ -224,8 +275,8 @@ public class MxModel implements Model, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public InputStream getResourceAsStream(String artifactName) throws IOException {
-        URL url = getResource(artifactName);
+    public InputStream getArtifactAsStream(String name) throws IOException {
+        URL url = getArtifact(name);
         if (url == null) {
             return null;
         }

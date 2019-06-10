@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.function.Function;
 
 /**
  * The <code>Model</code> interface is the holder of the model.
@@ -112,23 +113,50 @@ public interface Model {
     DataDesc[] describeOutput();
 
     /**
-     * Finds a artifact resource with a given name in the model.
+     * Returns artifact names associated with the model.
      *
-     * @param artifactName name of the desired artifact
-     * @return A {@link java.net.URL} object or {@code null} if no artifact with this name is found
-     * @throws IOException if an error occurs during loading resource
+     * @return array of artifact names
      */
-    URL getResource(String artifactName) throws IOException;
+    String[] getArtifactNames();
+
+    /**
+     * If the specified artifact is not already cached, attempts to load the artifact using the
+     * given function and cache it.
+     *
+     * <p>Model will cache loaded artifact, so user doesn't need to keep tracking it.
+     *
+     * <pre>{@code
+     * String synset = model.getArtifact("synset.txt", k -> IOUtils.toString(k)));
+     * }</pre>
+     *
+     * @param name name of the desired artifact
+     * @param function the function to load artifact
+     * @param <T> type of return artifact object
+     * @return the current (existing or computed) artifact associated with the specified name, or
+     *     null if the computed value is null
+     * @throws IOException if an error occurs during loading resource
+     * @throws ClassCastException if the cached artifact cannot be casted to target class
+     */
+    <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException;
 
     /**
      * Finds a artifact resource with a given name in the model.
      *
-     * @param artifactName name of the desired artifact
+     * @param name name of the desired artifact
+     * @return A {@link java.net.URL} object or {@code null} if no artifact with this name is found
+     * @throws IOException if an error occurs during loading resource
+     */
+    URL getArtifact(String name) throws IOException;
+
+    /**
+     * Finds a artifact resource with a given name in the model.
+     *
+     * @param name name of the desired artifact
      * @return A {@link java.io.InputStream} object or {@code null} if no resource with this name is
      *     found
      * @throws IOException if an error occurs during loading resource
      */
-    InputStream getResourceAsStream(String artifactName) throws IOException;
+    InputStream getArtifactAsStream(String name) throws IOException;
 
     /**
      * Cast the model to support different precision level.
