@@ -13,6 +13,7 @@
 
 package com.amazon.ai.example;
 
+import com.amazon.ai.Context;
 import com.amazon.ai.Model;
 import com.amazon.ai.TranslateException;
 import com.amazon.ai.Translator;
@@ -49,42 +50,40 @@ public final class BertQaInferenceExample extends AbstractExample {
     }
 
     @Override
-    public void predict(Arguments args, int iteration) throws IOException, TranslateException {
-        BertArguments arguments = (BertArguments) args;
+    public String predict(Arguments args, Metrics metrics, int iteration)
+            throws IOException, TranslateException {
+        String predictResult = null;
 
+        BertArguments arguments = (BertArguments) args;
         File modelDir = new File(arguments.getModelDir());
         String modelName = arguments.getModelName();
 
         Model model = Model.loadModel(modelDir, modelName);
 
-        String question = arguments.getQuestion();
-        String answer = arguments.getAnswer();
-        int seqLength = arguments.getSeqLength();
-
+        QAInput input = new QAInput(arguments);
         BertDataParser parser = model.getArtifact("vocab.json", BertDataParser::parse);
-        QAInput input = new QAInput(question, answer, seqLength);
 
         logger.info("Question: {}", input.getQuestion());
         logger.info("Paragraph: {}", input.getAnswer());
 
         BertTranslator translator = new BertTranslator(parser);
-        Metrics metrics = new Metrics();
 
-        try (Predictor<QAInput, String> predictor = Predictor.newInstance(model, translator)) {
-            predictor.setMetrics(metrics);
+        // Following context is not not required, default context will be used by Predictor without
+        // passing context to Predictor.newInstance(model, translator)
+        // Change to a specific context if needed.
+        Context context = Context.defaultContext();
+
+        try (Predictor<QAInput, String> predictor =
+                Predictor.newInstance(model, translator, context)) {
+            predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
-                String result = predictor.predict(input);
-                printProgress(iteration, i, result);
+                predictResult = predictor.predict(input);
+                printProgress(iteration, i);
+                collectMemoryInfo(metrics);
             }
-
-            float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1000000f;
-            float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000000f;
-
-            logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
-
-            dumpMemoryInfo(metrics, args.getLogDir());
         }
+        return predictResult;
     }
 
     @Override
@@ -103,10 +102,10 @@ public final class BertQaInferenceExample extends AbstractExample {
         private String answer;
         private int seqLength;
 
-        QAInput(String question, String answer, int seqLength) {
-            this.question = question;
-            this.answer = answer;
-            this.seqLength = seqLength;
+        QAInput(BertArguments arguments) {
+            question = arguments.getQuestion();
+            answer = arguments.getAnswer();
+            seqLength = arguments.getSeqLength();
         }
 
         public String getQuestion() {
@@ -200,12 +199,19 @@ public final class BertQaInferenceExample extends AbstractExample {
             super(cmd);
             if (cmd.hasOption("question")) {
                 question = cmd.getOptionValue("question");
+            } else {
+                question = "When did BBC Japan start broadcasting?";
             }
             if (cmd.hasOption("answer")) {
                 answer = cmd.getOptionValue("answer");
+            } else {
+                answer =
+                        "BBC Japan was a general entertainment Channel.\nWhich operated between December 2004 and April 2006.\nIt ceased operations after its Japanese distributor folded.";
             }
             if (cmd.hasOption("sequenceLength")) {
                 seqLength = Integer.parseInt(cmd.getOptionValue("sequenceLength"));
+            } else {
+                seqLength = 384;
             }
         }
 
@@ -226,10 +232,10 @@ public final class BertQaInferenceExample extends AbstractExample {
                             .desc("Answer paragraph of the model")
                             .build());
             options.addOption(
-                    Option.builder("sl")
-                            .longOpt("sequenceLength")
+                    Option.builder("l")
+                            .longOpt("sequence-length")
                             .hasArg()
-                            .argName("SEQUENCELENGTH")
+                            .argName("SEQUENCE-LENGTH")
                             .desc("Sequence Length of the paragraph")
                             .build());
             return options;

@@ -19,7 +19,6 @@ import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.Arguments;
-import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.Predictor;
@@ -34,11 +33,8 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
 
 public final class GenericInferenceExample extends AbstractExample {
-
-    private static final Logger logger = LogUtils.getLogger(GenericInferenceExample.class);
 
     private GenericInferenceExample() {}
 
@@ -47,7 +43,9 @@ public final class GenericInferenceExample extends AbstractExample {
     }
 
     @Override
-    public void predict(Arguments arguments, int iteration) throws IOException, TranslateException {
+    public DetectedObject predict(Arguments arguments, Metrics metrics, int iteration)
+            throws IOException, TranslateException {
+        DetectedObject predictResult = null;
         File modelDir = new File(arguments.getModelDir());
         String modelName = arguments.getModelName();
         String imageFile = arguments.getImageFile();
@@ -56,35 +54,24 @@ public final class GenericInferenceExample extends AbstractExample {
         Model model = Model.loadModel(modelDir, modelName);
 
         GenericTranslator translator = new GenericTranslator(5, 224, 224);
-        Metrics metrics = new Metrics();
 
         // Following context is not not required, default context will be used by Predictor without
         // passing context to Predictor.newInstance(model, translator)
         // Change to a specific context if needed.
         Context context = Context.defaultContext();
 
-        long init = System.nanoTime();
         try (Predictor<BufferedImage, List<DetectedObject>> predictor =
                 Predictor.newInstance(model, translator, context)) {
-
-            predictor.setMetrics(metrics);
-
-            long loadModel = System.nanoTime();
-            logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
+            predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
                 List<DetectedObject> result = predictor.predict(img);
-                printProgress(iteration, i, result.get(0).getClassName());
+                predictResult = result.get(0);
+                printProgress(iteration, i);
                 collectMemoryInfo(metrics);
             }
-
-            float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1000000f;
-            float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000000f;
-
-            logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
-
-            dumpMemoryInfo(metrics, arguments.getLogDir());
         }
+        return predictResult;
     }
 
     private static final class GenericTranslator

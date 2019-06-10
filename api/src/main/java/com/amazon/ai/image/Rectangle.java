@@ -113,4 +113,12 @@ public class Rectangle implements BoundingBox {
     public double getHeight() {
         return height;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        double x = point.getX();
+        double y = point.getY();
+        return "[x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ']';
+    }
 }

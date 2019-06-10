@@ -48,7 +48,9 @@ public abstract class AbstractExample {
 
     private static final Logger logger = LogUtils.getLogger(AbstractExample.class);
 
-    protected abstract void predict(Arguments arguments, int iteration)
+    private static Object lastResult;
+
+    protected abstract Object predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, TranslateException;
 
     public void runExample(String[] args) {
@@ -72,8 +74,20 @@ public abstract class AbstractExample {
                             "Load library %s in %.3f ms.", version, (loaded - init) / 1000000f));
 
             while (!duration.isNegative()) {
+                Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
+
                 long begin = System.currentTimeMillis();
-                predict(arguments, iteration);
+                setLastResult(predict(arguments, metrics, iteration));
+
+                logger.info("Inference result: {}", lastResult);
+
+                float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1000000f;
+                float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000000f;
+
+                logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
+
+                dumpMemoryInfo(metrics, arguments.getLogDir());
+
                 long delta = System.currentTimeMillis() - begin;
                 duration = duration.minus(Duration.ofMillis(delta));
             }
@@ -85,6 +99,14 @@ public abstract class AbstractExample {
         } catch (Throwable t) {
             logger.error("Unexpected error", t);
         }
+    }
+
+    public static void setLastResult(Object lastResult) {
+        AbstractExample.lastResult = lastResult;
+    }
+
+    public static Object getPredictResult() {
+        return lastResult;
     }
 
     protected void collectMemoryInfo(Metrics metrics) {
@@ -175,14 +197,10 @@ public abstract class AbstractExample {
     }
 
     @SuppressWarnings("PMD.SystemPrintln")
-    protected void printProgress(int iteration, int index, String message) {
-        if (index == 0) {
-            logger.info(String.format("Result: %s", message));
-        } else {
-            System.out.print(".");
-            if (index % 80 == 0 || index == iteration - 1) {
-                System.out.println();
-            }
+    protected void printProgress(int iteration, int index) {
+        System.out.print(".");
+        if (index % 80 == 79 || index == iteration - 1) {
+            System.out.println();
         }
     }
 

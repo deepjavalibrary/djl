@@ -24,6 +24,7 @@ import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.Arguments;
 import com.amazon.ai.image.Images;
+import com.amazon.ai.image.Rectangle;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.ImageTranslator;
 import com.amazon.ai.inference.ObjectDetector;
@@ -35,12 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class SsdExample extends AbstractExample {
-
-    private static final Logger logger = LoggerFactory.getLogger(SsdExample.class);
 
     private SsdExample() {}
 
@@ -49,7 +46,9 @@ public final class SsdExample extends AbstractExample {
     }
 
     @Override
-    public void predict(Arguments arguments, int iteration) throws IOException, TranslateException {
+    public DetectedObject predict(Arguments arguments, Metrics metrics, int iteration)
+            throws IOException, TranslateException {
+        DetectedObject predictResult = null;
         File modelDir = new File(arguments.getModelDir());
         String modelName = arguments.getModelName();
         String imageFile = arguments.getImageFile();
@@ -57,45 +56,35 @@ public final class SsdExample extends AbstractExample {
 
         Model model = Model.loadModel(modelDir, modelName);
 
-        SsdTranslator translator = new SsdTranslator(5, 224, 224);
-        Metrics metrics = new Metrics();
+        SsdTranslator translator = new SsdTranslator(0.2f, 512, 512);
 
         // Following context is not not required, default context will be used by Predictor without
         // passing context to Predictor.newInstance(model, translator)
         // Change to a specific context if needed.
         Context context = Context.defaultContext();
 
-        long init = System.nanoTime();
         try (ObjectDetector<BufferedImage, List<DetectedObject>> ssd =
                 new ObjectDetector<>(model, translator, context)) {
-            ssd.setMetrics(metrics);
-
-            long loadModel = System.nanoTime();
-            logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
+            ssd.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
                 List<DetectedObject> result = ssd.detect(img);
-                printProgress(iteration, i, result.get(0).getClassName());
+                predictResult = result.get(0);
+                printProgress(iteration, i);
                 collectMemoryInfo(metrics);
             }
-
-            float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1000000f;
-            float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000000f;
-
-            logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
-
-            dumpMemoryInfo(metrics, arguments.getLogDir());
         }
+        return predictResult;
     }
 
     private static final class SsdTranslator extends ImageTranslator<List<DetectedObject>> {
 
-        private int topK;
+        private float threshold;
         private int imageWidth;
         private int imageHeight;
 
-        public SsdTranslator(int topK, int imageWidth, int imageHeight) {
-            this.topK = topK;
+        public SsdTranslator(float threshold, int imageWidth, int imageHeight) {
+            this.threshold = threshold;
             this.imageWidth = imageWidth;
             this.imageHeight = imageHeight;
         }
@@ -112,30 +101,34 @@ public final class SsdExample extends AbstractExample {
             Model model = ctx.getModel();
             NDArray array = list.get(0);
 
-            int length = array.getShape().head();
-            length = Math.min(length, topK);
-            List<DetectedObject> ret = new ArrayList<>(length);
-            try (NDArray nd = array.at(0)) {
-                NDArray sorted = nd.argsort(-1, false);
-                NDArray top = sorted.slice(0, topK);
+            List<DetectedObject> ret = new ArrayList<>();
 
-                float[] probabilities = nd.toFloatArray();
-                float[] indices = top.toFloatArray();
-
-                sorted.close();
-                top.close();
-
+            try {
                 String[] synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
-                for (int i = 0; i < topK; ++i) {
-                    int index = (int) indices[i];
-                    String className = synset[index];
-                    DetectedObject output =
-                            new DetectedObject(className, probabilities[index], null);
-                    ret.add(output);
+                NDArray nd = array.at(0);
+                int length = array.getShape().head();
+                for (int i = 0; i < length; ++i) {
+                    try (NDArray item = nd.at(i)) {
+                        float[] values = item.toFloatArray();
+                        int classId = (int) values[0];
+                        float probability = values[1];
+                        if (classId > 0 && probability > threshold) {
+                            String className = synset[classId];
+
+                            double x = values[2] * imageWidth;
+                            double y = values[3] * imageHeight;
+                            double w = values[4] * imageHeight - x;
+                            double h = values[5] * imageHeight - y;
+
+                            Rectangle rect = new Rectangle(x, y, w, h);
+                            ret.add(new DetectedObject(className, probability, rect));
+                        }
+                    }
                 }
             } catch (IOException e) {
                 throw new TranslateException(e);
             }
+
             return ret;
         }
     }

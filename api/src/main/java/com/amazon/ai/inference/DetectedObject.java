@@ -26,4 +26,15 @@ public class DetectedObject extends Classification {
     public BoundingBox getBoundingBox() {
         return boundingBox;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        if (boundingBox != null) {
+            sb.append(", bounds: ").append(boundingBox);
+        }
+        return sb.toString();
+    }
 }

@@ -29,4 +29,10 @@ public class Classification {
     public double getProbability() {
         return probability;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "class: \"" + className + "\", probability: " + probability;
+    }
 }
