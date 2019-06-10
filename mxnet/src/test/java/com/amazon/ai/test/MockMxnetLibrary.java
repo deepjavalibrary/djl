@@ -13,6 +13,7 @@ import org.apache.mxnet.jna.NativeSize;
 import org.apache.mxnet.jna.NativeSizeByReference;
 import org.apache.mxnet.jna.PointerArray;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 
 // CHECKSTYLE:OFF:ParameterName
 public class MockMxnetLibrary implements MxnetLibrary {
@@ -166,6 +167,8 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXGetGPUMemoryInformation64(int dev, LongBuffer free_mem, LongBuffer total_mem) {
+        free_mem.put(900);
+        total_mem.put(1000);
         return 0;
     }
 
@@ -244,6 +247,15 @@ public class MockMxnetLibrary implements MxnetLibrary {
             PointerByReference out_arr,
             IntBuffer out_name_size,
             PointerByReference out_names) {
+        out_size.put(0, 3);
+        out_name_size.put(0, 3);
+        PointerArray out_arr_mocked = Mockito.mock(PointerArray.class);
+        PowerMockito.when(out_arr_mocked.getPointer(0)).thenReturn(out_arr_mocked);
+        PowerMockito.when(out_arr_mocked.getPointerArray(0, 3)).thenReturn(new Pointer[3]);
+        PowerMockito.when(out_arr_mocked.getStringArray(0, 3))
+                .thenReturn(new String[] {"A:" + fname, "B:b", "C:c"});
+        out_arr.setPointer(out_arr_mocked);
+        out_names.setPointer(out_arr_mocked);
         return 0;
     }
 
@@ -662,6 +674,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXSymbolCreateFromFile(String fname, PointerByReference out) {
+        out.setValue(new PointerArray());
         return 0;
     }
 
