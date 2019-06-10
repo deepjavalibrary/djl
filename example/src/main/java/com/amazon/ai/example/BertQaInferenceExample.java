@@ -17,7 +17,7 @@ import com.amazon.ai.Model;
 import com.amazon.ai.TranslateException;
 import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
-import com.amazon.ai.engine.Engine;
+import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.Arguments;
 import com.amazon.ai.example.util.BertDataParser;
 import com.amazon.ai.example.util.LogUtils;
@@ -30,70 +30,39 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 
-public class BertQaInferenceExample {
+public final class BertQaInferenceExample extends AbstractExample {
 
     private static Logger logger = LogUtils.getLogger(BertQaInferenceExample.class);
 
-    private void runExample(String[] args) {
-        Options options = BertArguments.getOptions();
-        try {
-            DefaultParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args, null, false);
-            BertArguments arguments = new BertArguments(cmd);
+    private BertQaInferenceExample() {}
 
-            File modelDir = new File(arguments.getModelDir());
-            String modelName = arguments.getModelName();
-            String question = arguments.getQuestion();
-            String answer = arguments.getAnswer();
-            int seqLength = arguments.getSeqLength();
-            Duration duration = Duration.ofMinutes(arguments.getDuration());
-            int iteration = arguments.getIteration();
-
-            logger.info("Running {}, iteration: {}", getClass().getSimpleName(), iteration);
-
-            File vocabulary = new File(modelDir, arguments.getVocabulary());
-            BertDataParser util = BertDataParser.parse(vocabulary);
-            QAInput input = new QAInput(question, answer, seqLength);
-
-            long init = System.nanoTime();
-            String version = Engine.getInstance().getVersion();
-            long loaded = System.nanoTime();
-            logger.info(
-                    String.format(
-                            "Load library %s in %.3f ms.", version, (loaded - init) / 1000000f));
-
-            while (!duration.isNegative()) {
-                long begin = System.currentTimeMillis();
-                predict(modelDir, modelName, util, input, iteration);
-                long delta = System.currentTimeMillis() - begin;
-                duration = duration.minus(Duration.ofMillis(delta));
-            }
-        } catch (ParseException e) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.setLeftPadding(1);
-            formatter.setWidth(120);
-            formatter.printHelp(e.getMessage(), options);
-        } catch (Throwable t) {
-            logger.error("Unexpected error", t);
-        }
+    public static void main(String[] args) {
+        new BertQaInferenceExample().runExample(args);
     }
 
-    private void predict(
-            File modelDir, String modelName, BertDataParser parser, QAInput input, int iteration)
-            throws IOException, TranslateException {
+    @Override
+    public void predict(Arguments args, int iteration) throws IOException, TranslateException {
+        BertArguments arguments = (BertArguments) args;
+
+        File modelDir = new File(arguments.getModelDir());
+        String modelName = arguments.getModelName();
+
         Model model = Model.loadModel(modelDir, modelName);
+
+        String question = arguments.getQuestion();
+        String answer = arguments.getAnswer();
+        int seqLength = arguments.getSeqLength();
+
+        BertDataParser parser = model.getArtifact("vocab.json", BertDataParser::parse);
+        QAInput input = new QAInput(question, answer, seqLength);
 
         logger.info("Question: {}", input.getQuestion());
         logger.info("Paragraph: {}", input.getAnswer());
@@ -105,31 +74,27 @@ public class BertQaInferenceExample {
             predictor.setMetrics(metrics);
 
             for (int i = 0; i < iteration; ++i) {
-                String answer = predictor.predict(input);
-                printProgress(iteration, i, answer);
+                String result = predictor.predict(input);
+                printProgress(iteration, i, result);
             }
 
             float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1000000f;
             float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000000f;
 
             logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
+
+            dumpMemoryInfo(metrics, args.getLogDir());
         }
     }
 
-    public static void main(String[] args) {
-        new BertQaInferenceExample().runExample(args);
+    @Override
+    protected Options getOptions() {
+        return BertArguments.getOptions();
     }
 
-    @SuppressWarnings("PMD.SystemPrintln")
-    private void printProgress(int iteration, int index, String message) {
-        if (index == 0) {
-            logger.info(String.format("Answer: %s", message));
-        } else {
-            System.out.print(".");
-            if (index % 80 == 0 || index == iteration - 1) {
-                System.out.println();
-            }
-        }
+    @Override
+    protected BertArguments parseArguments(CommandLine cmd) {
+        return new BertArguments(cmd);
     }
 
     private static final class QAInput {
@@ -230,7 +195,6 @@ public class BertQaInferenceExample {
         private String question;
         private String answer;
         private int seqLength;
-        private String vocabulary;
 
         public BertArguments(CommandLine cmd) {
             super(cmd);
@@ -242,9 +206,6 @@ public class BertQaInferenceExample {
             }
             if (cmd.hasOption("sequenceLength")) {
                 seqLength = Integer.parseInt(cmd.getOptionValue("sequenceLength"));
-            }
-            if (cmd.hasOption("vocabulary")) {
-                vocabulary = cmd.getOptionValue("vocabulary");
             }
         }
 
@@ -271,13 +232,6 @@ public class BertQaInferenceExample {
                             .argName("SEQUENCELENGTH")
                             .desc("Sequence Length of the paragraph")
                             .build());
-            options.addOption(
-                    Option.builder("v")
-                            .longOpt("vocabulary")
-                            .hasArg()
-                            .argName("VOCABULARY")
-                            .desc("Vocabulary of the model")
-                            .build());
             return options;
         }
 
@@ -291,10 +245,6 @@ public class BertQaInferenceExample {
 
         public int getSeqLength() {
             return seqLength;
-        }
-
-        public String getVocabulary() {
-            return vocabulary;
         }
     }
 }

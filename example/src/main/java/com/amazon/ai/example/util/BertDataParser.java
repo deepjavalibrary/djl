@@ -3,10 +3,11 @@ package com.amazon.ai.example.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,13 +34,15 @@ public class BertDataParser {
     /**
      * Parse the Vocabulary to JSON files [PAD], [CLS], [SEP], [MASK], [UNK] are reserved tokens.
      *
-     * @param jsonFile the file of the vocab.json
+     * @param is the <code>InputStream</code> for the vocab.json
      * @return instance of <code>BertDataParser</code>
-     * @throws IOException if failed read from file
+     * @throws IllegalStateException if failed read from <code>InputStream</code>
      */
-    public static BertDataParser parse(File jsonFile) throws IOException {
-        try (Reader reader = Files.newBufferedReader(jsonFile.toPath())) {
+    public static BertDataParser parse(InputStream is) {
+        try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             return GSON.fromJson(reader, BertDataParser.class);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 

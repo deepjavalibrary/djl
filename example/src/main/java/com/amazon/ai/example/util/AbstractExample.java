@@ -15,11 +15,9 @@ package com.amazon.ai.example.util;
 import com.amazon.ai.Context;
 import com.amazon.ai.TranslateException;
 import com.amazon.ai.engine.Engine;
-import com.amazon.ai.image.Images;
 import com.amazon.ai.metric.Metric;
 import com.amazon.ai.metric.Metrics;
 import com.sun.jna.Platform;
-import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -50,26 +48,20 @@ public abstract class AbstractExample {
 
     private static final Logger logger = LogUtils.getLogger(AbstractExample.class);
 
-    protected abstract void predict(
-            File modelDir, String modelName, BufferedImage image, int iteration)
+    protected abstract void predict(Arguments arguments, int iteration)
             throws IOException, TranslateException;
 
     public void runExample(String[] args) {
-        Options options = Arguments.getOptions();
+        Options options = getOptions();
         try {
             DefaultParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args, null, false);
-            Arguments arguments = new Arguments(cmd);
+            Arguments arguments = parseArguments(cmd);
 
-            File modelDir = new File(arguments.getModelDir());
-            String modelName = arguments.getModelName();
-            String imageFile = arguments.getImageFile();
             Duration duration = Duration.ofMinutes(arguments.getDuration());
             int iteration = arguments.getIteration();
 
             logger.info("Running {}, iteration: {}", getClass().getSimpleName(), iteration);
-
-            BufferedImage img = Images.loadImageFromFile(new File(imageFile));
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
@@ -81,7 +73,7 @@ public abstract class AbstractExample {
 
             while (!duration.isNegative()) {
                 long begin = System.currentTimeMillis();
-                predict(modelDir, modelName, img, iteration);
+                predict(arguments, iteration);
                 long delta = System.currentTimeMillis() - begin;
                 duration = duration.minus(Duration.ofMillis(delta));
             }
@@ -115,9 +107,13 @@ public abstract class AbstractExample {
         }
     }
 
-    protected void dumpMemoryInfo(Metrics metrics) {
+    protected void dumpMemoryInfo(Metrics metrics, String logDir) {
+        if (logDir == null) {
+            return;
+        }
+
         try {
-            File dir = new File("logs");
+            File dir = new File(logDir);
             if (!dir.exists()) {
                 FileUtils.forceMkdir(dir);
             }
@@ -129,7 +125,6 @@ public abstract class AbstractExample {
                 list.addAll(metrics.getMetric("Heap"));
                 list.addAll(metrics.getMetric("NonHeap"));
                 list.addAll(metrics.getMetric("cpu"));
-                list.addAll(metrics.getMetric("vsz"));
                 list.addAll(metrics.getMetric("rss"));
                 int gpuCount = Engine.getInstance().getGpuCount();
                 for (int i = 0; i < gpuCount; ++i) {
@@ -169,6 +164,14 @@ public abstract class AbstractExample {
                 logger.error("Failed execute cmd: " + cmd, e);
             }
         }
+    }
+
+    protected Options getOptions() {
+        return Arguments.getOptions();
+    }
+
+    protected Arguments parseArguments(CommandLine cmd) {
+        return new Arguments(cmd);
     }
 
     @SuppressWarnings("PMD.SystemPrintln")

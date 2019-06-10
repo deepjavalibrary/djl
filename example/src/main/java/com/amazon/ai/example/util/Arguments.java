@@ -14,22 +14,24 @@
 package com.amazon.ai.example.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
 public class Arguments {
 
     private String modelDir;
     private String modelName;
     private String imageFile;
+    private String logDir;
     private int duration;
     private int iteration = 1000;
 
     public Arguments(CommandLine cmd) {
         modelDir = cmd.getOptionValue("model-dir");
         modelName = cmd.getOptionValue("model-name");
+        logDir = cmd.getOptionValue("log-dir");
         if (cmd.hasOption("image")) {
             imageFile = cmd.getOptionValue("image");
         }
@@ -80,6 +82,13 @@ public class Arguments {
                         .argName("ITERATION")
                         .desc("Number of iterations in each test.")
                         .build());
+        options.addOption(
+                Option.builder("l")
+                        .longOpt("log-dir")
+                        .hasArg()
+                        .argName("LOG-DIR")
+                        .desc("Directory for output logs.")
+                        .build());
         return options;
     }
 
@@ -91,13 +100,13 @@ public class Arguments {
         return modelName;
     }
 
-    public String getImageFile() throws ParseException {
+    public String getImageFile() throws FileNotFoundException {
         if (imageFile == null) {
             File file = new File(modelDir, "kitten.jpg");
             if (file.exists()) {
                 return file.getAbsolutePath();
             } else {
-                throw new ParseException("Missing --image parameter.");
+                throw new FileNotFoundException("Missing --image parameter.");
             }
         }
         return imageFile;
@@ -109,5 +118,9 @@ public class Arguments {
 
     public int getIteration() {
         return iteration;
+    }
+
+    public String getLogDir() {
+        return logDir;
     }
 }

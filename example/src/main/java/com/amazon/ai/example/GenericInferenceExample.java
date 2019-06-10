@@ -18,6 +18,7 @@ import com.amazon.ai.TranslateException;
 import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.example.util.AbstractExample;
+import com.amazon.ai.example.util.Arguments;
 import com.amazon.ai.example.util.LogUtils;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.inference.DetectedObject;
@@ -46,12 +47,13 @@ public final class GenericInferenceExample extends AbstractExample {
     }
 
     @Override
-    protected void predict(File modelDir, String modelName, BufferedImage img, int iteration)
-            throws IOException, TranslateException {
-        Model model = Model.loadModel(modelDir, modelName);
+    public void predict(Arguments arguments, int iteration) throws IOException, TranslateException {
+        File modelDir = new File(arguments.getModelDir());
+        String modelName = arguments.getModelName();
+        String imageFile = arguments.getImageFile();
+        BufferedImage img = Images.loadImageFromFile(new File(imageFile));
 
-        BufferedImage image = Images.reshapeImage(img, 224, 224);
-        FloatBuffer data = Images.toFloatBuffer(image);
+        Model model = Model.loadModel(modelDir, modelName);
 
         GenericTranslator translator = new GenericTranslator(5, 224, 224);
         Metrics metrics = new Metrics();
@@ -62,7 +64,7 @@ public final class GenericInferenceExample extends AbstractExample {
         Context context = Context.defaultContext();
 
         long init = System.nanoTime();
-        try (Predictor<FloatBuffer, List<DetectedObject>> predictor =
+        try (Predictor<BufferedImage, List<DetectedObject>> predictor =
                 Predictor.newInstance(model, translator, context)) {
 
             predictor.setMetrics(metrics);
@@ -71,7 +73,7 @@ public final class GenericInferenceExample extends AbstractExample {
             logger.info(String.format("bind model  = %.3f ms.", (loadModel - init) / 1000000f));
 
             for (int i = 0; i < iteration; ++i) {
-                List<DetectedObject> result = predictor.predict(data);
+                List<DetectedObject> result = predictor.predict(img);
                 printProgress(iteration, i, result.get(0).getClassName());
                 collectMemoryInfo(metrics);
             }
@@ -81,26 +83,32 @@ public final class GenericInferenceExample extends AbstractExample {
 
             logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
 
-            dumpMemoryInfo(metrics);
+            dumpMemoryInfo(metrics, arguments.getLogDir());
         }
     }
 
     private static final class GenericTranslator
-            implements Translator<FloatBuffer, List<DetectedObject>> {
+            implements Translator<BufferedImage, List<DetectedObject>> {
 
         private int topK;
         private DataDesc dataDesc;
-        private String[] synset;
+        private int imageWidth;
+        private int imageHeight;
 
         public GenericTranslator(int topK, int imageWidth, int imageHeight) {
             this.topK = topK;
+            this.imageWidth = imageWidth;
+            this.imageHeight = imageHeight;
             dataDesc = new DataDesc(new Shape(1, 3, imageWidth, imageHeight), "data");
         }
 
         @Override
-        public NDList processInput(TranslatorContext ctx, FloatBuffer input) {
+        public NDList processInput(TranslatorContext ctx, BufferedImage input) {
+            BufferedImage image = Images.reshapeImage(input, imageWidth, imageHeight);
+            FloatBuffer buffer = Images.toFloatBuffer(image);
+
             NDArray array = ctx.getNDFactory().create(dataDesc);
-            array.set(input);
+            array.set(buffer);
             return new NDList(array);
         }
 
@@ -120,12 +128,11 @@ public final class GenericInferenceExample extends AbstractExample {
             float[] probabilities = nd.toFloatArray();
             float[] indices = top.toFloatArray();
 
-            if (synset == null) {
-                try {
-                    synset = loadSynset(model.getResourceAsStream("synset.txt"));
-                } catch (IOException e) {
-                    throw new TranslateException(e);
-                }
+            String[] synset;
+            try {
+                synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
+            } catch (IOException e) {
+                throw new TranslateException(e);
             }
             for (int i = 0; i < topK; ++i) {
                 int index = (int) indices[i];

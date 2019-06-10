@@ -22,6 +22,7 @@ import com.amazon.ai.Model;
 import com.amazon.ai.TranslateException;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.example.util.AbstractExample;
+import com.amazon.ai.example.util.Arguments;
 import com.amazon.ai.image.Images;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.ImageTranslator;
@@ -48,8 +49,12 @@ public final class SsdExample extends AbstractExample {
     }
 
     @Override
-    protected void predict(File modelDir, String modelName, BufferedImage img, int iteration)
-            throws IOException, TranslateException {
+    public void predict(Arguments arguments, int iteration) throws IOException, TranslateException {
+        File modelDir = new File(arguments.getModelDir());
+        String modelName = arguments.getModelName();
+        String imageFile = arguments.getImageFile();
+        BufferedImage img = Images.loadImageFromFile(new File(imageFile));
+
         Model model = Model.loadModel(modelDir, modelName);
 
         SsdTranslator translator = new SsdTranslator(5, 224, 224);
@@ -78,6 +83,8 @@ public final class SsdExample extends AbstractExample {
             float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000000f;
 
             logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
+
+            dumpMemoryInfo(metrics, arguments.getLogDir());
         }
     }
 
@@ -86,7 +93,6 @@ public final class SsdExample extends AbstractExample {
         private int topK;
         private int imageWidth;
         private int imageHeight;
-        private String[] synset;
 
         public SsdTranslator(int topK, int imageWidth, int imageHeight) {
             this.topK = topK;
@@ -119,9 +125,7 @@ public final class SsdExample extends AbstractExample {
                 sorted.close();
                 top.close();
 
-                if (synset == null) {
-                    synset = loadSynset(model.getResourceAsStream("synset.txt"));
-                }
+                String[] synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
                 for (int i = 0; i < topK; ++i) {
                     int index = (int) indices[i];
                     String className = synset[index];
