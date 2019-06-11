@@ -92,7 +92,7 @@ public class MxModel implements Model, AutoCloseable {
         }
 
         String[] stateNames = JnaUtils.readLines(new File(stateFile)).toArray(JnaUtils.EMPTY_ARRAY);
-
+        // TODO: Check if Symbol has all names that params file have
         return new MxModel(modelDir, symbol, parameters, stateNames);
     }
 

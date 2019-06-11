@@ -747,6 +747,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     @Override
     public int MXSymbolListOutputs(
             Pointer symbol, IntBuffer out_size, PointerByReference out_str_array) {
+
         return 0;
     }
 
@@ -1702,6 +1703,15 @@ public class MockMxnetLibrary implements MxnetLibrary {
     @Override
     public int NNSymbolListInputNames(
             Pointer symbol, int option, IntBuffer out_size, PointerByReference out_str_array) {
+        out_size.put(0, 5);
+        PointerArray ndarrays =
+                new PointerArray(
+                        TestHelper.toPointer("a"),
+                        TestHelper.toPointer("b"),
+                        TestHelper.toPointer("c"),
+                        TestHelper.toPointer("d"),
+                        TestHelper.toPointer("e"));
+        out_str_array.setValue(ndarrays);
         return 0;
     }
 
