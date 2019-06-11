@@ -12,10 +12,9 @@
  */
 
 /**
- * Contains top level common classes shared for both inference and training.
+ * Contains classes to collect metrics information.
  *
- * @see com.amazon.ai.Model
- * @see com.amazon.ai.Translator
- * @see com.amazon.ai.Context
+ * @see com.amazon.ai.metric.Metric
+ * @see com.amazon.ai.metric.Metrics
  */
-package com.amazon.ai;
+package com.amazon.ai.metric;

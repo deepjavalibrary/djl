@@ -11,11 +11,5 @@
  * and limitations under the License.
  */
 
-/**
- * Contains top level common classes shared for both inference and training.
- *
- * @see com.amazon.ai.Model
- * @see com.amazon.ai.Translator
- * @see com.amazon.ai.Context
- */
-package com.amazon.ai;
+/** Contains classes defines neural network operators. */
+package com.amazon.ai.nn;

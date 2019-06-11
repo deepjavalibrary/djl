@@ -12,10 +12,15 @@
  */
 
 /**
- * Contains top level common classes shared for both inference and training.
+ * Contains classes responsible for loading deep learning framework.
  *
- * @see com.amazon.ai.Model
- * @see com.amazon.ai.Translator
- * @see com.amazon.ai.Context
+ * <p>Joule API is deep learning framework agnostic. This package defines abstraction to hide the
+ * difference between each framework.
+ *
+ * <p>Each deep learning framework is implemented as a service provider and supply an implementation
+ * of {@link com.amazon.ai.engine.Engine} interface.
+ *
+ * @see com.amazon.ai.engine.Engine
+ * @see com.amazon.ai.engine.EngineProvider
  */
-package com.amazon.ai;
+package com.amazon.ai.engine;

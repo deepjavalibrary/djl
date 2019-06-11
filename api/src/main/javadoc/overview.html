@@ -5,5 +5,55 @@
 <body>
 <p>This document is the API specification for the Joule™.</p>
 
+<p>The key design goal for Joule API is to make it extremely easy to get started and simple to
+use deep learning framework for Java developers. They need not be ML/DL experts to get started
+and can start from their existing Java expertise as an on-ramp to learn and use ML/DL. They can
+use their favorite IDE to build/train/deploy their models and integrate these models with their
+Java applications. They don’t have to compromise on model performance, scale, choice of GPU vs.
+CPUs.
+
+<p>Joule API is deep learning framework agnostic, developer does not have to make a choice
+between framework while they started their project. They can switch to different framework at any
+time they want.
+
+<p>Joule API provide native Java development experience, just another regular java library.
+Joule's ergonomic API interface is designed to guide developer with best practice to accomplish
+deep learning task.
+
+<p>The following is an example of how to write inference code.
+
+<pre>
+    // Assume user has a pre-trained already, they just need load it
+    Model model = <b>Model.loadModel</b>(modelDir, modelName);
+
+    // User must implement <a href="com/amazon/ai/Translator.html" title="interface in com.amazon.ai"><code>Translator</code></a> interface, read <a href="com/amazon/ai/Translator.html" title="interface in com.amazon.ai"><code>Translator</code></a> for detail.
+    Translator translator = new <b>MyTranslator</b>();
+
+    // User can specify GPU/CPU <a href="com/amazon/ai/Context.html" title="class in com.amazon.ai"><code>Context</code></a> to run inference session.
+    // This context is optional, <a href="com/amazon/ai/inference/Predictor.html" title="interface in com.amazon.ai.inference"><code>Predictor</code></a> can pick up default Context if not specified.
+    // See <a href="com/amazon/ai/Context.html#defaultContext--"><code>Context.defaultContext()</code></a>
+    Context context = Context.defaultContext();
+
+    // Next user need create a <code>Predictor</code>, and use <a href="com/amazon/ai/inference/Predictor.html#predict-I-"><code>Predictor.predict()</code></a>
+    // to get prediction.
+    try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor =
+            <b>Predictor.newInstance</b>(model, translator, context)) {
+        List&lt;DetectedObject&gt; result = predictor.<b>predict</b>(img);
+    }
+</pre>
+
+<p>The following is an example of how to write training code.
+
+<p>Joule API contains following packages:
+<ul>
+    <li><code>com.amazon.ai</code> – This packages contains top level common classes shared for both inference and training.
+    <li><code>com.amazon.ai.engine</code> – This packages contains classes responsible for loading deep learning framework.
+    <li><code>com.amazon.ai.image</code> – This packages contains utility classes for image processing.
+    <li><code>com.amazon.ai.inference</code> – This packages contains classes to implement inference tasks.
+    <li><code>com.amazon.ai.metric</code> – This packages contains classes to collect metrics information.
+    <li><code>com.amazon.ai.ndarray.*</code> – These packages contain classes and interfaces that defines n-dimensional array.
+    <li><code>com.amazon.ai.nn.*</code> – These packages contain classes defines neural network operators.
+    <li><code>com.amazon.ai.training.*</code> – These packages contain classes to implement training tasks.
+</ul>
 </body>
 </html>

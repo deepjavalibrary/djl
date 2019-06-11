@@ -12,10 +12,8 @@
  */
 
 /**
- * Contains top level common classes shared for both inference and training.
+ * Contains classes to implement training tasks.
  *
- * @see com.amazon.ai.Model
- * @see com.amazon.ai.Translator
- * @see com.amazon.ai.Context
+ * @see com.amazon.ai.training.Trainer
  */
-package com.amazon.ai;
+package com.amazon.ai.training;
