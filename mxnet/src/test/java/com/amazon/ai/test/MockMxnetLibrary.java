@@ -12,8 +12,6 @@ import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.jna.NativeSize;
 import org.apache.mxnet.jna.NativeSizeByReference;
 import org.apache.mxnet.jna.PointerArray;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 
 // CHECKSTYLE:OFF:ParameterName
 public class MockMxnetLibrary implements MxnetLibrary {
@@ -249,13 +247,20 @@ public class MockMxnetLibrary implements MxnetLibrary {
             PointerByReference out_names) {
         out_size.put(0, 3);
         out_name_size.put(0, 3);
-        PointerArray out_arr_mocked = Mockito.mock(PointerArray.class);
-        PowerMockito.when(out_arr_mocked.getPointer(0)).thenReturn(out_arr_mocked);
-        PowerMockito.when(out_arr_mocked.getPointerArray(0, 3)).thenReturn(new Pointer[3]);
-        PowerMockito.when(out_arr_mocked.getStringArray(0, 3))
-                .thenReturn(new String[] {"A:" + fname, "B:b", "C:c"});
-        out_arr.setPointer(out_arr_mocked);
-        out_names.setPointer(out_arr_mocked);
+
+        PointerArray ndarrays =
+                new PointerArray(
+                        TestHelper.toPointer("A:" + fname),
+                        TestHelper.toPointer("B:b"),
+                        TestHelper.toPointer("C:c"));
+        PointerArray names =
+                new PointerArray(
+                        TestHelper.toPointer("A:" + fname),
+                        TestHelper.toPointer("B:b"),
+                        TestHelper.toPointer("C:c"));
+
+        out_arr.setValue(ndarrays);
+        out_names.setValue(names);
         return 0;
     }
 
@@ -609,14 +614,9 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXListAllOpNames(IntBuffer out_size, PointerByReference out_array) {
-        PointerArray pa = Mockito.mock(PointerArray.class);
-        Pointer[] ptrs = new Pointer[1];
-        ptrs[0] = Mockito.mock(Pointer.class);
-        Mockito.when(ptrs[0].getString(0)).thenReturn("softmax");
-        Mockito.when(pa.getPointerArray(0, 1)).thenReturn(ptrs);
-        Mockito.when(pa.getPointer(0)).thenReturn(pa);
+        PointerArray pa = new PointerArray(TestHelper.toPointer("softmax"));
         out_size.put(0, 1);
-        out_array.setPointer(pa);
+        out_array.setValue(pa);
         return 0;
     }
 

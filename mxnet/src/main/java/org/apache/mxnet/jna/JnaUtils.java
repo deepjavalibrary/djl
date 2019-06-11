@@ -82,7 +82,7 @@ public final class JnaUtils {
 
         Set<String> set = new HashSet<>();
         for (Pointer p : pointers) {
-            set.add(p.getString(0));
+            set.add(p.getString(0, StandardCharsets.UTF_8.name()));
         }
         return set;
     }
@@ -135,9 +135,9 @@ public final class JnaUtils {
             Pointer[] argNames = argNameRef.getValue().getPointerArray(0, count);
             Pointer[] argTypes = argTypeRef.getValue().getPointerArray(0, count);
             for (int i = 0; i < argTypes.length; ++i) {
-                String type = argTypes[i].getString(0);
+                String type = argTypes[i].getString(0, StandardCharsets.UTF_8.name());
                 if (!type.startsWith("NDArray") && !type.startsWith("Symbol")) {
-                    arguments.add(argNames[i].getString(0));
+                    arguments.add(argNames[i].getString(0, StandardCharsets.UTF_8.name()));
                 }
             }
         }
@@ -674,7 +674,7 @@ public final class JnaUtils {
     public static String getSymbolChildren(Pointer symbol) {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXSymbolGetChildren(symbol, ref));
-        return ref.getValue().getString(0);
+        return ref.getValue().getString(0, StandardCharsets.UTF_8.name());
     }
 
     public static String[] listSymbolAuxiliaryStates(Pointer symbol) {
@@ -706,14 +706,14 @@ public final class JnaUtils {
         IntBuffer size = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXSymbolGetInputSymbols(symbol, ref, size));
-        return ref.getValue().getString(0);
+        return ref.getValue().getString(0, StandardCharsets.UTF_8.name());
     }
 
     public static String cutSubgraph(Pointer symbol) {
         IntBuffer inputSize = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXSymbolCutSubgraph(symbol, ref, inputSize));
-        return ref.getValue().getString(0);
+        return ref.getValue().getString(0, StandardCharsets.UTF_8.name());
     }
 
     public static void getAtomicSymbolInfo(Pointer symbol, String name) {
@@ -1218,7 +1218,7 @@ public final class JnaUtils {
     public static String getDataIterLabel(Pointer iter) {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXDataIterGetLabel(iter, ref));
-        return ref.getValue().getString(0);
+        return ref.getValue().getString(0, StandardCharsets.UTF_8.name());
     }
 
     /*
@@ -1491,7 +1491,7 @@ public final class JnaUtils {
 
         String[] arr = new String[size];
         for (int i = 0; i < size; ++i) {
-            arr[i] = pointers[i].getString(0);
+            arr[i] = pointers[i].getString(0, StandardCharsets.UTF_8.name());
         }
 
         return arr;
@@ -1503,7 +1503,7 @@ public final class JnaUtils {
         List<String> names = new ArrayList<>(size);
         List<String> values = new ArrayList<>(size);
         for (Pointer pointer : pointers) {
-            String[] pair = pointer.getStringArray(0, 2);
+            String[] pair = pointer.getStringArray(0, 2, StandardCharsets.UTF_8.name());
             names.add(pair[0]);
             values.add(pair[1]);
         }

@@ -12,11 +12,15 @@
  */
 package com.amazon.ai.test;
 
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -79,6 +83,20 @@ public final class TestHelper {
                 }
             }
         }
+    }
+
+    public static Pointer toPointer(String val) {
+        byte[] buf = val.getBytes(StandardCharsets.UTF_8);
+        byte[] dest = new byte[buf.length + 1];
+        System.arraycopy(buf, 0, dest, 0, buf.length);
+        return toPointer(dest);
+    }
+
+    public static Pointer toPointer(byte[] buf) {
+        ByteBuffer bb = ByteBuffer.allocateDirect(buf.length);
+        bb.put(buf);
+        bb.rewind();
+        return Native.getDirectBufferPointer(bb);
     }
 
     private static List<Class<?>> getClasses(Class<?> clazz)
