@@ -13,7 +13,9 @@
 package org.apache.mxnet.engine;
 
 import com.amazon.ai.Block;
+import com.amazon.ai.Initializer;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Layout;
@@ -154,7 +156,7 @@ public class Symbol extends NativeResource implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(NDList inputs, Map<String, String> args) {
+    public NDList forward(NDList inputs, PairList<String, String> params) {
         return null;
     }
 
@@ -170,9 +172,19 @@ public class Symbol extends NativeResource implements Block {
 
     /** {@inheritDoc} */
     @Override
+    public List<NDArray> getDirectParameters() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public List<NDArray> getParameters() {
         return null;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void initialize(NDFactory factory, Initializer initializer) {}
 
     /** {@inheritDoc} */
     @Override

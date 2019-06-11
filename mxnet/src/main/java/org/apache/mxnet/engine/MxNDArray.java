@@ -15,6 +15,7 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.Matrix;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
@@ -99,6 +100,11 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void encode(OutputStream os) {}
+
+    @Override
+    public NDFactory getFactory() {
+        return factory;
+    }
 
     public void detach() {
         factory.detach(this);

@@ -50,6 +50,13 @@ public interface NDArray extends AutoCloseable {
     void encode(OutputStream os) throws IOException;
 
     /**
+     * Returns the {@link NDFactory} used to create the NDArray.
+     *
+     * @return {@link NDFactory}
+     */
+    NDFactory getFactory();
+
+    /**
      * Returns the {@link DataType} of the NDArray.
      *
      * <p>{@link DataType} is a definition of precision level of the NDArray. All values inside the

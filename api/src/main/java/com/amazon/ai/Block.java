@@ -13,25 +13,48 @@
 package com.amazon.ai;
 
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.Shape;
+import com.amazon.ai.util.PairList;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public interface Block {
 
-    default NDList forward(NDList inputs) {
-        return forward(inputs, Collections.emptyMap());
-    }
-
-    NDList forward(NDList inputs, Map<String, String> args);
+    NDList forward(NDList inputs, PairList<String, String> params);
 
     void backward();
 
     Shape getInputShape();
 
-    List<NDArray> getParameters();
+    List<NDArray> getDirectParameters();
+
+    void initialize(NDFactory factory, Initializer initializer);
 
     byte[] getEncoded();
+
+    default NDList forward(NDList inputs) {
+        return forward(inputs, new PairList<>());
+    }
+
+    default List<Block> getChildren() {
+        return Collections.emptyList();
+    }
+
+    default List<NDArray> getParameters() {
+        List<NDArray> parameters = new ArrayList<>();
+        parameters.addAll(getChildrenParameters());
+        parameters.addAll(getDirectParameters());
+        return parameters;
+    }
+
+    default List<NDArray> getChildrenParameters() {
+        List<NDArray> parameters = new ArrayList<>();
+        for (Block child : getChildren()) {
+            parameters.addAll(child.getParameters());
+        }
+        return parameters;
+    }
 }

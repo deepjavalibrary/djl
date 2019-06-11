@@ -3,6 +3,7 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.Matrix;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
@@ -279,6 +280,12 @@ public class MxMatrix implements Matrix {
     /** {@inheritDoc} */
     @Override
     public void encode(OutputStream os) throws IOException {}
+
+    /** {@inheritDoc} */
+    @Override
+    public NDFactory getFactory() {
+        return null;
+    }
 
     /** {@inheritDoc} */
     @Override

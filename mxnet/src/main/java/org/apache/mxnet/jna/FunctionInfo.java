@@ -41,26 +41,10 @@ public class FunctionInfo {
 
     public MxNDArray[] invoke(
             MxNDFactory factory, MxNDArray[] src, PairList<String, String> params) {
-
-        Pointer[] srcHandles = new Pointer[src.length];
-        for (int i = 0; i < src.length; i++) {
-            srcHandles[i] = (src[i]).getHandle();
-        }
-        PointerArray srcRef = new PointerArray(srcHandles);
-
-        PointerByReference destRef = new PointerByReference();
-
-        int numOutputs = JnaUtils.imperativeInvoke(handle, srcRef, destRef, params);
-
-        Pointer[] ptrArray = destRef.getValue().getPointerArray(0, numOutputs);
-        MxNDArray[] result = new MxNDArray[numOutputs];
-        for (int i = 0; i < numOutputs; i++) {
-            result[i] = factory.create(ptrArray[i]);
-        }
-        return result;
+        return invoke(factory, src, new MxNDArray[] {}, params);
     }
 
-    public void invoke(
+    public MxNDArray[] invoke(
             MxNDFactory factory,
             MxNDArray[] src,
             MxNDArray[] dest,
@@ -72,27 +56,23 @@ public class FunctionInfo {
         PointerArray srcRef = new PointerArray(srcHandles);
 
         PointerByReference destRef;
-        if (dest != null) {
+        if (dest.length > 0) {
             Pointer[] arrays = new Pointer[dest.length];
             for (int i = 0; i < dest.length; i++) {
                 arrays[i] = (dest[i]).getHandle();
             }
             destRef = new PointerByReference(new PointerArray(arrays));
         } else {
-            throw new NullPointerException(
-                    "Please use the invoke method with a return"
-                            + "type instead of passing null as destination NDArray.");
+            destRef = new PointerByReference();
         }
 
         int numOutputs = JnaUtils.imperativeInvoke(handle, srcRef, destRef, params);
-        if (numOutputs != dest.length) {
-            throw new IllegalArgumentException(
-                    "Operator output size does not match that of" + "the destination NDArray.");
-        }
+        MxNDArray[] result = new MxNDArray[numOutputs];
         Pointer[] ptrArray = destRef.getValue().getPointerArray(0, numOutputs);
         for (int i = 0; i < numOutputs; i++) {
-            dest[i] = factory.create(ptrArray[i]);
+            result[i] = factory.create(ptrArray[i]);
         }
+        return result;
     }
 
     public String getFunctionName() {

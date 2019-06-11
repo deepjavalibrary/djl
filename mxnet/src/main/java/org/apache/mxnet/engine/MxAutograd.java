@@ -31,7 +31,7 @@ public final class MxAutograd {
      * computation.
      *
      * @param isRecording recording state to be set
-     * @return previous recording state before this set.
+     * @return previous recording state before this set
      */
     public static boolean setRecording(boolean isRecording) {
         return JnaUtils.autogradSetIsRecording(isRecording);
