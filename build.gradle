@@ -46,8 +46,13 @@ configure(javaProjects()) {
             showStandardStreams = true
             events "passed", "skipped", "failed", "standardOut", "standardError"
         }
+
+        doFirst {
+            systemProperty "org.slf4j.simpleLogger.defaultLogLevel", 'debug'
+        }
+
+        finalizedBy project.tasks.jacocoTestReport
     }
-    test.finalizedBy(project.tasks.jacocoTestReport)
 
     compileJava {
         options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static" << "-Werror"
