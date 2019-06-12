@@ -6,6 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 import org.apache.mxnet.jna.LibFeature;
 import org.apache.mxnet.jna.MXCallbackList;
 import org.apache.mxnet.jna.MxnetLibrary;
@@ -15,6 +18,16 @@ import org.apache.mxnet.jna.PointerArray;
 
 // CHECKSTYLE:OFF:ParameterName
 public class MockMxnetLibrary implements MxnetLibrary {
+
+    private Map<String, Function<Object[], Integer>> functions = new HashMap<>();
+
+    public void setFunction(String funcName, Function<Object[], Integer> func) {
+        functions.put(funcName, func);
+    }
+
+    public void resetFunctions() {
+        functions = new HashMap<>();
+    }
 
     @Override
     public String MXGetLastError() {
@@ -277,6 +290,11 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXNDArraySyncCopyFromCPU(Pointer handle, Pointer data, NativeSize size) {
+        if (functions.containsKey("MXNDArraySyncCopyFromCPU")) {
+            return functions
+                    .get("MXNDArraySyncCopyFromCPU")
+                    .apply(new Object[] {handle, data, size});
+        }
         return 0;
     }
 
@@ -328,6 +346,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXNDArrayGetStorageType(Pointer handle, IntBuffer out_storage_type) {
+        out_storage_type.put(0, 2);
         return 0;
     }
 
@@ -344,6 +363,9 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXNDArrayGetShape(Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
+        out_dim.put(0, 3);
+        Pointer ptr = TestHelper.toPointer(new int[] {1, 2, 3});
+        out_pdata.setValue(ptr);
         return 0;
     }
 
@@ -396,6 +418,8 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXNDArrayGetContext(Pointer handle, IntBuffer out_dev_type, IntBuffer out_dev_id) {
+        out_dev_type.put(0, 2);
+        out_dev_id.put(1);
         return 0;
     }
 

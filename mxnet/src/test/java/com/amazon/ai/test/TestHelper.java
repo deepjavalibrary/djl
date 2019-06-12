@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,8 +93,17 @@ public final class TestHelper {
         return toPointer(dest);
     }
 
+    public static Pointer toPointer(int[] arr) {
+        ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.asIntBuffer().put(arr);
+        bb.rewind();
+        return Native.getDirectBufferPointer(bb);
+    }
+
     public static Pointer toPointer(byte[] buf) {
         ByteBuffer bb = ByteBuffer.allocateDirect(buf.length);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.put(buf);
         bb.rewind();
         return Native.getDirectBufferPointer(bb);
