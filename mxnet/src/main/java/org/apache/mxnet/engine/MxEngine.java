@@ -85,7 +85,7 @@ public class MxEngine extends Engine {
         if (modelPath.isDirectory()) {
             modelDir = modelPath;
         } else {
-            modelDir = modelPath.getParentFile();
+            modelDir = modelPath.getCanonicalFile().getParentFile();
         }
         String modelPrefix = new File(modelDir, modelName).getAbsolutePath();
         if (epoch == -1) {
