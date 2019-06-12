@@ -64,7 +64,7 @@ public class Metrics {
         return list.get(index);
     }
 
-    public double mean(String metricName, int percent) {
+    public double mean(String metricName) {
         List<Metric> metric = metrics.get(metricName);
         if (metric == null || metrics.isEmpty()) {
             throw new IllegalArgumentException("Metric name not found: " + metricName);
