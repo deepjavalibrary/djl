@@ -49,7 +49,6 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         this.translator = translator;
         this.context = context;
         cachedOp = JnaUtils.createCachedOp(model, factory);
-        metrics = new Metrics();
     }
 
     /** {@inheritDoc} */
