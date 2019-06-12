@@ -46,6 +46,7 @@ public abstract class NativeResource implements AutoCloseable {
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
         if (getHandle() != null) {
