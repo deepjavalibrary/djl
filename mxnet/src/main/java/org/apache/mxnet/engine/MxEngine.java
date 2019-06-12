@@ -103,6 +103,9 @@ public class MxEngine extends Engine {
                             .filter(Objects::nonNull)
                             .sorted()
                             .collect(Collectors.toList());
+            if (checkpoints.isEmpty()) {
+                throw new IOException("Parameter files not found: " + modelPrefix + "-0001.params");
+            }
             epoch = checkpoints.get(checkpoints.size() - 1);
         }
 
