@@ -1,5 +1,5 @@
-*#* Joule examples
-=======
+Joule examples
+==============
 
 This module contains example project to demonstrate how developer can use Joule API.
 

@@ -1,5 +1,5 @@
-*#* Joule - Deep learning for Java
-=======
+Joule - Deep learning for Java
+==============================
 
 ## Overview
 
@@ -20,7 +20,7 @@ deep learning task.
 
 The following is an example of how to write inference code:
 
-```
+```java
     // Assume user has a pre-trained already, they just need load it
     Model model = <b>Model.loadModel</b>(modelDir, modelName);
 
@@ -44,6 +44,12 @@ The following is an example of how to write inference code:
 * 1.0 Initial release
 
 ## Building From Source
+
+In current version, full Joule build requires MXNet 1.5 installed on your system:
+
+```sh
+sudo pip install mxnet-mkl --pre
+```
 
 Once you check out the code, you can build it using gradle:
 
