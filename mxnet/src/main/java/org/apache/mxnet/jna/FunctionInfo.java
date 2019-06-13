@@ -13,26 +13,29 @@
 package org.apache.mxnet.jna;
 
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 
 public class FunctionInfo {
 
     private Pointer handle;
-    private String functionName;
-    private List<String> arguments;
-    private List<String> signature;
+    private String name;
+    private PairList<String, String> arguments;
 
     FunctionInfo(
-            Pointer pointer, String functionName, List<String> arguments, List<String> signature) {
+            Pointer pointer,
+            String functionName,
+            PairList<String, String> arguments) {
         this.handle = pointer;
-        this.functionName = functionName;
+        this.name = functionName;
         this.arguments = arguments;
-        this.signature = signature;
     }
 
     public NDList invoke(MxNDFactory factory, MxNDArray src, PairList<String, String> params) {
@@ -79,14 +82,14 @@ public class FunctionInfo {
     }
 
     public String getFunctionName() {
-        return functionName;
+        return name;
     }
 
-    public List<String> getArguments() {
-        return arguments;
+    public List<String> getArgumentNames() {
+        return arguments.keys();
     }
 
-    public List<String> getSignature() {
-        return signature;
+    public List<String> getArgumentTypes() {
+        return arguments.values();
     }
 }

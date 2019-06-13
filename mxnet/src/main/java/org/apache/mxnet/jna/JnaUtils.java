@@ -17,6 +17,7 @@ import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
+import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -127,22 +128,18 @@ public final class JnaUtils {
                         returnType));
 
         int count = numArgs.get();
-        List<String> arguments;
-        if (count == 0) {
-            arguments = Collections.emptyList();
-        } else {
-            arguments = new ArrayList<>(count);
-            Pointer[] argNames = argNameRef.getValue().getPointerArray(0, count);
-            Pointer[] argTypes = argTypeRef.getValue().getPointerArray(0, count);
-            for (int i = 0; i < argTypes.length; ++i) {
-                String type = argTypes[i].getString(0, StandardCharsets.UTF_8.name());
-                if (!type.startsWith("NDArray") && !type.startsWith("Symbol")) {
-                    arguments.add(argNames[i].getString(0, StandardCharsets.UTF_8.name()));
-                }
+        PairList<String, String> arguments = new PairList<>();
+        if (count != 0) {
+            String[] argNames =
+                    argNameRef.getValue().getStringArray(0, count, StandardCharsets.UTF_8.name());
+            String[] argTypes =
+                    argTypeRef.getValue().getStringArray(0, count, StandardCharsets.UTF_8.name());
+            for (int i = 0; i < argNames.length; i++) {
+                arguments.add(argNames[i], argTypes[i]);
             }
         }
 
-        return new FunctionInfo(handle, functionName, arguments, null);
+        return new FunctionInfo(handle, functionName, arguments);
     }
 
     /*
@@ -714,28 +711,6 @@ public final class JnaUtils {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXSymbolCutSubgraph(symbol, ref, inputSize));
         return ref.getValue().getString(0, StandardCharsets.UTF_8.name());
-    }
-
-    public static void getAtomicSymbolInfo(Pointer symbol, String name) {
-        String[] nameRef = new String[] {name};
-        String[] description = new String[1];
-        IntBuffer numArgs = IntBuffer.allocate(1);
-        PointerByReference argNames = new PointerByReference();
-        PointerByReference argTypes = new PointerByReference();
-        PointerByReference argDescs = new PointerByReference();
-        String[] keyVarNumArgs = new String[1];
-        String[] returnType = new String[1];
-        checkCall(
-                LIB.MXSymbolGetAtomicSymbolInfo(
-                        symbol,
-                        nameRef,
-                        description,
-                        numArgs,
-                        argNames,
-                        argTypes,
-                        argDescs,
-                        keyVarNumArgs,
-                        returnType));
     }
 
     public static Pointer createAtomicSymbol(Pointer symbol, String[] keys, String[] values) {
