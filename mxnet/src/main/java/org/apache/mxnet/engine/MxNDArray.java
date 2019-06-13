@@ -79,7 +79,7 @@ public class MxNDArray extends NativeResource implements NDArray {
                 context,
                 sparseFormat,
                 shape,
-                DataType.FLOAT32,
+                dataType,
                 JnaUtils.createNdArray(
                         context,
                         shape,

@@ -16,13 +16,17 @@ package org.apache.mxnet.engine;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import com.amazon.ai.ndarray.types.DataDesc;
+import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.test.MockMxnetLibrary;
 import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.function.Function;
 import org.apache.commons.io.FileUtils;
 import org.apache.mxnet.jna.LibUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
@@ -57,6 +61,9 @@ public class MxModelTest extends PowerMockTestCase {
         int epoch = 122;
         MxModel model = MxModel.loadModel(prefix, epoch);
         Assert.assertEquals(model.getParameters().get(0).getKey(), "A-0122.params");
+        Symbol sym = model.getSymbol();
+        Assert.assertNotNull(sym);
+        model.close();
     }
 
     @Test
@@ -71,25 +78,58 @@ public class MxModelTest extends PowerMockTestCase {
         // Comparing between a, b, c to a, b, c, d, e
         Assert.assertEquals(descs[0].getName(), "d");
         Assert.assertEquals(descs[1].getName(), "e");
+        DataDesc[] descs2 = model.describeInput();
+        Assert.assertTrue(Arrays.equals(descs2, descs));
     }
 
     @Test
-    public void testGetArtifactNames() throws IOException {
+    public void testCast() throws IOException {
+        String prefix = "A";
+        int epoch = 122;
+        MxModel model = MxModel.loadModel(prefix, epoch);
+        MxModel casted = (MxModel) model.cast(DataType.FLOAT32);
+        Assert.assertEquals(casted.getParameters(), model.getParameters());
+        casted = (MxModel) model.cast(DataType.FLOAT64);
+        Assert.assertEquals(
+                casted.getParameters().get(0).getValue().getDataType(), DataType.FLOAT64);
+    }
+
+    @Test
+    public void testGetArtifacts() throws IOException {
         String dir = "build/tmp/testArt/";
         String prefix = "A";
         int epoch = 122;
         // Test: Check filter
         FileUtils.forceMkdir(new File(dir));
         Files.createFile(Paths.get(dir + prefix + "-0001.params"));
+        Files.createFile(Paths.get(dir + prefix + "-symbol.json"));
         MxModel model = MxModel.loadModel(dir + prefix, epoch);
         Assert.assertEquals(model.getArtifactNames().length, 0);
         // Test: Add new file
         String synset = "synset.txt";
         Files.createFile(Paths.get(dir + synset));
         Assert.assertEquals(model.getArtifactNames()[0], synset);
-        // Test: add subDir
+        // Test: Add subDir
         FileUtils.forceMkdir(new File(dir + "inner/"));
         Files.createFile(Paths.get(dir + "inner/" + "innerFiles"));
         Assert.assertEquals(model.getArtifactNames()[0], "inner/innerFiles");
+        // Test: Get Artifacts
+        InputStream stream = model.getArtifactAsStream(synset);
+        Assert.assertEquals(stream.available(), 0);
+        Assert.assertNull(model.getArtifact("fileNotExist"));
+        Assert.assertThrows(IllegalArgumentException.class, () -> model.getArtifact(null));
+        // Test: Get Custom Artifacts
+        Function<InputStream, String> wrongFunc =
+                tempStream -> {
+                    throw new RuntimeException("Test");
+                };
+        Assert.assertThrows(RuntimeException.class, () -> model.getArtifact(synset, wrongFunc));
+        Function<InputStream, String> func =
+                tempStream -> {
+                    return "Hello";
+                };
+        String result = model.getArtifact(synset, func);
+        Assert.assertEquals(result, "Hello");
+        model.close();
     }
 }

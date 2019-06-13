@@ -110,6 +110,14 @@ public class CachedOpTest extends PowerMockTestCase {
         Assert.assertEquals(params[2].getShape(), new Shape(3));
         Assert.assertEquals(params[5].getShape(), new Shape(5));
         Assert.assertEquals(params[6].getShape(), new Shape(6));
+        logger.info("Test: Illigal inputs");
+        final NDList input2 = new NDList();
+        input2.add("data_not_exist", null);
+        Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    co.forward(input2);
+                });
     }
 
     @ObjectFactory

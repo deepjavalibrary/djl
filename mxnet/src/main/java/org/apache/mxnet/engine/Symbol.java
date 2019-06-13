@@ -86,14 +86,6 @@ public class Symbol extends NativeResource implements Block {
         return JnaUtils.listSymbolAttr(getHandle());
     }
 
-    public void plus(Symbol other) {}
-
-    public void plusScalar(Symbol other) {}
-
-    public void minus(Symbol other) {}
-
-    public void minusScalar(Symbol other) {}
-
     public Symbol copy() {
         return this;
     }

@@ -45,7 +45,7 @@ public class JnaUtilsTest extends PowerMockTestCase {
 
     @Test
     public void testGetOpNames() {
-        Assert.assertEquals(JnaUtils.getAllOpNames().size(), 1);
+        Assert.assertTrue(JnaUtils.getAllOpNames().size() > 0);
     }
 
     @Test

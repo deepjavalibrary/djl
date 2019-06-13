@@ -18,7 +18,6 @@ import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
-import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.io.File;
@@ -52,7 +51,6 @@ public class MxModel implements Model, AutoCloseable {
     private Symbol symbol;
     private PairList<String, MxNDArray> parameters;
     private String[] optimizerStates;
-    private String[] fixedParameters;
     private DataDesc[] inputData;
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
@@ -129,52 +127,6 @@ public class MxModel implements Model, AutoCloseable {
         }
         return new MxModel(modelDir, symbol, newParam, optimizerStates);
     }
-
-    public String[] getOptimizerStates() {
-        return optimizerStates;
-    }
-
-    public void setOptimizerStates(String[] optimizerStates) {
-        validate(optimizerStates, "state", true);
-        this.optimizerStates = optimizerStates;
-    }
-
-    public String[] getFixedParameters() {
-        return fixedParameters;
-    }
-
-    public void setFixedParameters(String[] fixedParameters) {
-        validate(fixedParameters, "fixed_param", true);
-        this.fixedParameters = fixedParameters;
-    }
-
-    public void saveCheckpoint(
-            String prefix,
-            int epoch,
-            Symbol symbol,
-            Map<String, MxNDArray> argParams,
-            Map<String, MxNDArray> auxParams) {
-        symbol.save(prefix + "-symbol.json");
-        String paramName = String.format("%s-%04d.params", prefix, epoch);
-
-        Pointer[] pointers = new Pointer[argParams.size() + auxParams.size()];
-        String[] keys = new String[pointers.length];
-        int i = 0;
-        for (Map.Entry<String, MxNDArray> entry : argParams.entrySet()) {
-            keys[i] = "arg:" + entry.getKey();
-            pointers[i] = entry.getValue().getHandle();
-            ++i;
-        }
-        for (Map.Entry<String, MxNDArray> entry : auxParams.entrySet()) {
-            keys[i] = "aux:" + entry.getKey();
-            pointers[i] = entry.getValue().getHandle();
-            ++i;
-        }
-
-        JnaUtils.saveNdArray(paramName, pointers, keys);
-    }
-
-    public void save(File dir, String name, int epoch) {}
 
     /** {@inheritDoc} */
     @Override
@@ -281,25 +233,5 @@ public class MxModel implements Model, AutoCloseable {
             return null;
         }
         return url.openStream();
-    }
-
-    private void validate(String[] names, String typeName, boolean required) {
-        if (names == null || names.length == 0) {
-            return;
-        }
-
-        String[] args = symbol.getArgParams();
-        for (String name : names) {
-            if (!Utils.contains(args, name)) {
-                String msg =
-                        String.format(
-                                "Input %s_%s is not found in symbol.list_arguments().",
-                                typeName, name);
-                if (required) {
-                    throw new IllegalArgumentException(msg);
-                }
-                logger.warn(msg);
-            }
-        }
     }
 }

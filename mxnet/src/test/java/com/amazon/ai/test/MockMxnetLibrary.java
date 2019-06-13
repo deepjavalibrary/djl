@@ -214,7 +214,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
             int delay_alloc,
             int dtype,
             PointerByReference out) {
-        out.setValue(new PointerArray());
+        out.setValue(TestHelper.toPointer("NDArray"));
         return 0;
     }
 
@@ -638,8 +638,9 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXListAllOpNames(IntBuffer out_size, PointerByReference out_array) {
-        PointerArray pa = new PointerArray(TestHelper.toPointer("softmax"));
-        out_size.put(0, 1);
+        PointerArray pa =
+                new PointerArray(TestHelper.toPointer("softmax"), TestHelper.toPointer("_copyto"));
+        out_size.put(0, 2);
         out_array.setValue(pa);
         return 0;
     }
@@ -1644,6 +1645,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int NNGetOpHandle(String op_name, PointerByReference op_out) {
+        op_out.setValue(TestHelper.toPointer("This is a sample Op Pointer"));
         return 0;
     }
 
