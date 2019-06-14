@@ -48,7 +48,7 @@ public class GenericInferenceExampleTest {
                     "-l",
                     "build/logs"
                 };
-        GenericInferenceExample.main(args);
+        Assert.assertTrue(new GenericInferenceExample().runExample(args));
         DetectedObject result = (DetectedObject) AbstractExample.getPredictResult();
         Assert.assertEquals(result.getClassName(), "tabby, tabby cat");
         Assert.assertTrue(Double.compare(result.getProbability(), 0.7) > 0);

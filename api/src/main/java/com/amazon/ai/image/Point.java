@@ -17,8 +17,8 @@ package com.amazon.ai.image;
  */
 public class Point {
 
-    private double x;
-    private double y;
+    private int x;
+    private int y;
 
     /**
      * Constructs and initializes a point at the specified {@code (x,y)} location in the coordinate
@@ -27,7 +27,7 @@ public class Point {
      * @param x the X coordinate of the newly constructed <code>Point</code>
      * @param y the Y coordinate of the newly constructed <code>Point</code>
      */
-    public Point(double x, double y) {
+    public Point(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -37,7 +37,7 @@ public class Point {
      *
      * @return the X coordinate of this <code>Point</code>.
      */
-    public double getX() {
+    public int getX() {
         return x;
     }
 
@@ -46,7 +46,7 @@ public class Point {
      *
      * @return the Y coordinate of this <code>Point</code>.
      */
-    public double getY() {
+    public int getY() {
         return y;
     }
 }

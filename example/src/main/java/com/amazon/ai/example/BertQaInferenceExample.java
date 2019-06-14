@@ -43,8 +43,6 @@ public final class BertQaInferenceExample extends AbstractExample {
 
     private static Logger logger = LogUtils.getLogger(BertQaInferenceExample.class);
 
-    private BertQaInferenceExample() {}
-
     public static void main(String[] args) {
         new BertQaInferenceExample().runExample(args);
     }
@@ -55,7 +53,7 @@ public final class BertQaInferenceExample extends AbstractExample {
         String predictResult = null;
 
         BertArguments arguments = (BertArguments) args;
-        File modelDir = new File(arguments.getModelDir());
+        File modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
 
         Model model = Model.loadModel(modelDir, modelName);

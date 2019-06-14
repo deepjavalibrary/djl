@@ -48,7 +48,7 @@ public class SsdExampleTest {
                     "-l",
                     "build/logs"
                 };
-        SsdExample.main(args);
+        Assert.assertTrue(new SsdExample().runExample(args));
         DetectedObject result = (DetectedObject) AbstractExample.getPredictResult();
         Assert.assertEquals(result.getClassName(), "dog");
         Assert.assertTrue(Double.compare(result.getProbability(), 0.8) > 0);

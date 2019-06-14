@@ -20,8 +20,8 @@ package com.amazon.ai.image;
 public class Rectangle implements BoundingBox {
 
     Point point;
-    double width;
-    double height;
+    int width;
+    int height;
 
     /**
      * Constructs a new <code>Rectangle</code> whose upper-left corner is specified as {@code (x,y)}
@@ -32,7 +32,7 @@ public class Rectangle implements BoundingBox {
      * @param width the width of the <code>Rectangle</code>
      * @param height the height of the <code>Rectangle</code>
      */
-    public Rectangle(double x, double y, double width, double height) {
+    public Rectangle(int x, int y, int width, int height) {
         this(new Point(x, y), width, height);
     }
 
@@ -44,7 +44,7 @@ public class Rectangle implements BoundingBox {
      * @param width the width of the <code>Rectangle</code>
      * @param height the height of the <code>Rectangle</code>
      */
-    public Rectangle(Point point, double width, double height) {
+    public Rectangle(Point point, int width, int height) {
         this.point = point;
         this.width = width;
         this.height = height;
@@ -98,19 +98,19 @@ public class Rectangle implements BoundingBox {
         return point;
     }
 
-    public double getX() {
+    public int getX() {
         return point.getX();
     }
 
-    public double getY() {
+    public int getY() {
         return point.getY();
     }
 
-    public double getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public double getHeight() {
+    public int getHeight() {
         return height;
     }
 

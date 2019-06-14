@@ -53,7 +53,7 @@ public abstract class AbstractExample {
     protected abstract Object predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, TranslateException;
 
-    public void runExample(String[] args) {
+    public boolean runExample(String[] args) {
         Options options = getOptions();
         try {
             DefaultParser parser = new DefaultParser();
@@ -91,6 +91,7 @@ public abstract class AbstractExample {
                 long delta = System.currentTimeMillis() - begin;
                 duration = duration.minus(Duration.ofMillis(delta));
             }
+            return true;
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.setLeftPadding(1);
@@ -99,6 +100,7 @@ public abstract class AbstractExample {
         } catch (Throwable t) {
             logger.error("Unexpected error", t);
         }
+        return false;
     }
 
     public static void setLastResult(Object lastResult) {

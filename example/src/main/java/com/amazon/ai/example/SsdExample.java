@@ -31,15 +31,18 @@ import com.amazon.ai.inference.ObjectDetector;
 import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 public final class SsdExample extends AbstractExample {
-
-    private SsdExample() {}
 
     public static void main(String[] args) {
         new SsdExample().runExample(args);
@@ -48,11 +51,11 @@ public final class SsdExample extends AbstractExample {
     @Override
     public DetectedObject predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, TranslateException {
-        DetectedObject predictResult = null;
-        File modelDir = new File(arguments.getModelDir());
+        List<DetectedObject> predictResult = null;
+        File modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
-        String imageFile = arguments.getImageFile();
-        BufferedImage img = Images.loadImageFromFile(new File(imageFile));
+        File imageFile = arguments.getImageFile();
+        BufferedImage img = Images.loadImageFromFile(imageFile);
 
         Model model = Model.loadModel(modelDir, modelName);
 
@@ -68,13 +71,52 @@ public final class SsdExample extends AbstractExample {
             ssd.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
-                List<DetectedObject> result = ssd.detect(img);
-                predictResult = result.get(0);
+                predictResult = ssd.detect(img);
                 printProgress(iteration, i);
                 collectMemoryInfo(metrics);
             }
         }
-        return predictResult;
+        drawBoundingBox(img, predictResult, arguments.getLogDir());
+        return predictResult.get(0);
+    }
+
+    private void drawBoundingBox(
+            BufferedImage img, List<DetectedObject> predictResult, String logDir)
+            throws IOException {
+        if (logDir == null) {
+            return;
+        }
+
+        BufferedImage newImg = Images.reshapeImage(img, 512, 512);
+        Graphics2D g = (Graphics2D) newImg.getGraphics();
+        g.drawImage(img, 0, 0, 512, 512, null);
+        int stroke = 2;
+        g.setStroke(new BasicStroke(stroke));
+
+        for (DetectedObject result : predictResult) {
+            String className = result.getClassName();
+            Rectangle rect = result.getBoundingBox().getBounds();
+            g.setPaint(Color.WHITE);
+            g.drawRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+            drawText(g, className, rect, stroke, 4);
+        }
+        g.dispose();
+
+        File out = new File(logDir, "ssd.jpg");
+        ImageIO.write(newImg, "jpg", out);
+    }
+
+    private void drawText(Graphics2D g, String text, Rectangle rect, int stroke, int padding) {
+        FontMetrics metrics = g.getFontMetrics();
+        int x = rect.getX() + stroke / 2;
+        int y = rect.getY() + +stroke / 2;
+        int width = metrics.stringWidth(text) + padding * 2 - stroke / 2;
+        int height = metrics.getHeight() + metrics.getDescent();
+        int ascent = metrics.getAscent();
+        java.awt.Rectangle background = new java.awt.Rectangle(x, y, width, height);
+        g.fill(background);
+        g.setPaint(Color.BLACK);
+        g.drawString(text, x + padding, y + ascent);
     }
 
     private static final class SsdTranslator extends ImageTranslator<List<DetectedObject>> {
@@ -106,7 +148,7 @@ public final class SsdExample extends AbstractExample {
             try {
                 String[] synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
                 NDArray nd = array.at(0);
-                int length = array.getShape().head();
+                int length = nd.getShape().head();
                 for (int i = 0; i < length; ++i) {
                     try (NDArray item = nd.at(i)) {
                         float[] values = item.toFloatArray();
@@ -120,7 +162,7 @@ public final class SsdExample extends AbstractExample {
                             double w = values[4] * imageHeight - x;
                             double h = values[5] * imageHeight - y;
 
-                            Rectangle rect = new Rectangle(x, y, w, h);
+                            Rectangle rect = new Rectangle((int) x, (int) y, (int) w, (int) h);
                             ret.add(new DetectedObject(className, probability, rect));
                         }
                     }

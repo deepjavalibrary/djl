@@ -26,7 +26,7 @@ public class Arguments {
     private String imageFile;
     private String logDir;
     private int duration;
-    private int iteration = 1000;
+    private int iteration = 1;
 
     public Arguments(CommandLine cmd) {
         modelDir = cmd.getOptionValue("model-dir");
@@ -92,24 +92,31 @@ public class Arguments {
         return options;
     }
 
-    public String getModelDir() {
-        return modelDir;
+    public File getModelDir() throws FileNotFoundException {
+        File file = new File(modelDir);
+        if (!file.exists()) {
+            throw new FileNotFoundException("model directory not found: " + modelDir);
+        }
+        return file;
     }
 
     public String getModelName() {
         return modelName;
     }
 
-    public String getImageFile() throws FileNotFoundException {
+    public File getImageFile() throws FileNotFoundException {
         if (imageFile == null) {
             File file = new File(modelDir, "kitten.jpg");
-            if (file.exists()) {
-                return file.getAbsolutePath();
-            } else {
+            if (!file.exists()) {
                 throw new FileNotFoundException("Missing --image parameter.");
             }
+            return file;
         }
-        return imageFile;
+        File file = new File(imageFile);
+        if (!file.exists()) {
+            throw new FileNotFoundException("image file not found: " + imageFile);
+        }
+        return file;
     }
 
     public int getDuration() {

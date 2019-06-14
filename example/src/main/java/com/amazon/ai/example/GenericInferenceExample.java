@@ -36,8 +36,6 @@ import java.util.List;
 
 public final class GenericInferenceExample extends AbstractExample {
 
-    private GenericInferenceExample() {}
-
     public static void main(String[] args) {
         new GenericInferenceExample().runExample(args);
     }
@@ -46,10 +44,10 @@ public final class GenericInferenceExample extends AbstractExample {
     public DetectedObject predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, TranslateException {
         DetectedObject predictResult = null;
-        File modelDir = new File(arguments.getModelDir());
+        File modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
-        String imageFile = arguments.getImageFile();
-        BufferedImage img = Images.loadImageFromFile(new File(imageFile));
+        File imageFile = arguments.getImageFile();
+        BufferedImage img = Images.loadImageFromFile(imageFile);
 
         Model model = Model.loadModel(modelDir, modelName);
 
