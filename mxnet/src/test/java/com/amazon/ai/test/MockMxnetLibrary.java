@@ -605,6 +605,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     @Override
     public int MXCreateCachedOpEx(
             Pointer handle, int num_flags, String[] keys, String[] vals, PointerByReference out) {
+        out.setValue(TestHelper.toPointer("This is a cachedOp"));
         return 0;
     }
 
@@ -621,7 +622,12 @@ public class MockMxnetLibrary implements MxnetLibrary {
             IntBuffer num_outputs,
             PointerByReference outputs) {
         num_outputs.put(0, 3);
-        outputs.setValue(new PointerArray());
+        PointerArray arr =
+                new PointerArray(
+                        TestHelper.toPointer("a"),
+                        TestHelper.toPointer("b"),
+                        TestHelper.toPointer("c"));
+        outputs.setValue(arr);
         return 0;
     }
 
