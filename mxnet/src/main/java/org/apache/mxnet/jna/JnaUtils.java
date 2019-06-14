@@ -17,7 +17,6 @@ import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;

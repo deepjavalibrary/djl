@@ -13,13 +13,10 @@
 package org.apache.mxnet.jna;
 
 import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 
@@ -29,10 +26,7 @@ public class FunctionInfo {
     private String name;
     private PairList<String, String> arguments;
 
-    FunctionInfo(
-            Pointer pointer,
-            String functionName,
-            PairList<String, String> arguments) {
+    FunctionInfo(Pointer pointer, String functionName, PairList<String, String> arguments) {
         this.handle = pointer;
         this.name = functionName;
         this.arguments = arguments;
