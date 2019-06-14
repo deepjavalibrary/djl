@@ -102,7 +102,10 @@ public class CachedOp extends NativeResource {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        JnaUtils.freeCachedOp(getHandle());
+        Pointer pointer = handle.getAndSet(null);
+        if (pointer != null) {
+            JnaUtils.freeCachedOp(pointer);
+        }
     }
 
     private int indexOf(String inputName, int position) {
