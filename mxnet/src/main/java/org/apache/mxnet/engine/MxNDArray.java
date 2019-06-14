@@ -17,10 +17,10 @@ import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -29,6 +29,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -214,7 +215,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         MxNDArray array = (MxNDArray) ndArray;
 
-        functionInfo.invoke(factory, this, new NDList(array), null);
+        functionInfo.invoke(factory, new MxNDArray[] {this}, new MxNDArray[] {array}, null);
     }
 
     /** {@inheritDoc} */
@@ -261,44 +262,96 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argsort(int axis, boolean isAscend) {
-        PairList<String, String> params = new PairList<>();
-        params.add("axis", String.valueOf(axis));
-        params.add("is_ascend", isAscend ? "True" : "False");
+    public void attachGrad() {
+        attachGrad(GradReq.WRITE, null);
+    }
 
-        FunctionInfo functionInfo = OPS.get("argsort");
-        return functionInfo.invoke(factory, this, params).get(0);
+    /** {@inheritDoc} */
+    @Override
+    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
+        MxNDArray grad;
+        if (sparseFormat == null || sparseFormat == sparseFormat.UNDEFINED) {
+            grad = zerosLike();
+        } else {
+            grad = Operators.zeros(factory, shape, context, dataType, sparseFormat);
+        }
+        int gradReqValue = gradReq.getValue();
+        IntBuffer gradReqBuffer = IntBuffer.allocate(1);
+        gradReqBuffer.put(0, gradReqValue);
+        JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward() {
+        backward(null, false, true);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward(boolean retainGraph, boolean isTraining) {
+        backward(null, retainGraph, isTraining);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {
+        Pointer outGradHandle;
+        if (outGrad != null) {
+            MxNDArray outGradND = (MxNDArray) outGrad;
+            outGradHandle = outGradND.getHandle();
+        } else {
+            outGradHandle = null;
+        }
+
+        JnaUtils.autogradBackwardExecute(
+                1,
+                getHandle(),
+                outGradHandle,
+                0,
+                null,
+                retainGraph ? 1 : 0,
+                0,
+                isTraining ? 1 : 0,
+                null,
+                null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getGradient() {
+        Pointer pointer = JnaUtils.getGradient(getHandle());
+        return factory.create(pointer);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray argsort(int axis, boolean isAscend) {
+        return Operators.argsort(factory, this, axis, isAscend);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(Integer axis, Double temperature) {
-        PairList<String, String> params = new PairList<>();
-        if (axis != null) {
-            params.add("axis", String.valueOf(axis));
-        }
-        if (temperature != null) {
-            params.add("temperature", String.valueOf(temperature));
-        }
-
-        FunctionInfo functionInfo = OPS.get("softmax");
-        return functionInfo.invoke(factory, this, params).get(0);
+        return Operators.softmax(factory, this, axis, temperature);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList split(int numOutputs, Integer axis, Boolean squeezeAxis) {
-        PairList<String, String> params = new PairList<>();
-        params.add("num_outputs", String.valueOf(numOutputs));
-        if (axis != null) {
-            params.add("axis", String.valueOf(axis));
-        }
-        if (squeezeAxis != null) {
-            params.add("squeeze_axis", String.valueOf(squeezeAxis));
-        }
+        return new NDList(Operators.split(factory, this, numOutputs, axis, squeezeAxis));
+    }
 
-        FunctionInfo functionInfo = OPS.get("split");
-        return functionInfo.invoke(factory, this, params);
+    /** {@inheritDoc} */
+    @Override
+    public MxNDArray zerosLike() {
+        return Operators.zerosLike(factory, this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MxNDArray onesLike() {
+        return Operators.onesLike(factory, this);
     }
 
     /** {@inheritDoc} */

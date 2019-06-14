@@ -526,21 +526,36 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXAutogradSetIsRecording(int is_recording, IntBuffer prev) {
+        if (functions.containsKey("MXAutogradSetIsRecording")) {
+            return functions
+                    .get("MXAutogradSetIsRecording")
+                    .apply(new Object[] {is_recording, prev});
+        }
         return 0;
     }
 
     @Override
     public int MXAutogradSetIsTraining(int is_training, IntBuffer prev) {
+        if (functions.containsKey("MXAutogradSetIsTraining")) {
+            return functions.get("MXAutogradSetIsTraining").apply(new Object[] {is_training, prev});
+        }
         return 0;
     }
 
     @Override
     public int MXAutogradIsRecording(ByteBuffer curr) {
+        if (functions.containsKey("MXAutogradIsRecording")) {
+            return functions.get("MXAutogradIsRecording").apply(new Object[] {curr});
+        }
         return 0;
     }
 
     @Override
     public int MXAutogradIsTraining(ByteBuffer curr) {
+
+        if (functions.containsKey("MXAutogradIsTraining")) {
+            return functions.get("MXAutogradIsTraining").apply(new Object[] {curr});
+        }
         return 0;
     }
 

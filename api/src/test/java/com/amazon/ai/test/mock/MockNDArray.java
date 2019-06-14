@@ -17,8 +17,10 @@ import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
+import com.amazon.ai.ndarray.types.SparseFormat;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
@@ -90,6 +92,26 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public void attachGrad() {}
+
+    @Override
+    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {}
+
+    @Override
+    public NDArray getGradient() {
+        return null;
+    }
+
+    @Override
+    public void backward() {}
+
+    @Override
+    public void backward(boolean retainGraph, boolean isTraining) {}
+
+    @Override
+    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {}
+
+    @Override
     public NDArray argsort(int axis, boolean isAscend) {
         return null;
     }
@@ -101,6 +123,16 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDList split(int numOutputs, Integer axis, Boolean squeezeAxis) {
+        return null;
+    }
+
+    @Override
+    public NDArray zerosLike() {
+        return null;
+    }
+
+    @Override
+    public NDArray onesLike() {
         return null;
     }
 

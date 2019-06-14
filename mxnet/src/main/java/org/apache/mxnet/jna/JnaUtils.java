@@ -456,6 +456,76 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
+    /////////////////////////////////
+    // MxAutograd
+    /////////////////////////////////
+    public static boolean autogradSetIsRecording(boolean isRecording) {
+        IntBuffer prev = IntBuffer.allocate(1);
+        checkCall(LIB.MXAutogradSetIsRecording(isRecording ? 1 : 0, prev));
+        return prev.get(0) == 1;
+    }
+
+    public static boolean autogradSetTraining(boolean isTraining) {
+        IntBuffer prev = IntBuffer.allocate(1);
+        checkCall(LIB.MXAutogradSetIsTraining(isTraining ? 1 : 0, prev));
+        return prev.get(0) == 1;
+    }
+
+    public static boolean autogradIsRecording() {
+        ByteBuffer isRecording = ByteBuffer.allocate(1);
+        checkCall(LIB.MXAutogradIsRecording(isRecording));
+        return isRecording.get(0) == 1;
+    }
+
+    public static boolean autogradIsTraining() {
+        ByteBuffer isTraining = ByteBuffer.allocate(1);
+        checkCall(LIB.MXAutogradIsTraining(isTraining));
+        return isTraining.get(0) == 1;
+    }
+
+    public static void autogradMarkVariables(
+            int numVar, Pointer varHandles, IntBuffer reqsArray, Pointer gradHandles) {
+        PointerByReference varRef = new PointerByReference(varHandles);
+        PointerByReference gradRef = new PointerByReference(gradHandles);
+        checkCall(LIB.MXAutogradMarkVariables(numVar, varRef, reqsArray, gradRef));
+    }
+
+    public static void autogradBackwardExecute(
+            int numOutput,
+            Pointer outputHandle,
+            Pointer outputGradHandle,
+            int numVariables,
+            Pointer varHandles,
+            int retainGraph,
+            int createGraph,
+            int isTrain,
+            Pointer gradHandles,
+            Pointer gradSparseFormat) {
+        PointerByReference outRef = new PointerByReference(outputHandle);
+        PointerByReference outGradRef = new PointerByReference(outputGradHandle);
+        PointerByReference varRef = new PointerByReference(varHandles);
+        PointerByReference gradRef = new PointerByReference(gradHandles);
+        PointerByReference gradSparseFormatRef = new PointerByReference(gradSparseFormat);
+        checkCall(
+                LIB.MXAutogradBackwardEx(
+                        numOutput,
+                        outRef,
+                        outGradRef,
+                        numVariables,
+                        varRef,
+                        retainGraph,
+                        createGraph,
+                        isTrain,
+                        gradRef,
+                        gradSparseFormatRef));
+    }
+
+    public static Pointer getGradient(Pointer handle) {
+        PointerByReference ref = new PointerByReference();
+        checkCall(LIB.MXNDArrayGetGrad(handle, ref));
+        return ref.getValue();
+    }
+
     /*
     int MXImperativeInvokeEx(Pointer creator, int num_inputs, PointerByReference inputs,
                              IntBuffer num_outputs, PointerByReference outputs, int num_params,
@@ -492,8 +562,6 @@ public final class JnaUtils {
 
     int MXNDArrayGetContext(Pointer handle, IntBuffer out_dev_type, IntBuffer out_dev_id);
 
-    int MXNDArrayGetGrad(Pointer handle, PointerByReference out);
-
     int MXNDArrayDetach(Pointer handle, PointerByReference out);
 
     int MXNDArraySetGradState(Pointer handle, int state);
@@ -503,27 +571,10 @@ public final class JnaUtils {
     int MXListFunctions(IntBuffer out_size, PointerByReference out_array);
 
 
-    int MXAutogradSetIsRecording(int is_recording, IntBuffer prev);
-
-    int MXAutogradSetIsTraining(int is_training, IntBuffer prev);
-
-    int MXAutogradIsRecording(ByteBuffer curr);
-
-    int MXAutogradIsTraining(ByteBuffer curr);
-
-    int MXAutogradMarkVariables(int num_var, PointerByReference var_handles, IntBuffer reqs_array,
-                                PointerByReference grad_handles);
-
     int MXAutogradComputeGradient(int num_output, PointerByReference output_handles);
 
     int MXAutogradBackward(int num_output, PointerByReference output_handles,
                            PointerByReference ograd_handles, int retain_graph);
-
-    int MXAutogradBackwardEx(int num_output, PointerByReference output_handles,
-                             PointerByReference ograd_handles, int num_variables,
-                             PointerByReference var_handles, int retain_graph, int create_graph,
-                             int is_train, PointerByReference grad_handles,
-                             PointerByReference grad_stypes);
 
 
     int MXAutogradGetSymbol(Pointer handle, PointerByReference out);

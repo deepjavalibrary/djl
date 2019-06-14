@@ -15,8 +15,10 @@ package com.amazon.ai.ndarray;
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
+import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
+import com.amazon.ai.ndarray.types.SparseFormat;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
@@ -153,11 +155,72 @@ public interface NDArray extends AutoCloseable {
      */
     NDArray asType(DataType dtype, boolean copy);
 
+    /**
+     * Attach a gradient buffer to this NDArray, so that `backward` can compute gradient with
+     * respect to it.
+     */
+    void attachGrad();
+
+    /**
+     * Attach a gradient buffer to this NDArray, so that `backward` can compute gradient with
+     * respect to it.
+     *
+     * @param gradReq {@link GradReq} How gradient will be accumulated.
+     * @param sparseFormat {@link SparseFormat} The storage type of the gradient array. Defaults to
+     *     the same stype of this NDArray.
+     */
+    void attachGrad(GradReq gradReq, SparseFormat sparseFormat);
+
+    /**
+     * Returns the gradient buffer attached to this NDArray.
+     *
+     * @return the gradient buffer attached to this NDArray.
+     */
+    NDArray getGradient();
+
+    /** Compute the gradients of this NDArray w.r.t variables. */
+    void backward();
+
+    /**
+     * Compute the gradients of this NDArray w.r.t variables.
+     *
+     * @param retainGraph Whether to retain the computation graph for another backward pass on the
+     *     same graph. By default the computation history is cleared.
+     * @param isTraining Whether to compute gradient for training or inference.
+     */
+    void backward(boolean retainGraph, boolean isTraining);
+
+    /**
+     * Compute the gradients of this NDArray w.r.t variables.
+     *
+     * @param outGrad Gradient with respect to head
+     * @param retainGraph Whether to retain the computation graph for another backward pass on the
+     *     same graph. By default the computation history is cleared.
+     * @param isTraining Whether to compute gradient for training or inference.
+     */
+    void backward(NDArray outGrad, boolean retainGraph, boolean isTraining);
+
     NDArray argsort(int axis, boolean isAscend);
 
     NDArray softmax(Integer axis, Double temperature);
 
     NDList split(int numOutputs, Integer axis, Boolean squeezeAxis);
+
+    /**
+     * Return an array of zeros with the same {@link Shape}, {@link DataType} and {@link
+     * SparseFormat} as the input array
+     *
+     * @return {@link NDArray} filled with zeros
+     */
+    NDArray zerosLike();
+
+    /**
+     * Return an array of ones with the same {@link Shape}, {@link DataType} and {@link
+     * SparseFormat} as the input array
+     *
+     * @return {@link NDArray} filled with ones
+     */
+    NDArray onesLike();
 
     boolean isSparse();
 
