@@ -87,7 +87,7 @@ public final class SsdExample extends AbstractExample {
             return;
         }
 
-        BufferedImage newImg = Images.reshapeImage(img, 512, 512);
+        BufferedImage newImg = Images.resizeImage(img, 512, 512);
         Graphics2D g = (Graphics2D) newImg.getGraphics();
         g.drawImage(img, 0, 0, 512, 512, null);
         int stroke = 2;
@@ -133,7 +133,7 @@ public final class SsdExample extends AbstractExample {
 
         @Override
         public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-            BufferedImage image = Images.reshapeImage(input, imageWidth, imageHeight);
+            BufferedImage image = Images.resizeImage(input, imageWidth, imageHeight);
             return super.processInput(ctx, image);
         }
 

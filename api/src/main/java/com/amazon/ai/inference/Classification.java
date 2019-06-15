@@ -12,6 +12,7 @@
  */
 package com.amazon.ai.inference;
 
+/** The <code>Classification</code> is the container to store the classification result. */
 public class Classification {
 
     private String className;
@@ -22,10 +23,22 @@ public class Classification {
         this.probability = probability;
     }
 
+    /**
+     * Return the class name.
+     *
+     * @return Class name
+     */
     public String getClassName() {
         return className;
     }
 
+    /**
+     * Return the probability.
+     *
+     * <p>Probability explain how accuracy the classifier identified to the target class
+     *
+     * @return Probability
+     */
     public double getProbability() {
         return probability;
     }

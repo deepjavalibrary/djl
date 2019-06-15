@@ -89,7 +89,7 @@ public final class GenericInferenceExample extends AbstractExample {
 
         @Override
         public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-            BufferedImage image = Images.reshapeImage(input, imageWidth, imageHeight);
+            BufferedImage image = Images.resizeImage(input, imageWidth, imageHeight);
             FloatBuffer buffer = Images.toFloatBuffer(image);
 
             NDArray array = ctx.getNDFactory().create(dataDesc);

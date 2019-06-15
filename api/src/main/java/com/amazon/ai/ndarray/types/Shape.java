@@ -51,7 +51,7 @@ public class Shape {
             if (d < 0 || d >= shape.length) {
                 throw new IllegalArgumentException("Invalid dimension " + d);
             }
-            total *= d;
+            total *= shape[d];
         }
         return total;
     }
@@ -79,7 +79,7 @@ public class Shape {
     }
 
     public Shape drop(int n) {
-        return slice(n, shape.length);
+        return slice(n + 1, shape.length);
     }
 
     public Shape slice(int from, int end) {

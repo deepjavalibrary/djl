@@ -143,17 +143,18 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     private class Itr implements Iterator<Pair<K, V>> {
 
         private int cursor;
+        private int size = size();
 
         Itr() {}
 
         @Override
         public boolean hasNext() {
-            return cursor < size();
+            return cursor < size;
         }
 
         @Override
         public Pair<K, V> next() {
-            if (cursor >= size()) {
+            if (cursor >= size) {
                 throw new NoSuchElementException();
             }
 
