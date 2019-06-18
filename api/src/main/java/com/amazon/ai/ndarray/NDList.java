@@ -17,7 +17,7 @@ import com.amazon.ai.util.PairList;
 import java.util.Iterator;
 
 /**
- * A <code>NDList</code> represents a sequence of {@link NDArray}s.
+ * A <code>NDList</code> represents a sequence of {@link NDArray}s with names.
  *
  * <p>Each {@link NDArray} in this list can optionally has a name. User can use name to look up
  * NDArray in the NDList.
