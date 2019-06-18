@@ -1,3 +1,7 @@
+plugins {
+    id 'maven-publish'
+}
+
 dependencies {
     compile "net.java.dev.jna:jna:${jna_version}"
     compile "org.slf4j:slf4j-api:${slf4j_version}"
@@ -79,3 +83,42 @@ task checkHeaderFile() {
 
 compileJava.dependsOn(jnarator)
 check.dependsOn checkHeaderFile
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId project.getGroup()
+            artifactId project.getName()
+            version rootProject.getVersion()
+            from components.java
+            artifacts = [jar, javadocJar, sourcesJar]
+            pom {
+                name = "MXNet Java API"
+                description = "Java API for MXNet"
+                url = "http://mxnet.apache.org"
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "local"
+            url = project.buildDir.absolutePath + '/repo'
+        }
+    }
+}

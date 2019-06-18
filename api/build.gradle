@@ -1,3 +1,7 @@
+plugins {
+    id 'maven-publish'
+}
+
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
 
@@ -11,4 +15,43 @@ javadoc {
     title "Joule™ ${project.version} API specification"
     exclude "com/amazon/ai/util/**"
     options.overview "src/main/javadoc/overview.html"
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId project.getGroup()
+            artifactId project.getName()
+            version rootProject.getVersion()
+            from components.java
+            artifacts = [jar, javadocJar, sourcesJar]
+            pom {
+                name = "Joule API"
+                description = "A Deep Learning API in Java"
+                url = "http://aws.com/Joule"
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://aws.amazon.com/apache2.0/'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "local"
+            url = project.buildDir.absolutePath + '/repo'
+        }
+    }
 }
