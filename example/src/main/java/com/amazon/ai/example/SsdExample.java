@@ -38,6 +38,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -86,6 +89,9 @@ public final class SsdExample extends AbstractExample {
         if (logDir == null) {
             return;
         }
+
+        Path dir = Paths.get(logDir);
+        Files.createDirectories(dir);
 
         BufferedImage newImg = Images.resizeImage(img, 512, 512);
         Graphics2D g = (Graphics2D) newImg.getGraphics();

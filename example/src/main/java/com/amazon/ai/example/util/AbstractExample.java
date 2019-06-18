@@ -103,7 +103,12 @@ public abstract class AbstractExample {
             Duration duration = Duration.ofMinutes(arguments.getDuration());
             int iteration = arguments.getIteration();
 
-            logger.info("Running {}, iteration: {}", getClass().getSimpleName(), iteration);
+            logger.info(
+                    "Running {} on: {}, iteration: {}, duration: {} min.",
+                    getClass().getSimpleName(),
+                    Context.defaultContext(),
+                    iteration,
+                    duration);
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();

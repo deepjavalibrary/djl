@@ -15,30 +15,20 @@ package com.amazon.ai.example;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.ModelInfo;
 import com.amazon.ai.inference.DetectedObject;
-import java.io.IOException;
-import java.nio.file.Path;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class SsdExampleTest {
 
     private static final String MODEL_NAME = "resnet50_ssd_model";
 
-    private ModelInfo modelInfo = ModelInfo.getModel(MODEL_NAME);
-
-    @BeforeClass
-    public void downloadModel() throws IOException {
-        modelInfo.download();
-    }
-
     @Test
     public void testSsdExample() {
-        Path dir = modelInfo.getDownloadDir();
+        String url = ModelInfo.getModel(MODEL_NAME).getUrl();
         String[] args =
                 new String[] {
-                    "-p",
-                    dir.toString(),
+                    "-u",
+                    url,
                     "-n",
                     MODEL_NAME,
                     "-i",

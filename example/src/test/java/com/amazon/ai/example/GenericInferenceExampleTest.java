@@ -15,30 +15,20 @@ package com.amazon.ai.example;
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.ModelInfo;
 import com.amazon.ai.inference.DetectedObject;
-import java.io.IOException;
-import java.nio.file.Path;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class GenericInferenceExampleTest {
 
     private static final String MODEL_NAME = "squeezenet_v1.1";
 
-    private ModelInfo modelInfo = ModelInfo.getModel(MODEL_NAME);
-
-    @BeforeClass
-    public void downloadModel() throws IOException {
-        modelInfo.download();
-    }
-
     @Test
     public void testGenericeInferenceExample() {
-        Path dir = modelInfo.getDownloadDir();
+        ModelInfo modelInfo = ModelInfo.getModel(MODEL_NAME);
         String[] args =
                 new String[] {
-                    "-p",
-                    dir.toString(),
+                    "-u",
+                    modelInfo.getUrl(),
                     "-n",
                     MODEL_NAME,
                     "-i",
