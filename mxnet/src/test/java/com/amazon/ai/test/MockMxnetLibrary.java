@@ -91,6 +91,12 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXAggregateProfileStatsPrintEx(
+            String[] out_str, int reset, int format, int sort_by, int ascending) {
+        return 0;
+    }
+
+    @Override
     public int MXProcessProfilePause(int paused, int profile_process, Pointer kvStoreHandle) {
         return 0;
     }
@@ -386,7 +392,12 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
-    public int MXNDArrayFromDLPack(
+    public int MXNDArrayFromDLPack(Pointer dlpack, PointerByReference out_handle) {
+        return 0;
+    }
+
+    @Override
+    public int MXNDArrayFromDLPackEx(
             Pointer dlpack, byte transient_handle, PointerByReference out_handle) {
         return 0;
     }
@@ -1645,6 +1656,39 @@ public class MockMxnetLibrary implements MxnetLibrary {
             int num_const_vars,
             Pointer mutable_vars_handle,
             int num_mutable_vars,
+            Pointer prop_handle,
+            int priority,
+            String opr_name) {
+        return 0;
+    }
+
+    @Override
+    public int MXEnginePushAsyncND(
+            EngineAsyncFunc async_func,
+            Pointer func_param,
+            EngineFuncParamDeleter deleter,
+            Pointer ctx_handle,
+            Pointer const_nds_handle,
+            int num_const_nds,
+            Pointer mutable_nds_handle,
+            int num_mutable_nds,
+            Pointer prop_handle,
+            int priority,
+            String opr_name,
+            byte wait) {
+        return 0;
+    }
+
+    @Override
+    public int MXEnginePushSyncND(
+            EngineSyncFunc sync_func,
+            Pointer func_param,
+            EngineFuncParamDeleter deleter,
+            Pointer ctx_handle,
+            Pointer const_nds_handle,
+            int num_const_nds,
+            Pointer mutable_nds_handle,
+            int num_mutable_nds,
             Pointer prop_handle,
             int priority,
             String opr_name) {
