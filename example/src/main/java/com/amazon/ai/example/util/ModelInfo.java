@@ -25,6 +25,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.io.IOUtils;
 
+/** A class hold information of model zoo models and their URLs. */
 public class ModelInfo {
 
     public static final int IMAGE_CLASSIFICATION = 1;

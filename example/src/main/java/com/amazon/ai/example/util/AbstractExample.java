@@ -44,16 +44,56 @@ import org.apache.commons.io.IOUtils;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
+/** Abstract class that encapsulate command line options for example project. */
 public abstract class AbstractExample {
 
     private static final Logger logger = LogUtils.getLogger(AbstractExample.class);
 
     private static Object lastResult;
 
+    /**
+     * Abstract predict method that must be implemented by sub class.
+     *
+     * @param arguments command line arguments
+     * @param metrics {@link Metrics} to collect statistic informations
+     * @param iteration number of prediction iteration to run
+     * @return prediction result
+     * @throws IOException if io error occurs when loading model.
+     * @throws TranslateException if error occurs when processing input or output
+     */
     protected abstract Object predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, TranslateException;
 
-    public boolean runExample(String[] args) {
+    /**
+     * Returns command line options.
+     *
+     * <p>Child class can override this method and return different command line options.
+     *
+     * @return command line options
+     */
+    protected Options getOptions() {
+        return Arguments.getOptions();
+    }
+
+    /**
+     * Parse command line into arguments.
+     *
+     * <p>Child class can override this method and return extension of {@link Arguments}.
+     *
+     * @param cmd list of arguments parsed against a {@link Options} descriptor
+     * @return parsed arguments
+     */
+    protected Arguments parseArguments(CommandLine cmd) {
+        return new Arguments(cmd);
+    }
+
+    /**
+     * Execute example code.
+     *
+     * @param args input raw arguments
+     * @return if example execution complete successfully
+     */
+    public final boolean runExample(String[] args) {
         Options options = getOptions();
         try {
             DefaultParser parser = new DefaultParser();
@@ -103,14 +143,33 @@ public abstract class AbstractExample {
         return false;
     }
 
-    public static void setLastResult(Object lastResult) {
+    /**
+     * Set predict result.
+     *
+     * <p>This method is used for unit test only.
+     *
+     * @param lastResult last predict result
+     */
+    private static void setLastResult(Object lastResult) {
         AbstractExample.lastResult = lastResult;
     }
 
+    /**
+     * Returns last predict result.
+     *
+     * <p>This method is used for unit test only.
+     *
+     * @return last predict result
+     */
     public static Object getPredictResult() {
         return lastResult;
     }
 
+    /**
+     * Collect memory information.
+     *
+     * @param metrics {@link Metrics} to store memory information
+     */
     protected void collectMemoryInfo(Metrics metrics) {
         MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
         MemoryUsage heap = memBean.getHeapMemoryUsage();
@@ -131,6 +190,12 @@ public abstract class AbstractExample {
         }
     }
 
+    /**
+     * Dump memory metrics into log directory.
+     *
+     * @param metrics metrics contains memory information
+     * @param logDir output log directory
+     */
     protected void dumpMemoryInfo(Metrics metrics, String logDir) {
         if (logDir == null) {
             return;
@@ -164,6 +229,41 @@ public abstract class AbstractExample {
         }
     }
 
+    /**
+     * Print inference iteration progress.
+     *
+     * @param iteration total number of iteration
+     * @param index index of iteration
+     */
+    @SuppressWarnings("PMD.SystemPrintln")
+    protected void printProgress(int iteration, int index) {
+        System.out.print(".");
+        if (index % 80 == 79 || index == iteration - 1) {
+            System.out.println();
+        }
+    }
+
+    /**
+     * Load MXNet synset.txt file into array of string.
+     *
+     * @param inputStream sysnet.txt input
+     * @return array of string
+     */
+    public static String[] loadSynset(InputStream inputStream) {
+        try {
+            List<String> output = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
+            ListIterator<String> it = output.listIterator();
+            while (it.hasNext()) {
+                String synsetLemma = it.next();
+                it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
+            }
+            return output.toArray(JnaUtils.EMPTY_ARRAY);
+        } catch (IOException e) {
+            logger.warn("Error opening synset file.", e);
+        }
+        return JnaUtils.EMPTY_ARRAY;
+    }
+
     private void getProcessInfo(Metrics metrics) {
         if (Platform.isLinux() || Platform.isMac()) {
             // This solution only work for Linux like system.
@@ -188,36 +288,5 @@ public abstract class AbstractExample {
                 logger.error("Failed execute cmd: " + cmd, e);
             }
         }
-    }
-
-    protected Options getOptions() {
-        return Arguments.getOptions();
-    }
-
-    protected Arguments parseArguments(CommandLine cmd) {
-        return new Arguments(cmd);
-    }
-
-    @SuppressWarnings("PMD.SystemPrintln")
-    protected void printProgress(int iteration, int index) {
-        System.out.print(".");
-        if (index % 80 == 79 || index == iteration - 1) {
-            System.out.println();
-        }
-    }
-
-    public static String[] loadSynset(InputStream inputStream) {
-        try {
-            List<String> output = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
-            ListIterator<String> it = output.listIterator();
-            while (it.hasNext()) {
-                String synsetLemma = it.next();
-                it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
-            }
-            return output.toArray(JnaUtils.EMPTY_ARRAY);
-        } catch (IOException e) {
-            logger.warn("Error opening synset file.", e);
-        }
-        return JnaUtils.EMPTY_ARRAY;
     }
 }

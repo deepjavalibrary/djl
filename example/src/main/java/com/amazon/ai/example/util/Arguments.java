@@ -19,6 +19,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
+/** A class represents parsed command line arguments. */
 public class Arguments {
 
     private String modelDir;

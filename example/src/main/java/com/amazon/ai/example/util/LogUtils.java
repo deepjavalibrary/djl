@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.SimpleLogger;
 
+/** Utility class for simple slf4j. */
 public final class LogUtils {
 
     static {
@@ -28,6 +29,12 @@ public final class LogUtils {
 
     private LogUtils() {}
 
+    /**
+     * Returns sl4fj Logger instance.
+     *
+     * @param cls class of the logger
+     * @return <code>Logger</code> instance
+     */
     public static Logger getLogger(Class<?> cls) {
         return LoggerFactory.getLogger(cls);
     }
