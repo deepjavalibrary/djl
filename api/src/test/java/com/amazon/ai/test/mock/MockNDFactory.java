@@ -34,6 +34,28 @@ public class MockNDFactory implements NDFactory {
     }
 
     @Override
+    public NDArray zeros(
+            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
+        return null;
+    }
+
+    @Override
+    public NDArray zeros(DataDesc dataDesc) {
+        return null;
+    }
+
+    @Override
+    public NDArray ones(
+            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
+        return null;
+    }
+
+    @Override
+    public NDArray ones(DataDesc dataDesc) {
+        return null;
+    }
+
+    @Override
     public NDFactory getParentFactory() {
         return this;
     }

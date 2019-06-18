@@ -280,7 +280,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (sparseFormat == null || sparseFormat == sparseFormat.UNDEFINED) {
             grad = zerosLike();
         } else {
-            grad = Operators.zeros(factory, shape, context, dataType, sparseFormat);
+            grad = (MxNDArray) factory.zeros(context, shape, dataType, sparseFormat);
         }
         int gradReqValue = gradReq.getValue();
         IntBuffer gradReqBuffer = IntBuffer.allocate(1);
@@ -334,31 +334,41 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray argsort(int axis, boolean isAscend) {
-        return Operators.argsort(factory, this, axis, isAscend);
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        params.addParam("is_ascend", isAscend);
+        return OPS.get("argsort").invoke(factory, this, params)[0];
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(Integer axis, Double temperature) {
-        return Operators.softmax(factory, this, axis, temperature);
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        params.addParam("temperature", temperature);
+        return OPS.get("softmax").invoke(factory, this, params)[0];
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList split(int numOutputs, Integer axis, Boolean squeezeAxis) {
-        return new NDList(Operators.split(factory, this, numOutputs, axis, squeezeAxis));
+        MxOpParams params = new MxOpParams();
+        params.addParam("num_outputs", numOutputs);
+        params.addParam("axis", axis);
+        params.addParam("squeeze_axis", squeezeAxis);
+        return new NDList(OPS.get("split").invoke(factory, this, params));
     }
 
     /** {@inheritDoc} */
     @Override
     public MxNDArray zerosLike() {
-        return Operators.zerosLike(factory, this);
+        return OPS.get("zeros_like").invoke(factory, this, null)[0];
     }
 
     /** {@inheritDoc} */
     @Override
     public MxNDArray onesLike() {
-        return Operators.onesLike(factory, this);
+        return OPS.get("ones_like").invoke(factory, this, null)[0];
     }
 
     /** {@inheritDoc} */

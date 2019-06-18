@@ -108,6 +108,46 @@ public interface NDFactory extends AutoCloseable {
     NDArray create(DataDesc dataDesc);
 
     /**
+     * Create an instance of {@link NDArray} filled with zeros with specified {@link Context},
+     * {@link Shape}, {@link DataType} and {@link SparseFormat}.
+     *
+     * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param sparseFormat the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray zeros(Context context, Shape shape, DataType dataType, SparseFormat sparseFormat);
+
+    /**
+     * Create an instance of {@link NDArray} filled with zeros with specified {@link DataDesc}.
+     *
+     * @param dataDesc the {@link DataDesc} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray zeros(DataDesc dataDesc);
+
+    /**
+     * Create an instance of {@link NDArray} filled with ones with specified {@link Context}, {@link
+     * Shape}, {@link DataType} and {@link SparseFormat}.
+     *
+     * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param sparseFormat the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray ones(Context context, Shape shape, DataType dataType, SparseFormat sparseFormat);
+
+    /**
+     * Create an instance of {@link NDArray} filled with ones with specified {@link DataDesc}.
+     *
+     * @param dataDesc the {@link DataDesc} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray ones(DataDesc dataDesc);
+
+    /**
      * Returns parent NDFactory.
      *
      * @return parent NDFactory

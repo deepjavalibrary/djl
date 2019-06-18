@@ -13,6 +13,7 @@
 package org.apache.mxnet.engine;
 
 import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
@@ -21,8 +22,12 @@ import com.amazon.ai.ndarray.types.SparseFormat;
 import com.sun.jna.Pointer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.mxnet.jna.FunctionInfo;
+import org.apache.mxnet.jna.JnaUtils;
 
 public class MxNDFactory implements NDFactory {
+
+    private static final Map<String, FunctionInfo> OPS = JnaUtils.getNdArrayFunctions();
 
     /**
      * A global {@link NDFactory} singleton instance.
@@ -65,6 +70,60 @@ public class MxNDFactory implements NDFactory {
     @Override
     public MxNDArray create(DataDesc dataDesc) {
         return create(
+                dataDesc.getContext(),
+                dataDesc.getShape(),
+                dataDesc.getDataType(),
+                SparseFormat.DEFAULT);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray zeros(
+            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
+        return fill("_zeros", context, shape, dataType, sparseFormat);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray zeros(DataDesc dataDesc) {
+        return zeros(
+                dataDesc.getContext(),
+                dataDesc.getShape(),
+                dataDesc.getDataType(),
+                SparseFormat.DEFAULT);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray ones(
+            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
+        return fill("_ones", context, shape, dataType, sparseFormat);
+    }
+
+    private MxNDArray fill(
+            String opName,
+            Context context,
+            Shape shape,
+            DataType dataType,
+            SparseFormat sparseFormat) {
+
+        MxOpParams params = new MxOpParams();
+        if (shape == null) {
+            throw new NullPointerException(
+                    String.format("Shape is required for %s", opName.substring(1)));
+        }
+        params.addShape(shape);
+        params.addContext(context);
+        params.addDataType(dataType);
+        params.addSparseFormat(sparseFormat);
+        FunctionInfo functionInfo = OPS.get(opName);
+        return functionInfo.invoke(this, params)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray ones(DataDesc dataDesc) {
+        return ones(
                 dataDesc.getContext(),
                 dataDesc.getShape(),
                 dataDesc.getDataType(),

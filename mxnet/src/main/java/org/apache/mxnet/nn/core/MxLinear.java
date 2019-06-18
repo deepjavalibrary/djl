@@ -7,9 +7,9 @@ import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.nn.core.Linear;
-import com.amazon.ai.util.PairList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
 
 public class MxLinear extends MxNNBlock implements Linear {
@@ -50,7 +50,7 @@ public class MxLinear extends MxNNBlock implements Linear {
     @Override
     public NDArray forward(NDArray data) {
         NDList inputs = new NDList(data, weight, bias);
-        PairList<String, String> params = new PairList<>();
+        MxOpParams params = new MxOpParams();
         params.add("num_hidden", "1");
         return forward(inputs, params).get(0);
     }
