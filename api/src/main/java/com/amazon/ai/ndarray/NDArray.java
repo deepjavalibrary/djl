@@ -497,20 +497,46 @@ public interface NDArray extends AutoCloseable {
     NDArray subi(Number n);
 
     /**
-     * Scalar addition (cloning)
+     * Adds a number to each element of the array.
      *
      * @param n the number to add
-     * @return a clone with this matrix + the given number
+     * @return Returns the result of the addition
      */
-    NDArray add(Number n);
+    default NDArray add(Number n) {
+        return NDArrays.add(this, n);
+    }
 
     /**
-     * In place scalar addition
+     * Adds a number to each element of the array.
      *
-     * @param n Number to add
-     * @return This array, after adding value
+     * @param n the number to add
+     * @param params optional params to the function
+     * @return Returns the result of the addition
      */
-    NDArray addi(Number n);
+    default NDArray add(Number n, NDFuncParams params) {
+        return NDArrays.add(this, n, params);
+    }
+
+    /**
+     * Adds (broadcasting) another NDArray to this NDArray.
+     *
+     * @param other the other NDArray to add
+     * @return Returns the result of the addition
+     */
+    default NDArray add(NDArray other) {
+        return NDArrays.add(this, other);
+    }
+
+    /**
+     * Adds (broadcasting) another NDArray to this NDArray.
+     *
+     * @param other the other NDArray to add
+     * @param params optional params to the function
+     * @return Returns the result of the addition
+     */
+    default NDArray add(NDArray other, NDFuncParams params) {
+        return NDArrays.add(this, other, params);
+    }
 
     /**
      * Reverse division (number / ndarray)
@@ -594,24 +620,6 @@ public interface NDArray extends AutoCloseable {
      * @return the result NDArray
      */
     NDArray subi(Number n, NDArray result);
-
-    /**
-     * Addition of this NDArray
-     *
-     * @param n the number to add
-     * @param result the result NDArray
-     * @return the result NDArray
-     */
-    NDArray add(Number n, NDArray result);
-
-    /**
-     * In place addition
-     *
-     * @param n the number to add
-     * @param result the result NDArray
-     * @return the result NDArray
-     */
-    NDArray addi(Number n, NDArray result);
 
     /**
      * Return a mask on whether each element matches the given condition.
@@ -997,23 +1005,6 @@ public interface NDArray extends AutoCloseable {
     NDArray sub(NDArray other, NDArray result);
 
     /**
-     * Element-wise copy addition of two NDArrays
-     *
-     * @param other the second NDArray to add
-     * @return the result of the addition
-     */
-    NDArray add(NDArray other);
-
-    /**
-     * Element-wise copy addition of two NDArrays
-     *
-     * @param other the second NDArray to add
-     * @param result the result NDArray
-     * @return the result of the addition
-     */
-    NDArray add(NDArray other, NDArray result);
-
-    /**
      * Perform an inplace matrix multiplication
      *
      * @param other the other matrix to perform matrix multiply with
@@ -1080,23 +1071,6 @@ public interface NDArray extends AutoCloseable {
      * @return the result of the subtraction
      */
     NDArray subi(NDArray other, NDArray result);
-
-    /**
-     * in place (element wise) addition of two NDArrays
-     *
-     * @param other the second NDArray to add
-     * @return the result of the addition
-     */
-    NDArray addi(NDArray other);
-
-    /**
-     * in place (element wise) addition of two NDArrays
-     *
-     * @param other the second NDArray to add
-     * @param result the result NDArray
-     * @return the result of the addition
-     */
-    NDArray addi(NDArray other, NDArray result);
 
     /**
      * Returns the max norm (aka infinity norm, equal to the maximum absolute value) along the

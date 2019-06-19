@@ -18,6 +18,7 @@ import com.amazon.ai.Profiler;
 import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.inference.Predictor;
+import com.amazon.ai.ndarray.EngineNDArrays;
 import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
 import java.io.IOException;
@@ -35,6 +36,7 @@ import org.apache.mxnet.nn.MxNNIndex;
 public class MxEngine extends Engine {
 
     public static final NNIndex NN_INDEX = new MxNNIndex();
+    public static final MxEngineNDArrays MX_ENGINE_NDARRAYS = new MxEngineNDArrays();
 
     MxEngine() {}
 
@@ -119,6 +121,11 @@ public class MxEngine extends Engine {
     @Override
     public NNIndex getNNIndex() {
         return NN_INDEX;
+    }
+
+    @Override
+    public EngineNDArrays getEngineNDArrays() {
+        return MX_ENGINE_NDARRAYS;
     }
 
     /** {@inheritDoc} */

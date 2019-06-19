@@ -18,6 +18,7 @@ import com.amazon.ai.Profiler;
 import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.inference.Predictor;
+import com.amazon.ai.ndarray.EngineNDArrays;
 import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
 import java.io.FileNotFoundException;
@@ -74,6 +75,11 @@ public class MockEngine extends Engine {
 
     @Override
     public NNIndex getNNIndex() {
+        return null;
+    }
+
+    @Override
+    public EngineNDArrays getEngineNDArrays() {
         return null;
     }
 

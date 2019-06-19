@@ -627,18 +627,6 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray add(Number n) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray addi(Number n) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray rdiv(Number n, NDArray result) {
         return null;
     }
@@ -694,18 +682,6 @@ public class MxMatrix implements Matrix {
     /** {@inheritDoc} */
     @Override
     public NDArray subi(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray add(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray addi(Number n, NDArray result) {
         return null;
     }
 
@@ -975,18 +951,6 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray add(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray add(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray mmuli(NDArray other) {
         return null;
     }
@@ -1030,18 +994,6 @@ public class MxMatrix implements Matrix {
     /** {@inheritDoc} */
     @Override
     public NDArray subi(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray addi(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray addi(NDArray other, NDArray result) {
         return null;
     }
 

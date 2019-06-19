@@ -329,11 +329,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray addi(Number n) {
-        return null;
-    }
-
-    @Override
     public NDArray rdiv(Number n, NDArray result) {
         return null;
     }
@@ -380,16 +375,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray subi(Number n, NDArray result) {
-        return null;
-    }
-
-    @Override
-    public NDArray add(Number n, NDArray result) {
-        return null;
-    }
-
-    @Override
-    public NDArray addi(Number n, NDArray result) {
         return null;
     }
 
@@ -619,11 +604,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray add(NDArray other, NDArray result) {
-        return null;
-    }
-
-    @Override
     public NDArray mmuli(NDArray other) {
         return null;
     }
@@ -660,16 +640,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray subi(NDArray other, NDArray result) {
-        return null;
-    }
-
-    @Override
-    public NDArray addi(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray addi(NDArray other, NDArray result) {
         return null;
     }
 
