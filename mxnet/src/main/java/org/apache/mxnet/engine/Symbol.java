@@ -17,30 +17,26 @@ import com.amazon.ai.Initializer;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.apache.mxnet.jna.JnaUtils;
 
 public class Symbol extends NativeResource implements Block {
 
-    private String[] argParams;
-    private String[] auxParams;
+    //    private String[] argParams;
+    //    private String[] auxParams;
     private String[] outputs;
-    private List<Integer> outputLayouts;
+    //    private List<Integer> outputLayouts;
     private MxNDFactory factory;
 
     Symbol(MxNDFactory factory, Pointer pointer) {
         super(pointer);
         this.factory = factory;
-        argParams = JnaUtils.listSymbolArguments(getHandle());
-        auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
+        //        argParams = JnaUtils.listSymbolArguments(getHandle());
+        //        auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }
 
     public static Symbol load(MxNDFactory factory, String path) {
@@ -48,6 +44,7 @@ public class Symbol extends NativeResource implements Block {
         return new Symbol(factory, pointer);
     }
 
+    /*
     public String[] getArgParams() {
         return argParams;
     }
@@ -55,6 +52,8 @@ public class Symbol extends NativeResource implements Block {
     public String[] getAuxParams() {
         return auxParams;
     }
+
+     */
 
     public String[] getAllNames() {
         return JnaUtils.listSymbolNames(getHandle());
@@ -67,6 +66,7 @@ public class Symbol extends NativeResource implements Block {
         return outputs;
     }
 
+    /*
     public List<Integer> getOutputLayouts() {
         if (outputLayouts == null) {
             outputLayouts = new ArrayList<>();
@@ -88,6 +88,8 @@ public class Symbol extends NativeResource implements Block {
         return JnaUtils.listSymbolAttr(getHandle());
     }
 
+     */
+
     public Symbol copy() {
         return this;
     }
@@ -106,6 +108,7 @@ public class Symbol extends NativeResource implements Block {
         return get(index);
     }
 
+    /*
     public Symbol getInternals() {
         Pointer pointer = JnaUtils.getSymbolInternals(getHandle());
         return new Symbol(factory, pointer);
@@ -144,6 +147,8 @@ public class Symbol extends NativeResource implements Block {
     public String toJson() {
         return JnaUtils.symbolToJson(getHandle());
     }
+
+     */
 
     /** {@inheritDoc} */
     @Override
