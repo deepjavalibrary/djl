@@ -14,6 +14,7 @@ package com.amazon.ai;
 
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
+import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.util.PairList;
@@ -23,7 +24,7 @@ import java.util.List;
 
 public interface Block {
 
-    NDList forward(NDList inputs, PairList<String, String> params);
+    NDList forward(NDList inputs, PairList<String, String> params, NDFuncParams fparams);
 
     void backward();
 
@@ -36,7 +37,11 @@ public interface Block {
     byte[] getEncoded();
 
     default NDList forward(NDList inputs) {
-        return forward(inputs, new PairList<>());
+        return forward(inputs, new PairList<>(), NDFuncParams.NONE);
+    }
+
+    default NDList forward(NDList inputs, PairList<String, String> params) {
+        return forward(inputs, params, NDFuncParams.NONE);
     }
 
     default List<Block> getChildren() {

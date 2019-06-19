@@ -207,27 +207,227 @@ public interface NDArray extends AutoCloseable {
      */
     void backward(NDArray outGrad, boolean retainGraph, boolean isTraining);
 
-    NDArray argsort(int axis, boolean isAscend);
+    /**
+     * Performs an indirect sort of the NDArray ascending on the last dimension.
+     *
+     * @return Returns an array of indices corresponding to elements in the NDArray on the axis
+     * @see NDArray#argsort(int, boolean, NDFuncParams)
+     */
+    default NDArray argsort() {
+        return argsort(-1, true, NDFuncParams.NONE);
+    }
 
-    NDArray softmax(Integer axis, Double temperature);
+    /**
+     * Performs an indirect sort of the NDArray ascending on the given dimension.
+     *
+     * @param axis the axis along which to sort
+     * @return Returns an array of indices corresponding to elements in the NDArray on the axis
+     * @see NDArray#argsort(int, boolean, NDFuncParams)
+     */
+    default NDArray argsort(int axis) {
+        return argsort(axis, true, NDFuncParams.NONE);
+    }
 
-    NDList split(int numOutputs, Integer axis, Boolean squeezeAxis);
+    /**
+     * Performs an indirect sort of the NDArray on the given dimension.
+     *
+     * @param axis the axis along which to sort
+     * @param ascending whether to sort ascending
+     * @return Returns an array of indices corresponding to elements in the NDArray on the axis
+     */
+    default NDArray argsort(int axis, boolean ascending) {
+        return argsort(axis, ascending, NDFuncParams.NONE);
+    }
+
+    /**
+     * Performs an indirect sort of the NDArray on the given dimension.
+     *
+     * @param axis the axis along which to sort
+     * @param ascending whether to sort ascending
+     * @param fparams optional params to the function
+     * @return Returns an array of indices corresponding to elements in the NDArray on the axis
+     */
+    NDArray argsort(int axis, boolean ascending, NDFuncParams fparams);
+
+    /**
+     * Returns the softmax across the entire array.
+     *
+     * @return Returns the softmax across the entire array
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     * @see NDArray#softmax(int[], Double, NDFuncParams)
+     */
+    default NDArray softmax() {
+        return softmax(null, null, NDFuncParams.NONE);
+    }
+
+    /**
+     * Returns the softmax across the specified axes.
+     *
+     * @param axes The axes to compute the softmax over or null for the whole array
+     * @return Returns the softmax
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     * @see NDArray#softmax(int[], Double, NDFuncParams)
+     */
+    default NDArray softmax(int[] axes) {
+        return softmax(axes, null, NDFuncParams.NONE);
+    }
+
+    /**
+     * Returns the softmax across the specified axes.
+     *
+     * @param axes The axes to compute the softmax over or null for the whole array
+     * @param fparams optional params to the function
+     * @return Returns the softmax
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     * @see NDArray#softmax(int[], Double, NDFuncParams)
+     */
+    default NDArray softmax(int[] axes, NDFuncParams fparams) {
+        return softmax(axes, null, fparams);
+    }
+
+    /**
+     * Returns the softmax across the specified axes.
+     *
+     * @param axes The axes to compute the softmax over or null for the whole array
+     * @param temperature The exponent multiplier Beta in the softmax.
+     * @return Returns the softmax
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     * @see NDArray#softmax(int[], Double, NDFuncParams)
+     */
+    default NDArray softmax(int[] axes, Double temperature) {
+        return softmax(axes, temperature, NDFuncParams.NONE);
+    }
+
+    /**
+     * Returns the softmax across the specified axes.
+     *
+     * @param axes The axes to compute the softmax over or null for the whole array
+     * @param temperature The exponent multiplier Beta in the softmax. Use null for default 1.0
+     * @param fparams optional fparams to the function
+     * @return Returns the softmax
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     * @see NDArray#softmax(int[], Double, NDFuncParams)
+     */
+    NDArray softmax(int[] axes, Double temperature, NDFuncParams fparams);
+
+    /**
+     * Splits the array into size(0) new NDArrays along the first dimension.
+     *
+     * @return Given this array has shape [n, a, b, c, ...], returns an NDList of n arrays of shape
+     *     [a, b, c, ...]
+     * @see NDArray#split(int, boolean, NDFuncParams)
+     */
+    default NDList split() {
+        return split(0, true, NDFuncParams.NONE);
+    }
+
+    /**
+     * Splits the array into size(axis) new NDArrays along the given dimension.
+     *
+     * @param axis The axis to split along
+     * @return Returns an NDList with size(axis) NDArrays with shape <code>this.shape.remove(axis)
+     *     </code>
+     * @see NDArray#split(int, boolean, NDFuncParams)
+     */
+    default NDList split(int axis) {
+        return split(axis, true, NDFuncParams.NONE);
+    }
+
+    /**
+     * Splits the array into size(axis) new NDArrays along the given dimension.
+     *
+     * @param axis The axis to split along
+     * @param squeezeAxis whether to remove the specified output from the output NDArrays or leave
+     *     as size 1
+     * @return Returns an NDList with size(axis) NDArrays with shape <code>
+     *     squeezeAxis ? this.shape.remove(axis) : this.shape.set(axis, 1)</code>
+     * @see NDArray#split(int, boolean, NDFuncParams)
+     */
+    default NDList split(int axis, boolean squeezeAxis) {
+        return split(axis, squeezeAxis, NDFuncParams.NONE);
+    }
+
+    /**
+     * Splits the array into size(axis) new NDArrays along the given dimension.
+     *
+     * @param axis The axis to split along
+     * @param squeezeAxis whether to remove the specified output from the output NDArrays or leave
+     *     as size 1
+     * @param fparams optional params to the function
+     * @return Returns an NDList with size(axis) NDArrays with shape <code>
+     *     squeezeAxis ? this.shape.remove(axis) : this.shape.set(axis, 1)</code>
+     */
+    NDList split(int axis, boolean squeezeAxis, NDFuncParams fparams);
+
+    /**
+     * Splits the array into a given number of new NDArrays along the given dimension.
+     *
+     * @param axis The axis to split along
+     * @param numOutputs The number of NDArrays to split into. This must equally divide the length
+     *     of the axis.
+     * @return Returns an NDList with numOutputs NDArrays with shape <code>(this.shape.axis /= axis)
+     *     </code>
+     * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
+     *     axis
+     * @see NDArray#split(int, int, NDFuncParams)
+     */
+    default NDList split(int axis, int numOutputs) throws IllegalArgumentException {
+        return split(axis, numOutputs, NDFuncParams.NONE);
+    }
+
+    /**
+     * Splits the array into a given number of new NDArrays along the given dimension.
+     *
+     * @param axis The axis to split along
+     * @param numOutputs The number of NDArrays to split into. This must equally divide the length
+     *     of the axis.
+     * @param fparams optional params to the function
+     * @return Returns an NDList with numOutputs NDArrays with shape <code>(this.shape.axis /= axis)
+     *     </code>
+     * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
+     *     axis
+     */
+    NDList split(int axis, int numOutputs, NDFuncParams fparams) throws IllegalArgumentException;
 
     /**
      * Return an array of zeros with the same {@link Shape}, {@link DataType} and {@link
      * SparseFormat} as the input array
      *
      * @return {@link NDArray} filled with zeros
+     * @see NDArray#zerosLike(NDFuncParams)
      */
-    NDArray zerosLike();
+    default NDArray zerosLike() {
+        return zerosLike(NDFuncParams.NONE);
+    }
+
+    /**
+     * Return an array of zeros with the same {@link Shape}, {@link DataType} and {@link
+     * SparseFormat} as the input array
+     *
+     * @param fparams optional params to the function
+     * @return {@link NDArray} filled with zeros
+     */
+    NDArray zerosLike(NDFuncParams fparams);
 
     /**
      * Return an array of ones with the same {@link Shape}, {@link DataType} and {@link
      * SparseFormat} as the input array
      *
      * @return {@link NDArray} filled with ones
+     * @see NDArray#onesLike(NDFuncParams)
      */
-    NDArray onesLike();
+    default NDArray onesLike() {
+        return onesLike(NDFuncParams.NONE);
+    }
+
+    /**
+     * Return an array of ones with the same {@link Shape}, {@link DataType} and {@link
+     * SparseFormat} as the input array
+     *
+     * @param fparams optional params to the function
+     * @return {@link NDArray} filled with ones
+     */
+    NDArray onesLike(NDFuncParams fparams);
 
     boolean isSparse();
 
@@ -510,11 +710,11 @@ public interface NDArray extends AutoCloseable {
      * Adds a number to each element of the array.
      *
      * @param n the number to add
-     * @param params optional params to the function
+     * @param fparams optional fparams to the function
      * @return Returns the result of the addition
      */
-    default NDArray add(Number n, NDFuncParams params) {
-        return NDArrays.add(this, n, params);
+    default NDArray add(Number n, NDFuncParams fparams) {
+        return NDArrays.add(this, n, fparams);
     }
 
     /**
@@ -531,11 +731,11 @@ public interface NDArray extends AutoCloseable {
      * Adds (broadcasting) another NDArray to this NDArray.
      *
      * @param other the other NDArray to add
-     * @param params optional params to the function
+     * @param fparams optional fparams to the function
      * @return Returns the result of the addition
      */
-    default NDArray add(NDArray other, NDFuncParams params) {
-        return NDArrays.add(this, other, params);
+    default NDArray add(NDArray other, NDFuncParams fparams) {
+        return NDArrays.add(this, other, fparams);
     }
 
     /**

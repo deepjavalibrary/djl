@@ -15,6 +15,7 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
+import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
@@ -117,7 +118,7 @@ public class MxNDFactory implements NDFactory {
         params.addDataType(dataType);
         params.addSparseFormat(sparseFormat);
         FunctionInfo functionInfo = OPS.get(opName);
-        return functionInfo.invoke(this, params)[0];
+        return functionInfo.invoke(this, params, NDFuncParams.NONE)[0];
     }
 
     /** {@inheritDoc} */

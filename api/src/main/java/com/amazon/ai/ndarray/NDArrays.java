@@ -15,7 +15,7 @@ public final class NDArrays {
      * @return Returns the result of the addition
      */
     public static NDArray add(NDArray a, Number n) {
-        return add(a, n, new NDFuncParams());
+        return add(a, n, NDFuncParams.NONE);
     }
 
     /**
@@ -23,11 +23,11 @@ public final class NDArrays {
      *
      * @param a the NDArray that will be added to.
      * @param n the number to add to the {@link NDArray} elements.
-     * @param params optional params to the function
+     * @param fparams optional fparams to the function
      * @return Returns the result of the addition
      */
-    public static NDArray add(NDArray a, Number n, NDFuncParams params) {
-        return Engine.getInstance().getEngineNDArrays().add(a, n, params);
+    public static NDArray add(NDArray a, Number n, NDFuncParams fparams) {
+        return Engine.getInstance().getEngineUtils().add(a, n, fparams);
     }
 
     /**
@@ -38,7 +38,7 @@ public final class NDArrays {
      * @return Returns the result of the addition
      */
     public static NDArray add(Number n, NDArray a) {
-        return add(n, a, new NDFuncParams());
+        return add(n, a, NDFuncParams.NONE);
     }
 
     /**
@@ -46,11 +46,11 @@ public final class NDArrays {
      *
      * @param a the NDArray that will be added to.
      * @param n the number to add to the {@link NDArray} elements.
-     * @param params optional params to the function
+     * @param fparams optional fparams to the function
      * @return Returns the result of the addition
      */
-    public static NDArray add(Number n, NDArray a, NDFuncParams params) {
-        return Engine.getInstance().getEngineNDArrays().add(n, a, params);
+    public static NDArray add(Number n, NDArray a, NDFuncParams fparams) {
+        return Engine.getInstance().getEngineUtils().add(n, a, fparams);
     }
 
     /**
@@ -61,7 +61,7 @@ public final class NDArrays {
      * @return Returns the result of the addition
      */
     public static NDArray add(NDArray a, NDArray b) {
-        return add(a, b, new NDFuncParams());
+        return add(a, b, NDFuncParams.NONE);
     }
 
     /**
@@ -69,10 +69,10 @@ public final class NDArrays {
      *
      * @param a the left NDArray
      * @param b the right NDArray
-     * @param params optional params to the function
+     * @param fparams optional fparams to the function
      * @return Returns the result of the addition
      */
-    public static NDArray add(NDArray a, NDArray b, NDFuncParams params) {
-        return Engine.getInstance().getEngineNDArrays().add(a, b, params);
+    public static NDArray add(NDArray a, NDArray b, NDFuncParams fparams) {
+        return Engine.getInstance().getEngineUtils().add(a, b, fparams);
     }
 }

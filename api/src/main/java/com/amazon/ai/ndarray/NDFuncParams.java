@@ -3,12 +3,14 @@ package com.amazon.ai.ndarray;
 import com.amazon.ai.Context;
 
 /** A parameter class representing standard options for an NDArray function. */
-public class NDFuncParams {
+public final class NDFuncParams {
 
     private NDFactory factory;
     private Context context;
     private boolean isInPlace;
     private NDArray out;
+
+    public static final NDFuncParams NONE = new Builder().build();
 
     /**
      * Returns the factory to use for the function result otherwise null.
@@ -45,9 +47,6 @@ public class NDFuncParams {
     public NDArray getOut() {
         return out;
     }
-
-    /** Creates an empty NDFuncParams that does not change the function */
-    NDFuncParams() {}
 
     private NDFuncParams(NDFactory factory, Context context, boolean isInPlace, NDArray out) {
         this.factory = factory;

@@ -16,6 +16,7 @@ import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.Matrix;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
+import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
@@ -119,17 +120,23 @@ public class MockNDArray implements NDArray {
     public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {}
 
     @Override
-    public NDArray argsort(int axis, boolean isAscend) {
+    public NDArray argsort(int axis, boolean ascending, NDFuncParams fparams) {
         return null;
     }
 
     @Override
-    public NDArray softmax(Integer axis, Double temperature) {
+    public NDArray softmax(int[] axes, Double temperature, NDFuncParams fparams) {
         return null;
     }
 
     @Override
-    public NDList split(int numOutputs, Integer axis, Boolean squeezeAxis) {
+    public NDList split(int axis, boolean squeezeAxis, NDFuncParams fparams) {
+        return null;
+    }
+
+    @Override
+    public NDList split(int axis, int numOutputs, NDFuncParams fparams)
+            throws IllegalArgumentException {
         return null;
     }
 
@@ -139,7 +146,17 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray zerosLike(NDFuncParams fparams) {
+        return null;
+    }
+
+    @Override
     public NDArray onesLike() {
+        return null;
+    }
+
+    @Override
+    public NDArray onesLike(NDFuncParams fparams) {
         return null;
     }
 

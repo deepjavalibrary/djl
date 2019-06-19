@@ -16,6 +16,7 @@ import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.Matrix;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
+import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
@@ -222,7 +223,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         MxNDArray array = (MxNDArray) ndArray;
 
-        functionInfo.invoke(factory, new MxNDArray[] {this}, new MxNDArray[] {array}, null);
+        functionInfo.invoke(
+                factory, new MxNDArray[] {this}, new MxNDArray[] {array}, null, NDFuncParams.NONE);
     }
 
     /** {@inheritDoc} */
@@ -278,7 +280,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
         MxNDArray grad;
         if (sparseFormat == null || sparseFormat == sparseFormat.UNDEFINED) {
-            grad = zerosLike();
+            grad = (MxNDArray) zerosLike();
         } else {
             grad = (MxNDArray) factory.zeros(context, shape, dataType, sparseFormat);
         }
@@ -333,42 +335,55 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argsort(int axis, boolean isAscend) {
+    public NDArray argsort(int axis, boolean ascending, NDFuncParams fparams) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
-        params.addParam("is_ascend", isAscend);
-        return OPS.get("argsort").invoke(factory, this, params)[0];
+        params.addParam("is_ascend", ascending);
+        return OPS.get("argsort").invoke(factory, this, params, fparams)[0];
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(Integer axis, Double temperature) {
+    public NDArray softmax(int[] axes, Double temperature, NDFuncParams fparams) {
+        if (axes.length != 1) {
+            throw new UnsupportedOperationException("softmax only supports a single axis");
+        }
         MxOpParams params = new MxOpParams();
-        params.addParam("axis", axis);
+        params.addParam("axis", axes[0]);
         params.addParam("temperature", temperature);
-        return OPS.get("softmax").invoke(factory, this, params)[0];
+        return OPS.get("softmax").invoke(factory, this, params, fparams)[0];
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int numOutputs, Integer axis, Boolean squeezeAxis) {
+    public NDList split(int axis, boolean squeezeAxis, NDFuncParams fparams) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("num_outputs", size(axis));
+        params.addParam("axis", axis);
+        params.addParam("squeeze_axis", squeezeAxis);
+        return new NDList(OPS.get("split").invoke(factory, this, params, fparams));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList split(int axis, int numOutputs, NDFuncParams fparams)
+            throws IllegalArgumentException {
         MxOpParams params = new MxOpParams();
         params.addParam("num_outputs", numOutputs);
         params.addParam("axis", axis);
-        params.addParam("squeeze_axis", squeezeAxis);
-        return new NDList(OPS.get("split").invoke(factory, this, params));
+        return new NDList(OPS.get("split").invoke(factory, this, params, fparams));
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray zerosLike() {
-        return OPS.get("zeros_like").invoke(factory, this, null)[0];
+    public MxNDArray zerosLike(NDFuncParams fparams) {
+        return OPS.get("zeros_like").invoke(factory, this, null, fparams)[0];
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray onesLike() {
-        return OPS.get("ones_like").invoke(factory, this, null)[0];
+    public MxNDArray onesLike(NDFuncParams fparams) {
+        return OPS.get("ones_like").invoke(factory, this, null, fparams)[0];
     }
 
     /** {@inheritDoc} */

@@ -3,6 +3,7 @@ package org.apache.mxnet.nn.core;
 import com.amazon.ai.Initializer;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
+import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
@@ -48,10 +49,10 @@ public class MxLinear extends MxNNBlock implements Linear {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray forward(NDArray data) {
+    public NDArray forward(NDArray data, NDFuncParams fparams) {
         NDList inputs = new NDList(data, weight, bias);
         MxOpParams params = new MxOpParams();
         params.add("num_hidden", "1");
-        return forward(inputs, params).get(0);
+        return forward(inputs, params, fparams).get(0);
     }
 }

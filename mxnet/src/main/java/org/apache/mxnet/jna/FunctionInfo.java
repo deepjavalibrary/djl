@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.jna;
 
+import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
@@ -31,24 +32,38 @@ public class FunctionInfo {
         this.arguments = arguments;
     }
 
-    public MxNDArray[] invoke(MxNDFactory factory, PairList<String, String> params) {
-        return invoke(factory, new MxNDArray[] {}, params);
-    }
-
-    public MxNDArray[] invoke(MxNDFactory factory, MxNDArray src, PairList<String, String> params) {
-        return invoke(factory, new MxNDArray[] {src}, params);
+    public MxNDArray[] invoke(
+            MxNDFactory factory, PairList<String, String> params, NDFuncParams fparams) {
+        return invoke(factory, new MxNDArray[] {}, params, fparams);
     }
 
     public MxNDArray[] invoke(
-            MxNDFactory factory, MxNDArray[] src, PairList<String, String> params) {
-        return invoke(factory, src, new MxNDArray[] {}, params);
+            MxNDFactory factory,
+            MxNDArray src,
+            PairList<String, String> params,
+            NDFuncParams fparams) {
+        return invoke(factory, new MxNDArray[] {src}, params, fparams);
+    }
+
+    public MxNDArray[] invoke(
+            MxNDFactory factory,
+            MxNDArray[] src,
+            PairList<String, String> params,
+            NDFuncParams fparams) {
+        return invoke(factory, src, new MxNDArray[] {}, params, fparams);
     }
 
     public MxNDArray[] invoke(
             MxNDFactory factory,
             MxNDArray[] src,
             MxNDArray[] dest,
-            PairList<String, String> params) {
+            PairList<String, String> params,
+            NDFuncParams fparams) {
+
+        if (fparams.getFactory() != null) {
+            factory = (MxNDFactory) fparams.getFactory();
+        }
+
         Pointer[] srcHandles = new Pointer[src.length];
         for (int i = 0; i < src.length; i++) {
             srcHandles[i] = (src[i]).getHandle();
@@ -56,6 +71,13 @@ public class FunctionInfo {
         PointerArray srcRef = new PointerArray(srcHandles);
 
         PointerByReference destRef;
+        if (dest.length == 0) {
+            if (fparams.getInPlace()) {
+                dest = new MxNDArray[] {src[0]};
+            } else if (fparams.getOut() != null) {
+                dest = new MxNDArray[] {(MxNDArray) fparams.getOut()};
+            }
+        }
         if (dest.length > 0) {
             Pointer[] arrays = new Pointer[dest.length];
             for (int i = 0; i < dest.length; i++) {
@@ -71,6 +93,9 @@ public class FunctionInfo {
         Pointer[] ptrArray = destRef.getValue().getPointerArray(0, numOutputs);
         for (int i = 0; i < numOutputs; i++) {
             result[i] = factory.create(ptrArray[i]);
+            if (fparams.getContext() != null) {
+                result[i] = result[i].asInContext(fparams.getContext(), false);
+            }
         }
         return result;
     }

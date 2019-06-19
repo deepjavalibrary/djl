@@ -3,10 +3,15 @@ package com.amazon.ai.nn.core;
 import com.amazon.ai.Block;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFuncParams;
 
 public interface Linear extends Block {
 
-    NDArray forward(NDArray data);
+    default NDArray forward(NDArray data) {
+        return forward(data, NDFuncParams.NONE);
+    }
+
+    NDArray forward(NDArray data, NDFuncParams fparams);
 
     class Builder {
 
