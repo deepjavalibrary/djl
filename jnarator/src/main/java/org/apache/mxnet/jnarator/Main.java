@@ -12,9 +12,9 @@
  */
 package org.apache.mxnet.jnarator;
 
-import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
@@ -47,20 +47,17 @@ public final class Main {
             String[] headerFiles = config.getHeaderFiles();
             String mappingFile = config.getMappingFile();
 
-            File dir = new File(output);
-            if (!dir.exists() && !dir.mkdirs()) {
-                logger.error("Invalid output directory path: " + output);
-                System.exit(-1); // NOPMD
-            }
+            Path dir = Paths.get(output);
+            Files.createDirectories(dir);
 
             Properties mapping = new Properties();
             if (mappingFile != null) {
-                File file = new File(mappingFile);
-                if (!file.exists()) {
+                Path file = Paths.get(mappingFile);
+                if (Files.notExists(file)) {
                     logger.error("mapping file does not exists: " + mappingFile);
                     System.exit(-1); // NOPMD
                 }
-                try (InputStream in = Files.newInputStream(Paths.get(mappingFile))) {
+                try (InputStream in = Files.newInputStream(file)) {
                     mapping.load(in);
                 }
             }

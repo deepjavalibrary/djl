@@ -20,14 +20,13 @@ import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.test.MockMxnetLibrary;
 import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
-import java.io.File;
+import com.amazon.ai.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.function.Function;
-import org.apache.commons.io.FileUtils;
 import org.apache.mxnet.jna.LibUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
 import org.powermock.api.mockito.PowerMockito;
@@ -42,17 +41,18 @@ import org.testng.annotations.Test;
 
 @PrepareForTest(LibUtils.class)
 public class MxModelTest extends PowerMockTestCase {
+
     @BeforeClass
     public void prepare() {
         mockStatic(LibUtils.class);
         MxnetLibrary library = new MockMxnetLibrary();
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
-        FileUtils.deleteQuietly(new File("build/tmp/testArt/"));
+        Utils.deleteQuietly(Paths.get("build/tmp/testArt/"));
     }
 
     @AfterClass
     public void postProcess() {
-        FileUtils.deleteQuietly(new File("build/tmp/testArt/"));
+        Utils.deleteQuietly(Paths.get("build/tmp/testArt/"));
     }
 
     @Test
@@ -100,19 +100,22 @@ public class MxModelTest extends PowerMockTestCase {
         String prefix = "A";
         int epoch = 122;
         // Test: Check filter
-        FileUtils.forceMkdir(new File(dir));
+        Files.createDirectories(Paths.get(dir));
         Files.createFile(Paths.get(dir + prefix + "-0001.params"));
         Files.createFile(Paths.get(dir + prefix + "-symbol.json"));
         MxModel model = MxModel.loadModel(dir + prefix, epoch);
         Assert.assertEquals(model.getArtifactNames().length, 0);
+
         // Test: Add new file
         String synset = "synset.txt";
         Files.createFile(Paths.get(dir + synset));
         Assert.assertEquals(model.getArtifactNames()[0], synset);
+
         // Test: Add subDir
-        FileUtils.forceMkdir(new File(dir + "inner/"));
-        Files.createFile(Paths.get(dir + "inner/" + "innerFiles"));
+        Files.createDirectories(Paths.get(dir + "inner/"));
+        Files.createFile(Paths.get(dir + "inner/innerFiles"));
         Assert.assertEquals(model.getArtifactNames()[0], "inner/innerFiles");
+
         // Test: Get Artifacts
         InputStream stream = model.getArtifactAsStream(synset);
         Assert.assertEquals(stream.available(), 0);
@@ -124,10 +127,7 @@ public class MxModelTest extends PowerMockTestCase {
                     throw new RuntimeException("Test");
                 };
         Assert.assertThrows(RuntimeException.class, () -> model.getArtifact(synset, wrongFunc));
-        Function<InputStream, String> func =
-                tempStream -> {
-                    return "Hello";
-                };
+        Function<InputStream, String> func = tempStream -> "Hello";
         String result = model.getArtifact(synset, func);
         Assert.assertEquals(result, "Hello");
         model.close();

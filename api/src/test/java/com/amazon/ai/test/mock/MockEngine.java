@@ -20,10 +20,11 @@ import com.amazon.ai.engine.Engine;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.management.MemoryUsage;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class MockEngine extends Engine {
 
@@ -58,8 +59,8 @@ public class MockEngine extends Engine {
     }
 
     @Override
-    public Model loadModel(File modelPath, String modelName, int epoch) throws IOException {
-        if (!modelPath.exists()) {
+    public Model loadModel(Path modelPath, String modelName, int epoch) throws IOException {
+        if (Files.notExists(modelPath)) {
             throw new FileNotFoundException("File not found: " + modelPath);
         }
         return new MockModel();

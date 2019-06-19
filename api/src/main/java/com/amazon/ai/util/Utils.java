@@ -12,6 +12,17 @@
  */
 package com.amazon.ai.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
+
 public final class Utils {
 
     public static final boolean DEBUG = true;
@@ -38,5 +49,42 @@ public final class Utils {
         for (int i = 0; i < count; ++i) {
             sb.append(c);
         }
+    }
+
+    public static void deleteQuietly(Path dir) {
+        try {
+            Files.walk(dir)
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(
+                            path -> {
+                                try {
+                                    Files.deleteIfExists(path);
+                                } catch (IOException ignore) {
+                                    // ignore
+                                }
+                            });
+        } catch (IOException ignore) {
+            // ignore
+        }
+    }
+
+    public static List<String> readLines(Path file) throws IOException {
+        if (Files.notExists(file)) {
+            return Collections.emptyList();
+        }
+        try (InputStream is = Files.newInputStream(file)) {
+            return readLines(is);
+        }
+    }
+
+    public static List<String> readLines(InputStream is) {
+        List<String> list = new ArrayList<>();
+        try (Scanner scanner =
+                new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\\n|\\r\\n")) {
+            while (scanner.hasNext()) {
+                list.add(scanner.next());
+            }
+        }
+        return list;
     }
 }

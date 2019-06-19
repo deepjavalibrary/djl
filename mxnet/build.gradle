@@ -1,5 +1,4 @@
 dependencies {
-    compile "commons-io:commons-io:${commons_io_version}"
     compile "net.java.dev.jna:jna:${jna_version}"
     compile "org.slf4j:slf4j-api:${slf4j_version}"
     compile project(":api")

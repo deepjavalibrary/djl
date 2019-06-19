@@ -22,23 +22,17 @@ import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.engine.CachedOp;
@@ -1489,22 +1483,6 @@ public final class JnaUtils {
 
     private static String getLastError() {
         return LIB.MXGetLastError();
-    }
-
-    public static List<String> readLines(File file) throws IOException {
-        if (!file.exists()) {
-            return Collections.emptyList();
-        }
-        List<String> list = new ArrayList<>();
-        try (InputStream is = Files.newInputStream(file.toPath())) {
-            try (Scanner scanner =
-                    new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\\n|\\r\\n")) {
-                while (scanner.hasNext()) {
-                    list.add(scanner.next());
-                }
-            }
-        }
-        return list;
     }
 
     private static String[] toStringArray(PointerByReference ref, int size) {

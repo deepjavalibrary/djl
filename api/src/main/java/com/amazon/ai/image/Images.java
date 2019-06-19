@@ -14,11 +14,11 @@ package com.amazon.ai.image;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.file.Path;
 import javax.imageio.ImageIO;
 
 /**
@@ -35,8 +35,8 @@ public final class Images {
      * @return a {@link BufferedImage}
      * @throws IOException file is not found
      */
-    public static BufferedImage loadImageFromFile(File file) throws IOException {
-        return ImageIO.read(file);
+    public static BufferedImage loadImageFromFile(Path file) throws IOException {
+        return ImageIO.read(file.toFile());
     }
 
     /**

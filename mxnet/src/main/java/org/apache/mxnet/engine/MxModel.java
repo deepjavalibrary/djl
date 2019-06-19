@@ -18,20 +18,21 @@ import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.util.Pair;
 import com.amazon.ai.util.PairList;
+import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import org.apache.commons.io.FileUtils;
+import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class MxModel implements Model, AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
-    private File modelDir;
+    private Path modelDir;
     private Symbol symbol;
     private PairList<String, MxNDArray> parameters;
     private String[] optimizerStates;
@@ -55,7 +56,7 @@ public class MxModel implements Model, AutoCloseable {
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
     MxModel(
-            File modelDir,
+            Path modelDir,
             Symbol symbol,
             PairList<String, MxNDArray> parameters,
             String[] optimizerStates) {
@@ -75,7 +76,7 @@ public class MxModel implements Model, AutoCloseable {
         Symbol symbol = Symbol.load(factory, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
         String stateFile = String.format("%s-%04d.states", prefix, epoch);
-        File modelDir = new File(paramFile).getParentFile();
+        Path modelDir = Paths.get(paramFile).toAbsolutePath().getParent();
 
         PointerByReference namesRef = new PointerByReference();
         Pointer[] handles = JnaUtils.loadNdArray(paramFile, namesRef);
@@ -89,7 +90,7 @@ public class MxModel implements Model, AutoCloseable {
             parameters.add(pair[1], array);
         }
 
-        String[] stateNames = JnaUtils.readLines(new File(stateFile)).toArray(JnaUtils.EMPTY_ARRAY);
+        String[] stateNames = Utils.readLines(Paths.get(stateFile)).toArray(JnaUtils.EMPTY_ARRAY);
         // TODO: Check if Symbol has all names that params file have
         return new MxModel(modelDir, symbol, parameters, stateNames);
     }
@@ -171,20 +172,23 @@ public class MxModel implements Model, AutoCloseable {
     /** {@inheritDoc} */
     @Override
     public String[] getArtifactNames() {
-        Collection<File> files = FileUtils.listFiles(modelDir, null, true);
-        List<String> ret = new ArrayList<>(files.size());
-        Path base = modelDir.toPath();
-        for (File f : files) {
-            String fileName = f.getName();
-            if (fileName.endsWith(".params") || fileName.endsWith("-symbol.json")) {
-                // ignore symbol and param files.
-                continue;
+        try {
+            List<Path> files =
+                    Files.walk(modelDir).filter(Files::isRegularFile).collect(Collectors.toList());
+            List<String> ret = new ArrayList<>(files.size());
+            for (Path path : files) {
+                String fileName = path.toFile().getName();
+                if (fileName.endsWith(".params") || fileName.endsWith("-symbol.json")) {
+                    // ignore symbol and param files.
+                    continue;
+                }
+                Path relative = modelDir.relativize(path);
+                ret.add(relative.toString());
             }
-            Path path = f.toPath();
-            Path relative = base.relativize(path);
-            ret.add(relative.toString());
+            return ret.toArray(new String[0]);
+        } catch (IOException e) {
+            throw new AssertionError("Failed list files", e);
         }
-        return ret.toArray(new String[0]);
     }
 
     /** {@inheritDoc} */
@@ -218,9 +222,9 @@ public class MxModel implements Model, AutoCloseable {
         if (artifactName == null) {
             throw new IllegalArgumentException("artifactName cannot be null");
         }
-        File file = new File(modelDir, artifactName);
-        if (file.exists() && file.canRead()) {
-            return file.toURI().toURL();
+        Path file = modelDir.resolve(artifactName);
+        if (Files.exists(file) && Files.isReadable(file)) {
+            return file.toUri().toURL();
         }
         return null;
     }

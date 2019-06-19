@@ -19,9 +19,9 @@ import com.amazon.ai.Translator;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.MemoryUsage;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -122,7 +122,7 @@ public abstract class Engine {
      * @return {@link Model} contains the model information
      * @throws IOException Exception for file loading
      */
-    public abstract Model loadModel(File modelPath, String modelName, int epoch) throws IOException;
+    public abstract Model loadModel(Path modelPath, String modelName, int epoch) throws IOException;
 
     /**
      * Create new predictor with specific Engine.

@@ -20,10 +20,10 @@ import com.amazon.ai.engine.Engine;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -80,18 +80,21 @@ public class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model loadModel(File modelPath, String modelName, int epoch) throws IOException {
-        File modelDir;
-        if (modelPath.isDirectory()) {
+    public Model loadModel(Path modelPath, String modelName, int epoch) throws IOException {
+        Path modelDir;
+        if (Files.isDirectory(modelPath)) {
             modelDir = modelPath;
         } else {
-            modelDir = modelPath.getCanonicalFile().getParentFile();
+            modelDir = modelPath.toAbsolutePath().getParent();
+            if (modelDir == null) {
+                throw new AssertionError("Invalid path: " + modelPath.toString());
+            }
         }
-        String modelPrefix = new File(modelDir, modelName).getAbsolutePath();
+        String modelPrefix = modelDir.resolve(modelName).toAbsolutePath().toString();
         if (epoch == -1) {
             final Pattern pattern = Pattern.compile(Pattern.quote(modelName) + "-(\\d{4}).params");
             List<Integer> checkpoints =
-                    Files.walk(modelDir.toPath(), 1)
+                    Files.walk(modelDir, 1)
                             .map(
                                     p -> {
                                         Matcher m = pattern.matcher(p.toFile().getName());

@@ -14,7 +14,6 @@ package com.amazon.ai.example.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.apache.commons.io.IOUtils;
 
 /** A class hold information of model zoo models and their URLs. */
 public class ModelInfo {
@@ -126,7 +124,7 @@ public class ModelInfo {
             return;
         }
 
-        Path tmp = modelZooDir.resolve("tmp/" + modelName);
+        Path tmp = modelZooDir.resolve("tmp/" + modelName).toAbsolutePath();
         Files.createDirectories(tmp);
 
         try (InputStream is = downloadUrl.openStream()) {
@@ -156,9 +154,7 @@ public class ModelInfo {
                                 "Parent path should never be null: " + file.toString());
                     }
                     Files.createDirectories(parentFile);
-                    try (OutputStream os = Files.newOutputStream(file)) {
-                        IOUtils.copy(zis, os);
-                    }
+                    Files.copy(zis, file);
                 }
             }
         }

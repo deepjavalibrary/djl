@@ -15,10 +15,11 @@ package com.amazon.ai;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Function;
 
 /**
@@ -28,19 +29,6 @@ import java.util.function.Function;
  * and {@link com.amazon.ai.inference.Predictor} for Training and Inference jobs.
  */
 public interface Model {
-
-    /**
-     * Load model from a file path.
-     *
-     * <p>Please provide the model name/prefix
-     *
-     * @param modelPath Path to the model, include the model name
-     * @return {@link Model} object
-     * @throws IOException IO exception happened in loading
-     */
-    static Model loadModel(String modelPath) throws IOException {
-        return loadModel(modelPath, -1);
-    }
 
     /**
      * Load the model from a file path with epoch provided.
@@ -53,36 +41,36 @@ public interface Model {
      * @throws IOException IO exception happened in loading
      */
     static Model loadModel(String modelPath, int epoch) throws IOException {
-        File file = new File(modelPath);
-        String modelName = file.getName();
-        return loadModel(file, modelName, epoch);
+        Path path = Paths.get(modelPath);
+        String modelName = path.toFile().getName();
+        return loadModel(path, modelName, epoch);
     }
 
     /**
-     * Load the model from the {@link File}.
+     * Load the model from the {@link Path}.
      *
      * @param modelPath File object point to a path
      * @return {@link Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model loadModel(File modelPath) throws IOException {
-        return loadModel(modelPath, modelPath.getName(), -1);
+    static Model loadModel(Path modelPath) throws IOException {
+        return loadModel(modelPath, modelPath.toFile().getName(), -1);
     }
 
     /**
-     * Load the model from the {@link File} and the given name.
+     * Load the model from the {@link Path} and the given name.
      *
      * @param modelPath Directory/prefix of the file
      * @param modelName model file name or assigned name
      * @return {@link Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model loadModel(File modelPath, String modelName) throws IOException {
+    static Model loadModel(Path modelPath, String modelName) throws IOException {
         return loadModel(modelPath, modelName, -1);
     }
 
     /**
-     * Load the model from a {@link File} object with name and epoch provided.
+     * Load the model from a {@link Path} object with name and epoch provided.
      *
      * @param modelPath Directory/prefix of the file
      * @param modelName model file name or assigned name
@@ -90,7 +78,7 @@ public interface Model {
      * @return {@link Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model loadModel(File modelPath, String modelName, int epoch) throws IOException {
+    static Model loadModel(Path modelPath, String modelName, int epoch) throws IOException {
         return Engine.getInstance().loadModel(modelPath, modelName, epoch);
     }
     /**

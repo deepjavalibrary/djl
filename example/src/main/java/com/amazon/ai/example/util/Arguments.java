@@ -13,9 +13,11 @@
 
 package com.amazon.ai.example.util;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
@@ -103,7 +105,7 @@ public class Arguments {
         return options;
     }
 
-    public File getModelDir() throws IOException {
+    public Path getModelDir() throws IOException {
         if (modelDir == null) {
             ModelInfo modelInfo;
             if (modelUrl == null) {
@@ -115,33 +117,33 @@ public class Arguments {
                 modelInfo = new ModelInfo(modelName, modelUrl);
             }
             modelInfo.download();
-            return modelInfo.getDownloadDir().toFile();
+            return modelInfo.getDownloadDir();
         }
 
-        File file = new File(modelDir);
-        if (!file.exists()) {
+        Path path = Paths.get(modelDir);
+        if (Files.notExists(path)) {
             throw new FileNotFoundException("model directory not found: " + modelDir);
         }
-        return file;
+        return path;
     }
 
     public String getModelName() {
         return modelName;
     }
 
-    public File getImageFile() throws FileNotFoundException {
+    public Path getImageFile() throws FileNotFoundException {
         if (imageFile == null) {
-            File file = new File(modelDir, "kitten.jpg");
-            if (!file.exists()) {
+            Path path = Paths.get(modelDir, "kitten.jpg");
+            if (Files.notExists(path)) {
                 throw new FileNotFoundException("Missing --image parameter.");
             }
-            return file;
+            return path;
         }
-        File file = new File(imageFile);
-        if (!file.exists()) {
+        Path path = Paths.get(imageFile);
+        if (Files.notExists(path)) {
             throw new FileNotFoundException("image file not found: " + imageFile);
         }
-        return file;
+        return path;
     }
 
     public int getDuration() {

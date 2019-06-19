@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.jna;
 
+import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import java.io.BufferedReader;
@@ -19,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,29 +74,28 @@ public class LibUtils {
 
             String userHome = System.getProperty("user.home");
             String libName = System.mapLibraryName(LIB_NAME);
-            File dir = new File(userHome, ".mxnet/cache/" + version);
-            File path = new File(dir, libName);
-            if (path.exists()) {
-                return path.getAbsolutePath();
+            Path dir = Paths.get(userHome, ".mxnet/cache/" + version);
+            Path path = dir.resolve(libName);
+            if (Files.exists(path)) {
+                return path.toAbsolutePath().toString();
             }
             tmp = Paths.get(userHome, ".mxnet/cache/tmp");
             Files.createDirectories(tmp);
             for (String file : files) {
                 String libPath = "/native/lib/" + file;
-                try (InputStream is = LibUtils.class.getResourceAsStream(libPath);
-                        OutputStream os = Files.newOutputStream(tmp.resolve(file))) {
-                    IOUtils.copy(is, os);
+                try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                    Files.copy(is, tmp.resolve(file));
                 }
             }
-            Files.move(tmp, dir.toPath());
+            Files.move(tmp, dir);
             tmp = null;
-            return path.getAbsolutePath();
+            return path.toAbsolutePath().toString();
         } catch (IOException e) {
             logger.error("Failed to load mxnet native library.", e);
             return null;
         } finally {
             if (tmp != null) {
-                FileUtils.deleteQuietly(tmp.toFile());
+                Utils.deleteQuietly(tmp);
             }
         }
     }

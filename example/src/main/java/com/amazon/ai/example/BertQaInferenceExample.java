@@ -29,8 +29,8 @@ import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +53,7 @@ public final class BertQaInferenceExample extends AbstractExample {
         String predictResult = null;
 
         BertArguments arguments = (BertArguments) args;
-        File modelDir = arguments.getModelDir();
+        Path modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
 
         Model model = Model.loadModel(modelDir, modelName);

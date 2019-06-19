@@ -22,6 +22,9 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.apache.commons.io.FileUtils;
+import java.util.stream.Collectors;
 
 public final class TestHelper {
 
@@ -120,19 +123,20 @@ public final class TestHelper {
 
         List<Class<?>> classList = new ArrayList<>();
 
-        File classPath = new File(path);
-        if (classPath.isDirectory()) {
-            String rootPath = classPath.getCanonicalPath();
-            String[] filters = new String[] {"class"};
-            Collection<File> files = FileUtils.listFiles(classPath, filters, true);
-            for (File file : files) {
-                String fileName = file.getCanonicalPath();
-                fileName = fileName.substring(rootPath.length() + 1);
-                fileName = fileName.substring(0, fileName.lastIndexOf("."));
-                fileName = fileName.replace(File.separatorChar, '.');
+        Path classPath = Paths.get(path);
+        if (Files.isDirectory(classPath)) {
+            Collection<Path> files =
+                    Files.walk(Paths.get(path))
+                            .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
+                            .collect(Collectors.toList());
+            for (Path file : files) {
+                Path p = classPath.relativize(file);
+                String className = p.toString();
+                className = className.substring(0, className.lastIndexOf("."));
+                className = className.replace(File.separatorChar, '.');
 
                 try {
-                    classList.add(Class.forName(fileName));
+                    classList.add(Class.forName(className));
                 } catch (ExceptionInInitializerError ignore) {
                     // ignore
                 }

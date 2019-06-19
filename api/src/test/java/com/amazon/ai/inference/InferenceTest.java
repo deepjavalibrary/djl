@@ -22,10 +22,11 @@ import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.test.mock.EchoTranslator;
 import com.amazon.ai.test.mock.MockImageTranslator;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -36,13 +37,13 @@ public class InferenceTest {
 
     @BeforeClass
     public void setup() throws IOException {
-        FileUtils.forceMkdir(new File("build/model"));
+        Files.createDirectories(Paths.get("build/model"));
         image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
     }
 
     @Test
     public void testObjectDection() throws IOException, TranslateException {
-        File modelDir = new File("build/model");
+        Path modelDir = Paths.get("build/model");
         String modelName = "mockModel";
 
         Model model = Model.loadModel(modelDir, modelName);
@@ -67,7 +68,7 @@ public class InferenceTest {
 
     @Test
     public void testClassifier() throws IOException, TranslateException {
-        File modelDir = new File("build/model");
+        Path modelDir = Paths.get("build/model");
         String modelName = "mockModel";
 
         Model model = Model.loadModel(modelDir, modelName);
@@ -107,7 +108,7 @@ public class InferenceTest {
 
     @Test(expectedExceptions = IOException.class)
     public void loadModelException() throws IOException {
-        File modelDir = new File("build/non-exist-model");
+        Path modelDir = Paths.get("build/non-exist-model");
         String modelName = "mockModel";
 
         Model.loadModel(modelDir, modelName);

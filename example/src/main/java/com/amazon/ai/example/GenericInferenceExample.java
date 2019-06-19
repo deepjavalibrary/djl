@@ -28,9 +28,9 @@ import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,9 +44,9 @@ public final class GenericInferenceExample extends AbstractExample {
     public DetectedObject predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, TranslateException {
         DetectedObject predictResult = null;
-        File modelDir = arguments.getModelDir();
+        Path modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
-        File imageFile = arguments.getImageFile();
+        Path imageFile = arguments.getImageFile();
         BufferedImage img = Images.loadImageFromFile(imageFile);
 
         Model model = Model.loadModel(modelDir, modelName);

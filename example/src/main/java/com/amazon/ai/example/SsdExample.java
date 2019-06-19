@@ -36,7 +36,6 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,9 +54,9 @@ public final class SsdExample extends AbstractExample {
     public DetectedObject predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, TranslateException {
         List<DetectedObject> predictResult = null;
-        File modelDir = arguments.getModelDir();
+        Path modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
-        File imageFile = arguments.getImageFile();
+        Path imageFile = arguments.getImageFile();
         BufferedImage img = Images.loadImageFromFile(imageFile);
 
         Model model = Model.loadModel(modelDir, modelName);
@@ -108,8 +107,8 @@ public final class SsdExample extends AbstractExample {
         }
         g.dispose();
 
-        File out = new File(logDir, "ssd.jpg");
-        ImageIO.write(newImg, "jpg", out);
+        Path out = Paths.get(logDir, "ssd.jpg");
+        ImageIO.write(newImg, "jpg", out.toFile());
     }
 
     private void drawText(Graphics2D g, String text, Rectangle rect, int stroke, int padding) {
@@ -161,6 +160,9 @@ public final class SsdExample extends AbstractExample {
                         int classId = (int) values[0];
                         float probability = values[1];
                         if (classId > 0 && probability > threshold) {
+                            if (classId >= synset.length) {
+                                throw new AssertionError("Unexpected index: " + classId);
+                            }
                             String className = synset[classId];
 
                             double x = values[2] * imageWidth;

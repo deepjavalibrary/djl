@@ -17,12 +17,11 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import com.amazon.ai.Context;
 import com.amazon.ai.test.MockMxnetLibrary;
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.commons.io.FileUtils;
 import org.apache.mxnet.jna.LibUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
 import org.powermock.api.mockito.PowerMockito;
@@ -39,18 +38,18 @@ import org.testng.annotations.Test;
 public class MxEngineTest extends PowerMockTestCase {
 
     @BeforeClass
-    public void prepare() {
+    public void prepare() throws IOException {
         mockStatic(LibUtils.class);
         MxnetLibrary library = new MockMxnetLibrary();
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
-        FileUtils.deleteQuietly(new File("build/tmp/A-0122.params"));
-        FileUtils.deleteQuietly(new File("build/tmp/A-0001.params"));
+        Files.deleteIfExists(Paths.get("build/tmp/A-0122.params"));
+        Files.deleteIfExists(Paths.get("build/tmp/A-0001.params"));
     }
 
     @AfterClass
-    public void postProcessing() {
-        FileUtils.deleteQuietly(new File("build/tmp/A-0122.params"));
-        FileUtils.deleteQuietly(new File("build/tmp/A-0001.params"));
+    public void postProcessing() throws IOException {
+        Files.deleteIfExists(Paths.get("build/tmp/A-0122.params"));
+        Files.deleteIfExists(Paths.get("build/tmp/A-0001.params"));
     }
 
     @Test
@@ -76,29 +75,35 @@ public class MxEngineTest extends PowerMockTestCase {
     @Test
     public void testLoadModel() throws IOException {
         MxEngine engine = new MxEngine();
-        String fileLocation = "build/tmp/";
+        Path modelDir = Paths.get("build/tmp/");
         String modelName = "A";
-        Files.createFile(Paths.get(fileLocation + modelName + "-0122.params"));
-        String result = loadModel(engine, fileLocation, modelName, -1);
-        FileUtils.forceDelete(new File(fileLocation + modelName + "-0122.params"));
+        Path path122 = modelDir.resolve(modelName + "-0122.params");
+        Files.createFile(path122);
+        String result = loadModel(engine, modelDir, modelName, -1);
+        Files.delete(path122);
         Assert.assertEquals(result, "A-0122.params");
-        Files.createFile(Paths.get(fileLocation + modelName + "-0001.params"));
-        result = loadModel(engine, fileLocation, modelName, -1);
-        FileUtils.forceDelete(new File(fileLocation + modelName + "-0001.params"));
+
+        Path path1 = modelDir.resolve(modelName + "-0001.params");
+        Files.createFile(path1);
+        result = loadModel(engine, modelDir, modelName, -1);
+        Files.delete(path1);
         Assert.assertEquals(result, "A-0001.params");
-        result = loadModel(engine, fileLocation, modelName, 122);
+
+        result = loadModel(engine, modelDir, modelName, 122);
         Assert.assertEquals(result, "A-0122.params");
-        Files.createFile(Paths.get(fileLocation + modelName + "-0122.params"));
-        Files.createFile(Paths.get(fileLocation + modelName + "-0001.params"));
-        result = loadModel(engine, fileLocation, modelName, -1);
+
+        Files.createFile(path122);
+        Files.createFile(path1);
+
+        result = loadModel(engine, modelDir, modelName, 122);
         Assert.assertEquals(result, "A-0122.params");
     }
 
-    private String loadModel(MxEngine engine, String location, String modelName, int epoch)
+    private String loadModel(MxEngine engine, Path location, String modelName, int epoch)
             throws IOException {
-        MxModel model = (MxModel) engine.loadModel(new File(location), modelName, epoch);
+        MxModel model = (MxModel) engine.loadModel(location, modelName, epoch);
         // In JNA.MXNDArrayLoad function, file name is stored as the first param name in Model
         String paramPath = model.getParameters().get(0).getKey();
-        return new File(paramPath).getName();
+        return Paths.get(paramPath).toFile().getName();
     }
 }

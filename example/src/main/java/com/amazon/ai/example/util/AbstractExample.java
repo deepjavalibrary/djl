@@ -17,9 +17,10 @@ import com.amazon.ai.TranslateException;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.metric.Metric;
 import com.amazon.ai.metric.Metrics;
+import com.amazon.ai.util.Utils;
 import com.sun.jna.Platform;
 import java.io.BufferedWriter;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
@@ -29,6 +30,7 @@ import java.lang.management.RuntimeMXBean;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -39,8 +41,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 
@@ -207,11 +207,9 @@ public abstract class AbstractExample {
         }
 
         try {
-            File dir = new File(logDir);
-            if (!dir.exists()) {
-                FileUtils.forceMkdir(dir);
-            }
-            Path file = dir.toPath().resolve("memory.log");
+            Path dir = Paths.get(logDir);
+            Files.createDirectories(dir);
+            Path file = dir.resolve("memory.log");
             try (BufferedWriter writer =
                     Files.newBufferedWriter(
                             file, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
@@ -255,18 +253,13 @@ public abstract class AbstractExample {
      * @return array of string
      */
     public static String[] loadSynset(InputStream inputStream) {
-        try {
-            List<String> output = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
-            ListIterator<String> it = output.listIterator();
-            while (it.hasNext()) {
-                String synsetLemma = it.next();
-                it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
-            }
-            return output.toArray(JnaUtils.EMPTY_ARRAY);
-        } catch (IOException e) {
-            logger.warn("Error opening synset file.", e);
+        List<String> output = Utils.readLines(inputStream);
+        ListIterator<String> it = output.listIterator();
+        while (it.hasNext()) {
+            String synsetLemma = it.next();
+            it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
         }
-        return JnaUtils.EMPTY_ARRAY;
+        return output.toArray(JnaUtils.EMPTY_ARRAY);
     }
 
     private void getProcessInfo(Metrics metrics) {
@@ -278,7 +271,7 @@ public abstract class AbstractExample {
             try {
                 Process process = Runtime.getRuntime().exec(cmd);
                 try (InputStream is = process.getInputStream()) {
-                    String line = IOUtils.toString(is, StandardCharsets.UTF_8).trim();
+                    String line = new String(readAll(is), StandardCharsets.UTF_8).trim();
                     String[] tokens = line.split("\\s+");
                     if (tokens.length != 2) {
                         logger.error("Invalid ps output: " + line);
@@ -292,6 +285,17 @@ public abstract class AbstractExample {
             } catch (IOException e) {
                 logger.error("Failed execute cmd: " + cmd, e);
             }
+        }
+    }
+
+    private static byte[] readAll(InputStream is) throws IOException {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            int read;
+            byte[] buf = new byte[8192];
+            while ((read = is.read(buf)) != -1) {
+                bos.write(buf, 0, read);
+            }
+            return bos.toByteArray();
         }
     }
 }
