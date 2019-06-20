@@ -3,3 +3,5 @@ include 'api'
 include 'mxnet'
 include 'jnarator'
 include 'example'
+include 'integration'
+

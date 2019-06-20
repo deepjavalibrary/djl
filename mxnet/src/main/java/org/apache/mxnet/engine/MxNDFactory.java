@@ -49,6 +49,10 @@ public class MxNDFactory implements NDFactory {
         resources = new ConcurrentHashMap<>();
     }
 
+    public static MxNDFactory getSystemFactory() {
+        return SYSTEM_FACTORY;
+    }
+
     /** {@inheritDoc} */
     @Override
     public MxNDArray create(
