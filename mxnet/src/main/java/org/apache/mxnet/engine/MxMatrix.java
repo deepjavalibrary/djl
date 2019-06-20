@@ -536,11 +536,13 @@ public class MxMatrix implements Matrix {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean contentEquals(NDArray other) {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
         return false;
@@ -872,13 +874,49 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repmat(int... shape) {
+    public NDArray tile(int repeats) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int dimension, long... repeats) {
+    public NDArray tile(int axis, int repeats) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tile(int[] repeats) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tile(Shape desiredShape) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(int repeats) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(int repeats, int axis) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(int[] repeats) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(Shape desiredShape) {
         return null;
     }
 

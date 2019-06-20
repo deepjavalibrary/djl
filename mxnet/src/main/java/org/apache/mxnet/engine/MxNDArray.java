@@ -553,7 +553,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         return factory.invoke("_equal", new NDArray[] {this, other}, null)[0];
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean contentEquals(NDArray other) {
         try (NDArray result = eq(other)) {
@@ -894,14 +893,100 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repmat(int... shape) {
-        return null;
+    public NDArray tile(int repeats) {
+        int[] repeatsArray = new int[getShape().dimension()];
+        Arrays.fill(repeatsArray, repeats);
+        return tile(repeatsArray);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int dimension, long... repeats) {
-        return null;
+    public NDArray tile(int axis, int repeats) {
+        int[] repeatsArray = new int[getShape().dimension()];
+        Arrays.fill(repeatsArray, 1);
+        repeatsArray[withAxis(axis)] = repeats;
+        return tile(repeatsArray);
+    }
+
+    @Override
+    public NDArray tile(int[] repeats) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("reps", repeats);
+        return factory.invoke("tile", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tile(Shape desiredShape) {
+        return tile(repeatsToMatchShape(desiredShape));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(int repeats) {
+        int[] repeatsArray = new int[getShape().dimension()];
+        Arrays.fill(repeatsArray, repeats);
+        return repeat(repeatsArray);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(int axis, int repeats) {
+        int[] repeatsArray = new int[getShape().dimension()];
+        Arrays.fill(repeatsArray, 1);
+        repeatsArray[withAxis(axis)] = repeats;
+        return repeat(repeatsArray);
+    }
+
+    @Override
+    public NDArray repeat(int[] repeats) {
+        NDArray array = this;
+        int baseAxis = getShape().dimension() - repeats.length;
+        for (int i = 0; i < repeats.length; i++) {
+            if (repeats[i] > 1) {
+                NDArray previousArray = array;
+                MxOpParams params = new MxOpParams();
+                params.addParam("repeats", repeats[i]);
+                params.addParam("axis", baseAxis + i);
+                array = factory.invoke("repeat", array, params);
+                if (previousArray != this) {
+                    previousArray.close();
+                }
+            }
+        }
+        return array;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(Shape desiredShape) {
+        return repeat(repeatsToMatchShape(desiredShape));
+    }
+
+    private int[] repeatsToMatchShape(Shape desiredShape) throws IllegalArgumentException {
+        Shape curShape = getShape();
+        int dimension = curShape.dimension();
+        if (desiredShape.dimension() > dimension) {
+            throw new IllegalArgumentException("The desired shape has too many dimensions");
+        }
+        if (desiredShape.dimension() < dimension) {
+            int additionalDimensions = dimension - desiredShape.dimension();
+            desiredShape = curShape.slice(0, additionalDimensions).addAll(desiredShape);
+        }
+        int[] repeats = new int[dimension];
+        for (int i = 0; i < dimension; i++) {
+            if (desiredShape.get(i) % curShape.get(i) != 0) {
+                throw new IllegalArgumentException(
+                        "The desired shape is not a multiple of the original shape");
+            }
+            repeats[i] =
+                    (int) Math.round(Math.ceil((double) desiredShape.get(i) / curShape.get(i)));
+        }
+        return repeats;
+    }
+
+    private int withAxis(int axis) {
+        return Math.floorMod(axis, getShape().dimension());
     }
 
     /** {@inheritDoc} */

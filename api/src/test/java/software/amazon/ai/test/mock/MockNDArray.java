@@ -532,12 +532,42 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray repmat(int... shape) {
+    public NDArray tile(int repeats) {
         return null;
     }
 
     @Override
-    public NDArray repeat(int dimension, long... repeats) {
+    public NDArray tile(int axis, int repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray tile(int[] repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray tile(Shape desiredShape) {
+        return null;
+    }
+
+    @Override
+    public NDArray repeat(int repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray repeat(int axis, int repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray repeat(int[] repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray repeat(Shape desiredShape) {
         return null;
     }
 

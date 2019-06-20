@@ -368,7 +368,7 @@ public interface NDArray extends AutoCloseable {
      * @param numOutputs The number of NDArrays to split into. This must equally divide the length
      *     of the axis.
      * @return Returns an NDList with numOutputs NDArrays with shape <code>(this.shape.axis /= axis)
-     *     </code>
+     * </code>
      * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
      *     axis
      */
@@ -484,7 +484,7 @@ public interface NDArray extends AutoCloseable {
     NDArray eq(NDArray other);
 
     /**
-     * Returns the boolean true iff all elements in both the NDArrays are equal.
+     * Returns the boolean true iff all elements in the NDArray is equal to the Number
      *
      * @param other the ndarray to compare.
      * @return the binary ndarray for "Equals" comparison.
@@ -984,21 +984,78 @@ public interface NDArray extends AutoCloseable {
     NDArray cond(Condition condition);
 
     /**
-     * Replicate and tile array to fill out to the given shape
+     * Repeat the array in tiles a given number of times.
      *
-     * @param shape the new shape of this NDArray
-     * @return the shape to fill out to
+     * @param repeats the number of times to repeat for each dimension
+     * @return Returns a NDArray that has been tiled
      */
-    NDArray repmat(int... shape);
+    NDArray tile(int repeats);
 
     /**
-     * Repeat elements along a specified dimension.
+     * Repeat the array in tiles a given number of times along the given axis.
      *
-     * @param dimension the dimension to repeat
-     * @param repeats the number of elements to repeat on each element
-     * @return NDArray NDArray
+     * @param axis the axis to repeat
+     * @param repeats the number of times to repeat for each dimension
+     * @return Returns a NDArray that has been tiled
+     * @throws IllegalArgumentException Thrown for invalid axis
      */
-    NDArray repeat(int dimension, long... repeats);
+    NDArray tile(int axis, int repeats);
+
+    /**
+     * Repeat the array in tiles a given number of times.
+     *
+     * @param repeats the number of times to repeat along each axis
+     * @return Returns a NDArray that has been tiled
+     */
+    NDArray tile(int[] repeats);
+
+    /**
+     * Repeat the array in tiles a given number of times to match the desired shape.
+     *
+     * <p>If the desired shape has fewer dimensions that the array, it will tile against the final
+     * dimensions.
+     *
+     * @param desiredShape the shape that should be converted to
+     * @return Returns a NDArray that has been tiled
+     */
+    NDArray tile(Shape desiredShape);
+
+    /**
+     * Repeat each array element a given number of times.
+     *
+     * @param repeats the number of times to repeat for each dimension
+     * @return Returns a NDArray that has been tiled
+     */
+    NDArray repeat(int repeats);
+
+    /**
+     * Repeat each array element a given number of times along the given axis.
+     *
+     * @param axis the axis to repeat
+     * @param repeats the number of times to repeat for each dimension
+     * @return Returns a NDArray that has been tiled
+     * @throws IllegalArgumentException Thrown for invalid axis
+     */
+    NDArray repeat(int axis, int repeats);
+
+    /**
+     * Repeat each array element a given number of times for each axis.
+     *
+     * @param repeats the number of times to repeat along each axis
+     * @return Returns a NDArray that has been tiled
+     */
+    NDArray repeat(int[] repeats);
+
+    /**
+     * Repeat each array element to match the desired shape.
+     *
+     * <p>If the desired shape has fewer dimensions that the array, it will tile against the final
+     * dimensions.
+     *
+     * @param desiredShape the shape that should be converted to
+     * @return Returns a NDArray that has been tiled
+     */
+    NDArray repeat(Shape desiredShape);
 
     /**
      * Returns the element at the specified index
@@ -1880,28 +1937,31 @@ public interface NDArray extends AutoCloseable {
     Matrix asMatrix();
 
     /**
-     * This method checks if all elements within this array are non-zero (or true, in case of
-     * boolean)
+     * Returns true if all elements within this array are non-zero or true.
      *
-     * @return true if all elements within this array are non-zero
+     * @return Returns true if all elements within this array are non-zero or true
      */
-    boolean all();
+    default boolean all() {
+        return nonzero() == size();
+    }
 
     /**
-     * This method checks if any of the elements within this array are non-zero (or true, in case of
-     * boolean)
+     * Returns true if any of the elements within this array are non-zero or true.
      *
-     * @return true if any of the elements within this array are non-zero
+     * @return Returns true if any of the elements within this array are non-zero or true
      */
-    boolean any();
+    default boolean any() {
+        return nonzero() > 0;
+    }
 
     /**
-     * This method checks if any of the elements within this array are non-zero (or true, in case of
-     * boolean)
+     * Returns true if none of the elements within this array are non-zero or true.
      *
-     * @return NDArray
+     * @return Returns true if none of the elements within this array are non-zero or true
      */
-    boolean none();
+    default boolean none() {
+        return nonzero() == 0;
+    }
 
     /**
      * This method returns empty array with the same dtype/order/shape as this one

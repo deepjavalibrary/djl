@@ -137,4 +137,74 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
             throw new FailedTestException("Incorrect value in summed array");
         }
     }
+
+    @RunAsTest
+    public void testTile() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(2, 2));
+
+        NDArray tileAll = original.tile(2);
+        NDArray tileAllExpected =
+                mxNDFactory.create(
+                        new float[] {1, 2, 1, 2, 3, 4, 3, 4, 1, 2, 1, 2, 3, 4, 3, 4},
+                        null,
+                        new Shape(4, 4));
+        if (!tileAll.contentEquals(tileAllExpected)) {
+            throw new FailedTestException("Incorrect tile all");
+        }
+
+        NDArray tileAxis = original.tile(0, 3);
+        NDArray tileAxisExpected =
+                mxNDFactory.create(
+                        new float[] {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, null, new Shape(6, 2));
+        if (!tileAxis.contentEquals(tileAxisExpected)) {
+            throw new FailedTestException("Incorrect tile on axis");
+        }
+
+        NDArray tileArray = original.tile(new int[] {3, 1});
+        if (!tileArray.contentEquals(tileAxisExpected)) {
+            throw new FailedTestException("Incorrect tile array");
+        }
+
+        NDArray tileShape = original.tile(new Shape(4));
+        NDArray tileShapeExpected =
+                mxNDFactory.create(new float[] {1, 2, 1, 2, 3, 4, 3, 4}, null, new Shape(2, 4));
+        if (!tileShape.contentEquals(tileShapeExpected)) {
+            throw new FailedTestException("Incorrect tile shape");
+        }
+    }
+
+    @RunAsTest
+    public void testRepeat() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(2, 2));
+
+        NDArray repeatAll = original.repeat(2);
+        NDArray repeatAllExpected =
+                mxNDFactory.create(
+                        new float[] {1, 1, 2, 2, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 4, 4},
+                        null,
+                        new Shape(4, 4));
+        if (!repeatAll.contentEquals(repeatAllExpected)) {
+            throw new FailedTestException("Incorrect repeat all");
+        }
+
+        NDArray repeatAxis = original.repeat(0, 3);
+        NDArray repeatAxisExpected =
+                mxNDFactory.create(
+                        new float[] {1, 2, 1, 2, 1, 2, 3, 4, 3, 4, 3, 4}, null, new Shape(6, 2));
+        if (!repeatAxis.contentEquals(repeatAxisExpected)) {
+            throw new FailedTestException("Incorrect repeat on axis");
+        }
+
+        NDArray repeatArray = original.repeat(new int[] {3, 1});
+        if (!repeatArray.contentEquals(repeatAxisExpected)) {
+            throw new FailedTestException("Incorrect repeat array");
+        }
+
+        NDArray repeatShape = original.repeat(new Shape(4));
+        NDArray repeatShapeExpected =
+                mxNDFactory.create(new float[] {1, 1, 2, 2, 3, 3, 4, 4}, null, new Shape(2, 4));
+        if (!repeatShape.contentEquals(repeatShapeExpected)) {
+            throw new FailedTestException("Incorrect repeat shape");
+        }
+    }
 }

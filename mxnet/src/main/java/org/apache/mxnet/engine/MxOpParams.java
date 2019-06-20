@@ -57,4 +57,8 @@ public class MxOpParams extends PairList<String, String> {
     public void addParam(String paramName, boolean value) {
         add(paramName, value ? "True" : "False");
     }
+
+    public void addTupleParam(String paramName, int... tuple) {
+        add(paramName, new Shape(tuple).toString());
+    }
 }

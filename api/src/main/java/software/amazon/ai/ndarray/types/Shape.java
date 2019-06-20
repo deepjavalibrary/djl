@@ -13,6 +13,7 @@
 package software.amazon.ai.ndarray.types;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /** A class presents {@link software.amazon.ai.ndarray.NDArray}'s shape information. */
 public class Shape {
@@ -40,6 +41,16 @@ public class Shape {
 
     public long[] getShapeLong() {
         return Arrays.stream(getShape()).mapToLong((i) -> (long) i).toArray();
+    }
+
+    /**
+     * Returns the shape in the given dimension.
+     *
+     * @param dimension the dimension to get the shape in
+     * @return Returns the shape in the given dimension
+     */
+    public int get(int dimension) {
+        return shape[dimension];
     }
 
     /**
@@ -91,6 +102,11 @@ public class Shape {
         int[] out = new int[size];
         System.arraycopy(shape, from, out, 0, size);
         return new Shape(out);
+    }
+
+    public Shape addAll(Shape other) {
+        return new Shape(
+                IntStream.concat(Arrays.stream(shape), Arrays.stream(other.shape)).toArray());
     }
 
     public int head() {
