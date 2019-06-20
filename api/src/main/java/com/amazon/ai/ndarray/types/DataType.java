@@ -17,9 +17,9 @@ public enum DataType {
     FLOAT32("float32", 4),
     FLOAT64("float64", 8),
     FLOAT16("float16", 2),
-    UINT8("uint8", 2),
+    UINT8("uint8", 1),
     INT32("int32", 4),
-    INT8("int8", 2),
+    INT8("int8", 1),
     INT64("int64", 8),
     UNKNOWN("unknown", 0);
 

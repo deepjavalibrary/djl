@@ -31,8 +31,10 @@ import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -860,12 +862,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public double[] toDoubleArray() {
-        return new double[0];
-    }
-
     public FunctionInfo genericNDArrayFunctionInvoke(String opName, Map<String, Object> args) {
         FunctionInfo func = OPS.get(opName);
         if (func == null) {
@@ -878,22 +874,60 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public float[] toFloatArray() {
+        if (getDataType() != DataType.FLOAT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required float" + " Actual " + getDataType());
+        }
         FloatBuffer fb = toByteBuffer().asFloatBuffer();
         float[] ret = new float[fb.remaining()];
         fb.get(ret);
         return ret;
     }
 
+    public byte[] toByteArray() {
+        ByteBuffer bb = toByteBuffer();
+        byte[] buf = new byte[bb.remaining()];
+        bb.get(buf);
+        return buf;
+    }
+
     /** {@inheritDoc} */
     @Override
     public int[] toIntArray() {
-        return new int[0];
+        if (getDataType() != DataType.INT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required int" + " Actual " + getDataType());
+        }
+        IntBuffer ib = toByteBuffer().asIntBuffer();
+        int[] ret = new int[ib.remaining()];
+        ib.get(ret);
+        return ret;
     }
 
     /** {@inheritDoc} */
     @Override
     public long[] toLongArray() {
-        return new long[0];
+        if (getDataType() != DataType.INT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required long" + " Actual " + getDataType());
+        }
+        LongBuffer lb = toByteBuffer().asLongBuffer();
+        long[] ret = new long[lb.remaining()];
+        lb.get(ret);
+        return ret;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double[] toDoubleArray() {
+        if (getDataType() != DataType.FLOAT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required double" + " Actual " + getDataType());
+        }
+        DoubleBuffer db = toByteBuffer().asDoubleBuffer();
+        double[] ret = new double[db.remaining()];
+        db.get(ret);
+        return ret;
     }
 
     /** {@inheritDoc} */
@@ -1529,13 +1563,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         return null;
     }
 
-    public byte[] toByteArray() {
-        ByteBuffer bb = toByteBuffer();
-        byte[] buf = new byte[bb.remaining()];
-        bb.get(buf);
-        return buf;
-    }
-
     private ByteBuffer toByteBuffer() {
         Shape sh = getShape();
         DataType dType = getDataType();
@@ -1553,24 +1580,12 @@ public class MxNDArray extends NativeResource implements NDArray {
         sb.append('[');
         int len = getShape().head();
         if (getShape().dimension() == 1) {
-            float[] arr = toFloatArray();
-            int limit = Math.min(arr.length, MAX_PRINT_ITEMS);
-            for (int i = 0; i < limit; ++i) {
-                if (i > 0) {
-                    sb.append(", ");
-                }
-                switch (getDataType()) {
-                    case FLOAT32:
-                    case FLOAT16:
-                    case FLOAT64:
-                        sb.append(String.format("%.8e", arr[i]));
-                        break;
-                    default:
-                        sb.append((long) arr[i]);
-                        break;
-                }
-            }
-            int remaining = arr.length - limit;
+            int limit = Math.min(getShape().head(), MAX_PRINT_ITEMS);
+            ByteBuffer buf = toByteBuffer().slice();
+            buf.limit(limit * getDataType().getNumOfBytes());
+            buf.order(ByteOrder.LITTLE_ENDIAN);
+            sb.append(Utils.toCharSequence(buf, getDataType()));
+            int remaining = getShape().head() - limit;
             if (remaining > 0) {
                 sb.append(", ... ").append(remaining).append(" more");
             }

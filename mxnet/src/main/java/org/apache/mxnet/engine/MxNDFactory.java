@@ -132,8 +132,7 @@ public class MxNDFactory implements NDFactory {
     }
 
     public MxNDArray create(Pointer handle) {
-        MxNDArray array =
-                new MxNDArray(this, null, SparseFormat.DEFAULT, null, DataType.FLOAT32, handle);
+        MxNDArray array = new MxNDArray(this, null, null, null, null, handle);
         resources.put(array, array);
         return array;
     }

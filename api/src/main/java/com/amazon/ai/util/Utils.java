@@ -12,8 +12,10 @@
  */
 package com.amazon.ai.util;
 
+import com.amazon.ai.ndarray.types.DataType;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -86,5 +88,34 @@ public final class Utils {
             }
         }
         return list;
+    }
+
+    public static CharSequence toCharSequence(ByteBuffer buf, DataType dataType) {
+        StringBuilder sb = new StringBuilder();
+        while (buf.hasRemaining()) {
+            switch (dataType) {
+                case FLOAT32:
+                    sb.append(String.format("%.8e", buf.getFloat()));
+                    break;
+                case FLOAT64:
+                    sb.append(String.format("%.8e", buf.getDouble()));
+                    break;
+                case INT8:
+                    sb.append(buf.get());
+                    break;
+                case INT32:
+                    sb.append(buf.getInt());
+                    break;
+                case INT64:
+                    sb.append(buf.getLong());
+                    break;
+                default:
+                    throw new IllegalStateException("Unsupported DataType: " + dataType);
+            }
+            if (buf.hasRemaining()) {
+                sb.append(", ");
+            }
+        }
+        return sb;
     }
 }
