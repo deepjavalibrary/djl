@@ -50,10 +50,10 @@ public class InferenceTest {
         MockImageTranslator translator = new MockImageTranslator("cat");
 
         Metrics metrics = new Metrics();
-        try (ObjectDetector<BufferedImage, List<DetectedObject>> ssd =
-                new ObjectDetector<>(model, translator)) {
+        try (Predictor<BufferedImage, List<DetectedObject>> ssd =
+                Predictor.newInstance(model, translator)) {
             ssd.setMetrics(metrics);
-            List<DetectedObject> result = ssd.detect(image);
+            List<DetectedObject> result = ssd.predict(image);
             DetectedObject detectedObject = result.get(0);
             Assert.assertEquals(detectedObject.getClassName(), "cat");
 
@@ -89,9 +89,10 @@ public class InferenceTest {
                 };
         Metrics metrics = new Metrics();
 
-        try (Classifier<String, Classification> classifier = new Classifier<>(model, translator)) {
+        try (Predictor<String, Classification> classifier =
+                Predictor.newInstance(model, translator)) {
             classifier.setMetrics(metrics);
-            Classification result = classifier.classify(data);
+            Classification result = classifier.predict(data);
             Assert.assertEquals(result.getClassName(), "cat");
             Assert.assertEquals(Double.compare(result.getProbability(), 0.9d), 0);
         }

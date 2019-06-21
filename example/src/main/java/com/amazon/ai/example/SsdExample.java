@@ -27,7 +27,7 @@ import com.amazon.ai.image.Images;
 import com.amazon.ai.image.Rectangle;
 import com.amazon.ai.inference.DetectedObject;
 import com.amazon.ai.inference.ImageTranslator;
-import com.amazon.ai.inference.ObjectDetector;
+import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDList;
@@ -68,12 +68,12 @@ public final class SsdExample extends AbstractExample {
         // Change to a specific context if needed.
         Context context = Context.defaultContext();
 
-        try (ObjectDetector<BufferedImage, List<DetectedObject>> ssd =
-                new ObjectDetector<>(model, translator, context)) {
+        try (Predictor<BufferedImage, List<DetectedObject>> ssd =
+                Predictor.newInstance(model, translator, context)) {
             ssd.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
-                predictResult = ssd.detect(img);
+                predictResult = ssd.predict(img);
                 printProgress(iteration, i);
                 collectMemoryInfo(metrics);
             }
