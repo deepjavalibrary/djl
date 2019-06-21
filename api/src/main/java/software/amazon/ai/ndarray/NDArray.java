@@ -1527,21 +1527,6 @@ public interface NDArray extends AutoCloseable {
     NDArray dup();
 
     /**
-     * Returns a flattened version of this NDArray
-     *
-     * @return a flattened version of this NDArray
-     */
-    NDArray ravel();
-
-    /**
-     * Returns a flattened version of this NDArray
-     *
-     * @param order the order of the new array
-     * @return a flattened version of this NDArray
-     */
-    NDArray ravel(char order);
-
-    /**
      * Returns the specified slice of this NDArray
      *
      * @param i the index of the slice to return
@@ -1559,27 +1544,26 @@ public interface NDArray extends AutoCloseable {
     NDArray slice(long i);
 
     /**
-     * Reshapes the NDArray (can't change the length of the NDArray). Typically this will be a view,
-     * unless reshaping without copying is impossible.
+     * Flattens the array into a 1D NDArray in row-major order.
      *
-     * @param order the order of the new array
-     * @param newShape the new shape of the NDArray
-     * @return the reshaped NDArray
+     * <p>To flatten in column-major order, first transpose the NDArray
+     *
+     * @return Returns 1 1D NDArray of equal size
      */
-    NDArray reshape(char order, long... newShape);
-
-    NDArray reshape(char order, int... newShape);
+    NDArray flatten();
 
     /**
-     * Reshapes the NDArray (can't change the length of the NDArray). Typically this will be a view,
-     * unless reshaping without copying is impossible.
+     * Reshapes the NDArray to the given shape.
      *
-     * @param newShape the new shape of the NDArray
-     * @return the reshaped NDArray
+     * <p>You can reshape it to match another NDArray by calling <code>a.reshape(b.getShape())
+     * </code>
+     *
+     * @param shape the shape to reshape into. Must have equal size to the current shape.
+     * @return Returns a reshaped NDArray
+     * @throws IllegalArgumentException Thrown if the given shape does not match the size of the
+     *     current shape
      */
-    NDArray reshape(long... newShape);
-
-    NDArray reshape(int[] shape);
+    NDArray reshape(Shape shape);
 
     /**
      * Mainly here for people coming from numpy. This is equivalent to a call to permute

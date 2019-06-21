@@ -827,16 +827,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray ravel() {
-        return null;
-    }
-
-    @Override
-    public NDArray ravel(char order) {
-        return null;
-    }
-
-    @Override
     public NDArray slice(long i, int dimension) {
         return null;
     }
@@ -847,22 +837,12 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray reshape(char order, long... newShape) {
+    public NDArray flatten() {
         return null;
     }
 
     @Override
-    public NDArray reshape(char order, int... newShape) {
-        return null;
-    }
-
-    @Override
-    public NDArray reshape(long... newShape) {
-        return null;
-    }
-
-    @Override
-    public NDArray reshape(int[] shape) {
+    public NDArray reshape(Shape shape) {
         return null;
     }
 

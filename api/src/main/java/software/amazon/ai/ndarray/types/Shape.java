@@ -25,8 +25,13 @@ public class Shape {
      * shape)}.
      *
      * @param shape dimensions of the shape
+     * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
+     *     less than -1
      */
     public Shape(int... shape) {
+        if (Arrays.stream(shape).anyMatch(s -> s < -1)) {
+            throw new IllegalArgumentException("The shape must be >= -1");
+        }
         this.shape = shape;
     }
 
@@ -57,7 +62,7 @@ public class Shape {
      * Returns size of a specific dimension or several specific dimensions.
      *
      * @param dimensions The dimension or dimensions to find the size of
-     * @return size of specific dimension(s)
+     * @return size of specific dimension(s) or -1 for indeterminate size
      * @throws IllegalArgumentException thrown if passed an invalid dimension
      */
     public int size(int... dimensions) {
@@ -65,6 +70,9 @@ public class Shape {
         for (int d : dimensions) {
             if (d < 0 || d >= shape.length) {
                 throw new IllegalArgumentException("Invalid dimension " + d);
+            }
+            if (shape[d] == -1) {
+                return -1;
             }
             total *= shape[d];
         }
@@ -74,11 +82,14 @@ public class Shape {
     /**
      * Returns the total size .
      *
-     * @return total size
+     * @return total size or -1 for indeterminate size
      */
     public int size() {
         int total = 1;
         for (int v : shape) {
+            if (v == -1) {
+                return -1;
+            }
             total *= v;
         }
         return total;

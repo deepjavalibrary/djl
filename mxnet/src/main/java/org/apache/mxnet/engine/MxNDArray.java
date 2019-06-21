@@ -1356,18 +1356,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ravel() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ravel(char order) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray slice(long i, int dimension) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -1380,27 +1368,19 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshape(char order, long... newShape) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public NDArray flatten() {
+        return reshape(new Shape(Math.toIntExact(size())));
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshape(char order, int... newShape) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray reshape(long... newShape) {
-        Pointer pointer = JnaUtils.reshape(getHandle(), newShape, false);
+    public NDArray reshape(Shape shape) {
+        if (shape.size() != -1 && getShape().size() != shape.size()) {
+            throw new IllegalArgumentException("The given shape does not match the current shape");
+        }
+        long[] dims = Arrays.stream(shape.getShape()).asLongStream().toArray();
+        Pointer pointer = JnaUtils.reshape(getHandle(), dims, false);
         return factory.create(pointer);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray reshape(int[] shape) {
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */

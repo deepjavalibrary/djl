@@ -35,6 +35,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.Utils;
 
@@ -142,18 +143,18 @@ public final class BertQaInferenceExample extends AbstractExample {
 
             int seqLength = input.getSeqLength();
             NDFactory factory = ctx.getNDFactory();
-            NDArray data0 = factory.create(new DataDesc(new Shape(1, seqLength)));
+            NDArray data0 = factory.create(new DataDesc(new Shape(1, seqLength), DataType.INT32));
             NDArray data1 = factory.create(new DataDesc(new Shape(1, seqLength)));
-            NDArray data2 = factory.create(new DataDesc(new Shape(1)));
+            NDArray data2 = factory.create(new DataDesc(new Shape(1), DataType.INT32));
 
             data0.set(indexesFloat);
             data1.set(types);
             data2.set(new float[] {validLength});
 
             NDList list = new NDList(3);
-            list.add("data0", data0);
+            list.add("data0", data0.asType(DataType.FLOAT32, false));
             list.add("data1", data1);
-            list.add("data2", data2);
+            list.add("data2", data2.asType(DataType.FLOAT32, false));
 
             return list;
         }
@@ -163,8 +164,8 @@ public final class BertQaInferenceExample extends AbstractExample {
             NDArray array = list.get(0);
             NDList output = array.split(2, 2);
             // Get the formatted logits result
-            NDArray startLogits = output.get(0).reshape(0, -3);
-            NDArray endLogits = output.get(1).reshape(0, -3);
+            NDArray startLogits = output.get(0).reshape(new Shape(1, -1));
+            NDArray endLogits = output.get(1).reshape(new Shape(1, -1));
             // Get Probability distribution
             float[] startProb = startLogits.softmax(-1).toFloatArray();
             float[] endProb = endLogits.softmax(-1).toFloatArray();

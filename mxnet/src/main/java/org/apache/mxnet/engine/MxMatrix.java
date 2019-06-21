@@ -1233,18 +1233,6 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ravel() {
-        return array.ravel();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ravel(char order) {
-        return array.ravel(order);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray slice(long i, int dimension) {
         return array.slice(i, dimension);
     }
@@ -1257,25 +1245,13 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshape(char order, long... newShape) {
-        return array.reshape(order, newShape);
+    public NDArray flatten() {
+        return array.flatten();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshape(char order, int... newShape) {
-        return array.reshape(order, newShape);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray reshape(long... newShape) {
-        return array.reshape(newShape);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray reshape(int[] shape) {
+    public NDArray reshape(Shape shape) {
         return array.reshape(shape);
     }
 

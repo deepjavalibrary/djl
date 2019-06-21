@@ -1118,18 +1118,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ravel() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ravel(char order) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray slice(long i, int dimension) {
         return null;
     }
@@ -1142,25 +1130,13 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshape(char order, long... newShape) {
+    public NDArray flatten() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshape(char order, int... newShape) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray reshape(long... newShape) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray reshape(int[] shape) {
+    public NDArray reshape(Shape shape) {
         return null;
     }
 

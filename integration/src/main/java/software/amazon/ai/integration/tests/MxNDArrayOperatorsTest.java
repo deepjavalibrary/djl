@@ -585,4 +585,26 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
 
         Assertions.assertEquals(original.clip(2.0, 3.0), actual);
     }
+
+    @RunAsTest
+    public void testReshape() throws FailedTestException {
+        NDArray original =
+                mxNDFactory.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, null, new Shape(3, 2));
+        NDArray reshaped = original.reshape(new Shape(2, 3));
+        NDArray expected =
+                mxNDFactory.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, null, new Shape(2, 3));
+        if (!reshaped.contentEquals(expected)) {
+            throw new FailedTestException("Incorrect reshape");
+        }
+    }
+
+    @RunAsTest
+    public void testFlatten() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(2, 2));
+        NDArray flattened = original.flatten();
+        NDArray expected = mxNDFactory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(4));
+        if (!flattened.contentEquals(expected)) {
+            throw new FailedTestException("Incorrect flatten");
+        }
+    }
 }
