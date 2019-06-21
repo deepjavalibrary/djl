@@ -587,21 +587,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public double squaredDistance(NDArray other) {
-        return 0;
-    }
-
-    @Override
-    public double distance2(NDArray other) {
-        return 0;
-    }
-
-    @Override
-    public double distance1(NDArray other) {
-        return 0;
-    }
-
-    @Override
     public NDArray put(List<List<Integer>> indices, NDArray element) {
         return null;
     }
@@ -727,107 +712,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray normmax(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number normmaxNumber() {
-        return null;
-    }
-
-    @Override
-    public NDArray norm2(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number norm2Number() {
-        return null;
-    }
-
-    @Override
-    public NDArray norm1(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number norm1Number() {
-        return null;
-    }
-
-    @Override
-    public NDArray std(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number stdNumber() {
-        return null;
-    }
-
-    @Override
-    public NDArray std(boolean biasCorrected, int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number stdNumber(boolean biasCorrected) {
-        return null;
-    }
-
-    @Override
-    public NDArray mean(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray mean(NDArray result, int... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray amean(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number meanNumber() {
-        return null;
-    }
-
-    @Override
-    public Number ameanNumber() {
-        return null;
-    }
-
-    @Override
-    public NDArray var(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray var(boolean biasCorrected, int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number varNumber() {
-        return null;
-    }
-
-    @Override
-    public NDArray max(int... dimension) {
-        return null;
-    }
-
-    @Override
     public NDArray amax(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number maxNumber() {
         return null;
     }
 
@@ -837,17 +722,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray min(int... dimension) {
-        return null;
-    }
-
-    @Override
     public NDArray amin(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number minNumber() {
         return null;
     }
 
@@ -857,52 +732,52 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray sum(int... dimension) {
+    public Number max() {
         return null;
     }
 
     @Override
-    public NDArray sum(boolean keepDims, int... dimension) {
+    public NDArray max(int[] axes, boolean keepDims) {
         return null;
     }
 
     @Override
-    public NDArray sum(NDArray result, int... dimension) {
+    public Number min() {
         return null;
     }
 
     @Override
-    public Number sumNumber() {
+    public NDArray min(int[] axes, boolean keepDims) {
         return null;
     }
 
     @Override
-    public Number entropyNumber() {
+    public Number sum() {
         return null;
     }
 
     @Override
-    public Number shannonEntropyNumber() {
+    public NDArray sum(int[] axes, boolean keepDims) {
         return null;
     }
 
     @Override
-    public Number logEntropyNumber() {
+    public Number prod() {
         return null;
     }
 
     @Override
-    public NDArray entropy(int... dimension) {
+    public NDArray prod(int[] axes, boolean keepDims) {
         return null;
     }
 
     @Override
-    public NDArray shannonEntropy(int... dimension) {
+    public Number mean() {
         return null;
     }
 
     @Override
-    public NDArray logEntropy(int... dimension) {
+    public NDArray mean(int[] axes, boolean keepDims) {
         return null;
     }
 

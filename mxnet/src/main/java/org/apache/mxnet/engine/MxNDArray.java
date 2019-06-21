@@ -1017,24 +1017,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public double squaredDistance(NDArray other) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double distance2(NDArray other) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double distance1(NDArray other) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray put(List<List<Integer>> indices, NDArray element) {
         return null;
     }
@@ -1214,127 +1196,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray normmax(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number normmaxNumber() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray norm2(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number norm2Number() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray norm1(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number norm1Number() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray std(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number stdNumber() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray std(boolean biasCorrected, int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number stdNumber(boolean biasCorrected) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mean(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mean(NDArray result, int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray amean(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number meanNumber() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number ameanNumber() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray var(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray var(boolean biasCorrected, int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number varNumber() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray max(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray amax(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number maxNumber() {
         return null;
     }
 
@@ -1346,19 +1208,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray min(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray amin(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number minNumber() {
         return null;
     }
 
@@ -1370,62 +1220,82 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sum(int... dimension) {
-        return null;
+    public Number max() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("max", this, params).toArray()[0];
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sum(boolean keepDims, int... dimension) {
-        return null;
+    public NDArray max(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("max", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sum(NDArray result, int... dimension) {
-        return null;
+    public Number min() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("min", this, params).toArray()[0];
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number sumNumber() {
-        return null;
+    public NDArray min(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("min", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number entropyNumber() {
-        return null;
+    public Number sum() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("sum", this, params).toArray()[0];
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number shannonEntropyNumber() {
-        return null;
+    public NDArray sum(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("sum", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number logEntropyNumber() {
-        return null;
+    public Number prod() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("prod", this, params).toArray()[0];
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray entropy(int... dimension) {
-        return null;
+    public NDArray prod(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("prod", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray shannonEntropy(int... dimension) {
-        return null;
+    public Number mean() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("mean", this, params).toArray()[0];
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logEntropy(int... dimension) {
-        return null;
+    public NDArray mean(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("mean", this, params);
     }
 
     /** {@inheritDoc} */

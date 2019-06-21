@@ -15,8 +15,10 @@ package software.amazon.ai.ndarray;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
+import java.util.stream.IntStream;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -1082,30 +1084,6 @@ public interface NDArray extends AutoCloseable {
     NDArray getScalar(long i);
 
     /**
-     * Returns the square of the Euclidean distance.
-     *
-     * @param other the other array to measure squared distance
-     * @return squared distance
-     */
-    double squaredDistance(NDArray other);
-
-    /**
-     * Returns the (euclidean) distance.
-     *
-     * @param other the other array to measure distance
-     * @return distance
-     */
-    double distance2(NDArray other);
-
-    /**
-     * Returns the (1-norm) distance.
-     *
-     * @param other the other array to measure distance
-     * @return distance
-     */
-    double distance1(NDArray other);
-
-    /**
      * Put element in to the indices denoted by the indices NDArray. This is equivalent to:
      * a[indices] = element
      *
@@ -1183,6 +1161,24 @@ public interface NDArray extends AutoCloseable {
     int[] toIntArray();
 
     long[] toLongArray();
+
+    default Number[] toArray() {
+        switch (getDataType()) {
+            case FLOAT32:
+                float[] floatArray = toFloatArray();
+                return IntStream.range(0, floatArray.length)
+                        .mapToObj(i -> floatArray[i])
+                        .toArray(Number[]::new);
+            case FLOAT64:
+                return Arrays.stream(toDoubleArray()).boxed().toArray(Double[]::new);
+            case INT32:
+                return Arrays.stream(toIntArray()).boxed().toArray(Integer[]::new);
+            case INT64:
+                return Arrays.stream(toLongArray()).boxed().toArray(Long[]::new);
+            default:
+                throw new IllegalStateException("Unsupported DataType: " + getDataType());
+        }
+    }
 
     /**
      * Perform an copy matrix multiplication
@@ -1313,161 +1309,6 @@ public interface NDArray extends AutoCloseable {
     NDArray subi(NDArray other, NDArray result);
 
     /**
-     * Returns the max norm (aka infinity norm, equal to the maximum absolute value) along the
-     * specified dimension(s)
-     *
-     * @param dimension the dimension to the max norm along
-     * @return Max norm along the specified dimension
-     */
-    NDArray normmax(int... dimension);
-
-    /**
-     * Return the max norm (aka infinity norm, equal to the maximum absolute value) for the entire
-     * array
-     *
-     * @return Max norm for the entire array
-     */
-    Number normmaxNumber();
-
-    /**
-     * Returns the norm2 (L2 norm, sqrt(sum(x_i^2), also known as Euclidean norm) along the
-     * specified dimension(s)
-     *
-     * @param dimension the dimension to getScalar the norm2 along
-     * @return the norm2 along the specified dimension
-     */
-    NDArray norm2(int... dimension);
-
-    /**
-     * Return the norm2 (L2 norm, sqrt(sum(x_i^2), also known as Euclidean norm) for the entire
-     * array
-     *
-     * @return L2 norm for the array
-     */
-    Number norm2Number();
-
-    /**
-     * Returns the norm1 (L1 norm, i.e., sum of absolute values; also known as Taxicab or Manhattan
-     * norm) along the specified dimension
-     *
-     * @param dimension the dimension to getScalar the norm1 along
-     * @return the norm1 along the specified dimension
-     */
-    NDArray norm1(int... dimension);
-
-    /**
-     * Calculate and return norm1 (L1 norm, i.e., sum of absolute values; also known as Taxicab or
-     * Manhattan norm) for the entire array
-     *
-     * @return Norm 1 for the array
-     */
-    Number norm1Number();
-
-    /**
-     * Standard deviation of an NDArray along one or more dimensions
-     *
-     * @param dimension the dimension to getScalar the std along
-     * @return the standard deviation along a particular dimension
-     */
-    NDArray std(int... dimension);
-
-    /**
-     * Calculate the standard deviation for the entire array
-     *
-     * @return NDArray NDArray
-     */
-    Number stdNumber();
-
-    /**
-     * Standard deviation of an NDArray along a dimension
-     *
-     * @param biasCorrected If true: bias corrected standard deviation. False: not bias corrected
-     * @param dimension the dimension to getScalar the std along
-     * @return the standard deviation along a particular dimension
-     */
-    NDArray std(boolean biasCorrected, int... dimension);
-
-    /**
-     * Calculate the standard deviation for the entire array, specifying whether it is bias
-     * corrected or not
-     *
-     * @param biasCorrected If true: bias corrected standard deviation. False: not bias corrected
-     * @return Standard dev
-     */
-    Number stdNumber(boolean biasCorrected);
-
-    /**
-     * Returns the overall mean of this NDArray
-     *
-     * @param dimension the dimension to getScalar the mean along
-     * @return the mean along the specified dimension of this NDArray
-     */
-    NDArray mean(int... dimension);
-
-    /**
-     * Returns the overall mean of this NDArray
-     *
-     * @param result the result array
-     * @param dimension the dimension to getScalar the mean along
-     * @return the mean along the specified dimension of this NDArray
-     */
-    NDArray mean(NDArray result, int... dimension);
-
-    /**
-     * Returns the absolute overall mean of this NDArray
-     *
-     * @param dimension the dimension to getScalar the mean along
-     * @return the mean along the specified dimension of this NDArray
-     */
-    NDArray amean(int... dimension);
-
-    /**
-     * Returns the overall mean of this NDArray
-     *
-     * @return the mean along the specified dimension of this NDArray
-     */
-    Number meanNumber();
-
-    /**
-     * Returns the absolute overall mean of this NDArray
-     *
-     * @return the mean along the specified dimension of this NDArray
-     */
-    Number ameanNumber();
-
-    /**
-     * Returns the overall variance of this NDArray
-     *
-     * @param dimension the dimension to getScalar the mean along
-     * @return the mean along the specified dimension of this NDArray
-     */
-    NDArray var(int... dimension);
-
-    /**
-     * Returns the overall variance of this NDArray
-     *
-     * @param biasCorrected boolean on whether to apply corrected bias
-     * @param dimension the dimension to getScalar the mean along
-     * @return the mean along the specified dimension of this NDArray
-     */
-    NDArray var(boolean biasCorrected, int... dimension);
-
-    /**
-     * Returns the overall variance of all values in this NDArray
-     *
-     * @return variance
-     */
-    Number varNumber();
-
-    /**
-     * Returns the overall max of this NDArray along given dimensions
-     *
-     * @param dimension the dimension to getScalar the mean along
-     * @return the mean along the specified dimension of this NDArray
-     */
-    NDArray max(int... dimension);
-
-    /**
      * Returns the absolute overall max of this NDArray along given dimensions
      *
      * @param dimension the dimension to getScalar the mean along
@@ -1476,26 +1317,11 @@ public interface NDArray extends AutoCloseable {
     NDArray amax(int... dimension);
 
     /**
-     * Returns maximum value in this NDArray
-     *
-     * @return maximum value
-     */
-    Number maxNumber();
-
-    /**
      * Returns maximum (absolute) value in this NDArray
      *
      * @return Max absolute value
      */
     Number amaxNumber();
-
-    /**
-     * Returns the overall min of this NDArray
-     *
-     * @param dimension the dimension to getScalar the min along
-     * @return the mean along the specified dimension of this NDArray
-     */
-    NDArray min(int... dimension);
 
     /**
      * Returns minimum (absolute) value in this NDArray, along the specified dimensions
@@ -1506,13 +1332,6 @@ public interface NDArray extends AutoCloseable {
     NDArray amin(int... dimension);
 
     /**
-     * Returns min value in this NDArray
-     *
-     * @return Minimum value in the array
-     */
-    Number minNumber();
-
-    /**
      * Returns absolute min value in this NDArray
      *
      * @return Absolute min value
@@ -1520,75 +1339,144 @@ public interface NDArray extends AutoCloseable {
     Number aminNumber();
 
     /**
-     * Returns the sum along the last dimension of this NDArray
+     * Finds the max of all elements in the NDArray.
      *
-     * @param dimension the dimension to getScalar the sum along
-     * @return the sum along the specified dimension of this NDArray
+     * @return Returns the max
      */
-    NDArray sum(int... dimension);
-
-    NDArray sum(boolean keepDims, int... dimension);
+    Number max();
 
     /**
-     * Returns the sum along the last dimension of this NDArray
+     * Finds the max over the given axes.
      *
-     * @param result result of this operation will be stored here
-     * @param dimension the dimension to getScalar the sum along
-     * @return the sum along the specified dimension of this NDArray
+     * @param axes the axes to find the max over
+     * @return Returns an NDArray with the specified axes removed from the Shape containing the max
+     * @see NDArray#max(int[], boolean)
      */
-    NDArray sum(NDArray result, int... dimension);
+    default NDArray max(int[] axes) {
+        return max(axes, false);
+    }
 
     /**
-     * Sum the entire array
+     * Finds the max over the given axes.
      *
-     * @return Sum of array
+     * @param axes the axes to find the max over
+     * @param keepDims True to keep the specified axes as size 1 in the output array, false to
+     *     squeeze the values out of the output array
+     * @return Returns an NDArray after the max
      */
-    Number sumNumber();
+    NDArray max(int[] axes, boolean keepDims);
 
     /**
-     * Returns entropy value for this NDArray
+     * Finds the min of all elements in the NDArray.
      *
-     * @return NDArray NDArray
+     * @return Returns the min
      */
-    Number entropyNumber();
+    Number min();
 
     /**
-     * Returns non-normalized Shannon entropy value for this NDArray
+     * Finds the min over the given axes.
      *
-     * @return NDArray NDArray
+     * @param axes the axes to find the min over
+     * @return Returns an NDArray with the specified axes removed from the Shape containing the min
+     * @see NDArray#min(int[], boolean)
      */
-    Number shannonEntropyNumber();
+    default NDArray min(int[] axes) {
+        return min(axes, false);
+    }
 
     /**
-     * Returns log entropy value for this NDArray
+     * Finds the min over the given axes.
      *
-     * @return NDArray NDArray
+     * @param axes the axes to find the min over
+     * @param keepDims True to keep the specified axes as size 1 in the output array, false to
+     *     squeeze the values out of the output array
+     * @return Returns an NDArray after the min
      */
-    Number logEntropyNumber();
+    NDArray min(int[] axes, boolean keepDims);
 
     /**
-     * Returns entropy value for this NDArray along specified dimension(s)
+     * Sums all elements in the NDArray.
      *
-     * @param dimension the dimension to return the entropy for
-     * @return NDArray NDArray
+     * @return Returns the sum
      */
-    NDArray entropy(int... dimension);
+    Number sum();
 
     /**
-     * Returns entropy value for this NDArray along specified dimension(s)
+     * Sums over the given axes.
      *
-     * @param dimension the dimension to return the shannonEntropy for
-     * @return NDArray
+     * @param axes the axes to sum over
+     * @return Returns an NDArray with the specified axes removed from the Shape containing the sum
+     * @see NDArray#sum(int[], boolean)
      */
-    NDArray shannonEntropy(int... dimension);
+    default NDArray sum(int[] axes) {
+        return sum(axes, false);
+    }
 
     /**
-     * Returns entropy value for this NDArray along specified dimension(s)
+     * Sums over the given axes.
      *
-     * @param dimension the dimension to return the logEntropy for
-     * @return NDArray
+     * @param axes the axes to sum over
+     * @param keepDims True to keep the specified axes as size 1 in the output array, false to
+     *     squeeze the values out of the output array
+     * @return Returns an NDArray after the sum
      */
-    NDArray logEntropy(int... dimension);
+    NDArray sum(int[] axes, boolean keepDims);
+
+    /**
+     * Finds the product of all elements in the NDArray.
+     *
+     * @return Returns the product
+     */
+    Number prod();
+
+    /**
+     * Finds the product over the given axes.
+     *
+     * @param axes the axes to prod over
+     * @return Returns an NDArray with the specified axes removed from the Shape containing the prod
+     * @see NDArray#prod(int[], boolean)
+     */
+    default NDArray prod(int[] axes) {
+        return prod(axes, false);
+    }
+
+    /**
+     * Finds the product over the given axes.
+     *
+     * @param axes the axes to prod over
+     * @param keepDims True to keep the specified axes as size 1 in the output array, false to
+     *     squeeze the values out of the output array
+     * @return Returns an NDArray after the prod
+     */
+    NDArray prod(int[] axes, boolean keepDims);
+
+    /**
+     * Finds the mean of all elements in the NDArray.
+     *
+     * @return Returns the mean
+     */
+    Number mean();
+
+    /**
+     * Finds the mean over the given axes.
+     *
+     * @param axes the axes to find the mean over
+     * @return Returns an NDArray with the specified axes removed from the Shape containing the mean
+     * @see NDArray#mean(int[], boolean)
+     */
+    default NDArray mean(int[] axes) {
+        return mean(axes, false);
+    }
+
+    /**
+     * Finds the mean over the given axes.
+     *
+     * @param axes the axes to find the mean over
+     * @param keepDims True to keep the specified axes as size 1 in the output array, false to
+     *     squeeze the values out of the output array
+     * @return Returns an NDArray after the mean
+     */
+    NDArray mean(int[] axes, boolean keepDims);
 
     /**
      * Returns the elements at the specified indices

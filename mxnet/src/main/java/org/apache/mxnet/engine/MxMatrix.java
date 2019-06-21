@@ -927,8 +927,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int repeats, int axis) {
-        return array.repeat(repeats, axis);
+    public NDArray repeat(int axis, int repeats) {
+        return array.repeat(axis, repeats);
     }
 
     /** {@inheritDoc} */
@@ -947,24 +947,6 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray getScalar(long i) {
         return array.getScalar(i);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double squaredDistance(NDArray other) {
-        return array.squaredDistance(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double distance2(NDArray other) {
-        return array.distance2(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double distance1(NDArray other) {
-        return array.distance1(other);
     }
 
     /** {@inheritDoc} */
@@ -1113,128 +1095,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray normmax(int... dimension) {
-        return array.normmax(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number normmaxNumber() {
-        return array.normmaxNumber();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray norm2(int... dimension) {
-        return array.norm2(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number norm2Number() {
-        return array.norm2Number();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray norm1(int... dimension) {
-        return array.norm1(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number norm1Number() {
-        return array.norm1Number();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray std(int... dimension) {
-        return array.std(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number stdNumber() {
-        return array.stdNumber();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray std(boolean biasCorrected, int... dimension) {
-        return array.std(biasCorrected, dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number stdNumber(boolean biasCorrected) {
-        return array.stdNumber(biasCorrected);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mean(int... dimension) {
-        return array.mean(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mean(NDArray result, int... dimension) {
-        return array.mean(result, dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray amean(int... dimension) {
-        return array.amean(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number meanNumber() {
-        return array.meanNumber();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number ameanNumber() {
-        return array.ameanNumber();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray var(int... dimension) {
-        return array.var(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray var(boolean biasCorrected, int... dimension) {
-        return array.var(biasCorrected, dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number varNumber() {
-        return array.varNumber();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray max(int... dimension) {
-        return array.max(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray amax(int... dimension) {
         return array.amax(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number maxNumber() {
-        return array.maxNumber();
     }
 
     /** {@inheritDoc} */
@@ -1245,20 +1107,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray min(int... dimension) {
-        return array.min(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray amin(int... dimension) {
         return array.amin(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number minNumber() {
-        return array.minNumber();
     }
 
     /** {@inheritDoc} */
@@ -1269,62 +1119,62 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sum(int... dimension) {
-        return array.sum(dimension);
+    public Number max() {
+        return array.max();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sum(boolean keepDims, int... dimension) {
-        return array.sum(keepDims, dimension);
+    public NDArray max(int[] axes, boolean keepDims) {
+        return array.max(axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sum(NDArray result, int... dimension) {
-        return array.sum(result, dimension);
+    public Number min() {
+        return array.min();
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number sumNumber() {
-        return array.sumNumber();
+    public NDArray min(int[] axes, boolean keepDims) {
+        return array.min(axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number entropyNumber() {
-        return array.entropyNumber();
+    public Number sum() {
+        return array.sum();
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number shannonEntropyNumber() {
-        return array.shannonEntropyNumber();
+    public NDArray sum(int[] axes, boolean keepDims) {
+        return array.sum(axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number logEntropyNumber() {
-        return array.logEntropyNumber();
+    public Number prod() {
+        return array.prod();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray entropy(int... dimension) {
-        return array.entropy(dimension);
+    public NDArray prod(int[] axes, boolean keepDims) {
+        return array.prod(axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray shannonEntropy(int... dimension) {
-        return array.shannonEntropy(dimension);
+    public Number mean() {
+        return array.mean();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logEntropy(int... dimension) {
-        return array.logEntropy(dimension);
+    public NDArray mean(int[] axes, boolean keepDims) {
+        return array.mean(axes, keepDims);
     }
 
     /** {@inheritDoc} */

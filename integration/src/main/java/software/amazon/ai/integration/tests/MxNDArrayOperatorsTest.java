@@ -207,4 +207,114 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
             throw new FailedTestException("Incorrect repeat shape");
         }
     }
+
+    @RunAsTest
+    public void testMax() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new float[] {2, 4, 6, 8}, null, new Shape(2, 2));
+
+        Float maxAll = (Float) original.max();
+        if (maxAll != 8) {
+            throw new FailedTestException("Incorrect max all");
+        }
+
+        NDArray maxAxes = original.max(new int[] {1});
+        NDArray maxAxesExpected = mxNDFactory.create(new float[] {4, 8}, null, new Shape(2));
+        if (!maxAxes.contentEquals(maxAxesExpected)) {
+            throw new FailedTestException("Incorrect max axes");
+        }
+
+        NDArray maxKeep = original.max(new int[] {0}, true);
+        NDArray maxKeepExpected = mxNDFactory.create(new float[] {6, 8}, null, new Shape(1, 2));
+        if (!maxKeep.contentEquals(maxKeepExpected)) {
+            throw new FailedTestException("Incorrect max keep");
+        }
+    }
+
+    @RunAsTest
+    public void testMin() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new float[] {2, 4, 6, 8}, null, new Shape(2, 2));
+
+        Float minAll = (Float) original.min();
+        if (minAll != 2) {
+            throw new FailedTestException("Incorrect min all");
+        }
+
+        NDArray minAxes = original.min(new int[] {1});
+        NDArray minAxesExpected = mxNDFactory.create(new float[] {2, 6}, null, new Shape(2));
+        if (!minAxes.contentEquals(minAxesExpected)) {
+            throw new FailedTestException("Incorrect min axes");
+        }
+
+        NDArray minKeep = original.min(new int[] {0}, true);
+        NDArray minKeepExpected = mxNDFactory.create(new float[] {2, 4}, null, new Shape(1, 2));
+        if (!minKeep.contentEquals(minKeepExpected)) {
+            throw new FailedTestException("Incorrect min keep");
+        }
+    }
+
+    @RunAsTest
+    public void testSum() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new float[] {2, 4, 6, 8}, null, new Shape(2, 2));
+
+        Float sumAll = (Float) original.sum();
+        if (sumAll != 20) {
+            throw new FailedTestException("Incorrect sum all");
+        }
+
+        NDArray sumAxes = original.sum(new int[] {1});
+        NDArray sumAxesExpected = mxNDFactory.create(new float[] {6, 14}, null, new Shape(2));
+        if (!sumAxes.contentEquals(sumAxesExpected)) {
+            throw new FailedTestException("Incorrect sum axes");
+        }
+
+        NDArray sumKeep = original.sum(new int[] {0}, true);
+        NDArray sumKeepExpected = mxNDFactory.create(new float[] {8, 12}, null, new Shape(1, 2));
+        if (!sumKeep.contentEquals(sumKeepExpected)) {
+            throw new FailedTestException("Incorrect sum keep");
+        }
+    }
+
+    @RunAsTest
+    public void testProd() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new float[] {2, 4, 6, 8}, null, new Shape(2, 2));
+
+        Float prodAll = (Float) original.prod();
+        if (prodAll != 384) {
+            throw new FailedTestException("Incorrect prod all");
+        }
+
+        NDArray prodAxes = original.prod(new int[] {1});
+        NDArray prodAxesExpected = mxNDFactory.create(new float[] {8, 48}, null, new Shape(2));
+        if (!prodAxes.contentEquals(prodAxesExpected)) {
+            throw new FailedTestException("Incorrect prod axes");
+        }
+
+        NDArray prodKeep = original.prod(new int[] {0}, true);
+        NDArray prodKeepExpected = mxNDFactory.create(new float[] {12, 32}, null, new Shape(1, 2));
+        if (!prodKeep.contentEquals(prodKeepExpected)) {
+            throw new FailedTestException("Incorrect prod keep");
+        }
+    }
+
+    @RunAsTest
+    public void testMean() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new float[] {2, 4, 6, 8}, null, new Shape(2, 2));
+
+        Float meanAll = (Float) original.mean();
+        if (meanAll != 5) {
+            throw new FailedTestException("Incorrect mean all");
+        }
+
+        NDArray meanAxes = original.mean(new int[] {1});
+        NDArray meanAxesExpected = mxNDFactory.create(new float[] {3, 7}, null, new Shape(2));
+        if (!meanAxes.contentEquals(meanAxesExpected)) {
+            throw new FailedTestException("Incorrect mean axes");
+        }
+
+        NDArray meanKeep = original.mean(new int[] {0}, true);
+        NDArray meanKeepExpected = mxNDFactory.create(new float[] {4, 6}, null, new Shape(1, 2));
+        if (!meanKeep.contentEquals(meanKeepExpected)) {
+            throw new FailedTestException("Incorrect mean keep");
+        }
+    }
 }
