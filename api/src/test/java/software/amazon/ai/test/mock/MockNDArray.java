@@ -622,21 +622,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray swapAxes(int dimension, int with) {
-        return null;
-    }
-
-    @Override
-    public NDArray transpose(int... dimensions) {
-        return null;
-    }
-
-    @Override
-    public NDArray transposei(int... dimensions) {
-        return null;
-    }
-
-    @Override
     public NDArray expandDims(int axis) {
         return null;
     }
@@ -657,18 +642,18 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray concat(NDList arrays, int axis) {
-        return null;
-    }
-
-    @Override
     public NDArray clip(double min, double max) {
         return null;
     }
 
     @Override
-    public long size(int dimension) {
-        return 0;
+    public NDArray transpose() {
+        return null;
+    }
+
+    @Override
+    public NDArray transpose(int[] dimensions) {
+        return null;
     }
 
     @Override

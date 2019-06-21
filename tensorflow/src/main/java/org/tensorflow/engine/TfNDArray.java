@@ -879,24 +879,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(int dimension, int with) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray transpose(int... dimensions) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray transposei(int... dimensions) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray expandDims(int axis) {
         return null;
     }
@@ -922,6 +904,18 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray clip(double min, double max) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray transpose() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray transpose(int[] dimensions) {
         return null;
     }
 

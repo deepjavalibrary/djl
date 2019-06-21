@@ -237,6 +237,18 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray transpose() {
+        return array.transpose();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray transpose(int[] dimensions) {
+        return array.transpose(dimensions);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public double[][] toDoubleMatrix() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -987,24 +999,6 @@ public class MxMatrix implements Matrix {
         return array.reshape(shape);
     }
 
-    @Override
-    public NDArray swapAxes(int dimension, int with) {
-        return array.swapAxes(dimension, with);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray transpose(int... dimensions) {
-        return array.transpose(dimensions);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray transposei(int... dimensions) {
-        return array.transposei(dimensions);
-    }
-
-    /** {@inheritDoc} */
     @Override
     public NDArray expandDims(int axis) {
         return array.expandDims(axis);

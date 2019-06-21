@@ -926,4 +926,20 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         NDArray expected = factory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(2, 2));
         Assertions.assertEquals(original.sort(), expected);
     }
+
+    @RunAsTest
+    public void testTranspose() throws FailedTestException {
+        NDArray original = factory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(1, 2, 2));
+
+        NDArray transposeAll = original.transpose();
+        NDArray transposeAllExpected =
+                factory.create(new float[] {1, 3, 2, 4}, null, new Shape(2, 2, 1));
+        Assertions.assertEquals(transposeAll, transposeAllExpected, "Incorrect transpose all");
+
+        NDArray transpose = original.transpose(new int[] {1, 0, 2});
+        NDArray transposeExpected =
+                factory.create(new float[] {1, 2, 3, 4}, null, new Shape(2, 1, 2));
+        Assertions.assertEquals(transpose, transposeExpected, "Incorrect transpose all");
+        Assertions.assertEquals(original.swapAxes(0, 1), transposeExpected, "Incorrect swap axes");
+    }
 }

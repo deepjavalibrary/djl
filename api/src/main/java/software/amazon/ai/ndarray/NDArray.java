@@ -1197,35 +1197,6 @@ public interface NDArray extends AutoCloseable {
     NDArray reshape(Shape shape);
 
     /**
-     * Mainly here for people coming from numpy. This is equivalent to a call to permute
-     *
-     * @param dimension the dimension to swap
-     * @param with the one to swap it with
-     * @return the swapped axes view
-     */
-    NDArray swapAxes(int dimension, int with);
-
-    /**
-     * Reorders the dimensions in the {@link NDArray}.
-     *
-     * <p>Specify the new order for the axis given. Use -1 to broadcast across a dimension.
-     *
-     * @param dimensions the dimensions to swap to
-     * @return the newly permuted array
-     */
-    NDArray transpose(int... dimensions);
-
-    /**
-     * Reorders the dimensions in the {@link NDArray} in place.
-     *
-     * <p>Specify the new order for the axis given. Use -1 to broadcast across a dimension.
-     *
-     * @param dimensions the dimensions to swap to
-     * @return the current array
-     */
-    NDArray transposei(int... dimensions);
-
-    /**
      * Expand the shape of a {@link NDArray}.
      *
      * <p>Insert a new axis that will appear at the axis position in the expanded
@@ -1400,6 +1371,38 @@ public interface NDArray extends AutoCloseable {
     default NDArray clip(int min, int max) {
         return clip((double) min, (double) max);
     }
+
+    /**
+     * Transposes one dimension with another one.
+     *
+     * @param dimension the dimension to swap
+     * @param with the one to swap it with
+     * @return Returns the swapped axes view
+     */
+    default NDArray swapAxes(int dimension, int with) {
+        int[] dims = IntStream.range(0, getShape().dimension()).toArray();
+        int tmp = dims[dimension];
+        dims[dimension] = dims[with];
+        dims[with] = tmp;
+        return transpose(dims);
+    }
+
+    /**
+     * Reverses the order of the dimensions in the {@link NDArray}.
+     *
+     * @return Returns the newly permuted array
+     */
+    NDArray transpose();
+
+    /**
+     * Reorders the dimensions in the {@link NDArray}.
+     *
+     * @param dimensions the dimensions to swap to
+     * @return Returns the newly permuted array
+     * @throws IllegalArgumentException thrown when passing a dimension that is greater than the
+     *     actual number of dimensions
+     */
+    NDArray transpose(int[] dimensions);
 
     /**
      * Returns the size along a specified dimension

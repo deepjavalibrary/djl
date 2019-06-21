@@ -443,7 +443,7 @@ public interface NDFactory extends AutoCloseable {
      *     (however, the last element is always assumed to account for the remaining probability, as
      *     long as ``sum(pvals[:-1]) &lt;= 1)``
      * @param shape Output shape
-     * @return
+     * @return Returns the random NDArray
      */
     NDArray randomMultinomial(int n, NDArray pValues, Shape shape);
 
@@ -459,7 +459,7 @@ public interface NDFactory extends AutoCloseable {
      * @param pValues Probabilities of each of the p different outcomes. These should sum to 1
      *     (however, the last element is always assumed to account for the remaining probability, as
      *     long as ``sum(pvals[:-1]) &lt;= 1)``
-     * @return
+     * @return Returns the random NDArray
      */
     NDArray randomMultinomial(int n, NDArray pValues);
 

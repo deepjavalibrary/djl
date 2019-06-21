@@ -25,6 +25,7 @@ import java.nio.LongBuffer;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
@@ -1183,24 +1184,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(int dimension, int with) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray transpose(int... dimensions) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray transposei(int... dimensions) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray expandDims(int axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
@@ -1243,6 +1226,32 @@ public class MxNDArray extends NativeResource implements NDArray {
         params.addParam("a_min", min);
         params.addParam("a_max", max);
         return factory.invoke("_npi_clip", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray transpose() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("transpose", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray transpose(int[] dimensions) {
+        if (Arrays.stream(dimensions).anyMatch((int d) -> d < 0)) {
+            throw new UnsupportedOperationException(
+                    "Passing -1 for broadcasting the dimension is not currently supported");
+        }
+        if (!Arrays.equals(
+                Arrays.stream(dimensions).sorted().toArray(),
+                IntStream.range(0, getShape().dimension()).toArray())) {
+            throw new IllegalArgumentException(
+                    "You must include each of the dimensions from 0 until "
+                            + getShape().dimension());
+        }
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axes", dimensions);
+        return factory.invoke("transpose", this, params);
     }
 
     /** {@inheritDoc} */
