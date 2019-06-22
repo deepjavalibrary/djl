@@ -44,8 +44,6 @@ import org.apache.mxnet.jna.JnaUtils;
 
 public class MxNDArray extends NativeResource implements NDArray {
 
-    private static final Map<String, FunctionInfo> OPS = JnaUtils.getNdArrayFunctions();
-
     private static final int MAX_DEPTH = 10;
     private static final int MAX_PRINT_ROWS = 10;
     private static final int MAX_PRINT_ITEMS = 20;
@@ -221,7 +219,7 @@ public class MxNDArray extends NativeResource implements NDArray {
                     String.format("shape are diff. Required: %s, Actual %s", destShape, inShape));
         }
 
-        FunctionInfo functionInfo = OPS.get("_copyto");
+        FunctionInfo functionInfo = JnaUtils.op("_copyto");
 
         MxNDArray array = (MxNDArray) ndArray;
 
@@ -341,7 +339,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         params.addParam("is_ascend", ascending);
-        return OPS.get("argsort").invoke(factory, this, params, fparams)[0];
+        return JnaUtils.op("argsort").invoke(factory, this, params, fparams)[0];
     }
 
     /** {@inheritDoc} */
@@ -353,7 +351,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axes[0]);
         params.addParam("temperature", temperature);
-        return OPS.get("softmax").invoke(factory, this, params, fparams)[0];
+        return JnaUtils.op("softmax").invoke(factory, this, params, fparams)[0];
     }
 
     /** {@inheritDoc} */
@@ -363,7 +361,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         params.addParam("num_outputs", size(axis));
         params.addParam("axis", axis);
         params.addParam("squeeze_axis", squeezeAxis);
-        return new NDList(OPS.get("split").invoke(factory, this, params, fparams));
+        return new NDList(JnaUtils.op("split").invoke(factory, this, params, fparams));
     }
 
     /** {@inheritDoc} */
@@ -373,19 +371,19 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addParam("num_outputs", numOutputs);
         params.addParam("axis", axis);
-        return new NDList(OPS.get("split").invoke(factory, this, params, fparams));
+        return new NDList(JnaUtils.op("split").invoke(factory, this, params, fparams));
     }
 
     /** {@inheritDoc} */
     @Override
     public MxNDArray zerosLike(NDFuncParams fparams) {
-        return OPS.get("zeros_like").invoke(factory, this, null, fparams)[0];
+        return JnaUtils.op("zeros_like").invoke(factory, this, null, fparams)[0];
     }
 
     /** {@inheritDoc} */
     @Override
     public MxNDArray onesLike(NDFuncParams fparams) {
-        return OPS.get("ones_like").invoke(factory, this, null, fparams)[0];
+        return JnaUtils.op("ones_like").invoke(factory, this, null, fparams)[0];
     }
 
     /** {@inheritDoc} */
@@ -863,7 +861,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     public FunctionInfo genericNDArrayFunctionInvoke(String opName, Map<String, Object> args) {
-        FunctionInfo func = OPS.get(opName);
+        FunctionInfo func = JnaUtils.op(opName);
         if (func == null) {
             throw new UnsupportedOperationException("Unsupported operation: " + opName);
         }

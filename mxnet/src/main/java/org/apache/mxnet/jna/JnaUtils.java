@@ -13,25 +13,20 @@
 package org.apache.mxnet.jna;
 
 import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
-import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,6 +46,8 @@ public final class JnaUtils {
     private static final MxnetLibrary LIB = LibUtils.loadLibrary();
 
     public static final String[] EMPTY_ARRAY = new String[0];
+
+    private static final Map<String, FunctionInfo> OPS = getNdArrayFunctions();
 
     private JnaUtils() {}
 
@@ -95,6 +92,10 @@ public final class JnaUtils {
             map.put(functionName, getFunctionByName(opName, functionName, ref.getValue()));
         }
         return map;
+    }
+
+    public static FunctionInfo op(String opName) {
+        return OPS.get(opName);
     }
 
     private static FunctionInfo getFunctionByName(
@@ -178,6 +179,7 @@ public final class JnaUtils {
         return ret;
     }
 
+    /* Need tests
     public static void setOmpThreads(int threads) {
         checkCall(LIB.MXSetNumOMPThreads(threads));
     }
@@ -188,11 +190,13 @@ public final class JnaUtils {
 
         return prevBulkSize.get();
     }
+    */
 
     /////////////////////////////////
     // Utilities
     /////////////////////////////////
 
+    /* Need tests
     public static int randomSeed(int seed) {
         return LIB.MXRandomSeed(seed);
     }
@@ -205,6 +209,7 @@ public final class JnaUtils {
     public static void notifyShutdown() {
         checkCall(LIB.MXNotifyShutdown());
     }
+    */
 
     /////////////////////////////////
     // Profiler information
@@ -261,12 +266,14 @@ public final class JnaUtils {
     // NDArray
     /////////////////////////////////
 
+    /* Need tests
     public static Pointer createNdArray() {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXNDArrayCreateNone(ref));
 
         return ref.getValue();
     }
+     */
 
     public static Pointer createNdArray(
             Context context, Shape shape, DataType dtype, int size, boolean delayedAlloc) {
@@ -282,6 +289,7 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
+    /* Need tests
     public static Pointer loadFromBytes(byte[] buf, int offset, int size) {
         Memory memory = new Memory(size);
         memory.write(0, buf, offset, size);
@@ -296,6 +304,7 @@ public final class JnaUtils {
         PointerArray array = new PointerArray(ndArrays);
         checkCall(LIB.MXNDArraySave(file, ndArrays.length, array, keys));
     }
+     */
 
     public static Pointer[] loadNdArray(String file, PointerByReference namesRef) {
         IntBuffer size = IntBuffer.allocate(1);
@@ -313,6 +322,7 @@ public final class JnaUtils {
         return ref.getValue().getPointerArray(0, ndArrayCount);
     }
 
+    /* Need tests
     public static ByteBuffer readBytes(Pointer ndArray) {
         NativeSizeByReference size = new NativeSizeByReference();
         PointerByReference ref = new PointerByReference();
@@ -320,6 +330,7 @@ public final class JnaUtils {
 
         return ref.getValue().getByteBuffer(0, size.getValue().longValue());
     }
+     */
 
     public static void freeNdArray(Pointer ndArray) {
         checkCall(LIB.MXNDArrayFree(ndArray));
@@ -333,9 +344,11 @@ public final class JnaUtils {
         checkCall(LIB.MXNDArrayWaitToWrite(ndArray));
     }
 
+    /* Need tests
     public static void waitAll() {
         checkCall(LIB.MXNDArrayWaitAll());
     }
+     */
 
     public static void syncCopyToCPU(Pointer ndArray, Pointer data, int len) {
         NativeSize size = new NativeSize(len);
@@ -405,6 +418,7 @@ public final class JnaUtils {
         return DataType.values()[dataType.get()];
     }
 
+    /* Need tests
     public static DataType getAuxType(Pointer ndArray, int index) {
         IntBuffer dataType = IntBuffer.allocate(1);
         checkCall(LIB.MXNDArrayGetAuxType(ndArray, index, dataType));
@@ -428,6 +442,7 @@ public final class JnaUtils {
         checkCall(LIB.MXNDArrayGetGrad(ndArray, ref));
         return ref.getValue();
     }
+     */
 
     public static Pointer ndArrayAt(Pointer ndArray, int index) {
         PointerByReference ref = new PointerByReference();
@@ -614,16 +629,19 @@ public final class JnaUtils {
         return toStringArray(ref, size.get());
     }
 
+    /* Need tests
     public static String symbolToJson(Pointer symbol) {
         String[] out = new String[1];
         checkCall(LIB.MXSymbolSaveToJSON(symbol, out));
         return out[0];
     }
+     */
 
     public static void freeSymbol(Pointer symbol) {
         checkCall(LIB.MXSymbolFree(symbol));
     }
 
+    /* Need tests
     public static void saveSymbol(Pointer symbol, String path) {
         checkCall(LIB.MXSymbolSaveToFile(symbol, path));
     }
@@ -681,6 +699,7 @@ public final class JnaUtils {
 
         return toPairList(ref, size.get());
     }
+     */
 
     public static String[] listSymbolNames(Pointer symbol) {
         IntBuffer size = IntBuffer.allocate(1);
@@ -691,6 +710,7 @@ public final class JnaUtils {
         return toStringArray(ref, size.get());
     }
 
+    /* Need tests
     public static String[] listSymbolArguments(Pointer symbol) {
         IntBuffer size = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
@@ -775,6 +795,7 @@ public final class JnaUtils {
         checkCall(LIB.MXSymbolCreateGroup(numOfSymbols, symbolsRef, ref));
         return ref.getValue();
     }
+     */
 
     public static Pointer createSymbolFromFile(String path) {
         PointerByReference ref = new PointerByReference();
@@ -782,6 +803,7 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
+    /* Need tests
     public static Pointer createSymbolFromJson(String json) {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXSymbolCreateFromJSON(json, ref));
@@ -907,11 +929,13 @@ public final class JnaUtils {
         checkCall(LIB.MXGenBackendSubgraph(symbol, backend, ref));
         return ref.getValue();
     }
+     */
 
     /////////////////////////////////
     // MXNet Executors
     /////////////////////////////////
 
+    /* Need tests
     public static void freeExecutor(Pointer executor) {
         checkCall(LIB.MXExecutorFree(executor));
     }
@@ -1170,11 +1194,13 @@ public final class JnaUtils {
             Pointer callbackHandle) {
         checkCall(LIB.MXExecutorSetMonitorCallback(executor, callback, callbackHandle));
     }
+     */
 
     /////////////////////////////////
     // MXNet Executors
     /////////////////////////////////
 
+    /*
     public static Pointer[] listDataIters() {
         IntBuffer outSize = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
@@ -1239,6 +1265,7 @@ public final class JnaUtils {
         checkCall(LIB.MXDataIterGetLabel(iter, ref));
         return ref.getValue().getString(0, StandardCharsets.UTF_8.name());
     }
+     */
 
     /*
     int MXInitPSEnv(int num_vars, String keys[], String vals[]);
@@ -1500,6 +1527,7 @@ public final class JnaUtils {
         return arr;
     }
 
+    /*
     private static PairList<String, String> toPairList(PointerByReference ref, int size) {
         Pointer[] pointers = ref.getValue().getPointerArray(0, size);
 
@@ -1513,6 +1541,7 @@ public final class JnaUtils {
 
         return new PairList<>(names, values);
     }
+     */
 
     private static String getOpNamePrefix(String name) {
         for (String prefix : OP_NAME_PREFIX) {

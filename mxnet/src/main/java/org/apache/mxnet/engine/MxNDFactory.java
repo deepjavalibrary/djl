@@ -28,8 +28,6 @@ import org.apache.mxnet.jna.JnaUtils;
 
 public class MxNDFactory implements NDFactory {
 
-    private static final Map<String, FunctionInfo> OPS = JnaUtils.getNdArrayFunctions();
-
     /**
      * A global {@link NDFactory} singleton instance.
      *
@@ -121,7 +119,7 @@ public class MxNDFactory implements NDFactory {
         params.addContext(context);
         params.addDataType(dataType);
         params.addSparseFormat(sparseFormat);
-        FunctionInfo functionInfo = OPS.get(opName);
+        FunctionInfo functionInfo = JnaUtils.op(opName);
         return functionInfo.invoke(this, params, NDFuncParams.NONE)[0];
     }
 

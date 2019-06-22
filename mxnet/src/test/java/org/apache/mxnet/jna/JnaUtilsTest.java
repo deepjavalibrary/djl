@@ -54,6 +54,11 @@ public class JnaUtilsTest extends PowerMockTestCase {
     }
 
     @Test
+    public void testOp() {
+        Assert.assertEquals(JnaUtils.op("softmax").getFunctionName(), "softmax");
+    }
+
+    @Test
     public void testGetGpuCount() {
         Assert.assertTrue(JnaUtils.getGpuCount() >= 0);
     }
