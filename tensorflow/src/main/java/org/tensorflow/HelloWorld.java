@@ -12,15 +12,16 @@
  */
 
 package org.tensorflow;
-import org.tensorflow.Tensors;
 
 import java.util.Arrays;
 
-public class HelloWorld {
+public final class HelloWorld {
 
+    private HelloWorld() {}
+
+    @SuppressWarnings("PMD.SystemPrintln")
     public static void main(String[] args) {
-        Tensor t = Tensors.create(new float[]{1.0f, 2.0f});
+        Tensor<Float> t = Tensors.create(new float[] {1.0f, 2.0f});
         System.out.println(Arrays.toString(t.shape()));
     }
-
 }

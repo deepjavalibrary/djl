@@ -1,6 +1,7 @@
 
 dependencies {
     compile 'org.tensorflow:tensorflow:1.13.1'
+    compile project(":api")
 }
 
 sourceSets {
