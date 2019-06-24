@@ -120,6 +120,41 @@ public interface NDArray extends AutoCloseable {
     void set(List<Float> data);
 
     /**
+     * Set the NDArray value from a array of float.
+     *
+     * @param data array of floats to set
+     */
+    void set(float[] data);
+
+    /**
+     * Set the NDArray value from a array of float.
+     *
+     * @param data array of floats to set
+     */
+    void set(int[] data);
+
+    /**
+     * Set the NDArray value from a array of float.
+     *
+     * @param data array of floats to set
+     */
+    void set(double[] data);
+
+    /**
+     * Set the NDArray value from a array of float.
+     *
+     * @param data array of floats to set
+     */
+    void set(long[] data);
+
+    /**
+     * Set the NDArray value from a array of float.
+     *
+     * @param data array of floats to set
+     */
+    void set(byte[] data);
+
+    /**
      * Get the certain layer from the first dimension of the NDArray.
      *
      * @param index the layer index of the first dimension
@@ -453,6 +488,22 @@ public interface NDArray extends AutoCloseable {
      * @return the binary ndarray for "Equals" comparison.
      */
     NDArray eq(NDArray other);
+
+    /**
+     * Returns the boolean true iff all elements in both the NDArrays are equal.
+     *
+     * @param other the ndarray to compare.
+     * @return the binary ndarray for "Equals" comparison.
+     */
+    boolean equals(NDArray other);
+
+    /**
+     * Returns the boolean true iff all elements in the
+     * NDArray is equal to the Number
+     * @param number the Number to compare.
+     * @return the binary ndarray for "Equals" comparison.
+     */
+    boolean equals(Number number);
 
     /**
      * Returns the binary ndarray for "Greater" comparison.

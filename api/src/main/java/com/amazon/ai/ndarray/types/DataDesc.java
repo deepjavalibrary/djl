@@ -34,7 +34,6 @@ public class DataDesc {
     private String name;
     private Shape shape;
     private DataType dataType;
-    private SparseFormat sparseFormat;
     private Layout layout;
 
     /**
@@ -43,7 +42,7 @@ public class DataDesc {
      * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape) {
-        this(shape, DataType.FLOAT32, null, Layout.UNDEFINED, null, SparseFormat.DEFAULT);
+        this(shape, DataType.FLOAT32, null, Layout.UNDEFINED, null);
     }
 
     /**
@@ -53,7 +52,7 @@ public class DataDesc {
      * @param name the name of the {@link com.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape, String name) {
-        this(shape, DataType.FLOAT32, name, Layout.UNDEFINED, null, SparseFormat.DEFAULT);
+        this(shape, DataType.FLOAT32, name, Layout.UNDEFINED, null);
     }
 
     /**
@@ -64,7 +63,7 @@ public class DataDesc {
      * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape, DataType dataType) {
-        this(shape, dataType, null, Layout.UNDEFINED, null, SparseFormat.DEFAULT);
+        this(shape, dataType, null, Layout.UNDEFINED, null);
     }
 
     /**
@@ -76,7 +75,7 @@ public class DataDesc {
      * @param name the name of the {@link com.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape, DataType dataType, String name) {
-        this(shape, dataType, name, Layout.UNDEFINED, null, SparseFormat.DEFAULT);
+        this(shape, dataType, name, Layout.UNDEFINED, null);
     }
 
     /**
@@ -89,7 +88,7 @@ public class DataDesc {
      * @param layout the {@link Layout} of the {@link com.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape, DataType dataType, String name, Layout layout) {
-        this(shape, dataType, name, layout, null, SparseFormat.DEFAULT);
+        this(shape, dataType, name, layout, null);
     }
 
     /**
@@ -101,20 +100,12 @@ public class DataDesc {
      * @param name the name of the {@link com.amazon.ai.ndarray.NDArray}
      * @param layout the {@link Layout} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
-     * @param sparseFormat the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
      */
-    public DataDesc(
-            Shape shape,
-            DataType dataType,
-            String name,
-            Layout layout,
-            Context context,
-            SparseFormat sparseFormat) {
+    public DataDesc(Shape shape, DataType dataType, String name, Layout layout, Context context) {
         this.context = context;
         this.name = name;
         this.shape = shape;
         this.dataType = dataType;
-        this.sparseFormat = sparseFormat;
         this.layout = layout;
     }
 
@@ -188,24 +179,6 @@ public class DataDesc {
      */
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
-    }
-
-    /**
-     * Returns the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}.
-     *
-     * @return the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
-     */
-    public SparseFormat getSparseFormat() {
-        return sparseFormat;
-    }
-
-    /**
-     * Sets the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}.
-     *
-     * @param sparseFormat the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
-     */
-    public void setSparseFormat(SparseFormat sparseFormat) {
-        this.sparseFormat = sparseFormat;
     }
 
     /**

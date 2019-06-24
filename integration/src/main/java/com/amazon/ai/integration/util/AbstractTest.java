@@ -48,8 +48,8 @@ public class AbstractTest {
                     }
                 }
             }
-        } catch (Throwable t) {
-            logger.error("{} test failed. Exception message={}", methodName, t.getMessage());
+        } catch (Exception e) {
+            logger.error("{} test failed. Exception message={}", methodName, e.getCause());
         }
     }
 

@@ -18,15 +18,13 @@ import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
 import java.nio.Buffer;
 
 public class MockNDFactory implements NDFactory {
 
     @Override
-    public NDArray create(
-            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
+    public NDArray create(Context context, Shape shape, DataType dataType) {
         return new MockNDArray();
     }
 
@@ -36,8 +34,8 @@ public class MockNDFactory implements NDFactory {
     }
 
     @Override
-    public NDArray create(DataDesc dataDesc, Buffer buffer) {
-        return new MockNDArray();
+    public NDArray create(DataDesc dataDesc, Buffer data) {
+        return null;
     }
 
     @Override
@@ -48,6 +46,31 @@ public class MockNDFactory implements NDFactory {
 
     @Override
     public NDArray zeros(Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(float[] data, Context context, Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(int[] data, Context context, Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(double[] data, Context context, Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(long[] data, Context context, Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(byte[] data, Context context, Shape shape) {
         return null;
     }
 

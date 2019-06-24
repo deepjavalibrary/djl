@@ -19,7 +19,6 @@ import com.amazon.ai.engine.Engine;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
 import java.nio.Buffer;
 
@@ -90,16 +89,15 @@ import java.nio.Buffer;
 public interface NDFactory extends AutoCloseable {
 
     /**
-     * Create an instance of {@link NDArray} with specified {@link Context}, {@link Shape}, {@link
-     * DataType} and {@link SparseFormat}.
+     * Create an instance of {@link NDArray} with specified {@link Context}, {@link Shape}, and
+     * {@link DataType}.
      *
      * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
-     * @param sparseFormat the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray create(Context context, Shape shape, DataType dataType, SparseFormat sparseFormat);
+    NDArray create(Context context, Shape shape, DataType dataType);
 
     /**
      * Create an instance of {@link NDArray} with specified {@link DataDesc}.
@@ -146,8 +144,58 @@ public interface NDFactory extends AutoCloseable {
     NDArray zeros(Shape shape);
 
     /**
+     * Create an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     *
+     * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    NDArray create(float[] data, Context context, Shape shape);
+
+    /**
+     * Create an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     *
+     * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    NDArray create(int[] data, Context context, Shape shape);
+
+    /**
+     * Create an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     *
+     * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    NDArray create(double[] data, Context context, Shape shape);
+
+    /**
+     * Create an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     *
+     * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    NDArray create(long[] data, Context context, Shape shape);
+
+    /**
+     * Create an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     *
+     * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    NDArray create(byte[] data, Context context, Shape shape);
+
+    /**
      * Create an instance of {@link NDArray} filled with zeros with specified {@link Context},
-     * {@link Shape}, {@link DataType}.
+     * {@link Shape}, and {@link DataType}
      *
      * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
@@ -166,7 +214,7 @@ public interface NDFactory extends AutoCloseable {
 
     /**
      * Create an instance of {@link NDArray} filled with ones with specified {@link Context}, {@link
-     * Shape}, {@link DataType}.
+     * Shape}, and {@link DataType}
      *
      * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}

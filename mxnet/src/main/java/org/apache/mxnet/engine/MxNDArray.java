@@ -24,6 +24,7 @@ import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.training.GradReq;
+import com.amazon.ai.util.PairList;
 import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -35,6 +36,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -57,39 +59,22 @@ public class MxNDArray extends NativeResource implements NDArray {
     private boolean isReady;
 
     MxNDArray(
-            MxNDFactory factory,
-            Context context,
-            SparseFormat sparseFormat,
-            Shape shape,
-            DataType dataType,
-            Pointer handle) {
+            MxNDFactory factory, Context context, Shape shape, DataType dataType, Pointer handle) {
         super(handle);
         this.factory = factory;
         this.context = context;
         this.dataType = dataType;
         this.shape = shape;
-        this.sparseFormat = sparseFormat;
         this.isReady = false;
     }
 
-    MxNDArray(
-            MxNDFactory factory,
-            Context context,
-            SparseFormat sparseFormat,
-            Shape shape,
-            DataType dataType) {
+    MxNDArray(MxNDFactory factory, Context context, Shape shape, DataType dataType) {
         this(
                 factory,
                 context,
-                sparseFormat,
                 shape,
                 dataType,
-                JnaUtils.createNdArray(
-                        context,
-                        shape,
-                        dataType,
-                        shape.dimension(),
-                        sparseFormat != SparseFormat.DEFAULT));
+                JnaUtils.createNdArray(context, shape, dataType, shape.dimension(), false));
     }
 
     /** {@inheritDoc} */
@@ -161,8 +146,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataDesc getDataDescriptor() {
-        return new DataDesc(
-                getShape(), getDataType(), null, getLayout(), getContext(), getSparseFormat());
+        return new DataDesc(getShape(), getDataType(), null, getLayout(), getContext());
     }
 
     /** {@inheritDoc} */
@@ -186,6 +170,76 @@ public class MxNDArray extends NativeResource implements NDArray {
         FloatBuffer output =
                 ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
         for (Float v : data) {
+            output.put(v);
+        }
+        output.rewind();
+        set(output);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(float[] data) {
+        waitToWrite();
+        int size = data.length;
+        FloatBuffer output =
+                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
+        for (float v : data) {
+            output.put(v);
+        }
+        output.rewind();
+        set(output);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(int[] data) {
+        waitToWrite();
+        int size = data.length;
+        IntBuffer output =
+                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
+        for (int v : data) {
+            output.put(v);
+        }
+        output.rewind();
+        set(output);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(double[] data) {
+        waitToWrite();
+        int size = data.length;
+        DoubleBuffer output =
+                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer();
+        for (double v : data) {
+            output.put(v);
+        }
+        output.rewind();
+        set(output);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(long[] data) {
+        waitToWrite();
+        int size = data.length;
+        LongBuffer output =
+                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asLongBuffer();
+        for (long v : data) {
+            output.put(v);
+        }
+        output.rewind();
+        set(output);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(byte[] data) {
+        waitToWrite();
+        int size = data.length;
+        ShortBuffer output =
+                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
+        for (byte v : data) {
             output.put(v);
         }
         output.rewind();
@@ -229,7 +283,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (ctx.equals(getContext()) && !copy) {
             return this;
         }
-        MxNDArray nd = factory.create(ctx, getShape(), getDataType(), getSparseFormat());
+        MxNDArray nd = factory.create(ctx, getShape(), getDataType());
         copyTo(nd);
         return nd;
     }
@@ -240,7 +294,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (dtype.equals(getDataType()) && !copy) {
             return this;
         }
-        MxNDArray nd = factory.create(getContext(), getShape(), dtype, getSparseFormat());
+        MxNDArray nd = factory.create(getContext(), getShape(), dtype);
         copyTo(nd);
         return nd;
     }
@@ -386,25 +440,37 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray add(Number n) {
-        return null;
+        PairList<String, String> pairList = new PairList<>();
+        pairList.add("scalar", n.toString());
+        return factory.invoke("_plus_scalar", this, pairList);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray addi(Number n) {
-        return null;
+        PairList<String, String> pairList = new PairList<>();
+        pairList.add("scalar", n.toString());
+        return factory.invoke(
+                        "_plus_scalar", new MxNDArray[] {this}, new MxNDArray[] {this}, pairList)[
+                0];
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray add(NDArray other) {
-        return null;
+        return factory.invoke(
+                        "_plus", new MxNDArray[] {this, (MxNDArray) other}, null, new PairList<>())[
+                0];
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray addi(NDArray other) {
-        return null;
+        return factory.invoke(
+                        "_plus",
+                        new MxNDArray[] {this, (MxNDArray) other},
+                        new MxNDArray[] {this},
+                        new PairList<>())[0];
     }
 
     /** {@inheritDoc} */
@@ -494,13 +560,36 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(Number other) {
-        return null;
+        MxNDArray numbers = (MxNDArray) factory.zeros(new DataDesc(getShape()));
+        numbers = (MxNDArray) numbers.add(other.floatValue());
+        return this.eq(numbers);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
-        return null;
+        PairList<String, String> pairList = new PairList<>();
+        MxNDArray[] src = new MxNDArray[] {this, (MxNDArray) other};
+        return factory.invoke("_equal", src, null, pairList)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(NDArray other) {
+        MxNDArray result = (MxNDArray) this.eq(other);
+        if (result.nonzero() == result.size()){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean equals(Number number) {
+        MxNDArray result = (MxNDArray) this.eq(number);
+        if (result.nonzero() == result.size()){
+            return true;
+        }
+        return false;
     }
 
     /** {@inheritDoc} */
@@ -1529,7 +1618,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public int nonzero() {
-        return 0;
+        MxNDArray zeros = (MxNDArray) this.eq(0);
+        MxNDArray sum =
+                (MxNDArray)
+                        factory.invoke(
+                                "sum", (MxNDArray) this.eq(zeros).eq(zeros), new PairList<>());
+        return (int) sum.toFloatArray()[0];
     }
 
     /** {@inheritDoc} */

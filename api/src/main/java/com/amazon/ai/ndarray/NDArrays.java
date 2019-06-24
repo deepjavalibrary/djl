@@ -59,4 +59,37 @@ public final class NDArrays {
     public static NDArray addi(NDArray a, NDArray b) {
         return a.addi(b);
     }
+
+    /**
+     * Returns the binary ndarray for "Equals" comparison.
+     *
+     * @param a the ndarray to compare.
+     * @param b the ndarray to compare.
+     * @return the binary ndarray for "Equals" comparison.
+     */
+    public static NDArray eq(NDArray a, NDArray b) {
+        return a.eq(b);
+    }
+
+    /**
+     * Returns the boolean true iff all elements in both
+     * the NDArrays are equal.
+     * @param a the ndarray to compare.
+     * @param b the ndarray to compare.
+     * @return the binary ndarray for "Equals" comparison.
+     */
+    public static boolean equals(NDArray a, NDArray b) {
+        return a.equals(b);
+    }
+
+    /**
+     * Returns the boolean true iff all elements in the
+     * NDArray is equal to the Number
+     * @param a the NDArray to compare.
+     * @param b the Number to compare.
+     * @return the binary ndarray for "Equals" comparison.
+     */
+    public static boolean equals(NDArray a, Number b) {
+        return a.equals(b);
+    }
 }

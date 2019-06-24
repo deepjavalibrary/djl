@@ -39,7 +39,6 @@ public class FunctionInfo {
         Pointer[] handles =
                 Arrays.stream(src).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
         PointerArray srcHandles = new PointerArray(handles);
-
         PointerByReference destRef;
         if (dest == null || dest.length == 0) {
             destRef = new PointerByReference();

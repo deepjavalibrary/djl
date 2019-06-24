@@ -18,7 +18,6 @@ import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
@@ -43,24 +42,23 @@ public class MxNDFactory implements NDFactory {
     private Context context;
     private Map<AutoCloseable, AutoCloseable> resources;
 
+    public static MxNDFactory getSystemFactory() {
+        return SYSTEM_FACTORY;
+    }
+
     private MxNDFactory(NDFactory parent, Context context) {
         this.parent = parent;
         this.context = context;
         resources = new ConcurrentHashMap<>();
     }
 
-    public static MxNDFactory getSystemFactory() {
-        return SYSTEM_FACTORY;
-    }
-
     /** {@inheritDoc} */
     @Override
-    public MxNDArray create(
-            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
+    public MxNDArray create(Context context, Shape shape, DataType dataType) {
         if (context == null) {
             context = this.context;
         }
-        MxNDArray array = new MxNDArray(this, context, sparseFormat, shape, dataType);
+        MxNDArray array = new MxNDArray(this, context, shape, dataType);
         resources.put(array, array);
         return array;
     }
@@ -74,22 +72,49 @@ public class MxNDFactory implements NDFactory {
     /** {@inheritDoc} */
     @Override
     public MxNDArray create(DataDesc dataDesc) {
-        return create(
-                dataDesc.getContext(),
-                dataDesc.getShape(),
-                dataDesc.getDataType(),
-                SparseFormat.DEFAULT);
+        return create(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
+    }
+
+    @Override
+    public MxNDArray create(float[] data, Context context, Shape shape) {
+        MxNDArray mxNDArray = create(context, shape, DataType.FLOAT32);
+        mxNDArray.set(data);
+        return mxNDArray;
+    }
+
+    @Override
+    public MxNDArray create(int[] data, Context context, Shape shape) {
+        MxNDArray mxNDArray = create(context, shape, DataType.INT32);
+        mxNDArray.set(data);
+        return mxNDArray;
+    }
+
+    @Override
+    public MxNDArray create(double[] data, Context context, Shape shape) {
+        MxNDArray mxNDArray = create(context, shape, DataType.FLOAT64);
+        mxNDArray.set(data);
+        return mxNDArray;
+    }
+
+    @Override
+    public MxNDArray create(long[] data, Context context, Shape shape) {
+        MxNDArray mxNDArray = create(context, shape, DataType.INT64);
+        mxNDArray.set(data);
+        return mxNDArray;
+    }
+
+    @Override
+    public MxNDArray create(byte[] data, Context context, Shape shape) {
+        MxNDArray mxNDArray = create(context, shape, DataType.INT8);
+        mxNDArray.set(data);
+        return mxNDArray;
     }
 
     /** {@inheritDoc} */
     @Override
     public MxNDArray create(DataDesc dataDesc, Buffer data) {
         MxNDArray array =
-                create(
-                        dataDesc.getContext(),
-                        dataDesc.getShape(),
-                        dataDesc.getDataType(),
-                        SparseFormat.DEFAULT);
+                create(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
         array.set(data);
         return array;
     }
@@ -150,7 +175,7 @@ public class MxNDFactory implements NDFactory {
     }
 
     public MxNDArray create(Pointer handle) {
-        MxNDArray array = new MxNDArray(this, null, null, null, null, handle);
+        MxNDArray array = new MxNDArray(this, null, null, null, handle);
         resources.put(array, array);
         return array;
     }

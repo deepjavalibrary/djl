@@ -1504,7 +1504,7 @@ public final class JnaUtils {
 
     public static void checkCall(int ret) {
         if (ret != 0) {
-            throw new JnaException("MXNet engined call failed: " + getLastError());
+            throw new JnaException("MXNet engine call failed: " + getLastError());
         }
     }
 

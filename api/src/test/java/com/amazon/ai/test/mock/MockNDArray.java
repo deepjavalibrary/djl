@@ -77,6 +77,21 @@ public class MockNDArray implements NDArray {
     public void set(List<Float> data) {}
 
     @Override
+    public void set(float[] data) {}
+
+    @Override
+    public void set(int[] data) {}
+
+    @Override
+    public void set(double[] data) {}
+
+    @Override
+    public void set(long[] data) {}
+
+    @Override
+    public void set(byte[] data) {}
+
+    @Override
     public NDArray at(int index) {
         return null;
     }
@@ -222,6 +237,16 @@ public class MockNDArray implements NDArray {
     @Override
     public NDArray eq(NDArray other) {
         return null;
+    }
+
+    @Override
+    public boolean equals(NDArray other) {
+        return false;
+    }
+
+    @Override
+    public boolean equals(Number number) {
+        return false;
     }
 
     @Override
@@ -1239,6 +1264,5 @@ public class MockNDArray implements NDArray {
         return null;
     }
 
-    @Override
     public void close() {}
 }
