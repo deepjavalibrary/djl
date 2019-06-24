@@ -1,0 +1,15 @@
+
+dependencies {
+    compile 'org.tensorflow:tensorflow:1.13.1'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'build/generated-src']
+        }
+    }
+}
+
+checkstyleMain.source = 'src/main/java'
+pmdMain.source = 'src/main/java'

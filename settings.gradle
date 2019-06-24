@@ -4,4 +4,5 @@ include 'mxnet'
 include 'jnarator'
 include 'example'
 include 'integration'
+include 'tensorflow'
 
