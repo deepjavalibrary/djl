@@ -15,15 +15,14 @@ package org.apache.mxnet.engine;
 import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
+import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.mxnet.jna.FunctionInfo;
 import org.apache.mxnet.jna.JnaUtils;
 
 public class MxNDFactory implements NDFactory {
@@ -36,6 +35,8 @@ public class MxNDFactory implements NDFactory {
      * might be run into out of native memory issue.
      */
     static final MxNDFactory SYSTEM_FACTORY = new SystemFactory();
+
+    private static final NDArray[] EMPTY = new NDArray[0];
 
     private NDFactory parent;
     private Context context;
@@ -81,6 +82,23 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray[] invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params) {
+        return JnaUtils.op(operation).invoke(this, src, dest, params);
+    }
+
+    public NDArray invoke(String operation, NDArray src, PairList<String, String> params) {
+        return invoke(operation, new NDArray[] {src}, null, params)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray zeros(Shape shape) {
+        return zeros(context, shape, null, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray zeros(
             Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
         return fill("_zeros", context, shape, dataType, sparseFormat);
@@ -89,11 +107,7 @@ public class MxNDFactory implements NDFactory {
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(DataDesc dataDesc) {
-        return zeros(
-                dataDesc.getContext(),
-                dataDesc.getShape(),
-                dataDesc.getDataType(),
-                SparseFormat.DEFAULT);
+        return zeros(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType(), null);
     }
 
     /** {@inheritDoc} */
@@ -103,24 +117,21 @@ public class MxNDFactory implements NDFactory {
         return fill("_ones", context, shape, dataType, sparseFormat);
     }
 
-    private MxNDArray fill(
+    private NDArray fill(
             String opName,
             Context context,
             Shape shape,
             DataType dataType,
             SparseFormat sparseFormat) {
-
         MxOpParams params = new MxOpParams();
         if (shape == null) {
-            throw new NullPointerException(
-                    String.format("Shape is required for %s", opName.substring(1)));
+            throw new IllegalArgumentException("Shape is required for " + opName.substring(1));
         }
         params.addShape(shape);
         params.addContext(context);
         params.addDataType(dataType);
         params.addSparseFormat(sparseFormat);
-        FunctionInfo functionInfo = JnaUtils.op(opName);
-        return functionInfo.invoke(this, params, NDFuncParams.NONE)[0];
+        return invoke(opName, EMPTY, null, params)[0];
     }
 
     /** {@inheritDoc} */

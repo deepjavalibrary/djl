@@ -20,6 +20,7 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
+import com.amazon.ai.util.PairList;
 
 /**
  * NDArray factories are used to create <I>NDArrays</I> (n-dimensional array on native engine).
@@ -106,6 +107,33 @@ public interface NDFactory extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     NDArray create(DataDesc dataDesc);
+
+    /**
+     * An engine specific generic invocation to native operator.
+     *
+     * <p>User should avoid using this function if possible. Since this function is engine specific,
+     * using this API may cause portability issue. And user must be aware that native operation may
+     * not compatible between each versions.
+     *
+     * @param operation native operation to performance
+     * @param src array of source NDArray
+     * @param dest array of destination to save output, null or empty array for new NDArray output
+     * @param params parameters to be passed to native operator
+     * @return output NDArray
+     * @throws IllegalArgumentException if operation is not supported by Engine
+     * @throws com.amazon.ai.engine.EngineException if operation failed in native engine
+     */
+    NDArray[] invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params);
+
+    /**
+     * Create an instance of {@link NDArray} filled with zeros with specified {@link Shape}.
+     *
+     * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     * @see #zeros(Context, Shape, DataType, SparseFormat)
+     */
+    NDArray zeros(Shape shape);
 
     /**
      * Create an instance of {@link NDArray} filled with zeros with specified {@link Context},

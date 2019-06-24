@@ -2,27 +2,19 @@ package org.apache.mxnet.nn;
 
 import com.amazon.ai.Block;
 import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFuncParams;
+import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.util.PairList;
-import org.apache.mxnet.engine.MxNDArray;
-import org.apache.mxnet.engine.MxNDFactory;
-import org.apache.mxnet.jna.JnaUtils;
 
 public abstract class MxNNBlock implements Block {
 
     protected String opName;
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, String> params, NDFuncParams fparams) {
+    public NDList forward(NDList inputs, PairList<String, String> params) {
         NDArray[] inputArray = inputs.toArray();
-        MxNDArray[] output =
-                JnaUtils.op(opName)
-                        .invoke(
-                                (MxNDFactory) inputs.get(0).getFactory(),
-                                (MxNDArray[]) inputArray,
-                                params,
-                                fparams);
+        NDFactory factory = inputArray[0].getFactory();
+        NDArray[] output = factory.invoke(opName, inputs.toArray(), null, params);
         return new NDList(output);
     }
 

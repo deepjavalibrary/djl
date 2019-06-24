@@ -164,13 +164,13 @@ public final class BertQaInferenceExample extends AbstractExample {
         @Override
         public String processOutput(TranslatorContext ctx, NDList list) {
             NDArray array = list.get(0);
-            NDList output = array.split(2, 2, null);
+            NDList output = array.split(2, 2);
             // Get the formatted logits result
             NDArray startLogits = output.get(0).reshape(0, -3);
             NDArray endLogits = output.get(1).reshape(0, -3);
             // Get Probability distribution
-            float[] startProb = startLogits.softmax().toFloatArray();
-            float[] endProb = endLogits.softmax().toFloatArray();
+            float[] startProb = startLogits.softmax(-1).toFloatArray();
+            float[] endProb = endLogits.softmax(-1).toFloatArray();
             int startIdx = argmax(startProb);
             int endIdx = argmax(endProb);
             return tokens.subList(startIdx, endIdx + 1).toString();

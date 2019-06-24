@@ -17,7 +17,6 @@ import com.amazon.ai.Model;
 import com.amazon.ai.Profiler;
 import com.amazon.ai.Translator;
 import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.ndarray.EngineUtils;
 import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
 import java.io.IOException;
@@ -147,13 +146,6 @@ public abstract class Engine {
      * @return The index of Neural Network operators to create a Block
      */
     public abstract NNIndex getNNIndex();
-
-    /**
-     * An internal helper to get the Engine specific implementations for utilities
-     *
-     * @return The engine specific utilities
-     */
-    public abstract EngineUtils getEngineUtils();
 
     /**
      * Try to use {@link Trainer}.newInstance() instead Load the model and create a Trainer to

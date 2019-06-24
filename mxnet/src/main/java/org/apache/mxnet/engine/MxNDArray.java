@@ -16,7 +16,6 @@ import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.Matrix;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
@@ -218,13 +217,9 @@ public class MxNDArray extends NativeResource implements NDArray {
             throw new IllegalArgumentException(
                     String.format("shape are diff. Required: %s, Actual %s", destShape, inShape));
         }
-
-        FunctionInfo functionInfo = JnaUtils.op("_copyto");
-
-        MxNDArray array = (MxNDArray) ndArray;
-
-        functionInfo.invoke(
-                factory, new MxNDArray[] {this}, new MxNDArray[] {array}, null, NDFuncParams.NONE);
+        NDArray[] src = new NDArray[] {this};
+        NDArray[] dest = new NDArray[] {ndArray};
+        factory.invoke("_copyto", src, dest, null);
     }
 
     /** {@inheritDoc} */
@@ -279,7 +274,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
         MxNDArray grad;
-        if (sparseFormat == null || sparseFormat == sparseFormat.UNDEFINED) {
+        if (sparseFormat == null || sparseFormat == SparseFormat.UNDEFINED) {
             grad = (MxNDArray) zerosLike();
         } else {
             grad = (MxNDArray) factory.zeros(context, shape, dataType, sparseFormat);
@@ -335,55 +330,91 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argsort(int axis, boolean ascending, NDFuncParams fparams) {
+    public NDArray argsort(int axis, boolean ascending) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         params.addParam("is_ascend", ascending);
-        return JnaUtils.op("argsort").invoke(factory, this, params, fparams)[0];
+        return factory.invoke("argsort", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, Double temperature, NDFuncParams fparams) {
+    public NDArray softmax(int[] axes) {
         if (axes.length != 1) {
-            throw new UnsupportedOperationException("softmax only supports a single axis");
+            // TODO:
+            throw new UnsupportedOperationException("Not implemented");
+        }
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axes[0]);
+        return factory.invoke("softmax", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray softmax(int[] axes, double temperature) {
+        if (axes.length != 1) {
+            // TODO:
+            throw new UnsupportedOperationException("Not implemented");
         }
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axes[0]);
         params.addParam("temperature", temperature);
-        return JnaUtils.op("softmax").invoke(factory, this, params, fparams)[0];
+        return factory.invoke("softmax", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int axis, boolean squeezeAxis, NDFuncParams fparams) {
+    public NDList split(int axis, boolean squeezeAxis) {
         MxOpParams params = new MxOpParams();
         params.addParam("num_outputs", size(axis));
         params.addParam("axis", axis);
         params.addParam("squeeze_axis", squeezeAxis);
-        return new NDList(JnaUtils.op("split").invoke(factory, this, params, fparams));
+        return new NDList(factory.invoke("split", new NDArray[] {this}, null, params));
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int axis, int numOutputs, NDFuncParams fparams)
-            throws IllegalArgumentException {
+    public NDList split(int axis, int numOutputs) throws IllegalArgumentException {
         MxOpParams params = new MxOpParams();
         params.addParam("num_outputs", numOutputs);
         params.addParam("axis", axis);
-        return new NDList(JnaUtils.op("split").invoke(factory, this, params, fparams));
+        return new NDList(factory.invoke("split", new NDArray[] {this}, null, params));
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray zerosLike(NDFuncParams fparams) {
-        return JnaUtils.op("zeros_like").invoke(factory, this, null, fparams)[0];
+    public NDArray add(Number n) {
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray onesLike(NDFuncParams fparams) {
-        return JnaUtils.op("ones_like").invoke(factory, this, null, fparams)[0];
+    public NDArray addi(Number n) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray add(NDArray other) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray addi(NDArray other) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray zerosLike() {
+        return factory.invoke("zeros_like", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray onesLike() {
+        return factory.invoke("ones_like", this, null);
     }
 
     /** {@inheritDoc} */

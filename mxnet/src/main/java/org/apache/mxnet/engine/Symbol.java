@@ -16,7 +16,6 @@ import com.amazon.ai.Block;
 import com.amazon.ai.Initializer;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.ndarray.NDList;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.util.PairList;
@@ -153,16 +152,7 @@ public class Symbol extends NativeResource implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public void close() {
-        Pointer pointer = handle.getAndSet(null);
-        if (pointer != null) {
-            JnaUtils.freeSymbol(pointer);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList forward(NDList inputs, PairList<String, String> params, NDFuncParams fparams) {
+    public NDList forward(NDList inputs, PairList<String, String> params) {
         return null;
     }
 
@@ -196,5 +186,14 @@ public class Symbol extends NativeResource implements Block {
     @Override
     public byte[] getEncoded() {
         return new byte[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        Pointer pointer = handle.getAndSet(null);
+        if (pointer != null) {
+            JnaUtils.freeSymbol(pointer);
+        }
     }
 }

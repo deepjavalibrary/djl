@@ -19,6 +19,7 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
+import com.amazon.ai.util.PairList;
 
 public class MockNDFactory implements NDFactory {
 
@@ -31,6 +32,17 @@ public class MockNDFactory implements NDFactory {
     @Override
     public NDArray create(DataDesc dataDesc) {
         return new MockNDArray();
+    }
+
+    @Override
+    public NDArray[] invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params) {
+        return new NDArray[0];
+    }
+
+    @Override
+    public NDArray zeros(Shape shape) {
+        return null;
     }
 
     @Override
