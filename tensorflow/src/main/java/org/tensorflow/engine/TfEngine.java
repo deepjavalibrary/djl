@@ -16,6 +16,10 @@ import org.tensorflow.TensorFlow;
 
 public class TfEngine extends Engine {
 
+    private static final TfUtils TF_ENGINE_UTILS = new TfUtils();
+
+    TfEngine() {}
+
     /** {@inheritDoc} */
     @Override
     public String getEngineName() {
@@ -37,7 +41,7 @@ public class TfEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public Context defaultContext() {
-        return null;
+        return Context.cpu();
     }
 
     /** {@inheritDoc} */
@@ -68,7 +72,7 @@ public class TfEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public EngineUtils getEngineUtils() {
-        return null;
+        return TF_ENGINE_UTILS;
     }
 
     /** {@inheritDoc} */

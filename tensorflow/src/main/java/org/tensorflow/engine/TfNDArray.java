@@ -12,13 +12,30 @@ import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
+import org.tensorflow.Tensor;
+import org.tensorflow.types.
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
+import java.util.Arrays;
+import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 
 public class TfNDArray implements NDArray {
+
+    private Tensor<?> t;
+    private Shape shape;
+    private TfNDFactory factory;
+
+    TfNDArray(Tensor<?> t) {
+        this.t = t;
+    }
+
+    TfNDArray(Shape shape, FloatBuffer data) {
+        t = Tensor.create(shape.getShapeLong(), data);
+        this.shape = shape;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -33,25 +50,28 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDFactory getFactory() {
-        return null;
+        return factory;
     }
 
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
-        return null;
+        return DataTypeMapper.getJoule(t.dataType());
     }
 
     /** {@inheritDoc} */
     @Override
     public Context getContext() {
-        return null;
+        return factory.getContext();
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape getShape() {
-        return null;
+        if (shape == null) {
+            shape = new Shape(Arrays.stream(t.shape()).mapToInt(Math::toIntExact).toArray());
+        }
+        return shape;
     }
 
     /** {@inheritDoc} */
@@ -63,16 +83,20 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataDesc getDataDescriptor() {
-        return null;
+        return new DataDesc(getShape(), getDataType(), null, getLayout(), getContext(), null);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void set(Buffer data) {}
+    public void set(Buffer data) {
+        throw new UnsupportedOperationException("Tensor cannot be modified after creation");
+    }
 
     /** {@inheritDoc} */
     @Override
-    public void set(List<Float> data) {}
+    public void set(List<Float> data) {
+        throw new UnsupportedOperationException("Tensor cannot be modified after creation");
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -648,7 +672,11 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public float[] toFloatArray() {
-        return new float[0];
+        FloatBuffer fb = FloatBuffer.allocate(t.numElements());
+        t.writeTo(fb);
+        float[] ret = new float[fb.remaining()];
+        fb.get(ret);
+        return ret;
     }
 
     /** {@inheritDoc} */
@@ -1098,7 +1126,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public long size() {
-        return 0;
+        return t.numElements();
     }
 
     /** {@inheritDoc} */

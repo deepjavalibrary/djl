@@ -38,6 +38,12 @@ public class Shape {
         return shape;
     }
 
+    public long[] getShapeLong() {
+        return Arrays.stream(getShape())
+                .mapToLong((i) -> (long) i)
+                .toArray();
+    }
+
     /**
      * Returns size of a specific dimension or several specific dimensions.
      *

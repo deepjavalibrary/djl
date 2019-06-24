@@ -13,7 +13,9 @@
 
 package org.tensorflow;
 
-import java.util.Arrays;
+import com.amazon.ai.ndarray.NDArray;
+import com.amazon.ai.ndarray.NDFactory;
+import org.tensorflow.engine.TfNDFactory;
 
 public final class HelloWorld {
 
@@ -21,7 +23,9 @@ public final class HelloWorld {
 
     @SuppressWarnings("PMD.SystemPrintln")
     public static void main(String[] args) {
-        Tensor<Float> t = Tensors.create(new float[] {1.0f, 2.0f});
-        System.out.println(Arrays.toString(t.shape()));
+        try (NDFactory factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory()) {
+            NDArray a = factory.create(new float[] {1.0f, 2.0f});
+            System.out.println(a.getShape());
+        }
     }
 }
