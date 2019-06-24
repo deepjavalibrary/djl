@@ -111,7 +111,7 @@ public final class GenericInferenceExample extends AbstractExample {
             NDArray top = sorted.slice(0, topK);
 
             float[] probabilities = nd.toFloatArray();
-            float[] indices = top.toFloatArray();
+            int[] indices = top.toIntArray();
 
             String[] synset;
             try {
@@ -120,7 +120,7 @@ public final class GenericInferenceExample extends AbstractExample {
                 throw new TranslateException(e);
             }
             for (int i = 0; i < topK; ++i) {
-                int index = (int) indices[i];
+                int index = indices[i];
                 String className = synset[index];
                 DetectedObject output = new DetectedObject(className, probabilities[index], null);
                 ret.add(output);
