@@ -7,26 +7,29 @@ import com.amazon.ai.Translator;
 import com.amazon.ai.TranslatorContext;
 import com.amazon.ai.inference.Predictor;
 import com.amazon.ai.metric.Metrics;
+import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.util.Pair;
+import java.util.List;
 import org.tensorflow.Session;
+import org.tensorflow.Tensor;
 
 public class TfPredictor<I, O> implements Predictor<I, O> {
 
     TfNDFactory factory;
     Session session;
     Model model;
-    Context context;
     private Translator<I, O> translator;
+    List<String> outputNames;
 
-    TfPredictor(TfModel model, Translator<I, O> translator, Context context) {
-        this.factory = (TfNDFactory) TfNDFactory.SYSTEM_FACTORY.newSubFactory(context);
+    TfPredictor(TfModel model, Translator<I, O> translator, List<String> outputNames) {
+        this.factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory();
         this.translator = translator;
         this.session = model.getSession();
         this.model = model;
-        this.context = context;
+        this.outputNames = outputNames;
     }
-
 
     /** {@inheritDoc} */
     @Override
@@ -42,7 +45,24 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
     }
 
     private NDList forward(NDList ndList) {
-        return null;
+        Session.Runner runner = session.runner();
+        for (Pair<String, NDArray> pair : ndList) {
+            runner.feed(pair.getKey(), ((TfNDArray) pair.getValue()).getTensor()).run();
+        }
+        for (String outputName : outputNames) {
+            runner.fetch(outputName);
+        }
+        List<Tensor<?>> result = runner.run();
+        NDList resultNDList = new NDList();
+        for (int i = 0; i < result.size(); i++) {
+            resultNDList.add(outputNames.get(i), factory.create(result.get(i)));
+        }
+
+        return resultNDList;
+    }
+
+    public void setOutputNames(List<String> outputNames) {
+        this.outputNames = outputNames;
     }
 
     /** {@inheritDoc} */
@@ -59,34 +79,34 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
         public PredictorContext() {
             ctxFactory = factory.newSubFactory();
         }
-            /** {@inheritDoc} */
-            @Override
-            public Model getModel() {
-                return model;
-            }
+        /** {@inheritDoc} */
+        @Override
+        public Model getModel() {
+            return model;
+        }
 
-            /** {@inheritDoc} */
-            @Override
-            public Context getContext() {
-                return context;
-            }
+        /** {@inheritDoc} */
+        @Override
+        public Context getContext() {
+            return null;
+        }
 
-            /** {@inheritDoc} */
-            @Override
-            public NDFactory getNDFactory() {
-                return ctxFactory;
-            }
+        /** {@inheritDoc} */
+        @Override
+        public NDFactory getNDFactory() {
+            return ctxFactory;
+        }
 
-            /** {@inheritDoc} */
-            @Override
-            public Metrics getMetrics() {
-                return null;
-            }
+        /** {@inheritDoc} */
+        @Override
+        public Metrics getMetrics() {
+            return null;
+        }
 
-            /** {@inheritDoc} */
-            @Override
-            public void close() {
-                ctxFactory.close();
-            }
+        /** {@inheritDoc} */
+        @Override
+        public void close() {
+            ctxFactory.close();
+        }
     }
 }

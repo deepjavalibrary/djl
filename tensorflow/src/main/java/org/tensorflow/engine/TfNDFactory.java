@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.amazon.ai.util.PairList;
 import org.tensorflow.Graph;
 import org.tensorflow.Session;
+import org.tensorflow.Tensor;
 import org.tensorflow.Tensors;
 
 public class TfNDFactory implements NDFactory, AutoCloseable {
@@ -68,6 +69,11 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
         return null;
     }
 
+    public TfNDArray create(Tensor<?> tensor) {
+        return new TfNDArray(this, tensor);
+    }
+
+    /** {@inheritDoc} */
     @Override
     public NDArray[] invoke(String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params) {
         return new NDArray[0];

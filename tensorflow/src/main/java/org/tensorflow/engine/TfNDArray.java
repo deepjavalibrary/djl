@@ -113,6 +113,10 @@ public class TfNDArray implements NDArray {
         return shape;
     }
 
+    public Tensor<?> getTensor() {
+        return tensor;
+    }
+
     /** {@inheritDoc} */
     @Override
     public Layout getLayout() {

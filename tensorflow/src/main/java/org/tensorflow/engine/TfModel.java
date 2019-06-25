@@ -18,30 +18,27 @@ public class TfModel implements Model {
     private Path modelDir;
     private SavedModelBundle bundle;
 
-    TfModel(
-            Path modelDir,
-            SavedModelBundle bundle) {
+    TfModel(Path modelDir, SavedModelBundle bundle) {
         this.modelDir = modelDir;
         this.bundle = bundle;
     }
 
     static TfModel loadModel(String modelDir, String... tags) {
         if (tags == null || tags.length == 0) {
-            tags = new String[]{"serve"};
+            tags = new String[] {"serve"};
         }
-        return new TfModel(
-                Paths.get(modelDir),
-                SavedModelBundle.load(modelDir, tags)
-        );
+        return new TfModel(Paths.get(modelDir), SavedModelBundle.load(modelDir, tags));
     }
 
-    static TfModel loadModel(String modelDir, byte[] configProto, byte[] runOptions, String... tags) {
-        SavedModelBundle bundle = SavedModelBundle.loader(modelDir)
-                .withConfigProto(configProto).withRunOptions(runOptions).withTags(tags).load();
-        return new TfModel(
-                Paths.get(modelDir),
-                bundle
-        );
+    static TfModel loadModel(
+            String modelDir, byte[] configProto, byte[] runOptions, String... tags) {
+        SavedModelBundle bundle =
+                SavedModelBundle.loader(modelDir)
+                        .withConfigProto(configProto)
+                        .withRunOptions(runOptions)
+                        .withTags(tags)
+                        .load();
+        return new TfModel(Paths.get(modelDir), bundle);
     }
 
     public Graph getGraph() {
