@@ -9,6 +9,7 @@ import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -71,6 +72,10 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
 
     public TfNDArray create(Tensor<?> tensor) {
         return new TfNDArray(this, tensor);
+    }
+
+    public TfNDArray create(Shape shape, ByteBuffer data) {
+        return new TfNDArray(this, shape, data);
     }
 
     /** {@inheritDoc} */

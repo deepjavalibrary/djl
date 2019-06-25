@@ -15,6 +15,7 @@ import com.amazon.ai.ndarray.types.SparseFormat;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import java.util.stream.IntStream;
 import org.tensorflow.Operation;
 import org.tensorflow.Output;
 import org.tensorflow.Tensor;
+import org.tensorflow.types.UInt8;
 
 public class TfNDArray implements NDArray {
 
@@ -45,6 +47,12 @@ public class TfNDArray implements NDArray {
     TfNDArray(NDFactory factory, Shape shape, FloatBuffer data) {
         this.factory = (TfNDFactory) factory;
         tensor = Tensor.create(shape.getShapeLong(), data);
+        this.shape = shape;
+    }
+
+    TfNDArray(NDFactory factory, Shape shape, ByteBuffer data) {
+        this.factory = (TfNDFactory) factory;
+        tensor = Tensor.create(UInt8.class, shape.getShapeLong(), data);
         this.shape = shape;
     }
 

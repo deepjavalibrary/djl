@@ -51,7 +51,7 @@ public class TfModel implements Model {
             }
             // TODO: Add DataType mapping from framework.DataType
             // TODO: Add Layout mapping for the layout
-            descs[dataDescIter] = new DataDesc(new Shape(shape), null, entry.getKey(), null);
+            descs[dataDescIter] = new DataDesc(new Shape(shape), null, t.getName(), null);
             dataDescIter++;
         }
         return descs;

@@ -10,6 +10,7 @@ import com.amazon.ai.metric.Metrics;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.util.Pair;
 import java.util.List;
 import org.tensorflow.Session;
@@ -21,14 +22,12 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
     Session session;
     Model model;
     private Translator<I, O> translator;
-    List<String> outputNames;
 
-    TfPredictor(TfModel model, Translator<I, O> translator, List<String> outputNames) {
+    public TfPredictor(TfModel model, Translator<I, O> translator) {
         this.factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory();
         this.translator = translator;
         this.session = model.getSession();
         this.model = model;
-        this.outputNames = outputNames;
     }
 
     /** {@inheritDoc} */
@@ -39,30 +38,29 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
 
         NDList ndList = translator.processInput(inputCtx, input);
 
-        NDList result = forward(ndList);
+        NDList result = forward(ndList, model);
 
         return translator.processOutput(outputCtx, result);
     }
 
-    private NDList forward(NDList ndList) {
+    private NDList forward(NDList ndList, Model model) {
         Session.Runner runner = session.runner();
         for (Pair<String, NDArray> pair : ndList) {
-            runner.feed(pair.getKey(), ((TfNDArray) pair.getValue()).getTensor()).run();
+            runner.feed(pair.getKey(), ((TfNDArray) pair.getValue()).getTensor());
         }
-        for (String outputName : outputNames) {
-            runner.fetch(outputName);
+        // TODO We can extract input name from decribeInput in Model if NDList doesn't have names
+        DataDesc[] dataDescs = model.describeOutput();
+        for (DataDesc desc : dataDescs) {
+            runner.fetch(desc.getName());
         }
         List<Tensor<?>> result = runner.run();
+
         NDList resultNDList = new NDList();
         for (int i = 0; i < result.size(); i++) {
-            resultNDList.add(outputNames.get(i), factory.create(result.get(i)));
+            resultNDList.add(dataDescs[i].getName(), factory.create(result.get(i)));
         }
 
         return resultNDList;
-    }
-
-    public void setOutputNames(List<String> outputNames) {
-        this.outputNames = outputNames;
     }
 
     /** {@inheritDoc} */
