@@ -246,6 +246,224 @@ public interface NDFactory extends AutoCloseable {
     NDArray ones(DataDesc dataDesc);
 
     /**
+     * Returns evenly spaced values within a given interval.
+     *
+     * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
+     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * equivalent to the Python built-in `range` function, but returns an instance of {@link
+     * NDArray} rather than a list.
+     *
+     * @param start start of interval. The interval includes this value.
+     * @param stop end of interval. The interval does not include this value.
+     * @param step spacing between values.
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray arange(int start, int stop, int step, Context context, DataType dataType);
+
+    /**
+     * Returns evenly spaced values within a given interval in current context.
+     *
+     * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
+     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * equivalent to the Python built-in `range` function, but returns an instance of {@link
+     * NDArray} rather than a list.
+     *
+     * @param start start of interval. The interval includes this value.
+     * @param stop end of interval. The interval does not include this value.
+     * @param step spacing between values.
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray arange(int start, int stop, int step, DataType dataType) {
+        return arange(start, stop, step, getContext(), dataType);
+    }
+
+    /**
+     * Returns evenly spaced values within a given interval in current context.
+     *
+     * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
+     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * equivalent to the Python built-in `range` function, but returns an instance of {@link
+     * NDArray} rather than a list.
+     *
+     * @param start start of interval. The interval includes this value.
+     * @param stop end of interval. The interval does not include this value.
+     * @param step spacing between values.
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray arange(int start, int stop, int step) {
+        return arange(start, stop, step, getContext(), DataType.FLOAT32);
+    }
+
+    /**
+     * Returns evenly spaced values within a given interval in current context with step 1.
+     *
+     * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
+     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * equivalent to the Python built-in `range` function, but returns an instance of {@link
+     * NDArray} rather than a list.
+     *
+     * @param start start of interval. The interval includes this value.
+     * @param stop end of interval. The interval does not include this value.
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray arange(int start, int stop) {
+        return arange(start, stop, 1, getContext(), DataType.INT32);
+    }
+
+    /**
+     * Returns evenly spaced values starting from 0 in current context.
+     *
+     * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
+     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * equivalent to the Python built-in `range` function, but returns an instance of {@link
+     * NDArray} rather than a list.
+     *
+     * @param stop end of interval. The interval does not include this value.
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray arange(int stop) {
+        return arange(0, stop, 1, getContext(), DataType.FLOAT32);
+    }
+
+    /**
+     * Return evenly spaced numbers over a specified interval.
+     *
+     * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].The endpoint
+     * of the interval can optionally be excluded.
+     *
+     * @param start The starting value of the sequence.
+     * @param stop The end value of the sequence.
+     * @param num Number of samples to generate.
+     * @param endpoint If True, stop is the last sample. Otherwise, it is not included.
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray linspace(double start, double stop, int num, boolean endpoint, Context context);
+
+    /**
+     * Return evenly spaced numbers over a specified interval in current context.
+     *
+     * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].
+     *
+     * @param start The starting value of the sequence.
+     * @param stop The end value of the sequence.
+     * @param num Number of samples to generate.
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray linspace(double start, double stop, int num) {
+        return linspace(start, stop, num, true, getContext());
+    }
+
+    /**
+     * Draw random samples from a normal (Gaussian) distribution.
+     *
+     * <p>Samples are uniformly distributed over the half-open interval ``[low, high)`` (includes
+     * low, but excludes high). In other words, any value within the given interval is equally
+     * likely to be drawn by `uniform`
+     *
+     * @param low Lower boundary of the output interval. All values generated will be greater than
+     *     or equal to low.
+     * @param high Upper boundary of the output interval. All values generated will be less than
+     *     high.
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray randomUniform(double low, double high, Shape shape, Context context, DataType dataType);
+
+    /**
+     * Draw random samples from a normal (Gaussian) distribution in current context.
+     *
+     * <p>Samples are uniformly distributed over the half-open interval ``[low, high)`` (includes
+     * low, but excludes high). In other words, any value within the given interval is equally
+     * likely to be drawn by `uniform`
+     *
+     * @param low Lower boundary of the output interval. All values generated will be greater than
+     *     or equal to low.
+     * @param high Upper boundary of the output interval. All values generated will be less than
+     *     high.
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray randomUniform(double low, double high, Shape shape) {
+        return randomUniform(low, high, shape, getContext(), DataType.FLOAT32);
+    }
+
+    /**
+     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
+     * to a normal distribution parametrized by *loc* (mean) and *scale* (standard deviation).
+     *
+     * @param loc Mean (centre) of the distribution.
+     * @param scale Standard deviation (spread or "width") of the distribution.
+     * @param shape Output shape.
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray randomNormal(double loc, double scale, Shape shape, Context context, DataType dataType);
+
+    /**
+     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
+     * to a normal distribution parametrized by mean = 0 and standard deviation = 1.
+     *
+     * @param shape Output shape.
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray randomNormal(Shape shape, Context context, DataType dataType) {
+        return randomNormal(0f, 1f, shape, context, dataType);
+    }
+
+    /**
+     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
+     * to a normal distribution parametrized by mean = 0 and standard deviation = 1 in current
+     * context.
+     *
+     * @param shape Output shape.
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray randomNormal(Shape shape) {
+        return randomNormal(0f, 1f, shape, getContext(), DataType.FLOAT32);
+    }
+
+    /**
+     * Draw samples from a multinomial distribution. The multinomial distribution is a multivariate
+     * generalisation of the binomial distribution. Take an experiment with one of ``p`` possible
+     * outcomes. An example of such an experiment is throwing a dice, where the outcome can be 1
+     * through 6. Each sample drawn from the distribution represents n such experiments. Its values,
+     * ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the outcome was ``i``.
+     *
+     * @param n Number of experiments.
+     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1
+     *     (however, the last element is always assumed to account for the remaining probability, as
+     *     long as ``sum(pvals[:-1]) &lt;= 1)``
+     * @param shape Output shape
+     * @return
+     */
+    NDArray randomMultinomial(int n, NDArray pValues, Shape shape);
+
+    /**
+     * Return a single sample from a multinomial distribution. The multinomial distribution is a
+     * multivariate generalisation of the binomial distribution. Take an experiment with one of
+     * ``p`` possible outcomes. An example of such an experiment is throwing a dice, where the
+     * outcome can be 1 through 6. Each sample drawn from the distribution represents n such
+     * experiments. Its values, ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the
+     * outcome was ``i``.
+     *
+     * @param n Number of experiments.
+     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1
+     *     (however, the last element is always assumed to account for the remaining probability, as
+     *     long as ``sum(pvals[:-1]) &lt;= 1)``
+     * @return
+     */
+    NDArray randomMultinomial(int n, NDArray pValues);
+
+    /**
      * Returns parent NDFactory.
      *
      * @return parent NDFactory

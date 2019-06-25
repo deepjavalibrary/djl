@@ -493,14 +493,34 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi(int dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public NDArray cumsumi(int axis) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        params.setDataType(getDataType());
+        factory.invoke("_np_cumsum", new NDArray[] {this}, new NDArray[] {this}, params);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum(int dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public NDArray cumsumi() {
+        factory.invoke("_np_cumsum", new NDArray[] {this}, new NDArray[] {this}, null);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsum(int axis) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        params.setDataType(getDataType());
+        return factory.invoke("_np_cumsum", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsum() {
+        return factory.invoke("_np_cumsum", this, null);
     }
 
     /** {@inheritDoc} */

@@ -98,6 +98,38 @@ public class MockNDFactory implements NDFactory {
     }
 
     @Override
+    public NDArray arange(int start, int stop, int step, Context context, DataType dataType) {
+        return null;
+    }
+
+    @Override
+    public NDArray linspace(double start, double stop, int num, boolean endPoint, Context context) {
+        return null;
+    }
+
+    @Override
+    public NDArray randomUniform(
+            double low, double high, Shape shape, Context context, DataType dataType) {
+        return null;
+    }
+
+    @Override
+    public NDArray randomNormal(
+            double loc, double scale, Shape shape, Context context, DataType dataType) {
+        return null;
+    }
+
+    @Override
+    public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray randomMultinomial(int n, NDArray pValues) {
+        return null;
+    }
+
+    @Override
     public NDFactory getParentFactory() {
         return this;
     }

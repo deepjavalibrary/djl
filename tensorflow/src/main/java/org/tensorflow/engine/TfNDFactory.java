@@ -138,6 +138,44 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray arange(int start, int stop, int step, Context context, DataType dataType) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray linspace(double start, double stop, int num, boolean endpoint, Context context) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomUniform(
+            double low, double high, Shape shape, Context context, DataType dataType) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomNormal(
+            double loc, double scale, Shape shape, Context context, DataType dataType) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomMultinomial(int n, NDArray pValues) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray ones(DataDesc dataDesc) {
         return null;
     }

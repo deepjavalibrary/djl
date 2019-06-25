@@ -12,6 +12,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 
 public class MxNDArrayOperatorsTest extends AbstractTest {
@@ -165,6 +166,59 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         Assertions.assertStatement(greater.nonzero() == 3, "greater_equal: Incorrect comparison");
         NDArray lesser = NDArrays.lte(ndArray1, ndArray2);
         Assertions.assertStatement(lesser.nonzero() == 4, "lesser_equal: Incorrect comparison");
+    }
+
+    @RunAsTest
+    public void testArange() throws FailedTestException {
+        NDArray expectedND =
+                factory.create(
+                        new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f}, null, new Shape(10));
+        NDArray testedND = factory.arange(0, 10, 1, DataType.FLOAT32);
+        Assertions.assertEquals(testedND, expectedND);
+        testedND = factory.arange(0, 10, 1);
+        Assertions.assertEquals(testedND, expectedND);
+        testedND = factory.arange(10);
+        Assertions.assertEquals(testedND, expectedND);
+    }
+
+    @RunAsTest
+    public void testLinspace() throws FailedTestException {
+        NDArray expectedND =
+                factory.create(
+                        new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f}, null, new Shape(10));
+        NDArray testedND = factory.linspace(0.0, 9.0, 10, true, null);
+        Assertions.assertEquals(testedND, expectedND);
+    }
+
+    @RunAsTest
+    public void testCumsum() throws FailedTestException {
+        NDArray expectedND =
+                factory.create(
+                        new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f}, null, new Shape(10));
+        NDArray actualND =
+                factory.create(
+                        new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f},
+                        null,
+                        new Shape(10));
+        Assertions.assertEquals(expectedND.cumsum(0), actualND);
+    }
+
+    @RunAsTest
+    public void testCumsumi() throws FailedTestException {
+        MxNDArray expectedND =
+                (MxNDArray)
+                        factory.create(
+                                new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
+                                null,
+                                new Shape(10));
+        MxNDArray actualND =
+                (MxNDArray)
+                        factory.create(
+                                new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f},
+                                null,
+                                new Shape(10));
+        Assertions.assertEquals(expectedND.cumsumi(0), actualND);
+        Assertions.assertInPlace((MxNDArray) expectedND.cumsumi(0), expectedND);
     }
 
     @RunAsTest

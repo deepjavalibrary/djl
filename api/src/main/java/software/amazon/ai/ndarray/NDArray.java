@@ -410,20 +410,34 @@ public interface NDArray extends AutoCloseable {
     boolean isSparse();
 
     /**
-     * Returns the cumulative sum along a dimension. In-place method.
+     * Returns the cumulative sum along a axis. In-place method.
      *
-     * @param dimension the dimension to perform cumulative sum along.
+     * @param axis axis along which the cumulative sum is computed.
      * @return this object.
      */
-    NDArray cumsumi(int dimension);
+    NDArray cumsumi(int axis);
 
     /**
-     * Returns the cumulative sum along a dimension.
+     * Returns the cumulative sum over the flattened array. In-place method.
      *
-     * @param dimension the dimension to perform cumulative sum along.
+     * @return this object.
+     */
+    NDArray cumsumi();
+
+    /**
+     * Returns the cumulative sum along a axis.
+     *
+     * @param axis axis along which the cumulative sum is computed.
      * @return the cumulative sum along the specified dimension
      */
-    NDArray cumsum(int dimension);
+    NDArray cumsum(int axis);
+
+    /**
+     * Returns the cumulative sum over the flattened array.
+     *
+     * @return the cumulative sum along the specified dimension
+     */
+    NDArray cumsum();
 
     /**
      * Assign all of the elements in the given ndarray to this ndarray

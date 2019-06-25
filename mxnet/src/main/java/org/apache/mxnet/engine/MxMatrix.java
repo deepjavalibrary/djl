@@ -485,14 +485,26 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi(int dimension) {
-        return array.cumsumi(dimension);
+    public NDArray cumsumi(int axis) {
+        return array.cumsumi(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum(int dimension) {
-        return array.cumsum(dimension);
+    public NDArray cumsumi() {
+        return array.cumsumi();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsum(int axis) {
+        return array.cumsum(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsum() {
+        return array.cumsum();
     }
 
     /** {@inheritDoc} */

@@ -15,6 +15,12 @@ public class MxOpParams extends PairList<String, String> {
         }
     }
 
+    public void setShape(String alias, Shape shape) {
+        if (shape != null) {
+            setParam(alias, shape.toString());
+        }
+    }
+
     public void setContext(Context context) {
         if (context != null) {
             setParam("ctx", context.toString());

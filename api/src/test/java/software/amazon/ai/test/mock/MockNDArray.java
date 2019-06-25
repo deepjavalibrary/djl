@@ -182,12 +182,22 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray cumsumi(int dimension) {
+    public NDArray cumsumi(int axis) {
         return null;
     }
 
     @Override
-    public NDArray cumsum(int dimension) {
+    public NDArray cumsumi() {
+        return null;
+    }
+
+    @Override
+    public NDArray cumsum(int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray cumsum() {
         return null;
     }
 

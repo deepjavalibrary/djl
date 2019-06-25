@@ -189,6 +189,83 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray arange(int start, int stop, int step, Context context, DataType dataType) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("start", start);
+        params.addParam("stop", stop);
+        params.addParam("step", step);
+        params.setDataType(dataType);
+        params.setContext(context);
+        return invoke("_npi_arange", EMPTY, params)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray linspace(double start, double stop, int num, boolean endpoint, Context context) {
+        if (num < 0) {
+            throw new IllegalArgumentException("Num argument must be non-negative");
+        }
+        MxOpParams params = new MxOpParams();
+        params.addParam("start", start);
+        params.addParam("stop", stop);
+        params.addParam("num", num);
+        params.addParam("endpoint", endpoint);
+        params.setDataType(DataType.FLOAT32);
+        params.setContext(context);
+        return invoke("_npi_linspace", EMPTY, params)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomUniform(
+            double low, double high, Shape shape, Context context, DataType dataType) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("low", low);
+        params.addParam("high", high);
+        params.setShape(shape);
+        params.setContext(context);
+        params.setDataType(dataType);
+        return invoke("_npi_random_uniform", EMPTY, params)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomNormal(
+            double loc, double scale, Shape shape, Context context, DataType dataType) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("loc", loc);
+        params.addParam("scale", scale);
+        params.setShape(shape);
+        params.setContext(context);
+        params.setDataType(dataType);
+        return invoke("_npi_random_normal", EMPTY, params)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomNormal(Shape shape, Context context, DataType dataType) {
+        return randomNormal(0f, 1f, shape, context, dataType);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("n", n);
+        params.setShape("size", shape);
+        return invoke("_npi_multinomial", pValues, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomMultinomial(int n, NDArray pValues) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("n", n);
+        return invoke("_npi_multinomial", pValues, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDFactory getParentFactory() {
         return parent;
     }

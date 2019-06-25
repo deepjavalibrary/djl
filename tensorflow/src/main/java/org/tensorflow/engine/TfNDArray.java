@@ -332,13 +332,25 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi(int dimension) {
+    public NDArray cumsumi(int axis) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum(int dimension) {
+    public NDArray cumsumi() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsum(int axis) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsum() {
         return null;
     }
 
