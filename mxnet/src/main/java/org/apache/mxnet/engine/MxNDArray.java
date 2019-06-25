@@ -1600,6 +1600,150 @@ public class MxNDArray extends NativeResource implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public NDArray abs() {
+        return factory.invoke("_np_abs", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cbrt() {
+        return factory.invoke("_np_cbrt", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray floor() {
+        return factory.invoke("_np_floor", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray ceil() {
+        return factory.invoke("_np_ceil", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray round() {
+        return factory.invoke("_np_round", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray trunc() {
+        return factory.invoke("_np_trunc", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray exp() {
+        return factory.invoke("_np_exp", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray log() {
+        return factory.invoke("_np_log", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray log10() {
+        return factory.invoke("_np_log10", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray log2() {
+        return factory.invoke("_np_log2", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sin() {
+        return factory.invoke("_np_sin", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cos() {
+        return factory.invoke("_np_cos", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tan() {
+        return factory.invoke("_np_tan", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray asin() {
+        return factory.invoke("_np_arcsin", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray acos() {
+        return factory.invoke("_np_arccos", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray atan() {
+        return factory.invoke("_np_arctan", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toDegrees() {
+        return factory.invoke("_np_degrees", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toRadians() {
+        return factory.invoke("_np_radians", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sinh() {
+        return factory.invoke("_np_sinh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cosh() {
+        return factory.invoke("_np_cosh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tanh() {
+        return factory.invoke("_np_tanh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray asinh() {
+        return factory.invoke("_np_arcsinh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray acosh() {
+        return factory.invoke("_np_arccosh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray atanh() {
+        return factory.invoke("_np_arctanh", this, null);
+    }
+
     private ByteBuffer toByteBuffer() {
         Shape sh = getShape();
         DataType dType = getDataType();

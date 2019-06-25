@@ -1120,5 +1120,125 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray abs() {
+        return null;
+    }
+
+    @Override
+    public NDArray cbrt() {
+        return null;
+    }
+
+    @Override
+    public NDArray floor() {
+        return null;
+    }
+
+    @Override
+    public NDArray ceil() {
+        return null;
+    }
+
+    @Override
+    public NDArray round() {
+        return null;
+    }
+
+    @Override
+    public NDArray trunc() {
+        return null;
+    }
+
+    @Override
+    public NDArray exp() {
+        return null;
+    }
+
+    @Override
+    public NDArray log() {
+        return null;
+    }
+
+    @Override
+    public NDArray log10() {
+        return null;
+    }
+
+    @Override
+    public NDArray log2() {
+        return null;
+    }
+
+    @Override
+    public NDArray sin() {
+        return null;
+    }
+
+    @Override
+    public NDArray cos() {
+        return null;
+    }
+
+    @Override
+    public NDArray tan() {
+        return null;
+    }
+
+    @Override
+    public NDArray asin() {
+        return null;
+    }
+
+    @Override
+    public NDArray acos() {
+        return null;
+    }
+
+    @Override
+    public NDArray atan() {
+        return null;
+    }
+
+    @Override
+    public NDArray toDegrees() {
+        return null;
+    }
+
+    @Override
+    public NDArray toRadians() {
+        return null;
+    }
+
+    @Override
+    public NDArray sinh() {
+        return null;
+    }
+
+    @Override
+    public NDArray cosh() {
+        return null;
+    }
+
+    @Override
+    public NDArray tanh() {
+        return null;
+    }
+
+    @Override
+    public NDArray asinh() {
+        return null;
+    }
+
+    @Override
+    public NDArray acosh() {
+        return null;
+    }
+
+    @Override
+    public NDArray atanh() {
+        return null;
+    }
+
+    @Override
     public void close() {}
 }

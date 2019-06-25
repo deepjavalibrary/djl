@@ -1877,6 +1877,188 @@ public interface NDArray extends AutoCloseable {
      */
     NDArrayEx getNDArrayInternal();
 
+    /**
+     * Calculate the absolute value element-wise.
+     *
+     * @return NDArray
+     */
+    NDArray abs();
+
+    /**
+     * Return the cube-root of an array, element-wise.
+     *
+     * @return NDArray
+     */
+    NDArray cbrt();
+
+    /**
+     * Return the floor of the input, element-wise. The floor of the scalar x is the largest integer
+     * i, such that i &lt;= x. It is often denoted as \lfloor x \rfloor.
+     *
+     * @return NDArray
+     */
+    NDArray floor();
+
+    /**
+     * Return the ceiling of the input, element-wise. The ceil of the scalar x is the smallest
+     * integer i, such that i &gt;= x. It is often denoted as \lceil x \rceil.
+     *
+     * @return NDArray
+     */
+    NDArray ceil();
+
+    /**
+     * Returns element-wise rounded value to the nearest integer of the input.
+     *
+     * @return NDArray
+     */
+    NDArray round();
+
+    /**
+     * Return the element-wise truncated value of the input.
+     *
+     * @return NDArray
+     */
+    NDArray trunc();
+
+    /**
+     * Returns element-wise exponential value of the input.
+     *
+     * @return NDArray
+     */
+    NDArray exp();
+
+    /**
+     * Returns element-wise Natural logarithmic value of the input.
+     *
+     * @return NDArray
+     */
+    NDArray log();
+
+    /**
+     * Returns element-wise Base-2 logarithmic value of the input.
+     *
+     * @return NDArray
+     */
+    NDArray log10();
+
+    /**
+     * Returns element-wise Base-2 logarithmic value of the input.
+     *
+     * @return NDArray
+     */
+    NDArray log2();
+
+    /**
+     * Computes the element-wise sine of the input array. The input should be in radians ( 2𝜋 rad
+     * equals 360 degrees).
+     *
+     * @return NDArray
+     */
+    NDArray sin();
+
+    /**
+     * Computes the element-wise cosine of the input array. The input should be in radians ( 2𝜋 rad
+     * equals 360 degrees).
+     *
+     * @return NDArray
+     */
+    NDArray cos();
+
+    /**
+     * Computes the element-wise tangent of the input array. The input should be in radians ( 2𝜋
+     * rad equals 360 degrees).
+     *
+     * @return NDArray
+     */
+    NDArray tan();
+
+    /**
+     * Returns element-wise inverse sine of the input array. The input should be in the range [-1,
+     * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
+     *
+     * @return NDArray
+     */
+    NDArray asin();
+
+    /**
+     * Returns element-wise inverse cosine of the input array. The input should be in the range [-1,
+     * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
+     *
+     * @return NDArray
+     */
+    NDArray acos();
+
+    /**
+     * Returns element-wise inverse tangent of the input array. The input should be in the range
+     * [-1, 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
+     *
+     * @return NDArray
+     */
+    NDArray atan();
+
+    /**
+     * Converts each element of the input array from radians to degrees.
+     * 𝑑𝑒𝑔𝑟𝑒𝑒𝑠([0,𝜋/2,𝜋,3𝜋/2,2𝜋])=[0,90,180,270,360].
+     *
+     * @return NDArray
+     */
+    NDArray toDegrees();
+
+    /**
+     * Converts each element of the input array from degrees to radians.
+     * 𝑟𝑎𝑑𝑖𝑎𝑛𝑠([0,90,180,270,360])=[0,𝜋/2,𝜋,3𝜋/2,2𝜋]
+     *
+     * @return NDArray
+     */
+    NDArray toRadians();
+
+    /**
+     * Returns the hyperbolic sine of the input array, computed element-wise.
+     * 𝑠𝑖𝑛ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)−𝑒𝑥𝑝(−𝑥))
+     *
+     * @return NDArray
+     */
+    NDArray sinh();
+
+    /**
+     * Returns the hyperbolic cosine of the input array, computed element-wise.
+     * 𝑐𝑜𝑠ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)+𝑒𝑥𝑝(−𝑥))
+     *
+     * @return NDArray
+     */
+    NDArray cosh();
+
+    /**
+     * Returns the hyperbolic tangent of the input array, computed element-wise.
+     * 𝑡𝑎𝑛ℎ(𝑥)=𝑠𝑖𝑛ℎ(𝑥)/𝑐𝑜𝑠ℎ(𝑥)
+     *
+     * @return NDArray
+     */
+    NDArray tanh();
+
+    /**
+     * Returns the element-wise inverse hyperbolic sine of the input array, computed element-wise.
+     *
+     * @return NDArray
+     */
+    NDArray asinh();
+
+    /**
+     * Returns the element-wise inverse hyperbolic cosine of the input array, computed element-wise.
+     *
+     * @return NDArray
+     */
+    NDArray acosh();
+
+    /**
+     * Returns the element-wise inverse hyperbolic tangent of the input array, computed
+     * element-wise.
+     *
+     * @return NDArray
+     */
+    NDArray atanh();
+
     @Override
     void close();
 }

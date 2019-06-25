@@ -1577,5 +1577,149 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray abs() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cbrt() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray floor() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray ceil() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray round() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray trunc() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray exp() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray log() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray log10() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray log2() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sin() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cos() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tan() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray asin() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray acos() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray atan() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toDegrees() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toRadians() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sinh() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cosh() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tanh() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray asinh() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray acosh() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray atanh() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void close() {}
 }
