@@ -12,5 +12,4 @@
  */
 package com.amazon.ai.ndarray.internal;
 
-public interface NDArrayEx {
-}
+public interface NDArrayEx {}

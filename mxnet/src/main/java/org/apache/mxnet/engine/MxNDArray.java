@@ -17,6 +17,7 @@ import com.amazon.ai.ndarray.Matrix;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.ndarray.internal.NDArrayEx;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Layout;
@@ -277,7 +278,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (sparseFormat == null || sparseFormat == SparseFormat.UNDEFINED) {
             grad = (MxNDArray) zerosLike();
         } else {
-            grad = (MxNDArray) factory.zeros(context, shape, dataType, sparseFormat);
+            grad = (MxNDArray) factory.zeros(context, shape, dataType);
         }
         int gradReqValue = gradReq.getValue();
         IntBuffer gradReqBuffer = IntBuffer.allocate(1);
@@ -1590,6 +1591,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray ulike() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArrayEx getNDArrayInternal() {
         return null;
     }
 

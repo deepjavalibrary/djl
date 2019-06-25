@@ -141,21 +141,20 @@ public interface NDFactory extends AutoCloseable {
      *
      * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
-     * @see #zeros(Context, Shape, DataType, SparseFormat)
+     * @see #zeros(Context, Shape, DataType)
      */
     NDArray zeros(Shape shape);
 
     /**
      * Create an instance of {@link NDArray} filled with zeros with specified {@link Context},
-     * {@link Shape}, {@link DataType} and {@link SparseFormat}.
+     * {@link Shape}, {@link DataType}.
      *
      * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
-     * @param sparseFormat the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray zeros(Context context, Shape shape, DataType dataType, SparseFormat sparseFormat);
+    NDArray zeros(Context context, Shape shape, DataType dataType);
 
     /**
      * Create an instance of {@link NDArray} filled with zeros with specified {@link DataDesc}.
@@ -167,15 +166,14 @@ public interface NDFactory extends AutoCloseable {
 
     /**
      * Create an instance of {@link NDArray} filled with ones with specified {@link Context}, {@link
-     * Shape}, {@link DataType} and {@link SparseFormat}.
+     * Shape}, {@link DataType}.
      *
      * @param context the {@link Context} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link com.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link com.amazon.ai.ndarray.NDArray}
-     * @param sparseFormat the {@link SparseFormat} of the {@link com.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray ones(Context context, Shape shape, DataType dataType, SparseFormat sparseFormat);
+    NDArray ones(Context context, Shape shape, DataType dataType);
 
     /**
      * Create an instance of {@link NDArray} filled with ones with specified {@link DataDesc}.

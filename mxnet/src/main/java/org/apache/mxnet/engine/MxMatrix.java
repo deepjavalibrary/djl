@@ -5,6 +5,7 @@ import com.amazon.ai.ndarray.Matrix;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.ndarray.internal.NDArrayEx;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Layout;
@@ -1565,6 +1566,12 @@ public class MxMatrix implements Matrix {
     /** {@inheritDoc} */
     @Override
     public NDArray ulike() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArrayEx getNDArrayInternal() {
         return null;
     }
 

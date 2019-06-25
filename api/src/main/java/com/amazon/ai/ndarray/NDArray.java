@@ -1871,7 +1871,8 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns an internal representative of Native NDArray.
      *
-     * <p>This method should only be used by Engine provider.</p>
+     * <p>This method should only be used by Engine provider.
+     *
      * @return an internal representative of Native NDArray
      */
     NDArrayEx getNDArrayInternal();

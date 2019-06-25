@@ -108,35 +108,28 @@ public class MxNDFactory implements NDFactory {
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape) {
-        return zeros(context, shape, null, null);
+        return zeros(context, shape, null);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(
-            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
-        return fill("_zeros", context, shape, dataType, sparseFormat);
+    public NDArray zeros(Context context, Shape shape, DataType dataType) {
+        return fill("_zeros", context, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(DataDesc dataDesc) {
-        return zeros(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType(), null);
+        return zeros(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ones(
-            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
-        return fill("_ones", context, shape, dataType, sparseFormat);
+    public NDArray ones(Context context, Shape shape, DataType dataType) {
+        return fill("_ones", context, shape, dataType);
     }
 
-    private NDArray fill(
-            String opName,
-            Context context,
-            Shape shape,
-            DataType dataType,
-            SparseFormat sparseFormat) {
+    private NDArray fill(String opName, Context context, Shape shape, DataType dataType) {
         MxOpParams params = new MxOpParams();
         if (shape == null) {
             throw new IllegalArgumentException("Shape is required for " + opName.substring(1));
@@ -144,18 +137,13 @@ public class MxNDFactory implements NDFactory {
         params.setShape(shape);
         params.setContext(context);
         params.setDataType(dataType);
-        params.setSparseFormat(sparseFormat);
         return invoke(opName, EMPTY, null, params)[0];
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray ones(DataDesc dataDesc) {
-        return ones(
-                dataDesc.getContext(),
-                dataDesc.getShape(),
-                dataDesc.getDataType(),
-                SparseFormat.DEFAULT);
+        return ones(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
     }
 
     public MxNDArray create(Pointer handle) {
