@@ -83,13 +83,13 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public NDFactory newSubFactory() {
+    public TfNDFactory newSubFactory() {
         return newSubFactory(context);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDFactory newSubFactory(Context context) {
+    public TfNDFactory newSubFactory(Context context) {
         TfNDFactory factory = new TfNDFactory(this, context);
         resources.put(factory, factory);
         return factory;

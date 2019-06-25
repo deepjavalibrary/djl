@@ -13,7 +13,6 @@ import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import org.tensorflow.Tensor;
-import org.tensorflow.types.
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
