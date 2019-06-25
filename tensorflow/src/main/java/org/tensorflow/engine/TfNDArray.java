@@ -12,28 +12,59 @@ import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
-import org.tensorflow.Tensor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
-import java.util.Arrays;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
+import java.util.stream.IntStream;
+import org.tensorflow.Operation;
+import org.tensorflow.Output;
+import org.tensorflow.Tensor;
 
 public class TfNDArray implements NDArray {
 
-    private Tensor<?> t;
+    private Tensor<?> tensor;
+    private Output<?> out;
     private Shape shape;
     private TfNDFactory factory;
 
-    TfNDArray(Tensor<?> t) {
-        this.t = t;
+    TfNDArray(NDFactory factory, Tensor<?> tensor) {
+        this.factory = (TfNDFactory) factory;
+        this.tensor = tensor;
     }
 
-    TfNDArray(Shape shape, FloatBuffer data) {
-        t = Tensor.create(shape.getShapeLong(), data);
+    TfNDArray(NDFactory factory, Output<?> out) {
+        this.factory = (TfNDFactory) factory;
+        this.out = out;
+    }
+
+    TfNDArray(NDFactory factory, Shape shape, FloatBuffer data) {
+        this.factory = (TfNDFactory) factory;
+        tensor = Tensor.create(shape.getShapeLong(), data);
         this.shape = shape;
+    }
+
+    Output<?> getOutput() {
+        if (out == null) {
+            Operation op =
+                    factory.getGraph()
+                            .opBuilder("Const", "Const_" + TfNDFactory.nextNameAssignment())
+                            .setAttr("dtype", tensor.dataType())
+                            .setAttr("value", tensor)
+                            .build();
+            out = op.output(0);
+        }
+        return out;
+    }
+
+    private void runToTensor() {
+        if (tensor == null) {
+            tensor = factory.getSession().runner().fetch(out.op().name()).run().get(0);
+        }
     }
 
     /** {@inheritDoc} */
@@ -52,10 +83,18 @@ public class TfNDArray implements NDArray {
         return factory;
     }
 
-    /** {@inheritDoc} */
+    public org.tensorflow.DataType getTfDataType() {
+        if (tensor != null) {
+            return tensor.dataType();
+        } else {
+            return out.dataType();
+        }
+    }
+
+    /** /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
-        return DataTypeMapper.getJoule(t.dataType());
+        return DataTypeMapper.getJoule(getTfDataType());
     }
 
     /** {@inheritDoc} */
@@ -68,7 +107,8 @@ public class TfNDArray implements NDArray {
     @Override
     public Shape getShape() {
         if (shape == null) {
-            shape = new Shape(Arrays.stream(t.shape()).mapToInt(Math::toIntExact).toArray());
+            runToTensor();
+            shape = new Shape(Arrays.stream(tensor.shape()).mapToInt(Math::toIntExact).toArray());
         }
         return shape;
     }
@@ -160,7 +200,14 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(int[] axes, Double temperature, NDFuncParams fparams) {
-        return null;
+        Operation op =
+                factory.getGraph()
+                        .opBuilder("Softmax", "Softmax_" + TfNDFactory.nextNameAssignment())
+                        .setAttr("T", getTfDataType())
+                        .addInput(getOutput())
+                        .build();
+
+        return new TfNDArray(factory, op.output(0));
     }
 
     /** {@inheritDoc} */
@@ -665,15 +712,29 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public double[] toDoubleArray() {
-        return new double[0];
+        if (getDataType() != DataType.FLOAT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required double" + " Actual " + getDataType());
+        }
+        runToTensor();
+        DoubleBuffer db = DoubleBuffer.allocate(Math.toIntExact(size()));
+        tensor.writeTo(db.duplicate());
+        double[] ret = new double[Math.toIntExact(size())];
+        db.get(ret);
+        return ret;
     }
 
     /** {@inheritDoc} */
     @Override
     public float[] toFloatArray() {
-        FloatBuffer fb = FloatBuffer.allocate(t.numElements());
-        t.writeTo(fb);
-        float[] ret = new float[fb.remaining()];
+        if (getDataType() != DataType.FLOAT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required float" + " Actual " + getDataType());
+        }
+        runToTensor();
+        FloatBuffer fb = FloatBuffer.allocate(Math.toIntExact(size()));
+        tensor.writeTo(fb.duplicate());
+        float[] ret = new float[Math.toIntExact(size())];
         fb.get(ret);
         return ret;
     }
@@ -1118,14 +1179,15 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public long size(int dimension) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public long size() {
-        return t.numElements();
+        if (tensor != null) {
+            return tensor.numElements();
+        } else {
+            int dimensions = out.shape().numDimensions();
+            return IntStream.range(0, dimensions)
+                    .mapToLong((int i) -> out.shape().size(i))
+                    .reduce(1, (long a, long b) -> a * b);
+        }
     }
 
     /** {@inheritDoc} */
@@ -1322,5 +1384,10 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void close() {}
+    public void close() {
+        if (tensor != null) {
+            tensor.close();
+        }
+        tensor = null;
+    }
 }

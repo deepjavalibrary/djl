@@ -1610,14 +1610,18 @@ public interface NDArray extends AutoCloseable {
      * @param dimension the dimension to return the size for
      * @return the size of the array along the specified dimension
      */
-    long size(int dimension);
+    default long size(int dimension) {
+        return getShape().size(dimension);
+    }
 
     /**
      * Returns the total number of elements in the NDArray
      *
      * @return the number of elements in the NDArray
      */
-    long size();
+    default long size() {
+        return getShape().size();
+    }
 
     /**
      * Broadcasts this NDArray to be the specified shape

@@ -20,7 +20,7 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
     private Translator<I, O> translator;
 
     TfPredictor(TfModel model, Translator<I, O> translator, Context context) {
-        this.factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory(context);
+        this.factory = (TfNDFactory) TfNDFactory.SYSTEM_FACTORY.newSubFactory(context);
         this.translator = translator;
         this.session = model.getSession();
         this.model = model;
@@ -42,7 +42,7 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
     }
 
     private NDList forward(NDList ndList) {
-        
+        return null;
     }
 
     /** {@inheritDoc} */

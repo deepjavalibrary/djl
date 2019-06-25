@@ -109,8 +109,6 @@ public interface NDFactory extends AutoCloseable {
      */
     NDArray create(DataDesc dataDesc);
 
-    NDArray create(float[] data);
-
     /**
      * Create and initialize an instance of {@link NDArray} with specified {@link DataDesc}.
      *

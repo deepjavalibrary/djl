@@ -3,16 +3,15 @@ package org.tensorflow.engine;
 import com.amazon.ai.Model;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
-import org.tensorflow.Graph;
-import org.tensorflow.SavedModelBundle;
-import org.tensorflow.Session;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Function;
+import org.tensorflow.Graph;
+import org.tensorflow.SavedModelBundle;
+import org.tensorflow.Session;
 
 public class TfModel implements Model {
 

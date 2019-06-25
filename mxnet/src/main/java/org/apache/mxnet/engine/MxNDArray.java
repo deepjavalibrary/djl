@@ -1390,17 +1390,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public long size(int dimension) {
-        return shape.size(dimension);
-    }
-
-    @Override
-    public long size() {
-        return shape.size();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray broadcast(long... shape) {
         return null;
     }

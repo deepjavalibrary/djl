@@ -15,6 +15,7 @@ package org.tensorflow;
 
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
+import java.util.Arrays;
 import org.tensorflow.engine.TfNDFactory;
 
 public final class HelloWorld {
@@ -26,6 +27,9 @@ public final class HelloWorld {
         try (NDFactory factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory()) {
             NDArray a = factory.create(new float[] {1.0f, 2.0f});
             System.out.println(a.getShape());
+            NDArray s = a.softmax();
+            System.out.println(s.getShape());
+            System.out.println(Arrays.toString(a.softmax().toFloatArray()));
         }
     }
 }
