@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -12,16 +12,12 @@
  */
 package com.amazon.ai.test;
 
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,9 +34,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
-public final class TestHelper {
+public final class CoverageUtils {
 
-    private TestHelper() {}
+    private CoverageUtils() {}
 
     public static void testGetterSetters(Class<?> baseClass)
             throws IOException, ClassNotFoundException {
@@ -54,7 +52,7 @@ public final class TestHelper {
                         Class<?>[] types = con.getParameterTypes();
                         Object[] args = new Object[types.length];
                         for (int i = 0; i < args.length; ++i) {
-                            args[i] = getMockInstance(types[i]);
+                            args[i] = getMockInstance(types[i], true);
                         }
                         con.setAccessible(true);
                         obj = con.newInstance(args);
@@ -67,7 +65,7 @@ public final class TestHelper {
                 continue;
             }
 
-            Method[] methods = clazz.getMethods();
+            Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
                 String methodName = method.getName();
                 int parameterCount = method.getParameterCount();
@@ -75,41 +73,24 @@ public final class TestHelper {
                     if (parameterCount == 0
                             && (methodName.startsWith("get")
                                     || methodName.startsWith("is")
-                                    || "toString".equals(methodName))) {
+                                    || "toString".equals(methodName)
+                                    || "hashCode".equals(methodName))) {
                         method.invoke(obj);
                     } else if (parameterCount == 1
                             && (methodName.startsWith("set") || "fromValue".equals(methodName))) {
                         Class<?> type = method.getParameterTypes()[0];
-                        method.invoke(obj, getMockInstance(type));
+                        method.invoke(obj, getMockInstance(type, true));
+                    } else if ("equals".equals(methodName)) {
+                        method.invoke(obj, obj);
+                        method.invoke(obj, (Object) null);
+                        Class<?> type = method.getParameterTypes()[0];
+                        method.invoke(obj, getMockInstance(type, true));
                     }
                 } catch (ReflectiveOperationException ignore) {
                     // ignore
                 }
             }
         }
-    }
-
-    public static Pointer toPointer(String val) {
-        byte[] buf = val.getBytes(StandardCharsets.UTF_8);
-        byte[] dest = new byte[buf.length + 1];
-        System.arraycopy(buf, 0, dest, 0, buf.length);
-        return toPointer(dest);
-    }
-
-    public static Pointer toPointer(int[] arr) {
-        ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
-        bb.order(ByteOrder.LITTLE_ENDIAN);
-        bb.asIntBuffer().put(arr);
-        bb.rewind();
-        return Native.getDirectBufferPointer(bb);
-    }
-
-    public static Pointer toPointer(byte[] buf) {
-        ByteBuffer bb = ByteBuffer.allocateDirect(buf.length);
-        bb.order(ByteOrder.LITTLE_ENDIAN);
-        bb.put(buf);
-        bb.rewind();
-        return Native.getDirectBufferPointer(bb);
     }
 
     private static List<Class<?>> getClasses(Class<?> clazz)
@@ -163,7 +144,7 @@ public final class TestHelper {
         return classList;
     }
 
-    private static Object getMockInstance(Class<?> clazz) {
+    private static Object getMockInstance(Class<?> clazz, boolean useConstructor) {
         if (clazz.isPrimitive()) {
             if (clazz == Boolean.TYPE) {
                 return Boolean.TRUE;
@@ -196,21 +177,48 @@ public final class TestHelper {
         }
 
         if (clazz.isAssignableFrom(List.class)) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         if (clazz.isAssignableFrom(Set.class)) {
-            return Collections.emptySet();
+            return new HashSet<>();
         }
 
         if (clazz.isAssignableFrom(Map.class)) {
-            return Collections.emptyMap();
+            return new HashMap<>();
         }
 
         if (clazz.isEnum()) {
             return clazz.getEnumConstants()[0];
         }
 
+        if (clazz.isInterface()) {
+            return newProxyInstance(clazz);
+        }
+
+        if (useConstructor) {
+            Constructor<?>[] constructors = clazz.getConstructors();
+            for (Constructor<?> con : constructors) {
+                try {
+                    Class<?>[] types = con.getParameterTypes();
+                    Object[] args = new Object[types.length];
+                    for (int i = 0; i < args.length; ++i) {
+                        args[i] = getMockInstance(types[i], false);
+                    }
+                    con.setAccessible(true);
+                    return con.newInstance(args);
+                } catch (ReflectiveOperationException ignore) {
+                    // ignore
+                }
+            }
+        }
+
         return null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static Object newProxyInstance(Class<?> clazz) {
+        return Proxy.newProxyInstance(
+                clazz.getClassLoader(), new Class[] {clazz}, (proxy, method, args) -> null);
     }
 }

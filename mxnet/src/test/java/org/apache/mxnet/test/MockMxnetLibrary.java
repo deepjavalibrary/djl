@@ -1,4 +1,4 @@
-package com.amazon.ai.test;
+package org.apache.mxnet.test;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;

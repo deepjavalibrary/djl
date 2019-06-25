@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -12,15 +12,14 @@
  */
 package com.amazon.ai;
 
-import com.amazon.ai.test.TestHelper;
+import com.amazon.ai.test.CoverageUtils;
 import java.io.IOException;
-import org.apache.mxnet.jna.JnaUtils;
 import org.testng.annotations.Test;
 
 public class CoverageTest {
 
     @Test
     public void test() throws IOException, ClassNotFoundException {
-        TestHelper.testGetterSetters(JnaUtils.class);
+        CoverageUtils.testGetterSetters(Context.class);
     }
 }

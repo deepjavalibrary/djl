@@ -11,6 +11,7 @@ dependencies {
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
     testCompile "org.powermock:powermock-module-testng:${powermock_version}"
     testCompile "org.powermock:powermock-api-mockito2:${powermock_version}"
+    testCompile project(':api').sourceSets.test.output
 }
 
 sourceSets {
@@ -20,6 +21,8 @@ sourceSets {
         }
     }
 }
+
+compileTestJava.dependsOn tasks.getByPath(':api:testClasses')
 
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'

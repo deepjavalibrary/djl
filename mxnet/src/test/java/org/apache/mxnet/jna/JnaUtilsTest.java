@@ -16,7 +16,7 @@ package org.apache.mxnet.jna;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import com.amazon.ai.Context;
-import com.amazon.ai.test.MockMxnetLibrary;
+import org.apache.mxnet.test.MockMxnetLibrary;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
