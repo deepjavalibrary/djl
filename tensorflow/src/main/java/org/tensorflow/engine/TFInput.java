@@ -1,6 +1,5 @@
 package org.tensorflow.engine;
 
-
 public interface TFInput {
     public String setOutputName();
 
