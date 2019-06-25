@@ -14,6 +14,9 @@ dependencies {
 javadoc {
     title "Joule™ ${project.version} API specification"
     exclude "com/amazon/ai/util/**"
+    exclude "com/amazon/ai/ndarray/internal/**"
+    exclude "com/amazon/ai/nn/**/**"
+    exclude "com/amazon/ai/training/**"
     options.overview "src/main/javadoc/overview.html"
 }
 

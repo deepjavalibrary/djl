@@ -13,6 +13,7 @@
 package com.amazon.ai.ndarray;
 
 import com.amazon.ai.Context;
+import com.amazon.ai.ndarray.internal.NDArrayEx;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.GradReq;
@@ -1863,6 +1864,14 @@ public interface NDArray extends AutoCloseable {
      * @return NDArray
      */
     NDArray ulike();
+
+    /**
+     * Returns an internal representative of Native NDArray.
+     *
+     * <p>This method should only be used by Engine provider.</p>
+     * @return an internal representative of Native NDArray
+     */
+    NDArrayEx getNDArrayInternal();
 
     @Override
     void close();
