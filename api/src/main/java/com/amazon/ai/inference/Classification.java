@@ -18,6 +18,13 @@ public class Classification {
     private String className;
     private double probability;
 
+    /**
+     * Construct a <code>Classification</code> instance with <code>className</code> and <code>
+     * probability</code>.
+     *
+     * @param className the class name
+     * @param probability the probability
+     */
     public Classification(String className, double probability) {
         this.className = className;
         this.probability = probability;

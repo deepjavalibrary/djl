@@ -14,15 +14,29 @@ package com.amazon.ai.inference;
 
 import com.amazon.ai.image.BoundingBox;
 
+/** A class represent detected object in object detection case. */
 public class DetectedObject extends Classification {
 
     private BoundingBox boundingBox;
 
+    /**
+     * Construct a <code>DetectedObject</code> instance with <code>className</code>, <code>
+     * probability</code> and <code>boundingBox</code>.
+     *
+     * @param className the class name
+     * @param probability the probability
+     * @param boundingBox {@link BoundingBox} of detected object
+     */
     public DetectedObject(String className, double probability, BoundingBox boundingBox) {
         super(className, probability);
         this.boundingBox = boundingBox;
     }
 
+    /**
+     * Retruns {@link BoundingBox} of detected object.
+     *
+     * @return {@link BoundingBox} of detected object
+     */
     public BoundingBox getBoundingBox() {
         return boundingBox;
     }

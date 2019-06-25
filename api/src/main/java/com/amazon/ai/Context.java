@@ -42,6 +42,11 @@ public class Context {
         this.deviceId = deviceId;
     }
 
+    /**
+     * Returns device type of the Context.
+     *
+     * @return device type of the Context
+     */
     public String getDeviceType() {
         return deviceType;
     }

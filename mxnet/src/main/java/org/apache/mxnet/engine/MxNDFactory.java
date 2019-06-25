@@ -21,6 +21,7 @@ import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
+import java.nio.Buffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.jna.JnaUtils;
@@ -78,6 +79,19 @@ public class MxNDFactory implements NDFactory {
                 dataDesc.getShape(),
                 dataDesc.getDataType(),
                 SparseFormat.DEFAULT);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MxNDArray create(DataDesc dataDesc, Buffer data) {
+        MxNDArray array =
+                create(
+                        dataDesc.getContext(),
+                        dataDesc.getShape(),
+                        dataDesc.getDataType(),
+                        SparseFormat.DEFAULT);
+        array.set(data);
+        return array;
     }
 
     /** {@inheritDoc} */

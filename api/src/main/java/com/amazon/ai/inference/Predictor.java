@@ -22,7 +22,22 @@ import com.amazon.ai.metric.Metrics;
 /**
  * The <code>Predictor</code> interface provides model inference functionality.
  *
- * <p>Users can use this to do inference with {@link Model} with {@link Translator} specified
+ * <p>Users can use this to do inference with {@link Model} with {@link Translator} specified.
+ * Following is example code that uses <code>Predictor</code>:
+ *
+ * <pre>
+ * Model model = Model.loadModel(modelDir, modelName);
+ *
+ * // User must implement Translator interface, read Translator for detail.
+ * Translator translator = new MyTranslator();
+ *
+ * try (Predictor&lt;String, String&gt; predictor = <b>Predictor.newInstance</b>(model, translator)) {
+ *   String result = predictor.<b>predict</b>("What's up");
+ * }
+ * </pre>
+ *
+ * @see Model
+ * @see Translator
  */
 public interface Predictor<I, O> extends AutoCloseable {
 
@@ -48,7 +63,6 @@ public interface Predictor<I, O> extends AutoCloseable {
      * @param <I> Input object for preprocessing
      * @param <O> Output object come from postprocessing
      * @return new instance of <code>Predictor</code>
-     * @return instance of <code>Predictor</code>
      */
     static <I, O> Predictor<I, O> newInstance(
             Model model, Translator<I, O> translator, Context context) {
@@ -71,6 +85,7 @@ public interface Predictor<I, O> extends AutoCloseable {
      */
     void setMetrics(Metrics metrics);
 
+    /** {@inheritDoc} */
     @Override
     void close();
 }

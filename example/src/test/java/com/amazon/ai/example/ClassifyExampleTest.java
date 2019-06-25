@@ -14,11 +14,11 @@ package com.amazon.ai.example;
 
 import com.amazon.ai.example.util.AbstractExample;
 import com.amazon.ai.example.util.ModelInfo;
-import com.amazon.ai.inference.DetectedObject;
+import com.amazon.ai.inference.Classification;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class GenericInferenceExampleTest {
+public class ClassifyExampleTest {
 
     private static final String MODEL_NAME = "squeezenet_v1.1";
 
@@ -38,8 +38,8 @@ public class GenericInferenceExampleTest {
                     "-l",
                     "build/logs"
                 };
-        Assert.assertTrue(new GenericInferenceExample().runExample(args));
-        DetectedObject result = (DetectedObject) AbstractExample.getPredictResult();
+        Assert.assertTrue(new ClassifyExample().runExample(args));
+        Classification result = (Classification) AbstractExample.getPredictResult();
         Assert.assertEquals(result.getClassName(), "tabby, tabby cat");
         Assert.assertTrue(Double.compare(result.getProbability(), 0.7) > 0);
     }

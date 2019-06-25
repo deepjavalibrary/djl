@@ -12,6 +12,7 @@
  */
 package com.amazon.ai;
 
+/** Thrown to indicate that a error is raised during process input or process output. */
 public class TranslateException extends Exception {
 
     private static final long serialVersionUID = 1L;

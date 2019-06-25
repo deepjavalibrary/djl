@@ -12,4 +12,10 @@
  */
 package com.amazon.ai.ndarray;
 
+/**
+ * An class implement Sparse NDArray.
+ *
+ * @see com.amazon.ai.ndarray.types.SparseFormat
+ * @see <a href="https://software.intel.com/en-us/node/471374">Sparse Matrix Storage Formats</a>
+ */
 public interface SparseNDArray extends NDArray {}

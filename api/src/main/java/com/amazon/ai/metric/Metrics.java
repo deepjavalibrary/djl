@@ -21,29 +21,56 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/** A collection of {@link Metric} objects organized by metric name. */
 public class Metrics {
 
     private static final MetricValueComparator VALUE_COMPARATOR = new MetricValueComparator();
 
     private Map<String, List<Metric>> metrics;
 
+    /** Constructs a <code>Metrics</code> instance. */
     public Metrics() {
         metrics = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Add a {@link Metric} to the collection.
+     *
+     * @param metric a {@link Metric} to be added
+     */
     public void addMetric(Metric metric) {
         List<Metric> list = metrics.computeIfAbsent(metric.getMetricName(), v -> new ArrayList<>());
         list.add(metric);
     }
 
+    /**
+     * Add <code>Metric</code> by metric <code>name</code> and <code>value</code>.
+     *
+     * @param name metric name
+     * @param value metric value
+     */
     public void addMetric(String name, Number value) {
         addMetric(new Metric(name, value));
     }
 
+    /**
+     * Add <code>Metric</code> by metric <code>name</code>, <code>value</code> and <code>unit</code>
+     * .
+     *
+     * @param name metric name
+     * @param value metric value
+     * @param unit metric unit
+     */
     public void addMetric(String name, Number value, String unit) {
         addMetric(new Metric(name, value, unit));
     }
 
+    /**
+     * Returns a list of {@link Metrics} with specified metric name.
+     *
+     * @param name name of the metric
+     * @return a list of {@link Metrics} with specified metric name
+     */
     public List<Metric> getMetric(String name) {
         List<Metric> list = metrics.get(name);
         if (list == null) {
@@ -52,7 +79,14 @@ public class Metrics {
         return list;
     }
 
-    public Metric percentile(String metricName, int percent) {
+    /**
+     * Returns percentile {@link Metric} object for specified metric name.
+     *
+     * @param metricName name of the metric
+     * @param percentile percentile
+     * @return {@link Metric} object at specified <code>percentile</code>
+     */
+    public Metric percentile(String metricName, int percentile) {
         List<Metric> metric = metrics.get(metricName);
         if (metric == null || metrics.isEmpty()) {
             throw new IllegalArgumentException("Metric name not found: " + metricName);
@@ -60,10 +94,16 @@ public class Metrics {
 
         List<Metric> list = new ArrayList<>(metric);
         list.sort(VALUE_COMPARATOR);
-        int index = metric.size() * percent / 100;
+        int index = metric.size() * percentile / 100;
         return list.get(index);
     }
 
+    /**
+     * Returns average value of specified metric.
+     *
+     * @param metricName name of the metric
+     * @return average number of specified metric
+     */
     public double mean(String metricName) {
         List<Metric> metric = metrics.get(metricName);
         if (metric == null || metrics.isEmpty()) {

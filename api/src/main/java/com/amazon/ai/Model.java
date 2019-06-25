@@ -23,10 +23,35 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 
 /**
- * The <code>Model</code> interface is the holder of the model.
+ * A model is a collection of artifacts that is created by the training process.
  *
- * <p>Users can use this to load the model and apply it for {@link com.amazon.ai.training.Trainer}
- * and {@link com.amazon.ai.inference.Predictor} for Training and Inference jobs.
+ * <p>A deep learning model usually contains following parts:
+ *
+ * <ul>
+ *   <li>Graph: aka Symbols in MXNet, model in Keras, Block in Pytorch
+ *   <li>Parameters: weights
+ *   <li>Input/Output information: input and output parameter names, shape etc.
+ *   <li>Other artifacts: e.g. dictionary for classification
+ * </ul>
+ *
+ * <p>In common inference case, a model is usually loaded from a file: Onse model is loaded, user
+ * can create {@link com.amazon.ai.inference.Predictor} with loaded model and call {@link
+ * com.amazon.ai.inference.Predictor#predict(Object)} to get inference result.
+ *
+ * <pre>
+ * Model model = <b>Model.loadModel</b>(modelDir, modelName);
+ *
+ * // User must implement Translator interface, read Translator for detail.
+ * Translator translator = new MyTranslator();
+ *
+ * try (Predictor&lt;String, String&gt; predictor = <b>Predictor.newInstance</b>(model, translator)) {
+ *   String result = predictor.<b>predict</b>("What's up");
+ * }
+ * </pre>
+ *
+ * @see com.amazon.ai.Model#loadModel(Path, String)
+ * @see com.amazon.ai.inference.Predictor
+ * @see Translator
  */
 public interface Model {
 

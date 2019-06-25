@@ -21,6 +21,7 @@ import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
 import com.amazon.ai.util.PairList;
+import java.nio.Buffer;
 
 /**
  * NDArray factories are used to create <I>NDArrays</I> (n-dimensional array on native engine).
@@ -107,6 +108,15 @@ public interface NDFactory extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     NDArray create(DataDesc dataDesc);
+
+    /**
+     * Create and initialize an instance of {@link NDArray} with specified {@link DataDesc}.
+     *
+     * @param dataDesc the {@link DataDesc} of the {@link com.amazon.ai.ndarray.NDArray}
+     * @param data data to initialize the <code>NDArray</code>
+     * @return new instance of {@link NDArray}
+     */
+    NDArray create(DataDesc dataDesc, Buffer data);
 
     /**
      * An engine specific generic invocation to native operator.

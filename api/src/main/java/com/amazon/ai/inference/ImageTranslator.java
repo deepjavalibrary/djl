@@ -22,8 +22,20 @@ import com.amazon.ai.ndarray.types.Shape;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 
+/**
+ * Builtin <code>Translator</code> that provide default pre-process image.
+ *
+ * @param <T> output object type
+ */
 public abstract class ImageTranslator<T> implements Translator<BufferedImage, T> {
 
+    /**
+     * Process the <code>BufferedImage</code> input and convert to NDList.
+     *
+     * @param ctx toolkit that would help to creating input NDArray
+     * @param input <code>BufferedImage</code> input
+     * @return {@link NDList}
+     */
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
         int w = input.getWidth();
@@ -39,6 +51,14 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
         return new NDList(normalize(array));
     }
 
+    /**
+     * Normalize pre-processed {@link NDArray}.
+     *
+     * <p>It's expected that developer to override this method to provide customized normalization.
+     *
+     * @param array pre-processed {@link NDArray}
+     * @return normalized NDArray
+     */
     protected NDArray normalize(NDArray array) {
         return array;
     }
