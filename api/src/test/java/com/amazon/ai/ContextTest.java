@@ -20,9 +20,9 @@ public class ContextTest {
 
     @Test
     public void testContext() {
-        Context ctx = new Context("GPU", 3);
+        Context ctx = new Context("gpu", 3);
         Assert.assertEquals(ctx, Context.gpu(3));
-        Assert.assertEquals(Context.cpu(), new Context("CPU", 0));
-        Assert.assertEquals(Context.gpu(), new Context("GPU", 0));
+        Assert.assertEquals(Context.cpu(), new Context("cpu", 0));
+        Assert.assertEquals(Context.gpu(), new Context("gpu", 0));
     }
 }

@@ -24,8 +24,8 @@ import java.util.Objects;
  */
 public class Context {
 
-    private static final Context CPU = new Context("CPU", 0);
-    private static final Context GPU = new Context("GPU", 0);
+    private static final Context CPU = new Context("cpu", 0);
+    private static final Context GPU = new Context("gpu", 0);
 
     private String deviceType;
     private int deviceId;
@@ -77,7 +77,7 @@ public class Context {
     }
 
     public static Context cpu(int deviceId) {
-        return new Context("CPU", deviceId);
+        return new Context("cpu", deviceId);
     }
 
     public static Context gpu() {
@@ -85,7 +85,7 @@ public class Context {
     }
 
     public static Context gpu(int deviceId) {
-        return new Context("GPU", deviceId);
+        return new Context("gpu", deviceId);
     }
 
     /**

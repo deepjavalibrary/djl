@@ -211,7 +211,8 @@ public interface NDArray extends AutoCloseable {
     /**
      * Performs an indirect sort of the NDArray ascending on the last dimension.
      *
-     * @return Returns an array of indices corresponding to elements in the NDArray on the axis
+     * @return Returns an array of indices corresponding to elements in the NDArray on the axis, the
+     *     output DataType is always {@link DataType#INT32}
      * @see NDArray#argsort(int, boolean)
      */
     default NDArray argsort() {
@@ -222,7 +223,8 @@ public interface NDArray extends AutoCloseable {
      * Performs an indirect sort of the NDArray ascending on the given dimension.
      *
      * @param axis the axis along which to sort
-     * @return Returns an array of indices corresponding to elements in the NDArray on the axis
+     * @return Returns an array of indices corresponding to elements in the NDArray on the axis, the
+     *     output DataType is always {@link DataType#INT32}
      * @see NDArray#argsort(int, boolean)
      */
     default NDArray argsort(int axis) {
@@ -234,7 +236,8 @@ public interface NDArray extends AutoCloseable {
      *
      * @param axis the axis along which to sort
      * @param ascending whether to sort ascending
-     * @return Returns an array of indices corresponding to elements in the NDArray on the axis
+     * @return Returns an array of indices corresponding to elements in the NDArray on the axis, the
+     *     output DataType is always {@link DataType#INT32}
      */
     NDArray argsort(int axis, boolean ascending);
 

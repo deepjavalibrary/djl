@@ -127,10 +127,10 @@ public class MxNDFactory implements NDFactory {
         if (shape == null) {
             throw new IllegalArgumentException("Shape is required for " + opName.substring(1));
         }
-        params.addShape(shape);
-        params.addContext(context);
-        params.addDataType(dataType);
-        params.addSparseFormat(sparseFormat);
+        params.setShape(shape);
+        params.setContext(context);
+        params.setDataType(dataType);
+        params.setSparseFormat(sparseFormat);
         return invoke(opName, EMPTY, null, params)[0];
     }
 

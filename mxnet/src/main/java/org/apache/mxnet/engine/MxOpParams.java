@@ -9,28 +9,33 @@ import com.amazon.ai.util.PairList;
 /** Helper for creating the MXNet operator parameters. */
 public class MxOpParams extends PairList<String, String> {
 
-    public void addShape(Shape shape) {
+    public void setShape(Shape shape) {
         if (shape != null) {
-            add("shape", shape.toString());
+            setParam("shape", shape.toString());
         }
     }
 
-    public void addContext(Context context) {
+    public void setContext(Context context) {
         if (context != null) {
-            add("ctx", context.toString());
+            setParam("ctx", context.toString());
         }
     }
 
-    public void addDataType(DataType dataType) {
+    public void setDataType(DataType dataType) {
         if (dataType != null) {
-            add("dtype", dataType.toString());
+            setParam("dtype", dataType.getType());
         }
     }
 
-    public void addSparseFormat(SparseFormat sparseFormat) {
+    public void setSparseFormat(SparseFormat sparseFormat) {
         if (sparseFormat != null) {
-            addParam("stype", sparseFormat.getValue());
+            setParam("stype", String.valueOf(sparseFormat.getValue()));
         }
+    }
+
+    public void setParam(String paramName, String value) {
+        remove(paramName);
+        add(paramName, value);
     }
 
     public void addParam(String paramName, int value) {

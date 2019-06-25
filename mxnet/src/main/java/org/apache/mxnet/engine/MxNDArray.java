@@ -334,6 +334,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         params.addParam("is_ascend", ascending);
+        params.setDataType(DataType.INT32);
         return factory.invoke("argsort", this, params);
     }
 
