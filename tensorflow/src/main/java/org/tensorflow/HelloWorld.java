@@ -24,6 +24,7 @@ import com.amazon.ai.util.Pair;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
@@ -37,21 +38,29 @@ public final class HelloWorld {
     private HelloWorld() {}
 
     @SuppressWarnings("PMD.SystemPrintln")
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException, TranslateException {
         try (NDFactory factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory()) {
             NDArray a = factory.create(new float[] {1.0f, 2.0f});
+
+            System.out.println("Input Shape:");
             System.out.println(a.getShape());
-            NDArray s = a.softmax();
-            System.out.println(s.getShape());
+
+            System.out.println("Softmax:");
             System.out.println(Arrays.toString(a.softmax().toFloatArray()));
+
+            System.out.println("ZerosLike:");
+            System.out.println(Arrays.toString(a.zerosLike().toFloatArray()));
+
+            System.out.println("OnesLike:");
+            System.out.println(Arrays.toString(a.onesLike().toFloatArray()));
 
             TfModel model =
                     TfModel.loadModel(
-                            "/Users/kvasist/workplace/Models/models/ssd_inception_v2_coco_2017_11_17/saved_model");
+                            "ModelPath/TF-resnet_ssd");
             System.out.println(model.describeInput()[0].getShape());
             System.out.println(model.describeInput()[0].getName());
 
-            String filename = "/Users/kvasist/Downloads/Image.jpeg";
+            String filename = "ModelPath/TF-resnet_ssd/mfc.jpg";
             BufferedImage img = ImageIO.read(new File(filename));
             GenericTranslator translator = new GenericTranslator();
             TfPredictor<BufferedImage, NDList> predictor = new TfPredictor<>(model, translator);
@@ -73,6 +82,9 @@ public final class HelloWorld {
 
     private static final class GenericTranslator implements Translator<BufferedImage, NDList> {
 
+        private static final int BATCH_SIZE = 1;
+        private static final int CHANNELS = 3;
+
         @Override
         public NDList processInput(TranslatorContext ctx, BufferedImage img)
                 throws TranslateException {
@@ -82,8 +94,6 @@ public final class HelloWorld {
             byte[] data = ((DataBufferByte) img.getData().getDataBuffer()).getData();
             // ImageIO.read seems to produce BGR-encoded images, but the model expects RGB.
             bgr2rgb(data);
-            final int BATCH_SIZE = 1;
-            final int CHANNELS = 3;
             int[] shape = new int[] {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
             TfNDArray tfNDArray =
                     ((TfNDFactory) ctx.getNDFactory())

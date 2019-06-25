@@ -4,9 +4,11 @@ import com.amazon.ai.Model;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
+import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -26,7 +28,7 @@ public class TfModel implements Model {
     private DataDesc[] inputDesc;
     private DataDesc[] outputDesc;
 
-    TfModel(Path modelDir, SavedModelBundle bundle) throws Exception {
+    TfModel(Path modelDir, SavedModelBundle bundle) throws InvalidProtocolBufferException {
         this.modelDir = modelDir;
         this.bundle = bundle;
         SignatureDef sig =
@@ -41,11 +43,11 @@ public class TfModel implements Model {
         int dataDescIter = 0;
         for (Map.Entry<String, TensorInfo> entry : info.entrySet()) {
             TensorInfo t = entry.getValue();
-            StringBuilder layout = new StringBuilder();
+            // StringBuilder layout = new StringBuilder();
             int[] shape = new int[t.getTensorShape().getDimCount()];
             int dimIter = 0;
             for (TensorShapeProto.Dim dim : t.getTensorShape().getDimList()) {
-                layout.append(dim.getName());
+                // layout.append(dim.getName());
                 shape[dimIter] = (int) dim.getSize();
                 dimIter++;
             }
@@ -57,7 +59,8 @@ public class TfModel implements Model {
         return descs;
     }
 
-    public static TfModel loadModel(String modelDir, String... tags) throws Exception {
+    public static TfModel loadModel(String modelDir, String... tags)
+            throws InvalidProtocolBufferException {
         if (tags == null || tags.length == 0) {
             tags = new String[] {"serve"};
         }
@@ -66,7 +69,7 @@ public class TfModel implements Model {
 
     public static TfModel loadModel(
             String modelDir, byte[] configProto, byte[] runOptions, String... tags)
-            throws Exception {
+            throws InvalidProtocolBufferException {
         SavedModelBundle bundle =
                 SavedModelBundle.loader(modelDir)
                         .withConfigProto(configProto)
@@ -114,7 +117,14 @@ public class TfModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public URL getArtifact(String name) throws IOException {
+    public URL getArtifact(String artifactName) throws IOException {
+        if (artifactName == null) {
+            throw new IllegalArgumentException("artifactName cannot be null");
+        }
+        Path file = modelDir.resolve(artifactName);
+        if (Files.exists(file) && Files.isReadable(file)) {
+            return file.toUri().toURL();
+        }
         return null;
     }
 

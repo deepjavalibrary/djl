@@ -65,6 +65,11 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
         return null;
     }
 
+    public NDArray create(int data) {
+        return new TfNDArray(this, Tensors.create(data));
+    }
+
+    /** {@inheritDoc} */
     @Override
     public NDArray create(DataDesc dataDesc, Buffer data) {
         return null;

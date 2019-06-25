@@ -36,16 +36,19 @@ public class TfNDArray implements NDArray {
 
     TfNDArray(NDFactory factory, Tensor<?> tensor) {
         this.factory = (TfNDFactory) factory;
+        this.factory.attach(this);
         this.tensor = tensor;
     }
 
     TfNDArray(NDFactory factory, Output<?> out) {
         this.factory = (TfNDFactory) factory;
+        this.factory.attach(this);
         this.out = out;
     }
 
     TfNDArray(NDFactory factory, Shape shape, FloatBuffer data) {
         this.factory = (TfNDFactory) factory;
+        this.factory.attach(this);
         tensor = Tensor.create(shape.getShapeLong(), data);
         this.shape = shape;
     }
@@ -225,26 +228,72 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDList split(int axis, boolean squeezeAxis, NDFuncParams fparams) {
-        return null;
+        TfNDArray axisOp = (TfNDArray) factory.create(axis);
+        Operation op =
+                factory.getGraph()
+                        .opBuilder("Split", "Split_" + TfNDFactory.nextNameAssignment())
+                        .setAttr("T", getTfDataType())
+                        .setAttr("num_split", size(axis))
+                        .addInput(axisOp.getOutput())
+                        .addInput(getOutput())
+                        .build();
+
+        NDArray[] result =
+                IntStream.range(0, op.numOutputs())
+                        .mapToObj((int i) -> new TfNDArray(factory, op.output(i)))
+                        .toArray(NDArray[]::new);
+        return new NDList(result);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList split(int axis, int numOutputs, NDFuncParams fparams)
             throws IllegalArgumentException {
-        return null;
+        if (axis < 0 || axis > getShape().dimension()) {
+            throw new IllegalArgumentException("Invalid axis value");
+        }
+        if (numOutputs < 0 || numOutputs > size(axis)) {
+            throw new IllegalArgumentException("Invalid numOutputs");
+        }
+        TfNDArray axisOp = (TfNDArray) factory.create(axis);
+        Operation op =
+                factory.getGraph()
+                        .opBuilder("Split", "Split_" + TfNDFactory.nextNameAssignment())
+                        .setAttr("T", getTfDataType())
+                        .setAttr("num_split", numOutputs)
+                        .addInput(axisOp.getOutput())
+                        .addInput(getOutput())
+                        .build();
+
+        NDArray[] result =
+                IntStream.range(0, op.numOutputs())
+                        .mapToObj((int i) -> new TfNDArray(factory, op.output(i)))
+                        .toArray(NDArray[]::new);
+        return new NDList(result);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray zerosLike(NDFuncParams fparams) {
-        return null;
+        Operation op =
+                factory.getGraph()
+                        .opBuilder("ZerosLike", "ZerosLike_" + TfNDFactory.nextNameAssignment())
+                        .setAttr("T", getTfDataType())
+                        .addInput(getOutput())
+                        .build();
+        return new TfNDArray(factory, op.output(0));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray onesLike(NDFuncParams fparams) {
-        return null;
+        Operation op =
+                factory.getGraph()
+                        .opBuilder("OnesLike", "OnesLike_" + TfNDFactory.nextNameAssignment())
+                        .setAttr("T", getTfDataType())
+                        .addInput(getOutput())
+                        .build();
+        return new TfNDArray(factory, op.output(0));
     }
 
     /** {@inheritDoc} */
