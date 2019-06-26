@@ -1,0 +1,49 @@
+plugins {
+    id 'maven-publish'
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resources/"
+        }
+    }
+}
+
+def systemInfo = project.findProperty("classifier") ?: "osx-x86_64"
+def artifact = project.findProperty("artifact")?: "mxnet-native-mkl"
+def versionNum = project.findProperty("version")?: "1.5.0"
+
+task fatJar(type: Jar) {
+    from sourceSets.main.resources
+    archiveClassifier = systemInfo
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId "org.apache.mxnet"
+            artifactId artifact
+            version versionNum
+            from components.java
+            artifacts = [fatJar]
+            pom {
+                name = "MXNet Core"
+                description = "MXNet Engine binary"
+                url = "http://mxnet.apache.org"
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "local"
+            url = project.buildDir.absolutePath + '/repo'
+        }
+    }
+}
