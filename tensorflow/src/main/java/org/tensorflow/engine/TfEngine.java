@@ -6,7 +6,6 @@ import com.amazon.ai.Profiler;
 import com.amazon.ai.Translator;
 import com.amazon.ai.engine.Engine;
 import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.ndarray.EngineUtils;
 import com.amazon.ai.nn.NNIndex;
 import com.amazon.ai.training.Trainer;
 import java.io.IOException;
@@ -15,8 +14,6 @@ import java.nio.file.Path;
 import org.tensorflow.TensorFlow;
 
 public class TfEngine extends Engine {
-
-    private static final TfUtils TF_ENGINE_UTILS = new TfUtils();
 
     TfEngine() {}
 
@@ -67,12 +64,6 @@ public class TfEngine extends Engine {
     @Override
     public NNIndex getNNIndex() {
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public EngineUtils getEngineUtils() {
-        return TF_ENGINE_UTILS;
     }
 
     /** {@inheritDoc} */

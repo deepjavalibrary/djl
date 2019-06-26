@@ -26,6 +26,7 @@ import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
 import org.tensorflow.engine.TfModel;
@@ -40,7 +41,9 @@ public final class HelloWorld {
     @SuppressWarnings("PMD.SystemPrintln")
     public static void main(String[] args) throws IOException, TranslateException {
         try (NDFactory factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory()) {
-            NDArray a = factory.create(new float[] {1.0f, 2.0f});
+            NDArray a =
+                    new TfNDArray(
+                            factory, new Shape(1, 3), FloatBuffer.wrap(new float[] {1f, 2f, 3f}));
 
             System.out.println("Input Shape:");
             System.out.println(a.getShape());
@@ -54,9 +57,7 @@ public final class HelloWorld {
             System.out.println("OnesLike:");
             System.out.println(Arrays.toString(a.onesLike().toFloatArray()));
 
-            TfModel model =
-                    TfModel.loadModel(
-                            "ModelPath/TF-resnet_ssd");
+            TfModel model = TfModel.loadModel("ModelPath/TF-resnet_ssd");
             System.out.println(model.describeInput()[0].getShape());
             System.out.println(model.describeInput()[0].getName());
 

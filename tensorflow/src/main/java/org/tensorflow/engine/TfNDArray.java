@@ -4,14 +4,14 @@ import com.amazon.ai.Context;
 import com.amazon.ai.ndarray.Matrix;
 import com.amazon.ai.ndarray.NDArray;
 import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDFuncParams;
 import com.amazon.ai.ndarray.NDList;
+import com.amazon.ai.ndarray.internal.NDArrayEx;
 import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.GradReq;
 import com.amazon.ai.ndarray.types.Layout;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
+import com.amazon.ai.training.GradReq;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
@@ -46,7 +46,7 @@ public class TfNDArray implements NDArray {
         this.out = out;
     }
 
-    TfNDArray(NDFactory factory, Shape shape, FloatBuffer data) {
+    public TfNDArray(NDFactory factory, Shape shape, FloatBuffer data) {
         this.factory = (TfNDFactory) factory;
         this.factory.attach(this);
         tensor = Tensor.create(shape.getShapeLong(), data);
@@ -184,7 +184,6 @@ public class TfNDArray implements NDArray {
     @Override
     public void attachGrad() {}
 
-    /** {@inheritDoc} */
     @Override
     public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {}
 
@@ -206,15 +205,19 @@ public class TfNDArray implements NDArray {
     @Override
     public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {}
 
-    /** {@inheritDoc} */
     @Override
-    public NDArray argsort(int axis, boolean ascending, NDFuncParams fparams) {
+    public NDArray argsort(int axis, boolean ascending) {
+        return null;
+    }
+
+    @Override
+    public NDArray softmax(int[] axes) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, Double temperature, NDFuncParams fparams) {
+    public NDArray softmax(int[] axes, double temperature) {
         Operation op =
                 factory.getGraph()
                         .opBuilder("Softmax", "Softmax_" + TfNDFactory.nextNameAssignment())
@@ -227,7 +230,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int axis, boolean squeezeAxis, NDFuncParams fparams) {
+    public NDList split(int axis, boolean squeezeAxis) {
         TfNDArray axisOp = (TfNDArray) factory.create(axis);
         Operation op =
                 factory.getGraph()
@@ -247,8 +250,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int axis, int numOutputs, NDFuncParams fparams)
-            throws IllegalArgumentException {
+    public NDList split(int axis, int numOutputs) throws IllegalArgumentException {
         if (axis < 0 || axis > getShape().dimension()) {
             throw new IllegalArgumentException("Invalid axis value");
         }
@@ -274,7 +276,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zerosLike(NDFuncParams fparams) {
+    public NDArray zerosLike() {
         Operation op =
                 factory.getGraph()
                         .opBuilder("ZerosLike", "ZerosLike_" + TfNDFactory.nextNameAssignment())
@@ -286,7 +288,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray onesLike(NDFuncParams fparams) {
+    public NDArray onesLike() {
         Operation op =
                 factory.getGraph()
                         .opBuilder("OnesLike", "OnesLike_" + TfNDFactory.nextNameAssignment())
@@ -509,6 +511,26 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray subi(Number n) {
+        return null;
+    }
+
+    @Override
+    public NDArray add(Number n) {
+        return null;
+    }
+
+    @Override
+    public NDArray addi(Number n) {
+        return null;
+    }
+
+    @Override
+    public NDArray add(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray addi(NDArray other) {
         return null;
     }
 
@@ -1440,6 +1462,11 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray ulike() {
+        return null;
+    }
+
+    @Override
+    public NDArrayEx getNDArrayInternal() {
         return null;
     }
 

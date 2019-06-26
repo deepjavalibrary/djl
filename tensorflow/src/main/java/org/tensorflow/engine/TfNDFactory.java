@@ -7,13 +7,11 @@ import com.amazon.ai.ndarray.types.DataDesc;
 import com.amazon.ai.ndarray.types.DataType;
 import com.amazon.ai.ndarray.types.Shape;
 import com.amazon.ai.ndarray.types.SparseFormat;
-
+import com.amazon.ai.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.amazon.ai.util.PairList;
 import org.tensorflow.Graph;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
@@ -85,7 +83,8 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray[] invoke(String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params) {
+    public NDArray[] invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params) {
         return new NDArray[0];
     }
 
