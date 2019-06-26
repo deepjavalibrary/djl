@@ -1,10 +1,10 @@
 package org.apache.mxnet.nn;
 
-import com.amazon.ai.Block;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.util.PairList;
+import software.amazon.ai.Block;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.util.PairList;
 
 public abstract class MxNNBlock implements Block {
 

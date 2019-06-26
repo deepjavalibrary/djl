@@ -1,8 +1,8 @@
 package org.apache.mxnet.nn;
 
-import com.amazon.ai.nn.NNIndex;
-import com.amazon.ai.nn.core.Linear;
 import org.apache.mxnet.nn.core.MxLinear;
+import software.amazon.ai.nn.NNIndex;
+import software.amazon.ai.nn.core.Linear;
 
 public class MxNNIndex extends NNIndex {
 

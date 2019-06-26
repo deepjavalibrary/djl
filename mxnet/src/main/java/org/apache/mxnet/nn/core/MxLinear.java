@@ -1,16 +1,16 @@
 package org.apache.mxnet.nn.core;
 
-import com.amazon.ai.Initializer;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.nn.core.Linear;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
+import software.amazon.ai.Initializer;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.core.Linear;
 
 public class MxLinear extends MxNNBlock implements Linear {
 

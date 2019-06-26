@@ -1,4 +1,4 @@
-package com.amazon.ai.integration.util;
+package software.amazon.ai.integration.util;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

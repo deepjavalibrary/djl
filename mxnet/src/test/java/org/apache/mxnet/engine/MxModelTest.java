@@ -15,11 +15,6 @@ package org.apache.mxnet.engine;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.util.Pair;
-import com.amazon.ai.util.PairList;
-import com.amazon.ai.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -36,6 +31,11 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.util.Pair;
+import software.amazon.ai.util.PairList;
+import software.amazon.ai.util.Utils;
 
 // CHECKSTYLE:ON:AvoidStaticImport
 

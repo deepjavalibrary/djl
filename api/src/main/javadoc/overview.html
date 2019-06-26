@@ -26,15 +26,15 @@ deep learning task.
     // Assume user has a pre-trained already, they just need load it
     Model model = <b>Model.loadModel</b>(modelDir, modelName);
 
-    // User must implement <a href="com/amazon/ai/Translator.html" title="interface in com.amazon.ai"><code>Translator</code></a> interface, read <a href="com/amazon/ai/Translator.html" title="interface in com.amazon.ai"><code>Translator</code></a> for detail.
+    // User must implement <a href="software.amazon/ai/Translator.html" title="interface in software.amazon.ai"><code>Translator</code></a> interface, read <a href="software.amazon/ai/Translator.html" title="interface in software.amazon.ai"><code>Translator</code></a> for detail.
     Translator translator = new <b>MyTranslator</b>();
 
-    // User can specify GPU/CPU <a href="com/amazon/ai/Context.html" title="class in com.amazon.ai"><code>Context</code></a> to run inference session.
-    // This context is optional, <a href="com/amazon/ai/inference/Predictor.html" title="interface in com.amazon.ai.inference"><code>Predictor</code></a> can pick up default Context if not specified.
-    // See <a href="com/amazon/ai/Context.html#defaultContext--"><code>Context.defaultContext()</code></a>
+    // User can specify GPU/CPU <a href="software.amazon/ai/Context.html" title="class in software.amazon.ai"><code>Context</code></a> to run inference session.
+    // This context is optional, <a href="software.amazon/ai/inference/Predictor.html" title="interface in software.amazon.ai.inference"><code>Predictor</code></a> can pick up default Context if not specified.
+    // See <a href="software.amazon/ai/Context.html#defaultContext--"><code>Context.defaultContext()</code></a>
     Context context = Context.defaultContext();
 
-    // Next user need create a <code>Predictor</code>, and use <a href="com/amazon/ai/inference/Predictor.html#predict-I-"><code>Predictor.predict()</code></a>
+    // Next user need create a <code>Predictor</code>, and use <a href="software.amazon/ai/inference/Predictor.html#predict-I-"><code>Predictor.predict()</code></a>
     // to get prediction.
     try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor =
             <b>Predictor.newInstance</b>(model, translator, context)) {
@@ -46,14 +46,14 @@ deep learning task.
 
 <p>Joule API contains following packages:
 <ul>
-    <li><code>com.amazon.ai</code> – This packages contains top level common classes shared for both inference and training.
-    <li><code>com.amazon.ai.engine</code> – This packages contains classes responsible for loading deep learning framework.
-    <li><code>com.amazon.ai.image</code> – This packages contains utility classes for image processing.
-    <li><code>com.amazon.ai.inference</code> – This packages contains classes to implement inference tasks.
-    <li><code>com.amazon.ai.metric</code> – This packages contains classes to collect metrics information.
-    <li><code>com.amazon.ai.ndarray.*</code> – These packages contain classes and interfaces that defines n-dimensional array.
-    <li><code>com.amazon.ai.nn.*</code> – These packages contain classes defines neural network operators.
-    <li><code>com.amazon.ai.training.*</code> – These packages contain classes to implement training tasks.
+    <li><code>software.amazon.ai</code> – This packages contains top level common classes shared for both inference and training.
+    <li><code>software.amazon.ai.engine</code> – This packages contains classes responsible for loading deep learning framework.
+    <li><code>software.amazon.ai.image</code> – This packages contains utility classes for image processing.
+    <li><code>software.amazon.ai.inference</code> – This packages contains classes to implement inference tasks.
+    <li><code>software.amazon.ai.metric</code> – This packages contains classes to collect metrics information.
+    <li><code>software.amazon.ai.ndarray.*</code> – These packages contain classes and interfaces that defines n-dimensional array.
+    <li><code>software.amazon.ai.nn.*</code> – These packages contain classes defines neural network operators.
+    <li><code>software.amazon.ai.training.*</code> – These packages contain classes to implement training tasks.
 </ul>
 </body>
 </html>

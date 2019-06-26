@@ -12,13 +12,6 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Model;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.util.Pair;
-import com.amazon.ai.util.PairList;
-import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.io.IOException;
@@ -36,6 +29,13 @@ import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.ai.Model;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.util.Pair;
+import software.amazon.ai.util.PairList;
+import software.amazon.ai.util.Utils;
 
 /**
  * <code>MxModel</code> is MXNet implementation of {@link Model}.

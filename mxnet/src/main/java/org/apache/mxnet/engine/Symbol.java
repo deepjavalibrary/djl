@@ -12,17 +12,17 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Block;
-import com.amazon.ai.Initializer;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.util.PairList;
-import com.amazon.ai.util.Utils;
 import com.sun.jna.Pointer;
 import java.util.List;
 import org.apache.mxnet.jna.JnaUtils;
+import software.amazon.ai.Block;
+import software.amazon.ai.Initializer;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.util.PairList;
+import software.amazon.ai.util.Utils;
 
 public class Symbol extends NativeResource implements Block {
 

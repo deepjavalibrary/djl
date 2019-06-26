@@ -12,11 +12,6 @@
  */
 package org.apache.mxnet.jna;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.util.PairList;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
@@ -36,6 +31,11 @@ import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 import org.apache.mxnet.engine.Symbol;
+import software.amazon.ai.Context;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.ndarray.types.SparseFormat;
+import software.amazon.ai.util.PairList;
 
 public final class JnaUtils {
 

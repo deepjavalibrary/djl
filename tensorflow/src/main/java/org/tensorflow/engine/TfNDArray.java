@@ -1,17 +1,5 @@
 package org.tensorflow.engine;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.Matrix;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.internal.NDArrayEx;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Layout;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.training.GradReq;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
@@ -26,6 +14,18 @@ import org.tensorflow.Operation;
 import org.tensorflow.Output;
 import org.tensorflow.Tensor;
 import org.tensorflow.types.UInt8;
+import software.amazon.ai.Context;
+import software.amazon.ai.ndarray.Matrix;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Layout;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.ndarray.types.SparseFormat;
+import software.amazon.ai.training.GradReq;
 
 public class TfNDArray implements NDArray {
 
@@ -137,7 +137,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataDesc getDataDescriptor() {
-        return new DataDesc(getShape(), getDataType(), null, getLayout(), getContext(), null);
+        return new DataDesc(getShape(), getDataType(), null, getLayout(), getContext());
     }
 
     /** {@inheritDoc} */
@@ -151,6 +151,26 @@ public class TfNDArray implements NDArray {
     public void set(List<Float> data) {
         throw new UnsupportedOperationException("Tensor cannot be modified after creation");
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(float[] data) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(int[] data) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(double[] data) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(long[] data) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(byte[] data) {}
 
     /** {@inheritDoc} */
     @Override
@@ -1588,6 +1608,18 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray atanh() {
         return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean contentEquals(NDArray other) {
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean contentEquals(Number number) {
+        return false;
     }
 
     /** {@inheritDoc} */

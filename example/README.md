@@ -71,7 +71,7 @@ You can specify different example class with System property: "main"
 
 ```sh
 cd example
-./gradlew -Dmain=com.amazon.ai.example.SsdExample run --args="-p build/ -n squeezenet_v1.1 -c 1 -l build/logs -i build/kitten.jpg"
+./gradlew -Dmain=software.amazon.ai.example.SsdExample run --args="-p build/ -n squeezenet_v1.1 -c 1 -l build/logs -i build/kitten.jpg"
 ```
 
 

@@ -10,9 +10,8 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package com.amazon.ai.integration.util;
+package software.amazon.ai.integration.util;
 
-import com.amazon.ai.engine.Engine;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
+import software.amazon.ai.engine.Engine;
 
 public class AbstractTest {
 

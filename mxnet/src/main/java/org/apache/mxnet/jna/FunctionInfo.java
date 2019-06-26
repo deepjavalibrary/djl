@@ -12,15 +12,15 @@
  */
 package org.apache.mxnet.jna;
 
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.util.PairList;
 
 public class FunctionInfo {
 

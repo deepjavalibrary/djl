@@ -12,7 +12,6 @@
  */
 package org.apache.mxnet.jna;
 
-import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import java.io.BufferedReader;
@@ -33,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.ai.util.Utils;
 
 // CHECKSTYLE:OFF:FinalClass
 @SuppressWarnings("PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal")

@@ -12,18 +12,18 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.util.PairList;
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.jna.JnaUtils;
+import software.amazon.ai.Context;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.util.PairList;
 
 public class MxNDFactory implements NDFactory {
 

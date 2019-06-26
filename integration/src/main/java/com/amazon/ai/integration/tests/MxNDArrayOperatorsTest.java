@@ -1,13 +1,13 @@
-package com.amazon.ai.integration.tests;
+package software.amazon.ai.integration.tests;
 
-import com.amazon.ai.integration.exceptions.FailedTestException;
-import com.amazon.ai.integration.util.AbstractTest;
-import com.amazon.ai.integration.util.RunAsTest;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.Shape;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
+import software.amazon.ai.integration.exceptions.FailedTestException;
+import software.amazon.ai.integration.util.AbstractTest;
+import software.amazon.ai.integration.util.RunAsTest;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.Shape;
 
 public class MxNDArrayOperatorsTest extends AbstractTest {
 

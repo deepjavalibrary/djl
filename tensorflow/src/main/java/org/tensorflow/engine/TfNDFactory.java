@@ -1,13 +1,5 @@
 package org.tensorflow.engine;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -16,6 +8,13 @@ import org.tensorflow.Graph;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
 import org.tensorflow.Tensors;
+import software.amazon.ai.Context;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.util.PairList;
 
 public class TfNDFactory implements NDFactory, AutoCloseable {
 
@@ -51,12 +50,6 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
         return nameAssignment++;
     }
 
-    @Override
-    public NDArray create(
-            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
-        return null;
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDArray create(DataDesc dataDesc) {
@@ -65,6 +58,36 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
 
     public NDArray create(int data) {
         return new TfNDArray(this, Tensors.create(data));
+    }
+
+    @Override
+    public NDArray create(Context context, Shape shape, DataType dataType) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(float[] data, Context context, Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(int[] data, Context context, Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(double[] data, Context context, Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(long[] data, Context context, Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray create(byte[] data, Context context, Shape shape) {
+        return null;
     }
 
     /** {@inheritDoc} */

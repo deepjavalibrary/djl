@@ -15,16 +15,6 @@ package org.apache.mxnet.engine;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.TranslateException;
-import com.amazon.ai.Translator;
-import com.amazon.ai.TranslatorContext;
-import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.metric.Metrics;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.Shape;
 import org.apache.mxnet.jna.LibUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.test.MockMxnetLibrary;
@@ -34,6 +24,16 @@ import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import software.amazon.ai.Context;
+import software.amazon.ai.TranslateException;
+import software.amazon.ai.Translator;
+import software.amazon.ai.TranslatorContext;
+import software.amazon.ai.inference.Predictor;
+import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.Shape;
 
 // CHECKSTYLE:ON:AvoidStaticImport
 

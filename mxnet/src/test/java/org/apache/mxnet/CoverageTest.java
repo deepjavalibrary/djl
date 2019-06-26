@@ -12,10 +12,10 @@
  */
 package org.apache.mxnet;
 
-import com.amazon.ai.test.CoverageUtils;
 import java.io.IOException;
 import org.apache.mxnet.jna.JnaUtils;
 import org.testng.annotations.Test;
+import software.amazon.ai.test.CoverageUtils;
 
 public class CoverageTest {
 

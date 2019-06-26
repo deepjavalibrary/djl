@@ -1,17 +1,17 @@
 package org.tensorflow.engine;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.Model;
-import com.amazon.ai.Profiler;
-import com.amazon.ai.Translator;
-import com.amazon.ai.engine.Engine;
-import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.nn.NNIndex;
-import com.amazon.ai.training.Trainer;
 import java.io.IOException;
 import java.lang.management.MemoryUsage;
 import java.nio.file.Path;
 import org.tensorflow.TensorFlow;
+import software.amazon.ai.Context;
+import software.amazon.ai.Model;
+import software.amazon.ai.Profiler;
+import software.amazon.ai.Translator;
+import software.amazon.ai.engine.Engine;
+import software.amazon.ai.inference.Predictor;
+import software.amazon.ai.nn.NNIndex;
+import software.amazon.ai.training.Trainer;
 
 public class TfEngine extends Engine {
 

@@ -12,20 +12,6 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.Matrix;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.internal.NDArrayEx;
-import com.amazon.ai.ndarray.types.DataDesc;
-import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Layout;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.training.GradReq;
-import com.amazon.ai.util.PairList;
-import com.amazon.ai.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import java.io.OutputStream;
@@ -43,6 +29,20 @@ import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import org.apache.mxnet.jna.FunctionInfo;
 import org.apache.mxnet.jna.JnaUtils;
+import software.amazon.ai.Context;
+import software.amazon.ai.ndarray.Matrix;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Layout;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.ndarray.types.SparseFormat;
+import software.amazon.ai.training.GradReq;
+import software.amazon.ai.util.PairList;
+import software.amazon.ai.util.Utils;
 
 public class MxNDArray extends NativeResource implements NDArray {
 
@@ -575,21 +575,17 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equals(NDArray other) {
-        MxNDArray result = (MxNDArray) this.eq(other);
-        if (result.nonzero() == result.size()){
-            return true;
+    public boolean contentEquals(NDArray other) {
+        try (MxNDArray result = (MxNDArray) this.eq(other)) {
+            return result.nonzero() == result.size();
         }
-        return false;
     }
 
     @Override
-    public boolean equals(Number number) {
-        MxNDArray result = (MxNDArray) this.eq(number);
-        if (result.nonzero() == result.size()){
-            return true;
+    public boolean contentEquals(Number number) {
+        try (MxNDArray result = (MxNDArray) this.eq(number)) {
+            return result.nonzero() == result.size();
         }
-        return false;
     }
 
     /** {@inheritDoc} */
@@ -1618,11 +1614,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public int nonzero() {
-        MxNDArray zeros = (MxNDArray) this.eq(0);
-        MxNDArray sum =
-                (MxNDArray)
-                        factory.invoke(
-                                "sum", (MxNDArray) this.eq(zeros).eq(zeros), new PairList<>());
+        MxNDArray zeros = (MxNDArray) eq(0);
+        NDArray sum = factory.invoke("sum", eq(zeros).eq(zeros), new PairList<>());
         return (int) sum.toFloatArray()[0];
     }
 

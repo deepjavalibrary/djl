@@ -13,14 +13,6 @@
 
 package org.tensorflow;
 
-import com.amazon.ai.TranslateException;
-import com.amazon.ai.Translator;
-import com.amazon.ai.TranslatorContext;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.util.Pair;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
@@ -33,6 +25,14 @@ import org.tensorflow.engine.TfModel;
 import org.tensorflow.engine.TfNDArray;
 import org.tensorflow.engine.TfNDFactory;
 import org.tensorflow.engine.TfPredictor;
+import software.amazon.ai.TranslateException;
+import software.amazon.ai.Translator;
+import software.amazon.ai.TranslatorContext;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.util.Pair;
 
 public final class HelloWorld {
 

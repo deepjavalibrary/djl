@@ -12,7 +12,7 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Context;
+import software.amazon.ai.Context;
 
 public final class DeviceType {
 

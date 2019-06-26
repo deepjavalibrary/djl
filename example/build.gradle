@@ -13,7 +13,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': "com.amazon.ai.example.GenericInferenceExample"
+        attributes 'Main-Class': "software.amazon.ai.example.SsdExample"
     }
     includeEmptyDirs = false
     from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
@@ -31,5 +31,5 @@ task copyDependencies(type: Copy) {
 }
 
 application {
-    mainClassName = System.getProperty("main", "com.amazon.ai.example.GenericInferenceExample")
+    mainClassName = System.getProperty("main", "software.amazon.ai.example.SsdExample")
 }

@@ -6,7 +6,7 @@ plugins {
 ext.SpotBugsTask = com.github.spotbugs.SpotBugsTask
 
 allprojects {
-    group 'com.amazonaws.joule'
+    group 'software.amazon.joule'
     version = '1.0'
 
     repositories {

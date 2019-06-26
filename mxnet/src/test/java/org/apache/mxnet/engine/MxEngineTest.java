@@ -15,7 +15,6 @@ package org.apache.mxnet.engine;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import com.amazon.ai.Context;
 import java.io.IOException;
 import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
@@ -31,6 +30,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import software.amazon.ai.Context;
 
 // CHECKSTYLE:ON:AvoidStaticImport
 

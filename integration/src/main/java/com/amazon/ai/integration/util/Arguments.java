@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package com.amazon.ai.integration.util;
+package software.amazon.ai.integration.util;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;

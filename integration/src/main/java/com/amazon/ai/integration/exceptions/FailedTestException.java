@@ -1,4 +1,4 @@
-package com.amazon.ai.integration.exceptions;
+package software.amazon.ai.integration.exceptions;
 
 public class FailedTestException extends Exception {
     private static final long serialVersionUID = 1L;

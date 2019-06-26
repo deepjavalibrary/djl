@@ -1,10 +1,10 @@
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.ndarray.types.DataType;
-import com.amazon.ai.ndarray.types.Shape;
-import com.amazon.ai.ndarray.types.SparseFormat;
-import com.amazon.ai.util.PairList;
+import software.amazon.ai.Context;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.ndarray.types.SparseFormat;
+import software.amazon.ai.util.PairList;
 
 /** Helper for creating the MXNet operator parameters. */
 public class MxOpParams extends PairList<String, String> {

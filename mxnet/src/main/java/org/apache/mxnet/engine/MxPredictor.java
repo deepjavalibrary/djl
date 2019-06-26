@@ -12,18 +12,18 @@
  */
 package org.apache.mxnet.engine;
 
-import com.amazon.ai.Context;
-import com.amazon.ai.Model;
-import com.amazon.ai.TranslateException;
-import com.amazon.ai.Translator;
-import com.amazon.ai.TranslatorContext;
-import com.amazon.ai.inference.Predictor;
-import com.amazon.ai.metric.Metrics;
-import com.amazon.ai.ndarray.NDArray;
-import com.amazon.ai.ndarray.NDFactory;
-import com.amazon.ai.ndarray.NDList;
-import com.amazon.ai.util.Pair;
 import org.apache.mxnet.jna.JnaUtils;
+import software.amazon.ai.Context;
+import software.amazon.ai.Model;
+import software.amazon.ai.TranslateException;
+import software.amazon.ai.Translator;
+import software.amazon.ai.TranslatorContext;
+import software.amazon.ai.inference.Predictor;
+import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.util.Pair;
 
 /**
  * <code>MxPredictor</code> is the MXNet implementation of {@link Predictor}.

@@ -12,7 +12,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': "com.amazon.ai.integration.tests.MxNDArrayOperatorsTest"
+        attributes 'Main-Class': "software.amazon.ai.integration.tests.MxNDArrayOperatorsTest"
     }
     includeEmptyDirs = false
     from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
@@ -30,5 +30,5 @@ task copyDependencies(type: Copy) {
 }
 
 application {
-    mainClassName = System.getProperty("main", "com.amazon.ai.integration.tests.MxNDArrayOperatorsTest")
+    mainClassName = System.getProperty("main", "software.amazon.ai.integration.tests.MxNDArrayOperatorsTest")
 }
