@@ -52,8 +52,7 @@ public class MockNDFactory implements NDFactory {
     }
 
     @Override
-    public NDArray zeros(
-            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
+    public NDArray zeros(Context context, Shape shape, DataType dataType) {
         return null;
     }
 
@@ -63,8 +62,7 @@ public class MockNDFactory implements NDFactory {
     }
 
     @Override
-    public NDArray ones(
-            Context context, Shape shape, DataType dataType, SparseFormat sparseFormat) {
+    public NDArray ones(Context context, Shape shape, DataType dataType) {
         return null;
     }
 

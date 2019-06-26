@@ -102,6 +102,9 @@ public class MxNDFactory implements NDFactory {
     }
 
     public NDArray invoke(String operation, NDArray src, PairList<String, String> params) {
+        if (src == null) {
+            return invoke(operation, EMPTY, null, params)[0];
+        }
         return invoke(operation, new NDArray[] {src}, null, params)[0];
     }
 
