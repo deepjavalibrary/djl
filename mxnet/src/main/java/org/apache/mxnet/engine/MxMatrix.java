@@ -591,6 +591,11 @@ public class MxMatrix implements Matrix {
         return array.gte(other);
     }
 
+    @Override
+    public NDArray gte(NDArray other) {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray lte(Number other) {
@@ -601,6 +606,11 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray lt(Number other) {
         return array.lt(other);
+    }
+
+    @Override
+    public NDArray lte(NDArray other) {
+        return null;
     }
 
     /** {@inheritDoc} */

@@ -40,7 +40,6 @@ public class AbstractTest {
             } else {
                 methods = new ArrayList<>(Arrays.asList(this.getClass().getMethods()));
             }
-
             for (Method method : methods) {
                 for (int i = 0; i < iteration; i++) {
                     if (method.isAnnotationPresent(RunAsTest.class)) {

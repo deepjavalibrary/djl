@@ -396,6 +396,16 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    @Override
+    public boolean contentEquals(NDArray other) {
+        return false;
+    }
+
+    @Override
+    public boolean contentEquals(Number number) {
+        return false;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray gt(Number other) {
@@ -428,6 +438,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray gte(NDArray other) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray lte(Number other) {
         return null;
     }
@@ -435,6 +451,12 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lt(Number other) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray lte(NDArray other) {
         return null;
     }
 
@@ -1638,18 +1660,6 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray atanh() {
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean contentEquals(NDArray other) {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean contentEquals(Number number) {
-        return false;
     }
 
     /** {@inheritDoc} */

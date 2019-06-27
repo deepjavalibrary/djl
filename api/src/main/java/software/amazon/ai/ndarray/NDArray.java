@@ -123,28 +123,28 @@ public interface NDArray extends AutoCloseable {
     /**
      * Set the NDArray value from a array of float.
      *
-     * @param data array of floats to set
+     * @param data array of integers to set
      */
     void set(int[] data);
 
     /**
      * Set the NDArray value from a array of float.
      *
-     * @param data array of floats to set
+     * @param data array of doubles to set
      */
     void set(double[] data);
 
     /**
      * Set the NDArray value from a array of float.
      *
-     * @param data array of floats to set
+     * @param data array of longd to set
      */
     void set(long[] data);
 
     /**
      * Set the NDArray value from a array of float.
      *
-     * @param data array of floats to set
+     * @param data array of bytes to set
      */
     void set(byte[] data);
 
@@ -500,14 +500,6 @@ public interface NDArray extends AutoCloseable {
     boolean contentEquals(Number number);
 
     /**
-     * Returns the binary ndarray for "Greater" comparison.
-     *
-     * @param other the number to compare.
-     * @return the binary ndarray for "Greater" comparison.
-     */
-    NDArray gt(Number other);
-
-    /**
      * Returns the binary ndarray for "Not equals" comparison.
      *
      * @param other the number to compare.
@@ -524,6 +516,14 @@ public interface NDArray extends AutoCloseable {
     NDArray neq(NDArray other);
 
     /**
+     * Returns the binary ndarray for "Greater" comparison.
+     *
+     * @param other the number to compare.
+     * @return the binary ndarray for "Greater" comparison.
+     */
+    NDArray gt(Number other);
+
+    /**
      * Returns the binary ndarray for "Greater Than" comparison.
      *
      * @param other the ndarray to compare.
@@ -532,12 +532,20 @@ public interface NDArray extends AutoCloseable {
     NDArray gt(NDArray other);
 
     /**
-     * Returns binary ndarray for "Greter or equals" comparison.
+     * Returns binary ndarray for "Greater or equals" comparison.
      *
-     * @param other the number to compare.
-     * @return binary ndarray for "Greter or equals" comparison.
+     * @param other the ndarray to compare.
+     * @return binary ndarray for "Greater or equals" comparison.
      */
     NDArray gte(Number other);
+
+    /**
+     * Returns binary ndarray for "Greater or equals" comparison.
+     *
+     * @param other the number to compare.
+     * @return binary ndarray for "Greater or equals" comparison.
+     */
+    NDArray gte(NDArray other);
 
     /**
      * Returns the binary ndarray for "Less or equals" comparison.
@@ -554,6 +562,14 @@ public interface NDArray extends AutoCloseable {
      * @return the binary ndarray for "Less" comparison.
      */
     NDArray lt(Number other);
+
+    /**
+     * Returns the binary ndarray for "Less or equals" comparison.
+     *
+     * @param other the ndarray to compare.
+     * @return the binary ndarray for "Less or equals" comparison.
+     */
+    NDArray lte(NDArray other);
 
     /**
      * Returns the binary ndarray for "Less" comparison.

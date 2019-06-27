@@ -272,12 +272,22 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray gte(NDArray other) {
+        return null;
+    }
+
+    @Override
     public NDArray lte(Number other) {
         return null;
     }
 
     @Override
     public NDArray lt(Number other) {
+        return null;
+    }
+
+    @Override
+    public NDArray lte(NDArray other) {
         return null;
     }
 

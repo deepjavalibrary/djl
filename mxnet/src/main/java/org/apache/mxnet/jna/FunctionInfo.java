@@ -41,7 +41,6 @@ public class FunctionInfo {
         PointerArray srcHandles = new PointerArray(handles);
         handles = Arrays.stream(dest).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
         PointerByReference destRef = new PointerByReference(new PointerArray(handles));
-        JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params);
         return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params);
     }
 

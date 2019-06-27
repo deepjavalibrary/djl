@@ -9,15 +9,15 @@ public final class Assertions {
 
     private Assertions() {}
 
-    public static void assertEquals(boolean statement, String errorMessage)
+    public static void assertStatement(boolean statement, String errorMessage)
             throws FailedTestException {
         if (!statement) {
             throw new FailedTestException(errorMessage);
         }
     }
 
-    public static void assertEquals(boolean statement) throws FailedTestException {
-        assertEquals(statement, "Assertion failed!");
+    public static void assertStatement(boolean statement) throws FailedTestException {
+        assertStatement(statement, "Assertion failed!");
     }
 
     public static void assertEquals(NDArray expected, NDArray actual, String errorMessage)

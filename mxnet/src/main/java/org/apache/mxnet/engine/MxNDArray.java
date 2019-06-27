@@ -569,50 +569,70 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gt(Number other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray neq(Number other) {
-        return null;
+        return eq(other).eq(0);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
-        return null;
+        return eq(other).eq(0);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
-        return null;
+        return factory.invoke("_greater", new NDArray[] {this, other}, null)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray gte(NDArray other) {
+        return factory.invoke("_greater_equal", new NDArray[] {this, other}, null)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray gt(Number other) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return factory.invoke("_greater_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray gte(Number other) {
-        return null;
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return factory.invoke("_greater_equal_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray lte(Number other) {
-        return null;
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return factory.invoke("_lesser_equal_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray lt(Number other) {
-        return null;
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return factory.invoke("_lesser_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray lte(NDArray other) {
+        return factory.invoke("_lesser_equal", new NDArray[] {this, other}, null)[0];
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
-        return null;
+        return factory.invoke("_lesser", new NDArray[] {this, other}, null)[0];
     }
 
     /** {@inheritDoc} */

@@ -85,11 +85,99 @@ public final class NDArrays {
     /**
      * Returns the boolean true iff all elements in the NDArray is equal to the Number
      *
-     * @param a the NDArray to compare.
-     * @param b the Number to compare.
+     * @param a the ndarray to compare.
+     * @param b the number to compare.
      * @return the binary ndarray for "Equals" comparison.
      */
     public static boolean equals(NDArray a, Number b) {
         return a.contentEquals(b);
+    }
+
+    /**
+     * Returns the binary ndarray for "Greater Than" comparison.
+     *
+     * @param a ndarray to be compared
+     * @param b the ndarray to be compared against
+     * @return the binary ndarray for "Greater Than" comparison.
+     */
+    public NDArray gt(NDArray a, NDArray b) {
+        return a.gt(b);
+    }
+
+    /**
+     * Returns the binary ndarray for "Greater or Equals" comparison.
+     *
+     * @param a ndarray to be compared
+     * @param b the ndarray to be compared against
+     * @return the binary ndarray for "Greater Than" comparison.
+     */
+    public NDArray gte(NDArray a, NDArray b) {
+        return a.gte(b);
+    }
+
+    /**
+     * Returns binary ndarray for "Greater or equals" comparison.
+     *
+     * @param a ndarray to be compared
+     * @param b the number to be compared against
+     * @return binary ndarray for "Greater or equals" comparison.
+     */
+    public NDArray gte(NDArray a, Number b) {
+        return a.gte(b);
+    }
+
+    /**
+     * Returns the binary ndarray for "Less or equals" comparison.
+     *
+     * @param a ndarray to be compared
+     * @param b the number to be compared against
+     * @return the binary ndarray for "Less or equals" comparison.
+     */
+    public NDArray lte(NDArray a, Number b) {
+        return a.lte(b);
+    }
+
+    /**
+     * Returns the binary ndarray for "Less" comparison.
+     *
+     * @param a ndarray to be compared
+     * @param b the number to be compared against
+     * @return the binary ndarray for "Less" comparison.
+     */
+    public NDArray lt(NDArray a, Number b) {
+        return a.lt(b);
+    }
+
+    /**
+     * Returns the binary ndarray for "Lesser or equals" comparison.
+     *
+     * @param a ndarray to be compared
+     * @param b the ndarray to be compared against
+     * @return the binary ndarray for "Less" comparison.
+     */
+    public NDArray lte(NDArray a, NDArray b) {
+        return a.lte(b);
+    }
+
+    /**
+     * Returns the binary ndarray for "Less" comparison.
+     *
+     * @param a ndarray to be compared
+     * @param b the ndarray to be compared against
+     * @return the binary ndarray for "Less" comparison.
+     */
+    public NDArray lt(NDArray a, NDArray b) {
+        return a.lt(b);
+    }
+
+    /**
+     * Returns the binary ndarray for "Greater" comparison.
+     *
+     * @param a ndarray to be compared
+     * @param b the number to be compared against
+     * @return the binary ndarray for "Greater" comparison.
+     */
+    public NDArray gt(NDArray a, Number b) {
+        return a.gt(b);
     }
 }
