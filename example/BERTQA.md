@@ -1,0 +1,53 @@
+BERT QA Example
+==============
+
+In this tutorial, we will walk through the BERT QA model trained by MXNet. 
+Users can provide a question with a paragraph contains answer to the model and
+the model will be able to find the best answer from the answer paragraph.
+
+Example:
+```text
+Q: When did BBC Japan start broadcasting?
+```
+
+Answer paragraph
+```text
+BBC Japan was a general entertainment channel, which operated between December 2004 and April 2006.
+It ceased operations after its Japanese distributor folded.
+```
+And it picked up the right one:
+```text
+A: December 2004
+```
+
+## Setup Guide
+
+### Step 1: Download the model
+
+For this tutorial, you can get the model and vocabulary by running following commands:
+
+```bash
+  curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/vocab.json -O
+  curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/static_bert_qa-0002.params -O
+  curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/static_bert_qa-symbol.json -O
+```
+
+### Step 2: Do Inference
+
+The available arguments are as follows:
+
+| Argument   | Comments                                 |
+| ---------- | ---------------------------------------- |
+| `-q`      | Question for the model |
+| `-a`      | Paragraph that contains the answer |
+| `-l`      | Sequence Length of the model (384 by default) |
+| `-p`      | Path to the model directory |
+| `-n`      |  Model name prefix |
+
+You can simply type the followings to run the inference:
+
+```
+cd example
+./gradlew -Dmain=com.amazon.ai.example.BertQaInferenceExample run --args="-p build/ -n static_bert_qa"
+```
+
