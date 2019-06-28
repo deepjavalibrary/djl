@@ -39,8 +39,11 @@ public class MockNDFactory implements NDFactory {
     }
 
     @Override
-    public NDArray[] invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params) {
+    public void invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {}
+
+    @Override
+    public NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params) {
         return new NDArray[0];
     }
 

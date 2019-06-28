@@ -125,14 +125,28 @@ public interface NDFactory extends AutoCloseable {
      *
      * @param operation native operation to performance
      * @param src array of source NDArray
-     * @param dest array of destination to save output, null or empty array for new NDArray output
+     * @param dest array of destination to save output
      * @param params parameters to be passed to native operator
-     * @return output NDArray
      * @throws IllegalArgumentException if operation is not supported by Engine
      * @throws software.amazon.ai.engine.EngineException if operation failed in native engine
      */
-    NDArray[] invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params);
+    void invoke(String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params);
+
+    /**
+     * An engine specific generic invocation to native operator.
+     *
+     * <p>User should avoid using this function if possible. Since this function is engine specific,
+     * using this API may cause portability issue. And user must be aware that native operation may
+     * not compatible between each versions.
+     *
+     * @param operation native operation to performance
+     * @param src array of source NDArray
+     * @param params parameters to be passed to native operator
+     * @return output array of {@link NDArray}
+     * @throws IllegalArgumentException if operation is not supported by Engine
+     * @throws software.amazon.ai.engine.EngineException if operation failed in native engine
+     */
+    NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params);
 
     /**
      * Create an instance of {@link NDArray} filled with zeros with specified {@link Shape}.

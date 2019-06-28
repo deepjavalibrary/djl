@@ -365,7 +365,7 @@ public final class JnaUtils {
             Pointer function,
             PointerArray inputs,
             PointerByReference destRef,
-            PairList<String, String> params) {
+            PairList<String, ?> params) {
         String[] keys;
         String[] values;
         if (params == null) {
@@ -373,7 +373,7 @@ public final class JnaUtils {
             values = EMPTY_ARRAY;
         } else {
             keys = params.keyArray(EMPTY_ARRAY);
-            values = params.valueArray(EMPTY_ARRAY);
+            values = params.values().stream().map(Object::toString).toArray(String[]::new);
         }
         IntBuffer numOutputs = IntBuffer.allocate(1);
         numOutputs.put(0, 1);

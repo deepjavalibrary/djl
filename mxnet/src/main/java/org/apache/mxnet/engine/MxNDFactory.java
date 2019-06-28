@@ -121,16 +121,22 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray[] invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params) {
-        return JnaUtils.op(operation).invoke(this, src, dest, params);
+    public void invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
+        JnaUtils.op(operation).invoke(this, src, dest, params);
     }
 
-    public NDArray invoke(String operation, NDArray src, PairList<String, String> params) {
+    /** {@inheritDoc} */
+    @Override
+    public NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params) {
+        return JnaUtils.op(operation).invoke(this, src, params);
+    }
+
+    public NDArray invoke(String operation, NDArray src, PairList<String, ?> params) {
         if (src == null) {
-            return invoke(operation, EMPTY, null, params)[0];
+            return JnaUtils.op(operation).invoke(this, EMPTY, params)[0];
         }
-        return invoke(operation, new NDArray[] {src}, null, params)[0];
+        return JnaUtils.op(operation).invoke(this, src, params)[0];
     }
 
     /** {@inheritDoc} */
@@ -165,7 +171,7 @@ public class MxNDFactory implements NDFactory {
         params.setShape(shape);
         params.setContext(context);
         params.setDataType(dataType);
-        return invoke(opName, EMPTY, null, params)[0];
+        return invoke(opName, (NDArray) null, params);
     }
 
     /** {@inheritDoc} */

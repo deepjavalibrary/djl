@@ -106,8 +106,12 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray[] invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, String> params) {
+    public void invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params) {
         return new NDArray[0];
     }
 

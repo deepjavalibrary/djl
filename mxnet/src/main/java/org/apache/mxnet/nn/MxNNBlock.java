@@ -14,7 +14,7 @@ public abstract class MxNNBlock implements Block {
     public NDList forward(NDList inputs, PairList<String, String> params) {
         NDArray[] inputArray = inputs.toArray();
         NDFactory factory = inputArray[0].getFactory();
-        NDArray[] output = factory.invoke(opName, inputs.toArray(), null, params);
+        NDArray[] output = factory.invoke(opName, inputArray, params);
         return new NDList(output);
     }
 

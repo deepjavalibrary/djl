@@ -34,28 +34,37 @@ public class FunctionInfo {
         this.arguments = arguments;
     }
 
-    public NDArray[] invoke(
-            NDFactory factory, NDArray[] src, NDArray[] dest, PairList<String, String> params) {
+    public int invoke(
+            NDFactory factory, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
         Pointer[] handles =
                 Arrays.stream(src).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
         PointerArray srcHandles = new PointerArray(handles);
-        PointerByReference destRef;
-        if (dest == null || dest.length == 0) {
-            destRef = new PointerByReference();
-        } else {
-            handles =
-                    Arrays.stream(dest)
-                            .map(a -> ((MxNDArray) a).getHandle())
-                            .toArray(Pointer[]::new);
-            destRef = new PointerByReference(new PointerArray(handles));
-        }
+        handles = Arrays.stream(dest).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
+        PointerByReference destRef = new PointerByReference(new PointerArray(handles));
+        JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params);
+        return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params);
+    }
 
-        int numOutputs = JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params);
+    public NDArray[] invoke(NDFactory factory, NDArray[] src, PairList<String, ?> params) {
+        Pointer[] handles =
+                Arrays.stream(src).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
+        PointerArray srcHandles = new PointerArray(handles);
+        return invoke((MxNDFactory) factory, srcHandles, params);
+    }
+
+    public NDArray[] invoke(NDFactory factory, NDArray src, PairList<String, ?> params) {
+        PointerArray handles = new PointerArray(((MxNDArray) src).getHandle());
+        return invoke((MxNDFactory) factory, handles, params);
+    }
+
+    private NDArray[] invoke(MxNDFactory factory, PointerArray src, PairList<String, ?> params) {
+        PointerByReference destRef = new PointerByReference();
+
+        int numOutputs = JnaUtils.imperativeInvoke(handle, src, destRef, params);
         MxNDArray[] result = new MxNDArray[numOutputs];
         Pointer[] ptrArray = destRef.getValue().getPointerArray(0, numOutputs);
-        MxNDFactory mxNDArray = (MxNDFactory) factory;
         for (int i = 0; i < numOutputs; i++) {
-            result[i] = mxNDArray.create(ptrArray[i]);
+            result[i] = factory.create(ptrArray[i]);
         }
         return result;
     }
