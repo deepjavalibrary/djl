@@ -17,8 +17,6 @@ package org.apache.mxnet.engine;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 import org.apache.mxnet.jna.LibUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.jna.NativeSize;
@@ -82,12 +80,9 @@ public class MxNDArrayTest extends PowerMockTestCase {
                             return 0;
                         });
         MxNDArray nd = factory.create(new DataDesc(new Shape(3)));
-        List<Float> input = Arrays.asList(1.0f, 2.0f, 3.0f);
+        float[] input = new float[] {1.0f, 2.0f, 3.0f};
         nd.set(input);
         float[] fArr = fa[0];
-        Assert.assertEquals(fArr.length, input.size());
-        for (int i = 0; i < fArr.length; i++) {
-            Assert.assertEquals(input.get(i), fArr[i]);
-        }
+        Assert.assertEquals(input, fArr);
     }
 }

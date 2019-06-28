@@ -15,8 +15,6 @@ package software.amazon.ai.example;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -138,9 +136,10 @@ public final class BertQaInferenceExample extends AbstractExample {
                     BertDataParser.getTokenTypes(tokenQ, tokenA, input.getSeqLength());
             tokens = BertDataParser.formTokens(tokenQ, tokenA, input.getSeqLength());
             List<Integer> indexes = parser.token2idx(tokens);
-            List<Float> indexesFloat = new ArrayList<>(indexes.size());
-            for (int integer : indexes) {
-                indexesFloat.add((float) integer);
+            float[] types = new float[tokenTypes.size()];
+            int idx = 0;
+            for (Float f : tokenTypes) {
+                types[idx++] = f;
             }
 
             int seqLength = input.getSeqLength();
@@ -149,9 +148,9 @@ public final class BertQaInferenceExample extends AbstractExample {
             NDArray data1 = factory.create(new DataDesc(new Shape(1, seqLength)));
             NDArray data2 = factory.create(new DataDesc(new Shape(1)));
 
-            data0.set(indexesFloat);
-            data1.set(tokenTypes);
-            data2.set(Collections.singletonList((float) validLength));
+            data0.set(indexes.stream().mapToInt(Integer::intValue).toArray());
+            data1.set(types);
+            data2.set(new int[] {validLength});
 
             NDList list = new NDList(3);
             list.add("data0", data0);

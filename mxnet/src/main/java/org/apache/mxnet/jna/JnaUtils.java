@@ -355,8 +355,8 @@ public final class JnaUtils {
         checkCall(LIB.MXNDArraySyncCopyToCPU(ndArray, data, size));
     }
 
-    public static void syncCopyFromCPU(Pointer ndArray, Buffer data) {
-        NativeSize size = new NativeSize(data.remaining());
+    public static void syncCopyFromCPU(Pointer ndArray, Buffer data, int len) {
+        NativeSize size = new NativeSize(len);
         Pointer pointer = Native.getDirectBufferPointer(data);
         checkCall(LIB.MXNDArraySyncCopyFromCPU(ndArray, pointer, size));
     }

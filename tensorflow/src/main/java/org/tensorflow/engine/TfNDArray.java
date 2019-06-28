@@ -148,12 +148,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void set(List<Float> data) {
-        throw new UnsupportedOperationException("Tensor cannot be modified after creation");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void set(float[] data) {}
 
     /** {@inheritDoc} */

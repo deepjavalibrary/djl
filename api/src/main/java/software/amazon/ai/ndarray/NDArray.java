@@ -114,13 +114,6 @@ public interface NDArray extends AutoCloseable {
     void set(Buffer data);
 
     /**
-     * Set the NDArray value from a list of float.
-     *
-     * @param data list of floats to set
-     */
-    void set(List<Float> data);
-
-    /**
      * Set the NDArray value from a array of float.
      *
      * @param data array of floats to set

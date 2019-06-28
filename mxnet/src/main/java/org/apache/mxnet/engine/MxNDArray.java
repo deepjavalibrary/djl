@@ -22,7 +22,6 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
@@ -147,92 +146,96 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        if (data.remaining() != getShape().size()) {
+        int size = data.remaining();
+        DataType inputType;
+        if (data instanceof FloatBuffer) {
+            inputType = DataType.FLOAT32;
+        } else if (data instanceof DoubleBuffer) {
+            inputType = DataType.FLOAT64;
+        } else if (data instanceof IntBuffer) {
+            inputType = DataType.INT32;
+        } else if (data instanceof LongBuffer) {
+            inputType = DataType.INT64;
+        } else if (data instanceof ByteBuffer) {
+            inputType = DataType.INT8;
+        } else {
             throw new IllegalArgumentException(
-                    "array size ("
-                            + data.remaining()
-                            + ")do not match the size of NDArray ("
-                            + getShape().size());
+                    "Unsupported buffer type: " + data.getClass().getSimpleName());
         }
-        JnaUtils.syncCopyFromCPU(getHandle(), data);
-    }
+        validate(inputType, size);
 
-    /** {@inheritDoc} */
-    @Override
-    public void set(List<Float> data) {
-        int size = data.size();
-        FloatBuffer output =
-                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
-        for (Float v : data) {
-            output.put(v);
+        if (data.isDirect()) {
+            JnaUtils.syncCopyFromCPU(getHandle(), data, size);
+            return;
         }
-        output.rewind();
-        set(output);
+
+        int numOfBytes = inputType.getNumOfBytes();
+        ByteBuffer buf = ByteBuffer.allocateDirect(size * numOfBytes);
+        buf.order(ByteOrder.LITTLE_ENDIAN); // MXNet use little endian
+
+        switch (inputType) {
+            case FLOAT32:
+                buf.asFloatBuffer().put((FloatBuffer) data);
+                break;
+            case FLOAT64:
+                buf.asDoubleBuffer().put((DoubleBuffer) data);
+                break;
+            case INT8:
+                buf.put((ByteBuffer) data);
+                break;
+            case INT32:
+                buf.asIntBuffer().put((IntBuffer) data);
+                break;
+            case INT64:
+                buf.asLongBuffer().put((LongBuffer) data);
+                break;
+            case UINT8:
+            case FLOAT16:
+            default:
+                throw new AssertionError("Show never happen");
+        }
+        JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
     }
 
     /** {@inheritDoc} */
     @Override
     public void set(float[] data) {
-        int size = data.length;
-        FloatBuffer output =
-                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
-        for (float v : data) {
-            output.put(v);
-        }
-        output.rewind();
-        set(output);
+        set(FloatBuffer.wrap(data));
     }
 
     /** {@inheritDoc} */
     @Override
     public void set(int[] data) {
-        int size = data.length;
-        IntBuffer output =
-                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
-        for (int v : data) {
-            output.put(v);
-        }
-        output.rewind();
-        set(output);
+        set(IntBuffer.wrap(data));
     }
 
     /** {@inheritDoc} */
     @Override
     public void set(double[] data) {
-        int size = data.length;
-        DoubleBuffer output =
-                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer();
-        for (double v : data) {
-            output.put(v);
-        }
-        output.rewind();
-        set(output);
+        set(DoubleBuffer.wrap(data));
     }
 
     /** {@inheritDoc} */
     @Override
     public void set(long[] data) {
-        int size = data.length;
-        LongBuffer output =
-                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asLongBuffer();
-        for (long v : data) {
-            output.put(v);
-        }
-        output.rewind();
-        set(output);
+        set(LongBuffer.wrap(data));
     }
 
     /** {@inheritDoc} */
     @Override
     public void set(byte[] data) {
-        int size = data.length;
-        ShortBuffer output =
-                ByteBuffer.allocateDirect(size * 4).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
-        for (byte v : data) {
-            output.put(v);
+        set(ByteBuffer.wrap(data));
+    }
+
+    private void validate(DataType inputType, int size) {
+        if (getDataType() != inputType) {
+            throw new IllegalStateException(
+                    "DataType mismatch, required: " + dataType + ", actual: " + inputType);
         }
-        output.rewind();
-        set(output);
+        if (size != getShape().size()) {
+            throw new IllegalArgumentException(
+                    "array size (" + size + ") do not match NDArray shape: " + shape);
+        }
     }
 
     /** {@inheritDoc} */
@@ -960,7 +963,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public float[] toFloatArray() {
         if (getDataType() != DataType.FLOAT32) {
             throw new IllegalStateException(
-                    "DataType mismatch, Required float" + " Actual " + getDataType());
+                    "DataType mismatch, Required float, Actual " + getDataType());
         }
         FloatBuffer fb = toByteBuffer().asFloatBuffer();
         float[] ret = new float[fb.remaining()];

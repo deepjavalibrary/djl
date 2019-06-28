@@ -322,10 +322,6 @@ public class MxMatrix implements Matrix {
     @Override
     public void set(Buffer data) {}
 
-    /** {@inheritDoc} */
-    @Override
-    public void set(List<Float> data) {}
-
     @Override
     public void set(float[] data) {}
 
