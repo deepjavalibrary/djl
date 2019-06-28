@@ -133,10 +133,11 @@ public class MxNDFactory implements NDFactory {
     }
 
     public NDArray invoke(String operation, NDArray src, PairList<String, ?> params) {
-        if (src == null) {
-            return JnaUtils.op(operation).invoke(this, EMPTY, params)[0];
-        }
         return JnaUtils.op(operation).invoke(this, src, params)[0];
+    }
+
+    public NDArray invoke(String operation, PairList<String, ?> params) {
+        return JnaUtils.op(operation).invoke(this, EMPTY, params)[0];
     }
 
     /** {@inheritDoc} */
@@ -171,7 +172,7 @@ public class MxNDFactory implements NDFactory {
         params.setShape(shape);
         params.setContext(context);
         params.setDataType(dataType);
-        return invoke(opName, (NDArray) null, params);
+        return invoke(opName, params);
     }
 
     /** {@inheritDoc} */
