@@ -17,6 +17,7 @@ import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -78,9 +79,28 @@ public class MxEngine extends Engine {
         return major + "." + minor + '.' + patch;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Load the MXNet model from specified location.
+     *
+     * <p>MXNet engine looks for modelName.json and modelName-xxxx.params files in specified
+     * directory. By default, MXNet engine will pick up latest epoch of parameter file. However,
+     * user can explicitly an epoch to be loaded:
+     *
+     * <pre>
+     * Map&lt;String, String&gt; options = new HashMap&lt;&gt;()
+     * <b>options.put("epoch", "3");</b>
+     * Model model = Model.load(modelPath, "squeezenet", options);
+     * </pre>
+     *
+     * @param modelPath Directory of the model
+     * @param modelName Name/Prefix of the model
+     * @param options load model options, check document for specific engine
+     * @return {@link Model} contains the model information
+     * @throws IOException Exception for file loading
+     */
     @Override
-    public Model loadModel(Path modelPath, String modelName, int epoch) throws IOException {
+    public Model loadModel(Path modelPath, String modelName, Map<String, String> options)
+            throws IOException {
         Path modelDir;
         if (Files.isDirectory(modelPath)) {
             modelDir = modelPath;
@@ -91,7 +111,13 @@ public class MxEngine extends Engine {
             }
         }
         String modelPrefix = modelDir.resolve(modelName).toAbsolutePath().toString();
-        if (epoch == -1) {
+
+        String epochOption = null;
+        if (options != null) {
+            epochOption = options.get("epoch");
+        }
+        int epoch;
+        if (epochOption == null) {
             final Pattern pattern = Pattern.compile(Pattern.quote(modelName) + "-(\\d{4}).params");
             List<Integer> checkpoints =
                     Files.walk(modelDir, 1)
@@ -110,6 +136,8 @@ public class MxEngine extends Engine {
                 throw new IOException("Parameter files not found: " + modelPrefix + "-0001.params");
             }
             epoch = checkpoints.get(checkpoints.size() - 1);
+        } else {
+            epoch = Integer.parseInt(epochOption);
         }
 
         return MxModel.loadModel(modelPrefix, epoch);

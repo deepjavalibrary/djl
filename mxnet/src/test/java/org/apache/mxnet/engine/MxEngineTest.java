@@ -20,6 +20,8 @@ import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.jna.LibUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.test.MockMxnetLibrary;
@@ -79,29 +81,32 @@ public class MxEngineTest extends PowerMockTestCase {
         String modelName = "A";
         Path path122 = modelDir.resolve(modelName + "-0122.params");
         Files.createFile(path122);
-        String result = loadModel(engine, modelDir, modelName, -1);
+        String result = loadModel(engine, modelDir, modelName, null);
         Files.delete(path122);
         Assert.assertEquals(result, "A-0122.params");
 
         Path path1 = modelDir.resolve(modelName + "-0001.params");
         Files.createFile(path1);
-        result = loadModel(engine, modelDir, modelName, -1);
+        result = loadModel(engine, modelDir, modelName, null);
         Files.delete(path1);
         Assert.assertEquals(result, "A-0001.params");
 
-        result = loadModel(engine, modelDir, modelName, 122);
+        Map<String, String> options = new ConcurrentHashMap<>();
+        options.put("epoch", String.valueOf(122));
+        result = loadModel(engine, modelDir, modelName, options);
         Assert.assertEquals(result, "A-0122.params");
 
         Files.createFile(path122);
         Files.createFile(path1);
 
-        result = loadModel(engine, modelDir, modelName, 122);
+        result = loadModel(engine, modelDir, modelName, options);
         Assert.assertEquals(result, "A-0122.params");
     }
 
-    private String loadModel(MxEngine engine, Path location, String modelName, int epoch)
+    private String loadModel(
+            MxEngine engine, Path location, String modelName, Map<String, String> options)
             throws IOException {
-        MxModel model = (MxModel) engine.loadModel(location, modelName, epoch);
+        MxModel model = (MxModel) engine.loadModel(location, modelName, options);
         // In JNA.MXNDArrayLoad function, file name is stored as the first param name in Model
         String paramPath = model.getParameters().get(0).getKey();
         return Paths.get(paramPath).toFile().getName();

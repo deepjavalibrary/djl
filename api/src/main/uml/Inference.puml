@@ -22,9 +22,11 @@ interface Model {
     +String[] getArtifactNames()
     +URL getArtifact(String name)
     +InputStream getArtifactAsStream(String name)
-    +void save(File modelPath, String modelName, int epoch)
+    +void save(File modelPath, String modelName)
 	.. static Factory methods ..
-    +Model loadModel(File modelPath, String modelName, int epoch)
+    +Model loadModel(Path modelPath)
+    +Model loadModel(Path modelPath, String modelName)
+    +Model loadModel(Path modelPath, String modelName, Map options)
 }
 
 interface Translator<I, O> {

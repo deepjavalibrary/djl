@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Map;
 import java.util.function.Function;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -56,22 +56,6 @@ import software.amazon.ai.ndarray.types.DataType;
 public interface Model {
 
     /**
-     * Load the model from a file path with epoch provided.
-     *
-     * <p>It will try to find the model like res-152-0002.param
-     *
-     * @param modelPath Path to the model, include the model name
-     * @param epoch number of epoch of the model
-     * @return {@link Model} object
-     * @throws IOException IO exception happened in loading
-     */
-    static Model loadModel(String modelPath, int epoch) throws IOException {
-        Path path = Paths.get(modelPath);
-        String modelName = path.toFile().getName();
-        return loadModel(path, modelName, epoch);
-    }
-
-    /**
      * Load the model from the {@link Path}.
      *
      * @param modelPath File object point to a path
@@ -79,7 +63,7 @@ public interface Model {
      * @throws IOException IO exception happened in loading
      */
     static Model loadModel(Path modelPath) throws IOException {
-        return loadModel(modelPath, modelPath.toFile().getName(), -1);
+        return loadModel(modelPath, modelPath.toFile().getName(), null);
     }
 
     /**
@@ -91,7 +75,7 @@ public interface Model {
      * @throws IOException IO exception happened in loading
      */
     static Model loadModel(Path modelPath, String modelName) throws IOException {
-        return loadModel(modelPath, modelName, -1);
+        return loadModel(modelPath, modelName, null);
     }
 
     /**
@@ -99,12 +83,13 @@ public interface Model {
      *
      * @param modelPath Directory/prefix of the file
      * @param modelName model file name or assigned name
-     * @param epoch number of epoch of the model
+     * @param options engine specific load model options, see document for each engine
      * @return {@link Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model loadModel(Path modelPath, String modelName, int epoch) throws IOException {
-        return Engine.getInstance().loadModel(modelPath, modelName, epoch);
+    static Model loadModel(Path modelPath, String modelName, Map<String, String> options)
+            throws IOException {
+        return Engine.getInstance().loadModel(modelPath, modelName, options);
     }
     /**
      * Get the input descriptor of the model.

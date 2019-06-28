@@ -17,9 +17,11 @@ import software.amazon.ai.engine.EngineProvider;
 
 public class MxEngineProvider implements EngineProvider {
 
+    private static final Engine ENGINE = new MxEngine();
+
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        return new MxEngine();
+        return ENGINE;
     }
 }

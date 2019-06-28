@@ -17,8 +17,11 @@ import software.amazon.ai.engine.EngineProvider;
 
 public class MockEngineProvider implements EngineProvider {
 
+    private static final Engine ENGINE = new MockEngine();
+
+    /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        return new MockEngine();
+        return ENGINE;
     }
 }

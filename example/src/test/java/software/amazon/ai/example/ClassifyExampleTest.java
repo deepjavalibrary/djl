@@ -23,7 +23,7 @@ public class ClassifyExampleTest {
     private static final String MODEL_NAME = "squeezenet_v1.1";
 
     @Test
-    public void testGenericeInferenceExample() {
+    public void testClassifyExample() {
         ModelInfo modelInfo = ModelInfo.getModel(MODEL_NAME);
         String[] args =
                 new String[] {

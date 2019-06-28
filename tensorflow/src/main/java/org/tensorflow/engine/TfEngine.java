@@ -1,8 +1,8 @@
 package org.tensorflow.engine;
 
-import java.io.IOException;
 import java.lang.management.MemoryUsage;
 import java.nio.file.Path;
+import java.util.Map;
 import org.tensorflow.TensorFlow;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
@@ -49,7 +49,7 @@ public class TfEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model loadModel(Path modelPath, String modelName, int epoch) throws IOException {
+    public Model loadModel(Path modelPath, String modelName, Map<String, String> options) {
         return null;
     }
 

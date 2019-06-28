@@ -17,7 +17,9 @@ import java.lang.management.MemoryUsage;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Context;
@@ -37,6 +39,8 @@ public abstract class Engine {
 
     private static final Logger logger = LoggerFactory.getLogger(Engine.class);
 
+    private static final Map<String, Engine> ALL_ENGINES = new ConcurrentHashMap<>();
+
     private static final Engine ENGINE = initEngine();
 
     private static synchronized Engine initEngine() {
@@ -44,6 +48,8 @@ public abstract class Engine {
         List<EngineProvider> list = new ArrayList<>();
         for (EngineProvider provider : loaders) {
             list.add(provider);
+            Engine engine = provider.getEngine();
+            ALL_ENGINES.put(engine.getEngineName(), engine);
         }
 
         if (list.isEmpty()) {
@@ -60,14 +66,14 @@ public abstract class Engine {
     }
 
     /**
-     * Get the name of the Engine.
+     * Returns the name of the Engine.
      *
      * @return name of the engine
      */
     public abstract String getEngineName();
 
     /**
-     * Get the initialized Engine.
+     * Returns the default Engine.
      *
      * @return instance of <code>Engine</code>
      */
@@ -76,7 +82,17 @@ public abstract class Engine {
     }
 
     /**
-     * Get the number of GPU in the system.
+     * Returns <code>Engine</code> by engine name.
+     *
+     * @param engineName name of Engine to retrieve
+     * @return instance of <code>Engine</code>
+     */
+    public static Engine getEngine(String engineName) {
+        return ALL_ENGINES.get(engineName);
+    }
+
+    /**
+     * Returns the number of GPU in the system.
      *
      * @return number of GPUs available in the system
      */
@@ -103,31 +119,29 @@ public abstract class Engine {
     public abstract Context defaultContext();
 
     /**
-     * Get the version of the Deep Learning Framework.
+     * Returns the version of the Deep Learning Framework.
      *
      * @return version number
      */
     public abstract String getVersion();
 
     /**
-     * Load the model passed from the model class.
+     * Load the model from the specified location.
      *
-     * <p>We recommend to use {@link Model#loadModel(String, int)}. Preliminary check on the model
-     * path and name to see if the file exist. If the file exist, will handover to the corresponding
-     * Framework model loader
+     * <p>Model format is deep learning framework specific, each framework may have their own
+     * loading options. User should check each framework's document for available loading options.
      *
      * @param modelPath Directory of the model
      * @param modelName Name/Prefix of the model
-     * @param epoch Number of epoch of the model
+     * @param options load model options, check document for specific engine
      * @return {@link Model} contains the model information
      * @throws IOException Exception for file loading
      */
-    public abstract Model loadModel(Path modelPath, String modelName, int epoch) throws IOException;
+    public abstract Model loadModel(Path modelPath, String modelName, Map<String, String> options)
+            throws IOException;
 
     /**
-     * Create new predictor with specific Engine.
-     *
-     * <p>Recommend to use {@link Predictor#newInstance(Model, Translator, Context)}.
+     * Create new {@link Predictor} instance for this Engine.
      *
      * @param model the model used for inference
      * @param translator preprocessing and postprocessing helper class
@@ -148,8 +162,7 @@ public abstract class Engine {
     public abstract NNIndex getNNIndex();
 
     /**
-     * Try to use {@link Trainer}.newInstance() instead Load the model and create a Trainer to
-     * starting training process
+     * Create new {@link Trainer} instance for this Engine.
      *
      * @param model the model created to train on
      * @param context the context of training, can be CPU/GPU

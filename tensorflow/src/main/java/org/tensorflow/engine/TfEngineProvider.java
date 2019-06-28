@@ -5,9 +5,11 @@ import software.amazon.ai.engine.EngineProvider;
 
 public class TfEngineProvider implements EngineProvider {
 
+    private static final Engine ENGINE = new TfEngine();
+
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        return new TfEngine();
+        return ENGINE;
     }
 }
