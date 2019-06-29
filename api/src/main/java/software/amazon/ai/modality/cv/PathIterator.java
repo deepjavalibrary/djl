@@ -10,15 +10,15 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.image;
+package software.amazon.ai.modality.cv;
 
 /**
  * The <code>PathIterator</code> interface provides the mechanism for objects that implement the
- * {@link software.amazon.ai.image.BoundingBox BoundingBox} interface to return the geometry of
- * their boundary by allowing a caller to retrieve the path of that boundary a segment at a time.
+ * {@link BoundingBox BoundingBox} interface to return the geometry of their boundary by allowing a
+ * caller to retrieve the path of that boundary a segment at a time.
  *
- * @see software.amazon.ai.image.Rectangle
- * @see software.amazon.ai.image.BoundingBox
+ * @see Rectangle
+ * @see BoundingBox
  */
 public interface PathIterator {
 

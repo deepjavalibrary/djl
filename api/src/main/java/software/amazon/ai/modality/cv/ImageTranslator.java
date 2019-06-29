@@ -10,13 +10,12 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.inference;
+package software.amazon.ai.modality.cv;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import software.amazon.ai.Translator;
 import software.amazon.ai.TranslatorContext;
-import software.amazon.ai.image.Images;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataDesc;

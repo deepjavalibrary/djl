@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.inference;
+package software.amazon.ai.modality;
 
 /** The <code>Classification</code> is the container to store the classification result. */
 public class Classification {

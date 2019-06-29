@@ -16,7 +16,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.example.util.AbstractExample;
 import software.amazon.ai.example.util.ModelInfo;
-import software.amazon.ai.inference.Classification;
+import software.amazon.ai.modality.Classification;
 
 public class ClassifyExampleTest {
 

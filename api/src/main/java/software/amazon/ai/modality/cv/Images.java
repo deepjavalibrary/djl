@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.image;
+package software.amazon.ai.modality.cv;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

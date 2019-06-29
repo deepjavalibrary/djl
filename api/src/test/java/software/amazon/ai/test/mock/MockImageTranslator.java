@@ -15,9 +15,9 @@ package software.amazon.ai.test.mock;
 import java.util.ArrayList;
 import java.util.List;
 import software.amazon.ai.TranslatorContext;
-import software.amazon.ai.image.Rectangle;
-import software.amazon.ai.inference.DetectedObject;
-import software.amazon.ai.inference.ImageTranslator;
+import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.ImageTranslator;
+import software.amazon.ai.modality.cv.Rectangle;
 import software.amazon.ai.ndarray.NDList;
 
 public class MockImageTranslator extends ImageTranslator<List<DetectedObject>> {

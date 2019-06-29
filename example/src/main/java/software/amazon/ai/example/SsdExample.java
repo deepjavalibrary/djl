@@ -35,12 +35,12 @@ import software.amazon.ai.TranslateException;
 import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.example.util.AbstractExample;
 import software.amazon.ai.example.util.Arguments;
-import software.amazon.ai.image.Images;
-import software.amazon.ai.image.Rectangle;
-import software.amazon.ai.inference.DetectedObject;
-import software.amazon.ai.inference.ImageTranslator;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.ImageTranslator;
+import software.amazon.ai.modality.cv.Images;
+import software.amazon.ai.modality.cv.Rectangle;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 

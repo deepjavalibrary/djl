@@ -10,9 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.inference;
+package software.amazon.ai.modality.cv;
 
-import software.amazon.ai.image.BoundingBox;
+import software.amazon.ai.modality.Classification;
 
 /** A class represent detected object in object detection case. */
 public class DetectedObject extends Classification {
