@@ -290,20 +290,6 @@ public interface Matrix extends NDArray {
     NDArray reshape(char order, int rows, int columns);
 
     /**
-     * Flip the rows and columns of a matrix.
-     *
-     * @return the flipped rows and columns of a matrix
-     */
-    NDArray transpose();
-
-    /**
-     * Flip the rows and columns of a matrix, in-place.
-     *
-     * @return the flipped rows and columns of a matrix
-     */
-    NDArray transposei();
-
-    /**
      * Convert this NDArray to a 2d double matrix.
      *
      * <p>Note that THIS SHOULD NOT BE USED FOR SPEED. This is mainly used for integrations with
