@@ -1,9 +1,11 @@
 package software.amazon.ai.integration.tests;
 
+import java.util.stream.DoubleStream;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.AbstractTest;
+import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -316,5 +318,230 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         if (!meanKeep.contentEquals(meanKeepExpected)) {
             throw new FailedTestException("Incorrect mean keep");
         }
+    }
+
+    @RunAsTest
+    public void testLogicalNot() throws FailedTestException {
+        double[] testedData = new double[] {-2., 0., 1.};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        double[] boolData = new double[] {0.0, 1.0, 0.0};
+        MxNDArray expectedND = mxNDFactory.create(boolData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.logicalNot(), expectedND);
+    }
+
+    @RunAsTest
+    public void testAbs() throws FailedTestException {
+        double[] testedData = new double[] {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::abs).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.abs(), expectedND);
+    }
+
+    @RunAsTest
+    public void testSquare() throws FailedTestException {
+        double[] testedData = new double[] {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(x -> Math.pow(x, 2.0)).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.square(), expectedND);
+    }
+
+    @RunAsTest
+    public void testCbrt() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::cbrt).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.cbrt(), expectedND);
+    }
+
+    @RunAsTest
+    public void testFloor() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::floor).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.floor(), expectedND);
+    }
+
+    @RunAsTest
+    public void testCeil() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::ceil).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.ceil(), expectedND);
+    }
+
+    @RunAsTest
+    public void testRound() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::round).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.round(), expectedND);
+    }
+
+    @RunAsTest
+    public void testTrunc() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        double[] truncData = new double[] {1.0, 2.0, -3, -4, 5, -223};
+        MxNDArray expectedND = mxNDFactory.create(truncData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.trunc(), expectedND);
+    }
+
+    @RunAsTest
+    public void testExp() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::exp).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.exp(), expectedND);
+    }
+
+    @RunAsTest
+    public void testLog() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::log).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.log(), expectedND);
+    }
+
+    @RunAsTest
+    public void testLog10() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::log10).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.log10(), expectedND);
+    }
+
+    @RunAsTest
+    public void testLog2() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(x -> Math.log10(x) / Math.log10(2)).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.log2(), expectedND);
+    }
+
+    @RunAsTest
+    public void testSin() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::sin).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.sin(), expectedND);
+    }
+
+    @RunAsTest
+    public void testCos() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::cos).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.cos(), expectedND);
+    }
+
+    @RunAsTest
+    public void testTan() throws FailedTestException {
+        double[] testedData = new double[] {0.0, Math.PI / 4.0, Math.PI / 2.0};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::tan).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.tan(), expectedND);
+    }
+
+    @RunAsTest
+    public void testAsin() throws FailedTestException {
+        double[] testedData = new double[] {1.0, -1.0, -0.22, 0.4, 0.1234};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::asin).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.asin(), expectedND);
+    }
+
+    @RunAsTest
+    public void testAcos() throws FailedTestException {
+        double[] testedData = new double[] {-1.0, -0.707, 0.0, 0.707, 1.0};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::acos).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.acos(), expectedND);
+    }
+
+    @RunAsTest
+    public void testAtan() throws FailedTestException {
+        double[] testedData = new double[] {-1.0, 0.0, 1.0};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::atan).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.atan(), expectedND);
+    }
+
+    @RunAsTest
+    public void testToDegrees() throws FailedTestException {
+        double[] testedData = new double[] {0, Math.PI / 2, Math.PI, 3 * Math.PI / 2, 2 * Math.PI};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::toDegrees).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.toDegrees(), expectedND);
+    }
+
+    @RunAsTest
+    public void testToRadians() throws FailedTestException {
+        double[] testedData = new double[] {0.0, 90.0, 180.0, 270.0, 360.0};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::toRadians).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.toRadians(), expectedND);
+    }
+
+    @RunAsTest
+    public void testSinh() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::sinh).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.sinh(), expectedND);
+    }
+
+    @RunAsTest
+    public void testCosh() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::cosh).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.cosh(), expectedND);
+    }
+
+    @RunAsTest
+    public void testTanh() throws FailedTestException {
+        double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        testedData = DoubleStream.of(testedData).map(Math::tanh).toArray();
+        MxNDArray expectedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.tanh(), expectedND);
+    }
+
+    @RunAsTest
+    public void testAsinh() throws FailedTestException {
+        double[] testedData = new double[] {Math.E, 10.0};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        double[] aSinhData = new double[] {1.72538256, 2.99822295};
+        MxNDArray expectedND = mxNDFactory.create(aSinhData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.asinh(), expectedND);
+    }
+
+    @RunAsTest
+    public void testAtanh() throws FailedTestException {
+        double[] testedData = new double[] {0.0, -0.5};
+        MxNDArray testedND = mxNDFactory.create(testedData, null, new Shape(testedData.length));
+        double[] aTanhData = new double[] {0.0, -0.54930614};
+        MxNDArray expectedND = mxNDFactory.create(aTanhData, null, new Shape(testedData.length));
+        Assertions.assertAlmostEquals(testedND.atanh(), expectedND);
     }
 }

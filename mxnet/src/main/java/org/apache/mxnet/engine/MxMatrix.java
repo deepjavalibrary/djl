@@ -1509,6 +1509,18 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray logicalNot() {
+        return array.logicalNot();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray square() {
+        return array.square();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray abs() {
         return array.abs();
     }

@@ -1057,7 +1057,17 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray logicalNot() {
+        return null;
+    }
+
+    @Override
     public NDArray abs() {
+        return null;
+    }
+
+    @Override
+    public NDArray square() {
         return null;
     }
 

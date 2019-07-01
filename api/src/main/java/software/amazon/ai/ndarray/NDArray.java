@@ -1891,11 +1891,25 @@ public interface NDArray extends AutoCloseable {
     NDArrayEx getNDArrayInternal();
 
     /**
+     * Compute the truth value of NOT x element-wise.
+     *
+     * @return NDArray
+     */
+    NDArray logicalNot();
+
+    /**
      * Calculate the absolute value element-wise.
      *
      * @return NDArray
      */
     NDArray abs();
+
+    /**
+     * Return the element-wise square of the input.
+     *
+     * @return NDArray
+     */
+    NDArray square();
 
     /**
      * Return the cube-root of an array, element-wise.

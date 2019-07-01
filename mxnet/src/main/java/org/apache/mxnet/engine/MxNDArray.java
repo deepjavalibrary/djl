@@ -543,7 +543,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(Number other) {
-        try (NDArray numbers = factory.zeros(new DataDesc(getShape()))) {
+        try (NDArray numbers = zerosLike()) {
             numbers.addi(other);
             return eq(numbers);
         }
@@ -1564,7 +1564,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public int nonzero() {
         MxNDArray zeros = (MxNDArray) eq(0);
         NDArray sum = factory.invoke("sum", eq(zeros).eq(zeros), null);
-        return (int) sum.toFloatArray()[0];
+        return sum.toArray()[0].intValue();
     }
 
     /** {@inheritDoc} */
@@ -1626,8 +1626,20 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray logicalNot() {
+        return factory.invoke("_np_logical_not", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray abs() {
-        return factory.invoke("_np_abs", this, null);
+        return factory.invoke("_np_absolute", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray square() {
+        return factory.invoke("_np_square", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1651,7 +1663,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray round() {
-        return factory.invoke("_np_round", this, null);
+        return factory.invoke("round", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1663,7 +1675,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray exp() {
-        return factory.invoke("_np_exp", this, null);
+        return factory.invoke("_npi_exp", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1675,7 +1687,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray log10() {
-        return factory.invoke("_np_log10", this, null);
+        return factory.invoke("_npi_log10", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1687,13 +1699,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sin() {
-        return factory.invoke("_np_sin", this, null);
+        return factory.invoke("_npi_sin", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray cos() {
-        return factory.invoke("_np_cos", this, null);
+        return factory.invoke("_npi_cos", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1717,7 +1729,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray atan() {
-        return factory.invoke("_np_arctan", this, null);
+        return factory.invoke("_npi_arctan", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1735,13 +1747,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sinh() {
-        return factory.invoke("_np_sinh", this, null);
+        return factory.invoke("_npi_sinh", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray cosh() {
-        return factory.invoke("_np_cosh", this, null);
+        return factory.invoke("_npi_cosh", this, null);
     }
 
     /** {@inheritDoc} */
