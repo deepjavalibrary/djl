@@ -593,7 +593,7 @@ public class MxMatrix implements Matrix {
 
     @Override
     public NDArray gte(NDArray other) {
-        return null;
+        return array.gte(other);
     }
 
     /** {@inheritDoc} */
@@ -610,7 +610,7 @@ public class MxMatrix implements Matrix {
 
     @Override
     public NDArray lte(NDArray other) {
-        return null;
+        return array.lte(other);
     }
 
     /** {@inheritDoc} */
