@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.example.util;
 
-import com.sun.jna.Platform;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,7 +34,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import software.amazon.ai.Context;
 import software.amazon.ai.TranslateException;
@@ -112,7 +110,6 @@ public abstract class AbstractExample {
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
-            JnaUtils.getAllOpNames();
             long loaded = System.nanoTime();
             logger.info(
                     String.format(
@@ -259,11 +256,12 @@ public abstract class AbstractExample {
             String synsetLemma = it.next();
             it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
         }
-        return output.toArray(JnaUtils.EMPTY_ARRAY);
+        return output.toArray(new String[0]);
     }
 
     private void getProcessInfo(Metrics metrics) {
-        if (Platform.isLinux() || Platform.isMac()) {
+        if (System.getProperty("os.name").startsWith("Linux")
+                || System.getProperty("os.name").startsWith("Mac")) {
             // This solution only work for Linux like system.
             RuntimeMXBean mxBean = ManagementFactory.getRuntimeMXBean();
             String pid = mxBean.getName().split("@")[0];

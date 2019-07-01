@@ -14,7 +14,7 @@ Copy the library so files and all dependencies in `native/lib`
 do the followings to publish your package:
 
 ```bash
-./gradlew -Plocal -Pclassifier=osx-x86_64 -Partifact=mxnet-native-mkl publish
+./gradlew -Plocal -Pclassifier=osx-x86_64 -Partifact=mxnet-native-mkl -PversionNum=1.5.0-SNAPSHOT publish
 ```
 
 The available names:

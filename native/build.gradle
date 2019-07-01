@@ -12,7 +12,7 @@ sourceSets {
 
 def systemInfo = project.findProperty("classifier") ?: "osx-x86_64"
 def artifact = project.findProperty("artifact")?: "mxnet-native-mkl"
-def versionNum = project.findProperty("version")?: "1.5.0"
+def versionNum = project.findProperty("versionNum")?: "1.5.0-SNAPSHOT"
 
 task fatJar(type: Jar) {
     from sourceSets.main.resources

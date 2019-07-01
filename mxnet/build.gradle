@@ -2,16 +2,18 @@ plugins {
     id 'maven-publish'
 }
 
+group "org.apache.mxnet"
+
 dependencies {
     compile "net.java.dev.jna:jna:${jna_version}"
     compile "org.slf4j:slf4j-api:${slf4j_version}"
-    compile project(":api")
+    compile project(":joule-api")
 
     testCompile "org.testng:testng:${testng_version}"
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
     testCompile "org.powermock:powermock-module-testng:${powermock_version}"
     testCompile "org.powermock:powermock-api-mockito2:${powermock_version}"
-    testCompile project(':api').sourceSets.test.output
+    testCompile project(':joule-api').sourceSets.test.output
 }
 
 sourceSets {
@@ -22,7 +24,7 @@ sourceSets {
     }
 }
 
-compileTestJava.dependsOn tasks.getByPath(':api:testClasses')
+compileTestJava.dependsOn tasks.getByPath(':joule-api:testClasses')
 
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'
@@ -102,7 +104,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             groupId project.getGroup()
-            artifactId project.getName()
+            artifactId "joule"
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]

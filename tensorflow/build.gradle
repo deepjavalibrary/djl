@@ -2,7 +2,7 @@
 dependencies {
     compile 'org.tensorflow:tensorflow:1.13.1'
     compile 'org.tensorflow:proto:1.1.0'
-    compile project(":api")
+    compile project(":joule-api")
 }
 
 sourceSets {

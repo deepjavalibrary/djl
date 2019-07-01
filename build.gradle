@@ -6,8 +6,8 @@ plugins {
 ext.SpotBugsTask = com.github.spotbugs.SpotBugsTask
 
 allprojects {
-    group 'software.amazon.joule'
-    version = '1.0'
+    group 'software.amazon.ai'
+    version = '0.1.0'
 
     repositories {
         jcenter()
