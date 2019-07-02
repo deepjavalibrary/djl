@@ -3,16 +3,15 @@ Joule - Deep learning for Java
 
 ## Overview
 
-The key design goal for Joule API is to make it extremely easy to get started and simple to
-use deep learning framework for Java developers. They need not be ML/DL experts to get started
+Joule API is designed to be extremely easy to get started and simple to
+use deep learning framework for Java developers. Joule does not required user to be ML/DL experts to get started
 and can start from their existing Java expertise as an on-ramp to learn and use ML/DL. They can
 use their favorite IDE to build/train/deploy their models and integrate these models with their
-Java applications. They don’t have to compromise on model performance, scale, choice of GPU vs.
-CPUs.
+Java applications. 
 
 Joule API is deep learning framework agnostic, developer does not have to make a choice
 between framework while they started their project. They can switch to different framework at any
-time they want.
+time they want. Joule also provides automatic CPU/GPU chosen based on the hardware configuration to ensure the best performance.
 
 Joule API provide native Java development experience, just another regular java library.
 Joule's ergonomic API interface is designed to guide developer with best practice to accomplish

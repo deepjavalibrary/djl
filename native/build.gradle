@@ -12,6 +12,8 @@ task nativeJar(type: Jar) {
     doFirst {
         def propFile = file("src/main/resources/native/lib/mxnet.properties")
         propFile.delete()
+        def dsStore = file("src/main/resources/native/lib/.DS_Store")
+        dsStore.delete()
 
         def versionName = String.format("1.5.0-%s", new Date().format('yyyyMMdd'))
         def dir = file("src/main/resources/native/lib")

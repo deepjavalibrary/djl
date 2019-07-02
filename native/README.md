@@ -1,25 +1,20 @@
 ## Instruction
 
-### Step 1: Rename
-Change the version with the current date
+### Step 1: Copy library
 
-Copy and rename the file in properties to `mxnet.properties` to `binaries/native/lib` folder
+Copy the library files and all dependencies in `native/lib`
 
-### Step 2: Copy library
+### Step 2: Publish
 
-Copy the library so files and all dependencies in `native/lib`
-
-### Step 3: Publish
-
-do the followings to publish your package:
+do the followings to prepare your package:
 
 ```bash
 ./gradlew -Plocal -Pclassifier=osx-x86_64 -Pflavor=mkl publish
 ```
 
 The available flavor names are:
-- cu100mkl
-- cu100
+- cu101mkl
+- cu101
 - cu92mkl
 - cu92
 - cu90mkl
@@ -33,3 +28,10 @@ Supported classifier names are:
 - linux-x86_64
 - linux-arm
 
+
+### Step 3: Refresh repo
+
+You can refresh the bucket by running
+```bash
+aws s3 sync repo/ s3://joule/repo --acl public-read
+```

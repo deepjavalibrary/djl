@@ -23,6 +23,8 @@ If you want to skip unit test:
 ./gradlew build -x test
 ```
 
+By default, Joule examples will use `mxnet-mkl` as a backend.
+
 ## Running example code locally
 
 ### Download model files
