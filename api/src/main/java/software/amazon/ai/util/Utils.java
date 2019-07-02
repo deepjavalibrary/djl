@@ -118,4 +118,13 @@ public final class Utils {
         }
         return sb;
     }
+
+    public static float[] toFloatArray(List<? extends Number> list) {
+        float[] ret = new float[list.size()];
+        int idx = 0;
+        for (Number n : list) {
+            ret[idx++] = n.floatValue();
+        }
+        return ret;
+    }
 }

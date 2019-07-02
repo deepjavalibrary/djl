@@ -40,16 +40,10 @@ The following is an example of how to write inference code:
     }
 ```
 
-## Release Notes ##
-* 1.0 Initial release
+## Release Notes
+* 0.1.0 Initial release
 
 ## Building From Source
-
-In current version, full Joule build requires MXNet 1.5 installed on your system:
-
-```sh
-sudo pip install mxnet-mkl --pre
-```
 
 Once you check out the code, you can build it using gradle:
 

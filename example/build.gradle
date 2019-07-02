@@ -8,30 +8,19 @@ repositories {
     }
 }
 
-String systemInfo = getClassifier()
-
-def getClassifier() { 
-    String osName = System.getProperty("os.name")
-    String classiferName;
-    if (osName.startsWith("Win")) { 
-        classiferName = "win32" 
-    } else if (osName.startsWith("Mac")) { 
-        classiferName = "osx"
-    } else if (osName.startsWith("Linux")) { 
-        classifierName = "linux" 
-    } else { 
-        throw new GradleException("Unsupported os: " + osName)
-    } 
-    return classiferName + "-" + System.getProperty("os.arch") 
-}
+def classifier = getClassifier()
 
 dependencies {
+    // compile project(":joule-api")
+    // runtime project(":mxnet")
     compile "commons-cli:commons-cli:${commons_cli_version}"
     compile "org.slf4j:slf4j-simple:${slf4j_version}"
     compile "com.google.code.gson:gson:${gson_version}"
-    runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${systemInfo}"
-    runtime "org.apache.mxnet:joule:0.1.0"
-    compile "software.amazon.ai:joule-api:0.1.0"
+    compile "software.amazon.ai:joule-api:0.1.0-SNAPSHOT"
+
+    runtime "org.apache.mxnet:joule:0.1.0-SNAPSHOT"
+    runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
+
     testCompile "org.testng:testng:${testng_version}"
 }
 
@@ -45,8 +34,8 @@ jar {
     exclude "META-INF/maven/**"
     exclude "META-INF/INDEX.LIST"
     exclude "META-INF/MANIFEST*"
-    exclude "META-INF//LICENSE*"
-    exclude "META-INF//NOTICE*"
+    exclude "META-INF/LICENSE*"
+    exclude "META-INF/NOTICE*"
 }
 
 task copyDependencies(type: Copy) {
@@ -55,5 +44,5 @@ task copyDependencies(type: Copy) {
 }
 
 application {
-    mainClassName = System.getProperty("main", "software.amazon.ai.example.SsdExample")
+    mainClassName = System.getProperty("main", "software.amazon.ai.example.ClassifyExample")
 }

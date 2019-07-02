@@ -14,15 +14,22 @@ Copy the library so files and all dependencies in `native/lib`
 do the followings to publish your package:
 
 ```bash
-./gradlew -Plocal -Pclassifier=osx-x86_64 -Partifact=mxnet-native-mkl -PversionNum=1.5.0-SNAPSHOT publish
+./gradlew -Plocal -Pclassifier=osx-x86_64 -Pflavor=mkl publish
 ```
 
-The available names:
-- mxnet-native-cu100mkl
-- mxnet-native-cu100
-- mxnet-native-cu92mkl
-- mxnet-native-cu92
-- mxnet-native-cu90mkl
-- mxnet-native-cu90
-- mxnet-native-mkl
-- mxnet-native-min
+The available flavor names are:
+- cu100mkl
+- cu100
+- cu92mkl
+- cu92
+- cu90mkl
+- cu90
+- mkl
+- min
+
+Supported classifier names are:
+- osx-x86_64
+- win32-x86_64
+- linux-x86_64
+- linux-arm
+

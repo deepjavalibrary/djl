@@ -36,6 +36,7 @@ import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.util.Utils;
 
 public final class BertQaInferenceExample extends AbstractExample {
 
@@ -136,11 +137,8 @@ public final class BertQaInferenceExample extends AbstractExample {
                     BertDataParser.getTokenTypes(tokenQ, tokenA, input.getSeqLength());
             tokens = BertDataParser.formTokens(tokenQ, tokenA, input.getSeqLength());
             List<Integer> indexes = parser.token2idx(tokens);
-            float[] types = new float[tokenTypes.size()];
-            int idx = 0;
-            for (Float f : tokenTypes) {
-                types[idx++] = f;
-            }
+            float[] types = Utils.toFloatArray(tokenTypes);
+            float[] indexesFloat = Utils.toFloatArray(indexes);
 
             int seqLength = input.getSeqLength();
             NDFactory factory = ctx.getNDFactory();
@@ -148,9 +146,9 @@ public final class BertQaInferenceExample extends AbstractExample {
             NDArray data1 = factory.create(new DataDesc(new Shape(1, seqLength)));
             NDArray data2 = factory.create(new DataDesc(new Shape(1)));
 
-            data0.set(indexes.stream().mapToInt(Integer::intValue).toArray());
+            data0.set(indexesFloat);
             data1.set(types);
-            data2.set(new int[] {validLength});
+            data2.set(new float[] {validLength});
 
             NDList list = new NDList(3);
             list.add("data0", data0);

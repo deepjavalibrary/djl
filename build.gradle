@@ -7,7 +7,7 @@ ext.SpotBugsTask = com.github.spotbugs.SpotBugsTask
 
 allprojects {
     group 'software.amazon.ai'
-    version = '0.1.0'
+    version = '0.1.0-SNAPSHOT'
 
     repositories {
         jcenter()
@@ -71,4 +71,19 @@ configure(javaProjects()) {
             }
         }
     }
+}
+
+def getClassifier() {
+    String osName = System.getProperty("os.name")
+    String osPrefix;
+    if (osName.startsWith("Win")) {
+        osPrefix = "win32"
+    } else if (osName.startsWith("Mac")) {
+        osPrefix = "osx"
+    } else if (osName.startsWith("Linux")) {
+        classifierName = "linux"
+    } else {
+        throw new GradleException("Unsupported os: " + osName)
+    }
+    return osPrefix + "-" + System.getProperty("os.arch")
 }

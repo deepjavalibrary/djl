@@ -2,34 +2,26 @@ plugins {
     id 'maven-publish'
 }
 
-sourceSets {
-    main {
-        resources {
-            srcDirs "src/main/resources/"
-        }
-    }
-}
+group = "org.apache.mxnet"
+version = "1.5.0-SNAPSHOT"
 
-def systemInfo = project.findProperty("classifier") ?: "osx-x86_64"
-def artifact = project.findProperty("artifact")?: "mxnet-native-mkl"
-def versionNum = project.findProperty("versionNum")?: "1.5.0-SNAPSHOT"
+def classifier = project.findProperty("classifier") ?: "osx-x86_64"
+def flavor = project.findProperty("flavor") ?: "mkl"
 
-task fatJar(type: Jar) {
+task nativeJar(type: Jar) {
     from sourceSets.main.resources
-    archiveClassifier = systemInfo
+    archiveClassifier = classifier
 }
 
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId "org.apache.mxnet"
-            artifactId artifact
-            version versionNum
+            artifactId "mxnet-native-${flavor}"
             from components.java
-            artifacts = [fatJar]
+            artifacts = [nativeJar]
             pom {
-                name = "MXNet Core"
-                description = "MXNet Engine binary"
+                name = "MXNet native library"
+                description = "MXNet Engine native library binary distribution"
                 url = "http://mxnet.apache.org"
                 licenses {
                     license {

@@ -12,15 +12,43 @@
  */
 package org.apache.mxnet;
 
+// CHECKSTYLE:OFF:AvoidStaticImport
+
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
 import java.io.IOException;
-import org.apache.mxnet.jna.JnaUtils;
+import org.apache.mxnet.engine.MxEngineProvider;
+import org.apache.mxnet.jna.LibUtils;
+import org.apache.mxnet.jna.MxnetLibrary;
+import org.apache.mxnet.test.MockMxnetLibrary;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.testng.PowerMockTestCase;
+import org.testng.IObjectFactory;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.test.CoverageUtils;
 
-public class CoverageTest {
+// CHECKSTYLE:ON:AvoidStaticImport
+
+@PrepareForTest(LibUtils.class)
+public class CoverageTest extends PowerMockTestCase {
+
+    @BeforeClass
+    public void prepare() {
+        mockStatic(LibUtils.class);
+        MxnetLibrary library = new MockMxnetLibrary();
+        PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
+    }
 
     @Test
     public void test() throws IOException, ClassNotFoundException {
-        CoverageUtils.testGetterSetters(JnaUtils.class);
+        CoverageUtils.testGetterSetters(MxEngineProvider.class);
+    }
+
+    @ObjectFactory
+    public IObjectFactory getObjectFactory() {
+        return new org.powermock.modules.testng.PowerMockObjectFactory();
     }
 }
