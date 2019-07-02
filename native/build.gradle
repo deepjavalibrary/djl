@@ -5,33 +5,36 @@ plugins {
 group = "org.apache.mxnet"
 version = "1.5.0-SNAPSHOT"
 
-def classifier = project.findProperty("classifier") ?: "osx-x86_64"
 def flavor = project.findProperty("flavor") ?: "mkl"
 
-task nativeJar(type: Jar) {
-    doFirst {
-        def propFile = file("src/main/resources/native/lib/mxnet.properties")
-        propFile.delete()
-        def dsStore = file("src/main/resources/native/lib/.DS_Store")
-        dsStore.delete()
+def platformNames = ["linux","osx"]
 
-        def versionName = String.format("1.5.0-%s", new Date().format('yyyyMMdd'))
-        def dir = file("src/main/resources/native/lib")
-        def sb = new StringBuilder()
-        sb.append("version=${versionName}\nlibraries=")
-        def first = true
-        for (String name : dir.list().sort()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(',')
+platformNames.each { osName ->
+    tasks.create(name: "${osName}Jar", type: Jar) {
+        doFirst {
+            def propFile = file("src/main/resources/${osName}/native/lib/mxnet.properties")
+            propFile.delete()
+            def dsStore = file("src/main/resources/${osName}/native/lib/.DS_Store")
+            dsStore.delete()
+
+            def versionName = String.format("1.5.0-%s", new Date().format('yyyyMMdd'))
+            def dir = file("src/main/resources/${osName}/native/lib")
+            def sb = new StringBuilder()
+            sb.append("version=${versionName}\nlibraries=")
+            def first = true
+            for (String name : dir.list().sort()) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(',')
+                }
+                sb.append(name)
             }
-            sb.append(name)
+            propFile.text = sb.toString()
         }
-        propFile.text = sb.toString()
+        from file("src/main/resources/${osName}")
+        archiveClassifier = "${osName}-x86_64"
     }
-    from sourceSets.main.resources
-    archiveClassifier = classifier
 }
 
 publishing {
@@ -39,7 +42,7 @@ publishing {
         maven(MavenPublication) {
             artifactId "mxnet-native-${flavor}"
             from components.java
-            artifacts = [nativeJar]
+            artifacts = [linuxJar, osxJar]
             pom {
                 name = "MXNet native library"
                 description = "MXNet Engine native library binary distribution"

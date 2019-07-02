@@ -2,14 +2,16 @@
 
 ### Step 1: Copy library
 
-Copy the library files and all dependencies in `native/lib`
+Copy the library files and all dependencies in `<osName>/native/lib`. The valid OS names are:
+- `osx`
+- `linux`
 
 ### Step 2: Publish
 
 do the followings to prepare your package:
 
 ```bash
-./gradlew -Plocal -Pclassifier=osx-x86_64 -Pflavor=mkl publish
+./gradlew -Plocal -Pflavor=mkl publish
 ```
 
 The available flavor names are:

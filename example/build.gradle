@@ -3,6 +3,7 @@ plugins {
 }
 
 repositories {
+    mavenLocal()
     maven {
         url 'https://joule.s3.amazonaws.com/repo'
     }
