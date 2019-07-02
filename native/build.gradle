@@ -9,6 +9,25 @@ def classifier = project.findProperty("classifier") ?: "osx-x86_64"
 def flavor = project.findProperty("flavor") ?: "mkl"
 
 task nativeJar(type: Jar) {
+    doFirst {
+        def propFile = file("src/main/resources/native/lib/mxnet.properties")
+        propFile.delete()
+
+        def versionName = String.format("1.5.0-%s", new Date().format('yyyyMMdd'))
+        def dir = file("src/main/resources/native/lib")
+        def sb = new StringBuilder()
+        sb.append("version=${versionName}\nlibraries=")
+        def first = true
+        for (String name : dir.list().sort()) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(',')
+            }
+            sb.append(name)
+        }
+        propFile.text = sb.toString()
+    }
     from sourceSets.main.resources
     archiveClassifier = classifier
 }
