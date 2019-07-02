@@ -1,5 +1,6 @@
 package software.amazon.ai.integration.tests;
 
+import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
@@ -8,6 +9,7 @@ import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 
@@ -30,17 +32,17 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         }
     }
 
-    @RunAsTest
-    public void testEqualsForEqualNDArray() throws FailedTestException {
-        MxNDArray mxNDArray1 =
-                mxNDFactory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(1, 4));
-        MxNDArray mxNDArray2 =
-                mxNDFactory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(1, 4));
-        NDArray result = mxNDArray1.eq(mxNDArray2);
-        if (result.nonzero() != 4 || !mxNDArray1.equals(mxNDArray2)) {
-            throw new FailedTestException("Incorrect comparison for equal NDArray");
-        }
-    }
+    //    @RunAsTest
+    //    public void testEqualsForEqualNDArray() throws FailedTestException {
+    //        MxNDArray mxNDArray1 =
+    //                mxNDFactory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(1, 4));
+    //        MxNDArray mxNDArray2 =
+    //                mxNDFactory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(1, 4));
+    //        NDArray result = mxNDArray1.eq(mxNDArray2);
+    //        if (result.nonzero() != 4 || !mxNDArray1.equals(mxNDArray2)) {
+    //            throw new FailedTestException("Incorrect comparison for equal NDArray");
+    //        }
+    //    }
 
     @RunAsTest
     public void testEqualsForScalar() throws FailedTestException {
@@ -543,5 +545,44 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         double[] aTanhData = new double[] {0.0, -0.54930614};
         MxNDArray expectedND = mxNDFactory.create(aTanhData, null, new Shape(testedData.length));
         Assertions.assertAlmostEquals(testedND.atanh(), expectedND);
+    }
+
+    @RunAsTest
+    public void testExpandDim() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new int[] {1, 2}, null, new Shape(2));
+        Assertions.assertStatement(
+                Arrays.equals(
+                        original.expandDims(0).getShape().getShape(), new Shape(1, 2).getShape()));
+    }
+
+    @RunAsTest
+    public void testStack() throws FailedTestException {
+        NDArray stackedND = mxNDFactory.create(new float[] {1f}, null, new Shape(1));
+        NDArray stackedND2 = mxNDFactory.create(new float[] {2f}, null, new Shape(1));
+        NDArray actual = mxNDFactory.create(new float[] {1f, 2f}, null, new Shape(2, 1));
+
+        Assertions.assertEquals(stackedND.stack(new NDArray[] {stackedND2}, 0), actual);
+        Assertions.assertEquals(stackedND.stack(stackedND2, 0), actual);
+        Assertions.assertEquals(NDArrays.stack(new NDArray[] {stackedND, stackedND2}, 0), actual);
+    }
+
+    @RunAsTest
+    public void testConcat() throws FailedTestException {
+        NDArray concatedND = mxNDFactory.create(new float[] {1f}, null, new Shape(1));
+        NDArray concatedND2 = mxNDFactory.create(new float[] {2f}, null, new Shape(1));
+        NDArray actual = mxNDFactory.create(new float[] {1f, 2f}, null, new Shape(2));
+
+        Assertions.assertEquals(concatedND.concat(new NDArray[] {concatedND2}, 0), actual);
+        Assertions.assertEquals(
+                NDArrays.concat(new NDArray[] {concatedND, concatedND2}, 0), actual);
+        Assertions.assertEquals(concatedND.concat(concatedND2), actual);
+    }
+
+    @RunAsTest
+    public void testClip() throws FailedTestException {
+        NDArray original = mxNDFactory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(4));
+        NDArray actual = mxNDFactory.create(new float[] {2f, 2f, 3f, 3f}, null, new Shape(4));
+
+        Assertions.assertEquals(original.clip(2.0, 3.0), actual);
     }
 }

@@ -1184,6 +1184,36 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray expandDims(int axis) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stack(NDArray[] arrays, int axis) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stack(NDList arrays, int axis) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray concat(NDArray[] arrays, int axis) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray clip(double min, double max) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public long size() {
         if (tensor != null) {
             return tensor.numElements();

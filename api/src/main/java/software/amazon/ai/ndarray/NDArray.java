@@ -1611,6 +1611,182 @@ public interface NDArray extends AutoCloseable {
     NDArray transposei(int... dimensions);
 
     /**
+     * Expand the shape of a {@link NDArray}.
+     *
+     * <p>Insert a new axis that will appear at the axis position in the expanded
+     *
+     * @param axis position in the expanded axes where the new axis is placed.
+     * @return output array. The number of dimensions is one greater than that of the input array.
+     */
+    NDArray expandDims(int axis);
+
+    /**
+     * Join a sequence of {@link NDArray} along a new axis.
+     *
+     * <p>The axis parameter specifies the index of the new axis in the dimensions of the result.
+     * For example, if `axis=0` it will be the first dimension and if `axis=-1` it will be the last
+     * dimension.
+     *
+     * @param arrays input {@link NDArray}[]. each {@link NDArray} must have the same shape.
+     * @param axis the axis in the result array along which the input arrays are stacked.
+     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     */
+    NDArray stack(NDArray[] arrays, int axis);
+
+    /**
+     * Join a sequence of {@link NDArray} along axis 0.
+     *
+     * @param arrays input {@link NDArray}[]. each {@link NDArray} must have the same shape.
+     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     */
+    default NDArray stack(NDArray[] arrays) {
+        return stack(arrays, 0);
+    }
+
+    /**
+     * Join a sequence of {@link NDArray} in NDList along a new axis.
+     *
+     * <p>The axis parameter specifies the index of the new axis in the dimensions of the result.
+     * For example, if `axis=0` it will be the first dimension and if `axis=-1` it will be the last
+     * dimension.
+     *
+     * @param arrays input NDList. each {@link NDArray} must have the same shape.
+     * @param axis the axis in the result array along which the input arrays are stacked.
+     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     */
+    NDArray stack(NDList arrays, int axis);
+
+    /**
+     * Join a sequence of {@link NDArray} in NDList along axis 0.
+     *
+     * @param arrays input NDList. each {@link NDArray} must have the same shape.
+     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     */
+    default NDArray stack(NDList arrays) {
+        return stack(arrays, 0);
+    }
+
+    /**
+     * Join a {@link NDArray} along a new axis.
+     *
+     * @param array input {@link NDArray} and it must have the same shape with {@link NDArray} that
+     *     invoke the function.
+     * @param axis the axis in the result array along which the input arrays are stacked.
+     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     */
+    default NDArray stack(NDArray array, int axis) {
+        return stack(new NDArray[] {array}, axis);
+    }
+
+    /**
+     * Join a {@link NDArray} along axis 0.
+     *
+     * @param array input {@link NDArray} and it must have the same shape with {@link NDArray} that
+     *     invoke the function.
+     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     */
+    default NDArray stack(NDArray array) {
+        return stack(new NDArray[] {array}, 0);
+    }
+
+    /**
+     * Join a sequence of {@link NDArray} along an existing axis.
+     *
+     * @param arrays input {@link NDArray}[] must have the same shape, except in the dimension
+     *     corresponding to `axis` (the first, by default).
+     * @param axis the axis along which the arrays will be joined.
+     * @return the concatenated {@link NDArray}
+     */
+    NDArray concat(NDArray[] arrays, int axis);
+
+    /**
+     * Join a sequence of {@link NDArray} along axis 0.
+     *
+     * @param arrays input {@link NDArray}[] in NDList must have the same shape, except in the
+     *     dimension corresponding to `axis` (the first, by default).
+     * @return the concatenated {@link NDArray}
+     */
+    default NDArray concat(NDArray[] arrays) {
+        return concat(arrays, 0);
+    }
+
+    /**
+     * Join a NDList along an existing axis.
+     *
+     * @param arrays input input {@link NDArray} in NDList must have the same shape, except in the
+     *     dimension corresponding to `axis` (the first, by default).
+     * @param axis the axis along which the arrays will be joined.
+     * @return the concatenated {@link NDArray}
+     */
+    default NDArray concat(NDList arrays, int axis) {
+        return concat(arrays.toArray(), axis);
+    }
+
+    /**
+     * Join a NDList along axis 0.
+     *
+     * @param arrays input {@link NDArray} in NDList must have the same shape, except in the
+     *     dimension corresponding to `axis` (the first, by default).
+     * @return the concatenated {@link NDArray}
+     */
+    default NDArray concat(NDList arrays) {
+        return concat(arrays, 0);
+    }
+
+    /**
+     * Join a {@link NDArray} along an existing axis.
+     *
+     * @param array the {@link NDArray} must have the same shape, except in the dimension
+     *     corresponding to `axis` (the first, by default).
+     * @param axis the axis along which the arrays will be joined.
+     * @return the concatenated {@link NDArray}
+     */
+    default NDArray concat(NDArray array, int axis) {
+        return concat(new NDArray[] {array}, axis);
+    }
+
+    /**
+     * Join a {@link NDArray} along axis 0.
+     *
+     * @param array the {@link NDArray} must have the same shape, except in the dimension
+     *     corresponding to `axis` (the first, by default).
+     * @return the concatenated {@link NDArray}
+     */
+    default NDArray concat(NDArray array) {
+        return concat(new NDArray[] {array}, 0);
+    }
+
+    /**
+     * Clip (limit) the values in an array.
+     *
+     * <p>Given an interval, values outside the interval are clipped to the interval edges. For
+     * example, if an interval of ``[0, 1]`` is specified, values smaller than 0 become 0, and
+     * values larger than 1 become 1.
+     *
+     * @param min minimum value double type.
+     * @param max maximum value double type.
+     * @return an {@link NDArray} with the elements of `a`, but where values &lt; `min` are replaced
+     *     with `min`, and those &gt; `max` with `max`.
+     */
+    NDArray clip(double min, double max);
+
+    /**
+     * Clip (limit) the values in an array.
+     *
+     * <p>Given an interval, values outside the interval are clipped to the interval edges. For
+     * example, if an interval of ``[0, 1]`` is specified, values smaller than 0 become 0, and
+     * values larger than 1 become 1.
+     *
+     * @param min minimum value int type.
+     * @param max maximum value int type.
+     * @return an {@link NDArray} with the elements of `a`, but where values &lt; `min` are replaced
+     *     with `min`, and those &gt; `max` with `max`.
+     */
+    default NDArray clip(int min, int max) {
+        return clip((double) min, (double) max);
+    }
+
+    /**
      * Returns the size along a specified dimension
      *
      * @param dimension the dimension to return the size for

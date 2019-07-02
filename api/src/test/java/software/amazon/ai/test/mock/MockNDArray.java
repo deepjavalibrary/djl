@@ -882,6 +882,36 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray expandDims(int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray stack(NDArray[] arrays, int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray stack(NDList arrays, int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray concat(NDArray[] arrays, int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray concat(NDList arrays, int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray clip(double min, double max) {
+        return null;
+    }
+
+    @Override
     public long size(int dimension) {
         return 0;
     }

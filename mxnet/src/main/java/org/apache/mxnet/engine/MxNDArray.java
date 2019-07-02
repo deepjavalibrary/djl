@@ -1423,6 +1423,52 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray expandDims(int axis) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        return factory.invoke("_npi_expand_dims", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stack(NDArray[] arrays, int axis) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        NDArray[] srcArray = new NDArray[arrays.length + 1];
+        srcArray[0] = this;
+        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
+        return factory.invoke("_npi_stack", srcArray, params)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stack(NDList arrays, int axis) {
+        return stack(arrays.toArray(), axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray concat(NDArray[] arrays, int axis) {
+        MxOpParams params = new MxOpParams();
+        // MXNet backend use dim as argument name
+        params.addParam("dim", axis);
+        NDArray[] srcArray = new NDArray[arrays.length + 1];
+        srcArray[0] = this;
+        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
+        return factory.invoke("_npi_concatenate", srcArray, params)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray clip(double min, double max) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("a_min", min);
+        params.addParam("a_max", max);
+        return factory.invoke("_npi_clip", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray broadcast(long... shape) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }

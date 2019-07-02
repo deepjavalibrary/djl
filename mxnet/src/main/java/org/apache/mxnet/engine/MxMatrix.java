@@ -1299,6 +1299,36 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray expandDims(int axis) {
+        return array.expandDims(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stack(NDArray[] arrays, int axis) {
+        return array.stack(arrays, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stack(NDList arrays, int axis) {
+        return array.stack(arrays, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray concat(NDArray[] arrays, int axis) {
+        return array.concat(arrays, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray clip(double min, double max) {
+        return array.clip(min, max);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public long size(int dimension) {
         return array.size(dimension);
     }
