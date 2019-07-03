@@ -481,6 +481,7 @@ public final class NDArrays {
      * Join a sequence of {@link NDArray} in NDList along existing axis.
      *
      * @param arrays input NDList. each {@link NDArray} must have the same shape.
+     * @param axis the axis along which the arrays will be joined.
      * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
      */
     public static NDArray concat(NDList arrays, int axis) {

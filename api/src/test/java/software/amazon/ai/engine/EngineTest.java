@@ -10,22 +10,16 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
-package software.amazon.ai;
+package software.amazon.ai.engine;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ContextTest {
+public class EngineTest {
 
     @Test
-    public void testContext() {
-        Assert.assertEquals(Context.cpu(), new Context("cpu", 0));
-        Assert.assertEquals(Context.cpu(1), new Context("cpu", 1));
-        Assert.assertEquals(Context.gpu(), new Context("gpu", 0));
-        Assert.assertEquals(Context.gpu(3), new Context("gpu", 3));
-        // Assert.assertTrue(Context.cpu().equals(new Context("cpu", 0)));
-        Assert.assertFalse(Context.gpu().equals(Context.cpu()));
-        Assert.assertFalse(Context.cpu().equals(new Context("cpu", 1)));
+    public void testGetEngine() {
+        Engine engine = Engine.getEngine("MockEngine");
+        Assert.assertNotNull(engine);
     }
 }

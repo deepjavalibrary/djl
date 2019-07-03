@@ -71,9 +71,7 @@ public class InferenceTest {
     @Test
     public void testClassifier() throws IOException, TranslateException {
         Path modelDir = Paths.get("build/model");
-        String modelName = "mockModel";
-
-        Model model = Model.loadModel(modelDir, modelName);
+        Model model = Model.loadModel(modelDir);
 
         final String data = "cat";
         Translator<String, Classification> translator =

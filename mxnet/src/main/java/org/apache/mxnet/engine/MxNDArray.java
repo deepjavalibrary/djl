@@ -1679,7 +1679,6 @@ public class MxNDArray extends NativeResource implements NDArray {
             int limit = Math.min(getShape().head(), MAX_PRINT_ITEMS);
             ByteBuffer buf = toByteBuffer().slice();
             buf.limit(limit * getDataType().getNumOfBytes());
-            buf.order(ByteOrder.LITTLE_ENDIAN);
             sb.append(Utils.toCharSequence(buf, getDataType()));
             int remaining = getShape().head() - limit;
             if (remaining > 0) {

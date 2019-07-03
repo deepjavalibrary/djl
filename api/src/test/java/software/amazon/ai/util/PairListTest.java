@@ -16,7 +16,9 @@ package software.amazon.ai.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -39,24 +41,39 @@ public class PairListTest {
 
     @Test
     public void testToMap() {
-        ArrayList<String> arr = new ArrayList<>();
-        arr.add("Hello");
-        arr.add("Hello");
-        ArrayList<String> values = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
+        keys.add("Hello");
+        keys.add("Hello");
+        List<String> values = new ArrayList<>();
         values.add("Hello");
         values.add("Hello");
         values.add("Hello");
-        Assert.assertThrows(IllegalArgumentException.class, () -> new PairList<>(arr, values));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new PairList<>(keys, values));
+
         values.remove(0);
-        PairList<String, String> pairs = new PairList<>(arr, values);
+        PairList<String, String> pairs = new PairList<>(keys, values);
         String[] strArr = pairs.keyArray(new String[3]);
         Assert.assertEquals(strArr.length, 3);
-        Assert.assertThrows(IllegalStateException.class, () -> pairs.toMap());
+        Assert.assertThrows(IllegalStateException.class, pairs::toMap);
+
         pairs.remove("Hello");
         Assert.assertEquals(pairs.size(), 1);
         pairs.remove("Hello");
         pairs.add("Hello", "World");
         Assert.assertEquals(pairs.toMap().size(), 1);
         Assert.assertEquals(pairs.get(0), new Pair<>("Hello", "World"));
+    }
+
+    @Test
+    public void testRemove() {
+        PairList<String, String> pairs = new PairList<>();
+        String value = pairs.remove("not_found");
+        Assert.assertNull(value);
+    }
+
+    @Test(expectedExceptions = NoSuchElementException.class)
+    public void testIteratorException() {
+        PairList<String, String> pairs = new PairList<>();
+        pairs.iterator().next();
     }
 }

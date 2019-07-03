@@ -93,25 +93,38 @@ public final class Utils {
     public static CharSequence toCharSequence(ByteBuffer buf, DataType dataType) {
         StringBuilder sb = new StringBuilder();
         while (buf.hasRemaining()) {
+            int padding;
+            String value;
             switch (dataType) {
                 case FLOAT32:
-                    sb.append(String.format("%.8e", buf.getFloat()));
+                    value = String.format("%.7e", buf.getFloat());
+                    padding = 14 - value.length();
                     break;
                 case FLOAT64:
-                    sb.append(String.format("%.8e", buf.getDouble()));
+                    value = String.format("%.7e", buf.getDouble());
+                    padding = 15 - value.length();
                     break;
                 case INT8:
-                    sb.append(buf.get());
+                    value = String.valueOf(buf.get());
+                    padding = 4 - value.length();
+                    break;
+                case UINT8:
+                    value = String.format("0x%02X", buf.get());
+                    padding = 0;
                     break;
                 case INT32:
-                    sb.append(buf.getInt());
+                    value = String.valueOf(buf.getInt());
+                    padding = 11 - value.length();
                     break;
                 case INT64:
-                    sb.append(buf.getLong());
+                    value = String.format("0x%016X", buf.getLong());
+                    padding = 18 - value.length();
                     break;
                 default:
-                    throw new IllegalStateException("Unsupported DataType: " + dataType);
+                    throw new IllegalArgumentException("Unsupported DataType: " + dataType);
             }
+            Utils.pad(sb, ' ', padding);
+            sb.append(value);
             if (buf.hasRemaining()) {
                 sb.append(", ");
             }
