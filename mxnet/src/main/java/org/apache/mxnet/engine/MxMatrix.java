@@ -406,6 +406,18 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sort(int axis) {
+        return array.sort(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sort() {
+        return array.sort();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray argsort(int axis, boolean ascending) {
         return array.argsort(axis, ascending);
     }
@@ -657,6 +669,18 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray mod(Number n) {
+        return array.mod(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(Number n) {
+        return array.modi(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray mul(Number n) {
         return array.mul(n);
     }
@@ -885,6 +909,12 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray mod(NDArray other) {
+        return array.mod(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray mul(NDArray other) {
         return array.mul(other);
     }
@@ -911,6 +941,12 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray divi(NDArray other) {
         return array.divi(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(NDArray other) {
+        return array.modi(other);
     }
 
     /** {@inheritDoc} */
@@ -1175,78 +1211,6 @@ public class MxMatrix implements Matrix {
     @Override
     public boolean equalShapes(NDArray other) {
         return array.equalShapes(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(NDArray denominator) {
-        return array.remainder(denominator);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(NDArray denominator, NDArray result) {
-        return array.remainder(denominator, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(Number denominator) {
-        return array.remainder(denominator);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(Number denominator, NDArray result) {
-        return array.remainder(denominator, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainderi(NDArray denominator) {
-        return array.remainderi(denominator);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainderi(Number denominator) {
-        return array.remainderi(denominator);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(NDArray denominator) {
-        return array.fmod(denominator);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(NDArray denominator, NDArray result) {
-        return array.fmod(denominator, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(Number denominator) {
-        return array.fmod(denominator);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(Number denominator, NDArray result) {
-        return array.fmod(denominator, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmodi(NDArray denominator) {
-        return array.fmodi(denominator);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmodi(Number denominator) {
-        return array.fmodi(denominator);
     }
 
     /** {@inheritDoc} */

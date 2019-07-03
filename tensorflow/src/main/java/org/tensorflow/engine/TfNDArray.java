@@ -219,6 +219,18 @@ public class TfNDArray implements NDArray {
     @Override
     public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {}
 
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sort(int axis) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sort() {
+        return null;
+    }
+
     @Override
     public NDArray argsort(int axis, boolean ascending) {
         return null;
@@ -543,6 +555,30 @@ public class TfNDArray implements NDArray {
 
     @Override
     public NDArray addi(NDArray other) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mod(Number n) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(Number n) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mod(NDArray other) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(NDArray other) {
         return null;
     }
 
@@ -1061,78 +1097,6 @@ public class TfNDArray implements NDArray {
     @Override
     public boolean equalShapes(NDArray other) {
         return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(NDArray denominator) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(NDArray denominator, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(Number denominator) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(Number denominator, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainderi(NDArray denominator) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainderi(Number denominator) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(NDArray denominator) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(NDArray denominator, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(Number denominator) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(Number denominator, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmodi(NDArray denominator) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmodi(Number denominator) {
-        return null;
     }
 
     /** {@inheritDoc} */

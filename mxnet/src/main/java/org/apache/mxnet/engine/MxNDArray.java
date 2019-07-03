@@ -376,6 +376,21 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sort(int axis) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        return factory.invoke("sort", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sort() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("sort", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray argsort(int axis, boolean ascending) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
@@ -712,6 +727,36 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
         factory.invoke("_minus_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mod(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_npi_mod_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_npi_mod_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mod(NDArray other) {
+        return factory.invoke("_npi_mod", new NDArray[] {this, other}, null)[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(NDArray other) {
+        factory.invoke("_npi_mod", new NDArray[] {this, other}, new NDArray[] {this}, null);
         return this;
     }
 
@@ -1327,78 +1372,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean equalShapes(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(NDArray denominator) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(NDArray denominator, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(Number denominator) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainder(Number denominator, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainderi(NDArray denominator) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray remainderi(Number denominator) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(NDArray denominator) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(NDArray denominator, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(Number denominator) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmod(Number denominator, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmodi(NDArray denominator) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray fmodi(Number denominator) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 

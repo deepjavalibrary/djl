@@ -78,4 +78,36 @@ public interface NDArrayEx {
      * @return This array after reverse subtraction
      */
     NDArray rsubi(NDArray b);
+
+    /**
+     * Reverse remainder of division with a scalar.
+     *
+     * @param n Value to use for reverse division
+     * @return Copy of array after applying reverse division
+     */
+    NDArray rmod(Number n);
+
+    /**
+     * Reverse remainder of division.
+     *
+     * @param b ndarray to use for reverse division
+     * @return Copy of array after applying reverse division
+     */
+    NDArray rmod(NDArray b);
+
+    /**
+     * In place reverse remainder of division with a scalar.
+     *
+     * @param n Value to use for reverse division
+     * @return This array after applying reverse division
+     */
+    NDArray rmodi(Number n);
+
+    /**
+     * In place reverse remainder of division
+     *
+     * @param b ndarray to use for reverse division
+     * @return This array after applying reverse division
+     */
+    NDArray rmodi(NDArray b);
 }

@@ -273,6 +273,21 @@ public interface NDArray extends AutoCloseable {
     NDArray argsort(int axis, boolean ascending);
 
     /**
+     * Returns a sorted copy of an input array along the given axis.
+     *
+     * @param axis axis along which to sort.
+     * @return return sorted NDArray
+     */
+    NDArray sort(int axis);
+
+    /**
+     * Returns a sorted copy of an flattened input array.
+     *
+     * @return return sorted NDArray
+     */
+    NDArray sort();
+
+    /**
      * Returns the softmax over the entire array.
      *
      * @return Returns the softmax over the entire array
@@ -1594,93 +1609,39 @@ public interface NDArray extends AutoCloseable {
     boolean equalShapes(NDArray other);
 
     /**
-     * Remainder operator
+     * Return element-wise remainder of division.
      *
-     * @param denominator the denominator
-     * @return NDArray NDArray
-     */
-    NDArray remainder(NDArray denominator);
-
-    /**
-     * Remainder operator
+     * <p>NDArray nd = factory.create(new float[] {-3, -5}, null, new Shape(2)); nd.mod(-2) //
+     * return [-1, -1]
      *
-     * @param denominator the denominator
-     * @param result the result array to put this in
-     * @return NDArray NDArray
+     * @param n divisor number
+     * @return Copy of {@link NDArray} after division
      */
-    NDArray remainder(NDArray denominator, NDArray result);
+    NDArray mod(Number n);
 
     /**
-     * The scalar denominator
+     * Return element-wise remainder of division.
      *
-     * @param denominator the denominator as a scalar
-     * @return NDArray NDArray
+     * @param n divisor number
+     * @return Copy of {@link NDArray} after division
      */
-    NDArray remainder(Number denominator);
+    NDArray modi(Number n);
 
     /**
-     * @param denominator the denominator as a scalar
-     * @param result the result array
-     * @return NDArray NDArray
-     */
-    NDArray remainder(Number denominator, NDArray result);
-
-    /**
-     * In place remainder
+     * Copy element-wise remainder of division.
      *
-     * @param denominator the denominator as a scalar
-     * @return NDArray NDArray
+     * @param other the second NDArray to divide
+     * @return the result of the divide
      */
-    NDArray remainderi(NDArray denominator);
+    NDArray mod(NDArray other);
 
     /**
-     * In place remainder
+     * In place element-wise remainder of division.
      *
-     * @param denominator the denominator as a scalar
-     * @return NDArray NDArray
+     * @param other the second NDArray to divide
+     * @return the result of the divide
      */
-    NDArray remainderi(Number denominator);
-
-    /**
-     * remainder of division
-     *
-     * @param denominator the array of denominators for each element in this array
-     * @return NDArray NDArray
-     */
-    NDArray fmod(NDArray denominator);
-
-    /**
-     * remainder of division
-     *
-     * @param denominator the denominator as a scalar
-     * @param result the result array
-     * @return NDArray NDArray
-     */
-    NDArray fmod(NDArray denominator, NDArray result);
-
-    /**
-     * @param denominator the denominator as a scalar
-     * @return NDArray NDArray
-     */
-    NDArray fmod(Number denominator);
-
-    NDArray fmod(Number denominator, NDArray result);
-
-    /**
-     * In place fmod
-     *
-     * @param denominator the denominator as a scalar
-     * @return NDArray NDArray
-     */
-    NDArray fmodi(NDArray denominator);
-
-    /**
-     * In place fmod
-     *
-     * @param denominator the denominator as a scalar
-     * @return NDArray NDArray
-     */
-    NDArray fmodi(Number denominator);
+    NDArray modi(NDArray other);
 
     /**
      * This method returns index of highest value along specified dimension(s)

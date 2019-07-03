@@ -404,6 +404,72 @@ public final class NDArrays {
     }
 
     /**
+     * Scalar remainder of division (copy)
+     *
+     * @param a ndarray to be operated on
+     * @param n the number to multiply by
+     * @return a copy of this ndarray multiplied by the given number
+     */
+    public static NDArray mod(NDArray a, Number n) {
+        return a.mod(n);
+    }
+
+    /**
+     * Copy scalar remainder of division
+     *
+     * @param n the number to multiply by
+     * @param a ndarray to be operated on
+     * @return a copy of this ndarray multiplied by the given number
+     */
+    public static NDArray mod(Number n, NDArray a) {
+        return a.getNDArrayInternal().rmod(n);
+    }
+
+    /**
+     * Copy (element wise) remainder of division of two NDArrays
+     *
+     * @param a ndarray to be operated on
+     * @param b the second NDArray to multiply
+     * @return the result of the addition
+     */
+    public static NDArray mod(NDArray a, NDArray b) {
+        return a.mod(b);
+    }
+
+    /**
+     * In place remainder of division
+     *
+     * @param a ndarray to be operated on
+     * @param n The number to multiply by
+     * @return This array, after applying scaler multiplication
+     */
+    public static NDArray modi(NDArray a, Number n) {
+        return a.modi(n);
+    }
+
+    /**
+     * In place scalar remainder of division
+     *
+     * @param n The number to multiply by
+     * @param a ndarray to be operated on
+     * @return This array, after applying scaler multiplication
+     */
+    public static NDArray modi(Number n, NDArray a) {
+        return a.getNDArrayInternal().rmodi(n);
+    }
+
+    /**
+     * In place scalar remainder of division
+     *
+     * @param a ndarray to be operated on
+     * @param b ndarray to multiply by
+     * @return This array, after applying scaler multiplication
+     */
+    public static NDArray modi(NDArray a, NDArray b) {
+        return a.modi(b);
+    }
+
+    /**
      * Join a sequence of {@link NDArray} along a new axis.
      *
      * <p>The axis parameter specifies the index of the new axis in the dimensions of the result.

@@ -394,23 +394,78 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
     }
 
     @RunAsTest
-    public void testElemWiseMultiplication() throws FailedTestException {
-        NDArray multiplicand =
-                factory.create(new float[] {6, -9, -12, 15, 0}, null, new Shape(1, 5));
-        NDArray multiplier = factory.create(new float[] {2, 3, -4, 5, 6}, null, new Shape(1, 5));
-        NDArray result = NDArrays.mul(multiplicand, multiplier);
-        NDArray inPlaceResult = NDArrays.muli(multiplicand, multiplier);
-        NDArray solution = factory.create(new float[] {12, -27, 48, 75, 0}, null, new Shape(1, 5));
+    public void testScalarRemainder() throws FailedTestException {
+        NDArray dividend = factory.create(new float[] {5, 6, 7, 8, 9}, null, new Shape(1, 5));
+        NDArray result = NDArrays.mod(dividend, 3);
+        NDArray inPlaceResult = NDArrays.modi(dividend, 3);
+        NDArray solution = factory.create(new float[] {2, 0, 1, 2, 0}, null, new Shape(1, 5));
         Assertions.assertEquals(
-                solution, result, "Element wise multiplication: Incorrect value in result ndarray");
+                result, solution, "Scalar Remainder: Incorrect value in result ndarray");
+        Assertions.assertEquals(
+                inPlaceResult,
+                solution,
+                "Scalar in-place Remainder: Incorrect value in result ndarray");
+        Assertions.assertInPlace(
+                (MxNDArray) dividend,
+                (MxNDArray) inPlaceResult,
+                "Scalar division: In-place operation failed");
+    }
+
+    @RunAsTest
+    public void testElemWiseRemainder() throws FailedTestException {
+        NDArray dividend = factory.create(new float[] {7, 8, 9, 10, 11}, null, new Shape(1, 5));
+        NDArray divisor = factory.create(new float[] {2, 3, 4, 5, 6}, null, new Shape(1, 5));
+        NDArray result = NDArrays.mod(dividend, divisor);
+        NDArray inPlaceResult = NDArrays.modi(dividend, divisor);
+        NDArray solution = factory.create(new float[] {1, 2, 1, 0, 5}, null, new Shape(1, 5));
+        Assertions.assertEquals(
+                solution, result, "Element wise Remainder: Incorrect value in result ndarray");
         Assertions.assertEquals(
                 solution,
                 inPlaceResult,
-                "Scalar in-place multiplication: Incorrect value in result ndarray");
+                "Scalar in-place Remainder: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) multiplicand,
+                (MxNDArray) dividend,
                 (MxNDArray) inPlaceResult,
-                "Element wise multiplication: In-place operation failed");
+                "Element wise Remainder: In-place operation failed");
+    }
+
+    @RunAsTest
+    public void testReverseScalarRemainder() throws FailedTestException {
+        NDArray dividend = factory.create(new float[] {5, 6, 7, 8, 9}, null, new Shape(1, 5));
+        NDArray result = NDArrays.mod(180, dividend);
+        NDArray inPlaceResult = NDArrays.modi(180, dividend);
+        NDArray solution = factory.create(new float[] {0, 0, 5, 4, 0}, null, new Shape(1, 5));
+        Assertions.assertEquals(
+                solution, result, "Scalar reverse Remainder: Incorrect value in result ndarray");
+        Assertions.assertEquals(
+                solution,
+                inPlaceResult,
+                "Scalar in-place reverse Remainder: Incorrect value in result ndarray");
+        Assertions.assertInPlace(
+                (MxNDArray) dividend,
+                (MxNDArray) inPlaceResult,
+                "Scalar Remainder division: In-place operation failed");
+    }
+
+    @RunAsTest
+    public void testReverseElemWiseRemainder() throws FailedTestException {
+        NDArray dividend = factory.create(new float[] {7, 8, 9, 10, 11}, null, new Shape(1, 5));
+        NDArray divisor = factory.create(new float[] {20, 21, 22, 23, 24}, null, new Shape(1, 5));
+        NDArray result = dividend.getNDArrayInternal().rmod(divisor);
+        NDArray inPlaceResult = dividend.getNDArrayInternal().rmodi(divisor);
+        NDArray solution = factory.create(new float[] {6, 5, 4, 3, 2}, null, new Shape(1, 5));
+        Assertions.assertEquals(
+                solution,
+                result,
+                "Reverse Element wise Remainder: Incorrect value in result ndarray");
+        Assertions.assertStatement(
+                NDArrays.equals(solution, inPlaceResult),
+                "Reverse Element wise in-place Remainder: Incorrect value in result ndarray");
+        Assertions.assertInPlace(
+                (MxNDArray) dividend,
+                (MxNDArray) inPlaceResult,
+                "Reverse Element wise Remainder: In-place operation failed");
     }
 
     @RunAsTest
@@ -798,5 +853,12 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         if (!flattened.contentEquals(expected)) {
             throw new FailedTestException("Incorrect flatten");
         }
+    }
+
+    @RunAsTest
+    public void testSort() throws FailedTestException {
+        NDArray original = factory.create(new float[] {2f, 1f, 4f, 3f}, null, new Shape(2, 2));
+        NDArray expected = factory.create(new float[] {1f, 2f, 3f, 4f}, null, new Shape(2, 2));
+        Assertions.assertEquals(original.sort(), expected);
     }
 }
