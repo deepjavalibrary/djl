@@ -22,8 +22,8 @@ import software.amazon.ai.metric.Metrics;
 /**
  * The <code>Predictor</code> interface provides model inference functionality.
  *
- * <p>Users can use this to do inference with {@link Model} with {@link Translator} specified.
- * Following is example code that uses <code>Predictor</code>:
+ * <p>You can use this to do inference with {@link Model} with {@link Translator} specified. The
+ * following is example code that uses <code>Predictor</code>:
  *
  * <pre>
  * Model model = Model.loadModel(modelDir, modelName);
@@ -42,7 +42,7 @@ import software.amazon.ai.metric.Metrics;
 public interface Predictor<I, O> extends AutoCloseable {
 
     /**
-     * Create new Predictor based on the model given.
+     * Creates a new Predictor based on the model given.
      *
      * @param model The model used for inference
      * @param translator The Object used for preprocessing and post processing
@@ -55,7 +55,7 @@ public interface Predictor<I, O> extends AutoCloseable {
     }
 
     /**
-     * Create new Predictor based on the model given.
+     * Creates a new Predictor based on the model given.
      *
      * @param model the model used for inference
      * @param translator The Object used for preprocessing and post processing
@@ -70,7 +70,7 @@ public interface Predictor<I, O> extends AutoCloseable {
     }
 
     /**
-     * Predict method used for inference.
+     * Predicts the method used for inference.
      *
      * @param input Input follows the inputObject
      * @return The Output object defined by user
@@ -79,7 +79,7 @@ public interface Predictor<I, O> extends AutoCloseable {
     O predict(I input) throws TranslateException;
 
     /**
-     * Attach a Metrics param to use for benchmark.
+     * Attaches a Metrics param to use for benchmark.
      *
      * @param metrics the Metrics class
      */

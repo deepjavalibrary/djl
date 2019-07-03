@@ -15,7 +15,8 @@ package software.amazon.ai.ndarray.types;
 import software.amazon.ai.Context;
 
 /**
- * A data descriptor class encapsulate information of a {@link software.amazon.ai.ndarray.NDArray}.
+ * A data descriptor class that encapsulates information of a {@link
+ * software.amazon.ai.ndarray.NDArray}.
  *
  * <p>The information includes:
  *
@@ -128,18 +129,18 @@ public class DataDesc {
     }
 
     /**
-     * Returns the name the name of the {@link software.amazon.ai.ndarray.NDArray}.
+     * Returns the name of the {@link software.amazon.ai.ndarray.NDArray}.
      *
-     * @return name the name of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return the name of the {@link software.amazon.ai.ndarray.NDArray}
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Sets the name the name of the {@link software.amazon.ai.ndarray.NDArray}.
+     * Sets the name of the {@link software.amazon.ai.ndarray.NDArray}.
      *
-     * @param name the name the name of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param name - the name of the {@link software.amazon.ai.ndarray.NDArray}
      */
     public void setName(String name) {
         this.name = name;

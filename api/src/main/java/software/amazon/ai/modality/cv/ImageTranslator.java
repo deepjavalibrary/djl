@@ -22,16 +22,16 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 
 /**
- * Builtin <code>Translator</code> that provide default pre-process image.
+ * Built-in <code>Translator</code> that provides default image pre-processing.
  *
  * @param <T> output object type
  */
 public abstract class ImageTranslator<T> implements Translator<BufferedImage, T> {
 
     /**
-     * Process the <code>BufferedImage</code> input and convert to NDList.
+     * Processes the <code>BufferedImage</code> input and converts it to NDList.
      *
-     * @param ctx toolkit that would help to creating input NDArray
+     * @param ctx toolkit that helps create input NDArray
      * @param input <code>BufferedImage</code> input
      * @return {@link NDList}
      */
@@ -51,9 +51,10 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
     }
 
     /**
-     * Normalize pre-processed {@link NDArray}.
+     * Normalizes a pre-processed {@link NDArray}.
      *
-     * <p>It's expected that developer to override this method to provide customized normalization.
+     * <p>It's expected that the developer overrides this method to provide customized
+     * normalization.
      *
      * @param array pre-processed {@link NDArray}
      * @return normalized NDArray

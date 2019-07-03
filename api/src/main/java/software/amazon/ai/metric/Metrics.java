@@ -34,7 +34,7 @@ public class Metrics {
     }
 
     /**
-     * Add a {@link Metric} to the collection.
+     * Adds a {@link Metric} to the collection.
      *
      * @param metric a {@link Metric} to be added
      */
@@ -44,7 +44,7 @@ public class Metrics {
     }
 
     /**
-     * Add <code>Metric</code> by metric <code>name</code> and <code>value</code>.
+     * Adds <code>Metric</code> by metric <code>name</code> and <code>value</code>.
      *
      * @param name metric name
      * @param value metric value
@@ -54,8 +54,8 @@ public class Metrics {
     }
 
     /**
-     * Add <code>Metric</code> by metric <code>name</code>, <code>value</code> and <code>unit</code>
-     * .
+     * Adds <code>Metric</code> by metric <code>name</code>, <code>value</code> and <code>unit
+     * </code> .
      *
      * @param name metric name
      * @param value metric value
@@ -66,7 +66,7 @@ public class Metrics {
     }
 
     /**
-     * Returns a list of {@link Metrics} with specified metric name.
+     * Returns a list of {@link Metrics} with the specified metric name.
      *
      * @param name name of the metric
      * @return a list of {@link Metrics} with specified metric name
@@ -80,7 +80,7 @@ public class Metrics {
     }
 
     /**
-     * Returns percentile {@link Metric} object for specified metric name.
+     * Returns a percentile {@link Metric} object for the specified metric name.
      *
      * @param metricName name of the metric
      * @param percentile percentile
@@ -99,7 +99,7 @@ public class Metrics {
     }
 
     /**
-     * Returns average value of specified metric.
+     * Returns the average value of the specified metric.
      *
      * @param metricName name of the metric
      * @return average number of specified metric

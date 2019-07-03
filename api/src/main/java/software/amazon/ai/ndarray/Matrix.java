@@ -3,19 +3,19 @@ package software.amazon.ai.ndarray;
 public interface Matrix extends NDArray {
 
     /**
-     * Inserts a row in to this matrix.
+     * Inserts a row into this matrix.
      *
-     * @param row the row insert into
+     * @param row the row to insert into
      * @param toPut the row to insert
      * @return this
      */
     NDArray putRow(long row, NDArray toPut);
 
     /**
-     * Insert a column in to this array.
+     * Inserts a column into this array.
      *
      * @param column the column to insert
-     * @param toPut the array to put
+     * @param toPut the array to insert into
      * @return this
      */
     NDArray putColumn(int column, NDArray toPut);
@@ -24,13 +24,13 @@ public interface Matrix extends NDArray {
      * Returns the element at the specified row/column.
      *
      * @param row the row of the element to return
-     * @param column the row of the element to return
+     * @param column the column of the element to return
      * @return a scalar NDArray of the element at this index
      */
     NDArray getScalar(long row, long column);
 
     /**
-     * In place division of a column vector.
+     * Divides a column vector in place.
      *
      * @param columnVector the column vector used for division
      * @return the result of the division
@@ -38,7 +38,7 @@ public interface Matrix extends NDArray {
     NDArray diviColumnVector(NDArray columnVector);
 
     /**
-     * Division of a column vector (copy).
+     * Divides a column vector (copy).
      *
      * @param columnVector the column vector used for division
      * @return the result of the division
@@ -46,7 +46,7 @@ public interface Matrix extends NDArray {
     NDArray divColumnVector(NDArray columnVector);
 
     /**
-     * In place division of a row vector.
+     * Divides a row vector in place.
      *
      * @param rowVector the row vector used for division
      * @return the result of the division
@@ -54,7 +54,7 @@ public interface Matrix extends NDArray {
     NDArray diviRowVector(NDArray rowVector);
 
     /**
-     * Division of a row vector (copy).
+     * Divides a row vector (copy).
      *
      * @param rowVector the row vector used for division
      * @return the result of the division
@@ -62,7 +62,7 @@ public interface Matrix extends NDArray {
     NDArray divRowVector(NDArray rowVector);
 
     /**
-     * In place reverse divison of a column vector.
+     * Reverses the divison of a column vector in place.
      *
      * @param columnVector the column vector used for division
      * @return the result of the division
@@ -70,7 +70,7 @@ public interface Matrix extends NDArray {
     NDArray rdiviColumnVector(NDArray columnVector);
 
     /**
-     * Reverse division of a column vector (copy).
+     * Reverses the division of a column vector (copy).
      *
      * @param columnVector the column vector used for division
      * @return the result of the division
@@ -78,7 +78,7 @@ public interface Matrix extends NDArray {
     NDArray rdivColumnVector(NDArray columnVector);
 
     /**
-     * In place reverse division of a column vector.
+     * Reverses division of a column vector in place.
      *
      * @param rowVector the row vector used for division
      * @return the result of the division
@@ -86,7 +86,7 @@ public interface Matrix extends NDArray {
     NDArray rdiviRowVector(NDArray rowVector);
 
     /**
-     * Reverse division of a column vector (copy).
+     * Reverses division of a column vector (copy).
      *
      * @param rowVector the row vector used for division
      * @return the result of the division
@@ -94,7 +94,7 @@ public interface Matrix extends NDArray {
     NDArray rdivRowVector(NDArray rowVector);
 
     /**
-     * In place multiplication of a column vector.
+     * Multiplies a column vector in place.
      *
      * @param columnVector the column vector used for multiplication
      * @return the result of the multiplication
@@ -102,7 +102,7 @@ public interface Matrix extends NDArray {
     NDArray muliColumnVector(NDArray columnVector);
 
     /**
-     * Multiplication of a column vector (copy).
+     * Multiplies a column vector (copy).
      *
      * @param columnVector the column vector used for multiplication
      * @return the result of the multiplication
@@ -110,7 +110,7 @@ public interface Matrix extends NDArray {
     NDArray mulColumnVector(NDArray columnVector);
 
     /**
-     * In place multiplication of a row vector.
+     * Multiplies a row vector in place.
      *
      * @param rowVector the row vector used for multiplication
      * @return the result of the multiplication
@@ -118,7 +118,7 @@ public interface Matrix extends NDArray {
     NDArray muliRowVector(NDArray rowVector);
 
     /**
-     * Multiplication of a row vector (copy).
+     * Multiplies a row vector (copy).
      *
      * @param rowVector the row vector used for multiplication
      * @return the result of the multiplication
@@ -126,7 +126,7 @@ public interface Matrix extends NDArray {
     NDArray mulRowVector(NDArray rowVector);
 
     /**
-     * In place reverse subtraction of a column vector.
+     * Reverses subtraction of a column vector in place.
      *
      * @param columnVector the column vector to subtract
      * @return the result of the subtraction
@@ -134,7 +134,7 @@ public interface Matrix extends NDArray {
     NDArray rsubiColumnVector(NDArray columnVector);
 
     /**
-     * Reverse subtraction of a column vector (copy).
+     * Reverses subtraction of a column vector (copy).
      *
      * @param columnVector the column vector to subtract
      * @return the result of the subtraction
@@ -142,7 +142,7 @@ public interface Matrix extends NDArray {
     NDArray rsubColumnVector(NDArray columnVector);
 
     /**
-     * In place reverse subtraction of a row vector.
+     * Reverses subtraction of a row vector in place.
      *
      * @param rowVector the row vector to subtract
      * @return the result of the subtraction
@@ -150,7 +150,7 @@ public interface Matrix extends NDArray {
     NDArray rsubiRowVector(NDArray rowVector);
 
     /**
-     * Reverse subtraction of a row vector (copy).
+     * Reverses subtraction of a row vector (copy).
      *
      * @param rowVector the row vector to subtract
      * @return the result of the subtraction
@@ -158,7 +158,7 @@ public interface Matrix extends NDArray {
     NDArray rsubRowVector(NDArray rowVector);
 
     /**
-     * In place subtraction of a column vector.
+     * Subtracts a column vector in place.
      *
      * @param columnVector the column vector to subtract
      * @return the result of the subtraction
@@ -166,7 +166,7 @@ public interface Matrix extends NDArray {
     NDArray subiColumnVector(NDArray columnVector);
 
     /**
-     * Subtraction of a column vector (copy).
+     * Subtracts a column vector (copy).
      *
      * @param columnVector the column vector to subtract
      * @return the result of the subtraction
@@ -174,7 +174,7 @@ public interface Matrix extends NDArray {
     NDArray subColumnVector(NDArray columnVector);
 
     /**
-     * In place subtraction of a row vector.
+     * Subtracts a row vector in place.
      *
      * @param rowVector the row vector to subtract
      * @return the result of the subtraction
@@ -182,7 +182,7 @@ public interface Matrix extends NDArray {
     NDArray subiRowVector(NDArray rowVector);
 
     /**
-     * Subtraction of a row vector (copy).
+     * Subtracts a row vector (copy).
      *
      * @param rowVector the row vector to subtract
      * @return the result of the subtraction
@@ -190,7 +190,7 @@ public interface Matrix extends NDArray {
     NDArray subRowVector(NDArray rowVector);
 
     /**
-     * In place addition of a column vector.
+     * Adds a column vector in place.
      *
      * @param columnVector the column vector to add
      * @return the result of the addition
@@ -198,7 +198,7 @@ public interface Matrix extends NDArray {
     NDArray addiColumnVector(NDArray columnVector);
 
     /**
-     * In place assignment of a column vector.
+     * Assigns a column vector in place.
      *
      * @param columnVector the column vector to add
      * @return the result of the addition
@@ -206,7 +206,7 @@ public interface Matrix extends NDArray {
     NDArray putiColumnVector(NDArray columnVector);
 
     /**
-     * Addition of a column vector (copy).
+     * Adds a column vector (copy).
      *
      * @param columnVector the column vector to add
      * @return the result of the addition
@@ -214,7 +214,7 @@ public interface Matrix extends NDArray {
     NDArray addColumnVector(NDArray columnVector);
 
     /**
-     * In place addition of a row vector.
+     * Adds a row vector in place.
      *
      * @param rowVector the row vector to add
      * @return the result of the addition
@@ -222,7 +222,7 @@ public interface Matrix extends NDArray {
     NDArray addiRowVector(NDArray rowVector);
 
     /**
-     * in place assignment of row vector, to each row of this array.
+     * Assigns a row vector to each row of this array in place.
      *
      * @param rowVector row vector to put
      * @return This array, after assigning every road to the specified value
@@ -230,7 +230,7 @@ public interface Matrix extends NDArray {
     NDArray putiRowVector(NDArray rowVector);
 
     /**
-     * Addition of a row vector (copy).
+     * Adds a row vector (copy).
      *
      * @param rowVector the row vector to add
      * @return the result of the addition
@@ -254,7 +254,7 @@ public interface Matrix extends NDArray {
     NDArray getRow(long i);
 
     /**
-     * Get a new NDArray comprised of the specified columns only.
+     * Gets a new NDArray comprised of the specified columns only.
      *
      * @param columns Columns to extract out of the current array
      * @return Array with only the specified columns
@@ -262,7 +262,7 @@ public interface Matrix extends NDArray {
     NDArray getColumns(int... columns);
 
     /**
-     * Get a new NDArray comprised of the specified rows only.
+     * Gets a new NDArray comprised of the specified rows only.
      *
      * @param rows rows to extract from this array
      * @return Array with only the specified rows
@@ -290,7 +290,7 @@ public interface Matrix extends NDArray {
     NDArray reshape(char order, int rows, int columns);
 
     /**
-     * Convert this NDArray to a 2d double matrix.
+     * Converts this NDArray to a 2d double matrix.
      *
      * <p>Note that THIS SHOULD NOT BE USED FOR SPEED. This is mainly used for integrations with
      * other libraries. Due to the off heap nature, moving data on heap is very expensive and should
@@ -301,7 +301,7 @@ public interface Matrix extends NDArray {
     double[][] toDoubleMatrix();
 
     /**
-     * Convert this NDArray to a 2d float matrix.
+     * Converts this NDArray to a 2d float matrix.
      *
      * <p>Note that THIS SHOULD NOT BE USED FOR SPEED. This is mainly used for integrations with
      * other libraries. Due to the off heap nature, moving data on to the heap is very expensive and
@@ -312,7 +312,7 @@ public interface Matrix extends NDArray {
     float[][] toFloatMatrix();
 
     /**
-     * Convert this NDArray to a 2d long matrix.
+     * Converts this NDArray to a 2d long matrix.
      *
      * <p>Note that THIS SHOULD NOT BE USED FOR SPEED. This is mainly used for integrations with
      * other libraries. Due to the off heap nature, moving data on to the heap is very expensive and
@@ -323,7 +323,7 @@ public interface Matrix extends NDArray {
     long[][] toLongMatrix();
 
     /**
-     * Convert this NDArray to a 2d int matrix.
+     * Converts this NDArray to a 2d int matrix.
      *
      * <p>Note that THIS SHOULD NOT BE USED FOR SPEED. This is mainly used for integrations with
      * other libraries. Due to the off heap nature, moving data on to the heap is very expensive and

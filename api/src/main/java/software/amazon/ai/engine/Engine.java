@@ -31,7 +31,7 @@ import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Trainer;
 
 /**
- * The <code>Engine</code> interface shadows difference between each deep learning frameworks.
+ * The <code>Engine</code> interface shadows differences between each deep learning framework.
  *
  * <p>Any framework specific functionality should be provided through this class.
  */
@@ -92,7 +92,7 @@ public abstract class Engine {
     }
 
     /**
-     * Returns the number of GPU in the system.
+     * Returns the number of GPUs available in the system.
      *
      * @return number of GPUs available in the system
      */
@@ -111,25 +111,26 @@ public abstract class Engine {
     /**
      * Returns system default context.
      *
-     * <p>If the system has GPU available, then default context is {@link
-     * software.amazon.ai.Context#gpu()}, otherwise returns {@link Context#cpu()}
+     * <p>If the system has GPU available, then the default context is {@link
+     * software.amazon.ai.Context#gpu()}. Otherwise the default context returned is {@link
+     * Context#cpu()}
      *
      * @return default context
      */
     public abstract Context defaultContext();
 
     /**
-     * Returns the version of the Deep Learning Framework.
+     * Returns the version of the deep learning framework.
      *
      * @return version number
      */
     public abstract String getVersion();
 
     /**
-     * Load the model from the specified location.
+     * Loads the model from the specified location.
      *
-     * <p>Model format is deep learning framework specific, each framework may have their own
-     * loading options. User should check each framework's document for available loading options.
+     * <p>The model format is deep learning framework specific, each framework may have its own
+     * loading options. You should check each framework's document for available loading options.
      *
      * @param modelPath Directory of the model
      * @param modelName Name/Prefix of the model
@@ -141,7 +142,7 @@ public abstract class Engine {
             throws IOException;
 
     /**
-     * Create new {@link Predictor} instance for this Engine.
+     * Creates new {@link Predictor} instance for this Engine.
      *
      * @param model the model used for inference
      * @param translator preprocessing and postprocessing helper class
@@ -162,7 +163,7 @@ public abstract class Engine {
     public abstract NNIndex getNNIndex();
 
     /**
-     * Create new {@link Trainer} instance for this Engine.
+     * Creates a new {@link Trainer} instance for this Engine.
      *
      * @param model the model created to train on
      * @param context the context of training, can be CPU/GPU

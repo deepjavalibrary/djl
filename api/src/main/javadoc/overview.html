@@ -3,38 +3,47 @@
   <meta charset="UTF-8">
 </head>
 <body>
-<p>This document is the API specification for the Joule.</p>
+<p>This document is the API specification for Joule.</p>
 
-<p>The key design goal for Joule API is to make it extremely easy to get started and simple to
-use deep learning framework for Java developers. They need not be ML/DL experts to get started
-and can start from their existing Java expertise as an on-ramp to learn and use ML/DL. They can
-use their favorite IDE to build/train/deploy their models and integrate these models with their
-Java applications. They don’t have to compromise on model performance, scale, choice of GPU vs.
-CPUs.
+<p>The key design goal for the Joule API is to simplify the use of deep learning frameworks for Java
+  developers. Developers don't need to be Machine Learning/Deep Learning experts to get started.
+  They can start with their existing Java expertise as a foundation to learn and use ML/DL.
+  Developers can
+  use their favorite IDE to build, train, and deploy their models. They can also easily integrate
+  these models with their
+  Java applications. They don’t have to compromise on model performance, scale, or choice of GPU vs.
+  CPUs.
 
-<p>Joule API is deep learning framework agnostic, developer does not have to make a choice
-between framework while they started their project. They can switch to different framework at any
-time they want.
+<p>Joule API is deep learning framework agnostic. Developers don't have to make a choice
+  between frameworks when they start their project. They can switch to a different framework at any
+  time.
 
-<p>Joule API provide native Java development experience, just another regular java library.
-Joule's ergonomic API interface is designed to guide developer with best practice to accomplish
-deep learning task.
+<p>Joule API provides a native Java development experience and functions as any other regular Java
+  library would.
+  Joule's ergonomic API interface is designed to guide developers with best practices to accomplish
+  deep learning tasks.
 
-<p>The following is an example of how to write inference code.
+<p>The following is an example of how to write inference code:
 
 <pre>
     // Assume user has a pre-trained already, they just need load it
     Model model = <b>Model.loadModel</b>(modelDir, modelName);
 
-    // User must implement <a href="software.amazon/ai/Translator.html" title="interface in software.amazon.ai"><code>Translator</code></a> interface, read <a href="software.amazon/ai/Translator.html" title="interface in software.amazon.ai"><code>Translator</code></a> for detail.
+    // User must implement <a href="software.amazon/ai/Translator.html"
+                              title="interface in software.amazon.ai"><code>Translator</code></a> interface, read <a
+    href="software.amazon/ai/Translator.html" title="interface in software.amazon.ai"><code>Translator</code></a> for detail.
     Translator translator = new <b>MyTranslator</b>();
 
-    // User can specify GPU/CPU <a href="software.amazon/ai/Context.html" title="class in software.amazon.ai"><code>Context</code></a> to run inference session.
-    // This context is optional, <a href="software.amazon/ai/inference/Predictor.html" title="interface in software.amazon.ai.inference"><code>Predictor</code></a> can pick up default Context if not specified.
-    // See <a href="software.amazon/ai/Context.html#defaultContext--"><code>Context.defaultContext()</code></a>
+    // User can specify GPU/CPU <a href="software.amazon/ai/Context.html"
+                                   title="class in software.amazon.ai"><code>Context</code></a> to run inference session.
+    // This context is optional, <a href="software.amazon/ai/inference/Predictor.html"
+                                    title="interface in software.amazon.ai.inference"><code>Predictor</code></a> can pick up default Context if not specified.
+    // See <a
+    href="software.amazon/ai/Context.html#defaultContext--"><code>Context.defaultContext()</code></a>
     Context context = Context.defaultContext();
 
-    // Next user need create a <code>Predictor</code>, and use <a href="software.amazon/ai/inference/Predictor.html#predict-I-"><code>Predictor.predict()</code></a>
+    // Next user need create a <code>Predictor</code>, and use <a
+    href="software.amazon/ai/inference/Predictor.html#predict-I-"><code>Predictor.predict()</code></a>
     // to get prediction.
     try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor =
             <b>Predictor.newInstance</b>(model, translator, context)) {
@@ -46,14 +55,19 @@ deep learning task.
 
 <p>Joule API contains following packages:
 <ul>
-    <li>software.amazon.ai – This packages contains top level common classes shared for both inference and training.
-    <li>software.amazon.ai.engine – This packages contains classes responsible for loading deep learning framework.
-    <li>software.amazon.ai.inference – This packages contains classes to implement inference tasks.
-    <li>software.amazon.ai.metric – This packages contains classes to collect metrics information.
-    <li>software.amazon.ai.modality.* – These packages contain utility classes for each predefined modalities.
-    <li>software.amazon.ai.ndarray.* – These packages contain classes and interfaces that defines n-dimensional array.
-    <li>software.amazon.ai.nn.* – These packages contain classes defines neural network operators.
-    <li>software.amazon.ai.training.* – These packages contain classes to implement training tasks.
+  <li>software.amazon.ai – This package contains common top level classes shared by both inference
+    and training.
+  <li>software.amazon.ai.engine – This package contains classes responsible for loading deep
+    learning frameworks.
+  <li>software.amazon.ai.image – This package contains utility classes for image processing.
+  <li>software.amazon.ai.inference – This package contains classes to implement inference tasks.
+  <li>software.amazon.ai.metric – This package contains classes to collect metrics information.
+  <li>software.amazon.ai.modality.* – These packages contain utility classes for each predefined
+    modalities.
+  <li>software.amazon.ai.ndarray.* – These packages contain classes and interfaces that define
+    n-dimensional arrays.
+  <li>software.amazon.ai.nn.* – These packages contain classes define neural network operators.
+  <li>software.amazon.ai.training.* – These packages contain classes to implement training tasks.
 </ul>
 </body>
 </html>

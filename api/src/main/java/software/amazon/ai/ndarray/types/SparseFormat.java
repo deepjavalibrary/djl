@@ -38,7 +38,7 @@ public enum SparseFormat {
     }
 
     /**
-     * Get the <code>SparseFormat</code> from it's integer value.
+     * Gets the <code>SparseFormat</code> from it's integer value.
      *
      * @param value integer value of the <code>SparseFormat</code>
      * @return <code>SparseFormat</code>

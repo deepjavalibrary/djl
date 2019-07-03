@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.modality.cv;
 
-/** An interface represent a bounding box for detected object. */
+/** An interface representing a bounding box for the detected object. */
 public interface BoundingBox {
 
     /**

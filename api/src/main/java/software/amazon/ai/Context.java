@@ -31,11 +31,11 @@ public class Context {
     private int deviceId;
 
     /**
-     * Create Context with basic information
+     * Creates Context with basic information
      *
      * @param deviceType device type user would like to use, typically CPU or GPU
-     * @param deviceId deviceId on the hardware. for example, if you have more GPUs, you can choose
-     *     which GPU to process the NDArray
+     * @param deviceId deviceId on the hardware. For example, if you have multiple GPUs, you can
+     *     choose which GPU to process the NDArray
      */
     public Context(String deviceType, int deviceId) {
         this.deviceType = deviceType;
@@ -94,7 +94,7 @@ public class Context {
     }
 
     /**
-     * Get the default context used in Engine
+     * Gets the default context used in Engine
      *
      * <p>default type is defined by whether the Deep Learning framework is recognizing GPUs
      * available on your machine. If there is no GPU avaiable, CPU will be used

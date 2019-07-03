@@ -17,9 +17,9 @@ import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
 /**
- * A <code>NDList</code> represents a sequence of {@link NDArray}s with names.
+ * An <code>NDList</code> represents a sequence of {@link NDArray}s with names.
  *
- * <p>Each {@link NDArray} in this list can optionally has a name. User can use name to look up
+ * <p>Each {@link NDArray} in this list can optionally have a name. You can use the name to look up
  * NDArray in the NDList.
  */
 public class NDList implements Iterable<Pair<String, NDArray>> {
@@ -42,7 +42,7 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
     }
 
     /**
-     * Constructs and initiate NDList with the specified {@link NDArray}s.
+     * Constructs and initiates an NDList with the specified {@link NDArray}s.
      *
      * @param arrays {@link NDArray}s
      */
@@ -54,9 +54,9 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
     }
 
     /**
-     * Return an array of {@link NDArray} in the same order as in the NDList.
+     * Returns an array of {@link NDArray} in the same order as in the NDList.
      *
-     * <p>The returning array will loose the name information in the NDList.
+     * <p>The returning array will lose the name information in the NDList.
      *
      * @return an array of {@link NDArray}
      */
@@ -65,7 +65,7 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
     }
 
     /**
-     * Returns the number of NDArray in this NDList.
+     * Returns the number of NDArrays in this NDList.
      *
      * <p>If this list contains more than <tt>Integer.MAX_VALUE</tt> NDArrays, returns
      * <tt>Integer.MAX_VALUE</tt>.
@@ -77,7 +77,7 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
     }
 
     /**
-     * Removes the first occurrence of the specified element from this NDList, if it is present
+     * Removes the first occurrence of the specified element from this NDList if it is present
      * (optional operation).
      *
      * <p>If this list does not contain the element, it is unchanged. More formally, removes the

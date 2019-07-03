@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.ndarray.types;
 
-/** An enum represents underlying {@link software.amazon.ai.ndarray.NDArray}'s data type. */
+/** An enum representing the underlying {@link software.amazon.ai.ndarray.NDArray}'s data type. */
 public enum DataType {
     FLOAT32("float32", 4),
     FLOAT64("float64", 8),

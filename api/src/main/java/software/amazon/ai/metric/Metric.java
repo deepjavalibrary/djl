@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.metric;
 
-/** A class represent a <code>Metric</code> item. */
+/** A class representing a <code>Metric</code> item. */
 public class Metric {
 
     private String metricName;

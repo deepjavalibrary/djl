@@ -14,13 +14,13 @@ package software.amazon.ai.modality.cv;
 
 import software.amazon.ai.modality.Classification;
 
-/** A class represent detected object in object detection case. */
+/** A class representing the detected object in an object detection case. */
 public class DetectedObject extends Classification {
 
     private BoundingBox boundingBox;
 
     /**
-     * Construct a <code>DetectedObject</code> instance with <code>className</code>, <code>
+     * Constructs a <code>DetectedObject</code> instance with <code>className</code>, <code>
      * probability</code> and <code>boundingBox</code>.
      *
      * @param className the class name
@@ -33,7 +33,7 @@ public class DetectedObject extends Classification {
     }
 
     /**
-     * Retruns {@link BoundingBox} of detected object.
+     * Returns {@link BoundingBox} of detected object.
      *
      * @return {@link BoundingBox} of detected object
      */

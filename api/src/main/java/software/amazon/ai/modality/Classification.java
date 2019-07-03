@@ -12,14 +12,14 @@
  */
 package software.amazon.ai.modality;
 
-/** The <code>Classification</code> is the container to store the classification result. */
+/** <code>Classification</code> is the container to store the classification result. */
 public class Classification {
 
     private String className;
     private double probability;
 
     /**
-     * Construct a <code>Classification</code> instance with <code>className</code> and <code>
+     * Constructs a <code>Classification</code> instance with <code>className</code> and <code>
      * probability</code>.
      *
      * @param className the class name
@@ -31,7 +31,7 @@ public class Classification {
     }
 
     /**
-     * Return the class name.
+     * Returns the class name.
      *
      * @return Class name
      */
@@ -40,9 +40,9 @@ public class Classification {
     }
 
     /**
-     * Return the probability.
+     * Returns the probability.
      *
-     * <p>Probability explain how accuracy the classifier identified to the target class
+     * <p>Probability explains how accurately the classifier identified the target class
      *
      * @return Probability
      */

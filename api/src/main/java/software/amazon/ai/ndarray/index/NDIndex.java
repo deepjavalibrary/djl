@@ -39,32 +39,32 @@ public class NDIndex {
      * <p>Here are some examples of the indices format.
      *
      * <pre>
-     *         NDArray a = factory.ones(new DataDesc(new Shape(5, 4, 3)));
+     *     NDArray a = factory.ones(new DataDesc(new Shape(5, 4, 3)));
      *
-     *         // Get a subsection of the NDArray in the first axis
-     *         assertEquals(a.get(new NDIndex("2")).getShape(), new Shape(4, 3));
+     *     // Get a subsection of the NDArray in the first axis
+     *     assertEquals(a.get(new NDIndex("2")).getShape(), new Shape(4, 3));
      *
-     *         // Get a subsection of the NDArray indexing from the end (-i == length - i)
-     *         assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(4, 3));
+     *     // Get a subsection of the NDArray indexing from the end (-i == length - i)
+     *     assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(4, 3));
      *
-     *         // Get everything in the first axis and a subsection in the second axis.
-     *         // You can use either : or * to represent everything
-     *         assertEquals(a.get(new NDIndex(":, 2")).getShape(), new Shape(5, 3));
-     *         assertEquals(a.get(new NDIndex("*, 2")).getShape(), new Shape(5, 3));
+     *     // Get everything in the first axis and a subsection in the second axis.
+     *     // You can use either : or * to represent everything
+     *     assertEquals(a.get(new NDIndex(":, 2")).getShape(), new Shape(5, 3));
+     *     assertEquals(a.get(new NDIndex("*, 2")).getShape(), new Shape(5, 3));
      *
-     *         // Gets a range of values along the second axis that is inclusive on the bottom and exclusive on the top
-     *         assertEquals(a.get(new NDIndex(":, 1:3")).getShape(), new Shape(5, 2, 3));
+     *     // Gets a range of values along the second axis that is inclusive on the bottom and exclusive on the top
+     *     assertEquals(a.get(new NDIndex(":, 1:3")).getShape(), new Shape(5, 2, 3));
      *
-     *         // You can exclude either the min or the max of the range to go all the way to the beginning or end.
-     *         assertEquals(a.get(new NDIndex(":, :3")).getShape(), new Shape(5, 3, 3));
-     *         assertEquals(a.get(new NDIndex(":, 1:")).getShape(), new Shape(5, 4, 3));
+     *     // You can exclude either the min or the max of the range to go all the way to the beginning or end.
+     *     assertEquals(a.get(new NDIndex(":, :3")).getShape(), new Shape(5, 3, 3));
+     *     assertEquals(a.get(new NDIndex(":, 1:")).getShape(), new Shape(5, 4, 3));
      *
-     *         // The value after the second colon in a slicing range is the step. You can use it to get every other result:
-     *         assertEquals(a.get(new NDIndex(":, 1::2")).getShape(), new Shape(5, 2, 3));
+     *     // The value after the second colon in a slicing range is the step. You can use it to get every other result:
+     *     assertEquals(a.get(new NDIndex(":, 1::2")).getShape(), new Shape(5, 2, 3));
      *
-     *         // Use a negative step to reverse along the dimension
-     *         assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(5, 4, 3));
-     *     </pre>
+     *     // Use a negative step to reverse along the dimension
+     *     assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(5, 4, 3));
+     * </pre>
      *
      * @param indices A comma separated list of indices corresponding to either subsections,
      *     everything, or slices on a particular dimension

@@ -14,8 +14,8 @@ package software.amazon.ai.modality.cv;
 
 /**
  * The <code>PathIterator</code> interface provides the mechanism for objects that implement the
- * {@link BoundingBox BoundingBox} interface to return the geometry of their boundary by allowing a
- * caller to retrieve the path of that boundary a segment at a time.
+ * {@link BoundingBox BoundingBox} interface to return the geometry of their boundary. It does this
+ * by allowing a caller to retrieve the path of that boundary one segment at a time.
  *
  * @see Rectangle
  * @see BoundingBox

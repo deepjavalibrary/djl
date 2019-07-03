@@ -15,13 +15,13 @@ package software.amazon.ai.ndarray.types;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-/** A class presents {@link software.amazon.ai.ndarray.NDArray}'s shape information. */
+/** A class the presents the {@link software.amazon.ai.ndarray.NDArray}'s shape information. */
 public class Shape {
 
     private int[] shape;
 
     /**
-     * Constructs and initialize a <code>Shape</code> with specified dimension as {@code (int...
+     * Constructs and initializes a <code>Shape</code> with specified dimension as {@code (int...
      * shape)}.
      *
      * @param shape dimensions of the shape
@@ -59,7 +59,7 @@ public class Shape {
     }
 
     /**
-     * Returns size of a specific dimension or several specific dimensions.
+     * Returns the size of a specific dimension or several specific dimensions.
      *
      * @param dimensions The dimension or dimensions to find the size of
      * @return size of specific dimension(s) or -1 for indeterminate size
@@ -80,7 +80,7 @@ public class Shape {
     }
 
     /**
-     * Returns the total size .
+     * Returns the total size.
      *
      * @return total size or -1 for indeterminate size
      */
@@ -96,7 +96,7 @@ public class Shape {
     }
 
     /**
-     * Returns number of dimensions of this <code>Shape</code>.
+     * Returns the number of dimensions of this <code>Shape</code>.
      *
      * @return number of dimensions of this <code>Shape</code>.
      */
@@ -198,18 +198,18 @@ public class Shape {
     }
 
     /**
-     * Returns true matrix and the number of columns is 1.
+     * Returns 'true' if this NDArray is a matrix and the number of columns is 1.
      *
-     * @return true if matrix and the number of columns is 1
+     * @return 'true' if NDArray is a matrix and the number of columns is 1
      */
     public boolean isColumnVector() {
         return isMatrix() && columns() == 1 && size() > 1;
     }
 
     /**
-     * Returns true if matrix and the number of rows is 1.
+     * Returns 'true' if this NDArray is a matrix and the number of rows is 1.
      *
-     * @return true if matrix and the number of rows is 1
+     * @return true if this NDArray is a matrix and the number of rows is 1
      */
     public boolean isRowVector() {
         return isMatrix() && rows() == 1 && size() > 1;
@@ -227,14 +227,14 @@ public class Shape {
     /**
      * Returns whether the matrix has the same rows and columns.
      *
-     * @return true if the matrix has the same rows and columns false otherwise
+     * @return 'true' if the matrix has the same rows and columns 'false' otherwise
      */
     public boolean isSquare() {
         return isMatrix() && columns() == rows();
     }
 
     /**
-     * Returns true if the NDArray is a matrix.
+     * Returns 'true' if the NDArray is a matrix.
      *
      * @return whether the NDArray is a matrix
      */
@@ -243,7 +243,7 @@ public class Shape {
     }
 
     /**
-     * Returns true if the NDArray is a scalar.
+     * Returns 'true' if the NDArray is a scalar.
      *
      * @return whether the NDArray is a scalar
      */

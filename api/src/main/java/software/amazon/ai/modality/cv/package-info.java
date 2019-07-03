@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains utility classes for computer vision. */
+/** Contains utility classes for image processing. */
 package software.amazon.ai.modality.cv;

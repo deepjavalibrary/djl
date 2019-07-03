@@ -13,7 +13,7 @@
 package software.amazon.ai.ndarray;
 
 /**
- * An class implement Sparse NDArray.
+ * A class implementing a Sparse NDArray.
  *
  * @see software.amazon.ai.ndarray.types.SparseFormat
  * @see <a href="https://software.intel.com/en-us/node/471374">Sparse Matrix Storage Formats</a>

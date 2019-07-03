@@ -12,7 +12,7 @@
  */
 package software.amazon.ai;
 
-/** Thrown to indicate that a error is raised during process input or process output. */
+/** Thrown to indicate that an error is raised during processing of the input or output. */
 public class TranslateException extends Exception {
 
     private static final long serialVersionUID = 1L;

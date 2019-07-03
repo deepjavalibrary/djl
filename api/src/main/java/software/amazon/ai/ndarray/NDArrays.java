@@ -30,7 +30,7 @@ public final class NDArrays {
     }
 
     /**
-     * Returns the boolean true iff all elements in both the NDArrays are equal.
+     * Returns the boolean 'true' iff all elements in both the NDArrays are equal.
      *
      * @param a the ndarray to compare.
      * @param b the ndarray to compare.
@@ -41,7 +41,7 @@ public final class NDArrays {
     }
 
     /**
-     * Returns the boolean true iff all elements in the NDArray is equal to the Number
+     * Returns the boolean 'true' iff all elements in the NDArray is equal to the Number
      *
      * @param a the ndarray to compare.
      * @param b the number to compare.
@@ -63,7 +63,7 @@ public final class NDArrays {
     }
 
     /**
-     * Returns binary ndarray for "Greater Than" comparison.
+     * Returns the binary ndarray for "Greater Than" comparison.
      *
      * @param a ndarray to be compared
      * @param b the number to be compared against
@@ -85,7 +85,7 @@ public final class NDArrays {
     }
 
     /**
-     * Returns binary ndarray for "Greater or equals" comparison.
+     * Returns the binary ndarray for "Greater or equals" comparison.
      *
      * @param a ndarray to be compared
      * @param b the number to be compared against
@@ -144,7 +144,7 @@ public final class NDArrays {
      *
      * @param a the NDArray that will be added to.
      * @param n the number to add to the {@link NDArray} elements.
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     public static NDArray add(NDArray a, Number n) {
         return a.add(n);
@@ -155,7 +155,7 @@ public final class NDArrays {
      *
      * @param a the NDArray that will be added to.
      * @param n the number to add to the {@link NDArray} elements.
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     public static NDArray add(Number n, NDArray a) {
         return a.add(n);
@@ -166,7 +166,7 @@ public final class NDArrays {
      *
      * @param a the left NDArray
      * @param b the right NDArray
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     public static NDArray add(NDArray a, NDArray b) {
         return a.add(b);
@@ -177,7 +177,7 @@ public final class NDArrays {
      *
      * @param a the NDArray that will be added to.
      * @param n the number to add to the {@link NDArray} elements.
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     public static NDArray addi(NDArray a, Number n) {
         return a.addi(n);
@@ -188,7 +188,7 @@ public final class NDArrays {
      *
      * @param a the NDArray that will be added to.
      * @param n the number to add to the {@link NDArray} elements.
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     public static NDArray addi(Number n, NDArray a) {
         return a.addi(n);
@@ -199,14 +199,14 @@ public final class NDArrays {
      *
      * @param a the left NDArray
      * @param b the right NDArray
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     public static NDArray addi(NDArray a, NDArray b) {
         return a.addi(b);
     }
 
     /**
-     * Division by a number
+     * Divides an NDArray by a number
      *
      * @param a ndarray to be operated on
      * @param n Number to divide values by
@@ -217,7 +217,7 @@ public final class NDArrays {
     }
 
     /**
-     * Division with a scalar - i.e., (n / thisArrayValues)
+     * Divides an NDArray with a scalar - i.e., (n / thisArrayValues)
      *
      * @param n Value to use for division
      * @param a ndarray to be operated on
@@ -239,7 +239,7 @@ public final class NDArrays {
     }
 
     /**
-     * Division by a number
+     * Divides an NDArray by a number
      *
      * @param a ndarray to be operated on
      * @param n Number to divide values by
@@ -250,7 +250,7 @@ public final class NDArrays {
     }
 
     /**
-     * In place division - i.e., (n / thisArrayValues)
+     * In place divides an NDArray - i.e., (n / thisArrayValues)
      *
      * @param n Value to use for division
      * @param a ndarray to be operated on
@@ -272,7 +272,7 @@ public final class NDArrays {
     }
 
     /**
-     * Scalar subtraction (copied)
+     * Scalar subtraction of an NDArray (copied)
      *
      * @param a ndarray to be operated on
      * @param n the number to subtract by
@@ -283,7 +283,7 @@ public final class NDArrays {
     }
 
     /**
-     * Subtraction with duplicates - i.e., (n - thisArrayValues)
+     * Subtracts an NDArray with duplicates - i.e., (n - thisArrayValues)
      *
      * @param n Value to use for subtraction
      * @param a ndarray to be operated on
@@ -305,7 +305,7 @@ public final class NDArrays {
     }
 
     /**
-     * In place scalar subtraction
+     * In place scalar subtraction of an NDArray
      *
      * @param a ndarray to be operated on
      * @param n Number to subtract
@@ -316,7 +316,7 @@ public final class NDArrays {
     }
 
     /**
-     * Subtraction in place - i.e., (n - thisArrayValues)
+     * Subtracts an NDArray in place - i.e., (n - thisArrayValues)
      *
      * @param n Value to use for subtraction
      * @param a ndarray to be operated on
@@ -404,7 +404,7 @@ public final class NDArrays {
     }
 
     /**
-     * Raises the power of each element in the ndarray
+     * <<<<<<< HEAD Raises the power of each element in the ndarray
      *
      * @param a ndarray to be operated on
      * @param n the number to raise the power to
@@ -546,7 +546,7 @@ public final class NDArrays {
     }
 
     /**
-     * Join a sequence of {@link NDArray} along axis 0.
+     * Joins a sequence of {@link NDArray} along axis 0.
      *
      * @param arrays input NDList. each {@link NDArray} must have the same shape.
      * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
@@ -556,7 +556,7 @@ public final class NDArrays {
     }
 
     /**
-     * Join a sequence of {@link NDArray} in NDList along a new axis.
+     * Joins a sequence of {@link NDArray} in NDList along a new axis.
      *
      * <p>The axis parameter specifies the index of the new axis in the dimensions of the result.
      * For example, if `axis=0` it will be the first dimension and if `axis=-1` it will be the last
@@ -571,7 +571,7 @@ public final class NDArrays {
     }
 
     /**
-     * Join a sequence of {@link NDArray} in NDList along axis 0.
+     * Joins a sequence of {@link NDArray} in NDList along axis 0.
      *
      * @param arrays input NDList. each {@link NDArray} must have the same shape.
      * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
@@ -581,7 +581,7 @@ public final class NDArrays {
     }
 
     /**
-     * Join a sequence of {@link NDArray} along an existing axis.
+     * Joins a sequence of {@link NDArray} along an existing axis.
      *
      * @param arrays the arrays must have the same shape, except in the dimension corresponding to
      *     `axis` (the first, by default).
@@ -594,7 +594,7 @@ public final class NDArrays {
     }
 
     /**
-     * Join a sequence of {@link NDArray} along axis 0.
+     * Joins a sequence of {@link NDArray} along axis 0.
      *
      * @param arrays input NDList. each {@link NDArray} must have the same shape.
      * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
@@ -604,7 +604,7 @@ public final class NDArrays {
     }
 
     /**
-     * Join a sequence of {@link NDArray} in NDList along existing axis.
+     * Joins a sequence of {@link NDArray} in NDList along existing axis.
      *
      * @param arrays input NDList. each {@link NDArray} must have the same shape.
      * @param axis the axis along which the arrays will be joined.
@@ -615,7 +615,7 @@ public final class NDArrays {
     }
 
     /**
-     * Join a sequence of {@link NDArray} in NDList along axis 0.
+     * Joins a sequence of {@link NDArray} in NDList along axis 0.
      *
      * @param arrays input NDList. each {@link NDArray} must have the same shape.
      * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.

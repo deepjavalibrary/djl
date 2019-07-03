@@ -15,13 +15,12 @@ package software.amazon.ai;
 import software.amazon.ai.ndarray.NDList;
 
 /**
- * The <code>Translator</code> interface provides model preprocessing and postprocessing
+ * The <code>Translator</code> interface provides model pre-processing and postprocessing
  * functionality.
  *
- * <p>Translator is center piece that use implements their bossiness logic.
- *
  * <p>Users can use this in {@link software.amazon.ai.inference.Predictor} with input and output
- * object specified. Following is a example of processing an image and create classification output.
+ * objects specified. The following is an example of processing an image and creating classification
+ * output:
  *
  * <pre>
  * private static final class MyTranslator implements Translator&lt;BufferedImage, Classification&gt; {
@@ -72,7 +71,7 @@ import software.amazon.ai.ndarray.NDList;
 public interface Translator<I, O> {
 
     /**
-     * Process the input and convert to NDList.
+     * Processes the input and converts it to NDList.
      *
      * @param ctx Toolkit that would help to creating input NDArray
      * @param input Input Object
@@ -82,7 +81,7 @@ public interface Translator<I, O> {
     NDList processInput(TranslatorContext ctx, I input) throws TranslateException;
 
     /**
-     * Process output NDList to the corresponding Output Object.
+     * Processes the output NDList to the corresponding Output Object.
      *
      * @param ctx Toolkit used to do postprocessing
      * @param list Output NDList after inference

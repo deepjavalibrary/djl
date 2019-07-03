@@ -21,15 +21,13 @@ import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
 
-/**
- * The <code>Images</code> is an image processing utility that can load, reshape and convert images.
- */
+/** <code>Images</code> is an image processing utility that can load, reshape and convert images. */
 public final class Images {
 
     private Images() {}
 
     /**
-     * Load the image from the file specified.
+     * Loads the image from the file specified.
      *
      * @param file the file to be loaded
      * @return a {@link BufferedImage}
@@ -40,7 +38,7 @@ public final class Images {
     }
 
     /**
-     * Resize the image with new width and height.
+     * Resizes the image with new width and height.
      *
      * @param image the input image
      * @param newWidth the new width of the reshaped image
@@ -58,7 +56,7 @@ public final class Images {
     }
 
     /**
-     * Convert image to a float buffer.
+     * Converts image to a float buffer.
      *
      * @param image the buffered image to be converted
      * @return {@link FloatBuffer}

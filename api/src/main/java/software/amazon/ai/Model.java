@@ -25,18 +25,18 @@ import software.amazon.ai.ndarray.types.DataType;
 /**
  * A model is a collection of artifacts that is created by the training process.
  *
- * <p>A deep learning model usually contains following parts:
+ * <p>A deep learning model usually contains the following parts:
  *
  * <ul>
  *   <li>Graph: aka Symbols in MXNet, model in Keras, Block in Pytorch
  *   <li>Parameters: weights
- *   <li>Input/Output information: input and output parameter names, shape etc.
+ *   <li>Input/Output information: input and output parameter names, shape, etc.
  *   <li>Other artifacts: e.g. dictionary for classification
  * </ul>
  *
- * <p>In common inference case, a model is usually loaded from a file: Onse model is loaded, user
- * can create {@link software.amazon.ai.inference.Predictor} with loaded model and call {@link
- * software.amazon.ai.inference.Predictor#predict(Object)} to get inference result.
+ * <p>In a common inference case, the model is usually loaded from a file. Once the model is loaded,
+ * you can create {@link software.amazon.ai.inference.Predictor} with the loaded model and call
+ * {@link software.amazon.ai.inference.Predictor#predict(Object)} to get the inference result.
  *
  * <pre>
  * Model model = <b>Model.loadModel</b>(modelDir, modelName);
@@ -56,9 +56,9 @@ import software.amazon.ai.ndarray.types.DataType;
 public interface Model {
 
     /**
-     * Load the model from the {@link Path}.
+     * Loads the model from the {@link Path}.
      *
-     * @param modelPath File object point to a path
+     * @param modelPath path that points to the model file object
      * @return {@link Model} object
      * @throws IOException IO exception happened in loading
      */
@@ -67,7 +67,7 @@ public interface Model {
     }
 
     /**
-     * Load the model from the {@link Path} and the given name.
+     * Loads the model from the {@link Path} and the given name.
      *
      * @param modelPath Directory/prefix of the file
      * @param modelName model file name or assigned name
@@ -79,7 +79,7 @@ public interface Model {
     }
 
     /**
-     * Load the model from a {@link Path} object with name and epoch provided.
+     * Loads the model from a {@link Path} object with the name and epoch provided.
      *
      * @param modelPath Directory/prefix of the file
      * @param modelName model file name or assigned name
@@ -92,7 +92,7 @@ public interface Model {
         return Engine.getInstance().loadModel(modelPath, modelName, options);
     }
     /**
-     * Get the input descriptor of the model.
+     * Gets the input descriptor of the model.
      *
      * <p>It contains the information that can be extracted from the model, usually name, shape,
      * layout and DataType.
@@ -102,7 +102,7 @@ public interface Model {
     DataDesc[] describeInput();
 
     /**
-     * Get the output descriptor of the model.
+     * Gets the output descriptor of the model.
      *
      * <p>It contains the output information that can be obtained from the model
      *
@@ -138,7 +138,7 @@ public interface Model {
     <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException;
 
     /**
-     * Finds a artifact resource with a given name in the model.
+     * Finds an artifact resource with a given name in the model.
      *
      * @param name name of the desired artifact
      * @return A {@link java.net.URL} object or {@code null} if no artifact with this name is found
@@ -147,7 +147,7 @@ public interface Model {
     URL getArtifact(String name) throws IOException;
 
     /**
-     * Finds a artifact resource with a given name in the model.
+     * Finds an artifact resource with a given name in the model.
      *
      * @param name name of the desired artifact
      * @return A {@link java.io.InputStream} object or {@code null} if no resource with this name is
@@ -157,7 +157,7 @@ public interface Model {
     InputStream getArtifactAsStream(String name) throws IOException;
 
     /**
-     * Cast the model to support different precision level.
+     * Casts the model to support a different precision level.
      *
      * <p>For example, you can cast the precision from Float to Int
      *
