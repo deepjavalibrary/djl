@@ -835,12 +835,6 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mmul(NDArray other, NDArray result) {
-        return array.mmul(other, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray div(NDArray other) {
         return array.div(other);
     }
@@ -861,18 +855,6 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray sub(NDArray other) {
         return array.sub(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mmuli(NDArray other) {
-        return array.mmuli(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mmuli(NDArray other, NDArray result) {
-        return array.mmuli(other, result);
     }
 
     /** {@inheritDoc} */

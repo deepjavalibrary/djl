@@ -1025,4 +1025,14 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         expected = factory.create(new float[] {0, 3, 4, 2}, null, new Shape(4, 1));
         Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
     }
+
+    public void testMatrixMultiplication() throws FailedTestException {
+        NDArray multiplicand =
+                factory.create(new float[] {6, -9, -12, 15, 0, 4}, null, new Shape(2, 3));
+        NDArray multiplier = factory.create(new float[] {2, 3, -4}, null, new Shape(3, 1));
+        NDArray result = NDArrays.mmul(multiplicand, multiplier);
+        NDArray solution = factory.create(new float[] {33, 14}, null, new Shape(2, 1));
+        Assertions.assertEquals(
+                solution, result, "Matrix multiplication: Incorrect value in result ndarray");
+    }
 }

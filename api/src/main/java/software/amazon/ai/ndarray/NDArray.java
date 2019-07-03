@@ -926,15 +926,6 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Perform an copy matrix multiplication
-     *
-     * @param other the other matrix to perform matrix multiply with
-     * @param result the result NDArray
-     * @return the result of the matrix multiplication
-     */
-    NDArray mmul(NDArray other, NDArray result);
-
-    /**
      * Copy (element wise) division of two NDArrays
      *
      * @param other the second NDArray to divide
@@ -957,23 +948,6 @@ public interface NDArray extends AutoCloseable {
      * @return the result of the addition
      */
     NDArray sub(NDArray other);
-
-    /**
-     * Perform an inplace matrix multiplication
-     *
-     * @param other the other matrix to perform matrix multiply with
-     * @return the result of the matrix multiplication
-     */
-    NDArray mmuli(NDArray other);
-
-    /**
-     * Perform an inplace matrix multiplication
-     *
-     * @param other the other matrix to perform matrix multiply with
-     * @param result the result NDArray
-     * @return the result of the matrix multiplication
-     */
-    NDArray mmuli(NDArray other, NDArray result);
 
     /**
      * in place (element wise) division of two NDArrays

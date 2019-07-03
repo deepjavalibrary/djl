@@ -387,6 +387,261 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray add(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray addi(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray createMask(NDIndex index) {
+        return null;
+    }
+
+    @Override
+    public NDArray createMask(Predicate<Number> predicate) {
+        return null;
+    }
+
+    @Override
+    public NDArray tile(int repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray tile(int axis, int repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray tile(int[] repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray tile(Shape desiredShape) {
+        return null;
+    }
+
+    @Override
+    public NDArray repeat(int repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray repeat(int axis, int repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray repeat(int[] repeats) {
+        return null;
+    }
+
+    @Override
+    public NDArray repeat(Shape desiredShape) {
+        return null;
+    }
+
+    @Override
+    public NDArray mmul(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public double[] toDoubleArray() {
+        return new double[0];
+    }
+
+    @Override
+    public float[] toFloatArray() {
+        return new float[0];
+    }
+
+    @Override
+    public int[] toIntArray() {
+        return new int[0];
+    }
+
+    @Override
+    public long[] toLongArray() {
+        return new long[0];
+    }
+
+    @Override
+    public NDArray div(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray mul(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray sub(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray divi(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray muli(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray subi(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray amax(int... dimension) {
+        return null;
+    }
+
+    @Override
+    public Number amaxNumber() {
+        return null;
+    }
+
+    @Override
+    public NDArray amin(int... dimension) {
+        return null;
+    }
+
+    @Override
+    public Number aminNumber() {
+        return null;
+    }
+
+    @Override
+    public Number max() {
+        return null;
+    }
+
+    @Override
+    public NDArray max(int[] axes, boolean keepDims) {
+        return null;
+    }
+
+    @Override
+    public Number min() {
+        return null;
+    }
+
+    @Override
+    public NDArray min(int[] axes, boolean keepDims) {
+        return null;
+    }
+
+    @Override
+    public Number sum() {
+        return null;
+    }
+
+    @Override
+    public NDArray sum(int[] axes, boolean keepDims) {
+        return null;
+    }
+
+    @Override
+    public Number prod() {
+        return null;
+    }
+
+    @Override
+    public NDArray prod(int[] axes, boolean keepDims) {
+        return null;
+    }
+
+    @Override
+    public Number mean() {
+        return null;
+    }
+
+    @Override
+    public NDArray mean(int[] axes, boolean keepDims) {
+        return null;
+    }
+
+    @Override
+    public NDArray dup() {
+        return null;
+    }
+
+    @Override
+    public NDArray flatten() {
+        return null;
+    }
+
+    @Override
+    public NDArray reshape(Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray expandDims(int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray stack(NDArray[] arrays, int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray stack(NDList arrays, int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray concat(NDArray[] arrays, int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray clip(double min, double max) {
+        return null;
+    }
+
+    @Override
+    public NDArray transpose() {
+        return null;
+    }
+
+    @Override
+    public NDArray transpose(int[] dimensions) {
+        return null;
+    }
+
+    @Override
+    public NDArray broadcast(long... shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray broadcast(NDArray result) {
+        return null;
+    }
+
+    @Override
+    public boolean equalsWithEps(Object o, double eps) {
+        return false;
+    }
+
+    @Override
+    public boolean equalShapes(NDArray other) {
+        return false;
+    }
+
+    @Override
     public NDArray mod(Number n) {
         return null;
     }
@@ -637,279 +892,5 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray mmul(NDArray other, NDArray result) {
-        return null;
-    }
-
-    @Override
-    public NDArray div(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray mul(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray sub(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray add(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray addi(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray createMask(NDIndex index) {
-        return null;
-    }
-
-    @Override
-    public NDArray createMask(Predicate<Number> predicate) {
-        return null;
-    }
-
-    @Override
-    public NDArray tile(int repeats) {
-        return null;
-    }
-
-    @Override
-    public NDArray tile(int axis, int repeats) {
-        return null;
-    }
-
-    @Override
-    public NDArray tile(int[] repeats) {
-        return null;
-    }
-
-    @Override
-    public NDArray tile(Shape desiredShape) {
-        return null;
-    }
-
-    @Override
-    public NDArray repeat(int repeats) {
-        return null;
-    }
-
-    @Override
-    public NDArray repeat(int axis, int repeats) {
-        return null;
-    }
-
-    @Override
-    public NDArray repeat(int[] repeats) {
-        return null;
-    }
-
-    @Override
-    public NDArray repeat(Shape desiredShape) {
-        return null;
-    }
-
-    @Override
-    public NDArray mmul(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public double[] toDoubleArray() {
-        return new double[0];
-    }
-
-    @Override
-    public float[] toFloatArray() {
-        return new float[0];
-    }
-
-    @Override
-    public int[] toIntArray() {
-        return new int[0];
-    }
-
-    @Override
-    public long[] toLongArray() {
-        return new long[0];
-    }
-
-    @Override
-    public NDArray mmuli(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray mmuli(NDArray other, NDArray result) {
-        return null;
-    }
-
-    @Override
-    public NDArray divi(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray muli(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray subi(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray amax(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number amaxNumber() {
-        return null;
-    }
-
-    @Override
-    public NDArray amin(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number aminNumber() {
-        return null;
-    }
-
-    @Override
-    public Number max() {
-        return null;
-    }
-
-    @Override
-    public NDArray max(int[] axes, boolean keepDims) {
-        return null;
-    }
-
-    @Override
-    public Number min() {
-        return null;
-    }
-
-    @Override
-    public NDArray min(int[] axes, boolean keepDims) {
-        return null;
-    }
-
-    @Override
-    public Number sum() {
-        return null;
-    }
-
-    @Override
-    public NDArray sum(int[] axes, boolean keepDims) {
-        return null;
-    }
-
-    @Override
-    public Number prod() {
-        return null;
-    }
-
-    @Override
-    public NDArray prod(int[] axes, boolean keepDims) {
-        return null;
-    }
-
-    @Override
-    public Number mean() {
-        return null;
-    }
-
-    @Override
-    public NDArray mean(int[] axes, boolean keepDims) {
-        return null;
-    }
-
-    @Override
-    public NDArray dup() {
-        return null;
-    }
-
-    @Override
-    public NDArray flatten() {
-        return null;
-    }
-
-    @Override
-    public NDArray reshape(Shape shape) {
-        return null;
-    }
-
-    @Override
-    public NDArray expandDims(int axis) {
-        return null;
-    }
-
-    @Override
-    public NDArray stack(NDArray[] arrays, int axis) {
-        return null;
-    }
-
-    @Override
-    public NDArray stack(NDList arrays, int axis) {
-        return null;
-    }
-
-    @Override
-    public NDArray concat(NDArray[] arrays, int axis) {
-        return null;
-    }
-
-    @Override
-    public NDArray clip(double min, double max) {
-        return null;
-    }
-
-    @Override
-    public NDArray transpose() {
-        return null;
-    }
-
-    @Override
-    public NDArray transpose(int[] dimensions) {
-        return null;
-    }
-
-    @Override
-    public long size() {
-        return 0;
-    }
-
-    @Override
-    public NDArray broadcast(long... shape) {
-        return null;
-    }
-
-    @Override
-    public NDArray broadcast(NDArray result) {
-        return null;
-    }
-
-    @Override
-    public boolean equalsWithEps(Object o, double eps) {
-        return false;
-    }
-
-    @Override
-    public boolean equalShapes(NDArray other) {
-        return false;
-    }
-
     public void close() {}
 }

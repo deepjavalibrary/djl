@@ -32,6 +32,7 @@ import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 import org.apache.mxnet.engine.Symbol;
 import software.amazon.ai.Context;
+import software.amazon.ai.engine.EngineException;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
@@ -1504,7 +1505,7 @@ public final class JnaUtils {
 
     public static void checkCall(int ret) {
         if (ret != 0) {
-            throw new JnaException("MXNet engine call failed: " + getLastError());
+            throw new EngineException("MXNet engine call failed: " + getLastError());
         }
     }
 

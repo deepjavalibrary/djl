@@ -788,12 +788,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mmul(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray div(NDArray other) {
         return null;
     }
@@ -807,18 +801,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mmuli(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mmuli(NDArray other, NDArray result) {
         return null;
     }
 

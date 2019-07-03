@@ -472,18 +472,21 @@ public final class NDArrays {
     }
 
     /**
-     * Copy (element wise) remainder of division of two NDArrays
+     * Scalar remainder of division
      *
      * @param a ndarray to be operated on
-     * @param b the second NDArray to multiply
-     * @return the result of the addition
+     * @param b ndarray to multiply by
+     * @return This array, after applying scaler multiplication
      */
     public static NDArray mod(NDArray a, NDArray b) {
         return a.mod(b);
     }
 
     /**
-     * In place remainder of division
+     * Copy (element wise) remainder of division of two NDArrays public static NDArray mod(NDArray
+     * a, NDArray b) { return a.mod(b); }
+     *
+     * <p>/** In place remainder of division
      *
      * @param a ndarray to be operated on
      * @param n The number to multiply by
@@ -513,6 +516,17 @@ public final class NDArrays {
      */
     public static NDArray modi(NDArray a, NDArray b) {
         return a.modi(b);
+    }
+
+    /**
+     * copy matrix multiplication of two NDArrays
+     *
+     * @param a ndarray to be operated on
+     * @param b the second NDArray to multiply
+     * @return the result of the addition
+     */
+    public static NDArray mmul(NDArray a, NDArray b) {
+        return a.mmul(b);
     }
 
     /**
