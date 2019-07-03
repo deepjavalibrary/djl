@@ -407,6 +407,236 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray argMax(int axis, boolean keepDims) {
+        return null;
+    }
+
+    @Override
+    public NDArray argMin() {
+        return null;
+    }
+
+    @Override
+    public NDArray argMin(int axis, boolean keepDims) {
+        return null;
+    }
+
+    @Override
+    public NDArray argMax() {
+        return null;
+    }
+
+    @Override
+    public Number percentileNumber(Number percentile) {
+        return null;
+    }
+
+    @Override
+    public Number medianNumber() {
+        return null;
+    }
+
+    @Override
+    public NDArray median(int... dimension) {
+        return null;
+    }
+
+    @Override
+    public NDArray percentile(Number percentile, int... dimension) {
+        return null;
+    }
+
+    @Override
+    public NDArray toDense() {
+        return null;
+    }
+
+    @Override
+    public int nonzero() {
+        return 0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public NDArray castTo(DataType dataType) {
+        return null;
+    }
+
+    @Override
+    public Matrix asMatrix() {
+        return null;
+    }
+
+    @Override
+    public NDArray like() {
+        return null;
+    }
+
+    @Override
+    public NDArray ulike() {
+        return null;
+    }
+
+    @Override
+    public NDArrayEx getNDArrayInternal() {
+        return null;
+    }
+
+    @Override
+    public NDArray logicalNot() {
+        return null;
+    }
+
+    @Override
+    public NDArray abs() {
+        return null;
+    }
+
+    @Override
+    public NDArray square() {
+        return null;
+    }
+
+    @Override
+    public NDArray cbrt() {
+        return null;
+    }
+
+    @Override
+    public NDArray floor() {
+        return null;
+    }
+
+    @Override
+    public NDArray ceil() {
+        return null;
+    }
+
+    @Override
+    public NDArray round() {
+        return null;
+    }
+
+    @Override
+    public NDArray trunc() {
+        return null;
+    }
+
+    @Override
+    public NDArray exp() {
+        return null;
+    }
+
+    @Override
+    public NDArray pow(Number n) {
+        return null;
+    }
+
+    @Override
+    public NDArray powi(Number n) {
+        return null;
+    }
+
+    @Override
+    public NDArray pow(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray powi(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray log() {
+        return null;
+    }
+
+    @Override
+    public NDArray log10() {
+        return null;
+    }
+
+    @Override
+    public NDArray log2() {
+        return null;
+    }
+
+    @Override
+    public NDArray sin() {
+        return null;
+    }
+
+    @Override
+    public NDArray cos() {
+        return null;
+    }
+
+    @Override
+    public NDArray tan() {
+        return null;
+    }
+
+    @Override
+    public NDArray asin() {
+        return null;
+    }
+
+    @Override
+    public NDArray acos() {
+        return null;
+    }
+
+    @Override
+    public NDArray atan() {
+        return null;
+    }
+
+    @Override
+    public NDArray toDegrees() {
+        return null;
+    }
+
+    @Override
+    public NDArray toRadians() {
+        return null;
+    }
+
+    @Override
+    public NDArray sinh() {
+        return null;
+    }
+
+    @Override
+    public NDArray cosh() {
+        return null;
+    }
+
+    @Override
+    public NDArray tanh() {
+        return null;
+    }
+
+    @Override
+    public NDArray asinh() {
+        return null;
+    }
+
+    @Override
+    public NDArray acosh() {
+        return null;
+    }
+
+    @Override
+    public NDArray atanh() {
+        return null;
+    }
+
+    @Override
     public NDArray mmul(NDArray other, NDArray result) {
         return null;
     }
@@ -679,236 +909,6 @@ public class MockNDArray implements NDArray {
     @Override
     public boolean equalShapes(NDArray other) {
         return false;
-    }
-
-    @Override
-    public NDArray argMax(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number percentileNumber(Number percentile) {
-        return null;
-    }
-
-    @Override
-    public Number medianNumber() {
-        return null;
-    }
-
-    @Override
-    public NDArray median(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray percentile(Number percentile, int... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray toDense() {
-        return null;
-    }
-
-    @Override
-    public int nonzero() {
-        return 0;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public NDArray castTo(DataType dataType) {
-        return null;
-    }
-
-    @Override
-    public Matrix asMatrix() {
-        return null;
-    }
-
-    @Override
-    public boolean all() {
-        return false;
-    }
-
-    @Override
-    public boolean any() {
-        return false;
-    }
-
-    @Override
-    public boolean none() {
-        return false;
-    }
-
-    @Override
-    public NDArray like() {
-        return null;
-    }
-
-    @Override
-    public NDArray ulike() {
-        return null;
-    }
-
-    @Override
-    public NDArrayEx getNDArrayInternal() {
-        return null;
-    }
-
-    @Override
-    public NDArray logicalNot() {
-        return null;
-    }
-
-    @Override
-    public NDArray abs() {
-        return null;
-    }
-
-    @Override
-    public NDArray square() {
-        return null;
-    }
-
-    @Override
-    public NDArray cbrt() {
-        return null;
-    }
-
-    @Override
-    public NDArray floor() {
-        return null;
-    }
-
-    @Override
-    public NDArray ceil() {
-        return null;
-    }
-
-    @Override
-    public NDArray round() {
-        return null;
-    }
-
-    @Override
-    public NDArray trunc() {
-        return null;
-    }
-
-    @Override
-    public NDArray exp() {
-        return null;
-    }
-
-    @Override
-    public NDArray pow(Number n) {
-        return null;
-    }
-
-    @Override
-    public NDArray powi(Number n) {
-        return null;
-    }
-
-    @Override
-    public NDArray pow(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray powi(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray log() {
-        return null;
-    }
-
-    @Override
-    public NDArray log10() {
-        return null;
-    }
-
-    @Override
-    public NDArray log2() {
-        return null;
-    }
-
-    @Override
-    public NDArray sin() {
-        return null;
-    }
-
-    @Override
-    public NDArray cos() {
-        return null;
-    }
-
-    @Override
-    public NDArray tan() {
-        return null;
-    }
-
-    @Override
-    public NDArray asin() {
-        return null;
-    }
-
-    @Override
-    public NDArray acos() {
-        return null;
-    }
-
-    @Override
-    public NDArray atan() {
-        return null;
-    }
-
-    @Override
-    public NDArray toDegrees() {
-        return null;
-    }
-
-    @Override
-    public NDArray toRadians() {
-        return null;
-    }
-
-    @Override
-    public NDArray sinh() {
-        return null;
-    }
-
-    @Override
-    public NDArray cosh() {
-        return null;
-    }
-
-    @Override
-    public NDArray tanh() {
-        return null;
-    }
-
-    @Override
-    public NDArray asinh() {
-        return null;
-    }
-
-    @Override
-    public NDArray acosh() {
-        return null;
-    }
-
-    @Override
-    public NDArray atanh() {
-        return null;
     }
 
     public void close() {}

@@ -589,6 +589,71 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    @Override
+    public NDArray argMax(int axis, boolean keepDims) {
+        return null;
+    }
+
+    @Override
+    public NDArray argMin() {
+        return null;
+    }
+
+    @Override
+    public NDArray argMin(int axis, boolean keepDims) {
+        return null;
+    }
+
+    @Override
+    public NDArray argMax() {
+        return null;
+    }
+
+    @Override
+    public Number percentileNumber(Number percentile) {
+        return null;
+    }
+
+    @Override
+    public Number medianNumber() {
+        return null;
+    }
+
+    @Override
+    public NDArray median(int... dimension) {
+        return null;
+    }
+
+    @Override
+    public NDArray percentile(Number percentile, int... dimension) {
+        return null;
+    }
+
+    @Override
+    public NDArray toDense() {
+        return null;
+    }
+
+    @Override
+    public int nonzero() {
+        return 0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public NDArray castTo(DataType dataType) {
+        return null;
+    }
+
+    @Override
+    public Matrix asMatrix() {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray add(Number n) {
@@ -871,160 +936,63 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray reshape(Shape shape) {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray expandDims(int axis) {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray stack(NDArray[] arrays, int axis) {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray stack(NDList arrays, int axis) {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray concat(NDArray[] arrays, int axis) {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray clip(double min, double max) {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray transpose() {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray transpose(int[] dimensions) {
         return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public long size() {
-        if (tensor != null) {
-            return tensor.numElements();
-        } else {
-            int dimensions = out.shape().numDimensions();
-            return IntStream.range(0, dimensions)
-                    .mapToLong((int i) -> out.shape().size(i))
-                    .reduce(1, (long a, long b) -> a * b);
-        }
-    }
-
-    /** {@inheritDoc} */
     @Override
     public NDArray broadcast(long... shape) {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDArray broadcast(NDArray result) {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equalsWithEps(Object o, double eps) {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equalShapes(NDArray other) {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray argMax(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number percentileNumber(Number percentile) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number medianNumber() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray median(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray percentile(Number percentile, int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray toDense() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int nonzero() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray castTo(DataType dataType) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Matrix asMatrix() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean all() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean any() {
         return false;
     }
 

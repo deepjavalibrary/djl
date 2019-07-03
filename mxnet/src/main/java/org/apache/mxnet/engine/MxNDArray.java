@@ -1278,10 +1278,30 @@ public class MxNDArray extends NativeResource implements NDArray {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    /** {@inheritDoc} */
     @Override
-    public NDArray argMax(int... dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public NDArray argMax(int axis, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("argmax", this, params);
+    }
+
+    @Override
+    public NDArray argMax() {
+        return factory.invoke("argmax", this, null);
+    }
+
+    @Override
+    public NDArray argMin(int axis, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("argmin", this, params);
+    }
+
+    @Override
+    public NDArray argMin() {
+        return factory.invoke("argmin", this, null);
     }
 
     /** {@inheritDoc} */

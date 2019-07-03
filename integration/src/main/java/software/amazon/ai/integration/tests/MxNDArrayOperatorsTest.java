@@ -980,4 +980,49 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 (MxNDArray) inPlaceResult,
                 "Scalar power: In-place operation failed");
     }
+
+    @RunAsTest
+    public void testArgMax() throws FailedTestException {
+        NDArray original =
+                factory.create(
+                        new float[] {
+                            1, 2, 3, 4, 4, 5, 6, 23, 54, 234, 54, 23, 54, 4, 34, 34, 23, 54, 4, 3
+                        },
+                        null,
+                        new Shape(4, 5));
+        NDArray argMax = original.argMax();
+        NDArray expected = factory.create(new float[] {9}, null, new Shape(1));
+        Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
+
+        argMax = original.argMax(0, true);
+        expected = factory.create(new float[] {2, 2, 2, 1, 1}, null, new Shape(1, 5));
+        Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
+
+        argMax = original.argMax(1, false);
+        expected = factory.create(new float[] {3, 4, 0, 2}, null, new Shape(4));
+        Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
+    }
+
+    @RunAsTest
+    public void testArgMin() throws FailedTestException {
+        NDArray original =
+                factory.create(
+                        new float[] {
+                            1, 23, 3, 74, 4, 5, 6, -23, -54, 234, 54, 2, 54, 4, -34, 34, 23, -54, 4,
+                            3
+                        },
+                        null,
+                        new Shape(4, 5));
+        NDArray argMax = original.argMin();
+        NDArray expected = factory.create(new float[] {8}, null, new Shape(1));
+        Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
+
+        argMax = original.argMin(0, false);
+        expected = factory.create(new float[] {0, 2, 3, 1, 2}, null, new Shape(5));
+        Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
+
+        argMax = original.argMin(1, true);
+        expected = factory.create(new float[] {0, 3, 4, 2}, null, new Shape(4, 1));
+        Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
+    }
 }

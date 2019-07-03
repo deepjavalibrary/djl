@@ -1495,12 +1495,38 @@ public interface NDArray extends AutoCloseable {
     NDArray modi(NDArray other);
 
     /**
-     * This method returns index of highest value along specified dimension(s)
+     * This method returns index of highest value along specified axi(e)s
      *
-     * @param dimension Dimension along which to perform the argMax operation
+     * @param axis the axis along which to find argmax
+     * @param keepDims True to keep the specified axes as size 1 in the output array, false to
+     *     squeeze the values out of the output array
      * @return Array containing indices
      */
-    NDArray argMax(int... dimension);
+    NDArray argMax(int axis, boolean keepDims);
+
+    /**
+     * This method returns index of lowest value
+     *
+     * @return Array containing indices
+     */
+    NDArray argMin();
+
+    /**
+     * This method returns index of lowest value along specified axi(e)s
+     *
+     * @param axis the axis along which to find argmax
+     * @param keepDims True to keep the specified axes as size 1 in the output array, false to
+     *     squeeze the values out of the output array
+     * @return Array containing indices
+     */
+    NDArray argMin(int axis, boolean keepDims);
+
+    /**
+     * This method returns index of highest value
+     *
+     * @return Array containing indices
+     */
+    NDArray argMax();
 
     /**
      * This method returns percentile value for this NDArray
