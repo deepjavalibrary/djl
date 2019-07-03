@@ -1689,6 +1689,40 @@ public interface NDArray extends AutoCloseable {
     NDArray exp();
 
     /**
+     * Raises the power of each element in the ndarray
+     *
+     * @param n the number to raise the power to
+     * @return NDArray
+     */
+    NDArray pow(Number n);
+
+    /**
+     * Raises the power of each element in the ndarray in-place
+     *
+     * @param n the number to raise the power to
+     * @return NDArray
+     */
+    NDArray powi(Number n);
+
+    /**
+     * Raises the power of each element in the ndarray by the corresponding element in the other
+     * ndarray
+     *
+     * @param other the ndarray by which the raise the power by
+     * @return NDArray
+     */
+    NDArray pow(NDArray other);
+
+    /**
+     * Raises the power of each element in the ndarray by the corresponding element in the other
+     * ndarray in-place
+     *
+     * @param other the ndarray by which the raise the power by
+     * @return NDArray
+     */
+    NDArray powi(NDArray other);
+
+    /**
      * Returns element-wise Natural logarithmic value of the input.
      *
      * @return NDArray

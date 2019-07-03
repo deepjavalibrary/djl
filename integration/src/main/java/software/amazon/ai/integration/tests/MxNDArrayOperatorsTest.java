@@ -942,4 +942,42 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         Assertions.assertEquals(transpose, transposeExpected, "Incorrect transpose all");
         Assertions.assertEquals(original.swapAxes(0, 1), transposeExpected, "Incorrect swap axes");
     }
+
+    @RunAsTest
+    public void testPower() throws FailedTestException {
+        NDArray array = factory.create(new float[] {6, 9, 12, 2, 0}, null, new Shape(1, 5));
+        NDArray power = factory.create(new float[] {3, 0, 1, -2, 3}, null, new Shape(1, 5));
+        NDArray result = array.pow(power);
+        NDArray inPlaceResult = array.powi(power);
+        NDArray solution =
+                factory.create(new float[] {216, 1, 12, 0.25f, 0}, null, new Shape(1, 5));
+        Assertions.assertEquals(
+                solution, result, "Scalar power: Incorrect value in result ndarray");
+        Assertions.assertEquals(
+                solution,
+                inPlaceResult,
+                "Scalar in-place power: Incorrect value in result ndarray");
+        Assertions.assertInPlace(
+                (MxNDArray) array,
+                (MxNDArray) inPlaceResult,
+                "Scalar power: In-place operation failed");
+    }
+
+    @RunAsTest
+    public void testPowerScalar() throws FailedTestException {
+        NDArray array = factory.create(new float[] {6, 0, -1, 5, 2}, null, new Shape(1, 5));
+        NDArray result = array.pow(2);
+        NDArray inPlaceResult = array.powi(2);
+        NDArray solution = factory.create(new float[] {36, 0, 1, 25, 4}, null, new Shape(1, 5));
+        Assertions.assertEquals(
+                solution, result, "Scalar power: Incorrect value in result ndarray");
+        Assertions.assertEquals(
+                solution,
+                inPlaceResult,
+                "Scalar in-place power: Incorrect value in result ndarray");
+        Assertions.assertInPlace(
+                (MxNDArray) array,
+                (MxNDArray) inPlaceResult,
+                "Scalar power: In-place operation failed");
+    }
 }

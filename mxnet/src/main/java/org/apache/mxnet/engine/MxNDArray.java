@@ -1433,6 +1433,32 @@ public class MxNDArray extends NativeResource implements NDArray {
         return factory.invoke("_npi_exp", this, null);
     }
 
+    @Override
+    public NDArray pow(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_power_scalar", this, params);
+    }
+
+    @Override
+    public NDArray powi(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_power_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
+        return this;
+    }
+
+    @Override
+    public NDArray pow(NDArray other) {
+        return factory.invoke("_power", new NDArray[] {this, other}, null)[0];
+    }
+
+    @Override
+    public NDArray powi(NDArray other) {
+        factory.invoke("_power", new NDArray[] {this, other}, new NDArray[] {this}, null);
+        return this;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray log() {

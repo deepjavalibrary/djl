@@ -1108,6 +1108,26 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray pow(Number n) {
+        return null;
+    }
+
+    @Override
+    public NDArray powi(Number n) {
+        return null;
+    }
+
+    @Override
+    public NDArray pow(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray powi(NDArray other) {
+        return null;
+    }
+
+    @Override
     public NDArray log() {
         return null;
     }

@@ -404,6 +404,52 @@ public final class NDArrays {
     }
 
     /**
+     * Raises the power of each element in the ndarray
+     *
+     * @param a ndarray to be operated on
+     * @param n the number to raise the power to
+     * @return NDArray
+     */
+    public static NDArray pow(NDArray a, Number n) {
+        return a.pow(n);
+    }
+
+    /**
+     * Raises the power of each element in the ndarray by the corresponding element in the other
+     * ndarray
+     *
+     * @param a ndarray to be operated on
+     * @param b the ndarray by which the raise the power by
+     * @return NDArray
+     */
+    public static NDArray pow(NDArray a, NDArray b) {
+        return a.pow(b);
+    }
+
+    /**
+     * Raises the power of each element in the ndarray in-place
+     *
+     * @param a ndarray to be operated on
+     * @param n the number to raise the power to
+     * @return NDArray
+     */
+    public static NDArray powi(NDArray a, Number n) {
+        return a.powi(n);
+    }
+
+    /**
+     * Raises the power of each element in the ndarray by the corresponding element in the other
+     * ndarray in-place
+     *
+     * @param a ndarray to be operated on
+     * @param b the ndarray by which the raise the power by
+     * @return NDArray
+     */
+    public static NDArray powi(NDArray a, NDArray b) {
+        return a.powi(b);
+    }
+
+    /**
      * Scalar remainder of division (copy)
      *
      * @param a ndarray to be operated on

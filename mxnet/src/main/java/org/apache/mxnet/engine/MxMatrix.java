@@ -1213,6 +1213,26 @@ public class MxMatrix implements Matrix {
         return array.exp();
     }
 
+    @Override
+    public NDArray pow(Number n) {
+        return null;
+    }
+
+    @Override
+    public NDArray powi(Number n) {
+        return null;
+    }
+
+    @Override
+    public NDArray pow(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray powi(NDArray other) {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray log() {
