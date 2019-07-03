@@ -612,38 +612,6 @@ public interface NDArray extends AutoCloseable {
     NDArray negi();
 
     /**
-     * Reverse division with a scalar - i.e., (n / thisArrayValues)
-     *
-     * @param n Value to use for reverse division
-     * @return Copy of array after applying reverse division
-     */
-    NDArray rdiv(Number n);
-
-    /**
-     * In place reverse division - i.e., (n / thisArrayValues)
-     *
-     * @param n Value to use for reverse division
-     * @return This array after applying reverse division
-     */
-    NDArray rdivi(Number n);
-
-    /**
-     * Reverse subtraction with duplicates - i.e., (n - thisArrayValues)
-     *
-     * @param n Value to use for reverse subtraction
-     * @return Copy of array after reverse subtraction
-     */
-    NDArray rsub(Number n);
-
-    /**
-     * Reverse subtraction in place - i.e., (n - thisArrayValues)
-     *
-     * @param n Value to use for reverse subtraction
-     * @return This array after reverse subtraction
-     */
-    NDArray rsubi(Number n);
-
-    /**
      * Division by a number
      *
      * @param n Number to divide values by
@@ -722,89 +690,6 @@ public interface NDArray extends AutoCloseable {
      * @return Returns the result of the addition
      */
     NDArray addi(NDArray other);
-
-    /**
-     * Reverse division (number / ndarray)
-     *
-     * @param n the number to divide by
-     * @param result Array to place the result in. Must match shape of this array
-     * @return Result array
-     */
-    NDArray rdiv(Number n, NDArray result);
-
-    /**
-     * Reverse in place division
-     *
-     * @param n the number to divide by
-     * @param result the result ndarray
-     * @return the result ndarray
-     */
-    NDArray rdivi(Number n, NDArray result);
-
-    /**
-     * Reverse subtraction
-     *
-     * @param n the number to subtract by
-     * @param result the result ndarray
-     * @return NDArray
-     */
-    NDArray rsub(Number n, NDArray result);
-
-    /**
-     * Reverse in place subtraction
-     *
-     * @param n the number to subtract by
-     * @param result the result ndarray
-     * @return the result ndarray
-     */
-    NDArray rsubi(Number n, NDArray result);
-
-    /**
-     * Division of this NDArray
-     *
-     * @param n the number to divide by
-     * @param result the result NDArray
-     * @return NDArray NDArray
-     */
-    NDArray div(Number n, NDArray result);
-
-    /**
-     * In place division of this NDArray
-     *
-     * @param n the number to divide by
-     * @param result the result NDArray
-     * @return NDArray NDArray
-     */
-    NDArray divi(Number n, NDArray result);
-
-    /**
-     * Multiplication of this NDArray.
-     *
-     * @param n the number to divide by
-     * @param result the result NDArray
-     * @return NDArray NDArray
-     */
-    NDArray mul(Number n, NDArray result);
-
-    /**
-     * In place multiplication of this NDArray
-     *
-     * @param n the number to divide by
-     * @param result the result NDArray
-     * @return NDArray NDArray
-     */
-    NDArray muli(Number n, NDArray result);
-
-    NDArray sub(Number n, NDArray result);
-
-    /**
-     * In place subtraction of this NDArray
-     *
-     * @param n the number to subtract by
-     * @param result the result NDArray
-     * @return the result NDArray
-     */
-    NDArray subi(Number n, NDArray result);
 
     /**
      * Return a mask on whether each element matches the given condition.
@@ -905,74 +790,6 @@ public interface NDArray extends AutoCloseable {
      * @return the elements to get the array for
      */
     NDArray get(List<List<Integer>> indices);
-
-    /**
-     * Reverse division, elements wise. i.e., other / this
-     *
-     * @param other the matrix to divide from
-     * @return Copy of this array after performing element wise reverse division
-     */
-    NDArray rdiv(NDArray other);
-
-    /**
-     * Reverse divsion (in place). i.e., other / this
-     *
-     * @param other The matrix to divide from
-     * @return This array after performing element wise reverse division
-     */
-    NDArray rdivi(NDArray other);
-
-    /**
-     * Reverse division
-     *
-     * @param other the matrix to subtract from
-     * @param result the result NDArray
-     * @return NDArray NDArray
-     */
-    NDArray rdiv(NDArray other, NDArray result);
-
-    /**
-     * Reverse division (in-place)
-     *
-     * @param other the other NDArray to subtract
-     * @param result the result NDArray
-     * @return the NDArray with the operation applied
-     */
-    NDArray rdivi(NDArray other, NDArray result);
-
-    /**
-     * Reverse subtraction
-     *
-     * @param other the matrix to subtract from
-     * @param result the result NDArray
-     * @return the resulting array
-     */
-    NDArray rsub(NDArray other, NDArray result);
-
-    /**
-     * Element-wise reverse subtraction (copy op). i.e., other - this
-     *
-     * @param other Other array to use in reverse subtraction
-     * @return Copy of this array, after applying reverse subtraction
-     */
-    NDArray rsub(NDArray other);
-
-    /**
-     * Element-wise reverse subtraction (in the place op) - i.e., other - this
-     *
-     * @param other Other way to use in reverse subtraction operation
-     * @return This array, after applying reverse subtraction
-     */
-    NDArray rsubi(NDArray other);
-
-    /**
-     * Reverse subtraction (in-place)
-     *
-     * @param other the other NDArray to subtract
-     * @param result the result NDArray
-     * @return the NDArray with the operation applied
-     */
-    NDArray rsubi(NDArray other, NDArray result);
 
     /**
      * Set all entries of the NDArray to the specified value
@@ -1198,15 +1015,6 @@ public interface NDArray extends AutoCloseable {
     NDArray div(NDArray other);
 
     /**
-     * copy (element wise) division of two NDArrays
-     *
-     * @param other the second NDArray to divide
-     * @param result the result NDArray
-     * @return the result of the divide
-     */
-    NDArray div(NDArray other, NDArray result);
-
-    /**
      * copy (element wise) multiplication of two NDArrays
      *
      * @param other the second NDArray to multiply
@@ -1215,30 +1023,12 @@ public interface NDArray extends AutoCloseable {
     NDArray mul(NDArray other);
 
     /**
-     * copy (element wise) multiplication of two NDArrays
-     *
-     * @param other the second NDArray to multiply
-     * @param result the result NDArray
-     * @return the result of the multiplication
-     */
-    NDArray mul(NDArray other, NDArray result);
-
-    /**
      * copy subtraction of two NDArrays
      *
      * @param other the second NDArray to subtract
      * @return the result of the addition
      */
     NDArray sub(NDArray other);
-
-    /**
-     * copy subtraction of two NDArrays
-     *
-     * @param other the second NDArray to subtract
-     * @param result the result NDArray
-     * @return the result of the subtraction
-     */
-    NDArray sub(NDArray other, NDArray result);
 
     /**
      * Perform an inplace matrix multiplication
@@ -1266,30 +1056,12 @@ public interface NDArray extends AutoCloseable {
     NDArray divi(NDArray other);
 
     /**
-     * in place (element wise) division of two NDArrays
-     *
-     * @param other the second NDArray to divide
-     * @param result the result NDArray
-     * @return the result of the divide
-     */
-    NDArray divi(NDArray other, NDArray result);
-
-    /**
      * in place (element wise) multiplication of two NDArrays
      *
      * @param other the second NDArray to multiply
      * @return the result of the multiplication
      */
     NDArray muli(NDArray other);
-
-    /**
-     * in place (element wise) multiplication of two NDArrays
-     *
-     * @param other the second NDArray to multiply
-     * @param result the result NDArray
-     * @return the result of the multiplication
-     */
-    NDArray muli(NDArray other, NDArray result);
 
     /**
      * in place (element wise) subtraction of two NDArrays
@@ -1300,17 +1072,6 @@ public interface NDArray extends AutoCloseable {
     NDArray subi(NDArray other);
 
     /**
-     * in place (element wise) subtraction of two NDArrays
-     *
-     * @param other the second NDArray to subtract
-     * @param result the result NDArray
-     * @return the result of the subtraction
-     */
-    NDArray subi(NDArray other, NDArray result);
-
-    /**
-     * Returns the absolute overall max of this NDArray along given dimensions
-     *
      * @param dimension the dimension to getScalar the mean along
      * @return the mean along the specified dimension of this NDArray
      */

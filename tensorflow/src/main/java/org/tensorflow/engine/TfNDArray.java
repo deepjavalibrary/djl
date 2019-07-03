@@ -492,30 +492,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rdiv(Number n) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(Number n) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(Number n) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(Number n) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray div(Number n) {
         return null;
     }
@@ -567,66 +543,6 @@ public class TfNDArray implements NDArray {
 
     @Override
     public NDArray addi(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray div(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray divi(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mul(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray muli(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(Number n, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subi(Number n, NDArray result) {
         return null;
     }
 
@@ -693,54 +609,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray get(List<List<Integer>> indices) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(NDArray other, NDArray result) {
         return null;
     }
 
@@ -902,31 +770,13 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray div(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray mul(NDArray other) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mul(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray sub(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(NDArray other, NDArray result) {
         return null;
     }
 
@@ -950,31 +800,13 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray divi(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray muli(NDArray other) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(NDArray other, NDArray result) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray subi(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subi(NDArray other, NDArray result) {
         return null;
     }
 

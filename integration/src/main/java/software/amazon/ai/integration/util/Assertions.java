@@ -27,6 +27,13 @@ public final class Assertions {
         }
     }
 
+    public static void assertEquals(float expected, float actual, String errorMessage)
+            throws FailedTestException {
+        if (expected != actual) {
+            throw new FailedTestException(errorMessage);
+        }
+    }
+
     public static void assertEquals(NDArray expected, NDArray actual) throws FailedTestException {
         assertEquals(expected, actual, "Two NDArrays are different!");
     }

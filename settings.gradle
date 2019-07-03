@@ -8,4 +8,3 @@ include 'tensorflow'
 include 'native'
 
 project(":api").name = "joule-api"
-

@@ -645,30 +645,6 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rdiv(Number n) {
-        return array.rdiv(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(Number n) {
-        return array.rdivi(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(Number n) {
-        return array.rsub(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(Number n) {
-        return array.rsubi(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray div(Number n) {
         return array.div(n);
     }
@@ -701,66 +677,6 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray subi(Number n) {
         return array.subi(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(Number n, NDArray result) {
-        return array.rdiv(n, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(Number n, NDArray result) {
-        return array.rdivi(n, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(Number n, NDArray result) {
-        return array.rsub(n, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(Number n, NDArray result) {
-        return array.rsubi(n, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray div(Number n, NDArray result) {
-        return array.div(n, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray divi(Number n, NDArray result) {
-        return array.divi(n, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mul(Number n, NDArray result) {
-        return array.mul(n, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray muli(Number n, NDArray result) {
-        return array.muli(n, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(Number n, NDArray result) {
-        return array.sub(n, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subi(Number n, NDArray result) {
-        return array.subi(n, result);
     }
 
     /** {@inheritDoc} */
@@ -827,54 +743,6 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray get(List<List<Integer>> indices) {
         return array.get(indices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(NDArray other) {
-        return array.rdiv(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(NDArray other) {
-        return array.rdivi(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(NDArray other, NDArray result) {
-        return array.rdiv(other, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(NDArray other, NDArray result) {
-        return array.rdivi(other, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(NDArray other, NDArray result) {
-        return array.rsub(other, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(NDArray other) {
-        return array.rsub(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(NDArray other) {
-        return array.rsubi(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(NDArray other, NDArray result) {
-        return array.rsubi(other, result);
     }
 
     /** {@inheritDoc} */
@@ -1017,32 +885,14 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray div(NDArray other, NDArray result) {
-        return array.div(other, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray mul(NDArray other) {
         return array.mul(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mul(NDArray other, NDArray result) {
-        return array.mul(other, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray sub(NDArray other) {
         return array.sub(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(NDArray other, NDArray result) {
-        return array.sub(other, result);
     }
 
     /** {@inheritDoc} */
@@ -1065,32 +915,14 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray divi(NDArray other, NDArray result) {
-        return array.divi(other, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray muli(NDArray other) {
         return array.muli(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(NDArray other, NDArray result) {
-        return array.muli(other, result);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray subi(NDArray other) {
         return array.subi(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subi(NDArray other, NDArray result) {
-        return array.subi(other, result);
     }
 
     /** {@inheritDoc} */

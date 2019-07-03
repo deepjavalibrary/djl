@@ -52,6 +52,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     private DataType dataType;
     private Shape shape;
     private MxNDFactory factory;
+    private MxNDArrayEx mxNDArrayEx;
 
     MxNDArray(
             MxNDFactory factory, Context context, Shape shape, DataType dataType, Pointer handle) {
@@ -60,6 +61,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         this.context = context;
         this.dataType = dataType;
         this.shape = shape;
+        this.mxNDArrayEx = new MxNDArrayEx(this);
     }
 
     MxNDArray(MxNDFactory factory, Context context, Shape shape, DataType dataType) {
@@ -652,133 +654,65 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neg() {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        return factory.invoke("negative", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray negi() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        factory.invoke("negative", new NDArray[] {this}, new NDArray[] {this}, null);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray div(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_div_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray divi(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_div_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray mul(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_mul_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray muli(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_mul_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sub(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_minus_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray subi(Number n) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray div(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray divi(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mul(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray muli(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subi(Number n, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_minus_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -844,54 +778,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray get(List<List<Integer>> indices) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(NDArray other, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(NDArray other, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(NDArray other, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(NDArray other, NDArray result) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
@@ -1115,37 +1001,19 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray div(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray div(NDArray other, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        return factory.invoke("elemwise_div", new NDArray[] {this, other}, null)[0];
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray mul(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mul(NDArray other, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        return factory.invoke("_mul", new NDArray[] {this, other}, null)[0];
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(NDArray other, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        return factory.invoke("_sub", new NDArray[] {this, other}, null)[0];
     }
 
     /** {@inheritDoc} */
@@ -1163,37 +1031,22 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray divi(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray divi(NDArray other, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        factory.invoke("elemwise_div", new NDArray[] {this, other}, new NDArray[] {this}, null);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray muli(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray muli(NDArray other, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        factory.invoke("_mul", new NDArray[] {this, other}, new NDArray[] {this}, null);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray subi(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subi(NDArray other, NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        factory.invoke("_sub", new NDArray[] {this, other}, new NDArray[] {this}, null);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -1647,7 +1500,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArrayEx getNDArrayInternal() {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        return mxNDArrayEx;
     }
 
     /** {@inheritDoc} */
