@@ -1,0 +1,32 @@
+/**
+ * This build file is used by joule project internally.
+ */
+
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url 'https://joule.s3.amazonaws.com/repo'
+    }
+}
+
+def classifier = getClassifier()
+
+dependencies {
+    compile "commons-cli:commons-cli:${commons_cli_version}"
+    compile "org.slf4j:slf4j-simple:${slf4j_version}"
+    compile "com.google.code.gson:gson:${gson_version}"
+    compile project(":joule-api")
+    compile project(":mxnet")
+
+    runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
+
+    testCompile "org.testng:testng:${testng_version}"
+}
+
+application {
+    mainClassName = System.getProperty("main", "software.amazon.ai.example.ClassifyExample")
+}

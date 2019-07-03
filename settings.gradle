@@ -8,3 +8,4 @@ include 'tensorflow'
 include 'native'
 
 project(":api").name = "joule-api"
+project(":example").buildFileName = "joule.gradle"
