@@ -143,9 +143,9 @@ public final class BertQaInferenceExample extends AbstractExample {
 
             int seqLength = input.getSeqLength();
             NDFactory factory = ctx.getNDFactory();
-            NDArray data0 = factory.create(new DataDesc(new Shape(1, seqLength), DataType.INT32));
+            NDArray data0 = factory.create(new DataDesc(new Shape(1, seqLength)));
             NDArray data1 = factory.create(new DataDesc(new Shape(1, seqLength)));
-            NDArray data2 = factory.create(new DataDesc(new Shape(1), DataType.INT32));
+            NDArray data2 = factory.create(new DataDesc(new Shape(1)));
 
             data0.set(indexesFloat);
             data1.set(types);
