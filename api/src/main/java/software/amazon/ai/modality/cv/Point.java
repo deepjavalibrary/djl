@@ -24,8 +24,8 @@ public class Point {
      * Constructs and initializes a point at the specified {@code (x,y)} location in the coordinate
      * space.
      *
-     * @param x the X coordinate of the newly constructed <code>Point</code>
-     * @param y the Y coordinate of the newly constructed <code>Point</code>
+     * @param x the X coordinate of the newly constructed {@code Point}
+     * @param y the Y coordinate of the newly constructed {@code Point}
      */
     public Point(int x, int y) {
         this.x = x;
@@ -33,18 +33,18 @@ public class Point {
     }
 
     /**
-     * Returns the X coordinate of this <code>Point</code> in <code>double</code> precision.
+     * Returns the X coordinate of this {@code Point} in <code>double</code> precision.
      *
-     * @return the X coordinate of this <code>Point</code>.
+     * @return the X coordinate of this {@code Point}.
      */
     public int getX() {
         return x;
     }
 
     /**
-     * Returns the Y coordinate of this <code>Point</code> in <code>double</code> precision.
+     * Returns the Y coordinate of this {@code Point} in <code>double</code> precision.
      *
-     * @return the Y coordinate of this <code>Point</code>.
+     * @return the Y coordinate of this {@code Point}.
      */
     public int getY() {
         return y;

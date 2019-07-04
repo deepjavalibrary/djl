@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.metric;
 
-/** A class representing a <code>Metric</code> item. */
+/** A class representing a {@code Metric} item. */
 public class Metric {
 
     private String metricName;
@@ -21,7 +21,7 @@ public class Metric {
     private long timestamp;
 
     /**
-     * Constructs a <code>Metric</code> instance with specified <code>metricName</code> and <code>
+     * Constructs a {@code Metric} instance with specified <code>metricName</code> and <code>
      * value</code>.
      *
      * @param metricName metric name
@@ -32,8 +32,8 @@ public class Metric {
     }
 
     /**
-     * Constructs a <code>Metric</code> instance with specified <code>metricName</code>, <code>value
-     * </code> and <code>unit</code>.
+     * Constructs a {@code Metric} instance with specified <code>metricName</code>, <code>value
+     * </code> and {@code unit}.
      *
      * @param metricName metric name
      * @param value metric value
@@ -47,7 +47,7 @@ public class Metric {
     }
 
     /**
-     * Returns name of the <code>Metric</code>.
+     * Returns name of the {@code Metric}.
      *
      * @return metric name
      */
@@ -56,7 +56,7 @@ public class Metric {
     }
 
     /**
-     * Returns value of the <code>Metric</code>.
+     * Returns value of the {@code Metric}.
      *
      * @return metric value
      */
@@ -65,7 +65,7 @@ public class Metric {
     }
 
     /**
-     * Returns unit of the <code>Metric</code>.
+     * Returns unit of the {@code Metric}.
      *
      * @return metric unit
      */
@@ -74,7 +74,7 @@ public class Metric {
     }
 
     /**
-     * Returns timestamp of the <code>Metric</code>.
+     * Returns timestamp of the {@code Metric}.
      *
      * @return metric timestamp
      */

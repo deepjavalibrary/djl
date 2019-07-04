@@ -33,7 +33,7 @@ public final class LogUtils {
      * Returns sl4fj Logger instance.
      *
      * @param cls class of the logger
-     * @return <code>Logger</code> instance
+     * @return {@code Logger} instance
      */
     public static Logger getLogger(Class<?> cls) {
         return LoggerFactory.getLogger(cls);

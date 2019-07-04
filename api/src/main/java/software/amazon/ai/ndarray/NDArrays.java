@@ -30,7 +30,7 @@ public final class NDArrays {
     }
 
     /**
-     * Returns the boolean 'true' iff all elements in both the NDArrays are equal.
+     * Returns the boolean {@code true} iff all elements in both the NDArrays are equal.
      *
      * @param a the ndarray to compare.
      * @param b the ndarray to compare.
@@ -41,7 +41,7 @@ public final class NDArrays {
     }
 
     /**
-     * Returns the boolean 'true' iff all elements in the NDArray is equal to the Number
+     * Returns the boolean {@code true} iff all elements in the NDArray is equal to the Number
      *
      * @param a the ndarray to compare.
      * @param b the number to compare.

@@ -285,7 +285,7 @@ public interface NDArray extends AutoCloseable {
      * Converts the NDArray to a different {@link Context}.
      *
      * @param ctx {@link Context} to be set
-     * @param copy set 'true' if you want to return a copy of the Existing NDArray.
+     * @param copy set {@code true} if you want to return a copy of the Existing NDArray.
      * @return NDArray with the new {@link Context}
      */
     NDArray asInContext(Context ctx, boolean copy);
@@ -294,7 +294,7 @@ public interface NDArray extends AutoCloseable {
      * Converts the NDArray to a different {@link DataType}.
      *
      * @param dtype {@link DataType} to be set
-     * @param copy set 'true' if you want to return a copy of the Existing NDArray
+     * @param copy set {@code true} if you want to return a copy of the Existing NDArray
      * @return NDArray with the new {@link DataType}
      */
     NDArray asType(DataType dtype, boolean copy);
@@ -465,8 +465,8 @@ public interface NDArray extends AutoCloseable {
      * Splits the array into size(axis) new NDArrays along the given dimension.
      *
      * @param axis The axis to split along
-     * @return Returns an NDList with size(axis) NDArrays with shape <code>this.shape.remove(axis)
-     *     </code>
+     * @return Returns an NDList with size(axis) NDArrays with shape {@code this.shape.remove(axis)
+     *     }
      * @see NDArray#split(int, boolean)
      */
     default NDList split(int axis) {
@@ -479,8 +479,8 @@ public interface NDArray extends AutoCloseable {
      * @param axis The axis to split along
      * @param squeezeAxis whether to remove the specified output from the output NDArrays or leave
      *     as size 1
-     * @return Returns an NDList with size(axis) NDArrays with shape <code>
-     *     squeezeAxis ? this.shape.remove(axis) : this.shape.set(axis, 1)</code>
+     * @return Returns an NDList with size(axis) NDArrays with shape {@code squeezeAxis ?
+     *     this.shape.remove(axis) : this.shape.set(axis, 1)}
      * @see NDArray#split(int, boolean)
      */
     NDList split(int axis, boolean squeezeAxis);
@@ -491,8 +491,8 @@ public interface NDArray extends AutoCloseable {
      * @param axis The axis to split along
      * @param numOutputs The number of NDArrays to split into. This must equally divide the length
      *     of the axis.
-     * @return Returns an NDList with numOutputs NDArrays with shape <code>(this.shape.axis /= axis)
-     * </code>
+     * @return Returns an NDList with numOutputs NDArrays with shape {@code (this.shape.axis /=
+     *     axis) }
      * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
      *     axis
      */
@@ -579,7 +579,7 @@ public interface NDArray extends AutoCloseable {
     NDArray eq(NDArray other);
 
     /**
-     * Returns the boolean 'true' iff all elements in the NDArray are equal to the Number
+     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the Number
      *
      * @param other the NDArray to compare.
      * @return the binary NDArray for "Equals" comparison.
@@ -587,7 +587,7 @@ public interface NDArray extends AutoCloseable {
     boolean contentEquals(NDArray other);
 
     /**
-     * Returns the boolean 'true' iff all elements in the NDArray are equal to the Number
+     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the Number
      *
      * @param number the number to compare.
      * @return the binary NDArray for "Equals" comparison.
@@ -675,18 +675,18 @@ public interface NDArray extends AutoCloseable {
     NDArray lt(NDArray other);
 
     /**
-     * Returns the binary NDArray with value 'true' where this array's entries are infinite, or
-     * 'false' where they are not infinite
+     * Returns the binary NDArray with value {@code true} where this array's entries are infinite,
+     * or {@code false} where they are not infinite
      *
-     * @return the binary array with value 'true' if the array's entries are infinite.
+     * @return the binary array with value {@code true} if the array's entries are infinite.
      */
     NDArray isInfinite();
 
     /**
-     * Returns the binary NDArray with value 'true' where this array's entries are NaN, or 'false'
-     * where they are not NaN
+     * Returns the binary NDArray with value {@code true} where this array's entries are NaN, or
+     * <code>false</code> where they are not NaN
      *
-     * @return the binary array with value 'true' if the array's entries are NaN.
+     * @return the binary array with value {@code true} if the array's entries are NaN.
      */
     NDArray isNaN();
 
@@ -786,7 +786,7 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * @param index the index of values to set to true
-     * @return new boolean NDArray where values are true if it matches the index
+     * @return new boolean NDArray where values are {@code true} if it matches the index
      */
     NDArray createMask(NDIndex index);
 
@@ -794,7 +794,7 @@ public interface NDArray extends AutoCloseable {
      * Return a mask on whether each element matches the given condition.
      *
      * @param predicate a predicate to apply to each element of the array
-     * @return new boolean NDArray where values are true if it matches the predicate
+     * @return new boolean NDArray where values are {@code true} if it matches the predicate
      */
     NDArray createMask(Predicate<Number> predicate);
 
@@ -1025,8 +1025,8 @@ public interface NDArray extends AutoCloseable {
      * Finds the max over the given axes.
      *
      * @param axes the axes to find the max over
-     * @param keepDims 'true' to keep the specified axes as size 1 in the output array, 'false' to
-     *     squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
+     *     false</code> to squeeze the values out of the output array
      * @return an NDArray after the max
      */
     NDArray max(int[] axes, boolean keepDims);
@@ -1053,8 +1053,8 @@ public interface NDArray extends AutoCloseable {
      * Finds the min over the given axes.
      *
      * @param axes the axes to find the min over
-     * @param keepDims 'true' to keep the specified axes as size 1 in the output array, 'false' to
-     *     squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
+     *     false</code> to squeeze the values out of the output array
      * @return an NDArray after the min
      */
     NDArray min(int[] axes, boolean keepDims);
@@ -1081,8 +1081,8 @@ public interface NDArray extends AutoCloseable {
      * Sums over the given axes.
      *
      * @param axes the axes to sum over
-     * @param keepDims 'true' to keep the specified axes as size 1 in the output array, 'false' to
-     *     squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
+     *     false</code> to squeeze the values out of the output array
      * @return an NDArray after the sum
      */
     NDArray sum(int[] axes, boolean keepDims);
@@ -1109,8 +1109,8 @@ public interface NDArray extends AutoCloseable {
      * Finds the product over the given axes.
      *
      * @param axes the axes to prod over
-     * @param keepDims 'true' to keep the specified axes as size 1 in the output array, 'false' to
-     *     squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
+     *     false</code> to squeeze the values out of the output array
      * @return an NDArray after the prod
      */
     NDArray prod(int[] axes, boolean keepDims);
@@ -1137,8 +1137,8 @@ public interface NDArray extends AutoCloseable {
      * Finds the mean over the given axes.
      *
      * @param axes the axes to find the mean over
-     * @param keepDims 'true' to keep the specified axes as size 1 in the output array, 'false' to
-     *     squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
+     *     false</code> to squeeze the values out of the output array
      * @return an NDArray after the mean
      */
     NDArray mean(int[] axes, boolean keepDims);
@@ -1162,8 +1162,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Reshapes the NDArray to the given shape.
      *
-     * <p>You can reshape it to match another NDArray by calling <code>a.reshape(b.getShape())
-     * </code>
+     * <p>You can reshape it to match another NDArray by calling {@code a.reshape(b.getShape()) }
      *
      * @param shape the shape to reshape into. Must have equal size to the current shape.
      * @return a reshaped NDArray
@@ -1431,7 +1430,7 @@ public interface NDArray extends AutoCloseable {
      * (b) size(0)...size(rank()-1) are equal for both arrays
      *
      * @param other Other
-     * @return 'true' if shap
+     * @return {@code true} if shap
      */
     boolean equalShapes(NDArray other);
 
@@ -1474,8 +1473,8 @@ public interface NDArray extends AutoCloseable {
      * This method returns index of highest value along specified axi(e)s
      *
      * @param axis the axis along which to find argmax
-     * @param keepDims True to keep the specified axes as size 1 in the output array, false to
-     *     squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
+     *     false</code> to squeeze the values out of the output array
      * @return Array containing indices
      */
     NDArray argMax(int axis, boolean keepDims);
@@ -1491,8 +1490,8 @@ public interface NDArray extends AutoCloseable {
      * This method returns index of lowest value along specified axi(e)s
      *
      * @param axis the axis along which to find argmax
-     * @param keepDims True to keep the specified axes as size 1 in the output array, false to
-     *     squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
+     *     false</code> to squeeze the values out of the output array
      * @return Array containing indices
      */
     NDArray argMin(int axis, boolean keepDims);
@@ -1553,16 +1552,16 @@ public interface NDArray extends AutoCloseable {
     int nonzero();
 
     /**
-     * Returns 'true' if this NDArray is special case: no-value NDArray
+     * Returns {@code true} if this NDArray is special case: no-value NDArray
      *
-     * @return 'true' if this NDArray is empty
+     * @return {@code true} if this NDArray is empty
      */
     boolean isEmpty();
 
     /**
      * Casts elements of this NDArray to new data type
      *
-     * @param dataType <code>DataType</code> to be casted
+     * @param dataType {@code DataType} to be casted
      * @return NDArray
      */
     NDArray castTo(DataType dataType);
@@ -1576,27 +1575,31 @@ public interface NDArray extends AutoCloseable {
     Matrix asMatrix();
 
     /**
-     * Returns 'true' if all elements within this array are non-zero or 'true'.
+     * Returns {@code true} if all elements within this array are non-zero or <code>true</code>.
      *
-     * @return 'true' if all elements within this array are non-zero or 'true'
+     * @return {@code true} if all elements within this array are non-zero or <code>true</code>
      */
     default boolean all() {
         return nonzero() == size();
     }
 
     /**
-     * Returns 'true' if any of the elements within this array are non-zero or 'true'.
+     * Returns {@code true} if any of the elements within this array are non-zero or <code>true
+     * </code>.
      *
-     * @return 'true' if any of the elements within this array are non-zero or 'true'
+     * @return {@code true} if any of the elements within this array are non-zero or <code>true
+     *     </code>
      */
     default boolean any() {
         return nonzero() > 0;
     }
 
     /**
-     * Returns 'true' if none of the elements within this array are non-zero or 'true'.
+     * Returns {@code true} if none of the elements within this array are non-zero or <code>true
+     * </code>.
      *
-     * @return 'true' if none of the elements within this array are non-zero or 'true'
+     * @return {@code true} if none of the elements within this array are non-zero or <code>true
+     *     </code>
      */
     default boolean none() {
         return nonzero() == 0;

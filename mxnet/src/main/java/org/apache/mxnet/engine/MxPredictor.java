@@ -26,7 +26,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.util.Pair;
 
 /**
- * <code>MxPredictor</code> is the MXNet implementation of {@link Predictor}.
+ * {@code MxPredictor} is the MXNet implementation of {@link Predictor}.
  *
  * <p>MxPredictor contains all methods in the Predictor class and MXNet specific implementations.
  *

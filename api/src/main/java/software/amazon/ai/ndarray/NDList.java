@@ -17,7 +17,7 @@ import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
 /**
- * An <code>NDList</code> represents a sequence of {@link NDArray}s with names.
+ * An {@code NDList} represents a sequence of {@link NDArray}s with names.
  *
  * <p>Each {@link NDArray} in this list can optionally have a name. You can use the name to look up
  * NDArray in the NDList.

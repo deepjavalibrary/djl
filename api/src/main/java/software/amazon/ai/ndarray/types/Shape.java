@@ -21,7 +21,7 @@ public class Shape {
     private int[] shape;
 
     /**
-     * Constructs and initializes a <code>Shape</code> with specified dimension as {@code (int...
+     * Constructs and initializes a {@code Shape} with specified dimension as {@code (int...
      * shape)}.
      *
      * @param shape dimensions of the shape
@@ -36,9 +36,9 @@ public class Shape {
     }
 
     /**
-     * Returns dimensions of the <code>Shape</code>.
+     * Returns dimensions of the {@code Shape}.
      *
-     * @return dimensions of the <code>Shape</code>
+     * @return dimensions of the {@code Shape}
      */
     public int[] getShape() {
         return shape;
@@ -96,9 +96,9 @@ public class Shape {
     }
 
     /**
-     * Returns the number of dimensions of this <code>Shape</code>.
+     * Returns the number of dimensions of this {@code Shape}.
      *
-     * @return number of dimensions of this <code>Shape</code>.
+     * @return number of dimensions of this {@code Shape}.
      */
     public int dimension() {
         return shape.length;
@@ -198,25 +198,25 @@ public class Shape {
     }
 
     /**
-     * Returns 'true' if this NDArray is a matrix and the number of columns is 1.
+     * Returns {@code true} if this NDArray is a matrix and the number of columns is 1.
      *
-     * @return 'true' if NDArray is a matrix and the number of columns is 1
+     * @return {@code true} if NDArray is a matrix and the number of columns is 1
      */
     public boolean isColumnVector() {
         return isMatrix() && columns() == 1 && size() > 1;
     }
 
     /**
-     * Returns 'true' if this NDArray is a matrix and the number of rows is 1.
+     * Returns {@code true} if this NDArray is a matrix and the number of rows is 1.
      *
-     * @return true if this NDArray is a matrix and the number of rows is 1
+     * @return {@code true} if this NDArray is a matrix and the number of rows is 1
      */
     public boolean isRowVector() {
         return isMatrix() && rows() == 1 && size() > 1;
     }
 
     /**
-     * Returns true if this NDArray is a vector matrix.
+     * Returns {@code true} if this NDArray is a vector matrix.
      *
      * @return whether this NDArray is a vector matrix
      */
@@ -227,14 +227,14 @@ public class Shape {
     /**
      * Returns whether the matrix has the same rows and columns.
      *
-     * @return 'true' if the matrix has the same rows and columns 'false' otherwise
+     * @return {@code true} if the matrix has the same rows and columns <code>false</code> otherwise
      */
     public boolean isSquare() {
         return isMatrix() && columns() == rows();
     }
 
     /**
-     * Returns 'true' if the NDArray is a matrix.
+     * Returns {@code true} if the NDArray is a matrix.
      *
      * @return whether the NDArray is a matrix
      */
@@ -243,7 +243,7 @@ public class Shape {
     }
 
     /**
-     * Returns 'true' if the NDArray is a scalar.
+     * Returns {@code true} if the NDArray is a scalar.
      *
      * @return whether the NDArray is a scalar
      */

@@ -42,7 +42,7 @@ public final class MxAutograd {
      * example, Dropout will drop inputs randomly when isTraining=True while simply passing through
      * if isTraining=False.
      *
-     * @param isTraining true if for training
+     * @param isTraining {@code true} if for training
      * @return the previous status before this set
      */
     public static boolean setTraining(boolean isTraining) {

@@ -25,7 +25,7 @@ public class ContextTest {
         Assert.assertEquals(Context.gpu(), new Context("gpu", 0));
         Assert.assertEquals(Context.gpu(3), new Context("gpu", 3));
         // Assert.assertTrue(Context.cpu().equals(new Context("cpu", 0)));
-        Assert.assertFalse(Context.gpu().equals(Context.cpu()));
-        Assert.assertFalse(Context.cpu().equals(new Context("cpu", 1)));
+        Assert.assertNotEquals(Context.cpu(), Context.gpu());
+        Assert.assertNotEquals(new Context("cpu", 1), Context.cpu());
     }
 }

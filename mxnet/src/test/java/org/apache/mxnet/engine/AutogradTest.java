@@ -61,7 +61,7 @@ public class AutogradTest extends PowerMockTestCase {
                         });
         boolean result = MxAutograd.setRecording(true);
         Assert.assertEquals(isRecording[0], 1);
-        Assert.assertEquals(result, false);
+        Assert.assertFalse(result);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class AutogradTest extends PowerMockTestCase {
                         });
         boolean result = MxAutograd.setTraining(true);
         Assert.assertEquals(isTraining[0], 1);
-        Assert.assertEquals(result, false);
+        Assert.assertFalse(result);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class AutogradTest extends PowerMockTestCase {
                             return 0;
                         });
         boolean result = MxAutograd.isRecording();
-        Assert.assertEquals(result, true);
+        Assert.assertTrue(result);
     }
 
     @Test
@@ -106,6 +106,6 @@ public class AutogradTest extends PowerMockTestCase {
                             return 0;
                         });
         boolean result = MxAutograd.isTraining();
-        Assert.assertEquals(result, false);
+        Assert.assertFalse(result);
     }
 }

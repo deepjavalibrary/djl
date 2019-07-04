@@ -28,7 +28,7 @@ public class Metrics {
 
     private Map<String, List<Metric>> metrics;
 
-    /** Constructs a <code>Metrics</code> instance. */
+    /** Constructs a {@code Metrics} instance. */
     public Metrics() {
         metrics = new ConcurrentHashMap<>();
     }
@@ -44,7 +44,7 @@ public class Metrics {
     }
 
     /**
-     * Adds <code>Metric</code> by metric <code>name</code> and <code>value</code>.
+     * Adds {@code Metric} by metric <code>name</code> and <code>value</code>.
      *
      * @param name metric name
      * @param value metric value
@@ -54,7 +54,7 @@ public class Metrics {
     }
 
     /**
-     * Adds <code>Metric</code> by metric <code>name</code>, <code>value</code> and <code>unit
+     * Adds {@code Metric} by metric <code>name</code>, <code>value</code> and <code>unit
      * </code> .
      *
      * @param name metric name
@@ -84,7 +84,7 @@ public class Metrics {
      *
      * @param metricName name of the metric
      * @param percentile percentile
-     * @return {@link Metric} object at specified <code>percentile</code>
+     * @return {@link Metric} object at specified {@code percentile}
      */
     public Metric percentile(String metricName, int percentile) {
         List<Metric> metric = metrics.get(metricName);

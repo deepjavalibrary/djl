@@ -25,7 +25,7 @@ import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
 /**
- * The <code>CachedOp</code> class provides the core functionality to execute a graph with MXNet.
+ * The {@code CachedOp} class provides the core functionality to execute a graph with MXNet.
  *
  * <p>Users are not recommended to interact with this class directly, use {@link
  * software.amazon.ai.inference.Predictor} instead. CachedOp is an operator that simplify the input

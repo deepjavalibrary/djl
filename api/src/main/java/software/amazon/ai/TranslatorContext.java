@@ -16,8 +16,8 @@ import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDFactory;
 
 /**
- * The <code>TranslatorContext</code> interface provides a toolkit for pre-processing and
- * postprocessing functionality.
+ * The {@code TranslatorContext} interface provides a toolkit for pre-processing and postprocessing
+ * functionality.
  *
  * <p>You can use this in {@link Translator} to get Model information and create an NDArray
  */

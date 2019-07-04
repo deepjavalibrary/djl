@@ -16,7 +16,7 @@ import java.util.Objects;
 import software.amazon.ai.engine.Engine;
 
 /**
- * The <code>Context</code> class provides the specified assignment for CPU/GPU processing on the
+ * The {@code Context} class provides the specified assignment for CPU/GPU processing on the
  * NDArray.
  *
  * <p>Users can use this to specify whether to load/compute the NDArray on CPU/GPU with deviceType
@@ -94,7 +94,7 @@ public class Context {
     }
 
     /**
-     * Gets the default context used in Engine
+     * Returns the default context used in Engine
      *
      * <p>default type is defined by whether the Deep Learning framework is recognizing GPUs
      * available on your machine. If there is no GPU avaiable, CPU will be used

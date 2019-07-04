@@ -21,7 +21,7 @@ import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
 
-/** <code>Images</code> is an image processing utility that can load, reshape and convert images. */
+/** {@code Images} is an image processing utility that can load, reshape and convert images. */
 public final class Images {
 
     private Images() {}

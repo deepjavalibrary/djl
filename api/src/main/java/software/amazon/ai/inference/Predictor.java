@@ -20,10 +20,10 @@ import software.amazon.ai.engine.Engine;
 import software.amazon.ai.metric.Metrics;
 
 /**
- * The <code>Predictor</code> interface provides model inference functionality.
+ * The {@code Predictor} interface provides model inference functionality.
  *
  * <p>You can use this to do inference with {@link Model} with {@link Translator} specified. The
- * following is example code that uses <code>Predictor</code>:
+ * following is example code that uses {@code Predictor}:
  *
  * <pre>
  * Model model = Model.loadModel(modelDir, modelName);
@@ -48,7 +48,7 @@ public interface Predictor<I, O> extends AutoCloseable {
      * @param translator The Object used for preprocessing and post processing
      * @param <I> Input object for preprocessing
      * @param <O> Output object come from postprocessing
-     * @return instance of <code>Predictor</code>
+     * @return instance of {@code Predictor}
      */
     static <I, O> Predictor<I, O> newInstance(Model model, Translator<I, O> translator) {
         return newInstance(model, translator, Context.defaultContext());
@@ -62,7 +62,7 @@ public interface Predictor<I, O> extends AutoCloseable {
      * @param context context used for the inference
      * @param <I> Input object for preprocessing
      * @param <O> Output object come from postprocessing
-     * @return new instance of <code>Predictor</code>
+     * @return new instance of {@code Predictor}
      */
     static <I, O> Predictor<I, O> newInstance(
             Model model, Translator<I, O> translator, Context context) {

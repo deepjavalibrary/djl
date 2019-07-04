@@ -34,9 +34,9 @@ public class BertDataParser {
     /**
      * Parse the Vocabulary to JSON files [PAD], [CLS], [SEP], [MASK], [UNK] are reserved tokens.
      *
-     * @param is the <code>InputStream</code> for the vocab.json
-     * @return instance of <code>BertDataParser</code>
-     * @throws IllegalStateException if failed read from <code>InputStream</code>
+     * @param is the {@code InputStream} for the vocab.json
+     * @return instance of {@code BertDataParser}
+     * @throws IllegalStateException if failed read from {@code InputStream}
      */
     public static BertDataParser parse(InputStream is) {
         try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {

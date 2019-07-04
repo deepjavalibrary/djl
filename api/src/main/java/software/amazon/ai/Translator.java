@@ -15,8 +15,7 @@ package software.amazon.ai;
 import software.amazon.ai.ndarray.NDList;
 
 /**
- * The <code>Translator</code> interface provides model pre-processing and postprocessing
- * functionality.
+ * The {@code Translator} interface provides model pre-processing and postprocessing functionality.
  *
  * <p>Users can use this in {@link software.amazon.ai.inference.Predictor} with input and output
  * objects specified. The following is an example of processing an image and creating classification

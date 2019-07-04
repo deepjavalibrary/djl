@@ -13,16 +13,15 @@
 package software.amazon.ai.engine;
 
 /**
- * The <code>EngineProvider</code> instance manufactures an {@link Engine} instance, which is
- * available in the system.
+ * The {@code EngineProvider} instance manufactures an {@link Engine} instance, which is available
+ * in the system.
  *
- * <p>At initialization time, {@link java.util.ServiceLoader} will search <code>EngineProvider
- * </code> implementations available in the class path.
+ * <p>At initialization time, {@link java.util.ServiceLoader} will search {@code EngineProvider }
+ * implementations available in the class path.
  *
  * <p>Engine is designed as a singleton. {@link Engine#getInstance()} will only return the first
  * Engine found in the class path. However, you can directly create a specific Engine instance (e.g.
- * <code>
- * MxEngine</code>).
+ * {@code MxEngine}).
  */
 public interface EngineProvider {
 

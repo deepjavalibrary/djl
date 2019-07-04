@@ -22,17 +22,17 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 
 /**
- * Built-in <code>Translator</code> that provides default image pre-processing.
+ * Built-in {@code Translator} that provides default image pre-processing.
  *
  * @param <T> output object type
  */
 public abstract class ImageTranslator<T> implements Translator<BufferedImage, T> {
 
     /**
-     * Processes the <code>BufferedImage</code> input and converts it to NDList.
+     * Processes the {@code BufferedImage} input and converts it to NDList.
      *
      * @param ctx toolkit that helps create input NDArray
-     * @param input <code>BufferedImage</code> input
+     * @param input {@code BufferedImage} input
      * @return {@link NDList}
      */
     @Override

@@ -31,7 +31,7 @@ import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Trainer;
 
 /**
- * The <code>Engine</code> interface shadows differences between each deep learning framework.
+ * The {@code Engine} interface shadows differences between each deep learning framework.
  *
  * <p>Any framework specific functionality should be provided through this class.
  */
@@ -75,17 +75,17 @@ public abstract class Engine {
     /**
      * Returns the default Engine.
      *
-     * @return instance of <code>Engine</code>
+     * @return instance of {@code Engine}
      */
     public static Engine getInstance() {
         return ENGINE;
     }
 
     /**
-     * Returns <code>Engine</code> by engine name.
+     * Returns {@code Engine} by engine name.
      *
      * @param engineName name of Engine to retrieve
-     * @return instance of <code>Engine</code>
+     * @return instance of {@code Engine}
      */
     public static Engine getEngine(String engineName) {
         return ALL_ENGINES.get(engineName);

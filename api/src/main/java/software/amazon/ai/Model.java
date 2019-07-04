@@ -92,7 +92,7 @@ public interface Model {
         return Engine.getInstance().loadModel(modelPath, modelName, options);
     }
     /**
-     * Gets the input descriptor of the model.
+     * Returns the input descriptor of the model.
      *
      * <p>It contains the information that can be extracted from the model, usually name, shape,
      * layout and DataType.
@@ -102,7 +102,7 @@ public interface Model {
     DataDesc[] describeInput();
 
     /**
-     * Gets the output descriptor of the model.
+     * Returns the output descriptor of the model.
      *
      * <p>It contains the output information that can be obtained from the model
      *

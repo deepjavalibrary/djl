@@ -38,7 +38,7 @@ public class DataDesc {
     private Layout layout;
 
     /**
-     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape}.
+     * Constructs and initializes a {@code DataDesc} with specified {@link Shape}.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      */
@@ -47,7 +47,7 @@ public class DataDesc {
     }
 
     /**
-     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape} and name.
+     * Constructs and initializes a {@code DataDesc} with specified {@link Shape} and name.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param name the name of the {@link software.amazon.ai.ndarray.NDArray}
@@ -57,7 +57,7 @@ public class DataDesc {
     }
 
     /**
-     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape} and {@link
+     * Constructs and initializes a {@code DataDesc} with specified {@link Shape} and {@link
      * DataType}.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
@@ -68,8 +68,8 @@ public class DataDesc {
     }
 
     /**
-     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape}, {@link
-     * DataType} and name.
+     * Constructs and initializes a {@code DataDesc} with specified {@link Shape}, {@link DataType}
+     * and name.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
@@ -80,8 +80,8 @@ public class DataDesc {
     }
 
     /**
-     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape}, {@link
-     * DataType}, name and {@link Layout}.
+     * Constructs and initializes a {@code DataDesc} with specified {@link Shape}, {@link DataType},
+     * name and {@link Layout}.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
@@ -93,8 +93,8 @@ public class DataDesc {
     }
 
     /**
-     * Constructs and initializes a <code>DataDesc</code> with specified {@link Shape}, {@link
-     * DataType}, name, {@link Layout}, {@link Context} and {@link SparseFormat}.
+     * Constructs and initializes a {@code DataDesc} with specified {@link Shape}, {@link DataType},
+     * name, {@link Layout}, {@link Context} and {@link SparseFormat}.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}

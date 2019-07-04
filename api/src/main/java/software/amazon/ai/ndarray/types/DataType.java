@@ -52,7 +52,7 @@ public enum DataType {
     /**
      * Checks whether it is a real data type.
      *
-     * @return true if it is a real type
+     * @return {@code true} if it is a real type
      */
     public boolean isReal() {
         return type.startsWith("float");
@@ -60,7 +60,7 @@ public enum DataType {
     /**
      * Checks whether it is an integer data type.
      *
-     * @return true if it is an integer type
+     * @return {@code true} if it is an integer type
      */
     public boolean isInteger() {
         return type.startsWith("int") || type.startsWith("uint");

@@ -111,7 +111,7 @@ public interface NDFactory extends AutoCloseable {
      * Creates and initialize an instance of {@link NDArray} with specified {@link DataDesc}.
      *
      * @param dataDesc the {@link DataDesc} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param data data to initialize the <code>NDArray</code>
+     * @param data data to initialize the {@code NDArray}
      * @return new instance of {@link NDArray}
      */
     NDArray create(DataDesc dataDesc, Buffer data);

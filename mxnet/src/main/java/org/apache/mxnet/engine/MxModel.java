@@ -38,7 +38,7 @@ import software.amazon.ai.util.PairList;
 import software.amazon.ai.util.Utils;
 
 /**
- * <code>MxModel</code> is MXNet implementation of {@link Model}.
+ * {@code MxModel} is MXNet implementation of {@link Model}.
  *
  * <p>MxModel contains all methods in Model to load and process model. In addition, it provides
  * MXNet Specific functionality, such as getSymbol to obtain the Symbolic graph and getParameters to

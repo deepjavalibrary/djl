@@ -16,18 +16,18 @@ package software.amazon.ai.modality.cv;
 public interface BoundingBox {
 
     /**
-     * Gets the bounding <code>Rectangle</code> of this <code>BoundingBox</code>.
+     * Returns the bounding {@code Rectangle} of this <code>BoundingBox</code>.
      *
-     * @return a new <code>Rectangle</code> for this <code>BoundingBox</code>.
+     * @return a new {@code Rectangle} for this <code>BoundingBox</code>.
      */
     Rectangle getBounds();
 
     /**
-     * Returns an iterator object that iterates along the <code>BoundingBox</code> boundary and
-     * provides access to the geometry of the <code>BoundingBox</code> outline.
+     * Returns an iterator object that iterates along the {@code BoundingBox} boundary and provides
+     * access to the geometry of the {@code BoundingBox} outline.
      *
-     * @return a <code>PathIterator</code> object, which independently traverses the geometry of the
-     *     <code>BoundingBox</code>.
+     * @return a {@code PathIterator} object, which independently traverses the geometry of the
+     *     {@code BoundingBox}.
      */
     PathIterator getPath();
 }

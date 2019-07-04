@@ -12,14 +12,14 @@
  */
 package software.amazon.ai.modality;
 
-/** <code>Classification</code> is the container to store the classification result. */
+/** {@code Classification} is the container to store the classification result. */
 public class Classification {
 
     private String className;
     private double probability;
 
     /**
-     * Constructs a <code>Classification</code> instance with <code>className</code> and <code>
+     * Constructs a {@code Classification} instance with <code>className</code> and <code>
      * probability</code>.
      *
      * @param className the class name

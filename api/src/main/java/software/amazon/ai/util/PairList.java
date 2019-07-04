@@ -24,14 +24,14 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     private List<K> keys;
     private List<V> values;
 
-    /** Constructs an empty <code>PairList</code> with an default initial capacity. */
+    /** Constructs an empty {@code PairList} with an default initial capacity. */
     public PairList() {
         keys = new ArrayList<>();
         values = new ArrayList<>();
     }
 
     /**
-     * Constructs an empty <code>PairList</code> with the specified initial capacity.
+     * Constructs an empty {@code PairList} with the specified initial capacity.
      *
      * @param initialCapacity the initial capacity of the list
      * @throws IllegalArgumentException if the specified initial capacity is negative
@@ -42,7 +42,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Constructs a <code>PairList</code> containing the elements of the specified keys and values.
+     * Constructs a {@code PairList} containing the elements of the specified keys and values.
      *
      * @param keys the key list whose elements are to be placed into this PairList
      * @param values the value list whose elements are to be placed into this PairList

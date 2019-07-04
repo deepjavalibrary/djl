@@ -254,7 +254,7 @@ public interface Matrix extends NDArray {
     NDArray getRow(long i);
 
     /**
-     * Gets a new NDArray comprised of the specified columns only.
+     * Returns a new NDArray comprised of the specified columns only.
      *
      * @param columns Columns to extract out of the current array
      * @return Array with only the specified columns
@@ -262,7 +262,7 @@ public interface Matrix extends NDArray {
     NDArray getColumns(int... columns);
 
     /**
-     * Gets a new NDArray comprised of the specified rows only.
+     * Returns a new NDArray comprised of the specified rows only.
      *
      * @param rows rows to extract from this array
      * @return Array with only the specified rows
