@@ -44,7 +44,7 @@ public class Metrics {
     }
 
     /**
-     * Adds {@code Metric} by metric <code>name</code> and <code>value</code>.
+     * Adds {@code Metric} by metric {@code name} and <code>value</code>.
      *
      * @param name metric name
      * @param value metric value
@@ -54,7 +54,7 @@ public class Metrics {
     }
 
     /**
-     * Adds {@code Metric} by metric <code>name</code>, <code>value</code> and <code>unit
+     * Adds {@code Metric} by metric {@code name}, <code>value</code> and <code>unit
      * </code> .
      *
      * @param name metric name
@@ -113,6 +113,7 @@ public class Metrics {
         return metric.stream().collect(Collectors.averagingLong(m -> m.getValue().longValue()));
     }
 
+    /** Comparator based on {@code Metric}'s value field. */
     private static final class MetricValueComparator implements Comparator<Metric>, Serializable {
 
         private static final long serialVersionUID = 1L;

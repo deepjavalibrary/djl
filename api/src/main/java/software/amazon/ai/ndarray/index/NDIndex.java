@@ -1,3 +1,15 @@
+/*
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 package software.amazon.ai.ndarray.index;
 
 import java.util.ArrayList;
@@ -7,7 +19,7 @@ import java.util.regex.Pattern;
 import software.amazon.ai.ndarray.NDArray;
 
 /**
- * The NDIndex allows you to specify a subset of an NDArray that can be used for fetching or
+ * The {@code NDIndex} allows you to specify a subset of an NDArray that can be used for fetching or
  * updating.
  *
  * <p>It accepts different index option for each dimension, given in the order of the dimensions.
@@ -20,14 +32,16 @@ import software.amazon.ai.ndarray.NDArray;
  *   <li>A range of values - Use addSliceDim
  * </ul>
  *
- * We recommend creating the NDIndex using {@link #NDIndex(String)}.
+ * <p>We recommend creating the NDIndex using {@link #NDIndex(String)}.
+ *
+ * @see #NDIndex(String)
  */
 public class NDIndex {
 
-    private static final Pattern ITEM_PATTERN = Pattern.compile("(\\*)|((-?\\d+)?:(-?\\d+)?(:-?\\d+)?)|(-?\\d+)");
+    private static final Pattern ITEM_PATTERN =
+            Pattern.compile("(\\*)|((-?\\d+)?:(-?\\d+)?(:-?\\d+)?)|(-?\\d+)");
 
     private int rank;
-
     private List<NDIndexElement> indices;
 
     /** Creates an empty {@link NDIndex} to append values to. */
@@ -99,7 +113,7 @@ public class NDIndex {
     }
 
     /**
-     * Returns the index affecting the given dimension
+     * Returns the index affecting the given dimension.
      *
      * @param dimension The affected dimension
      * @return Returns the index affecting the given dimension
@@ -122,36 +136,6 @@ public class NDIndex {
             addIndexItem(indexItem);
         }
         return this;
-    }
-
-    private void addIndexItem(String indexItem) {
-        indexItem = indexItem.trim();
-        Matcher m = ITEM_PATTERN.matcher(indexItem);
-        if (!m.matches()) {
-            throw new IllegalArgumentException("Invalid argument index: " + indexItem);
-        }
-
-        String star = m.group(1);
-        if (star != null) {
-            indices.add(new NDIndexAll());
-            return;
-        }
-
-        String digit = m.group(6);
-        if (digit != null) {
-            indices.add(new NDIndexFixed(Integer.parseInt(digit)));
-            return;
-        }
-
-        // Slice
-        Integer min = m.group(3) != null ? Integer.parseInt(m.group(3)) : null;
-        Integer max = m.group(4) != null ? Integer.parseInt(m.group(4)) : null;
-        Integer step = m.group(5) != null ? Integer.parseInt(m.group(5)) : null;
-        if (min == null && max == null && step == null) {
-            indices.add(new NDIndexAll());
-        } else {
-            indices.add(new NDIndexSlice(min, max, step));
-        }
     }
 
     /**
@@ -209,5 +193,35 @@ public class NDIndex {
         rank++;
         indices.add(new NDIndexSlice(min, max, step));
         return this;
+    }
+
+    private void addIndexItem(String indexItem) {
+        indexItem = indexItem.trim();
+        Matcher m = ITEM_PATTERN.matcher(indexItem);
+        if (!m.matches()) {
+            throw new IllegalArgumentException("Invalid argument index: " + indexItem);
+        }
+
+        String star = m.group(1);
+        if (star != null) {
+            indices.add(new NDIndexAll());
+            return;
+        }
+
+        String digit = m.group(6);
+        if (digit != null) {
+            indices.add(new NDIndexFixed(Integer.parseInt(digit)));
+            return;
+        }
+
+        // Slice
+        Integer min = m.group(3) != null ? Integer.parseInt(m.group(3)) : null;
+        Integer max = m.group(4) != null ? Integer.parseInt(m.group(4)) : null;
+        Integer step = m.group(5) != null ? Integer.parseInt(m.group(5)) : null;
+        if (min == null && max == null && step == null) {
+            indices.add(new NDIndexAll());
+        } else {
+            indices.add(new NDIndexSlice(min, max, step));
+        }
     }
 }

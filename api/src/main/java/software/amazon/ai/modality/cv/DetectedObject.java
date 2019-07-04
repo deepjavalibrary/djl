@@ -20,7 +20,7 @@ public class DetectedObject extends Classification {
     private BoundingBox boundingBox;
 
     /**
-     * Constructs a {@code DetectedObject} instance with <code>className</code>, <code>
+     * Constructs a {@code DetectedObject} instance with {@code className}, <code>
      * probability</code> and {@code boundingBox}.
      *
      * @param className the class name

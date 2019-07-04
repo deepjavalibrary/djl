@@ -63,7 +63,7 @@ public class MxEngine extends Engine {
     @Override
     public Context defaultContext() {
         if (getGpuCount() > 0) {
-            return Context.gpu(0);
+            return Context.gpu();
         }
         return Context.cpu();
     }

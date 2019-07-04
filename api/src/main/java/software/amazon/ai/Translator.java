@@ -66,6 +66,9 @@ import software.amazon.ai.ndarray.NDList;
  *     }
  * }
  * </pre>
+ *
+ * @param <I> input type
+ * @param <O> output type
  */
 public interface Translator<I, O> {
 

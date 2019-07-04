@@ -14,68 +14,70 @@ package software.amazon.ai.ndarray.internal;
 
 import software.amazon.ai.ndarray.NDArray;
 
+/** An internal interface that encapsulate engine specific operator methods. */
 public interface NDArrayEx {
+
     /**
-     * Reverse division with a scalar - i.e., (n / thisArrayValues)
+     * Reverse division with a scalar - i.e., (n / thisArrayValues).
      *
      * @param n Value to use for reverse division
-     * @return Copy of array after applying reverse division
+     * @return copy of array after applying reverse division
      */
     NDArray rdiv(Number n);
 
     /**
-     * Reverse division with a scalar - i.e., (n / thisArrayValues)
+     * Reverse division with a scalar - i.e., (n / thisArrayValues).
      *
      * @param b ndarray to use for reverse division
-     * @return Copy of array after applying reverse division
+     * @return copy of array after applying reverse division
      */
     NDArray rdiv(NDArray b);
 
     /**
-     * In place reverse division - i.e., (n / thisArrayValues)
+     * In place reverse division - i.e., (n / thisArrayValues).
      *
      * @param n Value to use for reverse division
-     * @return This array after applying reverse division
+     * @return this array after applying reverse division
      */
     NDArray rdivi(Number n);
 
     /**
-     * In place reverse division - i.e., (n / thisArrayValues)
+     * In place reverse division - i.e., (n / thisArrayValues).
      *
      * @param b ndarray to use for reverse division
-     * @return This array after applying reverse division
+     * @return this array after applying reverse division
      */
     NDArray rdivi(NDArray b);
 
     /**
-     * Reverse subtraction with duplicates - i.e., (n - thisArrayValues)
+     * Reverse subtraction with duplicates - i.e., (n - thisArrayValues).
      *
      * @param n Value to use for reverse subtraction
-     * @return Copy of array after reverse subtraction
+     * @return copy of array after reverse subtraction
      */
     NDArray rsub(Number n);
 
     /**
-     * Reverse subtraction with duplicates - i.e., (n - thisArrayValues)
+     * Reverse subtraction with duplicates - i.e., (n - thisArrayValues).
      *
      * @param b ndarray to use for reverse subtraction
-     * @return Copy of array after reverse subtraction
+     * @return copy of array after reverse subtraction
      */
     NDArray rsub(NDArray b);
 
     /**
-     * Reverse subtraction in place - i.e., (n - thisArrayValues)
+     * Reverse subtraction in place - i.e., (n - thisArrayValues).
      *
      * @param n Value to use for reverse subtraction
-     * @return This array after reverse subtraction
+     * @return this array after reverse subtraction
      */
     NDArray rsubi(Number n);
 
     /**
-     * Reverse subtraction in place - i.e., (n - thisArrayValues)
+     * Reverse subtraction in place - i.e., (n - thisArrayValues).
      *
      * @param b ndarray to use for reverse subtraction
-     * @return This array after reverse subtraction
+     * @return this array after reverse subtraction
      */
     NDArray rsubi(NDArray b);
 
@@ -83,7 +85,7 @@ public interface NDArrayEx {
      * Reverse remainder of division with a scalar.
      *
      * @param n Value to use for reverse division
-     * @return Copy of array after applying reverse division
+     * @return copy of array after applying reverse division
      */
     NDArray rmod(Number n);
 
@@ -91,7 +93,7 @@ public interface NDArrayEx {
      * Reverse remainder of division.
      *
      * @param b ndarray to use for reverse division
-     * @return Copy of array after applying reverse division
+     * @return copy of array after applying reverse division
      */
     NDArray rmod(NDArray b);
 
@@ -99,15 +101,15 @@ public interface NDArrayEx {
      * In place reverse remainder of division with a scalar.
      *
      * @param n Value to use for reverse division
-     * @return This array after applying reverse division
+     * @return this array after applying reverse division
      */
     NDArray rmodi(Number n);
 
     /**
-     * In place reverse remainder of division
+     * In place reverse remainder of division.
      *
      * @param b ndarray to use for reverse division
-     * @return This array after applying reverse division
+     * @return this array after applying reverse division
      */
     NDArray rmodi(NDArray b);
 }

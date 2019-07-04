@@ -40,7 +40,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the encoding format of the NDArray, or null.
      *
-     * @return the encoded NDArray.
+     * @return the encoded NDArray
      */
     byte[] getEncoded();
 
@@ -53,24 +53,24 @@ public interface NDArray extends AutoCloseable {
     void encode(OutputStream os) throws IOException;
 
     /**
-     * Returns the {@link NDFactory} used to create the NDArray.
+     * Returns the {@link NDFactory} used to create the {@code NDArray}.
      *
      * @return {@link NDFactory}
      */
     NDFactory getFactory();
 
     /**
-     * Returns the {@link DataType} of the NDArray.
+     * Returns the {@link DataType} of the {@code NDArray}.
      *
-     * <p>{@link DataType} is a definition of the precision level of the NDArray. All values inside
-     * the same NDArray would have the same data type.
+     * <p>{@link DataType} is a definition of the precision level of the {@code NDArray}. All values
+     * inside the same NDArray would have the same data type.
      *
      * @return {@link DataType}
      */
     DataType getDataType();
 
     /**
-     * Returns the {@link Context} of the NDArray.
+     * Returns the {@link Context} of the {@code NDArray}.
      *
      * <p>{@link Context} class contains the information where this NDArray stored in memory, like
      * CPU/GPU.
@@ -80,16 +80,16 @@ public interface NDArray extends AutoCloseable {
     Context getContext();
 
     /**
-     * Returns the {@link Shape} of the NDArray.
+     * Returns the {@link Shape} of the {@code NDArray}.
      *
      * <p>{@link Shape} defines how this NDArray is represented multi-dimensionally.
      *
-     * @return Returns the {@link Shape} of the NDArray.
+     * @return the {@link Shape} of the {@code NDArray}.
      */
     Shape getShape();
 
     /**
-     * Returns the {@link Layout} of the NDArray.
+     * Returns the {@link Layout} of the {@code NDArray}.
      *
      * <p>{@link Layout} defines the meaning of each dimension in the array.
      *
@@ -98,7 +98,7 @@ public interface NDArray extends AutoCloseable {
     Layout getLayout();
 
     /**
-     * Returns the {@link DataDesc} of the NDArray.
+     * Returns the {@link DataDesc} of the {@code NDArray}.
      *
      * <p>{@link DataDesc} contains all information about NDArray, including {@link Context}, {@link
      * DataType}, {@link Shape}, {@link Layout}, {@link
@@ -151,18 +151,18 @@ public interface NDArray extends AutoCloseable {
     void set(byte[] data);
 
     /**
-     * Returns a partial NDArray
+     * Returns a partial {@code NDArray}.
      *
      * @param index the section of the NDArray to return
-     * @return Returns the partial NDArray
+     * @return the partial NDArray
      */
     NDArray get(NDIndex index);
 
     /**
-     * Returns a partial NDArray.
+     * Returns a partial {@code NDArray}.
      *
      * @param indices Indices to indicate what to get
-     * @return Returns the partial NDArray
+     * @return the partial NDArray
      * @see NDIndex#NDIndex(String)
      */
     default NDArray get(String indices) {
@@ -170,11 +170,11 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Returns a partial NDArray.
+     * Returns a partial {@code NDArray}.
      *
      * @param indices indices with each index corresponding to the dimensions and negative indices
      *     tarting from the end
-     * @return Returns the partial NDArray
+     * @return the partial NDArray
      */
     default NDArray get(int... indices) {
         return get(new NDIndex(indices));
@@ -184,13 +184,13 @@ public interface NDArray extends AutoCloseable {
      * Returns a zero dimensional NDArray corresponding to a single element.
      *
      * @param index The index of the element to return. Must return only a single element.
-     * @return Returns a zero dimensional NDArray corresponding to the element.
+     * @return a zero dimensional NDArray corresponding to the element.
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
     NDArray getElement(NDIndex index) throws IllegalArgumentException;
 
     /**
-     * Returns an element from the NDArray.
+     * Returns an element from the {@code NDArray}.
      *
      * @param index The index
      * @return The element in the specified index as a long
@@ -199,7 +199,7 @@ public interface NDArray extends AutoCloseable {
     long getLong(NDIndex index) throws IllegalArgumentException;
 
     /**
-     * Returns an element from the NDArray.
+     * Returns an element from the {@code NDArray}.
      *
      * @param index The index
      * @return The element in the specified index as a double
@@ -208,7 +208,7 @@ public interface NDArray extends AutoCloseable {
     double getDouble(NDIndex index) throws IllegalArgumentException;
 
     /**
-     * Returns an element from the NDArray.
+     * Returns an element from the {@code NDArray}.
      *
      * @param index The index
      * @return The element in the specified index as a float
@@ -222,7 +222,7 @@ public interface NDArray extends AutoCloseable {
      * @param index The locations to update
      * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
      *     index
-     * @return Returns a new NDArray with the updated values
+     * @return a new NDArray with the updated values
      */
     NDArray set(NDIndex index, NDArray value);
 
@@ -231,7 +231,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param index The locations to update
      * @param value The value to replace with
-     * @return Returns a new NDArray with the updated values
+     * @return a new NDArray with the updated values
      */
     NDArray set(NDIndex index, Number value);
 
@@ -240,7 +240,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param index The single index to update
      * @param value The value to replace with
-     * @return Returns a new NDArray with the updated value
+     * @return a new NDArray with the updated value
      * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
      */
     NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException;
@@ -251,7 +251,7 @@ public interface NDArray extends AutoCloseable {
      * @param index The locations to update
      * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
      *     index
-     * @return Returns the updated NDArray
+     * @return the updated NDArray
      */
     NDArray seti(NDIndex index, NDArray value);
 
@@ -260,7 +260,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param index The locations to update
      * @param value The value to replace with
-     * @return Returns the updated NDArray
+     * @return the updated NDArray
      */
     NDArray seti(NDIndex index, Number value);
 
@@ -269,7 +269,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param index The single index to update
      * @param value The value to replace with
-     * @return Returns the updated NDArray
+     * @return the updated NDArray
      * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
      */
     NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException;
@@ -285,8 +285,8 @@ public interface NDArray extends AutoCloseable {
      * Converts the NDArray to a different {@link Context}.
      *
      * @param ctx {@link Context} to be set
-     * @param copy set {@code true} if you want to return a copy of the Existing NDArray.
-     * @return NDArray with the new {@link Context}
+     * @param copy set {@code true} if you want to return a copy of the Existing {@code NDArray}.
+     * @return the result {@code NDArray} with the new {@link Context}
      */
     NDArray asInContext(Context ctx, boolean copy);
 
@@ -295,7 +295,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param dtype {@link DataType} to be set
      * @param copy set {@code true} if you want to return a copy of the Existing NDArray
-     * @return NDArray with the new {@link DataType}
+     * @return the result {@code NDArray} with the new {@link DataType}
      */
     NDArray asType(DataType dtype, boolean copy);
 
@@ -311,14 +311,14 @@ public interface NDArray extends AutoCloseable {
      *
      * @param gradReq {@link GradReq} How gradient will be accumulated.
      * @param sparseFormat {@link SparseFormat} The storage type of the gradient array. Defaults to
-     *     the same type of this NDArray.
+     *     the same type of this {@code NDArray}.
      */
     void attachGrad(GradReq gradReq, SparseFormat sparseFormat);
 
     /**
-     * Returns the gradient buffer attached to this NDArray.
+     * Returns the gradient buffer attached to this {@code NDArray}.
      *
-     * @return the gradient buffer attached to this NDArray.
+     * @return the gradient buffer attached to this {@code NDArray}.
      */
     NDArray getGradient();
 
@@ -347,8 +347,8 @@ public interface NDArray extends AutoCloseable {
     /**
      * Performs an indirect sort of the NDArray ascending on the last dimension.
      *
-     * @return Returns an array of indices corresponding to elements in the NDArray on the axis, the
-     *     output DataType is always {@link DataType#INT32}
+     * @return an array of indices corresponding to elements in the NDArray on the axis, the output
+     *     DataType is always {@link DataType#INT32}
      * @see NDArray#argsort(int, boolean)
      */
     default NDArray argsort() {
@@ -359,8 +359,8 @@ public interface NDArray extends AutoCloseable {
      * Performs an indirect sort of the NDArray ascending on the given dimension.
      *
      * @param axis the axis to sort along
-     * @return Returns an array of indices corresponding to elements in the NDArray on the axis, the
-     *     output DataType is always {@link DataType#INT32}
+     * @return an array of indices corresponding to elements in the NDArray on the axis, the output
+     *     DataType is always {@link DataType#INT32}
      * @see NDArray#argsort(int, boolean)
      */
     default NDArray argsort(int axis) {
@@ -372,8 +372,8 @@ public interface NDArray extends AutoCloseable {
      *
      * @param axis the axis to sort along
      * @param ascending whether to sort ascending
-     * @return Returns an array of indices corresponding to elements in the NDArray on the axis, the
-     *     output DataType is always {@link DataType#INT32}
+     * @return an array of indices corresponding to elements in the NDArray on the axis, the output
+     *     DataType is always {@link DataType#INT32}
      */
     NDArray argsort(int axis, boolean ascending);
 
@@ -395,7 +395,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the softmax over the entire array.
      *
-     * @return Returns the softmax over the entire array
+     * @return the softmax over the entire array
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
      * @see NDArray#softmax(int[], double)
      */
@@ -407,7 +407,7 @@ public interface NDArray extends AutoCloseable {
      * Returns the softmax on the specified axis.
      *
      * @param axis the axis to sort along, -1 for the last axis
-     * @return Returns the softmax
+     * @return the softmax
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
      * @see NDArray#softmax(int[], double)
      */
@@ -433,7 +433,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param axes the axes to compute the softmax of. An empty array indicates computing the
      *     softmax for the whole array
-     * @return Returns the softmax
+     * @return the softmax
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
      */
     NDArray softmax(int[] axes);
@@ -444,7 +444,7 @@ public interface NDArray extends AutoCloseable {
      * @param axes the axes to compute the softmax of. An empty array indicates computing the
      *     softmax for the whole array
      * @param temperature The exponent multiplier Beta in the softmax.
-     * @return Returns the softmax
+     * @return the softmax
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
      * @see NDArray#softmax(int[], double)
      */
@@ -465,8 +465,7 @@ public interface NDArray extends AutoCloseable {
      * Splits the array into size(axis) new NDArrays along the given dimension.
      *
      * @param axis The axis to split along
-     * @return Returns an NDList with size(axis) NDArrays with shape {@code this.shape.remove(axis)
-     *     }
+     * @return an NDList with size(axis) NDArrays with shape {@code this.shape.remove(axis) }
      * @see NDArray#split(int, boolean)
      */
     default NDList split(int axis) {
@@ -479,7 +478,7 @@ public interface NDArray extends AutoCloseable {
      * @param axis The axis to split along
      * @param squeezeAxis whether to remove the specified output from the output NDArrays or leave
      *     as size 1
-     * @return Returns an NDList with size(axis) NDArrays with shape {@code squeezeAxis ?
+     * @return an NDList with size(axis) NDArrays with shape {@code squeezeAxis ?
      *     this.shape.remove(axis) : this.shape.set(axis, 1)}
      * @see NDArray#split(int, boolean)
      */
@@ -491,8 +490,7 @@ public interface NDArray extends AutoCloseable {
      * @param axis The axis to split along
      * @param numOutputs The number of NDArrays to split into. This must equally divide the length
      *     of the axis.
-     * @return Returns an NDList with numOutputs NDArrays with shape {@code (this.shape.axis /=
-     *     axis) }
+     * @return an NDList with numOutputs NDArrays with shape {@code (this.shape.axis /= axis) }
      * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
      *     axis
      */
@@ -502,7 +500,7 @@ public interface NDArray extends AutoCloseable {
      * Returns an array of zeros with the same {@link Shape}, {@link DataType} and {@link
      * SparseFormat} as the input array.
      *
-     * @return {@link NDArray} filled with zeros
+     * @return {@code NDArray} filled with zeros
      */
     NDArray zerosLike();
 
@@ -510,24 +508,29 @@ public interface NDArray extends AutoCloseable {
      * Returns an array of ones with the same {@link Shape}, {@link DataType} and {@link
      * SparseFormat} as the input array.
      *
-     * @return {@link NDArray} filled with ones
+     * @return {@code NDArray} filled with ones
      */
     NDArray onesLike();
 
+    /**
+     * Returns {@code true} if this array is a {@link SparseNDArray}.
+     *
+     * @return {@code true} if this array is a {@link SparseNDArray}
+     */
     boolean isSparse();
 
     /**
      * Returns the cumulative sum along a axis. In-place method.
      *
      * @param axis axis along which the cumulative sum is computed.
-     * @return this object.
+     * @return this object
      */
     NDArray cumsumi(int axis);
 
     /**
      * Returns the cumulative sum over the flattened array. In-place method.
      *
-     * @return this object.
+     * @return this object
      */
     NDArray cumsumi();
 
@@ -549,149 +552,151 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the binary NDArray for "Epsilon equals" comparison.
      *
-     * @param other the number to compare.
-     * @return the binary NDArray for "Epsilon equals" comparison.
+     * @param other the number to compare
+     * @return the binary NDArray for "Epsilon equals" comparison
      */
     NDArray eps(Number other);
 
     /**
      * Returns the binary NDArray for "Epsilon equals" comparison.
      *
-     * @param other the NDArray to compare.
-     * @return the binary NDArray for "Epsilon equals" comparison.
+     * @param other the NDArray to compare
+     * @return the binary NDArray for "Epsilon equals" comparison
      */
     NDArray eps(NDArray other);
 
     /**
      * Returns the binary NDArray for "Equals" comparison.
      *
-     * @param other the number to compare.
-     * @return the binary NDArray for "Equals" comparison.
+     * @param other the number to compare
+     * @return the binary NDArray for "Equals" comparison
      */
     NDArray eq(Number other);
 
     /**
      * Returns the binary NDArray for "Equals" comparison.
      *
-     * @param other the NDArray to compare.
-     * @return the binary NDArray for "Equals" comparison.
+     * @param other the NDArray to compare
+     * @return the binary NDArray for "Equals" comparison
      */
     NDArray eq(NDArray other);
 
     /**
-     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the Number
+     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the other
+     * {@code NDArray}.
      *
-     * @param other the NDArray to compare.
-     * @return the binary NDArray for "Equals" comparison.
+     * @param other the NDArray to compare
+     * @return the binary NDArray for "Equals" comparison
      */
     boolean contentEquals(NDArray other);
 
     /**
-     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the Number
+     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the {@code
+     * number}.
      *
-     * @param number the number to compare.
-     * @return the binary NDArray for "Equals" comparison.
+     * @param number the number to compare
+     * @return the binary NDArray for "Equals" comparison
      */
     boolean contentEquals(Number number);
 
     /**
      * Returns the binary NDArray for "Not equals" comparison.
      *
-     * @param other the number to compare.
-     * @return the binary NDArray for "Not equals" comparison.
+     * @param other the number to compare
+     * @return the binary NDArray for "Not equals" comparison
      */
     NDArray neq(Number other);
 
     /**
      * Returns the binary NDArray for "Not equals" comparison.
      *
-     * @param other the NDArray to compare.
-     * @return the binary NDArray for "Not equals" comparison.
+     * @param other the NDArray to compare
+     * @return the binary NDArray for "Not equals" comparison
      */
     NDArray neq(NDArray other);
 
     /**
      * Returns the binary NDArray for "Greater" comparison.
      *
-     * @param other the number to compare.
-     * @return the binary NDArray for "Greater" comparison.
+     * @param other the number to compare
+     * @return the binary NDArray for "Greater" comparison
      */
     NDArray gt(Number other);
 
     /**
      * Returns the binary NDArray for "Greater Than" comparison.
      *
-     * @param other the NDArray to compare.
-     * @return the binary NDArray for "Greater Than" comparison.
+     * @param other the NDArray to compare
+     * @return the binary NDArray for "Greater Than" comparison
      */
     NDArray gt(NDArray other);
 
     /**
      * Returns binary NDArray for "Greater or equals" comparison.
      *
-     * @param other the NDArray to compare.
-     * @return binary NDArray for "Greater or equals" comparison.
+     * @param other the NDArray to compare
+     * @return binary NDArray for "Greater or equals" comparison
      */
     NDArray gte(Number other);
 
     /**
      * Returns binary NDArray for "Greater or equals" comparison.
      *
-     * @param other the number to compare.
-     * @return binary NDArray for "Greater or equals" comparison.
+     * @param other the number to compare
+     * @return binary NDArray for "Greater or equals" comparison
      */
     NDArray gte(NDArray other);
 
     /**
      * Returns the binary NDArray for "Less or equals" comparison.
      *
-     * @param other the number to compare.
-     * @return the binary NDArray for "Less or equals" comparison.
+     * @param other the number to compare
+     * @return the binary NDArray for "Less or equals" comparison
      */
     NDArray lte(Number other);
 
     /**
      * Returns the binary NDArray for "Less" comparison.
      *
-     * @param other the number to compare.
-     * @return the binary NDArray for "Less" comparison.
+     * @param other the number to compare
+     * @return the binary NDArray for "Less" comparison
      */
     NDArray lt(Number other);
 
     /**
      * Returns the binary NDArray for "Less or equals" comparison.
      *
-     * @param other the NDArray to compare.
-     * @return the binary NDArray for "Less or equals" comparison.
+     * @param other the NDArray to compare
+     * @return the binary NDArray for "Less or equals" comparison
      */
     NDArray lte(NDArray other);
 
     /**
      * Returns the binary NDArray for "Less" comparison.
      *
-     * @param other the NDArray to compare.
-     * @return the binary NDArray for "Less" comparison.
+     * @param other the NDArray to compare
+     * @return the binary NDArray for "Less" comparison
      */
     NDArray lt(NDArray other);
 
     /**
      * Returns the binary NDArray with value {@code true} where this array's entries are infinite,
-     * or {@code false} where they are not infinite
+     * or {@code false} where they are not infinite.
      *
-     * @return the binary array with value {@code true} if the array's entries are infinite.
+     * @return the binary array with value {@code true} if the array's entries are infinite
      */
     NDArray isInfinite();
 
     /**
      * Returns the binary NDArray with value {@code true} where this array's entries are NaN, or
-     * <code>false</code> where they are not NaN
+     * {@code false} where they are not NaN.
      *
-     * @return the binary array with value {@code true} if the array's entries are NaN.
+     * @return the binary array with value {@code true} if the array's entries are NaN
      */
     NDArray isNaN();
 
     /**
-     * Returns the NDArray negative (cloned)
+     * Returns the NDArray negative (cloned).
      *
      * @return Array copy with all values negated
      */
@@ -700,28 +705,28 @@ public interface NDArray extends AutoCloseable {
     /**
      * Sets the negative version of this NDArray in place.
      *
-     * @return This array with all values negated
+     * @return this array with all values negated
      */
     NDArray negi();
 
     /**
-     * Divides an array by a number
+     * Divides an array by a number.
      *
      * @param n Number to divide values by
-     * @return Copy of array after division
+     * @return copy of array after division
      */
     NDArray div(Number n);
 
     /**
-     * In place scalar division of an array
+     * In place scalar division of an array.
      *
      * @param n Number to divide values by
-     * @return This array, after applying division operation
+     * @return this array after applying division operation
      */
     NDArray divi(Number n);
 
     /**
-     * Scalar multiplication of an array (copy)
+     * Scalar multiplication of an array (copy).
      *
      * @param n the number to multiply by
      * @return a copy of this NDArray multiplied by the given number
@@ -729,15 +734,15 @@ public interface NDArray extends AutoCloseable {
     NDArray mul(Number n);
 
     /**
-     * In place scalar multiplication of an array
+     * In place scalar multiplication of an array.
      *
      * @param n The number to multiply by
-     * @return This array, after applying scaler multiplication
+     * @return this array after applying scalar multiplication
      */
     NDArray muli(Number n);
 
     /**
-     * Scalar subtraction of an array (copied)
+     * Scalar subtraction of an array (copied).
      *
      * @param n the number to subtract by
      * @return Copy of this array after applying subtraction operation
@@ -745,10 +750,10 @@ public interface NDArray extends AutoCloseable {
     NDArray sub(Number n);
 
     /**
-     * In place scalar subtraction of an array
+     * In place scalar subtraction of an array.
      *
      * @param n Number to subtract
-     * @return This array, after applying subtraction operation
+     * @return this array after applying subtraction operation
      */
     NDArray subi(Number n);
 
@@ -756,7 +761,7 @@ public interface NDArray extends AutoCloseable {
      * Adds a number to each element of the array.
      *
      * @param n the number to add
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     NDArray add(Number n);
 
@@ -764,15 +769,15 @@ public interface NDArray extends AutoCloseable {
      * Adds a number to each element of the array in place.
      *
      * @param n the number to add
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     NDArray addi(Number n);
 
     /**
-     * Adds (broadcasting) another NDArray to this NDArray.
+     * Adds (broadcasting) another NDArray to this {@code NDArray}.
      *
      * @param other the other NDArray to add
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     NDArray add(NDArray other);
 
@@ -780,12 +785,14 @@ public interface NDArray extends AutoCloseable {
      * Adds (broadcasting) another NDArray to this NDArray in place.
      *
      * @param other the other NDArray to add
-     * @return Returns the result of the addition
+     * @return the result of the addition
      */
     NDArray addi(NDArray other);
 
     /**
-     * @param index the index of values to set to true
+     * Return a mask on whether each element matches the given index.
+     *
+     * @param index the index of values to set to true.
      * @return new boolean NDArray where values are {@code true} if it matches the index
      */
     NDArray createMask(NDIndex index);
@@ -802,7 +809,7 @@ public interface NDArray extends AutoCloseable {
      * Repeats the array in tiles a given number of times.
      *
      * @param repeats the number of times to repeat for each dimension
-     * @return Returns a NDArray that has been tiled
+     * @return a NDArray that has been tiled
      */
     NDArray tile(int repeats);
 
@@ -873,7 +880,7 @@ public interface NDArray extends AutoCloseable {
     NDArray repeat(Shape desiredShape);
 
     /**
-     * Perform a copy matrix multiplication
+     * Perform a copy matrix multiplication.
      *
      * @param other the other matrix to perform matrix multiply with
      * @return the result of the matrix multiplication
@@ -881,34 +888,38 @@ public interface NDArray extends AutoCloseable {
     NDArray mmul(NDArray other);
 
     /**
-     * Converts this NDArray to a 1d double matrix. Note that THIS SHOULD NOT BE USED FOR SPEED.
-     * This is mainly used for integrations with other libraries. Due to nd4j's off heap nature,
-     * moving data on heap is very expensive and should not be used if possible.
+     * Converts this NDArray to a double array.
      *
-     * @return a copy of this array as a 1d double array
+     * @return a double array
      */
     double[] toDoubleArray();
 
     /**
-     * Converts this NDArray to a 1d float vector. Note that THIS SHOULD NOT BE USED FOR SPEED. This
-     * is mainly used for integrations with other libraries. Due to nd4j's off heap nature, moving
-     * data on heap is very expensive and should not be used if possible.
+     * Converts this NDArray to a float array.
      *
-     * @return a copy of this array as a 1d float array
+     * @return a float array
      */
     float[] toFloatArray();
 
     /**
-     * Converts this NDArray to a 1d int matrix. Note that THIS SHOULD NOT BE USED FOR SPEED. This
-     * is mainly used for integrations with other libraries. Due to nd4j's off heap nature, moving
-     * data on heap is very expensive and should not be used if possible.
+     * Converts this NDArray to a int array.
      *
-     * @return a copy of this array as a 1d int array
+     * @return a int array
      */
     int[] toIntArray();
 
+    /**
+     * Converts this NDArray to a long array.
+     *
+     * @return a long array
+     */
     long[] toLongArray();
 
+    /**
+     * Converts this NDArray to a Number array based on its data type.
+     *
+     * @return a Number array
+     */
     default Number[] toArray() {
         switch (getDataType()) {
             case FLOAT32:
@@ -928,7 +939,7 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Copy (element wise) division of two NDArrays
+     * Copy (element wise) division of two NDArrays.
      *
      * @param other the second NDArray to divide
      * @return the result of the divide
@@ -936,7 +947,7 @@ public interface NDArray extends AutoCloseable {
     NDArray div(NDArray other);
 
     /**
-     * copy (element wise) multiplication of two NDArrays
+     * copy (element wise) multiplication of two NDArrays.
      *
      * @param other the second NDArray to multiply
      * @return the result of the addition
@@ -944,7 +955,7 @@ public interface NDArray extends AutoCloseable {
     NDArray mul(NDArray other);
 
     /**
-     * copy subtraction of two NDArrays
+     * copy subtraction of two NDArrays.
      *
      * @param other the second NDArray to subtract
      * @return the result of the addition
@@ -952,7 +963,7 @@ public interface NDArray extends AutoCloseable {
     NDArray sub(NDArray other);
 
     /**
-     * in place (element wise) division of two NDArrays
+     * in place (element wise) division of two NDArrays.
      *
      * @param other the second NDArray to divide
      * @return the result of the divide
@@ -960,7 +971,7 @@ public interface NDArray extends AutoCloseable {
     NDArray divi(NDArray other);
 
     /**
-     * Performs in place (element wise) multiplication of two NDArrays
+     * Performs in place (element wise) multiplication of two NDArrays.
      *
      * @param other the second NDArray to multiply
      * @return the result of the multiplication
@@ -968,7 +979,7 @@ public interface NDArray extends AutoCloseable {
     NDArray muli(NDArray other);
 
     /**
-     * Performs in place (element wise) subtraction of two NDArrays
+     * Performs in place (element wise) subtraction of two NDArrays.
      *
      * @param other the second NDArray to subtract
      * @return the result of the subtraction
@@ -976,20 +987,22 @@ public interface NDArray extends AutoCloseable {
     NDArray subi(NDArray other);
 
     /**
+     * Returns the maximum (absolute) value in this NDArray, along the specified dimensions.
+     *
      * @param dimension the dimension to getScalar the mean along
      * @return the mean along the specified dimension of this NDArray
      */
     NDArray amax(int... dimension);
 
     /**
-     * Returns the maximum (absolute) value in this NDArray
+     * Returns the maximum (absolute) value in this NDArray.
      *
      * @return Max absolute value
      */
     Number amaxNumber();
 
     /**
-     * Returns the minimum (absolute) value in this NDArray, along the specified dimensions
+     * Returns the minimum (absolute) value in this NDArray, along the specified dimensions.
      *
      * @param dimension the dimension to getScalar the absolute min along
      * @return Minimum absolute value
@@ -997,14 +1010,14 @@ public interface NDArray extends AutoCloseable {
     NDArray amin(int... dimension);
 
     /**
-     * Returns the absolute min value in this NDArray
+     * Returns the absolute min value in this NDArray.
      *
      * @return Absolute min value
      */
     Number aminNumber();
 
     /**
-     * Finds the max of all elements in the NDArray.
+     * Finds the max of all elements in the {@code NDArray}.
      *
      * @return the max
      */
@@ -1025,14 +1038,14 @@ public interface NDArray extends AutoCloseable {
      * Finds the max over the given axes.
      *
      * @param axes the axes to find the max over
-     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
-     *     false</code> to squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
+     *     false} to squeeze the values out of the output array
      * @return an NDArray after the max
      */
     NDArray max(int[] axes, boolean keepDims);
 
     /**
-     * Finds the min of all elements in the NDArray.
+     * Finds the min of all elements in the {@code NDArray}.
      *
      * @return the min
      */
@@ -1053,14 +1066,14 @@ public interface NDArray extends AutoCloseable {
      * Finds the min over the given axes.
      *
      * @param axes the axes to find the min over
-     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
-     *     false</code> to squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
+     *     false} to squeeze the values out of the output array
      * @return an NDArray after the min
      */
     NDArray min(int[] axes, boolean keepDims);
 
     /**
-     * Sums all elements in the NDArray.
+     * Sums all elements in the {@code NDArray}.
      *
      * @return the sum
      */
@@ -1081,14 +1094,14 @@ public interface NDArray extends AutoCloseable {
      * Sums over the given axes.
      *
      * @param axes the axes to sum over
-     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
-     *     false</code> to squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
+     *     false} to squeeze the values out of the output array
      * @return an NDArray after the sum
      */
     NDArray sum(int[] axes, boolean keepDims);
 
     /**
-     * Finds the product of all elements in the NDArray.
+     * Finds the product of all elements in the {@code NDArray}.
      *
      * @return the product
      */
@@ -1109,14 +1122,14 @@ public interface NDArray extends AutoCloseable {
      * Finds the product over the given axes.
      *
      * @param axes the axes to prod over
-     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
-     *     false</code> to squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
+     *     false} to squeeze the values out of the output array
      * @return an NDArray after the prod
      */
     NDArray prod(int[] axes, boolean keepDims);
 
     /**
-     * Finds the mean of all elements in the NDArray.
+     * Finds the mean of all elements in the {@code NDArray}.
      *
      * @return the mean
      */
@@ -1137,14 +1150,14 @@ public interface NDArray extends AutoCloseable {
      * Finds the mean over the given axes.
      *
      * @param axes the axes to find the mean over
-     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
-     *     false</code> to squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
+     *     false} to squeeze the values out of the output array
      * @return an NDArray after the mean
      */
     NDArray mean(int[] axes, boolean keepDims);
 
     /**
-     * Returns a copy of this NDArray
+     * Returns a copy of this NDArray.
      *
      * @return a copy of this NDArray
      */
@@ -1172,7 +1185,7 @@ public interface NDArray extends AutoCloseable {
     NDArray reshape(Shape shape);
 
     /**
-     * Expand the shape of a {@link NDArray}.
+     * Expand the shape of a {@code NDArray}.
      *
      * <p>Insert a new axis that will appear at the axis position in the expanded
      *
@@ -1182,90 +1195,90 @@ public interface NDArray extends AutoCloseable {
     NDArray expandDims(int axis);
 
     /**
-     * Joins a sequence of {@link NDArray} along a new axis.
+     * Joins a sequence of {@code NDArray} along a new axis.
      *
      * <p>The axis parameter specifies the index of the new axis in the dimensions of the result.
      * For example, if `axis=0` it will be the first dimension and if `axis=-1` it will be the last
      * dimension.
      *
-     * @param arrays input {@link NDArray}[]. each {@link NDArray} must have the same shape.
+     * @param arrays input {@code NDArray}[]. each {@code NDArray} must have the same shape.
      * @param axis the axis in the result array along which the input arrays are stacked.
-     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @return {@code NDArray}. The stacked array has one more dimension than the input arrays.
      */
     NDArray stack(NDArray[] arrays, int axis);
 
     /**
-     * Joins a sequence of {@link NDArray} along axis 0.
+     * Joins a sequence of {@code NDArray} along axis 0.
      *
-     * @param arrays input {@link NDArray}[]. each {@link NDArray} must have the same shape.
-     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @param arrays input {@code NDArray}[]. each {@code NDArray} must have the same shape.
+     * @return {@code NDArray}. The stacked array has one more dimension than the input arrays.
      */
     default NDArray stack(NDArray[] arrays) {
         return stack(arrays, 0);
     }
 
     /**
-     * Joins a sequence of {@link NDArray} in NDList along a new axis.
+     * Joins a sequence of {@code NDArray} in NDList along a new axis.
      *
      * <p>The axis parameter specifies the index of the new axis in the dimensions of the result.
      * For example, if `axis=0` it will be the first dimension and if `axis=-1` it will be the last
      * dimension.
      *
-     * @param arrays input NDList. each {@link NDArray} must have the same shape.
+     * @param arrays input NDList. each {@code NDArray} must have the same shape.
      * @param axis the axis in the result array along which the input arrays are stacked.
-     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @return {@code NDArray}. The stacked array has one more dimension than the input arrays.
      */
     NDArray stack(NDList arrays, int axis);
 
     /**
-     * Joins a sequence of {@link NDArray} in NDList along axis 0.
+     * Joins a sequence of {@code NDArray} in NDList along axis 0.
      *
-     * @param arrays input NDList. each {@link NDArray} must have the same shape.
-     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @param arrays input NDList. each {@code NDArray} must have the same shape.
+     * @return {@code NDArray}. The stacked array has one more dimension than the input arrays.
      */
     default NDArray stack(NDList arrays) {
         return stack(arrays, 0);
     }
 
     /**
-     * Joins a {@link NDArray} along a new axis.
+     * Joins a {@code NDArray} along a new axis.
      *
-     * @param array input {@link NDArray} and it must have the same shape with {@link NDArray} that
+     * @param array input {@code NDArray} and it must have the same shape with {@code NDArray} that
      *     invoke the function.
      * @param axis the axis in the result array along which the input arrays are stacked.
-     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @return {@code NDArray}. The stacked array has one more dimension than the input arrays.
      */
     default NDArray stack(NDArray array, int axis) {
         return stack(new NDArray[] {array}, axis);
     }
 
     /**
-     * Joins a {@link NDArray} along axis 0.
+     * Joins a {@code NDArray} along axis 0.
      *
-     * @param array input {@link NDArray} and it must have the same shape with {@link NDArray} that
+     * @param array input {@code NDArray} and it must have the same shape with {@code NDArray} that
      *     invoke the function.
-     * @return {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @return {@code NDArray}. The stacked array has one more dimension than the input arrays.
      */
     default NDArray stack(NDArray array) {
         return stack(new NDArray[] {array}, 0);
     }
 
     /**
-     * Joins a sequence of {@link NDArray} along an existing axis.
+     * Joins a sequence of {@code NDArray} along an existing axis.
      *
-     * @param arrays input {@link NDArray}[] must have the same shape, except in the dimension
+     * @param arrays input {@code NDArray}[] must have the same shape, except in the dimension
      *     corresponding to `axis` (the first, by default).
      * @param axis the axis along which the arrays will be joined.
-     * @return the concatenated {@link NDArray}
+     * @return the concatenated {@code NDArray}
      */
     NDArray concat(NDArray[] arrays, int axis);
 
     /**
-     * Joins a sequence of {@link NDArray} along axis 0.
+     * Joins a sequence of {@code NDArray} along axis 0.
      *
-     * @param arrays input {@link NDArray}[] in NDList must have the same shape, except in the
+     * @param arrays input {@code NDArray}[] in NDList must have the same shape, except in the
      *     dimension corresponding to `axis` (the first, by default).
-     * @return the concatenated {@link NDArray}
+     * @return the concatenated {@code NDArray}
      */
     default NDArray concat(NDArray[] arrays) {
         return concat(arrays, 0);
@@ -1274,10 +1287,10 @@ public interface NDArray extends AutoCloseable {
     /**
      * Joins a NDList along an existing axis.
      *
-     * @param arrays input input {@link NDArray} in NDList must have the same shape, except in the
+     * @param arrays input input {@code NDArray} in NDList must have the same shape, except in the
      *     dimension corresponding to `axis` (the first, by default).
      * @param axis the axis along which the arrays will be joined.
-     * @return the concatenated {@link NDArray}
+     * @return the concatenated {@code NDArray}
      */
     default NDArray concat(NDList arrays, int axis) {
         return concat(arrays.toArray(), axis);
@@ -1286,32 +1299,32 @@ public interface NDArray extends AutoCloseable {
     /**
      * Joins a NDList along axis 0.
      *
-     * @param arrays input {@link NDArray} in NDList must have the same shape, except in the
+     * @param arrays input {@code NDArray} in NDList must have the same shape, except in the
      *     dimension corresponding to `axis` (the first, by default).
-     * @return the concatenated {@link NDArray}
+     * @return the concatenated {@code NDArray}
      */
     default NDArray concat(NDList arrays) {
         return concat(arrays, 0);
     }
 
     /**
-     * Joins a {@link NDArray} along an existing axis.
+     * Joins a {@code NDArray} along an existing axis.
      *
-     * @param array the {@link NDArray} must have the same shape, except in the dimension
+     * @param array the {@code NDArray} must have the same shape, except in the dimension
      *     corresponding to `axis` (the first, by default).
      * @param axis the axis along which the arrays will be joined.
-     * @return the concatenated {@link NDArray}
+     * @return the concatenated {@code NDArray}
      */
     default NDArray concat(NDArray array, int axis) {
         return concat(new NDArray[] {array}, axis);
     }
 
     /**
-     * Joins a {@link NDArray} along axis 0.
+     * Joins a {@code NDArray} along axis 0.
      *
-     * @param array the {@link NDArray} must have the same shape, except in the dimension
+     * @param array the {@code NDArray} must have the same shape, except in the dimension
      *     corresponding to `axis` (the first, by default).
-     * @return the concatenated {@link NDArray}
+     * @return the concatenated {@code NDArray}
      */
     default NDArray concat(NDArray array) {
         return concat(new NDArray[] {array}, 0);
@@ -1326,7 +1339,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param min minimum value double type.
      * @param max maximum value double type.
-     * @return an {@link NDArray} with the elements of `a`, but where values &lt; `min` are replaced
+     * @return an {@code NDArray} with the elements of `a`, but where values &lt; `min` are replaced
      *     with `min`, and those &gt; `max` with `max`.
      */
     NDArray clip(double min, double max);
@@ -1340,7 +1353,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param min minimum value int type.
      * @param max maximum value int type.
-     * @return an {@link NDArray} with the elements of `a`, but where values &lt; `min` are replaced
+     * @return an {@code NDArray} with the elements of `a`, but where values &lt; `min` are replaced
      *     with `min`, and those &gt; `max` with `max`.
      */
     default NDArray clip(int min, int max) {
@@ -1352,7 +1365,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param dimension the dimension to swap
      * @param with the one to swap it with
-     * @return Returns the swapped axes view
+     * @return the swapped axes view
      */
     default NDArray swapAxes(int dimension, int with) {
         int[] dims = IntStream.range(0, getShape().dimension()).toArray();
@@ -1363,24 +1376,24 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Reverses the order of the dimensions in the {@link NDArray}.
+     * Reverses the order of the dimensions in the {@code NDArray}.
      *
-     * @return Returns the newly permuted array
+     * @return the newly permuted array
      */
     NDArray transpose();
 
     /**
-     * Reorders the dimensions in the {@link NDArray}.
+     * Reorders the dimensions in the {@code NDArray}.
      *
      * @param dimensions the dimensions to swap to
-     * @return Returns the newly permuted array
+     * @return the newly permuted array
      * @throws IllegalArgumentException thrown when passing a dimension that is greater than the
      *     actual number of dimensions
      */
     NDArray transpose(int[] dimensions);
 
     /**
-     * Returns the size along a specified dimension
+     * Returns the size along a specified dimension.
      *
      * @param dimension the dimension to return the size for
      * @return the size of the array along the specified dimension
@@ -1390,7 +1403,7 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Returns the total number of elements in the NDArray
+     * Returns the total number of elements in the {@code NDArray}.
      *
      * @return the number of elements in the NDArray
      */
@@ -1399,7 +1412,7 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Broadcasts this NDArray to be the specified shape
+     * Broadcasts this NDArray to be the specified shape.
      *
      * @param shape the new shape of this NDArray
      * @return the broadcasted NDArray
@@ -1407,30 +1420,33 @@ public interface NDArray extends AutoCloseable {
     NDArray broadcast(long... shape);
 
     /**
-     * Broadcasts this NDArray to be the specified shape
+     * Broadcasts this NDArray to be the specified shape.
      *
      * @param result the result array
-     * @return the broadcasted NDArray
+     * @return the broadcasted {@code NDArray}
      */
     NDArray broadcast(NDArray result);
 
     /**
-     * This method checks 2 NDArrays equality with given eps
+     * This method checks 2 NDArrays equality with given eps.
      *
      * @param o object to compare with
      * @param eps Epsilon value to use for the quality operation
-     * @return NDArray NDArray
+     * @return the result {@code NDArray}
      */
     boolean equalsWithEps(Object o, double eps);
 
     /**
-     * Checks 2 NDArrays for equal shapes.<br>
-     * Shapes are considered equal if:<br>
-     * (a) Both arrays have equal rank, and<br>
-     * (b) size(0)...size(rank()-1) are equal for both arrays
+     * Checks 2 NDArrays for equal shapes.
      *
-     * @param other Other
-     * @return {@code true} if shap
+     * <pre>
+     * Shapes are considered equal if:
+     * (a) Both arrays have equal rank, and
+     * (b) size(0)...size(rank()-1) are equal for both arrays
+     * </pre>
+     *
+     * @param other other
+     * @return {@code true} if shape are the same
      */
     boolean equalShapes(NDArray other);
 
@@ -1441,7 +1457,7 @@ public interface NDArray extends AutoCloseable {
      * return [-1, -1]
      *
      * @param n divisor number
-     * @return Copy of {@link NDArray} after division
+     * @return copy of {@code NDArray} after division
      */
     NDArray mod(Number n);
 
@@ -1449,7 +1465,7 @@ public interface NDArray extends AutoCloseable {
      * Return element-wise remainder of division.
      *
      * @param n divisor number
-     * @return Copy of {@link NDArray} after division
+     * @return Copy of {@code NDArray} after division
      */
     NDArray modi(Number n);
 
@@ -1470,56 +1486,56 @@ public interface NDArray extends AutoCloseable {
     NDArray modi(NDArray other);
 
     /**
-     * This method returns index of highest value along specified axi(e)s
+     * This method returns index of highest value along specified axi(e)s.
      *
      * @param axis the axis along which to find argmax
-     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
-     *     false</code> to squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
+     *     false} to squeeze the values out of the output array
      * @return Array containing indices
      */
     NDArray argMax(int axis, boolean keepDims);
 
     /**
-     * This method returns index of lowest value
+     * This method returns index of lowest value.
      *
      * @return Array containing indices
      */
     NDArray argMin();
 
     /**
-     * This method returns index of lowest value along specified axi(e)s
+     * This method returns index of lowest value along specified axi(e)s.
      *
      * @param axis the axis along which to find argmax
-     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, <code>
-     *     false</code> to squeeze the values out of the output array
+     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
+     *     false} to squeeze the values out of the output array
      * @return Array containing indices
      */
     NDArray argMin(int axis, boolean keepDims);
 
     /**
-     * This method returns index of highest value
+     * This method returns index of highest value.
      *
      * @return Array containing indices
      */
     NDArray argMax();
 
     /**
-     * Returns percentile value for this NDArray
+     * Returns percentile value for this {@code NDArray}.
      *
      * @param percentile target percentile in range of 0..100
-     * @return NDArray NDArray
+     * @return the result {@code NDArray} NDArray
      */
     Number percentileNumber(Number percentile);
 
     /**
-     * Returns median value for this NDArray
+     * Returns median value for this {@code NDArray}.
      *
      * @return Median value for array
      */
     Number medianNumber();
 
     /**
-     * Returns median along given dimension(s)
+     * Returns median along given dimension(s).
      *
      * @param dimension Dimension along which to perform the median operation
      * @return Median along specified dimensions
@@ -1527,42 +1543,42 @@ public interface NDArray extends AutoCloseable {
     NDArray median(int... dimension);
 
     /**
-     * Returns median along given dimension(s)
+     * Returns median along given dimension(s).
      *
      * @param percentile target percentile in range of 0..100
      * @param dimension Dimension to calculate percentile for
-     * @return NDArray NDArray
+     * @return the result {@code NDArray} NDArray
      */
     NDArray percentile(Number percentile, int... dimension);
 
     // ------------ Sparse methods ------------
 
     /**
-     * Returns a dense representation of the sparse NDArray
+     * Returns a dense representation of the sparse {@code NDArray}.
      *
-     * @return NDArray NDArray
+     * @return the result {@code NDArray} NDArray
      */
     NDArray toDense();
 
     /**
-     * Returns the number of non-null element
+     * Returns the number of non-null element.
      *
      * @return nnz
      */
     int nonzero();
 
     /**
-     * Returns {@code true} if this NDArray is special case: no-value NDArray
+     * Returns {@code true} if this NDArray is special case: no-value {@code NDArray}.
      *
      * @return {@code true} if this NDArray is empty
      */
     boolean isEmpty();
 
     /**
-     * Casts elements of this NDArray to new data type
+     * Casts elements of this NDArray to new data type.
      *
      * @param dataType {@code DataType} to be casted
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray castTo(DataType dataType);
 
@@ -1575,52 +1591,48 @@ public interface NDArray extends AutoCloseable {
     Matrix asMatrix();
 
     /**
-     * Returns {@code true} if all elements within this array are non-zero or <code>true</code>.
+     * Returns {@code true} if all elements within this array are non-zero or {@code true}.
      *
-     * @return {@code true} if all elements within this array are non-zero or <code>true</code>
+     * @return {@code true} if all elements within this array are non-zero or {@code true}
      */
     default boolean all() {
         return nonzero() == size();
     }
 
     /**
-     * Returns {@code true} if any of the elements within this array are non-zero or <code>true
-     * </code>.
+     * Returns {@code true} if any of the elements within this array are non-zero or {@code true }.
      *
-     * @return {@code true} if any of the elements within this array are non-zero or <code>true
-     *     </code>
+     * @return {@code true} if any of the elements within this array are non-zero or {@code true }
      */
     default boolean any() {
         return nonzero() > 0;
     }
 
     /**
-     * Returns {@code true} if none of the elements within this array are non-zero or <code>true
-     * </code>.
+     * Returns {@code true} if none of the elements within this array are non-zero or {@code true }.
      *
-     * @return {@code true} if none of the elements within this array are non-zero or <code>true
-     *     </code>
+     * @return {@code true} if none of the elements within this array are non-zero or {@code true }
      */
     default boolean none() {
         return nonzero() == 0;
     }
 
     /**
-     * Returns empty array with the same dtype/order/shape as this one
+     * Returns empty array with the same dtype/order/shape as this one.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray like();
 
     /**
-     * Returns uninitialized array with the same dtype/order/shape as this one
+     * Returns uninitialized array with the same dtype/order/shape as this one.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray ulike();
 
     /**
-     * Returns an internal representative of Native NDArray.
+     * Returns an internal representative of Native {@code NDArray}.
      *
      * <p>This method should only be used by Engine provider.
      *
@@ -1631,28 +1643,28 @@ public interface NDArray extends AutoCloseable {
     /**
      * Computes the truth value of NOT x element-wise.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray logicalNot();
 
     /**
      * Calculates the absolute value element-wise.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray abs();
 
     /**
      * Returns the element-wise square of the input.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray square();
 
     /**
      * Returns the cube-root of an array, element-wise.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray cbrt();
 
@@ -1660,7 +1672,7 @@ public interface NDArray extends AutoCloseable {
      * Returns the floor of the input, element-wise. The floor of the scalar x is the largest
      * integer i, such that i &lt;= x. It is often denoted as \lfloor x \rfloor.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray floor();
 
@@ -1668,83 +1680,83 @@ public interface NDArray extends AutoCloseable {
      * Returns the ceiling of the input, element-wise. The ceil of the scalar x is the smallest
      * integer i, such that i &gt;= x. It is often denoted as \lceil x \rceil.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray ceil();
 
     /**
      * Returns element-wise rounded value to the nearest integer of the input.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray round();
 
     /**
      * Returns the element-wise truncated value of the input.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray trunc();
 
     /**
      * Returns element-wise exponential value of the input.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray exp();
 
     /**
-     * Raises the power of each element in the ndarray
+     * Raises the power of each element in the {@code NDArray}.
      *
      * @param n the number to raise the power to
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray pow(Number n);
 
     /**
-     * Raises the power of each element in the ndarray in-place
+     * Raises the power of each element in the ndarray in-place.
      *
      * @param n the number to raise the power to
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray powi(Number n);
 
     /**
      * Raises the power of each element in the ndarray by the corresponding element in the other
-     * ndarray
+     * {@code NDArray}.
      *
      * @param other the ndarray by which the raise the power by
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray pow(NDArray other);
 
     /**
      * Raises the power of each element in the ndarray by the corresponding element in the other
-     * ndarray in-place
+     * ndarray in-place.
      *
      * @param other the ndarray by which the raise the power by
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray powi(NDArray other);
 
     /**
      * Returns element-wise Natural logarithmic value of the input.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray log();
 
     /**
      * Returns element-wise Base-2 logarithmic value of the input.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray log10();
 
     /**
      * Returns element-wise Base-2 logarithmic value of the input.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray log2();
 
@@ -1752,7 +1764,7 @@ public interface NDArray extends AutoCloseable {
      * Computes the element-wise sine of the input array. The input should be in radians ( 2𝜋 rad
      * equals 360 degrees).
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray sin();
 
@@ -1760,7 +1772,7 @@ public interface NDArray extends AutoCloseable {
      * Computes the element-wise cosine of the input array. The input should be in radians ( 2𝜋 rad
      * equals 360 degrees).
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray cos();
 
@@ -1768,7 +1780,7 @@ public interface NDArray extends AutoCloseable {
      * Computes the element-wise tangent of the input array. The input should be in radians ( 2𝜋
      * rad equals 360 degrees).
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray tan();
 
@@ -1776,7 +1788,7 @@ public interface NDArray extends AutoCloseable {
      * Returns element-wise inverse sine of the input array. The input should be in the range [-1,
      * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray asin();
 
@@ -1784,7 +1796,7 @@ public interface NDArray extends AutoCloseable {
      * Returns element-wise inverse cosine of the input array. The input should be in the range [-1,
      * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray acos();
 
@@ -1792,7 +1804,7 @@ public interface NDArray extends AutoCloseable {
      * Returns element-wise inverse tangent of the input array. The input should be in the range
      * [-1, 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray atan();
 
@@ -1800,7 +1812,7 @@ public interface NDArray extends AutoCloseable {
      * Converts each element of the input array from radians to degrees.
      * 𝑑𝑒𝑔𝑟𝑒𝑒𝑠([0,𝜋/2,𝜋,3𝜋/2,2𝜋])=[0,90,180,270,360].
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray toDegrees();
 
@@ -1808,7 +1820,7 @@ public interface NDArray extends AutoCloseable {
      * Converts each element of the input array from degrees to radians.
      * 𝑟𝑎𝑑𝑖𝑎𝑛𝑠([0,90,180,270,360])=[0,𝜋/2,𝜋,3𝜋/2,2𝜋]
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray toRadians();
 
@@ -1816,7 +1828,7 @@ public interface NDArray extends AutoCloseable {
      * Returns the hyperbolic sine of the input array, computed element-wise.
      * 𝑠𝑖𝑛ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)−𝑒𝑥𝑝(−𝑥))
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray sinh();
 
@@ -1824,7 +1836,7 @@ public interface NDArray extends AutoCloseable {
      * Returns the hyperbolic cosine of the input array, computed element-wise.
      * 𝑐𝑜𝑠ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)+𝑒𝑥𝑝(−𝑥))
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray cosh();
 
@@ -1832,21 +1844,21 @@ public interface NDArray extends AutoCloseable {
      * Returns the hyperbolic tangent of the input array, computed element-wise.
      * 𝑡𝑎𝑛ℎ(𝑥)=𝑠𝑖𝑛ℎ(𝑥)/𝑐𝑜𝑠ℎ(𝑥)
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray tanh();
 
     /**
      * Returns the element-wise inverse hyperbolic sine of the input array, computed element-wise.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray asinh();
 
     /**
      * Returns the element-wise inverse hyperbolic cosine of the input array, computed element-wise.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray acosh();
 
@@ -1854,7 +1866,7 @@ public interface NDArray extends AutoCloseable {
      * Returns the element-wise inverse hyperbolic tangent of the input array, computed
      * element-wise.
      *
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     NDArray atanh();
 

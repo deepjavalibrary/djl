@@ -19,7 +19,7 @@ public class Classification {
     private double probability;
 
     /**
-     * Constructs a {@code Classification} instance with <code>className</code> and <code>
+     * Constructs a {@code Classification} instance with {@code className} and <code>
      * probability</code>.
      *
      * @param className the class name

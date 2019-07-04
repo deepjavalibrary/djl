@@ -21,7 +21,7 @@ public class Metric {
     private long timestamp;
 
     /**
-     * Constructs a {@code Metric} instance with specified <code>metricName</code> and <code>
+     * Constructs a {@code Metric} instance with specified {@code metricName} and <code>
      * value</code>.
      *
      * @param metricName metric name
@@ -32,7 +32,7 @@ public class Metric {
     }
 
     /**
-     * Constructs a {@code Metric} instance with specified <code>metricName</code>, <code>value
+     * Constructs a {@code Metric} instance with specified {@code metricName}, <code>value
      * </code> and {@code unit}.
      *
      * @param metricName metric name

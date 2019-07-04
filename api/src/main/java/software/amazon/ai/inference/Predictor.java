@@ -36,6 +36,8 @@ import software.amazon.ai.metric.Metrics;
  * }
  * </pre>
  *
+ * @param <I> input type
+ * @param <O> output type
  * @see Model
  * @see Translator
  */

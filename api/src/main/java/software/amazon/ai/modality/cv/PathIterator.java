@@ -25,7 +25,7 @@ public interface PathIterator {
     /**
      * Tests if the iteration is complete.
      *
-     * @return {@code true} if all the segments have been read; <code>false</code> otherwise.
+     * @return {@code true} if all the segments have been read; {@code false} otherwise.
      */
     boolean hasNext();
 

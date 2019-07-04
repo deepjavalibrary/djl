@@ -1,3 +1,15 @@
+/*
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 package software.amazon.ai.ndarray;
 
 import java.util.Arrays;
@@ -41,7 +53,7 @@ public final class NDArrays {
     }
 
     /**
-     * Returns the boolean {@code true} iff all elements in the NDArray is equal to the Number
+     * Returns the boolean {@code true} iff all elements in the NDArray is equal to the Number.
      *
      * @param a the ndarray to compare.
      * @param b the number to compare.
@@ -206,7 +218,7 @@ public final class NDArrays {
     }
 
     /**
-     * Divides an NDArray by a number
+     * Divides an NDArray by a number.
      *
      * @param a ndarray to be operated on
      * @param n Number to divide values by
@@ -217,7 +229,7 @@ public final class NDArrays {
     }
 
     /**
-     * Divides an NDArray with a scalar - i.e., (n / thisArrayValues)
+     * Divides an NDArray with a scalar - i.e., (n / thisArrayValues).
      *
      * @param n Value to use for division
      * @param a ndarray to be operated on
@@ -228,18 +240,18 @@ public final class NDArrays {
     }
 
     /**
-     * In place scalar division
+     * In place scalar division.
      *
      * @param a ndarray to be operated on
      * @param b ndarray to divide values by
-     * @return This array, after applying division operation
+     * @return this array after applying division operation
      */
     public static NDArray div(NDArray a, NDArray b) {
         return a.div(b);
     }
 
     /**
-     * Divides an NDArray by a number
+     * Divides an NDArray by a number.
      *
      * @param a ndarray to be operated on
      * @param n Number to divide values by
@@ -250,7 +262,7 @@ public final class NDArrays {
     }
 
     /**
-     * In place divides an NDArray - i.e., (n / thisArrayValues)
+     * In place divides an NDArray - i.e., (n / thisArrayValues).
      *
      * @param n Value to use for division
      * @param a ndarray to be operated on
@@ -261,18 +273,18 @@ public final class NDArrays {
     }
 
     /**
-     * In place scalar division
+     * In place scalar division.
      *
      * @param a ndarray to be operated on
      * @param b ndarray to divide values by
-     * @return This array, after applying division operation
+     * @return this array after applying division operation
      */
     public static NDArray divi(NDArray a, NDArray b) {
         return a.divi(b);
     }
 
     /**
-     * Scalar subtraction of an NDArray (copied)
+     * Scalar subtraction of an NDArray (copied).
      *
      * @param a ndarray to be operated on
      * @param n the number to subtract by
@@ -283,7 +295,7 @@ public final class NDArrays {
     }
 
     /**
-     * Subtracts an NDArray with duplicates - i.e., (n - thisArrayValues)
+     * Subtracts an NDArray with duplicates - i.e., (n - thisArrayValues).
      *
      * @param n Value to use for subtraction
      * @param a ndarray to be operated on
@@ -294,7 +306,7 @@ public final class NDArrays {
     }
 
     /**
-     * Scalar subtraction (copied)
+     * Scalar subtraction (copied).
      *
      * @param a ndarray to be operated on
      * @param b the ndarray to subtract by
@@ -305,18 +317,18 @@ public final class NDArrays {
     }
 
     /**
-     * In place scalar subtraction of an NDArray
+     * In place scalar subtraction of an NDArray.
      *
      * @param a ndarray to be operated on
      * @param n Number to subtract
-     * @return This array, after applying subtraction operation
+     * @return this array after applying subtraction operation
      */
     public static NDArray subi(NDArray a, Number n) {
         return a.subi(n);
     }
 
     /**
-     * Subtracts an NDArray in place - i.e., (n - thisArrayValues)
+     * Subtracts an NDArray in place - i.e., (n - thisArrayValues).
      *
      * @param n Value to use for subtraction
      * @param a ndarray to be operated on
@@ -327,18 +339,18 @@ public final class NDArrays {
     }
 
     /**
-     * In place scalar subtraction
+     * In place scalar subtraction.
      *
      * @param a ndarray to be operated on
      * @param b the ndarray to subtract by
-     * @return This array, after applying subtraction operation
+     * @return this array after applying subtraction operation
      */
     public static NDArray subi(NDArray a, NDArray b) {
         return a.subi(b);
     }
 
     /**
-     * Scalar multiplication (copy)
+     * Scalar multiplication (copy).
      *
      * @param a ndarray to be operated on
      * @param n the number to multiply by
@@ -349,7 +361,7 @@ public final class NDArrays {
     }
 
     /**
-     * Scalar multiplication (copy)
+     * Scalar multiplication (copy).
      *
      * @param n the number to multiply by
      * @param a ndarray to be operated on
@@ -360,7 +372,7 @@ public final class NDArrays {
     }
 
     /**
-     * copy (element wise) multiplication of two NDArrays
+     * Copies (element wise) multiplication of two NDArrays.
      *
      * @param a ndarray to be operated on
      * @param b the second NDArray to multiply
@@ -371,33 +383,33 @@ public final class NDArrays {
     }
 
     /**
-     * In place scalar multiplication
+     * In place scalar multiplication.
      *
      * @param a ndarray to be operated on
      * @param n The number to multiply by
-     * @return This array, after applying scaler multiplication
+     * @return this array after applying scalar multiplication
      */
     public static NDArray muli(NDArray a, Number n) {
         return a.muli(n);
     }
 
     /**
-     * In place scalar multiplication
+     * In place scalar multiplication.
      *
      * @param n The number to multiply by
      * @param a ndarray to be operated on
-     * @return This array, after applying scaler multiplication
+     * @return this array after applying scalar multiplication
      */
     public static NDArray muli(Number n, NDArray a) {
         return a.muli(n);
     }
 
     /**
-     * In place scalar multiplication
+     * In place scalar multiplication.
      *
      * @param a ndarray to be operated on
      * @param b ndarray to multiply by
-     * @return This array, after applying scaler multiplication
+     * @return this array after applying scalar multiplication
      */
     public static NDArray muli(NDArray a, NDArray b) {
         return a.muli(b);
@@ -408,7 +420,7 @@ public final class NDArrays {
      *
      * @param a ndarray to be operated on
      * @param n the number to raise the power to
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     public static NDArray pow(NDArray a, Number n) {
         return a.pow(n);
@@ -416,22 +428,22 @@ public final class NDArrays {
 
     /**
      * Raises the power of each element in the ndarray by the corresponding element in the other
-     * ndarray
+     * ndarray.
      *
      * @param a ndarray to be operated on
      * @param b the ndarray by which the raise the power by
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     public static NDArray pow(NDArray a, NDArray b) {
         return a.pow(b);
     }
 
     /**
-     * Raises the power of each element in the ndarray in-place
+     * Raises the power of each element in the ndarray in-place.
      *
      * @param a ndarray to be operated on
      * @param n the number to raise the power to
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     public static NDArray powi(NDArray a, Number n) {
         return a.powi(n);
@@ -439,18 +451,18 @@ public final class NDArrays {
 
     /**
      * Raises the power of each element in the ndarray by the corresponding element in the other
-     * ndarray in-place
+     * ndarray in-place.
      *
      * @param a ndarray to be operated on
      * @param b the ndarray by which the raise the power by
-     * @return NDArray
+     * @return the result {@code NDArray}
      */
     public static NDArray powi(NDArray a, NDArray b) {
         return a.powi(b);
     }
 
     /**
-     * Scalar remainder of division (copy)
+     * Scalar remainder of division (copy).
      *
      * @param a ndarray to be operated on
      * @param n the number to multiply by
@@ -461,7 +473,7 @@ public final class NDArrays {
     }
 
     /**
-     * Copy scalar remainder of division
+     * Copy scalar remainder of division.
      *
      * @param n the number to multiply by
      * @param a ndarray to be operated on
@@ -472,54 +484,51 @@ public final class NDArrays {
     }
 
     /**
-     * Scalar remainder of division
+     * Scalar remainder of division.
      *
      * @param a ndarray to be operated on
      * @param b ndarray to multiply by
-     * @return This array, after applying scaler multiplication
+     * @return this array after applying scalar multiplication
      */
     public static NDArray mod(NDArray a, NDArray b) {
         return a.mod(b);
     }
 
     /**
-     * Copy (element wise) remainder of division of two NDArrays public static NDArray mod(NDArray
-     * a, NDArray b) { return a.mod(b); }
-     *
-     * <p>/** In place remainder of division
+     * In place remainder of division.
      *
      * @param a ndarray to be operated on
-     * @param n The number to multiply by
-     * @return This array, after applying scaler multiplication
+     * @param n the number to multiply by
+     * @return this array after applying scalar multiplication
      */
     public static NDArray modi(NDArray a, Number n) {
         return a.modi(n);
     }
 
     /**
-     * In place scalar remainder of division
+     * In place scalar remainder of division.
      *
      * @param n The number to multiply by
      * @param a ndarray to be operated on
-     * @return This array, after applying scaler multiplication
+     * @return this array after applying scalar multiplication
      */
     public static NDArray modi(Number n, NDArray a) {
         return a.getNDArrayInternal().rmodi(n);
     }
 
     /**
-     * In place scalar remainder of division
+     * In place scalar remainder of division.
      *
      * @param a ndarray to be operated on
      * @param b ndarray to multiply by
-     * @return This array, after applying scaler multiplication
+     * @return this array after applying scalar multiplication
      */
     public static NDArray modi(NDArray a, NDArray b) {
         return a.modi(b);
     }
 
     /**
-     * copy matrix multiplication of two NDArrays
+     * copy matrix multiplication of two NDArrays.
      *
      * @param a ndarray to be operated on
      * @param b the second NDArray to multiply

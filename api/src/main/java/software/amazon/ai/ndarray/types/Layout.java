@@ -37,4 +37,22 @@ public enum Layout {
         }
         throw new IllegalArgumentException("Invalid layout value: " + value);
     }
+
+    /**
+     * Returns index of 'N' (batch) axis of the {@code Layout}.
+     *
+     * @param layout {@code Layout} to exam
+     * @return index of 'N' (batch) axis of the {@code Layout}
+     */
+    public static int getBatchAxis(Layout layout) {
+        if (layout == null || Layout.UNDEFINED == layout) {
+            return 0;
+        }
+
+        if (!layout.getValue().contains("N")) {
+            throw new IllegalArgumentException("no Batch Axis('N') found in Layout!");
+        }
+
+        return layout.getValue().indexOf('N');
+    }
 }

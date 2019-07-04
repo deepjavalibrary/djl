@@ -44,6 +44,13 @@ public class Shape {
         return shape;
     }
 
+    /**
+     * Returns dimensions of the {@code Shape} in {@code long[]}.
+     *
+     * <p>This API provides support for large tensor.
+     *
+     * @return dimensions of the {@code Shape}
+     */
     public long[] getShapeLong() {
         return Arrays.stream(getShape()).mapToLong((i) -> (long) i).toArray();
     }
@@ -122,21 +129,6 @@ public class Shape {
 
     public int head() {
         return shape[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append('(');
-        for (int i = 0; i < shape.length; ++i) {
-            if (i > 0) {
-                sb.append(", ");
-            }
-            sb.append(shape[i]);
-        }
-        sb.append(')');
-        return sb.toString();
     }
 
     /**
@@ -227,7 +219,7 @@ public class Shape {
     /**
      * Returns whether the matrix has the same rows and columns.
      *
-     * @return {@code true} if the matrix has the same rows and columns <code>false</code> otherwise
+     * @return {@code true} if the matrix has the same rows and columns {@code false} otherwise
      */
     public boolean isSquare() {
         return isMatrix() && columns() == rows();
@@ -251,6 +243,7 @@ public class Shape {
         return dimension() == 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -263,8 +256,24 @@ public class Shape {
         return Arrays.equals(shape, shape1.shape);
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return Arrays.hashCode(shape);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append('(');
+        for (int i = 0; i < shape.length; ++i) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(shape[i]);
+        }
+        sb.append(')');
+        return sb.toString();
     }
 }

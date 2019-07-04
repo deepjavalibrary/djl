@@ -16,9 +16,9 @@ package software.amazon.ai.modality.cv;
 public interface BoundingBox {
 
     /**
-     * Returns the bounding {@code Rectangle} of this <code>BoundingBox</code>.
+     * Returns the bounding {@code Rectangle} of this {@code BoundingBox}.
      *
-     * @return a new {@code Rectangle} for this <code>BoundingBox</code>.
+     * @return a new {@code Rectangle} for this {@code BoundingBox}.
      */
     Rectangle getBounds();
 

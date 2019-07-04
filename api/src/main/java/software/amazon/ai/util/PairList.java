@@ -19,6 +19,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The {@code PairList} class provides an efficient way to access a list of key-value pair.
+ *
+ * @param <K> key type
+ * @param <V> value type
+ */
 public class PairList<K, V> implements Iterable<Pair<K, V>> {
 
     private List<K> keys;

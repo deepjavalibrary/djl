@@ -158,7 +158,7 @@ public interface NDFactory extends AutoCloseable {
     NDArray zeros(Shape shape);
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and float array.
      *
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
@@ -168,7 +168,7 @@ public interface NDFactory extends AutoCloseable {
     NDArray create(float[] data, Context context, Shape shape);
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and int array.
      *
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
@@ -178,7 +178,7 @@ public interface NDFactory extends AutoCloseable {
     NDArray create(int[] data, Context context, Shape shape);
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and double array.
      *
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
@@ -188,7 +188,7 @@ public interface NDFactory extends AutoCloseable {
     NDArray create(double[] data, Context context, Shape shape);
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and long array.
      *
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
@@ -198,7 +198,7 @@ public interface NDFactory extends AutoCloseable {
     NDArray create(long[] data, Context context, Shape shape);
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and float array
+     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and byte array.
      *
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}

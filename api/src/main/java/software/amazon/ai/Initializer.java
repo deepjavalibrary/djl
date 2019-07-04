@@ -12,18 +12,18 @@ import software.amazon.ai.ndarray.NDArray;
 public interface Initializer {
 
     /**
-     * Initializes a single NDArray
+     * Initializes a single {@link NDArray}.
      *
-     * @param array the NDArray to initialize
+     * @param array the {@link NDArray} to initialize
      */
     default void initialize(NDArray array) {
         initialize(Collections.singletonList(array));
     }
 
     /**
-     * Initializes a list of NDArrays
+     * Initializes a list of {@link NDArray}s.
      *
-     * @param parameters the NDArrays to initialize
+     * @param parameters the {@link NDArray}s to initialize
      */
     void initialize(List<NDArray> parameters);
 }
