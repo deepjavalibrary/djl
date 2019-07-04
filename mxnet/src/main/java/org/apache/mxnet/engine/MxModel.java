@@ -112,16 +112,20 @@ public class MxModel implements Model, AutoCloseable {
      * @return a {@link PairList} of model weights with their name
      */
     public PairList<String, MxNDArray> getParameters() {
-        return parameters;
+        return new PairList<>(parameters.keys(), parameters.values());
     }
 
     /** {@inheritDoc} */
     @Override
     public Model cast(DataType dataType) {
         if (parameters.get(0).getValue().getDataType() == dataType) {
-            logger.info("You are casting the model to its original type!");
+            logger.debug("You are casting the model to its original type!");
             return this;
         }
+
+        // TODO: This implementation is unsafe, new Model shares the same
+        // symbol and optimizerStates with original one. Close either one
+        // will cause anther model instance invalidated.
         PairList<String, MxNDArray> newParam = new PairList<>();
         for (Pair<String, MxNDArray> pair : parameters) {
             newParam.add(pair.getKey(), pair.getValue().asType(dataType, true));

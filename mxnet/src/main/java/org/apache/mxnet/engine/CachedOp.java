@@ -61,6 +61,7 @@ public class CachedOp extends NativeResource {
         this.inputNames = inputNames;
         inputNameMap = inputNames.toMap();
         this.factory = factory;
+        factory.attach(this);
     }
 
     /**

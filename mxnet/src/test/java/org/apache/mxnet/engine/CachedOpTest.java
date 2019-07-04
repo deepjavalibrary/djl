@@ -64,60 +64,56 @@ public class CachedOpTest extends PowerMockTestCase {
 
     @Test
     public void testForward() {
-        MxNDFactory factory = MxNDFactory.SYSTEM_FACTORY;
-        MxNDArray[] params =
-                new MxNDArray[] {
-                    null,
-                    factory.create(new DataDesc(new Shape(2))),
-                    factory.create(new DataDesc(new Shape(3))),
-                    null,
-                    null,
-                    factory.create(new DataDesc(new Shape(5))),
-                    factory.create(new DataDesc(new Shape(6)))
-                };
-        List<String> names = Arrays.asList("data0", "data1", "data2");
-        List<Integer> locations = Arrays.asList(0, 3, 4);
-        PairList<String, Integer> inputNames = new PairList<>(names, locations);
-        CachedOp co =
-                new CachedOp(new PointerArray(), MxNDFactory.SYSTEM_FACTORY, params, inputNames);
-        logger.info("Test: Positioned input");
-        NDList input =
-                new NDList(
+        try (MxNDFactory factory = MxNDFactory.SYSTEM_FACTORY.newSubFactory()) {
+            MxNDArray[] params =
+                    new MxNDArray[] {
+                        null,
                         factory.create(new DataDesc(new Shape(2))),
-                        factory.create(new DataDesc(new Shape(4))),
-                        factory.create(new DataDesc(new Shape(5))));
-        co.forward(input);
-        Assert.assertEquals(params[0].getShape(), new Shape(2));
-        Assert.assertEquals(params[3].getShape(), new Shape(4));
-        Assert.assertEquals(params[4].getShape(), new Shape(5));
-        logger.info("Test: Named input");
-        input = new NDList();
-        input.add("data2", factory.create(new DataDesc(new Shape(2))));
-        input.add("data1", factory.create(new DataDesc(new Shape(4))));
-        input.add("data0", factory.create(new DataDesc(new Shape(5))));
-        co.forward(input);
-        Assert.assertEquals(params[0].getShape(), new Shape(5));
-        Assert.assertEquals(params[3].getShape(), new Shape(4));
-        Assert.assertEquals(params[4].getShape(), new Shape(2));
-        logger.info("Test: No input, expect warnings");
-        input = new NDList();
-        co.forward(input);
-        Assert.assertEquals(params[0].getShape(), new Shape(1));
-        Assert.assertEquals(params[3].getShape(), new Shape(1));
-        Assert.assertEquals(params[4].getShape(), new Shape(1));
-        logger.info("Test: Check the remaining params");
-        Assert.assertEquals(params[1].getShape(), new Shape(2));
-        Assert.assertEquals(params[2].getShape(), new Shape(3));
-        Assert.assertEquals(params[5].getShape(), new Shape(5));
-        Assert.assertEquals(params[6].getShape(), new Shape(6));
-        logger.info("Test: Illigal inputs");
-        final NDList input2 = new NDList();
-        input2.add("data_not_exist", null);
-        Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> {
-                    co.forward(input2);
-                });
+                        factory.create(new DataDesc(new Shape(3))),
+                        null,
+                        null,
+                        factory.create(new DataDesc(new Shape(5))),
+                        factory.create(new DataDesc(new Shape(6)))
+                    };
+            List<String> names = Arrays.asList("data0", "data1", "data2");
+            List<Integer> locations = Arrays.asList(0, 3, 4);
+            PairList<String, Integer> inputNames = new PairList<>(names, locations);
+            CachedOp co = new CachedOp(new PointerArray(), factory, params, inputNames);
+            logger.info("Test: Positioned input");
+            NDList input =
+                    new NDList(
+                            factory.create(new DataDesc(new Shape(2))),
+                            factory.create(new DataDesc(new Shape(4))),
+                            factory.create(new DataDesc(new Shape(5))));
+            co.forward(input);
+            Assert.assertEquals(params[0].getShape(), new Shape(2));
+            Assert.assertEquals(params[3].getShape(), new Shape(4));
+            Assert.assertEquals(params[4].getShape(), new Shape(5));
+            logger.info("Test: Named input");
+            input = new NDList();
+            input.add("data2", factory.create(new DataDesc(new Shape(2))));
+            input.add("data1", factory.create(new DataDesc(new Shape(4))));
+            input.add("data0", factory.create(new DataDesc(new Shape(5))));
+            co.forward(input);
+            Assert.assertEquals(params[0].getShape(), new Shape(5));
+            Assert.assertEquals(params[3].getShape(), new Shape(4));
+            Assert.assertEquals(params[4].getShape(), new Shape(2));
+            logger.info("Test: No input, expect warnings");
+            input = new NDList();
+            co.forward(input);
+            Assert.assertEquals(params[0].getShape(), new Shape(1));
+            Assert.assertEquals(params[3].getShape(), new Shape(1));
+            Assert.assertEquals(params[4].getShape(), new Shape(1));
+            logger.info("Test: Check the remaining params");
+            Assert.assertEquals(params[1].getShape(), new Shape(2));
+            Assert.assertEquals(params[2].getShape(), new Shape(3));
+            Assert.assertEquals(params[5].getShape(), new Shape(5));
+            Assert.assertEquals(params[6].getShape(), new Shape(6));
+            logger.info("Test: Illegal inputs");
+            final NDList input2 = new NDList();
+            input2.add("data_not_exist", null);
+            Assert.assertThrows(IllegalArgumentException.class, () -> co.forward(input2));
+        }
     }
 
     @ObjectFactory

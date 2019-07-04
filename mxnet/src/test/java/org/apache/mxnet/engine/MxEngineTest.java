@@ -106,9 +106,10 @@ public class MxEngineTest extends PowerMockTestCase {
     private String loadModel(
             MxEngine engine, Path location, String modelName, Map<String, String> options)
             throws IOException {
-        MxModel model = (MxModel) engine.loadModel(location, modelName, options);
-        // In JNA.MXNDArrayLoad function, file name is stored as the first param name in Model
-        String paramPath = model.getParameters().get(0).getKey();
-        return Paths.get(paramPath).toFile().getName();
+        try (MxModel model = (MxModel) engine.loadModel(location, modelName, options)) {
+            // In JNA.MXNDArrayLoad function, file name is stored as the first param name in Model
+            String paramPath = model.getParameters().get(0).getKey();
+            return Paths.get(paramPath).toFile().getName();
+        }
     }
 }

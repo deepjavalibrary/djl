@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.function.Function;
 import org.apache.mxnet.jna.LibUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
@@ -33,8 +32,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.util.Pair;
-import software.amazon.ai.util.PairList;
 import software.amazon.ai.util.Utils;
 
 // CHECKSTYLE:ON:AvoidStaticImport
@@ -59,27 +56,22 @@ public class MxModelTest extends PowerMockTestCase {
     public void testLoadModel() throws IOException {
         String prefix = "A";
         int epoch = 122;
-        MxModel model = MxModel.loadModel(prefix, epoch);
-        Assert.assertEquals(model.getParameters().get(0).getKey(), "A-0122.params");
-        Symbol sym = model.getSymbol();
-        Assert.assertNotNull(sym);
-        model.close();
+        try (MxModel model = MxModel.loadModel(prefix, epoch)) {
+            Assert.assertEquals(model.getParameters().get(0).getKey(), "A-0122.params");
+            Symbol sym = model.getSymbol();
+            Assert.assertNotNull(sym);
+        }
     }
 
     @Test
     public void testDescribeInput() throws IOException {
         String prefix = "A";
         int epoch = 122;
-        MxModel model = MxModel.loadModel(prefix, epoch);
-        PairList<String, MxNDArray> pairs = model.getParameters();
-        pairs.remove("A-0122.params");
-        pairs.add(new Pair<>("a", null));
-        DataDesc[] descs = model.describeInput();
-        // Comparing between a, b, c to a, b, c, d, e
-        Assert.assertEquals(descs[0].getName(), "d");
-        Assert.assertEquals(descs[1].getName(), "e");
-        DataDesc[] descs2 = model.describeInput();
-        Assert.assertTrue(Arrays.equals(descs2, descs));
+        try (MxModel model = MxModel.loadModel(prefix, epoch)) {
+            DataDesc[] descs = model.describeInput();
+            Assert.assertEquals(descs.length, 3);
+            Assert.assertEquals(descs[0].getName(), "a");
+        }
     }
 
     @Test
@@ -89,9 +81,11 @@ public class MxModelTest extends PowerMockTestCase {
         MxModel model = MxModel.loadModel(prefix, epoch);
         MxModel casted = (MxModel) model.cast(DataType.FLOAT32);
         Assert.assertEquals(casted.getParameters(), model.getParameters());
+
         casted = (MxModel) model.cast(DataType.FLOAT64);
         Assert.assertEquals(
                 casted.getParameters().get(0).getValue().getDataType(), DataType.FLOAT64);
+        model.close();
     }
 
     @Test
