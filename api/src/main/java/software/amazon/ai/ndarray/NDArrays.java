@@ -404,7 +404,7 @@ public final class NDArrays {
     }
 
     /**
-     * <<<<<<< HEAD Raises the power of each element in the ndarray
+     * HEAD Raises the power of each element in the ndarray.
      *
      * @param a ndarray to be operated on
      * @param n the number to raise the power to
