@@ -241,9 +241,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         return map;
     }
 
-    /**
-     * Internal Iterator implementation.
-     */
+    /** Internal Iterator implementation. */
     private class Itr implements Iterator<Pair<K, V>> {
 
         private int cursor;

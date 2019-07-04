@@ -14,7 +14,6 @@ package org.apache.mxnet.engine;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -81,13 +80,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public byte[] getEncoded() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void encode(OutputStream os) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        return toByteArray();
     }
 
     @Override
@@ -956,6 +949,9 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     public byte[] toByteArray() {
         ByteBuffer bb = toByteBuffer();
+        if (bb.hasArray()) {
+            return bb.array();
+        }
         byte[] buf = new byte[bb.remaining()];
         bb.get(buf);
         return buf;
@@ -1334,12 +1330,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray castTo(DataType dataType) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Matrix asMatrix() {
         if (!shape.isMatrix()) {
             throw new IllegalStateException("NDArray is not a matrix");
@@ -1368,12 +1358,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray like() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ulike() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 

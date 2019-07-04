@@ -1,6 +1,5 @@
 package org.apache.mxnet.engine;
 
-import java.io.OutputStream;
 import java.nio.Buffer;
 import java.util.function.Predicate;
 import software.amazon.ai.Context;
@@ -275,12 +274,6 @@ public class MxMatrix implements Matrix {
     @Override
     public byte[] getEncoded() {
         return array.getEncoded();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void encode(OutputStream os) {
-        array.encode(os);
     }
 
     /** {@inheritDoc} */
@@ -925,22 +918,12 @@ public class MxMatrix implements Matrix {
     }
 
     @Override
-    public NDArray castTo(DataType dataType) {
-        return null;
-    }
-
-    @Override
     public Matrix asMatrix() {
         return null;
     }
 
     @Override
     public NDArray like() {
-        return null;
-    }
-
-    @Override
-    public NDArray ulike() {
         return null;
     }
 

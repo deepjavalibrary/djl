@@ -26,7 +26,6 @@ import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.nn.MxNNIndex;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.Profiler;
 import software.amazon.ai.Translator;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.inference.Predictor;
@@ -161,8 +160,4 @@ public class MxEngine extends Engine {
     public Trainer newTrainer(Model model, Context context) {
         return null;
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setProfiler(Profiler profiler) {}
 }

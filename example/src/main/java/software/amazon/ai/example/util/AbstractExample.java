@@ -53,7 +53,7 @@ public abstract class AbstractExample {
      * Abstract predict method that must be implemented by sub class.
      *
      * @param arguments command line arguments
-     * @param metrics {@link Metrics} to collect statistic informations
+     * @param metrics {@link Metrics} to collect statistic information
      * @param iteration number of prediction iteration to run
      * @return prediction result
      * @throws IOException if io error occurs when loading model.

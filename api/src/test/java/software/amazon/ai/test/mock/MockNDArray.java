@@ -12,8 +12,6 @@
  */
 package software.amazon.ai.test.mock;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.Buffer;
 import java.util.function.Predicate;
 import software.amazon.ai.Context;
@@ -36,9 +34,6 @@ public class MockNDArray implements NDArray {
     public byte[] getEncoded() {
         return new byte[0];
     }
-
-    @Override
-    public void encode(OutputStream os) throws IOException {}
 
     @Override
     public NDFactory getFactory() {
@@ -717,22 +712,12 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray castTo(DataType dataType) {
-        return null;
-    }
-
-    @Override
     public Matrix asMatrix() {
         return null;
     }
 
     @Override
     public NDArray like() {
-        return null;
-    }
-
-    @Override
-    public NDArray ulike() {
         return null;
     }
 

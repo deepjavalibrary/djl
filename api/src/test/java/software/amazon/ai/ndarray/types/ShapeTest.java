@@ -26,7 +26,7 @@ public class ShapeTest {
         Assert.assertEquals(shape.size(0, 1), 3);
         Assert.assertEquals(shape.size(), 150528);
         Assert.assertEquals(shape.dimension(), 4);
-        Assert.assertEquals(shape.drop(0), new Shape(3, 224, 224));
+        Assert.assertEquals(shape.slice(1), new Shape(3, 224, 224));
         Assert.assertEquals(shape.head(), 1);
         Assert.assertEquals(shape.toString(), "(1, 3, 224, 224)");
         Assert.assertEquals(shape.getTrailingOnes(), 0);

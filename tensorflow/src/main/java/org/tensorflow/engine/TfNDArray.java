@@ -1,7 +1,5 @@
 package org.tensorflow.engine;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -83,10 +81,6 @@ public class TfNDArray implements NDArray {
     public byte[] getEncoded() {
         return new byte[0];
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public void encode(OutputStream os) throws IOException {}
 
     /** {@inheritDoc} */
     @Override
@@ -645,11 +639,6 @@ public class TfNDArray implements NDArray {
     }
 
     @Override
-    public NDArray castTo(DataType dataType) {
-        return null;
-    }
-
-    @Override
     public Matrix asMatrix() {
         return null;
     }
@@ -987,12 +976,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray like() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ulike() {
         return null;
     }
 

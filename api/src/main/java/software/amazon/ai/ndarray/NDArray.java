@@ -38,21 +38,6 @@ import software.amazon.ai.training.GradReq;
 public interface NDArray extends AutoCloseable {
 
     /**
-     * Returns the encoding format of the NDArray, or null.
-     *
-     * @return the encoded NDArray
-     */
-    byte[] getEncoded();
-
-    /**
-     * Encodes NDArray to an {@link OutputStream}.
-     *
-     * @param os OutputStream
-     * @throws IOException for writing problems
-     */
-    void encode(OutputStream os) throws IOException;
-
-    /**
      * Returns the {@link NDFactory} used to create the {@code NDArray}.
      *
      * @return {@link NDFactory}
@@ -109,6 +94,152 @@ public interface NDArray extends AutoCloseable {
     DataDesc getDataDescriptor();
 
     /**
+     * Returns {@code true} if this array is a {@link SparseNDArray}.
+     *
+     * @return {@code true} if this array is a {@link SparseNDArray}
+     */
+    boolean isSparse();
+
+    /**
+     * Converts the NDArray to a different {@link Context}.
+     *
+     * @param ctx {@link Context} to be set
+     * @param copy set {@code true} if you want to return a copy of the Existing {@code NDArray}.
+     * @return the result {@code NDArray} with the new {@link Context}
+     */
+    NDArray asInContext(Context ctx, boolean copy);
+
+    /**
+     * Converts the NDArray to a different {@link DataType}.
+     *
+     * @param dtype {@link DataType} to be set
+     * @param copy set {@code true} if you want to return a copy of the Existing NDArray
+     * @return the result {@code NDArray} with the new {@link DataType}
+     */
+    NDArray asType(DataType dtype, boolean copy);
+
+    /**
+     * Converts the array into a 2D Matrix.
+     *
+     * @return This NDArray as Matrix
+     * @throws IllegalStateException Thrown if the NDArray is not a 2D matrix
+     */
+    Matrix asMatrix();
+
+    /** Computes the gradients of the NDArray w.r.t variables. */
+    void backward();
+
+    /**
+     * Computes the gradients of the NDArray w.r.t variables.
+     *
+     * @param retainGraph Whether to retain the computation graph for another backward pass on the
+     *     same graph. By default the computation history is cleared.
+     * @param isTraining Whether to compute gradient for training or inference.
+     */
+    void backward(boolean retainGraph, boolean isTraining);
+
+    /**
+     * Computes the gradients of the NDArray w.r.t variables.
+     *
+     * @param outGrad Gradient with respect to head
+     * @param retainGraph Whether to retain the computation graph for another backward pass on the
+     *     same graph. By default the computation history is cleared.
+     * @param isTraining Whether to compute gradient for training or inference.
+     */
+    void backward(NDArray outGrad, boolean retainGraph, boolean isTraining);
+
+    /**
+     * Attaches a gradient buffer to this NDArray, so that `backward` can compute the gradient with
+     * respect to it.
+     */
+    void attachGrad();
+
+    /**
+     * Attaches a gradient buffer to this NDArray, so that `backward` can compute the gradient with
+     * respect to it.
+     *
+     * @param gradReq {@link GradReq} How gradient will be accumulated.
+     * @param sparseFormat {@link SparseFormat} The storage type of the gradient array. Defaults to
+     *     the same type of this {@code NDArray}.
+     */
+    void attachGrad(GradReq gradReq, SparseFormat sparseFormat);
+
+    /**
+     * Returns the gradient buffer attached to this {@code NDArray}.
+     *
+     * @return the gradient buffer attached to this {@code NDArray}.
+     */
+    NDArray getGradient();
+
+    /**
+     * Returns the encoding format of the NDArray, or null.
+     *
+     * @return the encoded NDArray
+     */
+    byte[] getEncoded();
+
+    /**
+     * Encodes NDArray to an {@link OutputStream}.
+     *
+     * @param os OutputStream
+     * @throws IOException for writing problems
+     */
+    default void encode(OutputStream os) throws IOException {
+        os.write(getEncoded());
+    }
+
+    /**
+     * Converts this NDArray to a double array.
+     *
+     * @return a double array
+     */
+    double[] toDoubleArray();
+
+    /**
+     * Converts this NDArray to a float array.
+     *
+     * @return a float array
+     */
+    float[] toFloatArray();
+
+    /**
+     * Converts this NDArray to a int array.
+     *
+     * @return a int array
+     */
+    int[] toIntArray();
+
+    /**
+     * Converts this NDArray to a long array.
+     *
+     * @return a long array
+     */
+    long[] toLongArray();
+
+    /**
+     * Converts this NDArray to a Number array based on its data type.
+     *
+     * @return a Number array
+     */
+    default Number[] toArray() {
+        switch (getDataType()) {
+            case FLOAT32:
+                float[] floatArray = toFloatArray();
+                return IntStream.range(0, floatArray.length)
+                        .mapToObj(i -> floatArray[i])
+                        .toArray(Number[]::new);
+            case FLOAT64:
+                return Arrays.stream(toDoubleArray()).boxed().toArray(Double[]::new);
+            case INT32:
+                return Arrays.stream(toIntArray()).boxed().toArray(Integer[]::new);
+            case INT64:
+                return Arrays.stream(toLongArray()).boxed().toArray(Long[]::new);
+            default:
+                throw new IllegalStateException("Unsupported DataType: " + getDataType());
+        }
+    }
+
+    /**
      * Sets the NDArray value from {@link Buffer}.
      *
      * @param data The input buffered data
@@ -149,6 +280,64 @@ public interface NDArray extends AutoCloseable {
      * @param data array of bytes to set
      */
     void set(byte[] data);
+
+    /**
+     * Sets the specified index in a new NDArray with the given values.
+     *
+     * @param index The locations to update
+     * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
+     *     index
+     * @return a new NDArray with the updated values
+     */
+    NDArray set(NDIndex index, NDArray value);
+
+    /**
+     * Sets the specified index in a new NDArray with the given value.
+     *
+     * @param index The locations to update
+     * @param value The value to replace with
+     * @return a new NDArray with the updated values
+     */
+    NDArray set(NDIndex index, Number value);
+
+    /**
+     * Sets the specified index in a new NDArray with the given value.
+     *
+     * @param index The single index to update
+     * @param value The value to replace with
+     * @return a new NDArray with the updated value
+     * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
+     */
+    NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException;
+
+    /**
+     * Sets the specified index in the NDArray with the given values.
+     *
+     * @param index The locations to update
+     * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
+     *     index
+     * @return the updated NDArray
+     */
+    NDArray seti(NDIndex index, NDArray value);
+
+    /**
+     * Sets the specified index in the NDArray with the given value.
+     *
+     * @param index The locations to update
+     * @param value The value to replace with
+     * @return the updated NDArray
+     */
+    NDArray seti(NDIndex index, Number value);
+
+    /**
+     * Sets the specified index in the NDArray with the given value.
+     *
+     * @param index The single index to update
+     * @param value The value to replace with
+     * @return the updated NDArray
+     * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
+     */
+    NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException;
 
     /**
      * Returns a partial {@code NDArray}.
@@ -217,64 +406,6 @@ public interface NDArray extends AutoCloseable {
     float getFloat(NDIndex index) throws IllegalArgumentException;
 
     /**
-     * Sets the specified index in a new NDArray with the given values.
-     *
-     * @param index The locations to update
-     * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
-     *     index
-     * @return a new NDArray with the updated values
-     */
-    NDArray set(NDIndex index, NDArray value);
-
-    /**
-     * Sets the specified index in a new NDArray with the given value.
-     *
-     * @param index The locations to update
-     * @param value The value to replace with
-     * @return a new NDArray with the updated values
-     */
-    NDArray set(NDIndex index, Number value);
-
-    /**
-     * Sets the specified index in a new NDArray with the given value.
-     *
-     * @param index The single index to update
-     * @param value The value to replace with
-     * @return a new NDArray with the updated value
-     * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
-     */
-    NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException;
-
-    /**
-     * Sets the specified index in the NDArray with the given values.
-     *
-     * @param index The locations to update
-     * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
-     *     index
-     * @return the updated NDArray
-     */
-    NDArray seti(NDIndex index, NDArray value);
-
-    /**
-     * Sets the specified index in the NDArray with the given value.
-     *
-     * @param index The locations to update
-     * @param value The value to replace with
-     * @return the updated NDArray
-     */
-    NDArray seti(NDIndex index, Number value);
-
-    /**
-     * Sets the specified index in the NDArray with the given value.
-     *
-     * @param index The single index to update
-     * @param value The value to replace with
-     * @return the updated NDArray
-     * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
-     */
-    NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException;
-
-    /**
      * Copies the current NDArray value to the one passed in.
      *
      * @param array the NDArray prepared to be copied to
@@ -282,67 +413,38 @@ public interface NDArray extends AutoCloseable {
     void copyTo(NDArray array);
 
     /**
-     * Converts the NDArray to a different {@link Context}.
+     * Returns a copy of this NDArray.
      *
-     * @param ctx {@link Context} to be set
-     * @param copy set {@code true} if you want to return a copy of the Existing {@code NDArray}.
-     * @return the result {@code NDArray} with the new {@link Context}
+     * @return a copy of this NDArray
      */
-    NDArray asInContext(Context ctx, boolean copy);
+    NDArray dup();
 
     /**
-     * Converts the NDArray to a different {@link DataType}.
+     * Returns an array of zeros with the same {@link Shape}, {@link DataType} and {@link
+     * SparseFormat} as the input array.
      *
-     * @param dtype {@link DataType} to be set
-     * @param copy set {@code true} if you want to return a copy of the Existing NDArray
-     * @return the result {@code NDArray} with the new {@link DataType}
+     * @return {@code NDArray} filled with zeros
      */
-    NDArray asType(DataType dtype, boolean copy);
+    NDArray zerosLike();
 
     /**
-     * Attaches a gradient buffer to this NDArray, so that `backward` can compute the gradient with
-     * respect to it.
+     * Returns an array of ones with the same {@link Shape}, {@link DataType} and {@link
+     * SparseFormat} as the input array.
+     *
+     * @return {@code NDArray} filled with ones
      */
-    void attachGrad();
+    NDArray onesLike();
 
     /**
-     * Attaches a gradient buffer to this NDArray, so that `backward` can compute the gradient with
-     * respect to it.
+     * Returns uninitialized array with the same dtype/order/shape as this one.
      *
-     * @param gradReq {@link GradReq} How gradient will be accumulated.
-     * @param sparseFormat {@link SparseFormat} The storage type of the gradient array. Defaults to
-     *     the same type of this {@code NDArray}.
+     * @return the result {@code NDArray}
      */
-    void attachGrad(GradReq gradReq, SparseFormat sparseFormat);
+    NDArray like();
 
-    /**
-     * Returns the gradient buffer attached to this {@code NDArray}.
-     *
-     * @return the gradient buffer attached to this {@code NDArray}.
-     */
-    NDArray getGradient();
-
-    /** Computes the gradients of the NDArray w.r.t variables. */
-    void backward();
-
-    /**
-     * Computes the gradients of the NDArray w.r.t variables.
-     *
-     * @param retainGraph Whether to retain the computation graph for another backward pass on the
-     *     same graph. By default the computation history is cleared.
-     * @param isTraining Whether to compute gradient for training or inference.
-     */
-    void backward(boolean retainGraph, boolean isTraining);
-
-    /**
-     * Computes the gradients of the NDArray w.r.t variables.
-     *
-     * @param outGrad Gradient with respect to head
-     * @param retainGraph Whether to retain the computation graph for another backward pass on the
-     *     same graph. By default the computation history is cleared.
-     * @param isTraining Whether to compute gradient for training or inference.
-     */
-    void backward(NDArray outGrad, boolean retainGraph, boolean isTraining);
+    ////////////////////////////////////////
+    // Operators
+    ////////////////////////////////////////
 
     /**
      * Performs an indirect sort of the NDArray ascending on the last dimension.
@@ -495,29 +597,6 @@ public interface NDArray extends AutoCloseable {
      *     axis
      */
     NDList split(int axis, int numOutputs);
-
-    /**
-     * Returns an array of zeros with the same {@link Shape}, {@link DataType} and {@link
-     * SparseFormat} as the input array.
-     *
-     * @return {@code NDArray} filled with zeros
-     */
-    NDArray zerosLike();
-
-    /**
-     * Returns an array of ones with the same {@link Shape}, {@link DataType} and {@link
-     * SparseFormat} as the input array.
-     *
-     * @return {@code NDArray} filled with ones
-     */
-    NDArray onesLike();
-
-    /**
-     * Returns {@code true} if this array is a {@link SparseNDArray}.
-     *
-     * @return {@code true} if this array is a {@link SparseNDArray}
-     */
-    boolean isSparse();
 
     /**
      * Returns the cumulative sum along a axis. In-place method.
@@ -888,57 +967,6 @@ public interface NDArray extends AutoCloseable {
     NDArray mmul(NDArray other);
 
     /**
-     * Converts this NDArray to a double array.
-     *
-     * @return a double array
-     */
-    double[] toDoubleArray();
-
-    /**
-     * Converts this NDArray to a float array.
-     *
-     * @return a float array
-     */
-    float[] toFloatArray();
-
-    /**
-     * Converts this NDArray to a int array.
-     *
-     * @return a int array
-     */
-    int[] toIntArray();
-
-    /**
-     * Converts this NDArray to a long array.
-     *
-     * @return a long array
-     */
-    long[] toLongArray();
-
-    /**
-     * Converts this NDArray to a Number array based on its data type.
-     *
-     * @return a Number array
-     */
-    default Number[] toArray() {
-        switch (getDataType()) {
-            case FLOAT32:
-                float[] floatArray = toFloatArray();
-                return IntStream.range(0, floatArray.length)
-                        .mapToObj(i -> floatArray[i])
-                        .toArray(Number[]::new);
-            case FLOAT64:
-                return Arrays.stream(toDoubleArray()).boxed().toArray(Double[]::new);
-            case INT32:
-                return Arrays.stream(toIntArray()).boxed().toArray(Integer[]::new);
-            case INT64:
-                return Arrays.stream(toLongArray()).boxed().toArray(Long[]::new);
-            default:
-                throw new IllegalStateException("Unsupported DataType: " + getDataType());
-        }
-    }
-
-    /**
      * Copy (element wise) division of two NDArrays.
      *
      * @param other the second NDArray to divide
@@ -1155,13 +1183,6 @@ public interface NDArray extends AutoCloseable {
      * @return an NDArray after the mean
      */
     NDArray mean(int[] axes, boolean keepDims);
-
-    /**
-     * Returns a copy of this NDArray.
-     *
-     * @return a copy of this NDArray
-     */
-    NDArray dup();
 
     /**
      * Flattens the array into a 1D NDArray in row-major order.
@@ -1575,22 +1596,6 @@ public interface NDArray extends AutoCloseable {
     boolean isEmpty();
 
     /**
-     * Casts elements of this NDArray to new data type.
-     *
-     * @param dataType {@code DataType} to be casted
-     * @return the result {@code NDArray}
-     */
-    NDArray castTo(DataType dataType);
-
-    /**
-     * Converts the array into a 2D Matrix.
-     *
-     * @return This NDArray as Matrix
-     * @throws IllegalStateException Thrown if the NDArray is not a 2D matrix
-     */
-    Matrix asMatrix();
-
-    /**
      * Returns {@code true} if all elements within this array are non-zero or {@code true}.
      *
      * @return {@code true} if all elements within this array are non-zero or {@code true}
@@ -1618,34 +1623,15 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Returns empty array with the same dtype/order/shape as this one.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray like();
-
-    /**
-     * Returns uninitialized array with the same dtype/order/shape as this one.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray ulike();
-
-    /**
-     * Returns an internal representative of Native {@code NDArray}.
-     *
-     * <p>This method should only be used by Engine provider.
-     *
-     * @return an internal representative of Native NDArray
-     */
-    NDArrayEx getNDArrayInternal();
-
-    /**
      * Computes the truth value of NOT x element-wise.
      *
      * @return the result {@code NDArray}
      */
     NDArray logicalNot();
+
+    ////////////////////////////////////////
+    // basic numeric operations
+    ////////////////////////////////////////
 
     /**
      * Calculates the absolute value element-wise.
@@ -1869,6 +1855,15 @@ public interface NDArray extends AutoCloseable {
      * @return the result {@code NDArray}
      */
     NDArray atanh();
+
+    /**
+     * Returns an internal representative of Native {@code NDArray}.
+     *
+     * <p>This method should only be used by Engine provider.
+     *
+     * @return an internal representative of Native NDArray
+     */
+    NDArrayEx getNDArrayInternal();
 
     @Override
     void close();

@@ -20,7 +20,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.Profiler;
 import software.amazon.ai.Translator;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.inference.Predictor;
@@ -83,9 +82,6 @@ public class MockEngine extends Engine {
     public Trainer newTrainer(Model model, Context context) {
         return null;
     }
-
-    @Override
-    public void setProfiler(Profiler profiler) {}
 
     public void setGpuCount(int gpuCount) {
         this.gpuCount = gpuCount;

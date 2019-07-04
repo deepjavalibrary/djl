@@ -10,9 +10,7 @@ import software.amazon.ai.util.PairList;
 public class MxOpParams extends PairList<String, String> {
 
     public void setShape(Shape shape) {
-        if (shape != null) {
-            setParam("shape", shape.toString());
-        }
+        setShape("shape", shape);
     }
 
     public void setShape(String alias, Shape shape) {

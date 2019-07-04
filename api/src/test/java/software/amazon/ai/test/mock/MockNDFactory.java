@@ -48,11 +48,6 @@ public class MockNDFactory implements NDFactory {
     }
 
     @Override
-    public NDArray zeros(Shape shape) {
-        return null;
-    }
-
-    @Override
     public NDArray create(float[] data, Context context, Shape shape) {
         return null;
     }

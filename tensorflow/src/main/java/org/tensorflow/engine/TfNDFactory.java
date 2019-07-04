@@ -116,11 +116,6 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
     }
 
     @Override
-    public NDArray zeros(Shape shape) {
-        return null;
-    }
-
-    @Override
     public NDArray zeros(Context context, Shape shape, DataType dataType) {
         return null;
     }

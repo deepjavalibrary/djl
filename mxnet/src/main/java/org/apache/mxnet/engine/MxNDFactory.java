@@ -65,12 +65,6 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Context getContext() {
-        return context;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public MxNDArray create(DataDesc dataDesc) {
         return create(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
     }
@@ -121,33 +115,6 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
-    public void invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
-        JnaUtils.op(operation).invoke(this, src, dest, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params) {
-        return JnaUtils.op(operation).invoke(this, src, params);
-    }
-
-    public NDArray invoke(String operation, NDArray src, PairList<String, ?> params) {
-        return JnaUtils.op(operation).invoke(this, src, params)[0];
-    }
-
-    public NDArray invoke(String operation, PairList<String, ?> params) {
-        return JnaUtils.op(operation).invoke(this, EMPTY, params)[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray zeros(Shape shape) {
-        return zeros(context, shape, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray zeros(Context context, Shape shape, DataType dataType) {
         return fill("_zeros", context, shape, dataType);
     }
@@ -162,17 +129,6 @@ public class MxNDFactory implements NDFactory {
     @Override
     public NDArray ones(Context context, Shape shape, DataType dataType) {
         return fill("_ones", context, shape, dataType);
-    }
-
-    private NDArray fill(String opName, Context context, Shape shape, DataType dataType) {
-        MxOpParams params = new MxOpParams();
-        if (shape == null) {
-            throw new IllegalArgumentException("Shape is required for " + opName.substring(1));
-        }
-        params.setShape(shape);
-        params.setContext(context);
-        params.setDataType(dataType);
-        return invoke(opName, params);
     }
 
     /** {@inheritDoc} */
@@ -286,6 +242,12 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
+    public Context getContext() {
+        return context;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public synchronized void attach(AutoCloseable resource) {
         resources.put(resource, resource);
     }
@@ -294,6 +256,27 @@ public class MxNDFactory implements NDFactory {
     @Override
     public synchronized void detach(AutoCloseable resource) {
         resources.remove(resource);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
+        JnaUtils.op(operation).invoke(this, src, dest, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params) {
+        return JnaUtils.op(operation).invoke(this, src, params);
+    }
+
+    public NDArray invoke(String operation, NDArray src, PairList<String, ?> params) {
+        return JnaUtils.op(operation).invoke(this, src, params)[0];
+    }
+
+    public NDArray invoke(String operation, PairList<String, ?> params) {
+        return JnaUtils.op(operation).invoke(this, EMPTY, params)[0];
     }
 
     /** {@inheritDoc} */
@@ -308,6 +291,17 @@ public class MxNDFactory implements NDFactory {
         }
         resources = null;
         parent.detach(this);
+    }
+
+    private NDArray fill(String opName, Context context, Shape shape, DataType dataType) {
+        MxOpParams params = new MxOpParams();
+        if (shape == null) {
+            throw new IllegalArgumentException("Shape is required for " + opName.substring(1));
+        }
+        params.setShape(shape);
+        params.setContext(context == null ? this.context : context);
+        params.setDataType(dataType);
+        return invoke(opName, params);
     }
 
     private static final class SystemFactory extends MxNDFactory {

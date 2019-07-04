@@ -117,47 +117,6 @@ public interface NDFactory extends AutoCloseable {
     NDArray create(DataDesc dataDesc, Buffer data);
 
     /**
-     * An engine specific generic invocation to native operator.
-     *
-     * <p>You should avoid using this function if possible. Since this function is engine specific,
-     * using this API may cause portability issue. And user must be aware that native operation may
-     * not compatible between each versions.
-     *
-     * @param operation native operation to performance
-     * @param src array of source NDArray
-     * @param dest array of destination to save output
-     * @param params parameters to be passed to native operator
-     * @throws IllegalArgumentException if operation is not supported by Engine
-     * @throws software.amazon.ai.engine.EngineException if operation failed in native engine
-     */
-    void invoke(String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params);
-
-    /**
-     * An engine specific generic invocation to native operator.
-     *
-     * <p>You should avoid using this function if possible. Since this function is engine specific,
-     * using this API may cause portability issue. And user must be aware that native operation may
-     * not compatible between each versions.
-     *
-     * @param operation native operation to performance
-     * @param src array of source NDArray
-     * @param params parameters to be passed to native operator
-     * @return output array of {@link NDArray}
-     * @throws IllegalArgumentException if operation is not supported by Engine
-     * @throws software.amazon.ai.engine.EngineException if operation failed in native engine
-     */
-    NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params);
-
-    /**
-     * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
-     *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @return new instance of {@link NDArray}
-     * @see #zeros(Context, Shape, DataType)
-     */
-    NDArray zeros(Shape shape);
-
-    /**
      * Creates an instance of {@link NDArray} with specified {@link DataDesc} and float array.
      *
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
@@ -206,6 +165,17 @@ public interface NDFactory extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     NDArray create(byte[] data, Context context, Shape shape);
+
+    /**
+     * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
+     *
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     * @see #zeros(Context, Shape, DataType)
+     */
+    default NDArray zeros(Shape shape) {
+        return zeros(null, shape, null);
+    }
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Context}, * {@link Shape}, and
@@ -471,13 +441,6 @@ public interface NDFactory extends AutoCloseable {
     NDFactory getParentFactory();
 
     /**
-     * Returns default {@link Context} of this NDFactory.
-     *
-     * @return default {@link Context} of this NDFactory
-     */
-    Context getContext();
-
-    /**
      * Creates a child NDFactory.
      *
      * <p>Child NDFactory will inherit default {@link Context} from this NDFactory.
@@ -493,6 +456,13 @@ public interface NDFactory extends AutoCloseable {
      * @return a child NDFactory
      */
     NDFactory newSubFactory(Context context);
+
+    /**
+     * Returns default {@link Context} of this NDFactory.
+     *
+     * @return default {@link Context} of this NDFactory
+     */
+    Context getContext();
 
     /**
      * Attaches an NDArray or NDFactory to this factory.
@@ -513,6 +483,38 @@ public interface NDFactory extends AutoCloseable {
      * @param resource NDArray to be remove out of this NDFactory's lifecycle
      */
     void detach(AutoCloseable resource);
+
+    /**
+     * An engine specific generic invocation to native operator.
+     *
+     * <p>You should avoid using this function if possible. Since this function is engine specific,
+     * using this API may cause portability issue. And user must be aware that native operation may
+     * not compatible between each versions.
+     *
+     * @param operation native operation to performance
+     * @param src array of source NDArray
+     * @param dest array of destination to save output
+     * @param params parameters to be passed to native operator
+     * @throws IllegalArgumentException if operation is not supported by Engine
+     * @throws software.amazon.ai.engine.EngineException if operation failed in native engine
+     */
+    void invoke(String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params);
+
+    /**
+     * An engine specific generic invocation to native operator.
+     *
+     * <p>You should avoid using this function if possible. Since this function is engine specific,
+     * using this API may cause portability issue. And user must be aware that native operation may
+     * not compatible between each versions.
+     *
+     * @param operation native operation to performance
+     * @param src array of source NDArray
+     * @param params parameters to be passed to native operator
+     * @return output array of {@link NDArray}
+     * @throws IllegalArgumentException if operation is not supported by Engine
+     * @throws software.amazon.ai.engine.EngineException if operation failed in native engine
+     */
+    NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params);
 
     /** {@inheritDoc} */
     @Override
