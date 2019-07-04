@@ -4,9 +4,7 @@ package software.amazon.ai.ndarray.index;
 public class NDIndexSlice implements NDIndexElement {
 
     private Integer min;
-
     private Integer max;
-
     private Integer step;
 
     public NDIndexSlice(Integer min, Integer max, Integer step) {

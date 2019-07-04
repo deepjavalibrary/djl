@@ -24,7 +24,7 @@ import software.amazon.ai.ndarray.NDArray;
  */
 public class NDIndex {
 
-    private static final String ITEM_PATTERN = "(\\*)|((-?\\d+)?:(-?\\d+)?(:-?\\d+)?)|(-?\\d+)";
+    private static final Pattern ITEM_PATTERN = Pattern.compile("(\\*)|((-?\\d+)?:(-?\\d+)?(:-?\\d+)?)|(-?\\d+)");
 
     private int rank;
 
@@ -126,21 +126,20 @@ public class NDIndex {
 
     private void addIndexItem(String indexItem) {
         indexItem = indexItem.trim();
-        Pattern r = Pattern.compile(ITEM_PATTERN);
-        Matcher m = r.matcher(indexItem);
+        Matcher m = ITEM_PATTERN.matcher(indexItem);
         if (!m.matches()) {
             throw new IllegalArgumentException("Invalid argument index: " + indexItem);
         }
 
         String star = m.group(1);
         if (star != null) {
-            this.indices.add(new NDIndexAll());
+            indices.add(new NDIndexAll());
             return;
         }
 
         String digit = m.group(6);
         if (digit != null) {
-            this.indices.add(new NDIndexFixed(Integer.parseInt(digit)));
+            indices.add(new NDIndexFixed(Integer.parseInt(digit)));
             return;
         }
 
@@ -149,9 +148,9 @@ public class NDIndex {
         Integer max = m.group(4) != null ? Integer.parseInt(m.group(4)) : null;
         Integer step = m.group(5) != null ? Integer.parseInt(m.group(5)) : null;
         if (min == null && max == null && step == null) {
-            this.indices.add(new NDIndexAll());
+            indices.add(new NDIndexAll());
         } else {
-            this.indices.add(new NDIndexSlice(min, max, step));
+            indices.add(new NDIndexSlice(min, max, step));
         }
     }
 
@@ -181,7 +180,7 @@ public class NDIndex {
      */
     public NDIndex addBooleanIndex(NDArray index) {
         rank += index.getShape().dimension();
-        this.indices.add(new NDIndexBooleans(index));
+        indices.add(new NDIndexBooleans(index));
         return this;
     }
 
@@ -194,7 +193,7 @@ public class NDIndex {
      */
     public NDIndex addSliceDim(int min, int max) {
         rank++;
-        this.indices.add(new NDIndexSlice(min, max, null));
+        indices.add(new NDIndexSlice(min, max, null));
         return this;
     }
 
@@ -208,7 +207,7 @@ public class NDIndex {
      */
     public NDIndex addSliceDim(int min, int max, int step) {
         rank++;
-        this.indices.add(new NDIndexSlice(min, max, step));
+        indices.add(new NDIndexSlice(min, max, step));
         return this;
     }
 }

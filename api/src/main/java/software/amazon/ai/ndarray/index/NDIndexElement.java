@@ -8,5 +8,5 @@ public interface NDIndexElement {
      *
      * @return the number of dimensions occupied by this index element
      */
-    public abstract int getRank();
+    int getRank();
 }
