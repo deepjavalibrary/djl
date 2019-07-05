@@ -139,4 +139,7 @@ public class TfModel implements Model {
     public Model cast(DataType dataType) {
         return null;
     }
+
+    @Override
+    public void close() {}
 }

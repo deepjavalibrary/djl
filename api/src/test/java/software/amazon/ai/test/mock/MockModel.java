@@ -84,6 +84,9 @@ public class MockModel implements Model {
         return null;
     }
 
+    @Override
+    public void close() {}
+
     public void setArtifacts(Map<String, Object> artifacts) {
         this.artifacts = artifacts;
     }
