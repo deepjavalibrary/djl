@@ -40,30 +40,30 @@ public class ModelInfo {
     static {
         MODELS.put("FERPlus", new ModelInfo("FERPlus", ModelInfo.EMOTION_DETECTION));
         MODELS.put("caffenet", new ModelInfo("caffenet"));
-        MODELS.put("inception-bn", new ModelInfo("inception-bn"));
+        MODELS.put("Inception-BN", new ModelInfo("inception-bn"));
         MODELS.put("lstm_ptb", new ModelInfo("lstm_ptb", ModelInfo.LANGUAGE_MODELING));
         MODELS.put("nin", new ModelInfo("nin"));
         MODELS.put(
                 "onnx-arcface-resnet100",
                 new ModelInfo("onnx-arcface-resnet100", ModelInfo.FACE_RECOGNITION));
         MODELS.put("onnx-duc", new ModelInfo("onnx-duc", ModelInfo.SEMANTIC_SEGMENTATION));
-        MODELS.put("onnx-inception_v1", new ModelInfo("onnx-inception_v1"));
-        MODELS.put("onnx-mobilenet", new ModelInfo("onnx-mobilenet"));
-        MODELS.put("onnx-resnet101v1", new ModelInfo("onnx-resnet101v1"));
-        MODELS.put("onnx-resnet101v2", new ModelInfo("onnx-resnet101v2"));
-        MODELS.put("onnx-resnet152v1", new ModelInfo("onnx-resnet152v1"));
-        MODELS.put("onnx-resnet152v2", new ModelInfo("onnx-resnet152v2"));
-        MODELS.put("onnx-resnet18v1", new ModelInfo("onnx-resnet18v1"));
-        MODELS.put("onnx-resnet18v2", new ModelInfo("onnx-resnet18v2"));
-        MODELS.put("onnx-resnet34v1", new ModelInfo("onnx-resnet34v1"));
-        MODELS.put("onnx-resnet34v2", new ModelInfo("onnx-resnet34v2"));
-        MODELS.put("onnx-resnet50v1", new ModelInfo("onnx-resnet50v1"));
-        MODELS.put("onnx-resnet50v2", new ModelInfo("onnx-resnet50v2"));
-        MODELS.put("onnx-squeezenet", new ModelInfo("onnx-squeezenet"));
+        MODELS.put("inception_v1", new ModelInfo("onnx-inception_v1"));
+        MODELS.put("mobilenetv2-1.0", new ModelInfo("onnx-mobilenet"));
+        MODELS.put("resnet101v1", new ModelInfo("onnx-resnet101v1"));
+        MODELS.put("resnet101v2", new ModelInfo("onnx-resnet101v2"));
+        MODELS.put("resnet152v1", new ModelInfo("onnx-resnet152v1"));
+        MODELS.put("resnet152v2", new ModelInfo("onnx-resnet152v2"));
+        MODELS.put("resnet18v1", new ModelInfo("onnx-resnet18v1"));
+        MODELS.put("resnet18v2", new ModelInfo("onnx-resnet18v2"));
+        MODELS.put("resnet34v1", new ModelInfo("onnx-resnet34v1"));
+        MODELS.put("resnet34v2", new ModelInfo("onnx-resnet34v2"));
+        MODELS.put("resnet50v1", new ModelInfo("onnx-resnet50v1"));
+        MODELS.put("resnet50v2", new ModelInfo("onnx-resnet50v2"));
+        MODELS.put("squeezenet", new ModelInfo("onnx-squeezenet"));
         MODELS.put("onnx-vgg16", new ModelInfo("onnx-vgg16"));
-        MODELS.put("onnx-vgg16_bn", new ModelInfo("onnx-vgg16_bn"));
+        MODELS.put("vgg16_bn", new ModelInfo("onnx-vgg16_bn"));
         MODELS.put("onnx-vgg19", new ModelInfo("onnx-vgg19"));
-        MODELS.put("onnx-vgg19_bn", new ModelInfo("onnx-vgg19_bn"));
+        MODELS.put("vgg19_bn", new ModelInfo("onnx-vgg19_bn"));
         MODELS.put("resnet-152", new ModelInfo("resnet-152"));
         MODELS.put("resnet-18", new ModelInfo("resnet-18"));
         MODELS.put("resnet50_ssd_model", new ModelInfo("resnet50_ssd"));

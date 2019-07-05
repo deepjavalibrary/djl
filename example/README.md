@@ -44,7 +44,7 @@ from the MXNet model zoo, e.g.: squeezenet_v1.1 or resnet50_ssd_model
 ### Prepare test image files:
 
 Two test images can be found in project test resource folder: src/test/resources.
-You can also down cats image from internet.
+You can also download cats image from internet.
 
 
 ### Get command line parameters help

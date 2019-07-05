@@ -53,7 +53,7 @@ public final class ClassifyExample extends AbstractExample {
 
         ClassifyTranslator translator = new ClassifyTranslator(5, 224, 224);
 
-        // Following context is not not required, default context will be used by Predictor without
+        // Following context is not required, default context will be used by Predictor without
         // passing context to Predictor.newInstance(model, translator)
         // Change to a specific context if needed.
         Context context = Context.defaultContext();
