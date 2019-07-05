@@ -27,9 +27,10 @@ A: December 2004
 For this tutorial, you can get the model and vocabulary by running following commands:
 
 ```bash
-  curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/vocab.json -O
-  curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/static_bert_qa-0002.params -O
-  curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/static_bert_qa-symbol.json -O
+cd example/build
+curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/vocab.json -O
+curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/static_bert_qa-0002.params -O
+curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/static_bert_qa-symbol.json -O
 ```
 
 ### Step 2: Do Inference
@@ -48,6 +49,6 @@ You can simply type the followings to run the inference:
 
 ```
 cd example
-./gradlew -Dmain=com.amazon.ai.example.BertQaInferenceExample run --args="-p build/ -n static_bert_qa"
+./gradlew -Dmain=software.amazon.ai.example.BertQaInferenceExample run --args="-p build/ -n static_bert_qa"
 ```
 
