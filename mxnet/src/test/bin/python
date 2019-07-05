@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+echo "
+sys.path = [
+    'build/tmp/test/python2',
+]
+USER_BASE: 'usr/local/bin/python/2.7' (doesn't exist)
+USER_SITE: '/usr/local/bin/python/2.7/lib/python/site-packages' (doesn't exist)
+ENABLE_USER_SITE: True
+"

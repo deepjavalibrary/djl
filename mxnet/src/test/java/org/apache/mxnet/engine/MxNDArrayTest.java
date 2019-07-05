@@ -18,7 +18,6 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import com.sun.jna.Pointer;
 import org.apache.mxnet.jna.LibUtils;
-import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.jna.NativeSize;
 import org.apache.mxnet.jna.PointerArray;
 import org.apache.mxnet.test.MockMxnetLibrary;
@@ -26,8 +25,10 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.IObjectFactory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -41,7 +42,7 @@ import software.amazon.ai.ndarray.types.SparseFormat;
 @PrepareForTest(LibUtils.class)
 public class MxNDArrayTest extends PowerMockTestCase {
 
-    private MxnetLibrary library;
+    private MockMxnetLibrary library;
     private MxNDFactory factory;
 
     @BeforeClass
@@ -54,7 +55,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
 
     @AfterClass
     public void postProcessing() {
-        ((MockMxnetLibrary) library).resetFunctions();
+        library.resetFunctions();
     }
 
     @Test
@@ -72,19 +73,23 @@ public class MxNDArrayTest extends PowerMockTestCase {
     @Test
     public void testSet() {
         final float[][] fa = new float[][] {new float[1]};
-        ((MockMxnetLibrary) library)
-                .setFunction(
-                        "MXNDArraySyncCopyFromCPU",
-                        objects -> {
-                            int size = ((NativeSize) objects[2]).intValue();
-                            fa[0] = ((Pointer) objects[1]).getFloatArray(0, size);
-                            return 0;
-                        });
+        library.setFunction(
+                "MXNDArraySyncCopyFromCPU",
+                objects -> {
+                    int size = ((NativeSize) objects[2]).intValue();
+                    fa[0] = ((Pointer) objects[1]).getFloatArray(0, size);
+                    return 0;
+                });
         try (MxNDArray nd = factory.create(new DataDesc(new Shape(3)))) {
             float[] input = new float[] {1.0f, 2.0f, 3.0f};
             nd.set(input);
             float[] fArr = fa[0];
             Assert.assertEquals(input, fArr);
         }
+    }
+
+    @ObjectFactory
+    public IObjectFactory getObjectFactory() {
+        return new org.powermock.modules.testng.PowerMockObjectFactory();
     }
 }

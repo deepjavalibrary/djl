@@ -22,7 +22,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.IObjectFactory;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.Context;
 import software.amazon.ai.TranslateException;
@@ -40,12 +42,10 @@ import software.amazon.ai.ndarray.types.Shape;
 @PrepareForTest(LibUtils.class)
 public class MxPredictorTest extends PowerMockTestCase {
 
-    private MxnetLibrary library;
-
     @BeforeClass
     public void prepare() {
         mockStatic(LibUtils.class);
-        library = new MockMxnetLibrary();
+        MxnetLibrary library = new MockMxnetLibrary();
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
     }
 
@@ -59,6 +59,11 @@ public class MxPredictorTest extends PowerMockTestCase {
         predictor.setMetrics(new Metrics());
         NDList output = predictor.predict(5);
         Assert.assertEquals(output.size(), 3);
+    }
+
+    @ObjectFactory
+    public IObjectFactory getObjectFactory() {
+        return new org.powermock.modules.testng.PowerMockObjectFactory();
     }
 
     private static final class DummyTranslator implements Translator<Integer, NDList> {

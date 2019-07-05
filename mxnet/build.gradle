@@ -52,6 +52,10 @@ task jnarator(dependsOn: ":jnarator:jar") {
     }
 }
 
+test {
+    environment "PATH", "src/test/bin:${environment.PATH}"
+}
+
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 

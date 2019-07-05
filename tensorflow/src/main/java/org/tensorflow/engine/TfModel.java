@@ -111,7 +111,7 @@ public class TfModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException {
+    public <T> T getArtifact(String name, Function<InputStream, T> function) {
         return null;
     }
 
@@ -130,7 +130,7 @@ public class TfModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public InputStream getArtifactAsStream(String name) throws IOException {
+    public InputStream getArtifactAsStream(String name) {
         return null;
     }
 

@@ -20,7 +20,6 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import org.apache.mxnet.jna.LibUtils;
-import org.apache.mxnet.jna.MxnetLibrary;
 import org.apache.mxnet.test.MockMxnetLibrary;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -28,7 +27,9 @@ import org.powermock.modules.testng.PowerMockTestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.IObjectFactory;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 
 // CHECKSTYLE:ON:AvoidStaticImport
@@ -37,7 +38,7 @@ import org.testng.annotations.Test;
 public class AutogradTest extends PowerMockTestCase {
 
     private static final Logger logger = LoggerFactory.getLogger(AutogradTest.class);
-    private MxnetLibrary library;
+    private MockMxnetLibrary library;
 
     @BeforeClass
     public void prepare() {
@@ -51,14 +52,13 @@ public class AutogradTest extends PowerMockTestCase {
         logger.info("Test: Autograd setRecording");
 
         final int[] isRecording = new int[1];
-        ((MockMxnetLibrary) library)
-                .setFunction(
-                        "MXAutogradSetIsRecording",
-                        objects -> {
-                            isRecording[0] = ((int) objects[0]);
-                            ((IntBuffer) objects[1]).put(0, 0);
-                            return 0;
-                        });
+        library.setFunction(
+                "MXAutogradSetIsRecording",
+                objects -> {
+                    isRecording[0] = ((int) objects[0]);
+                    ((IntBuffer) objects[1]).put(0, 0);
+                    return 0;
+                });
         boolean result = MxAutograd.setRecording(true);
         Assert.assertEquals(isRecording[0], 1);
         Assert.assertFalse(result);
@@ -68,14 +68,13 @@ public class AutogradTest extends PowerMockTestCase {
     public void testSetTraining() {
         logger.info("Test: Autograd setTraining");
         final int[] isTraining = new int[1];
-        ((MockMxnetLibrary) library)
-                .setFunction(
-                        "MXAutogradSetIsTraining",
-                        objects -> {
-                            isTraining[0] = ((int) objects[0]);
-                            ((IntBuffer) objects[1]).put(0, 0);
-                            return 0;
-                        });
+        library.setFunction(
+                "MXAutogradSetIsTraining",
+                objects -> {
+                    isTraining[0] = ((int) objects[0]);
+                    ((IntBuffer) objects[1]).put(0, 0);
+                    return 0;
+                });
         boolean result = MxAutograd.setTraining(true);
         Assert.assertEquals(isTraining[0], 1);
         Assert.assertFalse(result);
@@ -84,13 +83,12 @@ public class AutogradTest extends PowerMockTestCase {
     @Test
     public void testIsRecording() {
         logger.info("Test: Autograd isRecording");
-        ((MockMxnetLibrary) library)
-                .setFunction(
-                        "MXAutogradIsRecording",
-                        objects -> {
-                            ((ByteBuffer) objects[0]).put(0, (byte) 1);
-                            return 0;
-                        });
+        library.setFunction(
+                "MXAutogradIsRecording",
+                objects -> {
+                    ((ByteBuffer) objects[0]).put(0, (byte) 1);
+                    return 0;
+                });
         boolean result = MxAutograd.isRecording();
         Assert.assertTrue(result);
     }
@@ -98,14 +96,18 @@ public class AutogradTest extends PowerMockTestCase {
     @Test
     public void testIsTraining() {
         logger.info("Test: Autograd isTraining");
-        ((MockMxnetLibrary) library)
-                .setFunction(
-                        "MXAutogradIsTraining",
-                        objects -> {
-                            ((ByteBuffer) objects[0]).put(0, (byte) 0);
-                            return 0;
-                        });
+        library.setFunction(
+                "MXAutogradIsTraining",
+                objects -> {
+                    ((ByteBuffer) objects[0]).put(0, (byte) 0);
+                    return 0;
+                });
         boolean result = MxAutograd.isTraining();
         Assert.assertFalse(result);
+    }
+
+    @ObjectFactory
+    public IObjectFactory getObjectFactory() {
+        return new org.powermock.modules.testng.PowerMockObjectFactory();
     }
 }

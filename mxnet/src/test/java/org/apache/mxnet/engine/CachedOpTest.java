@@ -16,7 +16,6 @@ package org.apache.mxnet.engine;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import com.sun.jna.ptr.PointerByReference;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.jna.LibUtils;
@@ -44,22 +43,12 @@ import software.amazon.ai.util.PairList;
 public class CachedOpTest extends PowerMockTestCase {
 
     private static final Logger logger = LoggerFactory.getLogger(CachedOpTest.class);
-    private MxnetLibrary library;
 
     @BeforeClass
     public void prepare() {
         mockStatic(LibUtils.class);
-        library = new MockMxnetLibrary();
+        MxnetLibrary library = new MockMxnetLibrary();
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
-    }
-
-    @Test
-    public void testConstructCachedOp() {
-        new CachedOp(
-                new PointerByReference().getValue(),
-                MxNDFactory.SYSTEM_FACTORY,
-                new MxNDArray[0],
-                new PairList<>());
     }
 
     @Test
