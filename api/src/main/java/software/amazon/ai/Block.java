@@ -21,6 +21,9 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
+/**
+ * An interface defining neural-network layers.
+ */
 public interface Block {
 
     NDList forward(NDList inputs, PairList<String, String> params);

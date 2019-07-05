@@ -252,7 +252,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray get(NDIndex index) {
         if (index.getRank() == 0) {
             return this;
-        } else if (index.getRank() == 1) {
+        }
+
+        if (index.getRank() == 1) {
             NDIndexElement ie = index.get(0);
             if (ie instanceof NDIndexFixed) {
                 Pointer pointer = JnaUtils.ndArrayAt(getHandle(), ((NDIndexFixed) ie).getIndex());
@@ -269,10 +271,10 @@ public class MxNDArray extends NativeResource implements NDArray {
                 return factory.create(pointer);
             } else {
                 throw new UnsupportedOperationException(
-                        "get currently supports Fixed and Slice indexes");
+                        "get() currently supports Fixed and Slice indexes");
             }
         } else {
-            throw new UnsupportedOperationException("get currently supports only rank 1");
+            throw new UnsupportedOperationException("get() currently supports only rank 1");
         }
     }
 

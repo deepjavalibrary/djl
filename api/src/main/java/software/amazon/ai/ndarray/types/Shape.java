@@ -111,22 +111,52 @@ public class Shape {
         return shape.length;
     }
 
-    public Shape drop(int n) {
-        return slice(n + 1, shape.length);
+    /**
+     * Creates a new {@code Shape} whose content is a slice of this shape.
+     *
+     * <p>The sub shape begins at the specified {@code beginIndex} and extends to {@code endIndex -
+     * 1}.
+     *
+     * @param beginIndex the beginning index, inclusive.
+     * @return a new {@code Shape} whose content is a slice of this shape
+     */
+    public Shape slice(int beginIndex) {
+        return slice(beginIndex, shape.length);
     }
 
-    public Shape slice(int from, int end) {
-        int size = end - from;
+    /**
+     * Creates a new {@code Shape} whose content is a slice of this shape.
+     *
+     * <p>The sub shape begins at the specified {@code beginIndex} and extends to {@code endIndex -
+     * 1}.
+     *
+     * @param beginIndex the beginning index, inclusive.
+     * @param endIndex the ending index, exclusive.
+     * @return a new {@code Shape} whose content is a slice of this shape
+     */
+    public Shape slice(int beginIndex, int endIndex) {
+        int size = endIndex - beginIndex;
         int[] out = new int[size];
-        System.arraycopy(shape, from, out, 0, size);
+        System.arraycopy(shape, beginIndex, out, 0, size);
         return new Shape(out);
     }
 
+    /**
+     * Joins a this shape with specified {@code other} shape.
+     *
+     * @param other the shape the join
+     * @return joined {@code Shape}
+     */
     public Shape addAll(Shape other) {
         return new Shape(
                 IntStream.concat(Arrays.stream(shape), Arrays.stream(other.shape)).toArray());
     }
 
+    /**
+     * Returns the head index of the shape.
+     *
+     * @return the head index of the shape
+     */
     public int head() {
         return shape[0];
     }

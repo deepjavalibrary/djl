@@ -12,4 +12,7 @@
  */
 package software.amazon.ai;
 
+/**
+ * An interface defining profiler functionality.
+ */
 public interface Profiler {}

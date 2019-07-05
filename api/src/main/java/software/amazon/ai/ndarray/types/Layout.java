@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.ndarray.types;
 
+/** A enum representing the underlying {@link software.amazon.ai.ndarray.NDArray}'s layout. */
 public enum Layout {
     UNDEFINED("__undefined__"),
     NCHW("NCHW"),

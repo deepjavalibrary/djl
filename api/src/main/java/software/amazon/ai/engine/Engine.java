@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.Profiler;
 import software.amazon.ai.Translator;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.nn.NNIndex;
@@ -170,7 +169,4 @@ public abstract class Engine {
      * @return Trainer
      */
     public abstract Trainer newTrainer(Model model, Context context);
-
-    // TODO: Not Implemented
-    public abstract void setProfiler(Profiler profiler);
 }

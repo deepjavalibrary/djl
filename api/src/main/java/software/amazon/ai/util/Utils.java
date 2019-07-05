@@ -25,16 +25,27 @@ import java.util.List;
 import java.util.Scanner;
 import software.amazon.ai.ndarray.types.DataType;
 
+/** A class containing utility methods. */
 public final class Utils {
 
     public static final boolean DEBUG = true;
 
     private Utils() {}
 
-    public static <T> int indexOf(T[] arr, T value) {
-        if (arr != null) {
-            for (int i = 0; i < arr.length; ++i) {
-                if (value.equals(arr[i])) {
+    /**
+     * Returns the index of the first occurrence of the specified element in {@code array}, or -1 if
+     * this list does not contain the element.
+     *
+     * @param array input array
+     * @param value element to search for
+     * @param <T> array type
+     * @return the index of the first occurrence of the specified element in {@code array}, or -1 if
+     *     this list does not contain the element
+     */
+    public static <T> int indexOf(T[] array, T value) {
+        if (array != null) {
+            for (int i = 0; i < array.length; ++i) {
+                if (value.equals(array[i])) {
                     return i;
                 }
             }
@@ -43,16 +54,36 @@ public final class Utils {
         return -1;
     }
 
-    public static <T> boolean contains(T[] arr, T value) {
-        return indexOf(arr, value) >= 0;
+    /**
+     * Returns @{code true} if the {@code array} contains the specified element.
+     *
+     * @param array input array
+     * @param value element whose presence in {@code array} is to be tested
+     * @param <T> array type
+     * @return @{code true} if this list contains the specified element
+     */
+    public static <T> boolean contains(T[] array, T value) {
+        return indexOf(array, value) >= 0;
     }
 
+    /**
+     * Adds padding chars to specified StringBuilder.
+     *
+     * @param sb the StringBuilder to append
+     * @param c padding char
+     * @param count number characters to be added
+     */
     public static void pad(StringBuilder sb, char c, int count) {
         for (int i = 0; i < count; ++i) {
             sb.append(c);
         }
     }
 
+    /**
+     * Deletes entire directory and ignore all errors.
+     *
+     * @param dir directory to be removed
+     */
     public static void deleteQuietly(Path dir) {
         try {
             Files.walk(dir)
@@ -70,6 +101,13 @@ public final class Utils {
         }
     }
 
+    /**
+     * Reads all lines from a file.
+     *
+     * @param file the file to be read
+     * @return all lines in the file
+     * @throws IOException if read file failed
+     */
     public static List<String> readLines(Path file) throws IOException {
         if (Files.notExists(file)) {
             return Collections.emptyList();
@@ -79,6 +117,12 @@ public final class Utils {
         }
     }
 
+    /**
+     * Reads all lines from specified InputStream.
+     *
+     * @param is the InputStream to read
+     * @return all lines from the input
+     */
     public static List<String> readLines(InputStream is) {
         List<String> list = new ArrayList<>();
         try (Scanner scanner =
@@ -90,6 +134,13 @@ public final class Utils {
         return list;
     }
 
+    /**
+     * Returns a formatted CharSequence from input ByteBuffer.
+     *
+     * @param buf buffer to read from
+     * @param dataType DataType to be used for formatting
+     * @return formatted CharSequence
+     */
     public static CharSequence toCharSequence(ByteBuffer buf, DataType dataType) {
         StringBuilder sb = new StringBuilder();
         while (buf.hasRemaining()) {
@@ -132,6 +183,12 @@ public final class Utils {
         return sb;
     }
 
+    /**
+     * Convert a List of Number to float array.
+     *
+     * @param list the list to be converted
+     * @return float array
+     */
     public static float[] toFloatArray(List<? extends Number> list) {
         float[] ret = new float[list.size()];
         int idx = 0;

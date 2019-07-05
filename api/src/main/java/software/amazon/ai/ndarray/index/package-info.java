@@ -10,14 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
+/** Contains classes that help access {@link software.amazon.ai.ndarray.NDArray}'s indices. */
 package software.amazon.ai.ndarray.index;
-
-/** An {@code NDIndexElement} to return all values in a particular dimension. */
-public class NDIndexAll implements NDIndexElement {
-
-    /** {@inheritDoc} */
-    @Override
-    public int getRank() {
-        return 1;
-    }
-}

@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains top level common classes shared for both inference and training. */
+/** Contains classes and interfaces that defines n-dimensional array. */
 package software.amazon.ai.ndarray;

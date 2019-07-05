@@ -14,14 +14,25 @@ package software.amazon.ai.ndarray.index;
 
 import software.amazon.ai.ndarray.NDArray;
 
+/** An {@code NDIndexElement} to return values based on a mask binary NDArray. */
 public class NDIndexBooleans implements NDIndexElement {
 
     private NDArray index;
 
+    /**
+     * Constructs a {@code NDIndexBooleans} instance with specified mask binary NDArray.
+     *
+     * @param index mask binary {@code NDArray}
+     */
     public NDIndexBooleans(NDArray index) {
         this.index = index;
     }
 
+    /**
+     * Returns mask binary {@code NDArray}.
+     *
+     * @return mask binary {@code NDArray}
+     */
     public NDArray getIndex() {
         return index;
     }
