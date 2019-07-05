@@ -13,6 +13,8 @@
 package org.apache.mxnet.engine;
 
 import org.apache.mxnet.jna.JnaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.TranslateException;
@@ -34,6 +36,8 @@ import software.amazon.ai.util.Pair;
  * @param <O> Output Object
  */
 public class MxPredictor<I, O> implements Predictor<I, O> {
+
+    private static final Logger logger = LoggerFactory.getLogger(MxPredictor.class);
 
     MxModel model;
     private Translator<I, O> translator;
@@ -116,6 +120,17 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     public void close() {
         cachedOp.close();
         factory.close();
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void finalize() throws Throwable {
+        if (logger.isDebugEnabled()) {
+            logger.warn("Model was not closed explicitly: {}", getClass().getSimpleName());
+        }
+        close();
+        super.finalize();
     }
 
     private class PredictorContext implements TranslatorContext {

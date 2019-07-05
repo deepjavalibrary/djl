@@ -51,7 +51,9 @@ public abstract class NativeResource implements AutoCloseable {
     protected void finalize() throws Throwable {
         if (getHandle() != null) {
             logger.warn("Resource was not closed explicitly: {}", getClass().getSimpleName());
-            logger.warn("Resource was created:", exception);
+            if (exception != null) {
+                logger.warn("Resource was created:", exception);
+            }
         }
         close();
         super.finalize();

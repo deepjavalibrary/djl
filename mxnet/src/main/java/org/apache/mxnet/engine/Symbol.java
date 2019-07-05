@@ -35,6 +35,7 @@ public class Symbol extends NativeResource implements Block {
     Symbol(MxNDFactory factory, Pointer pointer) {
         super(pointer);
         this.factory = factory;
+        factory.attach(this);
         //        argParams = JnaUtils.listSymbolArguments(getHandle());
         //        auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }

@@ -81,6 +81,8 @@ public final class BertQaInferenceExample extends AbstractExample {
                 collectMemoryInfo(metrics);
             }
         }
+
+        model.close();
         return predictResult;
     }
 

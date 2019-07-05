@@ -79,6 +79,8 @@ public final class SsdExample extends AbstractExample {
             }
         }
         drawBoundingBox(img, predictResult, arguments.getLogDir());
+
+        model.close();
         return predictResult.get(0);
     }
 

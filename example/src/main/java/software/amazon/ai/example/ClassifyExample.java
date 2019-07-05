@@ -69,6 +69,8 @@ public final class ClassifyExample extends AbstractExample {
                 collectMemoryInfo(metrics);
             }
         }
+
+        model.close();
         return predictResult;
     }
 

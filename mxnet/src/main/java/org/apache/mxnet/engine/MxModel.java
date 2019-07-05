@@ -30,6 +30,7 @@ import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Model;
+import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -44,10 +45,11 @@ import software.amazon.ai.util.Utils;
  * MXNet Specific functionality, such as getSymbol to obtain the Symbolic graph and getParameters to
  * obtain the parameter NDArrays
  */
-public class MxModel implements Model, AutoCloseable {
+public class MxModel implements Model {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
+    private NDFactory factory;
     private Path modelDir;
     private Symbol symbol;
     private PairList<String, MxNDArray> parameters;
@@ -56,10 +58,12 @@ public class MxModel implements Model, AutoCloseable {
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
     MxModel(
+            NDFactory factory,
             Path modelDir,
             Symbol symbol,
             PairList<String, MxNDArray> parameters,
             String[] optimizerStates) {
+        this.factory = factory;
         this.modelDir = modelDir;
         this.symbol = symbol;
         this.parameters = parameters;
@@ -67,7 +71,7 @@ public class MxModel implements Model, AutoCloseable {
     }
 
     static MxModel loadModel(String prefix, int epoch) throws IOException {
-        return loadModel(MxNDFactory.SYSTEM_FACTORY, prefix, epoch);
+        return loadModel(MxNDFactory.SYSTEM_FACTORY.newSubFactory(), prefix, epoch);
     }
 
     static MxModel loadModel(MxNDFactory factory, String prefix, int epoch) throws IOException {
@@ -92,7 +96,7 @@ public class MxModel implements Model, AutoCloseable {
 
         String[] stateNames = Utils.readLines(Paths.get(stateFile)).toArray(JnaUtils.EMPTY_ARRAY);
         // TODO: Check if Symbol has all names that params file have
-        return new MxModel(modelDir, symbol, parameters, stateNames);
+        return new MxModel(factory, modelDir, symbol, parameters, stateNames);
     }
 
     /**
@@ -130,18 +134,8 @@ public class MxModel implements Model, AutoCloseable {
         for (Pair<String, MxNDArray> pair : parameters) {
             newParam.add(pair.getKey(), pair.getValue().asType(dataType, true));
         }
-        return new MxModel(modelDir, symbol, newParam, optimizerStates);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        symbol.close();
-
-        for (int i = 0; i < parameters.size(); ++i) {
-            MxNDArray array = parameters.valueAt(i);
-            array.close();
-        }
+        NDFactory newFactory = MxNDFactory.getSystemFactory().newSubFactory();
+        return new MxModel(newFactory, modelDir, symbol, newParam, optimizerStates);
     }
 
     /** {@inheritDoc} */
@@ -241,5 +235,22 @@ public class MxModel implements Model, AutoCloseable {
             return null;
         }
         return url.openStream();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        factory.close();
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void finalize() throws Throwable {
+        if (logger.isDebugEnabled()) {
+            logger.warn("Model was not closed explicitly: {}", getClass().getSimpleName());
+        }
+        close();
+        super.finalize();
     }
 }

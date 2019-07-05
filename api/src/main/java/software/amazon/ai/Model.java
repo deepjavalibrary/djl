@@ -53,7 +53,7 @@ import software.amazon.ai.ndarray.types.DataType;
  * @see software.amazon.ai.inference.Predictor
  * @see Translator
  */
-public interface Model {
+public interface Model extends AutoCloseable {
 
     /**
      * Loads the model from the {@link Path}.
@@ -165,4 +165,8 @@ public interface Model {
      * @return A model with the down casting parameters
      */
     Model cast(DataType dataType);
+
+    /** {@inheritDoc} */
+    @Override
+    void close();
 }
