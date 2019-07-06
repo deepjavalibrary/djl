@@ -126,10 +126,12 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (logger.isDebugEnabled()) {
-            logger.warn("Model was not closed explicitly: {}", getClass().getSimpleName());
+        if (factory.isOpen()) {
+            if (logger.isDebugEnabled()) {
+                logger.warn("Model was not closed explicitly: {}", getClass().getSimpleName());
+            }
+            close();
         }
-        close();
         super.finalize();
     }
 

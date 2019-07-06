@@ -61,7 +61,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
     @Test
     public void testNDArrayCreation() {
         // By default the Mock lib will return the following set up
-        try (MxNDArray nd = new MxNDArray(factory, null, null, null, new PointerArray())) {
+        try (MxNDArray nd = new MxNDArray(factory, new PointerArray())) {
             Assert.assertEquals(nd.getShape(), new Shape(1, 2, 3));
             Assert.assertEquals(nd.getContext(), Context.gpu(1));
             Assert.assertEquals(nd.getDataType(), DataType.FLOAT32);

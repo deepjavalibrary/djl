@@ -16,6 +16,7 @@ import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
@@ -41,6 +42,7 @@ public class MxNDFactory implements NDFactory {
     private NDFactory parent;
     private Context context;
     private Map<AutoCloseable, AutoCloseable> resources;
+    private AtomicBoolean closed = new AtomicBoolean(false);
 
     public static MxNDFactory getSystemFactory() {
         return SYSTEM_FACTORY;
@@ -52,14 +54,22 @@ public class MxNDFactory implements NDFactory {
         resources = new ConcurrentHashMap<>();
     }
 
+    public MxNDArray create(Pointer handle) {
+        MxNDArray array = new MxNDArray(this, handle);
+        attach(array);
+        return array;
+    }
+
     /** {@inheritDoc} */
     @Override
     public MxNDArray create(Context context, Shape shape, DataType dataType) {
         if (context == null) {
             context = this.context;
         }
-        MxNDArray array = new MxNDArray(this, context, shape, dataType);
-        resources.put(array, array);
+
+        Pointer handle = JnaUtils.createNdArray(context, shape, dataType, shape.dimension(), false);
+        MxNDArray array = new MxNDArray(this, handle, context, shape, dataType);
+        attach(array);
         return array;
     }
 
@@ -71,37 +81,37 @@ public class MxNDFactory implements NDFactory {
 
     @Override
     public MxNDArray create(float[] data, Context context, Shape shape) {
-        MxNDArray mxNDArray = create(context, shape, DataType.FLOAT32);
-        mxNDArray.set(data);
-        return mxNDArray;
+        MxNDArray array = create(context, shape, DataType.FLOAT32);
+        array.set(data);
+        return array;
     }
 
     @Override
     public MxNDArray create(int[] data, Context context, Shape shape) {
-        MxNDArray mxNDArray = create(context, shape, DataType.INT32);
-        mxNDArray.set(data);
-        return mxNDArray;
+        MxNDArray array = create(context, shape, DataType.INT32);
+        array.set(data);
+        return array;
     }
 
     @Override
     public MxNDArray create(double[] data, Context context, Shape shape) {
-        MxNDArray mxNDArray = create(context, shape, DataType.FLOAT64);
-        mxNDArray.set(data);
-        return mxNDArray;
+        MxNDArray array = create(context, shape, DataType.FLOAT64);
+        array.set(data);
+        return array;
     }
 
     @Override
     public MxNDArray create(long[] data, Context context, Shape shape) {
-        MxNDArray mxNDArray = create(context, shape, DataType.INT64);
-        mxNDArray.set(data);
-        return mxNDArray;
+        MxNDArray array = create(context, shape, DataType.INT64);
+        array.set(data);
+        return array;
     }
 
     @Override
     public MxNDArray create(byte[] data, Context context, Shape shape) {
-        MxNDArray mxNDArray = create(context, shape, DataType.INT8);
-        mxNDArray.set(data);
-        return mxNDArray;
+        MxNDArray array = create(context, shape, DataType.INT8);
+        array.set(data);
+        return array;
     }
 
     /** {@inheritDoc} */
@@ -135,12 +145,6 @@ public class MxNDFactory implements NDFactory {
     @Override
     public NDArray ones(DataDesc dataDesc) {
         return ones(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
-    }
-
-    public MxNDArray create(Pointer handle) {
-        MxNDArray array = new MxNDArray(this, null, null, null, handle);
-        resources.put(array, array);
-        return array;
     }
 
     /** {@inheritDoc} */
@@ -236,7 +240,7 @@ public class MxNDFactory implements NDFactory {
     @Override
     public MxNDFactory newSubFactory(Context context) {
         MxNDFactory factory = new MxNDFactory(this, context);
-        resources.put(factory, factory);
+        attach(factory);
         return factory;
     }
 
@@ -249,12 +253,18 @@ public class MxNDFactory implements NDFactory {
     /** {@inheritDoc} */
     @Override
     public synchronized void attach(AutoCloseable resource) {
+        if (closed.get()) {
+            throw new IllegalStateException("NDFactor has been closed already.");
+        }
         resources.put(resource, resource);
     }
 
     /** {@inheritDoc} */
     @Override
     public synchronized void detach(AutoCloseable resource) {
+        if (closed.get()) {
+            throw new IllegalStateException("NDFactor has been closed already.");
+        }
         resources.remove(resource);
     }
 
@@ -282,15 +292,21 @@ public class MxNDFactory implements NDFactory {
     /** {@inheritDoc} */
     @Override
     public synchronized void close() {
-        for (AutoCloseable resource : resources.keySet()) {
-            try {
-                resource.close();
-            } catch (Exception ignore) {
-                // ignore
+        if (!closed.getAndSet(true)) {
+            for (AutoCloseable resource : resources.keySet()) {
+                try {
+                    resource.close();
+                } catch (Exception ignore) {
+                    // ignore
+                }
             }
+            parent.detach(this);
+            resources.clear();
         }
-        resources = null;
-        parent.detach(this);
+    }
+
+    boolean isOpen() {
+        return !closed.get();
     }
 
     private NDArray fill(String opName, Context context, Shape shape, DataType dataType) {

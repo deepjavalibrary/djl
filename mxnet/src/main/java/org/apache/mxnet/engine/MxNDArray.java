@@ -58,23 +58,18 @@ public class MxNDArray extends NativeResource implements NDArray {
     private MxNDFactory factory;
     private MxNDArrayEx mxNDArrayEx;
 
-    MxNDArray(
-            MxNDFactory factory, Context context, Shape shape, DataType dataType, Pointer handle) {
+    MxNDArray(MxNDFactory factory, Pointer handle) {
         super(handle);
         this.factory = factory;
-        this.context = context;
-        this.dataType = dataType;
-        this.shape = shape;
         this.mxNDArrayEx = new MxNDArrayEx(this);
     }
 
-    MxNDArray(MxNDFactory factory, Context context, Shape shape, DataType dataType) {
-        this(
-                factory,
-                context,
-                shape,
-                dataType,
-                JnaUtils.createNdArray(context, shape, dataType, shape.dimension(), false));
+    MxNDArray(
+            MxNDFactory factory, Pointer handle, Context context, Shape shape, DataType dataType) {
+        this(factory, handle);
+        this.context = context;
+        this.shape = shape;
+        this.dataType = dataType;
     }
 
     /** {@inheritDoc} */
