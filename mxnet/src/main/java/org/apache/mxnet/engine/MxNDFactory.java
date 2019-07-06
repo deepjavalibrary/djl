@@ -13,7 +13,6 @@
 package org.apache.mxnet.engine;
 
 import com.sun.jna.Pointer;
-import java.nio.Buffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,7 +20,6 @@ import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDFactory;
-import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
@@ -62,7 +60,7 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray create(Context context, Shape shape, DataType dataType) {
+    public MxNDArray create(Shape shape, DataType dataType, Context context) {
         if (context == null) {
             context = this.context;
         }
@@ -75,81 +73,19 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray create(DataDesc dataDesc) {
-        return create(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
-    }
-
-    @Override
-    public MxNDArray create(float[] data, Context context, Shape shape) {
-        MxNDArray array = create(context, shape, DataType.FLOAT32);
-        array.set(data);
-        return array;
-    }
-
-    @Override
-    public MxNDArray create(int[] data, Context context, Shape shape) {
-        MxNDArray array = create(context, shape, DataType.INT32);
-        array.set(data);
-        return array;
-    }
-
-    @Override
-    public MxNDArray create(double[] data, Context context, Shape shape) {
-        MxNDArray array = create(context, shape, DataType.FLOAT64);
-        array.set(data);
-        return array;
-    }
-
-    @Override
-    public MxNDArray create(long[] data, Context context, Shape shape) {
-        MxNDArray array = create(context, shape, DataType.INT64);
-        array.set(data);
-        return array;
-    }
-
-    @Override
-    public MxNDArray create(byte[] data, Context context, Shape shape) {
-        MxNDArray array = create(context, shape, DataType.INT8);
-        array.set(data);
-        return array;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public MxNDArray create(DataDesc dataDesc, Buffer data) {
-        MxNDArray array =
-                create(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
-        array.set(data);
-        return array;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray zeros(Context context, Shape shape, DataType dataType) {
+    public NDArray zeros(Shape shape, DataType dataType, Context context) {
         return fill("_zeros", context, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(DataDesc dataDesc) {
-        return zeros(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ones(Context context, Shape shape, DataType dataType) {
+    public NDArray ones(Shape shape, DataType dataType, Context context) {
         return fill("_ones", context, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ones(DataDesc dataDesc) {
-        return ones(dataDesc.getContext(), dataDesc.getShape(), dataDesc.getDataType());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray arange(int start, int stop, int step, Context context, DataType dataType) {
+    public NDArray arange(int start, int stop, int step, DataType dataType, Context context) {
         MxOpParams params = new MxOpParams();
         params.addParam("start", start);
         params.addParam("stop", stop);
@@ -178,7 +114,7 @@ public class MxNDFactory implements NDFactory {
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, Context context, DataType dataType) {
+            double low, double high, Shape shape, DataType dataType, Context context) {
         MxOpParams params = new MxOpParams();
         params.addParam("low", low);
         params.addParam("high", high);
@@ -191,7 +127,7 @@ public class MxNDFactory implements NDFactory {
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, Context context, DataType dataType) {
+            double loc, double scale, Shape shape, DataType dataType, Context context) {
         MxOpParams params = new MxOpParams();
         params.addParam("loc", loc);
         params.addParam("scale", scale);
@@ -199,12 +135,6 @@ public class MxNDFactory implements NDFactory {
         params.setContext(context);
         params.setDataType(dataType);
         return invoke("_npi_random_normal", EMPTY, params)[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray randomNormal(Shape shape, Context context, DataType dataType) {
-        return randomNormal(0f, 1f, shape, context, dataType);
     }
 
     /** {@inheritDoc} */

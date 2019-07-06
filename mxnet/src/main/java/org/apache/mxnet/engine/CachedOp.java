@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
@@ -93,7 +92,7 @@ public class CachedOp extends NativeResource {
                 if (!"prob_label".equals(key) && !"softmax_label".equals(key)) {
                     logger.warn("Input " + key + " not found, set NDArray to Shape(1) by default");
                 }
-                inputNDArray[pair.getValue()] = factory.create(new DataDesc(new Shape(1)));
+                inputNDArray[pair.getValue()] = (MxNDArray) factory.create(new Shape(1));
             }
         }
         MxNDArray[] result = JnaUtils.cachedOpInvoke(factory, getHandle(), inputNDArray);

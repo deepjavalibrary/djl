@@ -217,6 +217,13 @@ public interface NDArray extends AutoCloseable {
     long[] toLongArray();
 
     /**
+     * Converts this NDArray to a long array.
+     *
+     * @return a long array
+     */
+    byte[] toByteArray();
+
+    /**
      * Converts this NDArray to a Number array based on its data type.
      *
      * @return a Number array
@@ -372,38 +379,83 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns a zero dimensional NDArray corresponding to a single element.
      *
-     * @param index The index of the element to return. Must return only a single element.
+     * @param indices The index of the element to return. Must return only a single element.
      * @return a zero dimensional NDArray corresponding to the element.
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    NDArray getElement(NDIndex index) throws IllegalArgumentException;
+    default NDArray getElement(int... indices) {
+        NDArray value = get(new NDIndex(indices));
+        if (value.size() != 1) {
+            throw new IllegalArgumentException("The supplied Index does not produce an element");
+        }
+        return value;
+    }
 
     /**
      * Returns an element from the {@code NDArray}.
      *
-     * @param index The index
+     * @param indices the index
      * @return The element in the specified index as a long
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    long getLong(NDIndex index) throws IllegalArgumentException;
+    default long getLong(int... indices) {
+        return getElement(indices).toLongArray()[0];
+    }
 
     /**
      * Returns an element from the {@code NDArray}.
      *
-     * @param index The index
+     * @param indices the index
      * @return The element in the specified index as a double
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    double getDouble(NDIndex index) throws IllegalArgumentException;
+    default double getDouble(int... indices) {
+        return getElement(indices).toDoubleArray()[0];
+    }
 
     /**
      * Returns an element from the {@code NDArray}.
      *
-     * @param index The index
+     * @param indices the index
      * @return The element in the specified index as a float
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    float getFloat(NDIndex index) throws IllegalArgumentException;
+    default float getFloat(int... indices) {
+        return getElement(indices).toFloatArray()[0];
+    }
+
+    /**
+     * Returns an element from the {@code NDArray}.
+     *
+     * @param indices the index
+     * @return The element in the specified index as a float
+     * @throws IllegalArgumentException Thrown if the result is not a single element
+     */
+    default int getInt(int... indices) {
+        return getElement(indices).toIntArray()[0];
+    }
+
+    /**
+     * Returns an element from the {@code NDArray}.
+     *
+     * @param indices the index
+     * @return The element in the specified index as a float
+     * @throws IllegalArgumentException Thrown if the result is not a single element
+     */
+    default byte getByte(int... indices) {
+        return getElement(indices).toByteArray()[0];
+    }
+
+    /**
+     * Returns an element from the {@code NDArray}.
+     *
+     * @param indices the index
+     * @return The element in the specified index as a float
+     * @throws IllegalArgumentException Thrown if the result is not a single element
+     */
+    default int getUint8(int... indices) {
+        return getByte(indices) & 0xff;
+    }
 
     /**
      * Copies the current NDArray value to the one passed in.

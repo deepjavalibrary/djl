@@ -31,7 +31,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.Context;
-import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Layout;
 import software.amazon.ai.ndarray.types.Shape;
@@ -80,7 +80,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
                     fa[0] = ((Pointer) objects[1]).getFloatArray(0, size);
                     return 0;
                 });
-        try (MxNDArray nd = factory.create(new DataDesc(new Shape(3)))) {
+        try (NDArray nd = factory.create(new Shape(3))) {
             float[] input = new float[] {1.0f, 2.0f, 3.0f};
             nd.set(input);
             float[] fArr = fa[0];

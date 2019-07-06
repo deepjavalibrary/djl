@@ -13,6 +13,11 @@
 package software.amazon.ai.ndarray;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import software.amazon.ai.Context;
 import software.amazon.ai.Translator;
 import software.amazon.ai.TranslatorContext;
@@ -89,15 +94,43 @@ import software.amazon.ai.util.PairList;
 public interface NDFactory extends AutoCloseable {
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link Context}, {@link Shape}, and
-     * {@link DataType}.
+     * Creates an uninitialized instance of {@link DataType#FLOAT32} {@link NDArray} with specified
+     * {@link Shape}.
      *
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(Shape shape) {
+        return create(shape, DataType.FLOAT32, getContext());
+    }
+
+    /**
+     * Creates and initializes a {@link NDArray} with specified {@link Shape}.
+     *
+     * <p>{@link DataType} of the NDArray will determined by type of Buffer.
+     *
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param data data to initialize the {@code NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(Shape shape, Buffer data) {
+        DataType dataType = DataType.fromBuffer(data);
+        NDArray array = create(shape, dataType, getContext());
+        array.set(data);
+        return array;
+    }
+
+    /**
+     * Creates an uninitialized instance of {@link NDArray} with specified {@link Shape}, and {@link
+     * DataType}.
+     *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray create(Context context, Shape shape, DataType dataType);
+    default NDArray create(Shape shape, DataType dataType) {
+        return create(shape, dataType, getContext());
+    }
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link DataDesc}.
@@ -105,7 +138,9 @@ public interface NDFactory extends AutoCloseable {
      * @param dataDesc the {@link DataDesc} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray create(DataDesc dataDesc);
+    default NDArray create(DataDesc dataDesc) {
+        return create(dataDesc.getShape(), dataDesc.getDataType(), dataDesc.getContext());
+    }
 
     /**
      * Creates and initialize an instance of {@link NDArray} with specified {@link DataDesc}.
@@ -114,79 +149,93 @@ public interface NDFactory extends AutoCloseable {
      * @param data data to initialize the {@code NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray create(DataDesc dataDesc, Buffer data);
+    default NDArray create(DataDesc dataDesc, Buffer data) {
+        NDArray array = create(dataDesc);
+        array.set(data);
+        return array;
+    }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and float array.
+     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and float
+     * array.
      *
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
      * @return new instance of {@link NDArray}
      */
-    NDArray create(float[] data, Context context, Shape shape);
+    default NDArray create(Shape shape, float[] data) {
+        return create(shape, FloatBuffer.wrap(data));
+    }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and int array.
+     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and int
+     * array.
      *
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
      * @return new instance of {@link NDArray}
      */
-    NDArray create(int[] data, Context context, Shape shape);
+    default NDArray create(Shape shape, int[] data) {
+        return create(shape, IntBuffer.wrap(data));
+    }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and double array.
+     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and double
+     * array.
      *
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
      * @return new instance of {@link NDArray}
      */
-    NDArray create(double[] data, Context context, Shape shape);
+    default NDArray create(Shape shape, double[] data) {
+        return create(shape, DoubleBuffer.wrap(data));
+    }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and long array.
+     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and long
+     * array.
      *
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
      * @return new instance of {@link NDArray}
      */
-    NDArray create(long[] data, Context context, Shape shape);
+    default NDArray create(Shape shape, long[] data) {
+        return create(shape, LongBuffer.wrap(data));
+    }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} and byte array.
+     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and byte
+     * array.
      *
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
      * @return new instance of {@link NDArray}
      */
-    NDArray create(byte[] data, Context context, Shape shape);
+    default NDArray create(Shape shape, byte[] data) {
+        return create(shape, ByteBuffer.wrap(data));
+    }
+
+    /**
+     * Creates an uninitialized instance of {@link NDArray} with specified {@link Shape}, {@link
+     * DataType} and {@link Context}.
+     *
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray create(Shape shape, DataType dataType, Context context);
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
-     * @see #zeros(Context, Shape, DataType)
+     * @see #zeros(Shape, DataType, Context)
      */
     default NDArray zeros(Shape shape) {
-        return zeros(null, shape, null);
+        return zeros(shape, DataType.FLOAT32, getContext());
     }
-
-    /**
-     * Creates an instance of {@link NDArray} with specified {@link Context}, * {@link Shape}, and
-     * {@link DataType} filled with zeros.
-     *
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @return new instance of {@link NDArray}
-     */
-    NDArray zeros(Context context, Shape shape, DataType dataType);
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link DataDesc} filled with zeros.
@@ -194,18 +243,30 @@ public interface NDFactory extends AutoCloseable {
      * @param dataDesc the {@link DataDesc} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray zeros(DataDesc dataDesc);
+    default NDArray zeros(DataDesc dataDesc) {
+        return zeros(dataDesc.getShape(), dataDesc.getDataType(), dataDesc.getContext());
+    }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link Context}, {@link Shape}, and
-     * {@link DataType} filled with ones.
+     * Creates an instance of {@link NDArray} with specified {@link Context}, * {@link Shape}, and
+     * {@link DataType} filled with zeros.
      *
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray ones(Context context, Shape shape, DataType dataType);
+    NDArray zeros(Shape shape, DataType dataType, Context context);
+
+    /**
+     * Creates an instance of {@link NDArray} with specified {@link Shape} filled with ones.
+     *
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray ones(Shape shape) {
+        return ones(shape, DataType.FLOAT32, getContext());
+    }
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link DataDesc} filled with ones.
@@ -213,27 +274,38 @@ public interface NDFactory extends AutoCloseable {
      * @param dataDesc the {@link DataDesc} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray ones(DataDesc dataDesc);
+    default NDArray ones(DataDesc dataDesc) {
+        return ones(dataDesc.getShape(), dataDesc.getDataType(), dataDesc.getContext());
+    }
 
     /**
-     * Returns evenly spaced values within a given interval.
+     * Creates an instance of {@link NDArray} with specified {@link Context}, {@link Shape}, and
+     * {@link DataType} filled with ones.
      *
-     * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
-     * interval including `start` but excluding `stop`). For integer arguments the function is
-     * equivalent to the Python built-in `range` function, but returns an instance of {@link
-     * NDArray} rather than a list.
-     *
-     * @param start start of interval. The interval includes this value.
-     * @param stop end of interval. The interval does not include this value.
-     * @param step spacing between values.
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray arange(int start, int stop, int step, Context context, DataType dataType);
+    NDArray ones(Shape shape, DataType dataType, Context context);
 
     /**
-     * Returns evenly spaced values within a given interval in current context.
+     * Returns evenly spaced values starting from 0 in current context.
+     *
+     * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
+     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * equivalent to the Python built-in `range` function, but returns an instance of {@link
+     * NDArray} rather than a list.
+     *
+     * @param stop end of interval. The interval does not include this value.
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray arange(int stop) {
+        return arange(0, stop, 1, DataType.FLOAT32, getContext());
+    }
+
+    /**
+     * Returns evenly spaced values within a given interval in current context with step 1.
      *
      * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
      * interval including `start` but excluding `stop`). For integer arguments the function is
@@ -242,12 +314,10 @@ public interface NDFactory extends AutoCloseable {
      *
      * @param start start of interval. The interval includes this value.
      * @param stop end of interval. The interval does not include this value.
-     * @param step spacing between values.
-     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray arange(int start, int stop, int step, DataType dataType) {
-        return arange(start, stop, step, getContext(), dataType);
+    default NDArray arange(int start, int stop) {
+        return arange(start, stop, 1, DataType.FLOAT32, getContext());
     }
 
     /**
@@ -264,38 +334,38 @@ public interface NDFactory extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray arange(int start, int stop, int step) {
-        return arange(start, stop, step, getContext(), DataType.FLOAT32);
+        return arange(start, stop, step, DataType.FLOAT32, getContext());
     }
 
     /**
-     * Returns evenly spaced values within a given interval in current context with step 1.
+     * Returns evenly spaced values within a given interval.
      *
      * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
      * interval including `start` but excluding `stop`). For integer arguments the function is
      * equivalent to the Python built-in `range` function, but returns an instance of {@link
      * NDArray} rather than a list.
      *
-     * @param start start of interval. The interval includes this value.
-     * @param stop end of interval. The interval does not include this value.
+     * @param start start of interval, inclusive
+     * @param stop end of interval, exclusive
+     * @param step spacing between values
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray arange(int start, int stop) {
-        return arange(start, stop, 1, getContext(), DataType.INT32);
-    }
+    NDArray arange(int start, int stop, int step, DataType dataType, Context context);
 
     /**
-     * Returns evenly spaced values starting from 0 in current context.
+     * Return evenly spaced numbers over a specified interval in current context.
      *
-     * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
-     * interval including `start` but excluding `stop`). For integer arguments the function is
-     * equivalent to the Python built-in `range` function, but returns an instance of {@link
-     * NDArray} rather than a list.
+     * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].
      *
-     * @param stop end of interval. The interval does not include this value.
+     * @param start the starting value of the sequence
+     * @param stop the end value of the sequence
+     * @param num number of samples to generate
      * @return new instance of {@link NDArray}
      */
-    default NDArray arange(int stop) {
-        return arange(0, stop, 1, getContext(), DataType.FLOAT32);
+    default NDArray linspace(double start, double stop, int num) {
+        return linspace(start, stop, num, true, getContext());
     }
 
     /**
@@ -304,46 +374,14 @@ public interface NDFactory extends AutoCloseable {
      * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].The endpoint
      * of the interval can optionally be excluded.
      *
-     * @param start The starting value of the sequence.
-     * @param stop The end value of the sequence.
-     * @param num Number of samples to generate.
-     * @param endpoint If True, stop is the last sample. Otherwise, it is not included.
+     * @param start the starting value of the sequence
+     * @param stop the end value of the sequence
+     * @param num number of samples to generate
+     * @param endpoint if {@code true}, stop is the last sample, otherwise, it is not included
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
     NDArray linspace(double start, double stop, int num, boolean endpoint, Context context);
-
-    /**
-     * Return evenly spaced numbers over a specified interval in current context.
-     *
-     * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].
-     *
-     * @param start The starting value of the sequence.
-     * @param stop The end value of the sequence.
-     * @param num Number of samples to generate.
-     * @return new instance of {@link NDArray}
-     */
-    default NDArray linspace(double start, double stop, int num) {
-        return linspace(start, stop, num, true, getContext());
-    }
-
-    /**
-     * Draw random samples from a normal (Gaussian) distribution.
-     *
-     * <p>Samples are uniformly distributed over the half-open interval ``[low, high)`` (includes
-     * low, but excludes high). In other words, any value within the given interval is equally
-     * likely to be drawn by `uniform`
-     *
-     * @param low Lower boundary of the output interval. All values generated will be greater than
-     *     or equal to low.
-     * @param high Upper boundary of the output interval. All values generated will be less than
-     *     high.
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @return new instance of {@link NDArray}
-     */
-    NDArray randomUniform(double low, double high, Shape shape, Context context, DataType dataType);
 
     /**
      * Draw random samples from a normal (Gaussian) distribution in current context.
@@ -360,34 +398,26 @@ public interface NDFactory extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray randomUniform(double low, double high, Shape shape) {
-        return randomUniform(low, high, shape, getContext(), DataType.FLOAT32);
+        return randomUniform(low, high, shape, DataType.FLOAT32, getContext());
     }
 
     /**
-     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
-     * to a normal distribution parametrized by *loc* (mean) and *scale* (standard deviation).
+     * Draw random samples from a normal (Gaussian) distribution.
      *
-     * @param loc Mean (centre) of the distribution.
-     * @param scale Standard deviation (spread or "width") of the distribution.
-     * @param shape Output shape.
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * <p>Samples are uniformly distributed over the half-open interval ``[low, high)`` (includes
+     * low, but excludes high). In other words, any value within the given interval is equally
+     * likely to be drawn by `uniform`
+     *
+     * @param low Lower boundary of the output interval. All values generated will be greater than
+     *     or equal to low.
+     * @param high Upper boundary of the output interval. All values generated will be less than
+     *     high.
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray randomNormal(double loc, double scale, Shape shape, Context context, DataType dataType);
-
-    /**
-     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
-     * to a normal distribution parametrized by mean = 0 and standard deviation = 1.
-     *
-     * @param shape Output shape.
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @return new instance of {@link NDArray}
-     */
-    default NDArray randomNormal(Shape shape, Context context, DataType dataType) {
-        return randomNormal(0f, 1f, shape, context, dataType);
-    }
+    NDArray randomUniform(double low, double high, Shape shape, DataType dataType, Context context);
 
     /**
      * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
@@ -398,24 +428,35 @@ public interface NDFactory extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray randomNormal(Shape shape) {
-        return randomNormal(0f, 1f, shape, getContext(), DataType.FLOAT32);
+        return randomNormal(0f, 1f, shape, DataType.FLOAT32, getContext());
     }
 
     /**
-     * Draw samples from a multinomial distribution. The multinomial distribution is a multivariate
-     * generalisation of the binomial distribution. Take an experiment with one of ``p`` possible
-     * outcomes. An example of such an experiment is throwing a dice, where the outcome can be 1
-     * through 6. Each sample drawn from the distribution represents n such experiments. Its values,
-     * ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the outcome was ``i``.
+     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
+     * to a normal distribution parametrized by mean = 0 and standard deviation = 1.
      *
-     * @param n Number of experiments.
-     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1
-     *     (however, the last element is always assumed to account for the remaining probability, as
-     *     long as ``sum(pvals[:-1]) &lt;= 1)``
-     * @param shape Output shape
-     * @return Returns the random NDArray
+     * @param shape Output shape.
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
      */
-    NDArray randomMultinomial(int n, NDArray pValues, Shape shape);
+    default NDArray randomNormal(Shape shape, DataType dataType, Context context) {
+        return randomNormal(0d, 1d, shape, dataType, context);
+    }
+
+    /**
+     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
+     * to a normal distribution parametrized by {@code *loc*} (mean) and *scale* (standard
+     * deviation).
+     *
+     * @param loc Mean (centre) of the distribution.
+     * @param scale Standard deviation (spread or "width") of the distribution.
+     * @param shape Output shape.
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray randomNormal(double loc, double scale, Shape shape, DataType dataType, Context context);
 
     /**
      * Return a single sample from a multinomial distribution. The multinomial distribution is a
@@ -432,6 +473,22 @@ public interface NDFactory extends AutoCloseable {
      * @return Returns the random NDArray
      */
     NDArray randomMultinomial(int n, NDArray pValues);
+
+    /**
+     * Draw samples from a multinomial distribution. The multinomial distribution is a multivariate
+     * generalisation of the binomial distribution. Take an experiment with one of ``p`` possible
+     * outcomes. An example of such an experiment is throwing a dice, where the outcome can be 1
+     * through 6. Each sample drawn from the distribution represents n such experiments. Its values,
+     * ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the outcome was ``i``.
+     *
+     * @param n Number of experiments.
+     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1
+     *     (however, the last element is always assumed to account for the remaining probability, as
+     *     long as ``sum(pvals[:-1]) &lt;= 1)``
+     * @param shape Output shape
+     * @return Returns the random NDArray
+     */
+    NDArray randomMultinomial(int n, NDArray pValues, Shape shape);
 
     /**
      * Returns parent NDFactory.

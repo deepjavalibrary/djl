@@ -354,29 +354,6 @@ public class MxMatrix implements Matrix {
         return array.get(index);
     }
 
-    @Override
-    public NDArray getElement(NDIndex index) throws IllegalArgumentException {
-        return array.get(index);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long getLong(NDIndex index) throws IllegalArgumentException {
-        return array.getLong(index);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDouble(NDIndex index) throws IllegalArgumentException {
-        return array.getDouble(index);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float getFloat(NDIndex index) throws IllegalArgumentException {
-        return array.getFloat(index);
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDArray set(NDIndex index, NDArray value) {
@@ -824,6 +801,12 @@ public class MxMatrix implements Matrix {
     @Override
     public long[] toLongArray() {
         return array.toLongArray();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public byte[] toByteArray() {
+        return array.toByteArray();
     }
 
     /** {@inheritDoc} */

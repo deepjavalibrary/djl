@@ -168,30 +168,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getElement(NDIndex index) throws IllegalArgumentException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long getLong(NDIndex index) throws IllegalArgumentException {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDouble(NDIndex index) throws IllegalArgumentException {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float getFloat(NDIndex index) throws IllegalArgumentException {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray set(NDIndex index, NDArray value) {
         return null;
     }
@@ -773,6 +749,12 @@ public class TfNDArray implements NDArray {
     @Override
     public long[] toLongArray() {
         return new long[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public byte[] toByteArray() {
+        return new byte[0];
     }
 
     /** {@inheritDoc} */

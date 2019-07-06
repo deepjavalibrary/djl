@@ -89,26 +89,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray getElement(NDIndex index) throws IllegalArgumentException {
-        return null;
-    }
-
-    @Override
-    public long getLong(NDIndex index) {
-        return 0;
-    }
-
-    @Override
-    public double getDouble(NDIndex index) {
-        return 0;
-    }
-
-    @Override
-    public float getFloat(NDIndex index) {
-        return 0;
-    }
-
-    @Override
     public NDArray set(NDIndex index, NDArray value) {
         return null;
     }
@@ -464,6 +444,11 @@ public class MockNDArray implements NDArray {
     @Override
     public long[] toLongArray() {
         return new long[0];
+    }
+
+    @Override
+    public byte[] toByteArray() {
+        return new byte[0];
     }
 
     @Override

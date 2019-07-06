@@ -33,7 +33,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
@@ -57,12 +56,12 @@ public class CachedOpTest extends PowerMockTestCase {
             MxNDArray[] params =
                     new MxNDArray[] {
                         null,
-                        factory.create(new DataDesc(new Shape(2))),
-                        factory.create(new DataDesc(new Shape(3))),
+                        (MxNDArray) factory.create(new Shape(2)),
+                        (MxNDArray) factory.create(new Shape(3)),
                         null,
                         null,
-                        factory.create(new DataDesc(new Shape(5))),
-                        factory.create(new DataDesc(new Shape(6)))
+                        (MxNDArray) factory.create(new Shape(5)),
+                        (MxNDArray) factory.create(new Shape(6))
                     };
             List<String> names = Arrays.asList("data0", "data1", "data2");
             List<Integer> locations = Arrays.asList(0, 3, 4);
@@ -71,18 +70,18 @@ public class CachedOpTest extends PowerMockTestCase {
             logger.info("Test: Positioned input");
             NDList input =
                     new NDList(
-                            factory.create(new DataDesc(new Shape(2))),
-                            factory.create(new DataDesc(new Shape(4))),
-                            factory.create(new DataDesc(new Shape(5))));
+                            factory.create(new Shape(2)),
+                            factory.create(new Shape(4)),
+                            factory.create(new Shape(5)));
             co.forward(input);
             Assert.assertEquals(params[0].getShape(), new Shape(2));
             Assert.assertEquals(params[3].getShape(), new Shape(4));
             Assert.assertEquals(params[4].getShape(), new Shape(5));
             logger.info("Test: Named input");
             input = new NDList();
-            input.add("data2", factory.create(new DataDesc(new Shape(2))));
-            input.add("data1", factory.create(new DataDesc(new Shape(4))));
-            input.add("data0", factory.create(new DataDesc(new Shape(5))));
+            input.add("data2", factory.create(new Shape(2)));
+            input.add("data1", factory.create(new Shape(4)));
+            input.add("data0", factory.create(new Shape(5)));
             co.forward(input);
             Assert.assertEquals(params[0].getShape(), new Shape(5));
             Assert.assertEquals(params[3].getShape(), new Shape(4));

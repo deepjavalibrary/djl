@@ -12,6 +12,13 @@
  */
 package software.amazon.ai.ndarray.types;
 
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+
 /** An enum representing the underlying {@link software.amazon.ai.ndarray.NDArray}'s data type. */
 public enum DataType {
     FLOAT32("float32", 4),
@@ -64,6 +71,23 @@ public enum DataType {
      */
     public boolean isInteger() {
         return type.startsWith("int") || type.startsWith("uint");
+    }
+
+    public static DataType fromBuffer(Buffer data) {
+        if (data instanceof FloatBuffer) {
+            return DataType.FLOAT32;
+        } else if (data instanceof DoubleBuffer) {
+            return DataType.FLOAT64;
+        } else if (data instanceof IntBuffer) {
+            return DataType.INT32;
+        } else if (data instanceof LongBuffer) {
+            return DataType.INT64;
+        } else if (data instanceof ByteBuffer) {
+            return DataType.INT8;
+        } else {
+            throw new IllegalArgumentException(
+                    "Unsupported buffer type: " + data.getClass().getSimpleName());
+        }
     }
 
     /** {@inheritDoc} */

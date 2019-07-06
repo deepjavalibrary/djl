@@ -1,6 +1,5 @@
 package org.tensorflow.engine;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +10,6 @@ import org.tensorflow.Tensors;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDFactory;
-import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
@@ -50,50 +48,13 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
         return nameAssignment++;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public NDArray create(DataDesc dataDesc) {
+    public NDArray create(Shape shape, DataType dataType, Context context) {
         return null;
     }
 
     public NDArray create(int data) {
         return new TfNDArray(this, Tensors.create(data));
-    }
-
-    @Override
-    public NDArray create(Context context, Shape shape, DataType dataType) {
-        return null;
-    }
-
-    @Override
-    public NDArray create(float[] data, Context context, Shape shape) {
-        return null;
-    }
-
-    @Override
-    public NDArray create(int[] data, Context context, Shape shape) {
-        return null;
-    }
-
-    @Override
-    public NDArray create(double[] data, Context context, Shape shape) {
-        return null;
-    }
-
-    @Override
-    public NDArray create(long[] data, Context context, Shape shape) {
-        return null;
-    }
-
-    @Override
-    public NDArray create(byte[] data, Context context, Shape shape) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(DataDesc dataDesc, Buffer data) {
-        return null;
     }
 
     public TfNDArray create(Tensor<?> tensor) {
@@ -116,24 +77,18 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
     }
 
     @Override
-    public NDArray zeros(Context context, Shape shape, DataType dataType) {
+    public NDArray zeros(Shape shape, DataType dataType, Context context) {
+        return null;
+    }
+
+    @Override
+    public NDArray ones(Shape shape, DataType dataType, Context context) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(DataDesc dataDesc) {
-        return null;
-    }
-
-    @Override
-    public NDArray ones(Context context, Shape shape, DataType dataType) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray arange(int start, int stop, int step, Context context, DataType dataType) {
+    public NDArray arange(int start, int stop, int step, DataType dataType, Context context) {
         return null;
     }
 
@@ -146,14 +101,14 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, Context context, DataType dataType) {
+            double low, double high, Shape shape, DataType dataType, Context context) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, Context context, DataType dataType) {
+            double loc, double scale, Shape shape, DataType dataType, Context context) {
         return null;
     }
 
@@ -166,12 +121,6 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
     /** {@inheritDoc} */
     @Override
     public NDArray randomMultinomial(int n, NDArray pValues) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ones(DataDesc dataDesc) {
         return null;
     }
 

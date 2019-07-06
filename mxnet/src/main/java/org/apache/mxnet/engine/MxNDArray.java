@@ -144,21 +144,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public void set(Buffer data) {
         int size = data.remaining();
-        DataType inputType;
-        if (data instanceof FloatBuffer) {
-            inputType = DataType.FLOAT32;
-        } else if (data instanceof DoubleBuffer) {
-            inputType = DataType.FLOAT64;
-        } else if (data instanceof IntBuffer) {
-            inputType = DataType.INT32;
-        } else if (data instanceof LongBuffer) {
-            inputType = DataType.INT64;
-        } else if (data instanceof ByteBuffer) {
-            inputType = DataType.INT8;
-        } else {
-            throw new IllegalArgumentException(
-                    "Unsupported buffer type: " + data.getClass().getSimpleName());
-        }
+        DataType inputType = DataType.fromBuffer(data);
         validate(inputType, size);
 
         if (data.isDirect()) {
@@ -224,77 +210,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         set(ByteBuffer.wrap(data));
     }
 
-    private void validate(DataType inputType, int size) {
-        if (getDataType() != inputType) {
-            throw new IllegalStateException(
-                    "DataType mismatch, required: " + dataType + ", actual: " + inputType);
-        }
-        if (size != getShape().size()) {
-            throw new IllegalArgumentException(
-                    "array size (" + size + ") do not match NDArray shape: " + shape);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(NDIndex index) {
-        if (index.getRank() == 0) {
-            return this;
-        }
-
-        if (index.getRank() == 1) {
-            NDIndexElement ie = index.get(0);
-            if (ie instanceof NDIndexFixed) {
-                Pointer pointer = JnaUtils.ndArrayAt(getHandle(), ((NDIndexFixed) ie).getIndex());
-                return factory.create(pointer);
-            } else if (ie instanceof NDIndexSlice) {
-                NDIndexSlice slice = (NDIndexSlice) ie;
-                int min = Optional.ofNullable(slice.getMin()).orElse(0);
-                int max = Optional.ofNullable(slice.getMax()).orElse((int) size(0));
-                if (slice.getStep() != null) {
-                    throw new UnsupportedOperationException(
-                            "Slicing currently does not support step");
-                }
-                Pointer pointer = JnaUtils.slice(getHandle(), min, max);
-                return factory.create(pointer);
-            } else {
-                throw new UnsupportedOperationException(
-                        "get() currently supports Fixed and Slice indexes");
-            }
-        } else {
-            throw new UnsupportedOperationException("get() currently supports only rank 1");
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getElement(NDIndex index) throws IllegalArgumentException {
-        NDArray value = get(index);
-        if (value.size() != 1) {
-            throw new IllegalArgumentException("The supplied Index does not produce an element");
-        } else {
-            return value;
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long getLong(NDIndex index) throws IllegalArgumentException {
-        return getElement(index).toLongArray()[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDouble(NDIndex index) throws IllegalArgumentException {
-        return getElement(index).toDoubleArray()[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float getFloat(NDIndex index) throws IllegalArgumentException {
-        return getElement(index).toFloatArray()[0];
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDArray set(NDIndex index, NDArray value) {
@@ -333,6 +248,37 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray get(NDIndex index) {
+        if (index.getRank() == 0) {
+            return this;
+        }
+
+        if (index.getRank() == 1) {
+            NDIndexElement ie = index.get(0);
+            if (ie instanceof NDIndexFixed) {
+                Pointer pointer = JnaUtils.ndArrayAt(getHandle(), ((NDIndexFixed) ie).getIndex());
+                return factory.create(pointer);
+            } else if (ie instanceof NDIndexSlice) {
+                NDIndexSlice slice = (NDIndexSlice) ie;
+                int min = Optional.ofNullable(slice.getMin()).orElse(0);
+                int max = Optional.ofNullable(slice.getMax()).orElse((int) size(0));
+                if (slice.getStep() != null) {
+                    throw new UnsupportedOperationException(
+                            "Slicing currently does not support step");
+                }
+                Pointer pointer = JnaUtils.slice(getHandle(), min, max);
+                return factory.create(pointer);
+            } else {
+                throw new UnsupportedOperationException(
+                        "get() currently supports Fixed and Slice indexes");
+            }
+        } else {
+            throw new UnsupportedOperationException("get() currently supports only rank 1");
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void copyTo(NDArray ndArray) {
         if (!(ndArray instanceof MxNDArray)) {
             throw new IllegalArgumentException("Only MxNDArray is supported.");
@@ -354,7 +300,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (ctx.equals(getContext()) && !copy) {
             return this;
         }
-        MxNDArray nd = factory.create(ctx, getShape(), getDataType());
+        MxNDArray nd = factory.create(getShape(), getDataType(), ctx);
         copyTo(nd);
         return nd;
     }
@@ -365,7 +311,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (dtype.equals(getDataType()) && !copy) {
             return this;
         }
-        MxNDArray nd = factory.create(getContext(), getShape(), dtype);
+        MxNDArray nd = factory.create(getShape(), dtype, getContext());
         copyTo(nd);
         return nd;
     }
@@ -398,7 +344,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (sparseFormat == null || sparseFormat == SparseFormat.UNDEFINED) {
             grad = (MxNDArray) zerosLike();
         } else {
-            grad = (MxNDArray) factory.zeros(context, shape, dataType);
+            grad = (MxNDArray) factory.zeros(getShape(), getDataType(), getContext());
         }
         int gradReqValue = gradReq.getValue();
         IntBuffer gradReqBuffer = IntBuffer.allocate(1);
@@ -897,32 +843,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         return repeat(repeatsToMatchShape(desiredShape));
     }
 
-    private int[] repeatsToMatchShape(Shape desiredShape) throws IllegalArgumentException {
-        Shape curShape = getShape();
-        int dimension = curShape.dimension();
-        if (desiredShape.dimension() > dimension) {
-            throw new IllegalArgumentException("The desired shape has too many dimensions");
-        }
-        if (desiredShape.dimension() < dimension) {
-            int additionalDimensions = dimension - desiredShape.dimension();
-            desiredShape = curShape.slice(0, additionalDimensions).addAll(desiredShape);
-        }
-        int[] repeats = new int[dimension];
-        for (int i = 0; i < dimension; i++) {
-            if (desiredShape.get(i) % curShape.get(i) != 0) {
-                throw new IllegalArgumentException(
-                        "The desired shape is not a multiple of the original shape");
-            }
-            repeats[i] =
-                    (int) Math.round(Math.ceil((double) desiredShape.get(i) / curShape.get(i)));
-        }
-        return repeats;
-    }
-
-    private int withAxis(int axis) {
-        return Math.floorMod(axis, getShape().dimension());
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDArray mmul(NDArray other) {
@@ -942,6 +862,8 @@ public class MxNDArray extends NativeResource implements NDArray {
         return ret;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public byte[] toByteArray() {
         ByteBuffer bb = toByteBuffer();
         if (bb.hasArray()) {
@@ -1544,6 +1466,43 @@ public class MxNDArray extends NativeResource implements NDArray {
         return factory.invoke("_np_arctanh", this, null);
     }
 
+    public String dump() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("ND: ")
+                .append(getShape())
+                .append(' ')
+                .append(getContext())
+                .append(' ')
+                .append(getDataType())
+                .append(LF);
+        if (getShape().dimension() < MAX_DEPTH) {
+            dump(sb, 0);
+        } else {
+            sb.append("[ Exceed max print dimension ]");
+        }
+        return sb.toString();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        if (Utils.DEBUG) {
+            return dump();
+        }
+        return super.toString();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        Pointer pointer = handle.getAndSet(null);
+        if (pointer != null) {
+            JnaUtils.freeNdArray(pointer);
+            detach();
+            factory = null;
+        }
+    }
+
     private ByteBuffer toByteBuffer() {
         Shape sh = getShape();
         DataType dType = getDataType();
@@ -1588,40 +1547,40 @@ public class MxNDArray extends NativeResource implements NDArray {
         sb.append("],").append(LF);
     }
 
-    public String dump() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("ND: ")
-                .append(getShape())
-                .append(' ')
-                .append(getContext())
-                .append(' ')
-                .append(getDataType())
-                .append(LF);
-        if (getShape().dimension() < MAX_DEPTH) {
-            dump(sb, 0);
-        } else {
-            sb.append("[ Exceed max print dimension ]");
+    private void validate(DataType inputType, int size) {
+        if (getDataType() != inputType) {
+            throw new IllegalStateException(
+                    "DataType mismatch, required: " + dataType + ", actual: " + inputType);
         }
-        return sb.toString();
+        if (size != getShape().size()) {
+            throw new IllegalArgumentException(
+                    "array size (" + size + ") do not match NDArray shape: " + shape);
+        }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        if (Utils.DEBUG) {
-            return dump();
+    private int[] repeatsToMatchShape(Shape desiredShape) throws IllegalArgumentException {
+        Shape curShape = getShape();
+        int dimension = curShape.dimension();
+        if (desiredShape.dimension() > dimension) {
+            throw new IllegalArgumentException("The desired shape has too many dimensions");
         }
-        return super.toString();
+        if (desiredShape.dimension() < dimension) {
+            int additionalDimensions = dimension - desiredShape.dimension();
+            desiredShape = curShape.slice(0, additionalDimensions).addAll(desiredShape);
+        }
+        int[] repeats = new int[dimension];
+        for (int i = 0; i < dimension; i++) {
+            if (desiredShape.get(i) % curShape.get(i) != 0) {
+                throw new IllegalArgumentException(
+                        "The desired shape is not a multiple of the original shape");
+            }
+            repeats[i] =
+                    (int) Math.round(Math.ceil((double) desiredShape.get(i) / curShape.get(i)));
+        }
+        return repeats;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        Pointer pointer = handle.getAndSet(null);
-        if (pointer != null) {
-            JnaUtils.freeNdArray(pointer);
-            detach();
-            factory = null;
-        }
+    private int withAxis(int axis) {
+        return Math.floorMod(axis, getShape().dimension());
     }
 }
