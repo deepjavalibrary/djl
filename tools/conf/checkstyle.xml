@@ -106,7 +106,7 @@
 
     <!-- Size Violations -->
     <module name="FileLength">
-        <property name="max" value="2500"/>
+        <property name="max" value="3500"/>
         <property name="fileExtensions" value="java"/>
     </module>
 
