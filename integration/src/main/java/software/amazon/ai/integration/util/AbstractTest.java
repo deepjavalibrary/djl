@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.integration.util;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -33,22 +34,31 @@ public class AbstractTest {
     protected void test(Arguments arguments, int iteration) {
         List<Method> methods;
         String methodName = arguments.getMethodName();
-        try {
-            if (methodName != null) {
-                methods = new ArrayList<>();
-                methods.add(this.getClass().getMethod(methodName));
-            } else {
-                methods = new ArrayList<>(Arrays.asList(this.getClass().getMethods()));
+        if (methodName != null) {
+            methods = new ArrayList<>();
+            try {
+                methods.add(getClass().getMethod(methodName));
+            } catch (NoSuchMethodException e) {
+                logger.error("Method {} not found in class: {}", methodName, getClass().getName());
+                return;
             }
-            for (Method method : methods) {
+        } else {
+            methods = Arrays.asList(getClass().getMethods());
+        }
+
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(RunAsTest.class)) {
+                // TODO: collect performance data
                 for (int i = 0; i < iteration; i++) {
-                    if (method.isAnnotationPresent(RunAsTest.class)) {
+                    try {
                         method.invoke(this);
+                        logger.info("Test {}.{} PASSED", getClass().getName(), method.getName());
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        logger.info("Test {}.{} FAILED", getClass().getName(), method.getName());
+                        logger.error("", e);
                     }
                 }
             }
-        } catch (Exception e) {
-            logger.error("{} test failed. Exception message={}", methodName, e.getCause());
         }
     }
 
