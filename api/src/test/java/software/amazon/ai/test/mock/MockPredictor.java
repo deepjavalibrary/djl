@@ -36,6 +36,7 @@ public class MockPredictor<I, O> implements Predictor<I, O> {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidRethrowingException")
     public O predict(I input) throws TranslateException {
         if (metrics != null) {
             metrics.addMetric("Preprocess", 1, "nano");
@@ -43,9 +44,14 @@ public class MockPredictor<I, O> implements Predictor<I, O> {
             metrics.addMetric("Postprocess", 2, "nano");
         }
 
-        PredictorContext ctx = new PredictorContext();
-        NDList ndList = translator.processInput(ctx, input);
-        return translator.processOutput(ctx, ndList);
+        try (PredictorContext ctx = new PredictorContext()) {
+            NDList ndList = translator.processInput(ctx, input);
+            return translator.processOutput(ctx, ndList);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new TranslateException(e);
+        }
     }
 
     @Override

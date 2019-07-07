@@ -99,7 +99,7 @@ public final class ClassifyExample extends AbstractExample {
 
         @Override
         public List<Classification> processOutput(TranslatorContext ctx, NDList list)
-                throws TranslateException {
+                throws IOException {
             Model model = ctx.getModel();
             NDArray array = list.get(0).get(0);
 
@@ -112,12 +112,7 @@ public final class ClassifyExample extends AbstractExample {
             float[] probabilities = array.toFloatArray();
             int[] indices = top.toIntArray();
 
-            String[] synset;
-            try {
-                synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
-            } catch (IOException e) {
-                throw new TranslateException(e);
-            }
+            String[] synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
             for (int i = 0; i < topK; ++i) {
                 int index = indices[i];
                 String className = synset[index];

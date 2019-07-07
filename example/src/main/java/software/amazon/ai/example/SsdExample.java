@@ -146,39 +146,35 @@ public final class SsdExample extends AbstractExample {
 
         @Override
         public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list)
-                throws TranslateException {
+                throws IOException {
             Model model = ctx.getModel();
             NDArray array = list.get(0);
 
             List<DetectedObject> ret = new ArrayList<>();
 
-            try {
-                String[] synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
-                NDArray nd = array.get(0);
-                int length = nd.getShape().head();
-                for (int i = 0; i < length; ++i) {
-                    try (NDArray item = nd.get(i)) {
-                        float[] values = item.toFloatArray();
-                        int classId = (int) values[0];
-                        float probability = values[1];
-                        if (classId > 0 && probability > threshold) {
-                            if (classId >= synset.length) {
-                                throw new AssertionError("Unexpected index: " + classId);
-                            }
-                            String className = synset[classId];
-
-                            double x = values[2] * imageWidth;
-                            double y = values[3] * imageHeight;
-                            double w = values[4] * imageHeight - x;
-                            double h = values[5] * imageHeight - y;
-
-                            Rectangle rect = new Rectangle((int) x, (int) y, (int) w, (int) h);
-                            ret.add(new DetectedObject(className, probability, rect));
+            String[] synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
+            NDArray nd = array.get(0);
+            int length = nd.getShape().head();
+            for (int i = 0; i < length; ++i) {
+                try (NDArray item = nd.get(i)) {
+                    float[] values = item.toFloatArray();
+                    int classId = (int) values[0];
+                    float probability = values[1];
+                    if (classId > 0 && probability > threshold) {
+                        if (classId >= synset.length) {
+                            throw new AssertionError("Unexpected index: " + classId);
                         }
+                        String className = synset[classId];
+
+                        double x = values[2] * imageWidth;
+                        double y = values[3] * imageHeight;
+                        double w = values[4] * imageHeight - x;
+                        double h = values[5] * imageHeight - y;
+
+                        Rectangle rect = new Rectangle((int) x, (int) y, (int) w, (int) h);
+                        ret.add(new DetectedObject(className, probability, rect));
                     }
                 }
-            } catch (IOException e) {
-                throw new TranslateException(e);
             }
 
             return ret;

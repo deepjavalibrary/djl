@@ -57,6 +57,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings("PMD.AvoidRethrowingException")
     public O predict(I input) throws TranslateException {
         timestamp = System.nanoTime();
 
@@ -69,6 +70,10 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
             forwardEnd(result);
 
             return translator.processOutput(outputCtx, result);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new TranslateException(e);
         } finally {
             postProcessEnd();
         }

@@ -78,9 +78,10 @@ public interface Translator<I, O> {
      * @param ctx Toolkit that would help to creating input NDArray
      * @param input Input Object
      * @return {@link NDList}
-     * @throws TranslateException if an error occurs during processing input
+     * @throws Exception if an error occurs during processing input
      */
-    NDList processInput(TranslatorContext ctx, I input) throws TranslateException;
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    NDList processInput(TranslatorContext ctx, I input) throws Exception;
 
     /**
      * Processes the output NDList to the corresponding Output Object.
@@ -88,7 +89,8 @@ public interface Translator<I, O> {
      * @param ctx Toolkit used to do postprocessing
      * @param list Output NDList after inference
      * @return output object
-     * @throws TranslateException if an error occurs during processing output
+     * @throws Exception if an error occurs during processing output
      */
-    O processOutput(TranslatorContext ctx, NDList list) throws TranslateException;
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    O processOutput(TranslatorContext ctx, NDList list) throws Exception;
 }
