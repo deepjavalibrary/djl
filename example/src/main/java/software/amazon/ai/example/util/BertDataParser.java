@@ -28,8 +28,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This is the Utility for pre-processing the data for Bert Model You can use this utility to parse
- * Vocabulary JSON into Java Array and Dictionary, clean and tokenize sentences and pad the text
+ * This is the Utility for pre-processing the data for Bert Model.
+ *
+ * <p>You can use this utility to parse vocabulary JSON into Java Array and Dictionary, clean and
+ * tokenize sentences and pad the text
  */
 @SuppressWarnings("unused")
 public class BertDataParser {
@@ -102,7 +104,7 @@ public class BertDataParser {
     }
 
     /**
-     * Form the token types List [0000...1111...000] All questions are 0 and Answers are 1
+     * Form the token types List [0000...1111...000] where all questions are 0 and answers are 1.
      *
      * @param question question tokens
      * @param answer answer tokens
@@ -118,7 +120,7 @@ public class BertDataParser {
     }
 
     /**
-     * Form tokens with separation that can be used for BERT
+     * Form tokens with separation that can be used for BERT.
      *
      * @param question question tokens
      * @param answer answer tokens
@@ -138,7 +140,7 @@ public class BertDataParser {
     }
 
     /**
-     * Convert tokens to indexes
+     * Convert tokens to indexes.
      *
      * @param tokens input tokens
      * @return List of indexes
@@ -156,7 +158,7 @@ public class BertDataParser {
     }
 
     /**
-     * Convert indexes to tokens
+     * Convert indexes to tokens.
      *
      * @param indexes List of indexes
      * @return List of tokens

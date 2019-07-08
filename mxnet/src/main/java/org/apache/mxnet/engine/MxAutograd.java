@@ -21,7 +21,7 @@ public final class MxAutograd {
     }
 
     /**
-     * Get status on whether Autograd is recording computations
+     * Get status on whether Autograd is recording computations.
      *
      * @return Current state of recording.
      */
@@ -30,7 +30,7 @@ public final class MxAutograd {
     }
 
     /**
-     * Get status on whether Autograd is in training/predicting mode
+     * Get status on whether Autograd is in training/predicting mode.
      *
      * @return Current state of training/predicting.
      */

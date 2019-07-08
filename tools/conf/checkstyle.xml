@@ -35,13 +35,6 @@
     </module>
     -->
 
-    <!-- Javadoc Comments -->
-    <!--
-    <module name="JavadocPackage">
-        <property name="allowLegacy" value="false"/>
-    </module>
-    -->
-
     <!-- Miscellaneous -->
     <module name="NewlineAtEndOfFile">
         <property name="fileExtensions" value="*.java"/>
@@ -299,27 +292,28 @@
         <module name="UnusedImports"/>
 
         <!-- Javadoc Comments -->
-        <!--
         <module name="AtclauseOrder"/>
         <module name="JavadocMethod">
             <property name="allowUndeclaredRTE" value="true"/>
             <property name="allowThrowsTagsForSubclasses" value="true"/>
             <property name="allowMissingPropertyJavadoc" value="true"/>
+            <property name="allowMissingJavadoc" value="true"/>
         </module>
         <module name="JavadocParagraph"/>
         <module name="JavadocStyle">
             <property name="scope" value="public"/>
         </module>
         <module name="JavadocTagContinuationIndentation"/>
+        <module name="NonEmptyAtclauseDescription"/>
+        <module name="SummaryJavadoc"/>
+        <!--
+        <module name="JavadocPackage" />
         <module name="JavadocType">
-            <property name="authorFormat" value="\S"/>
             <property name="allowUnknownTags" value="true"/>
         </module>
         <module name="JavadocVariable"/>
-        <module name="NonEmptyAtclauseDescription"/>
         <module name="SingleLineJavadoc"/>
         <module name="WriteTag"/>
-        <module name="SummaryJavadoc"/>
         -->
 
         <!-- Metrics -->
