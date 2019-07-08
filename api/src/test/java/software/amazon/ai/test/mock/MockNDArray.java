@@ -17,8 +17,8 @@ import java.util.function.Predicate;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -36,7 +36,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDFactory getFactory() {
+    public NDScopedFactory getFactory() {
         return null;
     }
 

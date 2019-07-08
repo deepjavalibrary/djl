@@ -25,8 +25,8 @@ import org.tensorflow.types.UInt8;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -43,26 +43,26 @@ public class TfNDArray implements NDArray {
     private Shape shape;
     private TfNDFactory factory;
 
-    TfNDArray(NDFactory factory, Tensor<?> tensor) {
+    TfNDArray(NDScopedFactory factory, Tensor<?> tensor) {
         this.factory = (TfNDFactory) factory;
         this.factory.attach(this);
         this.tensor = tensor;
     }
 
-    TfNDArray(NDFactory factory, Output<?> out) {
+    TfNDArray(NDScopedFactory factory, Output<?> out) {
         this.factory = (TfNDFactory) factory;
         this.factory.attach(this);
         this.out = out;
     }
 
-    public TfNDArray(NDFactory factory, Shape shape, FloatBuffer data) {
+    public TfNDArray(NDScopedFactory factory, Shape shape, FloatBuffer data) {
         this.factory = (TfNDFactory) factory;
         this.factory.attach(this);
         tensor = Tensor.create(shape.getShape(), data);
         this.shape = shape;
     }
 
-    TfNDArray(NDFactory factory, Shape shape, ByteBuffer data) {
+    TfNDArray(NDScopedFactory factory, Shape shape, ByteBuffer data) {
         this.factory = (TfNDFactory) factory;
         tensor = Tensor.create(UInt8.class, shape.getShape(), data);
         this.shape = shape;
@@ -95,7 +95,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDFactory getFactory() {
+    public NDScopedFactory getFactory() {
         return factory;
     }
 

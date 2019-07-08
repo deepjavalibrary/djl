@@ -149,7 +149,7 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
         }
     }
 
-    public void attach(NDFactory factory) {
+    public void attach(NDScopedFactory factory) {
         for (NDArray array : list.values()) {
             array.attach(factory);
         }

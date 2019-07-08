@@ -13,8 +13,8 @@
 package org.apache.mxnet.nn;
 
 import software.amazon.ai.Block;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.util.PairList;
 
 public abstract class MxNNBlock implements Block {
@@ -23,7 +23,7 @@ public abstract class MxNNBlock implements Block {
 
     @Override
     public NDList forward(NDList inputs, PairList<String, String> params) {
-        NDFactory factory = inputs.get(0).getFactory();
+        NDScopedFactory factory = inputs.get(0).getFactory();
         return factory.invoke(opName, inputs, params);
     }
 

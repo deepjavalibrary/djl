@@ -29,8 +29,8 @@ import software.amazon.ai.TranslateException;
 import software.amazon.ai.Translator;
 import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.Pair;
 
@@ -40,7 +40,7 @@ public final class HelloWorld {
 
     @SuppressWarnings("PMD.SystemPrintln")
     public static void main(String[] args) throws IOException, TranslateException {
-        try (NDFactory factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory()) {
+        try (NDScopedFactory factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory()) {
             NDArray a =
                     new TfNDArray(
                             factory, new Shape(1, 3), FloatBuffer.wrap(new float[] {1f, 2f, 3f}));
@@ -97,7 +97,7 @@ public final class HelloWorld {
             bgr2rgb(data);
             long[] shape = new long[] {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
             TfNDArray tfNDArray =
-                    ((TfNDFactory) ctx.getNDFactory())
+                    ((TfNDFactory) ctx.getNDScopedFactory())
                             .create(new Shape(shape), ByteBuffer.wrap(data));
             NDList ndList = new NDList();
             ndList.add("image_tensor", tfNDArray);

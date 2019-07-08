@@ -1432,7 +1432,7 @@ public final class JnaUtils {
      * label param location
      *
      * @param model model that loaded in the backend
-     * @param factory NDFactory to create NDArray
+     * @param factory NDScopedFactory to create NDArray
      * @return CachedOp for inference
      */
     public static CachedOp createCachedOp(MxModel model, MxNDFactory factory) {

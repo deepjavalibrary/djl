@@ -32,8 +32,8 @@ import software.amazon.ai.example.util.LogUtils;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -144,7 +144,7 @@ public final class BertQaInferenceExample extends AbstractExample {
             float[] indexesFloat = Utils.toFloatArray(indexes);
 
             int seqLength = input.getSeqLength();
-            NDFactory factory = ctx.getNDFactory();
+            NDScopedFactory factory = ctx.getNDScopedFactory();
             NDArray data0 = factory.create(new DataDesc(new Shape(1, seqLength)));
             NDArray data1 = factory.create(new DataDesc(new Shape(1, seqLength)));
             NDArray data2 = factory.create(new DataDesc(new Shape(1)));

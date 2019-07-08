@@ -38,11 +38,11 @@ import software.amazon.ai.training.GradReq;
 public interface NDArray extends AutoCloseable {
 
     /**
-     * Returns the {@link NDFactory} used to create the {@code NDArray}.
+     * Returns the {@link NDScopedFactory} used to create the {@code NDArray}.
      *
-     * @return {@link NDFactory}
+     * @return {@link NDScopedFactory}
      */
-    NDFactory getFactory();
+    NDScopedFactory getFactory();
 
     /**
      * Returns the {@link DataType} of the {@code NDArray}.
@@ -101,19 +101,19 @@ public interface NDArray extends AutoCloseable {
     boolean isSparse();
 
     /**
-     * Attaches this NDArray to specified NDFactory.
+     * Attaches this NDArray to specified NDScopedFactory.
      *
      * <p>Attached resource will be closed when the factory is closed.
      *
-     * @param factory {@link NDFactory} to be attached
+     * @param factory {@link NDScopedFactory} to be attached
      */
-    default void attach(NDFactory factory) {
+    default void attach(NDScopedFactory factory) {
         detach();
         getFactory().attach(factory);
     }
 
     /**
-     * Detaches this NDArray from current NDFactory's lifecycle.
+     * Detaches this NDArray from current NDScopedFactory's lifecycle.
      *
      * <p>This NDArray becomes un-managed, it's user's responsibility to close the NDArray. Failed
      * to close the resource has to wait on GC to be freed, and might cause out of native memory.

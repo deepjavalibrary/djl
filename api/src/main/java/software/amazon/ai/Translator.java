@@ -39,7 +39,7 @@ import software.amazon.ai.ndarray.NDList;
  *         BufferedImage image = Images.resizeImage(input, imageWidth, imageHeight);
  *         FloatBuffer buffer = Images.toFloatBuffer(image);
  *
- *         return new NDList(ctx.getNDFactory().create(dataDesc, buffer));
+ *         return new NDList(ctx.getNDScopedFactory().create(dataDesc, buffer));
  *     }
  *
  *     &#064;Override

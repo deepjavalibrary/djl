@@ -19,7 +19,7 @@ import java.util.List;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDFactory;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.util.PairList;
 
 public class FunctionInfo {
@@ -35,7 +35,7 @@ public class FunctionInfo {
     }
 
     public int invoke(
-            NDFactory factory, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
+            NDScopedFactory factory, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
         Pointer[] handles =
                 Arrays.stream(src).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
         PointerArray srcHandles = new PointerArray(handles);
@@ -44,14 +44,14 @@ public class FunctionInfo {
         return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params);
     }
 
-    public NDArray[] invoke(NDFactory factory, NDArray[] src, PairList<String, ?> params) {
+    public NDArray[] invoke(NDScopedFactory factory, NDArray[] src, PairList<String, ?> params) {
         Pointer[] handles =
                 Arrays.stream(src).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
         PointerArray srcHandles = new PointerArray(handles);
         return invoke((MxNDFactory) factory, srcHandles, params);
     }
 
-    public NDArray[] invoke(NDFactory factory, NDArray src, PairList<String, ?> params) {
+    public NDArray[] invoke(NDScopedFactory factory, NDArray src, PairList<String, ?> params) {
         PointerArray handles = new PointerArray(((MxNDArray) src).getHandle());
         return invoke((MxNDFactory) factory, handles, params);
     }

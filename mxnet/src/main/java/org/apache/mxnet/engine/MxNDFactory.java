@@ -19,26 +19,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
-public class MxNDFactory implements NDFactory {
+public class MxNDFactory implements NDScopedFactory {
 
     /**
-     * A global {@link NDFactory} singleton instance.
+     * A global {@link NDScopedFactory} singleton instance.
      *
-     * <p>This NDFactory is the root of all the other NDFactories. NDArrays created by this factory
-     * are un-managed, user has to close them manually. Those NDArrays will be released on GC, and
-     * might be run into out of native memory issue.
+     * <p>This NDScopedFactory is the root of all the other NDFactories. NDArrays created by this
+     * factory are un-managed, user has to close them manually. Those NDArrays will be released on
+     * GC, and might be run into out of native memory issue.
      */
     static final MxNDFactory SYSTEM_FACTORY = new SystemFactory();
 
     private static final NDList EMPTY = new NDList(0);
 
-    private NDFactory parent;
+    private NDScopedFactory parent;
     private Context context;
     private Map<AutoCloseable, AutoCloseable> resources;
     private AtomicBoolean closed = new AtomicBoolean(false);
@@ -47,7 +47,7 @@ public class MxNDFactory implements NDFactory {
         return SYSTEM_FACTORY;
     }
 
-    private MxNDFactory(NDFactory parent, Context context) {
+    private MxNDFactory(NDScopedFactory parent, Context context) {
         this.parent = parent;
         this.context = context;
         resources = new ConcurrentHashMap<>();
@@ -157,7 +157,7 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
-    public NDFactory getParentFactory() {
+    public NDScopedFactory getParentFactory() {
         return parent;
     }
 

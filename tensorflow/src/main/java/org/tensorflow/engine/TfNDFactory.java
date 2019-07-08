@@ -21,24 +21,24 @@ import org.tensorflow.Tensor;
 import org.tensorflow.Tensors;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
-public class TfNDFactory implements NDFactory, AutoCloseable {
+public class TfNDFactory implements NDScopedFactory, AutoCloseable {
 
     public static final TfNDFactory SYSTEM_FACTORY = new SystemFactory();
     private static int nameAssignment = 1;
 
-    private NDFactory parent;
+    private NDScopedFactory parent;
     private Context context;
     Graph graph;
     Session session;
     private Map<AutoCloseable, AutoCloseable> resources;
 
-    private TfNDFactory(NDFactory parent, Context context, Graph graph) {
+    private TfNDFactory(NDScopedFactory parent, Context context, Graph graph) {
         this.parent = parent;
         this.context = context;
         this.graph = graph;
@@ -138,7 +138,7 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public NDFactory getParentFactory() {
+    public NDScopedFactory getParentFactory() {
         return parent;
     }
 
@@ -156,7 +156,7 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public NDFactory newSubFactory(Context context) {
+    public NDScopedFactory newSubFactory(Context context) {
         TfNDFactory factory = new TfNDFactory(this, context, graph);
         resources.put(factory, factory);
         return factory;

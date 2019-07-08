@@ -18,8 +18,8 @@ import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Block;
 import software.amazon.ai.Initializer;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 import software.amazon.ai.util.Utils;
@@ -181,7 +181,7 @@ public class Symbol extends NativeResource implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public void initialize(NDFactory factory, Initializer initializer) {}
+    public void initialize(NDScopedFactory factory, Initializer initializer) {}
 
     /** {@inheritDoc} */
     @Override

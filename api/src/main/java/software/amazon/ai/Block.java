@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
@@ -32,7 +32,7 @@ public interface Block {
 
     List<NDArray> getDirectParameters();
 
-    void initialize(NDFactory factory, Initializer initializer);
+    void initialize(NDScopedFactory factory, Initializer initializer);
 
     byte[] getEncoded();
 

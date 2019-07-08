@@ -29,8 +29,8 @@ import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.index.NDIndexElement;
 import software.amazon.ai.ndarray.index.NDIndexFixed;
@@ -80,7 +80,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDFactory getFactory() {
+    public NDScopedFactory getFactory() {
         return factory;
     }
 
@@ -93,7 +93,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void attach(NDFactory factory) {
+    public void attach(NDScopedFactory factory) {
         detach();
         this.factory = (MxNDFactory) factory;
         factory.attach(this);

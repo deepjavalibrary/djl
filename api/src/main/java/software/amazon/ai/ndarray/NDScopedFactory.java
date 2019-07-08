@@ -30,25 +30,26 @@ import software.amazon.ai.util.PairList;
 /**
  * NDArray factories are used to create <I>NDArrays</I> (n-dimensional array on native engine).
  *
- * <p>NDFactory is implemented in each deep learning framework {@link Engine}. {@link NDArray}s are
- * resources that allocated in each deep learning framework's native memory space. NDFactory is the
- * key class that manages those native resources.
+ * <p>NDScopedFactory is implemented in each deep learning framework {@link Engine}. {@link
+ * NDArray}s are resources that allocated in each deep learning framework's native memory space.
+ * NDScopedFactory is the key class that manages those native resources.
  *
- * <p>NDArray can only be created through NDFactory. By default, NDArray's lifecycle is attached to
- * the creator NDFactory. NDFactory itself implements {@link AutoCloseable}. When NDFactory is
- * closed, all the resource associated with it will be closed as well.
+ * <p>NDArray can only be created through NDScopedFactory. By default, NDArray's lifecycle is
+ * attached to the creator NDScopedFactory. NDScopedFactory itself implements {@link AutoCloseable}.
+ * When NDScopedFactory is closed, all the resource associated with it will be closed as well.
  *
- * <p>A typical place to obtain NDFactory is in {@link Translator#processInput(TranslatorContext,
- * Object)} or {@link Translator#processOutput(TranslatorContext, NDList)}.
+ * <p>A typical place to obtain NDScopedFactory is in {@link
+ * Translator#processInput(TranslatorContext, Object)} or {@link
+ * Translator#processOutput(TranslatorContext, NDList)}.
  *
- * <p>The following is an example of how to use NDFactory:
+ * <p>The following is an example of how to use NDScopedFactory:
  *
  * <pre>
  * public class MyTranslator implements Translator&lt;FloatBuffer, String&gt; {
  *
  *     &#064;Override
  *     public NDList processInput(TranslatorContext ctx, FloatBuffer input) {
- *         <b>NDFactory factory = ctx.getNDFactory();</b>
+ *         <b>NDScopedFactory factory = ctx.getNDScopedFactory();</b>
  *         NDArray array = <b>factory</b>.create(dataDesc);
  *         array.set(input);
  *         return new NDList(array);
@@ -56,12 +57,14 @@ import software.amazon.ai.util.PairList;
  * }
  * </pre>
  *
- * <p>NDFactory has a hierarchical structure; it has a single parent NDFactory and has child
- * NDFactories. When the parent NDFactory is closed, all children will be closed as well.
+ * <p>NDScopedFactory has a hierarchical structure; it has a single parent NDScopedFactory and has
+ * child NDFactories. When the parent NDScopedFactory is closed, all children will be closed as
+ * well.
  *
- * <p>The Joule framework manage NDFactory's lifecycle by default. You only need to manage the user
- * created child NDFactory. Child NDFactory becomes useful when you create a large amount of
- * temporary NDArrays and want to free the resources earlier than parent NDFactory's lifecycle.
+ * <p>The Joule framework manage NDScopedFactory's lifecycle by default. You only need to manage the
+ * user created child NDScopedFactory. Child NDScopedFactory becomes useful when you create a large
+ * amount of temporary NDArrays and want to free the resources earlier than parent NDScopedFactory's
+ * lifecycle.
  *
  * <p>The following is an example of such a use case:
  *
@@ -70,10 +73,10 @@ import software.amazon.ai.util.PairList;
  *
  *     &#064;Override
  *     public NDList processInput(TranslatorContext ctx, List&lt;FloatBuffer&gt; input) {
- *         NDFactory factory = ctx.getNDFactory();
+ *         NDScopedFactory factory = ctx.getNDScopedFactory();
  *         NDArray array = factory.create(dataDesc);
  *         for (int i = 0; i &lt; input.size(); ++i) {
- *             try (<b>NDFactory childFactory = factory.newSubFactory()</b>) {
+ *             try (<b>NDScopedFactory childFactory = factory.newSubFactory()</b>) {
  *                  NDArray tmp = <b>childFactory</b>.create(itemDataDesc);
  *                  tmp.put(input.get(i);
  *                  array.put(i, tmp);
@@ -84,14 +87,14 @@ import software.amazon.ai.util.PairList;
  * }
  * </pre>
  *
- * <p>You can also close an individual NDArray. NDFactory won't double close them. In certain use
- * cases, you might want to return an NDArray outside of NDFactory's scope.
+ * <p>You can also close an individual NDArray. NDScopedFactory won't double close them. In certain
+ * use cases, you might want to return an NDArray outside of NDScopedFactory's scope.
  *
  * @see NDArray
  * @see Translator
- * @see TranslatorContext#getNDFactory()
+ * @see TranslatorContext#getNDScopedFactory()
  */
-public interface NDFactory extends AutoCloseable {
+public interface NDScopedFactory extends AutoCloseable {
 
     /**
      * Creates an uninitialized instance of {@link DataType#FLOAT32} {@link NDArray} with specified
@@ -491,38 +494,38 @@ public interface NDFactory extends AutoCloseable {
     NDArray randomMultinomial(int n, NDArray pValues, Shape shape);
 
     /**
-     * Returns parent NDFactory.
+     * Returns parent NDScopedFactory.
      *
-     * @return parent NDFactory
+     * @return parent NDScopedFactory
      */
-    NDFactory getParentFactory();
+    NDScopedFactory getParentFactory();
 
     /**
-     * Creates a child NDFactory.
+     * Creates a child NDScopedFactory.
      *
-     * <p>Child NDFactory will inherit default {@link Context} from this NDFactory.
+     * <p>Child NDScopedFactory will inherit default {@link Context} from this NDScopedFactory.
      *
-     * @return a child NDFactory
+     * @return a child NDScopedFactory
      */
-    NDFactory newSubFactory();
+    NDScopedFactory newSubFactory();
 
     /**
-     * Creates a child NDFactory with specified default {@link Context}.
+     * Creates a child NDScopedFactory with specified default {@link Context}.
      *
      * @param context default {@link Context}
-     * @return a child NDFactory
+     * @return a child NDScopedFactory
      */
-    NDFactory newSubFactory(Context context);
+    NDScopedFactory newSubFactory(Context context);
 
     /**
-     * Returns default {@link Context} of this NDFactory.
+     * Returns default {@link Context} of this NDScopedFactory.
      *
-     * @return default {@link Context} of this NDFactory
+     * @return default {@link Context} of this NDScopedFactory
      */
     Context getContext();
 
     /**
-     * Attaches an NDArray or NDFactory to this factory.
+     * Attaches an NDArray or NDScopedFactory to this factory.
      *
      * <p>Attached resource will be closed when this factory is closed.
      *
@@ -531,13 +534,13 @@ public interface NDFactory extends AutoCloseable {
     void attach(AutoCloseable resource);
 
     /**
-     * Detaches an NDArray from this NDFactory's lifecycle.
+     * Detaches an NDArray from this NDScopedFactory's lifecycle.
      *
      * <p>The detached NDArray become un-managed, it's user's responsibility to close the resource.
      * Failed to close the resource has to wait on GC to be freed, and might cause out of native
      * memory.
      *
-     * @param resource NDArray to be remove out of this NDFactory's lifecycle
+     * @param resource NDArray to be remove out of this NDScopedFactory's lifecycle
      */
     void detach(AutoCloseable resource);
 

@@ -30,7 +30,7 @@ import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Model;
-import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -49,7 +49,7 @@ public class MxModel implements Model {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
-    private NDFactory factory;
+    private NDScopedFactory factory;
     private Path modelDir;
     private Symbol symbol;
     private PairList<String, MxNDArray> parameters;
@@ -58,7 +58,7 @@ public class MxModel implements Model {
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
     MxModel(
-            NDFactory factory,
+            NDScopedFactory factory,
             Path modelDir,
             Symbol symbol,
             PairList<String, MxNDArray> parameters,
@@ -134,7 +134,7 @@ public class MxModel implements Model {
         for (Pair<String, MxNDArray> pair : parameters) {
             newParam.add(pair.getKey(), pair.getValue().asType(dataType, true));
         }
-        NDFactory newFactory = MxNDFactory.getSystemFactory().newSubFactory();
+        NDScopedFactory newFactory = MxNDFactory.getSystemFactory().newSubFactory();
         return new MxModel(newFactory, modelDir, symbol, newParam, optimizerStates);
     }
 

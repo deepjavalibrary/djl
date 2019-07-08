@@ -23,8 +23,8 @@ import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.util.Pair;
 
@@ -108,7 +108,7 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
 
         /** {@inheritDoc} */
         @Override
-        public NDFactory getNDFactory() {
+        public NDScopedFactory getNDScopedFactory() {
             return ctxFactory;
         }
 

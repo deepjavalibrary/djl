@@ -43,11 +43,11 @@ interface Predictor<I, O> {
 interface TranslatorContext {
     +Model getModel()
     +Context getContext()
-    +NDFactory getNDFactory()
+    +NDScopedFactory getNDScopedFactory()
     +void close()
 }
 
-interface NDFactory {
+interface NDScopedFactory {
     +NDArray create(Context context, ...);
     +NDArray create(DataDesc dataDesc);
 }
@@ -68,7 +68,7 @@ Predictor -right-o Context : aggregation
 Predictor -right-> Translator : uses
 Translator -right-> NDArray : uses
 Translator --> TranslatorContext : uses
-NDFactory -left-> NDArray
+NDScopedFactory -left-> NDArray
 NDArray -down-o DataDesc
 
 @enduml

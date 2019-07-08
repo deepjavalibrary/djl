@@ -22,14 +22,14 @@ import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
-import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 
 public class MxNDArrayOperatorsTest extends AbstractTest {
 
-    NDFactory factory = MxNDFactory.getSystemFactory();
+    NDScopedFactory factory = MxNDFactory.getSystemFactory();
 
     public static void main(String[] args) {
         new MxNDArrayOperatorsTest().runTest(args);

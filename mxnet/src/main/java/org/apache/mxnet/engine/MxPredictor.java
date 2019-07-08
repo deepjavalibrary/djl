@@ -23,8 +23,8 @@ import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDScopedFactory;
 import software.amazon.ai.util.Pair;
 
 /**
@@ -142,7 +142,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
     private class PredictorContext implements TranslatorContext {
 
-        private NDFactory ctxFactory;
+        private NDScopedFactory ctxFactory;
 
         public PredictorContext() {
             ctxFactory = factory.newSubFactory();
@@ -162,7 +162,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
         /** {@inheritDoc} */
         @Override
-        public NDFactory getNDFactory() {
+        public NDScopedFactory getNDScopedFactory() {
             return ctxFactory;
         }
 
