@@ -20,6 +20,7 @@ import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
@@ -35,7 +36,7 @@ public class MxNDFactory implements NDFactory {
      */
     static final MxNDFactory SYSTEM_FACTORY = new SystemFactory();
 
-    private static final NDArray[] EMPTY = new NDArray[0];
+    private static final NDList EMPTY = new NDList(0);
 
     private NDFactory parent;
     private Context context;
@@ -92,7 +93,7 @@ public class MxNDFactory implements NDFactory {
         params.addParam("step", step);
         params.setDataType(dataType);
         params.setContext(context);
-        return invoke("_npi_arange", EMPTY, params)[0];
+        return invoke("_npi_arange", EMPTY, params).get(0);
     }
 
     /** {@inheritDoc} */
@@ -108,7 +109,7 @@ public class MxNDFactory implements NDFactory {
         params.addParam("endpoint", endpoint);
         params.setDataType(DataType.FLOAT32);
         params.setContext(context);
-        return invoke("_npi_linspace", EMPTY, params)[0];
+        return invoke("_npi_linspace", EMPTY, params).get(0);
     }
 
     /** {@inheritDoc} */
@@ -121,7 +122,7 @@ public class MxNDFactory implements NDFactory {
         params.setShape(shape);
         params.setContext(context);
         params.setDataType(dataType);
-        return invoke("_npi_random_uniform", EMPTY, params)[0];
+        return invoke("_npi_random_uniform", EMPTY, params).get(0);
     }
 
     /** {@inheritDoc} */
@@ -134,7 +135,7 @@ public class MxNDFactory implements NDFactory {
         params.setShape(shape);
         params.setContext(context);
         params.setDataType(dataType);
-        return invoke("_npi_random_normal", EMPTY, params)[0];
+        return invoke("_npi_random_normal", EMPTY, params).get(0);
     }
 
     /** {@inheritDoc} */
@@ -200,15 +201,14 @@ public class MxNDFactory implements NDFactory {
 
     /** {@inheritDoc} */
     @Override
-    public void invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
-        JnaUtils.op(operation).invoke(this, src, dest, params);
+    public void invoke(String operation, NDList src, NDList dest, PairList<String, ?> params) {
+        JnaUtils.op(operation).invoke(this, src.toArray(), dest.toArray(), params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params) {
-        return JnaUtils.op(operation).invoke(this, src, params);
+    public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
+        return new NDList(JnaUtils.op(operation).invoke(this, src.toArray(), params));
     }
 
     public NDArray invoke(String operation, NDArray src, PairList<String, ?> params) {
@@ -216,7 +216,7 @@ public class MxNDFactory implements NDFactory {
     }
 
     public NDArray invoke(String operation, PairList<String, ?> params) {
-        return JnaUtils.op(operation).invoke(this, EMPTY, params)[0];
+        return JnaUtils.op(operation).invoke(this, EMPTY.toArray(), params)[0];
     }
 
     /** {@inheritDoc} */

@@ -13,6 +13,7 @@
 package org.apache.mxnet.engine;
 
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 
 class MxNDArrayEx implements NDArrayEx {
@@ -44,13 +45,13 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rdivi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        factory.invoke("_rdiv_scalar", new NDArray[] {array}, new NDArray[] {array}, params);
+        factory.invoke("_rdiv_scalar", new NDList(array), new NDList(array), params);
         return array;
     }
 
     @Override
     public NDArray rdivi(NDArray b) {
-        factory.invoke("elemwise_div", new NDArray[] {b, array}, new NDArray[] {array}, null);
+        factory.invoke("elemwise_div", new NDList(b, array), new NDList(array), null);
         return array;
     }
 
@@ -95,14 +96,14 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rmodi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        factory.invoke("_npi_rmod_scalar", new NDArray[] {array}, new NDArray[] {array}, params);
+        factory.invoke("_npi_rmod_scalar", new NDList(array), new NDList(array), params);
         return array;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(NDArray b) {
-        factory.invoke("_npi_mod", new NDArray[] {b, array}, new NDArray[] {array}, null);
+        factory.invoke("_npi_mod", new NDList(b, array), new NDList(array), null);
         return array;
     }
 }

@@ -555,7 +555,7 @@ public interface NDFactory extends AutoCloseable {
      * @throws IllegalArgumentException if operation is not supported by Engine
      * @throws software.amazon.ai.engine.EngineException if operation failed in native engine
      */
-    void invoke(String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params);
+    void invoke(String operation, NDList src, NDList dest, PairList<String, ?> params);
 
     /**
      * An engine specific generic invocation to native operator.
@@ -571,7 +571,7 @@ public interface NDFactory extends AutoCloseable {
      * @throws IllegalArgumentException if operation is not supported by Engine
      * @throws software.amazon.ai.engine.EngineException if operation failed in native engine
      */
-    NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params);
+    NDList invoke(String operation, NDList src, PairList<String, ?> params);
 
     /** {@inheritDoc} */
     @Override

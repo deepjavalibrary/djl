@@ -22,6 +22,7 @@ import org.tensorflow.Tensors;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDFactory;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
@@ -79,13 +80,12 @@ public class TfNDFactory implements NDFactory, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public void invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {}
+    public void invoke(String operation, NDList src, NDList dest, PairList<String, ?> params) {}
 
     /** {@inheritDoc} */
     @Override
-    public NDArray[] invoke(String operation, NDArray[] src, PairList<String, ?> params) {
-        return new NDArray[0];
+    public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
+        return null;
     }
 
     @Override
