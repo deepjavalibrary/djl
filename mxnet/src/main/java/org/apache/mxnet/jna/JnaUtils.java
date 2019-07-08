@@ -283,9 +283,10 @@ public final class JnaUtils {
         int delay = delayedAlloc ? 1 : 0;
 
         PointerByReference ref = new PointerByReference();
+        int[] shapeArray = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
         checkCall(
                 LIB.MXNDArrayCreateEx(
-                        shape.getShape(), size, deviceType, deviceId, delay, dtype.ordinal(), ref));
+                        shapeArray, size, deviceType, deviceId, delay, dtype.ordinal(), ref));
 
         return ref.getValue();
     }
@@ -410,7 +411,7 @@ public final class JnaUtils {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXNDArrayGetShape(ndArray, dim, ref));
         int[] shape = ref.getValue().getIntArray(0, dim.get());
-        return new Shape(shape);
+        return new Shape(Arrays.stream(shape).asLongStream().toArray());
     }
 
     public static DataType getDataType(Pointer ndArray) {

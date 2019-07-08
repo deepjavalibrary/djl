@@ -119,7 +119,7 @@ public final class SsdExample extends AbstractExample {
 
             String[] synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
             NDArray nd = array.get(0);
-            int length = nd.getShape().head();
+            long length = nd.getShape().head();
             for (int i = 0; i < length; ++i) {
                 try (NDArray item = nd.get(i)) {
                     float[] values = item.toFloatArray();

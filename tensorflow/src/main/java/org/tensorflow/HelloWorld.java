@@ -95,7 +95,7 @@ public final class HelloWorld {
             byte[] data = ((DataBufferByte) img.getData().getDataBuffer()).getData();
             // ImageIO.read seems to produce BGR-encoded images, but the model expects RGB.
             bgr2rgb(data);
-            int[] shape = new int[] {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
+            long[] shape = new long[] {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
             TfNDArray tfNDArray =
                     ((TfNDFactory) ctx.getNDFactory())
                             .create(new Shape(shape), ByteBuffer.wrap(data));

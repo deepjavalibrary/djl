@@ -13,22 +13,22 @@
 package software.amazon.ai.ndarray.types;
 
 import java.util.Arrays;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 /** A class the presents the {@link software.amazon.ai.ndarray.NDArray}'s shape information. */
 public class Shape {
 
-    private int[] shape;
+    private long[] shape;
 
     /**
-     * Constructs and initializes a {@code Shape} with specified dimension as {@code (int...
+     * Constructs and initializes a {@code Shape} with specified dimension as {@code (long...
      * shape)}.
      *
      * @param shape dimensions of the shape
      * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
      *     less than -1
      */
-    public Shape(int... shape) {
+    public Shape(long... shape) {
         if (Arrays.stream(shape).anyMatch(s -> s < -1)) {
             throw new IllegalArgumentException("The shape must be >= -1");
         }
@@ -40,19 +40,8 @@ public class Shape {
      *
      * @return dimensions of the {@code Shape}
      */
-    public int[] getShape() {
+    public long[] getShape() {
         return shape;
-    }
-
-    /**
-     * Returns dimensions of the {@code Shape} in {@code long[]}.
-     *
-     * <p>This API provides support for large tensor.
-     *
-     * @return dimensions of the {@code Shape}
-     */
-    public long[] getShapeLong() {
-        return Arrays.stream(getShape()).mapToLong((i) -> (long) i).toArray();
     }
 
     /**
@@ -61,7 +50,7 @@ public class Shape {
      * @param dimension the dimension to get the shape in
      * @return Returns the shape in the given dimension
      */
-    public int get(int dimension) {
+    public long get(int dimension) {
         return shape[dimension];
     }
 
@@ -72,7 +61,7 @@ public class Shape {
      * @return size of specific dimension(s) or -1 for indeterminate size
      * @throws IllegalArgumentException thrown if passed an invalid dimension
      */
-    public int size(int... dimensions) {
+    public long size(int... dimensions) {
         int total = 1;
         for (int d : dimensions) {
             if (d < 0 || d >= shape.length) {
@@ -91,9 +80,9 @@ public class Shape {
      *
      * @return total size or -1 for indeterminate size
      */
-    public int size() {
+    public long size() {
         int total = 1;
-        for (int v : shape) {
+        for (long v : shape) {
             if (v == -1) {
                 return -1;
             }
@@ -136,7 +125,7 @@ public class Shape {
      */
     public Shape slice(int beginIndex, int endIndex) {
         int size = endIndex - beginIndex;
-        int[] out = new int[size];
+        long[] out = new long[size];
         System.arraycopy(shape, beginIndex, out, 0, size);
         return new Shape(out);
     }
@@ -149,7 +138,7 @@ public class Shape {
      */
     public Shape addAll(Shape other) {
         return new Shape(
-                IntStream.concat(Arrays.stream(shape), Arrays.stream(other.shape)).toArray());
+                LongStream.concat(Arrays.stream(shape), Arrays.stream(other.shape)).toArray());
     }
 
     /**
@@ -157,7 +146,7 @@ public class Shape {
      *
      * @return the head index of the shape
      */
-    public int head() {
+    public long head() {
         return shape[0];
     }
 
@@ -199,7 +188,7 @@ public class Shape {
      * @return the number of columns in the matrix
      * @throws IllegalStateException Thrown if not a 2D matrix
      */
-    public int columns() {
+    public long columns() {
         if (!isMatrix()) {
             throw new IllegalStateException("Not a Matrix");
         }
@@ -212,7 +201,7 @@ public class Shape {
      * @return the number of rows in the matrix
      * @throws IllegalStateException Thrown if not a 2D matrix
      */
-    public int rows() {
+    public long rows() {
         if (!isMatrix()) {
             throw new IllegalStateException("Not a Matrix");
         }

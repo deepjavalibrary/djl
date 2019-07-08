@@ -16,7 +16,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
-import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import org.tensorflow.Operation;
@@ -59,13 +58,13 @@ public class TfNDArray implements NDArray {
     public TfNDArray(NDFactory factory, Shape shape, FloatBuffer data) {
         this.factory = (TfNDFactory) factory;
         this.factory.attach(this);
-        tensor = Tensor.create(shape.getShapeLong(), data);
+        tensor = Tensor.create(shape.getShape(), data);
         this.shape = shape;
     }
 
     TfNDArray(NDFactory factory, Shape shape, ByteBuffer data) {
         this.factory = (TfNDFactory) factory;
-        tensor = Tensor.create(UInt8.class, shape.getShapeLong(), data);
+        tensor = Tensor.create(UInt8.class, shape.getShape(), data);
         this.shape = shape;
     }
 
@@ -125,7 +124,7 @@ public class TfNDArray implements NDArray {
     public Shape getShape() {
         if (shape == null) {
             runToTensor();
-            shape = new Shape(Arrays.stream(tensor.shape()).mapToInt(Math::toIntExact).toArray());
+            shape = new Shape(tensor.shape());
         }
         return shape;
     }
@@ -617,7 +616,7 @@ public class TfNDArray implements NDArray {
     }
 
     @Override
-    public int nonzero() {
+    public long nonzero() {
         return 0;
     }
 
@@ -669,19 +668,19 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(int repeats) {
+    public NDArray tile(long repeats) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(int axis, int repeats) {
+    public NDArray tile(int axis, long repeats) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(int[] repeats) {
+    public NDArray tile(long[] repeats) {
         return null;
     }
 
@@ -693,19 +692,19 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int repeats) {
+    public NDArray repeat(long repeats) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int axis, int repeats) {
+    public NDArray repeat(int axis, long repeats) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int[] repeats) {
+    public NDArray repeat(long[] repeats) {
         return null;
     }
 

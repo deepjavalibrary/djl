@@ -778,23 +778,23 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(int repeats) {
-        int[] repeatsArray = new int[getShape().dimension()];
+    public NDArray tile(long repeats) {
+        long[] repeatsArray = new long[getShape().dimension()];
         Arrays.fill(repeatsArray, repeats);
         return tile(repeatsArray);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(int axis, int repeats) {
-        int[] repeatsArray = new int[getShape().dimension()];
+    public NDArray tile(int axis, long repeats) {
+        long[] repeatsArray = new long[getShape().dimension()];
         Arrays.fill(repeatsArray, 1);
         repeatsArray[withAxis(axis)] = repeats;
         return tile(repeatsArray);
     }
 
     @Override
-    public NDArray tile(int[] repeats) {
+    public NDArray tile(long[] repeats) {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("reps", repeats);
         return factory.invoke("tile", this, params);
@@ -808,23 +808,23 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int repeats) {
-        int[] repeatsArray = new int[getShape().dimension()];
+    public NDArray repeat(long repeats) {
+        long[] repeatsArray = new long[getShape().dimension()];
         Arrays.fill(repeatsArray, repeats);
         return repeat(repeatsArray);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int axis, int repeats) {
-        int[] repeatsArray = new int[getShape().dimension()];
+    public NDArray repeat(int axis, long repeats) {
+        long[] repeatsArray = new long[getShape().dimension()];
         Arrays.fill(repeatsArray, 1);
         repeatsArray[withAxis(axis)] = repeats;
         return repeat(repeatsArray);
     }
 
     @Override
-    public NDArray repeat(int[] repeats) {
+    public NDArray repeat(long[] repeats) {
         NDArray array = this;
         int baseAxis = getShape().dimension() - repeats.length;
         for (int i = 0; i < repeats.length; i++) {
@@ -1079,8 +1079,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (shape.size() != -1 && getShape().size() != shape.size()) {
             throw new IllegalArgumentException("The given shape does not match the current shape");
         }
-        long[] dims = Arrays.stream(shape.getShape()).asLongStream().toArray();
-        Pointer pointer = JnaUtils.reshape(getHandle(), dims, false);
+        Pointer pointer = JnaUtils.reshape(getHandle(), shape.getShape(), false);
         return factory.create(pointer);
     }
 
@@ -1238,7 +1237,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public int nonzero() {
+    public long nonzero() {
         MxNDArray zeros = (MxNDArray) eq(0);
         NDArray sum = factory.invoke("sum", eq(zeros).eq(zeros), null);
         return sum.toArray()[0].intValue();
@@ -1511,11 +1510,11 @@ public class MxNDArray extends NativeResource implements NDArray {
     private ByteBuffer toByteBuffer() {
         Shape sh = getShape();
         DataType dType = getDataType();
-        int product = sh.size();
-        int len = dType.getNumOfBytes() * product;
-        ByteBuffer bb = ByteBuffer.allocateDirect(len);
+        long product = sh.size();
+        long len = dType.getNumOfBytes() * product;
+        ByteBuffer bb = ByteBuffer.allocateDirect(Math.toIntExact(len));
         Pointer pointer = Native.getDirectBufferPointer(bb);
-        JnaUtils.syncCopyToCPU(getHandle(), pointer, product);
+        JnaUtils.syncCopyToCPU(getHandle(), pointer, Math.toIntExact(product));
         bb.order(ByteOrder.LITTLE_ENDIAN);
         return bb;
     }
@@ -1523,26 +1522,26 @@ public class MxNDArray extends NativeResource implements NDArray {
     private void dump(StringBuilder sb, int depth) {
         Utils.pad(sb, ' ', depth);
         sb.append('[');
-        int len = getShape().head();
+        long len = getShape().head();
         if (getShape().dimension() == 1) {
-            int limit = Math.min(getShape().head(), MAX_PRINT_ITEMS);
+            long limit = Math.min(getShape().head(), MAX_PRINT_ITEMS);
             ByteBuffer buf = toByteBuffer().slice();
-            buf.limit(limit * getDataType().getNumOfBytes());
+            buf.limit(Math.toIntExact(limit * getDataType().getNumOfBytes()));
             buf.order(ByteOrder.LITTLE_ENDIAN);
             sb.append(Utils.toCharSequence(buf, getDataType()));
-            int remaining = getShape().head() - limit;
+            long remaining = getShape().head() - limit;
             if (remaining > 0) {
                 sb.append(", ... ").append(remaining).append(" more");
             }
         } else {
             sb.append(LF);
-            int limit = Math.min(len, MAX_PRINT_ROWS);
+            long limit = Math.min(len, MAX_PRINT_ROWS);
             for (int i = 0; i < limit; ++i) {
                 try (MxNDArray nd = (MxNDArray) get(i)) {
                     nd.dump(sb, depth + 1);
                 }
             }
-            int remaining = len - limit;
+            long remaining = len - limit;
             if (remaining > 0) {
                 Utils.pad(sb, ' ', depth + 1);
                 sb.append("... ").append(remaining).append(" more");
@@ -1563,7 +1562,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
     }
 
-    private int[] repeatsToMatchShape(Shape desiredShape) throws IllegalArgumentException {
+    private long[] repeatsToMatchShape(Shape desiredShape) throws IllegalArgumentException {
         Shape curShape = getShape();
         int dimension = curShape.dimension();
         if (desiredShape.dimension() > dimension) {
@@ -1573,14 +1572,13 @@ public class MxNDArray extends NativeResource implements NDArray {
             int additionalDimensions = dimension - desiredShape.dimension();
             desiredShape = curShape.slice(0, additionalDimensions).addAll(desiredShape);
         }
-        int[] repeats = new int[dimension];
+        long[] repeats = new long[dimension];
         for (int i = 0; i < dimension; i++) {
             if (desiredShape.get(i) % curShape.get(i) != 0) {
                 throw new IllegalArgumentException(
                         "The desired shape is not a multiple of the original shape");
             }
-            repeats[i] =
-                    (int) Math.round(Math.ceil((double) desiredShape.get(i) / curShape.get(i)));
+            repeats[i] = Math.round(Math.ceil((double) desiredShape.get(i) / curShape.get(i)));
         }
         return repeats;
     }

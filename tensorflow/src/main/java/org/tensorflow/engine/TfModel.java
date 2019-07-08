@@ -56,11 +56,11 @@ public class TfModel implements Model {
         for (Map.Entry<String, TensorInfo> entry : info.entrySet()) {
             TensorInfo t = entry.getValue();
             // StringBuilder layout = new StringBuilder();
-            int[] shape = new int[t.getTensorShape().getDimCount()];
+            long[] shape = new long[t.getTensorShape().getDimCount()];
             int dimIter = 0;
             for (TensorShapeProto.Dim dim : t.getTensorShape().getDimList()) {
                 // layout.append(dim.getName());
-                shape[dimIter] = (int) dim.getSize();
+                shape[dimIter] = dim.getSize();
                 dimIter++;
             }
             // TODO: Add DataType mapping from framework.DataType

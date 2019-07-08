@@ -75,6 +75,28 @@ public class MxOpParams extends PairList<String, String> {
     }
 
     public void addTupleParam(String paramName, int... tuple) {
-        add(paramName, new Shape(tuple).toString());
+        StringBuilder sb = new StringBuilder();
+        sb.append('(');
+        for (int i = 0; i < tuple.length; ++i) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(tuple[i]);
+        }
+        sb.append(')');
+        add(paramName, sb.toString());
+    }
+
+    public void addTupleParam(String paramName, long... tuple) {
+        StringBuilder sb = new StringBuilder();
+        sb.append('(');
+        for (int i = 0; i < tuple.length; ++i) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(tuple[i]);
+        }
+        sb.append(')');
+        add(paramName, sb.toString());
     }
 }

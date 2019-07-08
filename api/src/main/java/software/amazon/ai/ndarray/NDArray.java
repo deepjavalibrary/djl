@@ -964,7 +964,7 @@ public interface NDArray extends AutoCloseable {
      * @param repeats the number of times to repeat for each dimension
      * @return a NDArray that has been tiled
      */
-    NDArray tile(int repeats);
+    NDArray tile(long repeats);
 
     /**
      * Repeats the array in tiles a given number of times along the given axis.
@@ -974,7 +974,7 @@ public interface NDArray extends AutoCloseable {
      * @return an NDArray that has been tiled
      * @throws IllegalArgumentException Thrown for invalid axis
      */
-    NDArray tile(int axis, int repeats);
+    NDArray tile(int axis, long repeats);
 
     /**
      * Repeats the array in tiles a given number of times.
@@ -982,7 +982,7 @@ public interface NDArray extends AutoCloseable {
      * @param repeats the number of times to repeat along each axis
      * @return an NDArray that has been tiled
      */
-    NDArray tile(int[] repeats);
+    NDArray tile(long[] repeats);
 
     /**
      * Repeats the array in tiles a given number of times to match the desired shape.
@@ -1001,7 +1001,7 @@ public interface NDArray extends AutoCloseable {
      * @param repeats the number of times to repeat for each dimension
      * @return an NDArray that has been tiled
      */
-    NDArray repeat(int repeats);
+    NDArray repeat(long repeats);
 
     /**
      * Repeats each array element a given number of times along the given axis.
@@ -1011,7 +1011,7 @@ public interface NDArray extends AutoCloseable {
      * @return an NDArray that has been tiled
      * @throws IllegalArgumentException Thrown for invalid axis
      */
-    NDArray repeat(int axis, int repeats);
+    NDArray repeat(int axis, long repeats);
 
     /**
      * Repeats each array element a given number of times for each axis.
@@ -1019,7 +1019,7 @@ public interface NDArray extends AutoCloseable {
      * @param repeats the number of times to repeat along each axis
      * @return an NDArray that has been tiled
      */
-    NDArray repeat(int[] repeats);
+    NDArray repeat(long[] repeats);
 
     /**
      * Repeats each array element to match the desired shape.
@@ -1660,7 +1660,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return nnz
      */
-    int nonzero();
+    long nonzero();
 
     /**
      * Returns {@code true} if this NDArray is special case: no-value {@code NDArray}.

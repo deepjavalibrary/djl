@@ -103,9 +103,9 @@ public final class ClassifyExample extends AbstractExample {
             Model model = ctx.getModel();
             NDArray array = list.get(0).get(0);
 
-            int length = array.getShape().head();
+            long length = array.getShape().head();
             length = Math.min(length, topK);
-            List<Classification> ret = new ArrayList<>(length);
+            List<Classification> ret = new ArrayList<>(Math.toIntExact(length));
             NDArray sorted = array.argsort(-1, false);
             NDArray top = sorted.get(":" + topK);
 

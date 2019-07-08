@@ -743,19 +743,19 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(int repeats) {
+    public NDArray tile(long repeats) {
         return array.tile(repeats);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(int axis, int repeats) {
+    public NDArray tile(int axis, long repeats) {
         return array.tile(axis, repeats);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(int[] repeats) {
+    public NDArray tile(long[] repeats) {
         return array.repeat(repeats);
     }
 
@@ -766,18 +766,18 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int repeats) {
+    public NDArray repeat(long repeats) {
         return array.repeat(repeats);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int axis, int repeats) {
+    public NDArray repeat(int axis, long repeats) {
         return array.repeat(axis, repeats);
     }
 
     @Override
-    public NDArray repeat(int[] repeats) {
+    public NDArray repeat(long[] repeats) {
         return array.repeat(repeats);
     }
 
@@ -903,7 +903,7 @@ public class MxMatrix implements Matrix {
     }
 
     @Override
-    public int nonzero() {
+    public long nonzero() {
         return 0;
     }
 

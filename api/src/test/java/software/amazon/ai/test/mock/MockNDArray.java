@@ -382,17 +382,17 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray tile(int repeats) {
+    public NDArray tile(long repeats) {
         return null;
     }
 
     @Override
-    public NDArray tile(int axis, int repeats) {
+    public NDArray tile(int axis, long repeats) {
         return null;
     }
 
     @Override
-    public NDArray tile(int[] repeats) {
+    public NDArray tile(long[] repeats) {
         return null;
     }
 
@@ -402,17 +402,17 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray repeat(int repeats) {
+    public NDArray repeat(long repeats) {
         return null;
     }
 
     @Override
-    public NDArray repeat(int axis, int repeats) {
+    public NDArray repeat(int axis, long repeats) {
         return null;
     }
 
     @Override
-    public NDArray repeat(int[] repeats) {
+    public NDArray repeat(long[] repeats) {
         return null;
     }
 
@@ -687,7 +687,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public int nonzero() {
+    public long nonzero() {
         return 0;
     }
 

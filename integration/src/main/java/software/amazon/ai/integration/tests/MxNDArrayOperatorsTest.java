@@ -238,7 +238,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 factory.create(new Shape(6, 2), new float[] {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4});
         Assertions.assertEquals(tileAxis, tileAxisExpected, "Incorrect tile on axis");
 
-        NDArray tileArray = original.tile(new int[] {3, 1});
+        NDArray tileArray = original.tile(new long[] {3, 1});
         Assertions.assertStatement(
                 tileArray.contentEquals(tileAxisExpected), "Incorrect tile array");
 
@@ -264,7 +264,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 factory.create(new Shape(6, 2), new float[] {1, 2, 1, 2, 1, 2, 3, 4, 3, 4, 3, 4});
         Assertions.assertEquals(repeatAxis, repeatAxisExpected, "Incorrect repeat on axis");
 
-        NDArray repeatArray = original.repeat(new int[] {3, 1});
+        NDArray repeatArray = original.repeat(new long[] {3, 1});
         Assertions.assertEquals(repeatArray, repeatAxisExpected, "Incorrect repeat array");
 
         NDArray repeatShape = original.repeat(new Shape(4));
