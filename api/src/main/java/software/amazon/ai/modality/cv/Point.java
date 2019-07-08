@@ -17,8 +17,8 @@ package software.amazon.ai.modality.cv;
  */
 public class Point {
 
-    private int x;
-    private int y;
+    private double x;
+    private double y;
 
     /**
      * Constructs and initializes a point at the specified {@code (x,y)} location in the coordinate
@@ -27,7 +27,7 @@ public class Point {
      * @param x the X coordinate of the newly constructed {@code Point}
      * @param y the Y coordinate of the newly constructed {@code Point}
      */
-    public Point(int x, int y) {
+    public Point(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -37,7 +37,7 @@ public class Point {
      *
      * @return the X coordinate of this {@code Point}.
      */
-    public int getX() {
+    public double getX() {
         return x;
     }
 
@@ -46,7 +46,7 @@ public class Point {
      *
      * @return the Y coordinate of this {@code Point}.
      */
-    public int getY() {
+    public double getY() {
         return y;
     }
 }

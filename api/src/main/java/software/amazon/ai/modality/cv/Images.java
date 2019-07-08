@@ -12,6 +12,9 @@
  */
 package software.amazon.ai.modality.cv;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -19,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
+import java.util.List;
 import javax.imageio.ImageIO;
 
 /** {@code Images} is an image processing utility that can load, reshape and convert images. */
@@ -56,6 +60,36 @@ public final class Images {
     }
 
     /**
+     * Draws the bounding box on an image.
+     *
+     * @param image the input image
+     * @param detections the object detection results
+     */
+    public static void drawBoundingBox(BufferedImage image, List<DetectedObject> detections) {
+        Graphics2D g = (Graphics2D) image.getGraphics();
+        int stroke = 2;
+        g.setStroke(new BasicStroke(stroke));
+
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+
+        for (DetectedObject result : detections) {
+            String className = result.getClassName();
+            Rectangle rect = result.getBoundingBox().getBounds();
+            g.setPaint(Color.WHITE);
+
+            int x = (int) (rect.getX() * imageWidth);
+            int y = (int) (rect.getY() * imageHeight);
+            int w = (int) (rect.getWidth() * imageWidth);
+            int h = (int) (rect.getHeight() * imageHeight);
+
+            g.drawRect(x, y, w, h);
+            drawText(g, className, x, y, stroke, 4);
+        }
+        g.dispose();
+    }
+
+    /**
      * Converts image to a float buffer.
      *
      * @param image the buffered image to be converted
@@ -86,5 +120,18 @@ public final class Images {
             }
         }
         return buf;
+    }
+
+    private static void drawText(Graphics2D g, String text, int x, int y, int stroke, int padding) {
+        FontMetrics metrics = g.getFontMetrics();
+        x += stroke / 2;
+        y += stroke / 2;
+        int width = metrics.stringWidth(text) + padding * 2 - stroke / 2;
+        int height = metrics.getHeight() + metrics.getDescent();
+        int ascent = metrics.getAscent();
+        java.awt.Rectangle background = new java.awt.Rectangle(x, y, width, height);
+        g.fill(background);
+        g.setPaint(Color.BLACK);
+        g.drawString(text, x + padding, y + ascent);
     }
 }

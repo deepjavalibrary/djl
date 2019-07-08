@@ -17,10 +17,6 @@
 
 package software.amazon.ai.example;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -94,36 +90,10 @@ public final class SsdExample extends AbstractExample {
         Path dir = Paths.get(logDir);
         Files.createDirectories(dir);
 
-        BufferedImage newImg = Images.resizeImage(img, 512, 512);
-        Graphics2D g = (Graphics2D) newImg.getGraphics();
-        g.drawImage(img, 0, 0, 512, 512, null);
-        int stroke = 2;
-        g.setStroke(new BasicStroke(stroke));
-
-        for (DetectedObject result : predictResult) {
-            String className = result.getClassName();
-            Rectangle rect = result.getBoundingBox().getBounds();
-            g.setPaint(Color.WHITE);
-            g.drawRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
-            drawText(g, className, rect, stroke, 4);
-        }
-        g.dispose();
+        Images.drawBoundingBox(img, predictResult);
 
         Path out = Paths.get(logDir, "ssd.jpg");
-        ImageIO.write(newImg, "jpg", out.toFile());
-    }
-
-    private void drawText(Graphics2D g, String text, Rectangle rect, int stroke, int padding) {
-        FontMetrics metrics = g.getFontMetrics();
-        int x = rect.getX() + stroke / 2;
-        int y = rect.getY() + +stroke / 2;
-        int width = metrics.stringWidth(text) + padding * 2 - stroke / 2;
-        int height = metrics.getHeight() + metrics.getDescent();
-        int ascent = metrics.getAscent();
-        java.awt.Rectangle background = new java.awt.Rectangle(x, y, width, height);
-        g.fill(background);
-        g.setPaint(Color.BLACK);
-        g.drawString(text, x + padding, y + ascent);
+        ImageIO.write(img, "jpg", out.toFile());
     }
 
     private static final class SsdTranslator extends ImageTranslator<List<DetectedObject>> {
@@ -166,12 +136,12 @@ public final class SsdExample extends AbstractExample {
                         }
                         String className = synset[classId];
 
-                        double x = values[2] * imageWidth;
-                        double y = values[3] * imageHeight;
-                        double w = values[4] * imageHeight - x;
-                        double h = values[5] * imageHeight - y;
+                        double x = values[2];
+                        double y = values[3];
+                        double w = values[4] - x;
+                        double h = values[5] - y;
 
-                        Rectangle rect = new Rectangle((int) x, (int) y, (int) w, (int) h);
+                        Rectangle rect = new Rectangle(x, y, w, h);
                         ret.add(new DetectedObject(className, probability, rect));
                     }
                 }

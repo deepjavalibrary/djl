@@ -19,9 +19,9 @@ package software.amazon.ai.modality.cv;
  */
 public class Rectangle implements BoundingBox {
 
-    Point point;
-    int width;
-    int height;
+    private Point point;
+    private double width;
+    private double height;
 
     /**
      * Constructs a new {@code Rectangle} whose upper-left corner is specified as {@code (x,y)} and
@@ -32,7 +32,7 @@ public class Rectangle implements BoundingBox {
      * @param width the width of the {@code Rectangle}
      * @param height the height of the {@code Rectangle}
      */
-    public Rectangle(int x, int y, int width, int height) {
+    public Rectangle(double x, double y, double width, double height) {
         this(new Point(x, y), width, height);
     }
 
@@ -44,7 +44,7 @@ public class Rectangle implements BoundingBox {
      * @param width the width of the {@code Rectangle}
      * @param height the height of the {@code Rectangle}
      */
-    public Rectangle(Point point, int width, int height) {
+    public Rectangle(Point point, double width, double height) {
         this.point = point;
         this.width = width;
         this.height = height;
@@ -98,19 +98,19 @@ public class Rectangle implements BoundingBox {
         return point;
     }
 
-    public int getX() {
+    public double getX() {
         return point.getX();
     }
 
-    public int getY() {
+    public double getY() {
         return point.getY();
     }
 
-    public int getWidth() {
+    public double getWidth() {
         return width;
     }
 
-    public int getHeight() {
+    public double getHeight() {
         return height;
     }
 
