@@ -101,6 +101,28 @@ public interface NDArray extends AutoCloseable {
     boolean isSparse();
 
     /**
+     * Attaches this NDArray to specified NDFactory.
+     *
+     * <p>Attached resource will be closed when the factory is closed.
+     *
+     * @param factory {@link NDFactory} to be attached
+     */
+    default void attach(NDFactory factory) {
+        detach();
+        getFactory().attach(factory);
+    }
+
+    /**
+     * Detaches this NDArray from current NDFactory's lifecycle.
+     *
+     * <p>This NDArray becomes un-managed, it's user's responsibility to close the NDArray. Failed
+     * to close the resource has to wait on GC to be freed, and might cause out of native memory.
+     */
+    default void detach() {
+        getFactory().detach(this);
+    }
+
+    /**
      * Converts the NDArray to a different {@link Context}.
      *
      * @param ctx {@link Context} to be set

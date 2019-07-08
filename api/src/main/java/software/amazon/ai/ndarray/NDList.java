@@ -149,6 +149,18 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
         }
     }
 
+    public void attach(NDFactory factory) {
+        for (NDArray array : list.values()) {
+            array.attach(factory);
+        }
+    }
+
+    public void detach() {
+        for (NDArray array : list.values()) {
+            array.detach();
+        }
+    }
+
     /**
      * Returns an iterator over the NDArrays in this list in proper sequence.
      *

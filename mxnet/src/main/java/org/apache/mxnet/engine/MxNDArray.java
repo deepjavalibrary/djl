@@ -78,19 +78,24 @@ public class MxNDArray extends NativeResource implements NDArray {
         return toByteArray();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDFactory getFactory() {
         return factory;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public void detach() {
         factory.detach(this);
         factory = MxNDFactory.SYSTEM_FACTORY;
     }
 
-    public void attach(MxNDFactory factory) {
+    /** {@inheritDoc} */
+    @Override
+    public void attach(NDFactory factory) {
         detach();
-        this.factory = factory;
+        this.factory = (MxNDFactory) factory;
         factory.attach(this);
     }
 
