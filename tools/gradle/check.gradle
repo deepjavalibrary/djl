@@ -30,7 +30,10 @@ checkstyle {
     toolVersion = "7.1.2"
     ignoreFailures = false
     checkstyleTest.enabled = true
-    configProperties = [ "checkstyle.suppressions.file" : file("${rootProject.projectDir}/tools/conf/suppressions.xml")]
+    configProperties = [
+            "checkstyle.suppressions.file" : file("${rootProject.projectDir}/tools/conf/suppressions.xml"),
+            "checkstyle.licenseHeader.file" : file("${rootProject.projectDir}/tools/conf/licenseHeader.java")
+            ]
     configFile = file("${rootProject.projectDir}/tools/conf/checkstyle.xml")
 }
 checkstyleMain {

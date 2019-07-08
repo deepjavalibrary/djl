@@ -22,12 +22,13 @@
     <module name="SuppressWithNearbyCommentFilter"/>
 
     <!-- Headers -->
-    <!--
     <module name="Header">
-        <property name="headerFile" value="${checkstyle.header.file}"/>
+        <property name="headerFile" value="${checkstyle.licenseHeader.file}"/>
         <property name="fileExtensions" value="java"/>
+        <property name="ignoreLines" value="2"/>
         <property name="id" value="header"/>
     </module>
+    <!--
     <module name="RegexpHeader">
         <property name="headerFile" value="${checkstyle.regexp.header.file}"/>
         <property name="fileExtensions" value="java"/>
