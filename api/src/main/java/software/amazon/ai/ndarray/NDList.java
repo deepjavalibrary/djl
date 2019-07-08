@@ -67,8 +67,8 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
     /**
      * Returns the number of NDArrays in this NDList.
      *
-     * <p>If this list contains more than <tt>Integer.MAX_VALUE</tt> NDArrays, returns
-     * <tt>Integer.MAX_VALUE</tt>.
+     * <p>If this list contains more than {@code Integer.MAX_VALUE} NDArrays, returns {@code
+     * Integer.MAX_VALUE}.
      *
      * @return the number of NDArrays in this NDList
      */
@@ -81,23 +81,22 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
      * (optional operation).
      *
      * <p>If this list does not contain the element, it is unchanged. More formally, removes the
-     * element with the lowest index <tt>i</tt> such that
-     * <tt>(o==null&nbsp;?&nbsp;get(i)==null&nbsp;:&nbsp;o.equals(get(i)))</tt> (if such an element
-     * exists).
+     * element with the lowest index {@code i} such that {@code
+     * (o==null&nbsp;?&nbsp;get(i)==null&nbsp;:&nbsp;o.equals(get(i)))} (if such an element exists).
      *
      * @param name name of the NDArray to be removed from this NDList, if present
      * @return the element which got removed
-     * @throws UnsupportedOperationException if the <tt>NDList</tt> is read only
+     * @throws UnsupportedOperationException if the {@code NDList} is read only
      */
     public NDArray remove(String name) {
         return list.remove(name);
     }
 
     /**
-     * Returns <tt>true</tt> if this NDList contains NDArray with the specified name.
+     * Returns {@code true} if this NDList contains NDArray with the specified name.
      *
      * @param name name of the NDArray to be removed from this NDList, if present
-     * @return <tt>true</tt> if this list contains the specified element
+     * @return {@code true} if this list contains the specified element
      */
     public boolean contains(String name) {
         return list.contains(name);
@@ -108,8 +107,8 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
      *
      * @param index index of the NDArray to return
      * @return the NDArray at the specified position in this list
-     * @throws IndexOutOfBoundsException if the index is out of range (<tt>index &lt; 0 || index
-     *     &gt;= size()</tt>)
+     * @throws IndexOutOfBoundsException if the index is out of range ({@code index &lt; 0 || index
+     *     &gt;= size()})
      */
     public NDArray get(int index) {
         return list.valueAt(index);

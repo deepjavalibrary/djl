@@ -54,3 +54,9 @@ If you want to skip unit test:
 ```sh
 ./gradlew build -x test
 ```
+
+**Note:** Due to SpotBugs issue, default build will fail if you are using JDK 11+.
+You can skip SpotBugs if you are using JDK 11+:
+```sh
+./gradlew build -x spotBugsMain -x spotBugsTest
+```
