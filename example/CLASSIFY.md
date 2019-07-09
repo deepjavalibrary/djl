@@ -16,13 +16,17 @@ You can run the example either using Intellij or via command line.
 ### Intellij
 
 1. Open `ClassifyExample.java`
-2. Click `Edit Configuration` on the upper right side.  
-![edit_config](../doc/img/editConfig.png)
-3. In `Program arguments`, input the following arguments  
-`-n squeezenet_v1.1 -i ./example/src/test/resources/kitten.jpg`  
-![edit_config](../doc/img/programArguments.png)
-4. Run `ClassifyExample.main()` 
-![edit_config](../doc/img/run.png)
+2. Click `Edit Configuration` on the upper right side.
+
+    ![edit_config](../doc/img/editConfig.png)
+
+3. In `Program arguments`, input the following arguments `-n squeezenet_v1.1 -i ./example/src/test/resources/kitten.jpg`
+
+    ![edit_config](../doc/img/programArguments.png)
+
+4. Run `ClassifyExample.main()`
+
+    ![edit_config](../doc/img/run.png)
 
 ```text
 [INFO] Inference result: class: "tabby, tabby cat", probability: 0.7371954321861267
@@ -49,18 +53,18 @@ The available arguments are as follows:
 | `-i`       | Image file. |
 | `-l`       | Directory for output logs. |
 | `-n`       | Model name. |
-| `-p`       | Path to the model directory. |
-| `-u`       | URL to download model archive. |
+| `-p`       | Path to the model directory, optional if model comes from model zoo. |
+| `-u`       | URL to download model archive, optional point to a custom .mar file url. |
 
 The available models are as follows:
 
-| Models     |  
+| Models            |
 | ----------------  |
 | caffenet          |
 | nin               |
-| Inception-BN       |
-| inception_v1         |
-| resnet-18 |
+| Inception-BN      |
+| inception_v1      |
+| resnet-18         |
 | squeezenet_v1.1   |
 | squeezenet_v1.2   |
 | vgg16             |

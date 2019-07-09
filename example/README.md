@@ -5,43 +5,59 @@ This module contains example project to demonstrate how developer can use Joule 
 
 There are three examples:
 
-1. Image classification example
+1. [Image classification example](CLASSIFY.md)
 2. Single-shot Object detection example
-3. Bert question ans answer example
+3. [Bert question and answer example](BERTQA.md)
 
 Getting started: 30 seconds to run an example
 =======================
 
 ## Import the Joule with Intellij
 
-### Gradle
-
 1. Open Intellij and click `Import Project`.
-2. Find the `build.gradle` directly in Joule folder.
-Note that there are 7 build.gradle in api/example/integration/jnarator/mxnet/native/tensorflow seperately,
-make sure to select the one only one layer below Joule.
-3. Use the default configuration and click `OK`.
-4. Please go to seperate example to continue.
-[Image classification example](CLASSIFY.md)
-[Single-shot Object detection example]()
-[Bert question ans answer example](BERTQA.md)
+2. Select the `example` directly in Joule folder, and click "Open".
+3. Choose `Import project form existing model`, you can select either `Gradle` or `Maven`  
+4. Use the default configuration and click `OK`.
+5. Please go to separate example to continue.
 
----
-## Building From Source
 
-If you want to build the example from source, you can build it using gradle once you check out the code.
+## Building with command line
+
+This example project support both gradle and maven build, you can use either one at your choice:
+
+### gradle
 
 ```sh
 cd examples
 ./gradlew build
 ```
 
-If you want to skip unit test:
+### maven build
+
 ```sh
-./gradlew build -x test
+cd examples
+mvn package
 ```
 
-By default, Joule examples will use `mxnet-mkl` as a backend.
+### Run example code
+With gradle `application` plugin you can execute example code directly with gradle.
+You can find more detail in each example's detail document.
+Here is an example that execute classification example:
+
+```sh
+cd example
+./gradlew run --args="-n squeezenet_v1.1 -i ./src/test/resources/kitten.jpg"
+```
+
+## Engine selection
+
+Joule is engine agnostic, user can choose different engine provider. We currently
+provide MXNet engine implementation.
+
+With MXNet, user can choose different flavor of native MXNet library.
+In this example, we use `mxnet-mkl` for OSX platform. You might need to 
+change it for your platform.
+
 
 Available mxnet versions are as follows:
 
@@ -50,9 +66,10 @@ Available mxnet versions are as follows:
 | mxnet-mkl|
 | mxnet-cu101mkl|
 
----
+
+## Joule API reference
 Please find more information here:
-1. [Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
+[Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
 
 
 
