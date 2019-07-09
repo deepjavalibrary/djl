@@ -7,9 +7,12 @@ version = "1.5.0-SNAPSHOT"
 
 def flavor = project.findProperty("flavor") ?: "mkl"
 
-def platformNames = file("src/main/resources").list()
+def platformNames = file("src/main/resources").list() ?: []
+
+def artifactsNames = []
 
 platformNames.each { osName ->
+    artifactsNames.add("${osName}Jar")
     tasks.create(name: "${osName}Jar", type: Jar) {
         doFirst {
             def propFile = file("src/main/resources/${osName}/native/lib/mxnet.properties")
@@ -42,7 +45,7 @@ publishing {
         maven(MavenPublication) {
             artifactId "mxnet-native-${flavor}"
             from components.java
-            artifacts = [linuxJar, osxJar]
+            artifacts = artifactsNames
             pom {
                 name = "MXNet native library"
                 description = "MXNet Engine native library binary distribution"
