@@ -46,6 +46,7 @@ public class AbstractTest {
             methods = Arrays.asList(getClass().getMethods());
         }
 
+        int failed = 0;
         for (Method method : methods) {
             if (method.isAnnotationPresent(RunAsTest.class)) {
                 // TODO: collect performance data
@@ -56,9 +57,15 @@ public class AbstractTest {
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         logger.info("Test {}.{} FAILED", getClass().getName(), method.getName());
                         logger.error("", e);
+                        ++failed;
                     }
                 }
             }
+        }
+        if (failed > 0) {
+            logger.error("Failed {} out of {} tests", failed, methods.size());
+        } else {
+            logger.info("Passed all {} tests", methods.size());
         }
     }
 
