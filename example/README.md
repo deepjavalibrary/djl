@@ -15,7 +15,7 @@ Getting started: 30 seconds to run an example
 ## Import the Joule with Intellij
 
 1. Open Intellij and click `Import Project`.
-2. Select the `example` directly in Joule folder, and click "Open".
+2. Select the `example` directory in Joule folder, and click "Open".
 3. Choose `Import project form existing model`, you can select either `Gradle` or `Maven`  
 4. Use the default configuration and click `OK`.
 5. Please go to separate example to continue.
@@ -55,7 +55,7 @@ Joule is engine agnostic, user can choose different engine provider. We currentl
 provide MXNet engine implementation.
 
 With MXNet, user can choose different flavor of native MXNet library.
-In this example, we use `mxnet-mkl` for OSX platform. You might need to 
+In this example, we use `mxnet-native-mkl` for OSX platform. You might need to 
 change it for your platform.
 
 
