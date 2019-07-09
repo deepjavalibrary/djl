@@ -362,12 +362,12 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray add(NDArray other) {
+    public NDArray add(NDArray... others) {
         return null;
     }
 
     @Override
-    public NDArray addi(NDArray other) {
+    public NDArray addi(NDArray... others) {
         return null;
     }
 
@@ -457,7 +457,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray mul(NDArray other) {
+    public NDArray mul(NDArray... others) {
         return null;
     }
 
@@ -472,7 +472,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray muli(NDArray other) {
+    public NDArray muli(NDArray... others) {
         return null;
     }
 

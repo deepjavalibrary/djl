@@ -512,14 +512,14 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray add(NDArray other) {
-        return array.add(other);
+    public NDArray add(NDArray... others) {
+        return array.add(others);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray addi(NDArray other) {
-        return array.addi(other);
+    public NDArray addi(NDArray... others) {
+        return array.addi(others);
     }
 
     /** {@inheritDoc} */
@@ -835,8 +835,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mul(NDArray other) {
-        return array.mul(other);
+    public NDArray mul(NDArray... others) {
+        return array.mul(others);
     }
 
     /** {@inheritDoc} */
@@ -1082,8 +1082,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(NDArray other) {
-        return array.muli(other);
+    public NDArray muli(NDArray... others) {
+        return array.muli(others);
     }
 
     /** {@inheritDoc} */

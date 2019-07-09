@@ -927,20 +927,22 @@ public interface NDArray extends AutoCloseable {
     NDArray addi(Number n);
 
     /**
-     * Adds (broadcasting) another NDArray to this {@code NDArray}.
+     * Adds (broadcasting) other NDArray to this {@code NDArray}.
      *
-     * @param other the other NDArray to add
+     * @param others the other NDArrays to add
      * @return the result of the addition
+     * @throws IllegalArgumentException others arrays must have at least one element
      */
-    NDArray add(NDArray other);
+    NDArray add(NDArray... others);
 
     /**
-     * Adds (broadcasting) another NDArray to this NDArray in place.
+     * Adds (broadcasting) other NDArrays to this NDArray in place.
      *
-     * @param other the other NDArray to add
+     * @param others the other NDArrays to add
      * @return the result of the addition
+     * @throws IllegalArgumentException others arrays must have at least one element
      */
-    NDArray addi(NDArray other);
+    NDArray addi(NDArray... others);
 
     /**
      * Return a mask on whether each element matches the given index.
@@ -1049,12 +1051,13 @@ public interface NDArray extends AutoCloseable {
     NDArray div(NDArray other);
 
     /**
-     * copy (element wise) multiplication of two NDArrays.
+     * element wise multiplication of other NDArrays to this NDArray.
      *
-     * @param other the second NDArray to multiply
-     * @return the result of the addition
+     * @param others the other NDArrays to multiply with
+     * @return the result of the multiplication
+     * @throws IllegalArgumentException others arrays must have at least one element
      */
-    NDArray mul(NDArray other);
+    NDArray mul(NDArray... others);
 
     /**
      * copy subtraction of two NDArrays.
@@ -1073,12 +1076,13 @@ public interface NDArray extends AutoCloseable {
     NDArray divi(NDArray other);
 
     /**
-     * Performs in place (element wise) multiplication of two NDArrays.
+     * element wise multiplication in place of other NDArrays to this NDArray.
      *
-     * @param other the second NDArray to multiply
+     * @param others the other NDArrays to multiply with
      * @return the result of the multiplication
+     * @throws IllegalArgumentException others arrays must have at least one element
      */
-    NDArray muli(NDArray other);
+    NDArray muli(NDArray... others);
 
     /**
      * Performs in place (element wise) subtraction of two NDArrays.

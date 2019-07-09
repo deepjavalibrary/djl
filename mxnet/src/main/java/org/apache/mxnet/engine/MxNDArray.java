@@ -488,14 +488,30 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray add(NDArray other) {
-        return factory.invoke("_plus", new NDList(this, other), null).head();
+    public NDArray add(NDArray... others) {
+        NDList toAdd = new NDList(this);
+        toAdd.addAll(new NDList(others));
+        if (others.length == 0) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        } else if (others.length == 1) {
+            return factory.invoke("_plus", toAdd, null).head();
+        } else {
+            return factory.invoke("add_n", toAdd, null).head();
+        }
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray addi(NDArray other) {
-        factory.invoke("_plus", new NDList(this, other), new NDList(this), null);
+    public NDArray addi(NDArray... others) {
+        NDList toAdd = new NDList(this);
+        toAdd.addAll(new NDList(others));
+        if (others.length == 0) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        } else if (others.length == 1) {
+            factory.invoke("_plus", toAdd, new NDList(this), null);
+        } else {
+            factory.invoke("add_n", toAdd, new NDList(this), null);
+        }
         return this;
     }
 
@@ -926,8 +942,19 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mul(NDArray other) {
-        return factory.invoke("_mul", new NDList(this, other), null).head();
+    public NDArray mul(NDArray... others) {
+        if (others == null || others.length == 0) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        }
+        NDArray current = this;
+        for (NDArray other : others) {
+            NDArray next = factory.invoke("_mul", new NDList(current, other), null).head();
+            if (current != this) {
+                current.close();
+            }
+            current = next;
+        }
+        return current;
     }
 
     /** {@inheritDoc} */
@@ -945,8 +972,13 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(NDArray other) {
-        factory.invoke("_mul", new NDList(this, other), new NDList(this), null);
+    public NDArray muli(NDArray... others) {
+        if (others == null || others.length == 0) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        }
+        for (NDArray other : others) {
+            factory.invoke("_mul", new NDList(this, other), new NDList(this), null);
+        }
         return this;
     }
 

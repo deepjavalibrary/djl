@@ -174,14 +174,17 @@ public final class NDArrays {
     }
 
     /**
-     * Adds two {@link NDArray}s with broadcasting.
+     * Adds {@link NDArray}s elementwise with broadcasting.
      *
-     * @param a the left NDArray
-     * @param b the right NDArray
+     * @param arrays the arrays to add together
      * @return the result of the addition
+     * @throws IllegalArgumentException arrays must have at least two elements
      */
-    public static NDArray add(NDArray a, NDArray b) {
-        return a.add(b);
+    public static NDArray add(NDArray... arrays) {
+        if (arrays == null || arrays.length < 2) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        }
+        return arrays[0].add(Arrays.stream(arrays).skip(1).toArray(NDArray[]::new));
     }
 
     /**
@@ -207,14 +210,17 @@ public final class NDArrays {
     }
 
     /**
-     * Adds two {@link NDArray}s with broadcasting.
+     * Adds {@link NDArray}s elementwise with broadcasting.
      *
-     * @param a the left NDArray
-     * @param b the right NDArray
+     * @param arrays the arrays to add together
      * @return the result of the addition
+     * @throws IllegalArgumentException arrays must have at least two elements
      */
-    public static NDArray addi(NDArray a, NDArray b) {
-        return a.addi(b);
+    public static NDArray addi(NDArray... arrays) {
+        if (arrays == null || arrays.length < 2) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        }
+        return arrays[0].addi(Arrays.stream(arrays).skip(1).toArray(NDArray[]::new));
     }
 
     /**
@@ -372,14 +378,17 @@ public final class NDArrays {
     }
 
     /**
-     * Copies (element wise) multiplication of two NDArrays.
+     * Multiplies {@link NDArray}s elementwise with broadcasting.
      *
-     * @param a ndarray to be operated on
-     * @param b the second NDArray to multiply
-     * @return the result of the addition
+     * @param arrays the arrays to multiply together
+     * @return the result of the multiplication
+     * @throws IllegalArgumentException arrays must have at least two elements
      */
-    public static NDArray mul(NDArray a, NDArray b) {
-        return a.mul(b);
+    public static NDArray mul(NDArray... arrays) {
+        if (arrays == null || arrays.length < 2) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        }
+        return arrays[0].mul(Arrays.stream(arrays).skip(1).toArray(NDArray[]::new));
     }
 
     /**
@@ -405,14 +414,17 @@ public final class NDArrays {
     }
 
     /**
-     * In place scalar multiplication.
+     * Multiplies {@link NDArray}s in place elementwise with broadcasting.
      *
-     * @param a ndarray to be operated on
-     * @param b ndarray to multiply by
-     * @return this array after applying scalar multiplication
+     * @param arrays the arrays to multiply together
+     * @return the result of the multiplication
+     * @throws IllegalArgumentException arrays must have at least two elements
      */
-    public static NDArray muli(NDArray a, NDArray b) {
-        return a.muli(b);
+    public static NDArray muli(NDArray... arrays) {
+        if (arrays == null || arrays.length < 2) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        }
+        return arrays[0].muli(Arrays.stream(arrays).skip(1).toArray(NDArray[]::new));
     }
 
     /**

@@ -112,6 +112,17 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         Assertions.assertStatement(!NDArrays.equals(addend, result), "In-place summation failed");
         NDArray solution = factory.create(new Shape(1, 4), new float[] {3f, 5f, 7f, 9f});
         Assertions.assertEquals(solution, result, "Incorrect value in summed array");
+
+        NDArray[] toAddAll =
+                new NDArray[] {
+                    factory.create(new Shape(2, 2), new float[] {1, 2, 3, 4}),
+                    factory.create(new Shape(2, 2), new float[] {4, 3, 2, 1}),
+                    factory.create(new Shape(2, 2), new float[] {2, 2, 2, 2})
+                };
+        NDArray addAll = NDArrays.add(toAddAll);
+        Assertions.assertStatement(!addAll.equals(toAddAll[0]), "In-place summation failed");
+        NDArray addAllResult = factory.create(new Shape(2, 2), new float[] {7, 7, 7, 7});
+        Assertions.assertEquals(addAllResult, addAll, "Incorrect value in summed array");
     }
 
     @RunAsTest
@@ -124,6 +135,17 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         Assertions.assertInPlace(result, addend, "In-place summation failed");
         NDArray solution = factory.create(new Shape(1, 4), new float[] {3f, 5f, 7f, 9f});
         Assertions.assertEquals(solution, result, "Incorrect value in summed array");
+
+        NDArray[] toAddAll =
+                new NDArray[] {
+                    factory.create(new Shape(2, 2), new float[] {1, 2, 3, 4}),
+                    factory.create(new Shape(2, 2), new float[] {4, 3, 2, 1}),
+                    factory.create(new Shape(2, 2), new float[] {2, 2, 2, 2})
+                };
+        NDArray addAll = NDArrays.addi(toAddAll);
+        Assertions.assertStatement(addAll.equals(toAddAll[0]), "In-place summation failed");
+        NDArray addAllResult = factory.create(new Shape(2, 2), new float[] {7, 7, 7, 7});
+        Assertions.assertEquals(addAllResult, addAll, "Incorrect value in summed array");
     }
 
     @RunAsTest
@@ -439,6 +461,39 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 (MxNDArray) multiplicand,
                 (MxNDArray) inPlaceResult,
                 "Scalar multiplication: In-place operation failed");
+    }
+
+    @RunAsTest
+    public void testElemWiseMultiplication() throws FailedTestException {
+        NDArray multiplicand = factory.create(new Shape(1, 5), new float[] {6, 9, 12, 15, 0});
+        NDArray with = factory.create(new Shape(1, 5), new float[] {2, 3, 4, 5, 6});
+        NDArray result = NDArrays.mul(multiplicand, with);
+        NDArray inPlaceResult = NDArrays.muli(multiplicand, with);
+        NDArray solution = factory.create(new Shape(1, 5), new float[] {12, 27, 48, 75, 0});
+        Assertions.assertEquals(
+                solution, result, "Element wise multiplication: Incorrect value in result ndarray");
+        Assertions.assertEquals(
+                solution,
+                inPlaceResult,
+                "Scalar in-place multiplication: Incorrect value in result ndarray");
+        Assertions.assertInPlace(
+                (MxNDArray) multiplicand,
+                (MxNDArray) inPlaceResult,
+                "Element wise multiplication: In-place operation failed");
+
+        NDArray[] toMulAll =
+                new NDArray[] {
+                    factory.create(new Shape(2, 2), new float[] {1, 2, 3, 4}),
+                    factory.create(new Shape(2, 2), new float[] {4, 3, 2, 1}),
+                    factory.create(new Shape(2, 2), new float[] {2, 2, 2, 2})
+                };
+        NDArray mulAll = NDArrays.mul(toMulAll);
+        NDArray mulAllInPlace = NDArrays.muli(toMulAll);
+        Assertions.assertStatement(!mulAll.equals(toMulAll[0]), "In-place summation failed");
+        Assertions.assertStatement(mulAllInPlace.equals(toMulAll[0]), "In-place summation failed");
+        NDArray mulAllResult = factory.create(new Shape(2, 2), new float[] {8, 12, 12, 8});
+        Assertions.assertEquals(mulAllResult, mulAll, "Incorrect value in summed array");
+        Assertions.assertEquals(mulAllResult, mulAllInPlace, "Incorrect value in summed array");
     }
 
     @RunAsTest
