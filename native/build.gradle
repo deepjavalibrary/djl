@@ -7,7 +7,7 @@ version = "1.5.0-SNAPSHOT"
 
 def flavor = project.findProperty("flavor") ?: "mkl"
 
-def platformNames = ["linux","osx"]
+def platformNames = file("src/main/resources").list()
 
 platformNames.each { osName ->
     tasks.create(name: "${osName}Jar", type: Jar) {
