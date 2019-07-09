@@ -1,4 +1,4 @@
-Basic Classify Example
+Basic Image Classify Example
 ==============
 
 In this tutorial, we will walk through the Classify model trained by MXNet.
@@ -7,13 +7,13 @@ Users can provide a image and do image classification with different models.
 
 ## Setup Guide
 
-#### Prepare test image files
+### Prepare test image files
 
 Two test images can be found in project test resource folder: src/test/resources.
 You can also download cat's image from internet.
 
 You can run the example either using Intellij or via command line.
-### Intellij
+### IntelliJ
 
 1. Open `ClassifyExample.java`
 2. Click `Edit Configuration` on the upper right side.

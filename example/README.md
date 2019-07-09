@@ -1,78 +1,49 @@
-Joule examples
-==============
+Joule - examples
+================
 
-This module contains example project to demonstrate how developer can use Joule API.
+## Overview
 
-There are three examples:
+Joule API is designed to be extremely easy to get started and simple to
+use deep learning framework for Java developers. Joule does not required user to be ML/DL experts to get started
+and can start from their existing Java expertise as an on-ramp to learn and use ML/DL. They can
+use their favorite IDE to build/train/deploy their models and integrate these models with their
+Java applications. 
 
-1. [Image classification example](CLASSIFY.md)
-2. Single-shot Object detection example
-3. [Bert question and answer example](BERTQA.md)
+Joule API is deep learning framework agnostic, developer does not have to make a choice
+between framework while they started their project. They can switch to different framework at any
+time they want. Joule also provides automatic CPU/GPU chosen based on the hardware configuration to ensure the best performance.
 
-Getting started: 30 seconds to run an example
-=======================
+Joule API provide native Java development experience, just another regular java library.
+Joule's ergonomic API interface is designed to guide developer with best practice to accomplish
+deep learning task.
 
-## Import the Joule with Intellij
+The following is an example of how to write inference code:
 
-1. Open Intellij and click `Import Project`.
-2. Select the `example` directory in Joule folder, and click "Open".
-3. Choose `Import project form existing model`, you can select either `Gradle` or `Maven`  
-4. Use the default configuration and click `OK`.
-5. Please go to separate example to continue.
+```java
+    // Assume user has a pre-trained already, they just need load it
+    Model model = <b>Model.loadModel</b>(modelDir, modelName);
 
+    // User must implement Translator interface, read Translator document for detail.
+    Translator translator = new MyTranslator();
 
-## Building with command line
+    // User can specify GPU/CPU Context to run inference session.
+    // This context is optional, Predictor can pick up default Context if not specified.
+    // See Context.defaultContext()
+    Context context = Context.defaultContext();
 
-This example project support both gradle and maven build, you can use either one at your choice:
-
-### gradle
-
-```sh
-cd examples
-./gradlew build
+    // Next user need create a Predictor, and use Predictor.predict()
+    // to get prediction.
+    try (Predictor<BufferedImage, List<DetectedObject>> predictor =
+            Predictor.newInstance</b>(model, translator, context)) {
+        List<DetectedObject> result = predictor.predict(img);
+    }
 ```
-
-### maven build
-
-```sh
-cd examples
-mvn package
-```
-
-### Run example code
-With gradle `application` plugin you can execute example code directly with gradle.
-You can find more detail in each example's detail document.
-Here is an example that execute classification example:
-
-```sh
-cd example
-./gradlew run --args="-n squeezenet_v1.1 -i ./src/test/resources/kitten.jpg"
-```
-
-## Engine selection
-
-Joule is engine agnostic, user can choose different engine provider. We currently
-provide MXNet engine implementation.
-
-With MXNet, user can choose different flavor of native MXNet library.
-In this example, we use `mxnet-native-mkl` for OSX platform. You might need to 
-change it for your platform.
-
-
-Available mxnet versions are as follows:
-
-| Version  |
-| -------- |
-| mxnet-mkl|
-| mxnet-cu101mkl|
-
 
 ## Joule API reference
-Please find more information here:
-[Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
 
+Please find more information here: [Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
 
+## Examples project
 
-
-
+Please read [Example project](examples.md) for more detail.
 
