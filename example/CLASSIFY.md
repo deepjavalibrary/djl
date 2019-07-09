@@ -7,6 +7,39 @@ Users can provide a image and do image classification with different models.
 
 ## Setup Guide
 
+#### Prepare test image files
+
+Two test images can be found in project test resource folder: src/test/resources.
+You can also download cat's image from internet.
+
+You can run the example either using Intellij or via command line.
+### Intellij
+
+1. Open `ClassifyExample.java`
+2. Click `Edit Configuration` on the upper right side.  
+![edit_config](../doc/img/editConfig.png)
+3. In `Program arguments`, input the following arguments  
+`-n squeezenet_v1.1 -i ./example/src/test/resources/kitten.jpg`  
+![edit_config](../doc/img/programArguments.png)
+4. Run `ClassifyExample.main()` 
+![edit_config](../doc/img/run.png)
+
+```text
+[INFO] Inference result: class: "tabby, tabby cat", probability: 0.7371954321861267
+[INFO] inference P50: 48.655 ms, P90: 48.655 ms
+```
+
+### Command line
+
+```
+cd example
+./gradlew -Dmain=software.amazon.ai.example.ClassifyExample run --args="-n squeezenet_v1.1 -i ./src/test/resources/kitten.jpg"
+```
+```text
+[INFO] Inference result: class: "tabby, tabby cat", probability: 0.7371954321861267
+[INFO] inference P50: 66.185 ms, P90: 66.185 ms
+```
+---
 The available arguments are as follows:
 
 | Argument   | Comments                                 |
@@ -33,30 +66,11 @@ The available models are as follows:
 | vgg16             |
 | vgg19             |
 
-### Command line
+you can also download the model from MXNet model zoo: <https://github.com/awslabs/mxnet-model-server/blob/master/docs/model_zoo.md> and unzip it.  
+For example
 
 ```
-cd example
-./gradlew -Dmain=software.amazon.ai.example.ClassifyExample run --args="-n squeezenet_v1.1 -i ./src/test/resources/kitten.jpg"
-```
-
-```text
-[INFO] Inference result: class: "tabby, tabby cat", probability: 0.7371954321861267
-[INFO] inference P50: 66.185 ms, P90: 66.185 ms
-```
-
-### Intellij
-
-1. Open `ClassifyExample.java`
-2. Click `Edit Configuration` on the upper right side.  
-![edit_config](../doc/img/editConfig.png)
-3. In `Program arguments`, input the following arguments  
-`-n squeezenet_v1.1 -i ./example/src/test/resources/kitten.jpg`  
-![edit_config](../doc/img/programArguments.png)
-4. Run `ClassifyExample.main()` 
-![edit_config](../doc/img/run.png)
-
-```text
-[INFO] Inference result: class: "tabby, tabby cat", probability: 0.7371954321861267
-[INFO] inference P50: 48.655 ms, P90: 48.655 ms
+cd build
+curl -O https://s3.amazonaws.com/model-server/model_archive_1.0/squeezenet_v1.1.mar
+unzip squeezenet_v1.1.mar
 ```

@@ -9,9 +9,27 @@ There are three examples:
 2. Single-shot Object detection example
 3. Bert question ans answer example
 
+Getting started: 30 seconds to run an example
+=======================
+
+## Import the Joule with Intellij
+
+### Gradle
+
+1. Open Intellij and click `Import Project`.
+2. Find the `build.gradle` directly in Joule folder.
+Note that there are 7 build.gradle in api/example/integration/jnarator/mxnet/native/tensorflow seperately,
+make sure to select the one only one layer below Joule.
+3. Use the default configuration and click `OK`.
+4. Please go to seperate example to continue.
+[Image classification example](CLASSIFY.md)
+[Single-shot Object detection example]()
+[Bert question ans answer example](BERTQA.md)
+
+---
 ## Building From Source
 
-Once you check out the code, you can build it using gradle:
+If you want to build the example from source, you can build it using gradle once you check out the code.
 
 ```sh
 cd examples
@@ -25,59 +43,19 @@ If you want to skip unit test:
 
 By default, Joule examples will use `mxnet-mkl` as a backend.
 
-## Running example code locally
+Available mxnet versions are as follows:
 
-### Download model files
-Example models can be downloaded from MXNet model zoo: <https://github.com/awslabs/mxnet-model-server/blob/master/docs/model_zoo.md>
-You can download and unzip the .mar file, for example:
+| Version  |
+| -------- |
+| mxnet-mkl|
+| mxnet-cu101mkl|
 
-```
-cd build
-curl -O https://s3.amazonaws.com/model-server/model_archive_1.0/squeezenet_v1.1.mar
-unzip squeezenet_v1.1.mar
-```
-
-In this example, .mar file will be download automatically if you specify the model name 
-from the MXNet model zoo, e.g.: squeezenet_v1.1 or resnet50_ssd_model
+---
+Please find more information here:
+1. [Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
 
 
-### Prepare test image files:
-
-Two test images can be found in project test resource folder: src/test/resources.
-You can also download cats image from internet.
 
 
-### Get command line parameters help
-```sh
-cd example
-./gradlew run
 
->>>
->>>usage:
->>> -c,--iteration <ITERATION>     Number of iterations in each test.
->>> -d,--duration <DURATION>       Duration of the test.
->>> -i,--image <IMAGE>             Image file.
->>> -l,--log-dir <LOG-DIR>         Directory for output logs.
->>> -n,--model-name <MODEL-NAME>   Model name prefix.
->>> -p,--model-dir <MODEL-DIR>     Path to the model directory.
-```
 
-### Run default example - Image Classification
-
-There is a gradle task that can run examples, by default it will run Image Classification example:
-
-```sh
-cd example
-./gradlew run --args="-n squeezenet_v1.1 -i src/test/resources/kitten.jpg"
-```
-
-### Run a different example - Single-shot Object Detection
-
-You can specify different example class with System property: "main"
-
-```sh
-cd example
-./gradlew -Dmain=software.amazon.ai.example.SsdExample run --args="-n resnet50_ssd_model -l build/logs -i src/test/resources/3dogs.jpg"
-```
-
-With above command, an output image with bounding box will be save at: build/logs/ssd.jpg.
