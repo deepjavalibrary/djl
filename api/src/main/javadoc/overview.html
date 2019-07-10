@@ -29,19 +29,19 @@
     // Assume user has a pre-trained already, they just need load it
     Model model = <b>Model.loadModel</b>(modelDir, modelName);
 
-    // User must implement <a href="software.amazon/ai/Translator.html"><b>Translator</b></a> interface, read <a
-    href="software.amazon/ai/Translator.html"><b>Translator</b></a> for detail.
+    // User must implement <a href="software/amazon/ai/Translator.html"><b>Translator</b></a> interface, read <a
+    href="software/amazon/ai/Translator.html"><b>Translator</b></a> for detail.
     Translator translator = new <b>MyTranslator</b>();
 
-    // User can specify GPU/CPU <a href="software.amazon/ai/Context.html"><b>Context</b></a> to run inference session.
+    // User can specify GPU/CPU <a href="software/amazon/ai/Context.html"><b>Context</b></a> to run inference session.
     // This context is optional, <a
-    href="software.amazon/ai/inference/Predictor.html"><b>Predictor</b></a> can pick up default Context if not specified.
+    href="software/amazon/ai/inference/Predictor.html"><b>Predictor</b></a> can pick up default Context if not specified.
     // See <a
-    href="software.amazon/ai/Context.html#defaultContext--"><b>Context.defaultContext()</b></a>
+    href="software/amazon/ai/Context.html#defaultContext--"><b>Context.defaultContext()</b></a>
     Context context = Context.defaultContext();
 
     // Next user need create a <b>Predictor</b>, and use <a
-    href="software.amazon/ai/inference/Predictor.html#predict-I-"><b>Predictor.predict()</b></a>
+    href="software/amazon/ai/inference/Predictor.html#predict-I-"><b>Predictor.predict()</b></a>
     // to get prediction.
     try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor =
             <b>Predictor.newInstance</b>(model, translator, context)) {
