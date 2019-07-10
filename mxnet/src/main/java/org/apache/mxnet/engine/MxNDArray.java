@@ -489,7 +489,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray add(NDArray other) {
-        return factory.invoke("_plus", new NDList(this, other), null).get(0);
+        return factory.invoke("_plus", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -573,7 +573,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
-        return factory.invoke("_equal", new NDList(this, other), null).get(0);
+        return factory.invoke("_equal", new NDList(this, other), null).head();
     }
 
     @Override
@@ -605,13 +605,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
-        return factory.invoke("_greater", new NDList(this, other), null).get(0);
+        return factory.invoke("_greater", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
-        return factory.invoke("_greater_equal", new NDList(this, other), null).get(0);
+        return factory.invoke("_greater_equal", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -649,13 +649,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lte(NDArray other) {
-        return factory.invoke("_lesser_equal", new NDList(this, other), null).get(0);
+        return factory.invoke("_lesser_equal", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
-        return factory.invoke("_lesser", new NDList(this, other), null).get(0);
+        return factory.invoke("_lesser", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -754,7 +754,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mod(NDArray other) {
-        return factory.invoke("_npi_mod", new NDList(this, other), null).get(0);
+        return factory.invoke("_npi_mod", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -851,7 +851,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mmul(NDArray other) {
-        return factory.invoke("dot", new NDList(this, other), null).get(0);
+        return factory.invoke("dot", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -921,19 +921,19 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray div(NDArray other) {
-        return factory.invoke("elemwise_div", new NDList(this, other), null).get(0);
+        return factory.invoke("elemwise_div", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray mul(NDArray other) {
-        return factory.invoke("_mul", new NDList(this, other), null).get(0);
+        return factory.invoke("_mul", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
-        return factory.invoke("_sub", new NDList(this, other), null).get(0);
+        return factory.invoke("_sub", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -1099,7 +1099,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         NDArray[] srcArray = new NDArray[arrays.length + 1];
         srcArray[0] = this;
         System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
-        return factory.invoke("_npi_stack", new NDList(srcArray), params).get(0);
+        return factory.invoke("_npi_stack", new NDList(srcArray), params).head();
     }
 
     /** {@inheritDoc} */
@@ -1117,7 +1117,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         NDArray[] srcArray = new NDArray[arrays.length + 1];
         srcArray[0] = this;
         System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
-        return factory.invoke("_npi_concatenate", new NDList(srcArray), params).get(0);
+        return factory.invoke("_npi_concatenate", new NDList(srcArray), params).head();
     }
 
     /** {@inheritDoc} */
@@ -1359,7 +1359,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray pow(NDArray other) {
-        return factory.invoke("_power", new NDList(this, other), null).get(0);
+        return factory.invoke("_power", new NDList(this, other), null).head();
     }
 
     @Override

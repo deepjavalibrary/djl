@@ -93,7 +93,7 @@ public class MxNDFactory implements NDScopedFactory {
         params.addParam("step", step);
         params.setDataType(dataType);
         params.setContext(context);
-        return invoke("_npi_arange", EMPTY, params).get(0);
+        return invoke("_npi_arange", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */
@@ -109,7 +109,7 @@ public class MxNDFactory implements NDScopedFactory {
         params.addParam("endpoint", endpoint);
         params.setDataType(DataType.FLOAT32);
         params.setContext(context);
-        return invoke("_npi_linspace", EMPTY, params).get(0);
+        return invoke("_npi_linspace", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */
@@ -122,7 +122,7 @@ public class MxNDFactory implements NDScopedFactory {
         params.setShape(shape);
         params.setContext(context);
         params.setDataType(dataType);
-        return invoke("_npi_random_uniform", EMPTY, params).get(0);
+        return invoke("_npi_random_uniform", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */
@@ -135,7 +135,7 @@ public class MxNDFactory implements NDScopedFactory {
         params.setShape(shape);
         params.setContext(context);
         params.setDataType(dataType);
-        return invoke("_npi_random_normal", EMPTY, params).get(0);
+        return invoke("_npi_random_normal", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */

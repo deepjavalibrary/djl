@@ -115,6 +115,17 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
     }
 
     /**
+     * Returns the head index of the NDList.
+     *
+     * @return the head NDArray
+     * @throws IndexOutOfBoundsException if the index is out of range ({@code index &lt; 0 || index
+     *     &gt;= size()})
+     */
+    public NDArray head() {
+        return list.valueAt(0);
+    }
+
+    /**
      * Appends the specified NDArray to the end of this NDList.
      *
      * @param array NDArray to be appended to this list
