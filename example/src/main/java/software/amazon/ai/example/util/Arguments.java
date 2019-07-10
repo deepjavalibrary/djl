@@ -111,7 +111,7 @@ public class Arguments {
             if (modelUrl == null) {
                 modelInfo = ModelInfo.getModel(modelName);
                 if (modelInfo == null) {
-                    throw new IOException("Please specify --model-path or --model-url");
+                    throw new IOException("Please specify --model-dir or --model-url");
                 }
             } else {
                 modelInfo = new ModelInfo(modelName, modelUrl);
