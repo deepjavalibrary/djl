@@ -21,7 +21,7 @@ The following is an example of how to write inference code:
 
 ```java
     // Assume user has a pre-trained already, they just need load it
-    Model model = <b>Model.loadModel</b>(modelDir, modelName);
+    Model model = Model.loadModel(modelDir, modelName);
 
     // User must implement Translator interface, read Translator document for detail.
     Translator translator = new MyTranslator();
@@ -34,7 +34,7 @@ The following is an example of how to write inference code:
     // Next user need create a Predictor, and use Predictor.predict()
     // to get prediction.
     try (Predictor<BufferedImage, List<DetectedObject>> predictor =
-            Predictor.newInstance</b>(model, translator, context)) {
+            Predictor.newInstance(model, translator, context)) {
         List<DetectedObject> result = predictor.predict(img);
     }
 ```
@@ -45,5 +45,10 @@ Please find more information here: [Javadoc](https://joule.s3.amazonaws.com/java
 
 ## Examples project
 
-Please read [Example project](examples.md) for more detail.
+Please read [Example project](examples.md) for more detail about how to setup development environment and dependencies.
 
+You can also read individual examples: 
+
+1. [Image classification example](CLASSIFY.md)
+2. [Single-shot Object detection example](SSD.md)
+3. [Bert question and answer example](BERTQA.md)
