@@ -16,7 +16,7 @@ package software.amazon.ai.ndarray.types;
  * An enum represents Sparse matrix storage formats.
  *
  * <ul>
- *   <li>DEFAULT: No sparse format
+ *   <li>DENSE: No sparse format
  *   <li>ROW_SPARSE: Row Sparse
  *   <li>CSR: Compressed Sparse Row
  * </ul>
@@ -25,7 +25,7 @@ package software.amazon.ai.ndarray.types;
  */
 public enum SparseFormat {
     UNDEFINED("undefined", -1),
-    DEFAULT("default", 0),
+    DENSE("default", 0),
     ROW_SPARSE("row_sparse", 1),
     CSR("csr", 2);
 

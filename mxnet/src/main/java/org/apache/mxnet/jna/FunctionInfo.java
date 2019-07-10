@@ -20,6 +20,7 @@ import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDManager;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.SparseFormat;
 import software.amazon.ai.util.PairList;
 
 public class FunctionInfo {
@@ -41,7 +42,7 @@ public class FunctionInfo {
         PointerArray srcHandles = new PointerArray(handles);
         handles = Arrays.stream(dest).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
         PointerByReference destRef = new PointerByReference(new PointerArray(handles));
-        return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params);
+        return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params).size();
     }
 
     public NDArray[] invoke(NDManager manager, NDArray[] src, PairList<String, ?> params) {
@@ -59,13 +60,17 @@ public class FunctionInfo {
     private NDArray[] invoke(MxNDManager manager, PointerArray src, PairList<String, ?> params) {
         PointerByReference destRef = new PointerByReference();
 
-        int numOutputs = JnaUtils.imperativeInvoke(handle, src, destRef, params);
-        MxNDArray[] result = new MxNDArray[numOutputs];
-        Pointer[] ptrArray = destRef.getValue().getPointerArray(0, numOutputs);
-        for (int i = 0; i < numOutputs; i++) {
-            result[i] = manager.create(ptrArray[i]);
-        }
-        return result;
+        PairList<Pointer, SparseFormat> pairList =
+                JnaUtils.imperativeInvoke(handle, src, destRef, params);
+        return pairList.stream()
+                .map(
+                        pair -> {
+                            if (pair.getValue() != SparseFormat.DENSE) {
+                                return manager.create(pair.getKey(), pair.getValue());
+                            }
+                            return manager.create(pair.getKey());
+                        })
+                .toArray(MxNDArray[]::new);
     }
 
     public String getFunctionName() {

@@ -248,6 +248,57 @@ public interface NDManager extends AutoCloseable {
     NDArray create(Shape shape, DataType dataType, Context context);
 
     /**
+     * Create a Compressed Sparse Row Storage (CSR) Format Matrix.
+     *
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param data the data to set for the CSR Matrix
+     * @param indptr The indptr array is what will help identify the rows where the data appears
+     * @param indices The indices array stores the column index for each non-zero element in data
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray createCSR(Shape shape, Buffer data, long[] indptr, long[] indices, Context context);
+
+    /**
+     * Create a Compressed Sparse Row Storage (CSR) Format Matrix.
+     *
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param data the data to set for the CSR Matrix
+     * @param indptr The indptr array is what will help identify the rows where the data appears
+     * @param indices The indices array stores the column index for each non-zero element in data
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray createCSR(Shape shape, Buffer data, long[] indptr, long[] indices) {
+        return createCSR(shape, data, indptr, indices, getContext());
+    }
+
+    /**
+     * RowSparseNDArray stores the matrix in row sparse format.
+     *
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param data the data to set for the Row Sparse NDArray
+     * @param dataShape the {@link Shape} of the data {@link software.amazon.ai.ndarray.NDArray}
+     * @param indices the indices to store the data
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    NDArray createRowSparse(
+            Shape shape, Buffer data, Shape dataShape, long[] indices, Context context);
+
+    /**
+     * RowSparseNDArray stores the matrix in row sparse format.
+     *
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param data the data to set for the Row Sparse NDArray
+     * @param dataShape the {@link Shape} of the data {@link software.amazon.ai.ndarray.NDArray}
+     * @param indices the indices to store the data
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray createRowSparse(Shape shape, Buffer data, Shape dataShape, long[] indices) {
+        return createRowSparse(shape, data, dataShape, indices, getContext());
+    }
+
+    /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}

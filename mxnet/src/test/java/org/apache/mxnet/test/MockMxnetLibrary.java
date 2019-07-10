@@ -889,7 +889,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     public int MXImperativeInvokeEx(
             Pointer creator,
             int num_inputs,
-            PointerByReference inputs,
+            PointerArray inputs,
             IntBuffer num_outputs,
             PointerByReference outputs,
             int num_params,
@@ -912,6 +912,9 @@ public class MockMxnetLibrary implements MxnetLibrary {
                                 out_stypes
                             });
         }
+        num_outputs.put(1);
+        outputs.setValue(new PointerArray(TestHelper.toPointer("test")));
+        out_stypes.setValue(TestHelper.toPointer(new int[] {1}));
         return 0;
     }
 
@@ -1099,7 +1102,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     public int MXInvokeCachedOpEx(
             Pointer handle,
             int num_inputs,
-            PointerByReference inputs,
+            Pointer inputs,
             IntBuffer num_outputs,
             PointerByReference outputs,
             PointerByReference out_stypes) {
@@ -1111,6 +1114,16 @@ public class MockMxnetLibrary implements MxnetLibrary {
                                 handle, num_inputs, inputs, num_outputs, outputs, out_stypes
                             });
         }
+
+        num_outputs.put(0, 3);
+        PointerArray arr =
+                new PointerArray(
+                        TestHelper.toPointer("a"),
+                        TestHelper.toPointer("b"),
+                        TestHelper.toPointer("c"));
+        outputs.setValue(arr);
+        Pointer sTypes = TestHelper.toPointer(new int[] {0, 0, 1});
+        out_stypes.setValue(sTypes);
         return 0;
     }
 

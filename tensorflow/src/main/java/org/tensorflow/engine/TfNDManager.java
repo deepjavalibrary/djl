@@ -12,6 +12,7 @@
  */
 package org.tensorflow.engine;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -89,6 +90,18 @@ public class TfNDManager implements NDManager, AutoCloseable {
 
     public TfNDArray create(Shape shape, ByteBuffer data) {
         return new TfNDArray(this, shape, data);
+    }
+
+    @Override
+    public NDArray createCSR(
+            Shape shape, Buffer data, long[] indptr, long[] indices, Context context) {
+        return null;
+    }
+
+    @Override
+    public NDArray createRowSparse(
+            Shape shape, Buffer data, Shape dataShape, long[] indices, Context context) {
+        return null;
     }
 
     /** {@inheritDoc} */

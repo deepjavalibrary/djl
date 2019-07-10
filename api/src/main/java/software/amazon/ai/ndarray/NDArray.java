@@ -94,6 +94,13 @@ public interface NDArray extends AutoCloseable {
     DataDesc getDataDescriptor();
 
     /**
+     * Returns the {@link SparseFormat} of the {@code NDArray}.
+     *
+     * @return {@link SparseFormat}
+     */
+    SparseFormat getSparseFormat();
+
+    /**
      * Returns {@code true} if this array is a {@link SparseNDArray}.
      *
      * @return {@code true} if this array is a {@link SparseNDArray}
@@ -1666,6 +1673,14 @@ public interface NDArray extends AutoCloseable {
      * @return an NDArray that has been tiled
      */
     NDArray tile(Shape desiredShape);
+
+    /**
+     * Returns a sparse representation of {@code NDArray}.
+     *
+     * @param fmt the {@code SparseFormat} of the NDArray
+     * @return the result {@code NDArray} NDArray
+     */
+    NDArray toSparse(SparseFormat fmt);
 
     /**
      * Repeats each array element a given number of times.

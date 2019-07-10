@@ -31,7 +31,7 @@ public class MockEngine extends Engine {
 
     private int gpuCount;
     private MemoryUsage gpuMemory;
-    private Context context;
+    private Context context = Context.cpu();
     private String version;
 
     @Override

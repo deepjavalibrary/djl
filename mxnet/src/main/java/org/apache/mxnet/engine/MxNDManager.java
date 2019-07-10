@@ -13,6 +13,7 @@
 package org.apache.mxnet.engine;
 
 import com.sun.jna.Pointer;
+import java.nio.Buffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,6 +24,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.ndarray.types.SparseFormat;
 import software.amazon.ai.util.PairList;
 
 public class MxNDManager implements NDManager {
@@ -63,6 +65,12 @@ public class MxNDManager implements NDManager {
         return array;
     }
 
+    public MxSparseNDArray create(Pointer handle, SparseFormat fmt) {
+        MxSparseNDArray array = new MxSparseNDArray(this, handle, fmt);
+        attach(array);
+        return array;
+    }
+
     /** {@inheritDoc} */
     @Override
     public MxNDArray create(Shape shape, DataType dataType, Context context) {
@@ -74,6 +82,59 @@ public class MxNDManager implements NDManager {
         MxNDArray array = new MxNDArray(this, handle, context, shape, dataType);
         attach(array);
         return array;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MxSparseNDArray createCSR(
+            Shape shape, Buffer data, long[] indptr, long[] indices, Context context) {
+        SparseFormat fmt = SparseFormat.CSR;
+        DataType dataType = DataType.fromBuffer(data);
+        MxNDArray indptrNd = create(new Shape(indptr.length), DataType.INT64, context);
+        indptrNd.set(indptr);
+        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64, context);
+        indicesNd.set(indices);
+        Pointer handle =
+                JnaUtils.createSparseNdArray(
+                        fmt,
+                        context,
+                        shape,
+                        dataType,
+                        new DataType[] {indptrNd.getDataType(), indicesNd.getDataType()},
+                        new Shape[] {indptrNd.getShape(), indicesNd.getShape()},
+                        false);
+        MxSparseNDArray sparse = create(handle, fmt);
+        MxNDArray dataNd = create(new Shape(data.remaining()), dataType, context);
+        dataNd.set(data);
+        JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
+        JnaUtils.ndArraySyncCopyFromNdArray(sparse, indptrNd, 0);
+        JnaUtils.ndArraySyncCopyFromNdArray(sparse, indicesNd, 1);
+        return sparse;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MxSparseNDArray createRowSparse(
+            Shape shape, Buffer data, Shape dataShape, long[] indices, Context context) {
+        SparseFormat fmt = SparseFormat.ROW_SPARSE;
+        DataType dataType = DataType.fromBuffer(data);
+        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64, context);
+        indicesNd.set(indices);
+        Pointer handle =
+                JnaUtils.createSparseNdArray(
+                        fmt,
+                        context,
+                        shape,
+                        dataType,
+                        new DataType[] {indicesNd.getDataType()},
+                        new Shape[] {indicesNd.getShape()},
+                        false);
+        MxSparseNDArray sparse = create(handle, fmt);
+        MxNDArray dataNd = create(dataShape, dataType, context);
+        dataNd.set(data);
+        JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
+        JnaUtils.ndArraySyncCopyFromNdArray(sparse, indicesNd, 0);
+        return sparse;
     }
 
     /** {@inheritDoc} */

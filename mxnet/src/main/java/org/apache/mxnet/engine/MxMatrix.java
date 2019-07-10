@@ -312,6 +312,11 @@ public class MxMatrix implements Matrix {
         return array.getDataDescriptor();
     }
 
+    @Override
+    public SparseFormat getSparseFormat() {
+        return array.getSparseFormat();
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean isSparse() {
@@ -895,6 +900,18 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray toSparse(SparseFormat fmt) {
+        return array.toSparse(fmt);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toDense() {
+        return array.toDense();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray cosh() {
         return array.cosh();
     }
@@ -1275,12 +1292,6 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray percentile(Number percentile, int... dimension) {
         return array.percentile(percentile, dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray toDense() {
-        return array.toDense();
     }
 
     /** {@inheritDoc} */

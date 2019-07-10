@@ -122,6 +122,11 @@ public class TfNDArray implements NDArray {
         }
     }
 
+    @Override
+    public SparseFormat getSparseFormat() {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean isSparse() {
@@ -553,6 +558,11 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray divi(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray toSparse(SparseFormat fmt) {
         return null;
     }
 

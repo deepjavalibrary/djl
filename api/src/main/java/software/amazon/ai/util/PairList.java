@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * The {@code PairList} class provides an efficient way to access a list of key-value pair.
@@ -197,6 +199,16 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         }
         keys.remove(index);
         return values.remove(index);
+    }
+
+    /**
+     * Returns the {@link Stream} type of the PairList.
+     *
+     * @return {@link Stream} of PairList
+     */
+    public Stream<Pair<K, V>> stream() {
+        Iterable<Pair<K, V>> iterable = () -> iterator();
+        return StreamSupport.stream(iterable.spliterator(), false);
     }
 
     /**

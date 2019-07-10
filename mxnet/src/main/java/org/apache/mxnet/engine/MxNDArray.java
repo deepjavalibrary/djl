@@ -76,6 +76,11 @@ public class MxNDArray extends NativeResource implements NDArray {
         this.mxNDArrayEx = new MxNDArrayEx(this);
     }
 
+    MxNDArray(MxNDManager manager, Pointer handle, SparseFormat fmt) {
+        this(manager, handle);
+        this.sparseFormat = fmt;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDManager getManager() {
@@ -111,6 +116,15 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public SparseFormat getSparseFormat() {
+        if (sparseFormat == null) {
+            sparseFormat = JnaUtils.getStorageType(getHandle());
+        }
+        return sparseFormat;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Layout getLayout() {
         return Layout.UNDEFINED;
     }
@@ -119,12 +133,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public DataDesc getDataDescriptor() {
         return new DataDesc(getShape(), getDataType(), null, getLayout(), getContext());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isSparse() {
-        return false;
     }
 
     /** {@inheritDoc} */
@@ -661,6 +669,30 @@ public class MxNDArray extends NativeResource implements NDArray {
             current = next;
         }
         return current;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isSparse() {
+        return getSparseFormat() != SparseFormat.DENSE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toSparse(SparseFormat fmt) {
+        if (fmt == SparseFormat.DENSE) {
+            throw new IllegalArgumentException("Default type is not allowed");
+        }
+        if (fmt == getSparseFormat()) {
+            return this;
+        }
+        return castStorage(fmt);
+    }
+
+    private NDArray castStorage(SparseFormat fmt) {
+        MxOpParams params = new MxOpParams();
+        params.setParam("stype", fmt.getType());
+        return manager.invoke("cast_storage", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1245,6 +1277,15 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray toDense() {
+        if (!isSparse()) {
+            return this;
+        }
+        return castStorage(SparseFormat.DENSE);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray tile(long repeats) {
         long[] repeatsArray = new long[getShape().dimension()];
         Arrays.fill(repeatsArray, repeats);
@@ -1450,12 +1491,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray toDense() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public long nonzero() {
         MxNDArray zeros = (MxNDArray) eq(0);
         NDArray sum = manager.invoke("sum", eq(zeros).eq(zeros), null);
@@ -1544,13 +1579,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         JnaUtils.syncCopyToCPU(getHandle(), pointer, Math.toIntExact(product));
         bb.order(ByteOrder.LITTLE_ENDIAN);
         return bb;
-    }
-
-    public SparseFormat getSparseFormat() {
-        if (sparseFormat == null) {
-            sparseFormat = JnaUtils.getStorageType(getHandle());
-        }
-        return sparseFormat;
     }
 
     /** {@inheritDoc} */

@@ -61,6 +61,11 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public SparseFormat getSparseFormat() {
+        return null;
+    }
+
+    @Override
     public boolean isSparse() {
         return false;
     }
@@ -682,6 +687,16 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray toSparse(SparseFormat fmt) {
+        return null;
+    }
+
+    @Override
+    public NDArray toDense() {
+        return null;
+    }
+
+    @Override
     public NDArray isInfinite() {
         return null;
     }
@@ -833,11 +848,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray percentile(Number percentile, int... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray toDense() {
         return null;
     }
 

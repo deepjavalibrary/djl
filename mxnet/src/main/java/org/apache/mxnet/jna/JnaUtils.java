@@ -291,6 +291,45 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
+    public static Pointer createSparseNdArray(
+            SparseFormat fmt,
+            Context context,
+            Shape shape,
+            DataType dtype,
+            DataType[] auxDTypes,
+            Shape[] auxShapes,
+            boolean delayedAlloc) {
+        int[] shapeArray = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
+        int deviceType = DeviceType.toDeviceType(context);
+        int deviceId = context.getDeviceId();
+        int delay = delayedAlloc ? 1 : 0;
+        PointerByReference ref = new PointerByReference();
+        IntBuffer auxDTypesInt =
+                IntBuffer.wrap(Arrays.stream(auxDTypes).mapToInt(DataType::ordinal).toArray());
+        IntBuffer auxNDims =
+                IntBuffer.wrap(Arrays.stream(auxShapes).mapToInt(Shape::dimension).toArray());
+        int[] auxShapesInt = Arrays.stream(auxShapes).mapToInt(ele -> (int) ele.head()).toArray();
+        checkCall(
+                LIB.MXNDArrayCreateSparseEx(
+                        fmt.getValue(),
+                        shapeArray,
+                        shapeArray.length,
+                        deviceType,
+                        deviceId,
+                        delay,
+                        dtype.ordinal(),
+                        auxDTypes.length,
+                        auxDTypesInt,
+                        auxNDims,
+                        auxShapesInt,
+                        ref));
+        return ref.getValue();
+    }
+
+    public static void ndArraySyncCopyFromNdArray(MxNDArray dest, MxNDArray src, int location) {
+        checkCall(LIB.MXNDArraySyncCopyFromNDArray(dest.getHandle(), src.getHandle(), location));
+    }
+
     /* Need tests
     public static Pointer loadFromBytes(byte[] buf, int offset, int size) {
         Memory memory = new Memory(size);
@@ -363,7 +402,7 @@ public final class JnaUtils {
         checkCall(LIB.MXNDArraySyncCopyFromCPU(ndArray, pointer, size));
     }
 
-    public static int imperativeInvoke(
+    public static PairList<Pointer, SparseFormat> imperativeInvoke(
             Pointer function,
             PointerArray inputs,
             PointerByReference destRef,
@@ -377,11 +416,12 @@ public final class JnaUtils {
             keys = params.keyArray(EMPTY_ARRAY);
             values = params.values().stream().map(Object::toString).toArray(String[]::new);
         }
+        PointerByReference destSType = new PointerByReference();
         IntBuffer numOutputs = IntBuffer.allocate(1);
         numOutputs.put(0, 1);
 
         checkCall(
-                LIB.MXImperativeInvoke(
+                LIB.MXImperativeInvokeEx(
                         function,
                         inputs.numElements(),
                         inputs,
@@ -389,8 +429,16 @@ public final class JnaUtils {
                         destRef,
                         keys.length,
                         keys,
-                        values));
-        return numOutputs.get(0);
+                        values,
+                        destSType));
+        int numOfOutputs = numOutputs.get(0);
+        Pointer[] ptrArray = destRef.getValue().getPointerArray(0, numOfOutputs);
+        int[] sTypes = destSType.getValue().getIntArray(0, numOfOutputs);
+        PairList<Pointer, SparseFormat> pairList = new PairList<>();
+        for (int i = 0; i < numOfOutputs; i++) {
+            pairList.add(ptrArray[i], SparseFormat.fromValue(sTypes[i]));
+        }
+        return pairList;
     }
 
     public static SparseFormat getStorageType(Pointer ndArray) {
@@ -1496,12 +1544,20 @@ public final class JnaUtils {
         PointerArray array = new PointerArray(inputHandles);
         IntBuffer buf = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
-        checkCall(LIB.MXInvokeCachedOp(cachedOpHandle, inputs.length, array, buf, ref));
+        PointerByReference outSTypeRef = new PointerByReference();
+        checkCall(
+                LIB.MXInvokeCachedOpEx(
+                        cachedOpHandle, inputs.length, array, buf, ref, outSTypeRef));
         int numOutputs = buf.get();
         Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
+        int[] sTypes = outSTypeRef.getValue().getIntArray(0, numOutputs);
         MxNDArray[] output = new MxNDArray[numOutputs];
         for (int i = 0; i < numOutputs; i++) {
-            output[i] = manager.create(ptrArray[i]);
+            if (sTypes[i] != 0) {
+                output[i] = manager.create(ptrArray[i], SparseFormat.fromValue(sTypes[i]));
+            } else {
+                output[i] = manager.create(ptrArray[i]);
+            }
         }
         return output;
     }

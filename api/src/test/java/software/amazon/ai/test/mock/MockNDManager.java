@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.test.mock;
 
+import java.nio.Buffer;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -25,6 +26,18 @@ public class MockNDManager implements NDManager {
     @Override
     public NDArray create(Shape shape, DataType dataType, Context context) {
         return new MockNDArray();
+    }
+
+    @Override
+    public NDArray createCSR(
+            Shape shape, Buffer data, long[] indptr, long[] indices, Context context) {
+        return null;
+    }
+
+    @Override
+    public NDArray createRowSparse(
+            Shape shape, Buffer data, Shape dataShape, long[] indices, Context context) {
+        return null;
     }
 
     @Override
