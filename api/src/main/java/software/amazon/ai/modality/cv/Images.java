@@ -23,6 +23,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Random;
 import javax.imageio.ImageIO;
 
 /** {@code Images} is an image processing utility that can load, reshape and convert images. */
@@ -76,7 +77,7 @@ public final class Images {
         for (DetectedObject result : detections) {
             String className = result.getClassName();
             Rectangle rect = result.getBoundingBox().getBounds();
-            g.setPaint(Color.WHITE);
+            g.setPaint(randomColor().darker());
 
             int x = (int) (rect.getX() * imageWidth);
             int y = (int) (rect.getY() * imageHeight);
@@ -87,6 +88,10 @@ public final class Images {
             drawText(g, className, x, y, stroke, 4);
         }
         g.dispose();
+    }
+
+    private static Color randomColor(){
+        return new Color(new Random().nextInt(255));
     }
 
     /**
@@ -131,7 +136,7 @@ public final class Images {
         int ascent = metrics.getAscent();
         java.awt.Rectangle background = new java.awt.Rectangle(x, y, width, height);
         g.fill(background);
-        g.setPaint(Color.BLACK);
+        g.setPaint(Color.WHITE);
         g.drawString(text, x + padding, y + ascent);
     }
 }
