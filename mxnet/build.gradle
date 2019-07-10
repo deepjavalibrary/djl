@@ -108,7 +108,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             groupId project.getGroup()
-            artifactId "joule"
+            artifactId "mxnet-joule"
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
