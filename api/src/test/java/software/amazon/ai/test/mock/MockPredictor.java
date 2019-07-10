@@ -25,8 +25,8 @@ import software.amazon.ai.ndarray.NDScopedFactory;
 public class MockPredictor<I, O> implements Predictor<I, O> {
 
     Model model;
-    Context context;
     private Translator<I, O> translator;
+    Context context;
     Metrics metrics;
 
     public MockPredictor(Model model, Translator<I, O> translator, Context context) {

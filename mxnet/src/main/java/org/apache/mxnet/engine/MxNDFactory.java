@@ -43,14 +43,14 @@ public class MxNDFactory implements NDScopedFactory {
     private Map<AutoCloseable, AutoCloseable> resources;
     private AtomicBoolean closed = new AtomicBoolean(false);
 
-    public static MxNDFactory getSystemFactory() {
-        return SYSTEM_FACTORY;
-    }
-
     private MxNDFactory(NDScopedFactory parent, Context context) {
         this.parent = parent;
         this.context = context;
         resources = new ConcurrentHashMap<>();
+    }
+
+    public static MxNDFactory getSystemFactory() {
+        return SYSTEM_FACTORY;
     }
 
     public MxNDArray create(Pointer handle) {

@@ -40,13 +40,13 @@ import software.amazon.ai.util.PairList;
 
 public final class JnaUtils {
 
+    public static final String[] EMPTY_ARRAY = new String[0];
+
     private static final String[] OP_NAME_PREFIX = {
         "_contrib_", "_linalg_", "_sparse_", "_image_", "_random_"
     };
 
     private static final MxnetLibrary LIB = LibUtils.loadLibrary();
-
-    public static final String[] EMPTY_ARRAY = new String[0];
 
     private static final Map<String, FunctionInfo> OPS = getNdArrayFunctions();
 

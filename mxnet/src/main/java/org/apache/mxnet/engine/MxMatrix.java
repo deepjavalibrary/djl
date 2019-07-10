@@ -242,20 +242,14 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray reshape(Shape shape) {
+        return array.reshape(shape);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray reshape(char order, int rows, int columns) {
         throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray transpose() {
-        return array.transpose();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray transpose(int[] dimensions) {
-        return array.transpose(dimensions);
     }
 
     /** {@inheritDoc} */
@@ -280,12 +274,6 @@ public class MxMatrix implements Matrix {
     @Override
     public int[][] toIntMatrix() {
         throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public byte[] getEncoded() {
-        return array.getEncoded();
     }
 
     /** {@inheritDoc} */
@@ -326,6 +314,114 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public boolean isSparse() {
+        return array.isSparse();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray asInContext(Context ctx, boolean copy) {
+        return array.asInContext(ctx, copy);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray asType(DataType dtype, boolean copy) {
+        return array.asType(dtype, copy);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Matrix asMatrix() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward() {
+        array.backward();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward(boolean retainGraph, boolean isTraining) {
+        array.backward(retainGraph, isTraining);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {
+        array.backward(outGrad, retainGraph, isTraining);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void attachGrad() {
+        array.attachGrad();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
+        array.attachGrad(gradReq, sparseFormat);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getGradient() {
+        return array.getGradient();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public byte[] getEncoded() {
+        return array.getEncoded();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long size(int dimension) {
+        return array.size(dimension);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long size() {
+        return array.size();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double[] toDoubleArray() {
+        return array.toDoubleArray();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public float[] toFloatArray() {
+        return array.toFloatArray();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int[] toIntArray() {
+        return array.toIntArray();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long[] toLongArray() {
+        return array.toLongArray();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public byte[] toByteArray() {
+        return array.toByteArray();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void set(Buffer data) {
         array.set(data);
     }
@@ -358,12 +454,6 @@ public class MxMatrix implements Matrix {
     @Override
     public void set(byte[] data) {
         array.set(data);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(NDIndex index) {
-        return array.get(index);
     }
 
     /** {@inheritDoc} */
@@ -404,134 +494,19 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray get(NDIndex index) {
+        return array.get(index);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void copyTo(NDArray arr) {
         array.copyTo(arr);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public NDArray asInContext(Context ctx, boolean copy) {
-        return array.asInContext(ctx, copy);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray asType(DataType dtype, boolean copy) {
-        return array.asType(dtype, copy);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGrad() {
-        array.attachGrad();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
-        array.attachGrad(gradReq, sparseFormat);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getGradient() {
-        return array.getGradient();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward() {
-        array.backward();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward(boolean retainGraph, boolean isTraining) {
-        array.backward(retainGraph, isTraining);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {
-        array.backward(outGrad, retainGraph, isTraining);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sort(int axis) {
-        return array.sort(axis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sort() {
-        return array.sort();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray argsort(int axis, boolean ascending) {
-        return array.argsort(axis, ascending);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray softmax(int[] axes, double temperature) {
-        return array.softmax(axes, temperature);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray softmax(int[] axes) {
-        return array.softmax(axes);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList split(int axis, boolean squeezeAxis) {
-        return array.split(axis, squeezeAxis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList split(int axis, int numOutputs) {
-        return array.split(axis, numOutputs);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray add(Number n) {
-        return array.add(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray addi(Number n) {
-        return array.addi(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray add(NDArray... others) {
-        return array.add(others);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray addi(NDArray... others) {
-        return array.addi(others);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createMask(NDIndex index) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createMask(Predicate<Number> predicate) {
-        return null;
+    public NDArray dup() {
+        return array.dup();
     }
 
     /** {@inheritDoc} */
@@ -548,43 +523,26 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isSparse() {
-        return array.isSparse();
+    public NDArray like() {
+        return array.like();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi(int axis) {
-        return array.cumsumi(axis);
+    public boolean contentEquals(Number number) {
+        return array.contentEquals(number);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi() {
-        return array.cumsumi();
+    public boolean contentEquals(NDArray other) {
+        return array.contentEquals(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum(int axis) {
-        return array.cumsum(axis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cumsum() {
-        return array.cumsum();
-    }
-
-    @Override
-    public NDArray eps(Number other) {
-        return array.eps(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray eps(NDArray other) {
-        return array.eps(other);
+    public boolean equalsWithEps(Object o, double eps) {
+        return array.equalsWithEps(o, eps);
     }
 
     /** {@inheritDoc} */
@@ -601,20 +559,14 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public boolean contentEquals(NDArray other) {
-        return array.contentEquals(other);
+    public NDArray eps(Number other) {
+        return array.eps(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public boolean contentEquals(Number number) {
-        return array.contentEquals(number);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray gt(Number other) {
-        return array.gt(other);
+    public NDArray eps(NDArray other) {
+        return array.eps(other);
     }
 
     /** {@inheritDoc} */
@@ -631,6 +583,12 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray gt(Number other) {
+        return array.gt(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray gt(NDArray other) {
         return array.gt(other);
     }
@@ -641,6 +599,7 @@ public class MxMatrix implements Matrix {
         return array.gte(other);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
         return array.gte(other);
@@ -648,19 +607,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lte(Number other) {
-        return array.lte(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray lt(Number other) {
         return array.lt(other);
-    }
-
-    @Override
-    public NDArray lte(NDArray other) {
-        return array.lte(other);
     }
 
     /** {@inheritDoc} */
@@ -671,14 +619,158 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray isInfinite() {
-        return array.isInfinite();
+    public NDArray lte(Number other) {
+        return array.lte(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray isNaN() {
-        return array.isNaN();
+    public NDArray lte(NDArray other) {
+        return array.lte(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray add(Number n) {
+        return array.add(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray add(NDArray... others) {
+        return array.add(others);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sub(Number n) {
+        return array.sub(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sub(NDArray other) {
+        return array.sub(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mul(Number n) {
+        return array.mul(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mul(NDArray... others) {
+        return array.mul(others);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray div(Number n) {
+        return array.div(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray div(NDArray other) {
+        return array.div(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mod(Number n) {
+        return array.mod(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mod(NDArray other) {
+        return array.mod(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray pow(Number n) {
+        return array.pow(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray pow(NDArray other) {
+        return array.pow(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray addi(Number n) {
+        return array.addi(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray addi(NDArray... others) {
+        return array.addi(others);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray subi(Number n) {
+        return array.subi(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray subi(NDArray other) {
+        return array.subi(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray muli(Number n) {
+        return array.muli(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray muli(NDArray... others) {
+        return array.muli(others);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray divi(Number n) {
+        return array.divi(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray divi(NDArray other) {
+        return array.divi(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(Number n) {
+        return array.modi(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(NDArray other) {
+        return array.modi(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray powi(Number n) {
+        return array.powi(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray powi(NDArray other) {
+        return array.powi(other);
     }
 
     /** {@inheritDoc} */
@@ -695,425 +787,152 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray div(Number n) {
-        return array.div(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray divi(Number n) {
-        return array.divi(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mod(Number n) {
-        return array.mod(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray modi(Number n) {
-        return array.modi(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mul(Number n) {
-        return array.mul(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray muli(Number n) {
-        return array.muli(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(Number n) {
-        return array.sub(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subi(Number n) {
-        return array.subi(n);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray tile(long repeats) {
-        return array.tile(repeats);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray tile(int axis, long repeats) {
-        return array.tile(axis, repeats);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray tile(long[] repeats) {
-        return array.repeat(repeats);
-    }
-
-    @Override
-    public NDArray tile(Shape desiredShape) {
-        return array.tile(desiredShape);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray repeat(long repeats) {
-        return array.repeat(repeats);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray repeat(int axis, long repeats) {
-        return array.repeat(axis, repeats);
-    }
-
-    @Override
-    public NDArray repeat(long[] repeats) {
-        return array.repeat(repeats);
-    }
-
-    @Override
-    public NDArray repeat(Shape desiredShape) {
-        return array.repeat(desiredShape);
-    }
-
-    @Override
-    public NDArray mmul(NDArray other) {
-        return array.mmul(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double[] toDoubleArray() {
-        return array.toDoubleArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float[] toFloatArray() {
-        return array.toFloatArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] toIntArray() {
-        return array.toIntArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long[] toLongArray() {
-        return array.toLongArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public byte[] toByteArray() {
-        return array.toByteArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray div(NDArray other) {
-        return array.div(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mod(NDArray other) {
-        return array.mod(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mul(NDArray... others) {
-        return array.mul(others);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(NDArray other) {
-        return array.sub(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray divi(NDArray other) {
-        return array.divi(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray modi(NDArray other) {
-        return array.modi(other);
-    }
-
-    @Override
-    public NDArray argMax(int axis, boolean keepDims) {
-        return null;
-    }
-
-    @Override
-    public NDArray argMin() {
-        return null;
-    }
-
-    @Override
-    public NDArray argMin(int axis, boolean keepDims) {
-        return null;
-    }
-
-    @Override
-    public NDArray argMax() {
-        return null;
-    }
-
-    @Override
-    public Number percentileNumber(Number percentile) {
-        return null;
-    }
-
-    @Override
-    public Number medianNumber() {
-        return null;
-    }
-
-    @Override
-    public NDArray median(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray percentile(Number percentile, int... dimension) {
-        return null;
-    }
-
-    @Override
-    public NDArray toDense() {
-        return null;
-    }
-
-    @Override
-    public long nonzero() {
-        return 0;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public Matrix asMatrix() {
-        return null;
-    }
-
-    @Override
-    public NDArray like() {
-        return null;
-    }
-
-    @Override
-    public NDArrayEx getNDArrayInternal() {
-        return null;
-    }
-
-    @Override
-    public NDArray logicalNot() {
-        return null;
-    }
-
-    @Override
     public NDArray abs() {
-        return null;
+        return array.abs();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray square() {
-        return null;
+        return array.square();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cbrt() {
-        return null;
+        return array.cbrt();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray floor() {
-        return null;
+        return array.floor();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray ceil() {
-        return null;
+        return array.ceil();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray round() {
-        return null;
+        return array.round();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray trunc() {
-        return null;
+        return array.trunc();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray exp() {
-        return null;
+        return array.exp();
     }
 
-    @Override
-    public NDArray pow(Number n) {
-        return null;
-    }
-
-    @Override
-    public NDArray powi(Number n) {
-        return null;
-    }
-
-    @Override
-    public NDArray pow(NDArray other) {
-        return null;
-    }
-
-    @Override
-    public NDArray powi(NDArray other) {
-        return null;
-    }
-
+    /** {@inheritDoc} */
     @Override
     public NDArray log() {
-        return null;
+        return array.log();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray log10() {
-        return null;
+        return array.log10();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray log2() {
-        return null;
+        return array.log2();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sin() {
-        return null;
+        return array.sin();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cos() {
-        return null;
+        return array.cos();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tan() {
-        return null;
+        return array.tan();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray asin() {
-        return null;
+        return array.asin();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray acos() {
-        return null;
+        return array.acos();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray atan() {
-        return null;
+        return array.atan();
     }
 
-    @Override
-    public NDArray toDegrees() {
-        return null;
-    }
-
-    @Override
-    public NDArray toRadians() {
-        return null;
-    }
-
+    /** {@inheritDoc} */
     @Override
     public NDArray sinh() {
-        return null;
+        return array.sinh();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cosh() {
-        return null;
+        return array.cosh();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
-        return null;
+        return array.tanh();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray asinh() {
-        return null;
+        return array.asinh();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray acosh() {
-        return null;
+        return array.acosh();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray atanh() {
-        return null;
-    }
-
-    @Override
-    public void close() {}
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray muli(NDArray... others) {
-        return array.muli(others);
+        return array.atanh();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray subi(NDArray other) {
-        return array.subi(other);
+    public NDArray toDegrees() {
+        return array.toDegrees();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray amax(int... dimension) {
-        return array.amax(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number amaxNumber() {
-        return array.amaxNumber();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray amin(int... dimension) {
-        return array.amin(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number aminNumber() {
-        return array.aminNumber();
+    public NDArray toRadians() {
+        return array.toRadians();
     }
 
     /** {@inheritDoc} */
@@ -1176,22 +995,25 @@ public class MxMatrix implements Matrix {
         return array.mean(axes, keepDims);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDArray dup() {
-        return array.dup();
+    public NDList split(int axis, boolean squeezeAxis) {
+        return array.split(axis, squeezeAxis);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public NDList split(int axis, int numOutputs) {
+        return array.split(axis, numOutputs);
+    }
+
+    /** {@inheritDoc} */
     @Override
     public NDArray flatten() {
         return array.flatten();
     }
 
     /** {@inheritDoc} */
-    @Override
-    public NDArray reshape(Shape shape) {
-        return array.reshape(shape);
-    }
-
     @Override
     public NDArray expandDims(int axis) {
         return array.expandDims(axis);
@@ -1217,20 +1039,176 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray argsort(int axis, boolean ascending) {
+        return array.argsort(axis, ascending);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sort(int axis) {
+        return array.sort(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sort() {
+        return array.sort();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray softmax(int[] axes) {
+        return array.softmax(axes);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray softmax(int[] axes, double temperature) {
+        return array.softmax(axes, temperature);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsumi(int axis) {
+        return array.cumsumi(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsumi() {
+        return array.cumsumi();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsum(int axis) {
+        return array.cumsum(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumsum() {
+        return array.cumsum();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray isInfinite() {
+        return array.isInfinite();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray isNaN() {
+        return array.isNaN();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray createMask(NDIndex index) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray createMask(Predicate<Number> predicate) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tile(long repeats) {
+        return array.tile(repeats);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tile(int axis, long repeats) {
+        return array.tile(axis, repeats);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tile(long[] repeats) {
+        return array.repeat(repeats);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tile(Shape desiredShape) {
+        return array.tile(desiredShape);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(long repeats) {
+        return array.repeat(repeats);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(int axis, long repeats) {
+        return array.repeat(axis, repeats);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(long[] repeats) {
+        return array.repeat(repeats);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray repeat(Shape desiredShape) {
+        return array.repeat(desiredShape);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mmul(NDArray other) {
+        return array.mmul(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray amax(int... dimension) {
+        return array.amax(dimension);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Number amaxNumber() {
+        return array.amaxNumber();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray amin(int... dimension) {
+        return array.amin(dimension);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Number aminNumber() {
+        return array.aminNumber();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray clip(double min, double max) {
         return array.clip(min, max);
     }
 
     /** {@inheritDoc} */
     @Override
-    public long size(int dimension) {
-        return array.size(dimension);
+    public NDArray transpose() {
+        return array.transpose();
     }
 
     /** {@inheritDoc} */
     @Override
-    public long size() {
-        return array.size();
+    public NDArray transpose(int[] dimensions) {
+        return array.transpose(dimensions);
     }
 
     /** {@inheritDoc} */
@@ -1245,13 +1223,93 @@ public class MxMatrix implements Matrix {
         return array.broadcast(result);
     }
 
-    @Override
-    public boolean equalsWithEps(Object o, double eps) {
-        return array.equalsWithEps(o, eps);
-    }
-
+    /** {@inheritDoc} */
     @Override
     public boolean equalShapes(NDArray other) {
-        return false;
+        return array.equalShapes(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray argMax() {
+        return array.argMax();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray argMax(int axis, boolean keepDims) {
+        return array.argMax(axis, keepDims);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray argMin() {
+        return array.argMin();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray argMin(int axis, boolean keepDims) {
+        return array.argMin(axis, keepDims);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Number percentileNumber(Number percentile) {
+        return array.percentileNumber(percentile);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Number medianNumber() {
+        return array.medianNumber();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray median(int... dimension) {
+        return array.median(dimension);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray percentile(Number percentile, int... dimension) {
+        return array.percentile(percentile, dimension);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toDense() {
+        return array.toDense();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long nonzero() {
+        return array.nonzero();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isEmpty() {
+        return array.isEmpty();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalNot() {
+        return array.logicalNot();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArrayEx getNDArrayInternal() {
+        return array.getNDArrayInternal();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        // DO NOTHING
     }
 }

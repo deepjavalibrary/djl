@@ -58,12 +58,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     private MxNDFactory factory;
     private MxNDArrayEx mxNDArrayEx;
 
-    MxNDArray(MxNDFactory factory, Pointer handle) {
-        super(handle);
-        this.factory = factory;
-        this.mxNDArrayEx = new MxNDArrayEx(this);
-    }
-
     MxNDArray(
             MxNDFactory factory, Pointer handle, Context context, Shape shape, DataType dataType) {
         this(factory, handle);
@@ -76,31 +70,16 @@ public class MxNDArray extends NativeResource implements NDArray {
         this.dataType = dataType;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public byte[] getEncoded() {
-        return toByteArray();
+    MxNDArray(MxNDFactory factory, Pointer handle) {
+        super(handle);
+        this.factory = factory;
+        this.mxNDArrayEx = new MxNDArrayEx(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDScopedFactory getFactory() {
         return factory;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void detach() {
-        factory.detach(this);
-        factory = MxNDFactory.SYSTEM_FACTORY;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attach(NDScopedFactory factory) {
-        detach();
-        this.factory = (MxNDFactory) factory;
-        factory.attach(this);
     }
 
     /** {@inheritDoc} */
@@ -130,13 +109,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         return shape;
     }
 
-    public SparseFormat getSparseFormat() {
-        if (sparseFormat == null) {
-            sparseFormat = JnaUtils.getStorageType(getHandle());
-        }
-        return sparseFormat;
-    }
-
     /** {@inheritDoc} */
     @Override
     public Layout getLayout() {
@@ -147,6 +119,194 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public DataDesc getDataDescriptor() {
         return new DataDesc(getShape(), getDataType(), null, getLayout(), getContext());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isSparse() {
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void attach(NDScopedFactory factory) {
+        detach();
+        this.factory = (MxNDFactory) factory;
+        factory.attach(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void detach() {
+        factory.detach(this);
+        factory = MxNDFactory.SYSTEM_FACTORY;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MxNDArray asInContext(Context ctx, boolean copy) {
+        if (ctx.equals(getContext()) && !copy) {
+            return this;
+        }
+        MxNDArray nd = factory.create(getShape(), getDataType(), ctx);
+        copyTo(nd);
+        return nd;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MxNDArray asType(DataType dtype, boolean copy) {
+        if (dtype.equals(getDataType()) && !copy) {
+            return this;
+        }
+        MxNDArray nd = factory.create(getShape(), dtype, getContext());
+        copyTo(nd);
+        return nd;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Matrix asMatrix() {
+        if (!shape.isMatrix()) {
+            throw new IllegalStateException("NDArray is not a matrix");
+        }
+        return new MxMatrix(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward() {
+        backward(null, false, true);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward(boolean retainGraph, boolean isTraining) {
+        backward(null, retainGraph, isTraining);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {
+        Pointer outGradHandle;
+        if (outGrad != null) {
+            MxNDArray outGradND = (MxNDArray) outGrad;
+            outGradHandle = outGradND.getHandle();
+        } else {
+            outGradHandle = null;
+        }
+
+        JnaUtils.autogradBackwardExecute(
+                1,
+                getHandle(),
+                outGradHandle,
+                0,
+                null,
+                retainGraph ? 1 : 0,
+                0,
+                isTraining ? 1 : 0,
+                null,
+                null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void attachGrad() {
+        attachGrad(GradReq.WRITE, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
+        // TODO: should we close grad?
+        // Does zerosLike support sparse?
+        MxNDArray grad;
+        if (sparseFormat == null || sparseFormat == SparseFormat.UNDEFINED) {
+            grad = (MxNDArray) zerosLike();
+        } else {
+            grad = (MxNDArray) factory.zeros(getShape(), getDataType(), getContext());
+        }
+        int gradReqValue = gradReq.getValue();
+        IntBuffer gradReqBuffer = IntBuffer.allocate(1);
+        gradReqBuffer.put(0, gradReqValue);
+        JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getGradient() {
+        Pointer pointer = JnaUtils.getGradient(getHandle());
+        return factory.create(pointer);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public byte[] getEncoded() {
+        return toByteArray();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double[] toDoubleArray() {
+        if (getDataType() != DataType.FLOAT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required double" + " Actual " + getDataType());
+        }
+        DoubleBuffer db = toByteBuffer().asDoubleBuffer();
+        double[] ret = new double[db.remaining()];
+        db.get(ret);
+        return ret;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public float[] toFloatArray() {
+        if (getDataType() != DataType.FLOAT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required float, Actual " + getDataType());
+        }
+        FloatBuffer fb = toByteBuffer().asFloatBuffer();
+        float[] ret = new float[fb.remaining()];
+        fb.get(ret);
+        return ret;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int[] toIntArray() {
+        if (getDataType() != DataType.INT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required int" + " Actual " + getDataType());
+        }
+        IntBuffer ib = toByteBuffer().asIntBuffer();
+        int[] ret = new int[ib.remaining()];
+        ib.get(ret);
+        return ret;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long[] toLongArray() {
+        if (getDataType() != DataType.INT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required long" + " Actual " + getDataType());
+        }
+        LongBuffer lb = toByteBuffer().asLongBuffer();
+        long[] ret = new long[lb.remaining()];
+        lb.get(ret);
+        return ret;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public byte[] toByteArray() {
+        ByteBuffer bb = toByteBuffer();
+        if (bb.hasArray()) {
+            return bb.array();
+        }
+        byte[] buf = new byte[bb.remaining()];
+        bb.get(buf);
+        return buf;
     }
 
     /** {@inheritDoc} */
@@ -305,103 +465,686 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray asInContext(Context ctx, boolean copy) {
-        if (ctx.equals(getContext()) && !copy) {
-            return this;
+    public NDArray dup() {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray zerosLike() {
+        return factory.invoke("zeros_like", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray onesLike() {
+        return factory.invoke("ones_like", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray like() {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    @Override
+    public boolean contentEquals(Number number) {
+        try (NDArray result = eq(number)) {
+            return result.nonzero() == result.size();
         }
-        MxNDArray nd = factory.create(getShape(), getDataType(), ctx);
-        copyTo(nd);
-        return nd;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public MxNDArray asType(DataType dtype, boolean copy) {
-        if (dtype.equals(getDataType()) && !copy) {
-            return this;
+    public boolean contentEquals(NDArray other) {
+        try (NDArray result = eq(other)) {
+            return result.nonzero() == result.size();
         }
-        MxNDArray nd = factory.create(getShape(), dtype, getContext());
-        copyTo(nd);
-        return nd;
-    }
-
-    /** {@inheritDoc} */
-    public void waitToRead() {
-        JnaUtils.waitToRead(getHandle());
-    }
-
-    public void waitToWrite() {
-        JnaUtils.waitToWrite(getHandle());
-    }
-
-    public void waitAll() {
-        JnaUtils.waitToRead(getHandle());
     }
 
     /** {@inheritDoc} */
     @Override
-    public void attachGrad() {
-        attachGrad(GradReq.WRITE, null);
+    public boolean equalsWithEps(Object o, double eps) {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
     @Override
-    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
-        // TODO: should we close grad?
-        // Does zerosLike support sparse?
-        MxNDArray grad;
-        if (sparseFormat == null || sparseFormat == SparseFormat.UNDEFINED) {
-            grad = (MxNDArray) zerosLike();
+    public NDArray eq(Number other) {
+        try (NDArray numbers = zerosLike()) {
+            numbers.addi(other);
+            return eq(numbers);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray eq(NDArray other) {
+        return factory.invoke("_equal", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray eps(Number other) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray eps(NDArray other) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray neq(Number other) {
+        return eq(other).eq(0);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray neq(NDArray other) {
+        return eq(other).eq(0);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray gt(Number other) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return factory.invoke("_greater_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray gt(NDArray other) {
+        return factory.invoke("_greater", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray gte(Number other) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return factory.invoke("_greater_equal_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray gte(NDArray other) {
+        return factory.invoke("_greater_equal", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray lt(Number other) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return factory.invoke("_lesser_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray lt(NDArray other) {
+        return factory.invoke("_lesser", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray lte(Number other) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return factory.invoke("_lesser_equal_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray lte(NDArray other) {
+        return factory.invoke("_lesser_equal", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray add(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_plus_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray add(NDArray... others) {
+        NDList toAdd = new NDList(this);
+        toAdd.addAll(new NDList(others));
+        if (others.length == 0) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        } else if (others.length == 1) {
+            return factory.invoke("_plus", toAdd, null).head();
         } else {
-            grad = (MxNDArray) factory.zeros(getShape(), getDataType(), getContext());
+            return factory.invoke("add_n", toAdd, null).head();
         }
-        int gradReqValue = gradReq.getValue();
-        IntBuffer gradReqBuffer = IntBuffer.allocate(1);
-        gradReqBuffer.put(0, gradReqValue);
-        JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
     }
 
     /** {@inheritDoc} */
     @Override
-    public void backward() {
-        backward(null, false, true);
+    public NDArray sub(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_minus_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void backward(boolean retainGraph, boolean isTraining) {
-        backward(null, retainGraph, isTraining);
+    public NDArray sub(NDArray other) {
+        return factory.invoke("_sub", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
     @Override
-    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {
-        Pointer outGradHandle;
-        if (outGrad != null) {
-            MxNDArray outGradND = (MxNDArray) outGrad;
-            outGradHandle = outGradND.getHandle();
+    public NDArray mul(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_mul_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mul(NDArray... others) {
+        if (others == null || others.length == 0) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        }
+        NDArray current = this;
+        for (NDArray other : others) {
+            NDArray next = factory.invoke("_mul", new NDList(current, other), null).head();
+            if (current != this) {
+                current.close();
+            }
+            current = next;
+        }
+        return current;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray div(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_div_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray div(NDArray other) {
+        return factory.invoke("elemwise_div", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mod(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_npi_mod_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mod(NDArray other) {
+        return factory.invoke("_npi_mod", new NDList(this, other), null).head();
+    }
+
+    @Override
+    public NDArray pow(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return factory.invoke("_power_scalar", this, params);
+    }
+
+    @Override
+    public NDArray pow(NDArray other) {
+        return factory.invoke("_power", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray addi(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_plus_scalar", new NDList(this), new NDList(this), params);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray addi(NDArray... others) {
+        NDList toAdd = new NDList(this);
+        toAdd.addAll(new NDList(others));
+        if (others.length == 0) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        } else if (others.length == 1) {
+            factory.invoke("_plus", toAdd, new NDList(this), null);
         } else {
-            outGradHandle = null;
+            factory.invoke("add_n", toAdd, new NDList(this), null);
         }
-
-        JnaUtils.autogradBackwardExecute(
-                1,
-                getHandle(),
-                outGradHandle,
-                0,
-                null,
-                retainGraph ? 1 : 0,
-                0,
-                isTraining ? 1 : 0,
-                null,
-                null);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getGradient() {
-        Pointer pointer = JnaUtils.getGradient(getHandle());
+    public NDArray subi(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_minus_scalar", new NDList(this), new NDList(this), params);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray subi(NDArray other) {
+        factory.invoke("_sub", new NDList(this, other), new NDList(this), null);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray muli(NDArray... others) {
+        if (others == null || others.length == 0) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        }
+        for (NDArray other : others) {
+            factory.invoke("_mul", new NDList(this, other), new NDList(this), null);
+        }
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray muli(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_mul_scalar", new NDList(this), new NDList(this), params);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray divi(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_div_scalar", new NDList(this), new NDList(this), params);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray divi(NDArray other) {
+        factory.invoke("elemwise_div", new NDList(this, other), new NDList(this), null);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_npi_mod_scalar", new NDList(this), new NDList(this), params);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray modi(NDArray other) {
+        factory.invoke("_npi_mod", new NDList(this, other), new NDList(this), null);
+        return this;
+    }
+
+    @Override
+    public NDArray powi(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        factory.invoke("_power_scalar", new NDList(this), new NDList(this), params);
+        return this;
+    }
+
+    @Override
+    public NDArray powi(NDArray other) {
+        factory.invoke("_power", new NDList(this, other), new NDList(this), null);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray neg() {
+        return factory.invoke("negative", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray negi() {
+        factory.invoke("negative", new NDList(this), new NDList(this), null);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray abs() {
+        return factory.invoke("_np_absolute", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray square() {
+        return factory.invoke("_np_square", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cbrt() {
+        return factory.invoke("_np_cbrt", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray floor() {
+        return factory.invoke("_np_floor", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray ceil() {
+        return factory.invoke("_np_ceil", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray round() {
+        return factory.invoke("round", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray trunc() {
+        return factory.invoke("_np_trunc", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray exp() {
+        return factory.invoke("_npi_exp", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray log() {
+        return factory.invoke("_np_log", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray log10() {
+        return factory.invoke("_npi_log10", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray log2() {
+        return factory.invoke("_np_log2", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sin() {
+        return factory.invoke("_npi_sin", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cos() {
+        return factory.invoke("_npi_cos", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tan() {
+        return factory.invoke("_np_tan", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray asin() {
+        return factory.invoke("_np_arcsin", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray acos() {
+        return factory.invoke("_np_arccos", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray atan() {
+        return factory.invoke("_npi_arctan", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sinh() {
+        return factory.invoke("_npi_sinh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cosh() {
+        return factory.invoke("_npi_cosh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray tanh() {
+        return factory.invoke("_np_tanh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray asinh() {
+        return factory.invoke("_np_arcsinh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray acosh() {
+        return factory.invoke("_np_arccosh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray atanh() {
+        return factory.invoke("_np_arctanh", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toDegrees() {
+        return factory.invoke("_np_degrees", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toRadians() {
+        return factory.invoke("_np_radians", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Number max() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("max", this, params).toArray()[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray max(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("max", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Number min() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("min", this, params).toArray()[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray min(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("min", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Number sum() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("sum", this, params).toArray()[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sum(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("sum", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Number prod() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("prod", this, params).toArray()[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray prod(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("prod", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Number mean() {
+        MxOpParams params = new MxOpParams();
+        return factory.invoke("mean", this, params).toArray()[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray mean(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return factory.invoke("mean", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList split(int axis, boolean squeezeAxis) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("num_outputs", size(axis));
+        params.addParam("axis", axis);
+        params.addParam("squeeze_axis", squeezeAxis);
+        return factory.invoke("split", new NDList(this), params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList split(int axis, int numOutputs) throws IllegalArgumentException {
+        MxOpParams params = new MxOpParams();
+        params.addParam("num_outputs", numOutputs);
+        params.addParam("axis", axis);
+        return factory.invoke("split", new NDList(this), params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray flatten() {
+        return reshape(new Shape(Math.toIntExact(size())));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray reshape(Shape shape) {
+        long count = shape.getUnknownValueCount();
+        if (count == 0 && getShape().size() != shape.size()) {
+            throw new IllegalArgumentException("The given shape does not match the current shape");
+        }
+        // check multiply -1 in shape
+        if (count > 1) {
+            throw new IllegalArgumentException(
+                    "Shape could only have a single unknown dimension (-1).");
+        }
+        // check size outside the -1 is divisible factor of the original size
+        long sizeWithoutUnknown =
+                Arrays.stream(shape.getShape()).filter(s -> s != -1).reduce(1, Math::multiplyExact);
+        if (getShape().size() % sizeWithoutUnknown != 0) {
+            throw new IllegalArgumentException("The given shape does not match the current shape");
+        }
+        Pointer pointer = JnaUtils.reshape(getHandle(), shape.getShape(), false);
         return factory.create(pointer);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray expandDims(int axis) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        return factory.invoke("_npi_expand_dims", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stack(NDArray[] arrays, int axis) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        NDArray[] srcArray = new NDArray[arrays.length + 1];
+        srcArray[0] = this;
+        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
+        return factory.invoke("_npi_stack", new NDList(srcArray), params).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stack(NDList arrays, int axis) {
+        return stack(arrays.toArray(), axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray concat(NDArray[] arrays, int axis) {
+        MxOpParams params = new MxOpParams();
+        // MXNet backend use dim as argument name
+        params.addParam("dim", axis);
+        NDArray[] srcArray = new NDArray[arrays.length + 1];
+        srcArray[0] = this;
+        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
+        return factory.invoke("_npi_concatenate", new NDList(srcArray), params).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray argsort(int axis, boolean ascending) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        params.addParam("is_ascend", ascending);
+        params.setDataType(DataType.INT32);
+        return factory.invoke("argsort", this, params);
     }
 
     /** {@inheritDoc} */
@@ -417,16 +1160,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray sort() {
         MxOpParams params = new MxOpParams();
         return factory.invoke("sort", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray argsort(int axis, boolean ascending) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("axis", axis);
-        params.addParam("is_ascend", ascending);
-        params.setDataType(DataType.INT32);
-        return factory.invoke("argsort", this, params);
     }
 
     /** {@inheritDoc} */
@@ -452,89 +1185,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         params.addParam("axis", axes[0]);
         params.addParam("temperature", temperature);
         return factory.invoke("softmax", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList split(int axis, boolean squeezeAxis) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("num_outputs", size(axis));
-        params.addParam("axis", axis);
-        params.addParam("squeeze_axis", squeezeAxis);
-        return factory.invoke("split", new NDList(this), params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList split(int axis, int numOutputs) throws IllegalArgumentException {
-        MxOpParams params = new MxOpParams();
-        params.addParam("num_outputs", numOutputs);
-        params.addParam("axis", axis);
-        return factory.invoke("split", new NDList(this), params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray add(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        return factory.invoke("_plus_scalar", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray addi(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        factory.invoke("_plus_scalar", new NDList(this), new NDList(this), params);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray add(NDArray... others) {
-        NDList toAdd = new NDList(this);
-        toAdd.addAll(new NDList(others));
-        if (others.length == 0) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        } else if (others.length == 1) {
-            return factory.invoke("_plus", toAdd, null).head();
-        } else {
-            return factory.invoke("add_n", toAdd, null).head();
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray addi(NDArray... others) {
-        NDList toAdd = new NDList(this);
-        toAdd.addAll(new NDList(others));
-        if (others.length == 0) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        } else if (others.length == 1) {
-            factory.invoke("_plus", toAdd, new NDList(this), null);
-        } else {
-            factory.invoke("add_n", toAdd, new NDList(this), null);
-        }
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray zerosLike() {
-        return factory.invoke("zeros_like", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray onesLike() {
-        return factory.invoke("ones_like", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isSparse() {
-        return false;
     }
 
     /** {@inheritDoc} */
@@ -571,115 +1221,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eps(Number other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray eps(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray eq(Number other) {
-        try (NDArray numbers = zerosLike()) {
-            numbers.addi(other);
-            return eq(numbers);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray eq(NDArray other) {
-        return factory.invoke("_equal", new NDList(this, other), null).head();
-    }
-
-    @Override
-    public boolean contentEquals(NDArray other) {
-        try (NDArray result = eq(other)) {
-            return result.nonzero() == result.size();
-        }
-    }
-
-    @Override
-    public boolean contentEquals(Number number) {
-        try (NDArray result = eq(number)) {
-            return result.nonzero() == result.size();
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray neq(Number other) {
-        return eq(other).eq(0);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray neq(NDArray other) {
-        return eq(other).eq(0);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray gt(NDArray other) {
-        return factory.invoke("_greater", new NDList(this, other), null).head();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray gte(NDArray other) {
-        return factory.invoke("_greater_equal", new NDList(this, other), null).head();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray gt(Number other) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", other.toString());
-        return factory.invoke("_greater_scalar", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray gte(Number other) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", other.toString());
-        return factory.invoke("_greater_equal_scalar", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray lte(Number other) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", other.toString());
-        return factory.invoke("_lesser_equal_scalar", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray lt(Number other) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", other.toString());
-        return factory.invoke("_lesser_scalar", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray lte(NDArray other) {
-        return factory.invoke("_lesser_equal", new NDList(this, other), null).head();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray lt(NDArray other) {
-        return factory.invoke("_lesser", new NDList(this, other), null).head();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray isInfinite() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -688,100 +1229,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray isNaN() {
         throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray neg() {
-        return factory.invoke("negative", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray negi() {
-        factory.invoke("negative", new NDList(this), new NDList(this), null);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray div(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        return factory.invoke("_div_scalar", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray divi(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        factory.invoke("_div_scalar", new NDList(this), new NDList(this), params);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mul(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        return factory.invoke("_mul_scalar", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray muli(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        factory.invoke("_mul_scalar", new NDList(this), new NDList(this), params);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        return factory.invoke("_minus_scalar", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subi(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        factory.invoke("_minus_scalar", new NDList(this), new NDList(this), params);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mod(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        return factory.invoke("_npi_mod_scalar", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray modi(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        factory.invoke("_npi_mod_scalar", new NDList(this), new NDList(this), params);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mod(NDArray other) {
-        return factory.invoke("_npi_mod", new NDList(this, other), null).head();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray modi(NDArray other) {
-        factory.invoke("_npi_mod", new NDList(this, other), new NDList(this), null);
-        return this;
     }
 
     /** {@inheritDoc} */
@@ -876,125 +1323,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public float[] toFloatArray() {
-        if (getDataType() != DataType.FLOAT32) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required float, Actual " + getDataType());
-        }
-        FloatBuffer fb = toByteBuffer().asFloatBuffer();
-        float[] ret = new float[fb.remaining()];
-        fb.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public byte[] toByteArray() {
-        ByteBuffer bb = toByteBuffer();
-        if (bb.hasArray()) {
-            return bb.array();
-        }
-        byte[] buf = new byte[bb.remaining()];
-        bb.get(buf);
-        return buf;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] toIntArray() {
-        if (getDataType() != DataType.INT32) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required int" + " Actual " + getDataType());
-        }
-        IntBuffer ib = toByteBuffer().asIntBuffer();
-        int[] ret = new int[ib.remaining()];
-        ib.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long[] toLongArray() {
-        if (getDataType() != DataType.INT64) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required long" + " Actual " + getDataType());
-        }
-        LongBuffer lb = toByteBuffer().asLongBuffer();
-        long[] ret = new long[lb.remaining()];
-        lb.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double[] toDoubleArray() {
-        if (getDataType() != DataType.FLOAT64) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required double" + " Actual " + getDataType());
-        }
-        DoubleBuffer db = toByteBuffer().asDoubleBuffer();
-        double[] ret = new double[db.remaining()];
-        db.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray div(NDArray other) {
-        return factory.invoke("elemwise_div", new NDList(this, other), null).head();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mul(NDArray... others) {
-        if (others == null || others.length == 0) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        }
-        NDArray current = this;
-        for (NDArray other : others) {
-            NDArray next = factory.invoke("_mul", new NDList(current, other), null).head();
-            if (current != this) {
-                current.close();
-            }
-            current = next;
-        }
-        return current;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sub(NDArray other) {
-        return factory.invoke("_sub", new NDList(this, other), null).head();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray divi(NDArray other) {
-        factory.invoke("elemwise_div", new NDList(this, other), new NDList(this), null);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray muli(NDArray... others) {
-        if (others == null || others.length == 0) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        }
-        for (NDArray other : others) {
-            factory.invoke("_mul", new NDList(this, other), new NDList(this), null);
-        }
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray subi(NDArray other) {
-        factory.invoke("_sub", new NDList(this, other), new NDList(this), null);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray amax(int... dimension) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -1015,157 +1343,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public Number aminNumber() {
         throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number max() {
-        MxOpParams params = new MxOpParams();
-        return factory.invoke("max", this, params).toArray()[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray max(int[] axes, boolean keepDims) {
-        MxOpParams params = new MxOpParams();
-        params.addTupleParam("axis", axes);
-        params.addParam("keepdims", keepDims);
-        return factory.invoke("max", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number min() {
-        MxOpParams params = new MxOpParams();
-        return factory.invoke("min", this, params).toArray()[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray min(int[] axes, boolean keepDims) {
-        MxOpParams params = new MxOpParams();
-        params.addTupleParam("axis", axes);
-        params.addParam("keepdims", keepDims);
-        return factory.invoke("min", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number sum() {
-        MxOpParams params = new MxOpParams();
-        return factory.invoke("sum", this, params).toArray()[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sum(int[] axes, boolean keepDims) {
-        MxOpParams params = new MxOpParams();
-        params.addTupleParam("axis", axes);
-        params.addParam("keepdims", keepDims);
-        return factory.invoke("sum", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number prod() {
-        MxOpParams params = new MxOpParams();
-        return factory.invoke("prod", this, params).toArray()[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray prod(int[] axes, boolean keepDims) {
-        MxOpParams params = new MxOpParams();
-        params.addTupleParam("axis", axes);
-        params.addParam("keepdims", keepDims);
-        return factory.invoke("prod", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number mean() {
-        MxOpParams params = new MxOpParams();
-        return factory.invoke("mean", this, params).toArray()[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray mean(int[] axes, boolean keepDims) {
-        MxOpParams params = new MxOpParams();
-        params.addTupleParam("axis", axes);
-        params.addParam("keepdims", keepDims);
-        return factory.invoke("mean", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray dup() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray flatten() {
-        return reshape(new Shape(Math.toIntExact(size())));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray reshape(Shape shape) {
-        long count = shape.getUnknownValueCount();
-        if (count == 0 && getShape().size() != shape.size()) {
-            throw new IllegalArgumentException("The given shape does not match the current shape");
-        }
-        // check multiply -1 in shape
-        if (count > 1) {
-            throw new IllegalArgumentException(
-                    "Shape could only have a single unknown dimension (-1).");
-        }
-        // check size outside the -1 is divisible factor of the original size
-        long sizeWithoutUnknown =
-                Arrays.stream(shape.getShape()).filter(s -> s != -1).reduce(1, Math::multiplyExact);
-        if (getShape().size() % sizeWithoutUnknown != 0) {
-            throw new IllegalArgumentException("The given shape does not match the current shape");
-        }
-        Pointer pointer = JnaUtils.reshape(getHandle(), shape.getShape(), false);
-        return factory.create(pointer);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray expandDims(int axis) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("axis", axis);
-        return factory.invoke("_npi_expand_dims", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray stack(NDArray[] arrays, int axis) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("axis", axis);
-        NDArray[] srcArray = new NDArray[arrays.length + 1];
-        srcArray[0] = this;
-        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
-        return factory.invoke("_npi_stack", new NDList(srcArray), params).head();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray stack(NDList arrays, int axis) {
-        return stack(arrays.toArray(), axis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray concat(NDArray[] arrays, int axis) {
-        MxOpParams params = new MxOpParams();
-        // MXNet backend use dim as argument name
-        params.addParam("dim", axis);
-        NDArray[] srcArray = new NDArray[arrays.length + 1];
-        srcArray[0] = this;
-        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
-        return factory.invoke("_npi_concatenate", new NDList(srcArray), params).head();
     }
 
     /** {@inheritDoc} */
@@ -1217,14 +1394,13 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equalsWithEps(Object o, double eps) {
+    public boolean equalShapes(NDArray other) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean equalShapes(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public NDArray argMax() {
+        return factory.invoke("argmax", this, null);
     }
 
     @Override
@@ -1236,8 +1412,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     @Override
-    public NDArray argMax() {
-        return factory.invoke("argmax", this, null);
+    public NDArray argMin() {
+        return factory.invoke("argmin", this, null);
     }
 
     @Override
@@ -1246,11 +1422,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         params.addParam("axis", axis);
         params.addParam("keepdims", keepDims);
         return factory.invoke("argmin", this, params);
-    }
-
-    @Override
-    public NDArray argMin() {
-        return factory.invoke("argmin", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1299,15 +1470,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Matrix asMatrix() {
-        if (!shape.isMatrix()) {
-            throw new IllegalStateException("NDArray is not a matrix");
-        }
-        return new MxMatrix(this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public boolean all() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -1326,8 +1488,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray like() {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public NDArray logicalNot() {
+        return factory.invoke("_np_logical_not", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1336,208 +1498,72 @@ public class MxNDArray extends NativeResource implements NDArray {
         return mxNDArrayEx;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDArray logicalNot() {
-        return factory.invoke("_np_logical_not", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray abs() {
-        return factory.invoke("_np_absolute", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray square() {
-        return factory.invoke("_np_square", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cbrt() {
-        return factory.invoke("_np_cbrt", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray floor() {
-        return factory.invoke("_np_floor", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ceil() {
-        return factory.invoke("_np_ceil", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray round() {
-        return factory.invoke("round", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray trunc() {
-        return factory.invoke("_np_trunc", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray exp() {
-        return factory.invoke("_npi_exp", this, null);
-    }
-
-    @Override
-    public NDArray pow(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        return factory.invoke("_power_scalar", this, params);
-    }
-
-    @Override
-    public NDArray powi(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        factory.invoke("_power_scalar", new NDList(this), new NDList(this), params);
-        return this;
-    }
-
-    @Override
-    public NDArray pow(NDArray other) {
-        return factory.invoke("_power", new NDList(this, other), null).head();
-    }
-
-    @Override
-    public NDArray powi(NDArray other) {
-        factory.invoke("_power", new NDList(this, other), new NDList(this), null);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray log() {
-        return factory.invoke("_np_log", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray log10() {
-        return factory.invoke("_npi_log10", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray log2() {
-        return factory.invoke("_np_log2", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sin() {
-        return factory.invoke("_npi_sin", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cos() {
-        return factory.invoke("_npi_cos", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray tan() {
-        return factory.invoke("_np_tan", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray asin() {
-        return factory.invoke("_np_arcsin", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray acos() {
-        return factory.invoke("_np_arccos", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray atan() {
-        return factory.invoke("_npi_arctan", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray toDegrees() {
-        return factory.invoke("_np_degrees", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray toRadians() {
-        return factory.invoke("_np_radians", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sinh() {
-        return factory.invoke("_npi_sinh", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cosh() {
-        return factory.invoke("_npi_cosh", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray tanh() {
-        return factory.invoke("_np_tanh", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray asinh() {
-        return factory.invoke("_np_arcsinh", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray acosh() {
-        return factory.invoke("_np_arccosh", this, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray atanh() {
-        return factory.invoke("_np_arctanh", this, null);
-    }
-
-    public String dump() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("ND: ")
-                .append(getShape())
-                .append(' ')
-                .append(getContext())
-                .append(' ')
-                .append(getDataType())
-                .append(LF);
-        // corner case: 0 dimension
-        if (size() == 0) {
-            sb.append("[]");
-            return sb.toString();
+    private long[] repeatsToMatchShape(Shape desiredShape) throws IllegalArgumentException {
+        Shape curShape = getShape();
+        int dimension = curShape.dimension();
+        if (desiredShape.dimension() > dimension) {
+            throw new IllegalArgumentException("The desired shape has too many dimensions");
         }
-        if (getShape().dimension() < MAX_DEPTH) {
-            dump(sb, 0);
-        } else {
-            sb.append("[ Exceed max print dimension ]");
+        if (desiredShape.dimension() < dimension) {
+            int additionalDimensions = dimension - desiredShape.dimension();
+            desiredShape = curShape.slice(0, additionalDimensions).addAll(desiredShape);
         }
-        return sb.toString();
+        long[] repeats = new long[dimension];
+        for (int i = 0; i < dimension; i++) {
+            if (desiredShape.get(i) % curShape.get(i) != 0) {
+                throw new IllegalArgumentException(
+                        "The desired shape is not a multiple of the original shape");
+            }
+            repeats[i] = Math.round(Math.ceil((double) desiredShape.get(i) / curShape.get(i)));
+        }
+        return repeats;
+    }
+
+    private int withAxis(int axis) {
+        return Math.floorMod(axis, getShape().dimension());
+    }
+
+    private void validate(DataType inputType, int size) {
+        if (getDataType() != inputType) {
+            throw new IllegalStateException(
+                    "DataType mismatch, required: " + dataType + ", actual: " + inputType);
+        }
+        if (size != getShape().size()) {
+            throw new IllegalArgumentException(
+                    "array size (" + size + ") do not match NDArray shape: " + shape);
+        }
+    }
+
+    private ByteBuffer toByteBuffer() {
+        Shape sh = getShape();
+        DataType dType = getDataType();
+        long product = sh.size();
+        long len = dType.getNumOfBytes() * product;
+        ByteBuffer bb = ByteBuffer.allocateDirect(Math.toIntExact(len));
+        Pointer pointer = Native.getDirectBufferPointer(bb);
+        JnaUtils.syncCopyToCPU(getHandle(), pointer, Math.toIntExact(product));
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        return bb;
+    }
+
+    public SparseFormat getSparseFormat() {
+        if (sparseFormat == null) {
+            sparseFormat = JnaUtils.getStorageType(getHandle());
+        }
+        return sparseFormat;
+    }
+
+    /** {@inheritDoc} */
+    public void waitToRead() {
+        JnaUtils.waitToRead(getHandle());
+    }
+
+    public void waitToWrite() {
+        JnaUtils.waitToWrite(getHandle());
+    }
+
+    public void waitAll() {
+        JnaUtils.waitToRead(getHandle());
     }
 
     /** {@inheritDoc} */
@@ -1560,16 +1586,26 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
     }
 
-    private ByteBuffer toByteBuffer() {
-        Shape sh = getShape();
-        DataType dType = getDataType();
-        long product = sh.size();
-        long len = dType.getNumOfBytes() * product;
-        ByteBuffer bb = ByteBuffer.allocateDirect(Math.toIntExact(len));
-        Pointer pointer = Native.getDirectBufferPointer(bb);
-        JnaUtils.syncCopyToCPU(getHandle(), pointer, Math.toIntExact(product));
-        bb.order(ByteOrder.LITTLE_ENDIAN);
-        return bb;
+    public String dump() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("ND: ")
+                .append(getShape())
+                .append(' ')
+                .append(getContext())
+                .append(' ')
+                .append(getDataType())
+                .append(LF);
+        // corner case: 0 dimension
+        if (size() == 0) {
+            sb.append("[]");
+            return sb.toString();
+        }
+        if (getShape().dimension() < MAX_DEPTH) {
+            dump(sb, 0);
+        } else {
+            sb.append("[ Exceed max print dimension ]");
+        }
+        return sb.toString();
     }
 
     private void dump(StringBuilder sb, int depth) {
@@ -1602,41 +1638,5 @@ public class MxNDArray extends NativeResource implements NDArray {
             Utils.pad(sb, ' ', depth);
         }
         sb.append("],").append(LF);
-    }
-
-    private void validate(DataType inputType, int size) {
-        if (getDataType() != inputType) {
-            throw new IllegalStateException(
-                    "DataType mismatch, required: " + dataType + ", actual: " + inputType);
-        }
-        if (size != getShape().size()) {
-            throw new IllegalArgumentException(
-                    "array size (" + size + ") do not match NDArray shape: " + shape);
-        }
-    }
-
-    private long[] repeatsToMatchShape(Shape desiredShape) throws IllegalArgumentException {
-        Shape curShape = getShape();
-        int dimension = curShape.dimension();
-        if (desiredShape.dimension() > dimension) {
-            throw new IllegalArgumentException("The desired shape has too many dimensions");
-        }
-        if (desiredShape.dimension() < dimension) {
-            int additionalDimensions = dimension - desiredShape.dimension();
-            desiredShape = curShape.slice(0, additionalDimensions).addAll(desiredShape);
-        }
-        long[] repeats = new long[dimension];
-        for (int i = 0; i < dimension; i++) {
-            if (desiredShape.get(i) % curShape.get(i) != 0) {
-                throw new IllegalArgumentException(
-                        "The desired shape is not a multiple of the original shape");
-            }
-            repeats[i] = Math.round(Math.ceil((double) desiredShape.get(i) / curShape.get(i)));
-        }
-        return repeats;
-    }
-
-    private int withAxis(int axis) {
-        return Math.floorMod(axis, getShape().dimension());
     }
 }

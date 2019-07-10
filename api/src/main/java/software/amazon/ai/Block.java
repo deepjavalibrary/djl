@@ -26,6 +26,10 @@ public interface Block {
 
     NDList forward(NDList inputs, PairList<String, String> params);
 
+    default NDList forward(NDList inputs) {
+        return forward(inputs, new PairList<>());
+    }
+
     void backward();
 
     Shape getInputShape();
@@ -35,10 +39,6 @@ public interface Block {
     void initialize(NDScopedFactory factory, Initializer initializer);
 
     byte[] getEncoded();
-
-    default NDList forward(NDList inputs) {
-        return forward(inputs, new PairList<>());
-    }
 
     default List<Block> getChildren() {
         return Collections.emptyList();

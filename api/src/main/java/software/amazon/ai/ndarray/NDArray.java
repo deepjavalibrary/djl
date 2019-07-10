@@ -211,6 +211,25 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
+     * Returns the size along a specified dimension.
+     *
+     * @param dimension the dimension to return the size for
+     * @return the size of the array along the specified dimension
+     */
+    default long size(int dimension) {
+        return getShape().size(dimension);
+    }
+
+    /**
+     * Returns the total number of elements in the {@code NDArray}.
+     *
+     * @return the number of elements in the NDArray
+     */
+    default long size() {
+        return getShape().size();
+    }
+
+    /**
      * Converts this NDArray to a double array.
      *
      * @return a double array
@@ -517,206 +536,41 @@ public interface NDArray extends AutoCloseable {
     NDArray like();
 
     ////////////////////////////////////////
+    ////////////////////////////////////////
     // Operators
+    ////////////////////////////////////////
+    ////////////////////////////////////////
+
+    ////////////////////////////////////////
+    // Operators: Element Comparison
     ////////////////////////////////////////
 
     /**
-     * Performs an indirect sort of the NDArray ascending on the last dimension.
+     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the {@code
+     * number}.
      *
-     * @return an array of indices corresponding to elements in the NDArray on the axis, the output
-     *     DataType is always {@link DataType#INT32}
-     * @see NDArray#argsort(int, boolean)
+     * @param number the number to compare
+     * @return the binary NDArray for "Equals" comparison
      */
-    default NDArray argsort() {
-        return argsort(-1, true);
-    }
+    boolean contentEquals(Number number);
 
     /**
-     * Performs an indirect sort of the NDArray ascending on the given dimension.
-     *
-     * @param axis the axis to sort along
-     * @return an array of indices corresponding to elements in the NDArray on the axis, the output
-     *     DataType is always {@link DataType#INT32}
-     * @see NDArray#argsort(int, boolean)
-     */
-    default NDArray argsort(int axis) {
-        return argsort(axis, true);
-    }
-
-    /**
-     * Performs an indirect sort of the NDArray on the given dimension.
-     *
-     * @param axis the axis to sort along
-     * @param ascending whether to sort ascending
-     * @return an array of indices corresponding to elements in the NDArray on the axis, the output
-     *     DataType is always {@link DataType#INT32}
-     */
-    NDArray argsort(int axis, boolean ascending);
-
-    /**
-     * Returns a sorted copy of an input array along the given axis.
-     *
-     * @param axis axis along which to sort.
-     * @return return sorted NDArray
-     */
-    NDArray sort(int axis);
-
-    /**
-     * Returns a sorted copy of an flattened input array.
-     *
-     * @return return sorted NDArray
-     */
-    NDArray sort();
-
-    /**
-     * Returns the softmax over the entire array.
-     *
-     * @return the softmax over the entire array
-     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(int[], double)
-     */
-    default NDArray softmax() {
-        return softmax(new int[0]);
-    }
-
-    /**
-     * Returns the softmax on the specified axis.
-     *
-     * @param axis the axis to sort along, -1 for the last axis
-     * @return the softmax
-     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(int[], double)
-     */
-    default NDArray softmax(int axis) {
-        return softmax(new int[] {axis});
-    }
-
-    /**
-     * Returns the softmax on the specified axis.
-     *
-     * @param axis the axis to sort along, -1 for the last axis
-     * @param temperature the exponent multiplier Beta in the softmax.
-     * @return the softmax
-     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(int[], double)
-     */
-    default NDArray softmax(int axis, double temperature) {
-        return softmax(new int[] {axis}, temperature);
-    }
-
-    /**
-     * Returns the softmax across the specified axes.
-     *
-     * @param axes the axes to compute the softmax of. An empty array indicates computing the
-     *     softmax for the whole array
-     * @return the softmax
-     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     */
-    NDArray softmax(int[] axes);
-
-    /**
-     * Returns the softmax across the specified axes.
-     *
-     * @param axes the axes to compute the softmax of. An empty array indicates computing the
-     *     softmax for the whole array
-     * @param temperature The exponent multiplier Beta in the softmax.
-     * @return the softmax
-     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(int[], double)
-     */
-    NDArray softmax(int[] axes, double temperature);
-
-    /**
-     * Splits the array into size(0) new NDArrays along the first dimension.
-     *
-     * @return Given this array has shape [n, a, b, c, ...], returns an NDList of n arrays of shape
-     *     [a, b, c, ...]
-     * @see NDArray#split(int, boolean)
-     */
-    default NDList split() {
-        return split(0, true);
-    }
-
-    /**
-     * Splits the array into size(axis) new NDArrays along the given dimension.
-     *
-     * @param axis The axis to split along
-     * @return an NDList with size(axis) NDArrays with shape {@code this.shape.remove(axis) }
-     * @see NDArray#split(int, boolean)
-     */
-    default NDList split(int axis) {
-        return split(axis, true);
-    }
-
-    /**
-     * Splits the array into size(axis) new NDArrays along the given dimension.
-     *
-     * @param axis The axis to split along
-     * @param squeezeAxis whether to remove the specified output from the output NDArrays or leave
-     *     as size 1
-     * @return an NDList with size(axis) NDArrays with shape {@code squeezeAxis ?
-     *     this.shape.remove(axis) : this.shape.set(axis, 1)}
-     * @see NDArray#split(int, boolean)
-     */
-    NDList split(int axis, boolean squeezeAxis);
-
-    /**
-     * Splits the array into a given number of new NDArrays along the given dimension.
-     *
-     * @param axis The axis to split along
-     * @param numOutputs The number of NDArrays to split into. This must equally divide the length
-     *     of the axis.
-     * @return an NDList with numOutputs NDArrays with shape {@code (this.shape.axis /= axis) }
-     * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
-     *     axis
-     */
-    NDList split(int axis, int numOutputs);
-
-    /**
-     * Returns the cumulative sum along a axis. In-place method.
-     *
-     * @param axis axis along which the cumulative sum is computed.
-     * @return this object
-     */
-    NDArray cumsumi(int axis);
-
-    /**
-     * Returns the cumulative sum over the flattened array. In-place method.
-     *
-     * @return this object
-     */
-    NDArray cumsumi();
-
-    /**
-     * Returns the cumulative sum along a axis.
-     *
-     * @param axis axis along which the cumulative sum is computed.
-     * @return the cumulative sum along the specified dimension
-     */
-    NDArray cumsum(int axis);
-
-    /**
-     * Returns the cumulative sum over the flattened array.
-     *
-     * @return the cumulative sum along the specified dimension
-     */
-    NDArray cumsum();
-
-    /**
-     * Returns the binary NDArray for "Epsilon equals" comparison.
-     *
-     * @param other the number to compare
-     * @return the binary NDArray for "Epsilon equals" comparison
-     */
-    NDArray eps(Number other);
-
-    /**
-     * Returns the binary NDArray for "Epsilon equals" comparison.
+     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the other
+     * {@code NDArray}.
      *
      * @param other the NDArray to compare
-     * @return the binary NDArray for "Epsilon equals" comparison
+     * @return the binary NDArray for "Equals" comparison
      */
-    NDArray eps(NDArray other);
+    boolean contentEquals(NDArray other);
+
+    /**
+     * This method checks 2 NDArrays equality with given eps.
+     *
+     * @param o object to compare with
+     * @param eps Epsilon value to use for the quality operation
+     * @return the result {@code NDArray}
+     */
+    boolean equalsWithEps(Object o, double eps);
 
     /**
      * Returns the binary NDArray for "Equals" comparison.
@@ -735,22 +589,20 @@ public interface NDArray extends AutoCloseable {
     NDArray eq(NDArray other);
 
     /**
-     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the other
-     * {@code NDArray}.
+     * Returns the binary NDArray for "Epsilon equals" comparison.
      *
-     * @param other the NDArray to compare
-     * @return the binary NDArray for "Equals" comparison
+     * @param other the number to compare
+     * @return the binary NDArray for "Epsilon equals" comparison
      */
-    boolean contentEquals(NDArray other);
+    NDArray eps(Number other);
 
     /**
-     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the {@code
-     * number}.
+     * Returns the binary NDArray for "Epsilon equals" comparison.
      *
-     * @param number the number to compare
-     * @return the binary NDArray for "Equals" comparison
+     * @param other the NDArray to compare
+     * @return the binary NDArray for "Epsilon equals" comparison
      */
-    boolean contentEquals(Number number);
+    NDArray eps(NDArray other);
 
     /**
      * Returns the binary NDArray for "Not equals" comparison.
@@ -801,28 +653,12 @@ public interface NDArray extends AutoCloseable {
     NDArray gte(NDArray other);
 
     /**
-     * Returns the binary NDArray for "Less or equals" comparison.
-     *
-     * @param other the number to compare
-     * @return the binary NDArray for "Less or equals" comparison
-     */
-    NDArray lte(Number other);
-
-    /**
      * Returns the binary NDArray for "Less" comparison.
      *
      * @param other the number to compare
      * @return the binary NDArray for "Less" comparison
      */
     NDArray lt(Number other);
-
-    /**
-     * Returns the binary NDArray for "Less or equals" comparison.
-     *
-     * @param other the NDArray to compare
-     * @return the binary NDArray for "Less or equals" comparison
-     */
-    NDArray lte(NDArray other);
 
     /**
      * Returns the binary NDArray for "Less" comparison.
@@ -833,20 +669,228 @@ public interface NDArray extends AutoCloseable {
     NDArray lt(NDArray other);
 
     /**
-     * Returns the binary NDArray with value {@code true} where this array's entries are infinite,
-     * or {@code false} where they are not infinite.
+     * Returns the binary NDArray for "Less or equals" comparison.
      *
-     * @return the binary array with value {@code true} if the array's entries are infinite
+     * @param other the number to compare
+     * @return the binary NDArray for "Less or equals" comparison
      */
-    NDArray isInfinite();
+    NDArray lte(Number other);
 
     /**
-     * Returns the binary NDArray with value {@code true} where this array's entries are NaN, or
-     * {@code false} where they are not NaN.
+     * Returns the binary NDArray for "Less or equals" comparison.
      *
-     * @return the binary array with value {@code true} if the array's entries are NaN
+     * @param other the NDArray to compare
+     * @return the binary NDArray for "Less or equals" comparison
      */
-    NDArray isNaN();
+    NDArray lte(NDArray other);
+
+    ////////////////////////////////////////
+    // Operators: Element Arithmetic
+    ////////////////////////////////////////
+
+    /**
+     * Adds a number to each element of the array.
+     *
+     * @param n the number to add
+     * @return the result of the addition
+     */
+    NDArray add(Number n);
+
+    /**
+     * Adds (broadcasting) another NDArray to this {@code NDArray}.
+     *
+     * @param others the other NDArrays to add
+     * @return the result of the addition
+     */
+    NDArray add(NDArray... others);
+
+    /**
+     * Scalar subtraction of an array (copied).
+     *
+     * @param n the number to subtract by
+     * @return Copy of this array after applying subtraction operation
+     */
+    NDArray sub(Number n);
+
+    /**
+     * copy subtraction of two NDArrays.
+     *
+     * @param other the second NDArray to subtract
+     * @return the result of the addition
+     */
+    NDArray sub(NDArray other);
+
+    /**
+     * Scalar multiplication of an array (copy).
+     *
+     * @param n the number to multiply by
+     * @return a copy of this NDArray multiplied by the given number
+     */
+    NDArray mul(Number n);
+
+    /**
+     * element wise multiplication of other NDArrays to this NDArray.
+     *
+     * @param others the other NDArrays to multiply with
+     * @return the result of the multiplication
+     * @throws IllegalArgumentException others arrays must have at least one element
+     */
+    NDArray mul(NDArray... others);
+
+    /**
+     * Divides an array by a number.
+     *
+     * @param n Number to divide values by
+     * @return copy of array after division
+     */
+    NDArray div(Number n);
+
+    /**
+     * Copy (element wise) division of two NDArrays.
+     *
+     * @param other the second NDArray to divide
+     * @return the result of the divide
+     */
+    NDArray div(NDArray other);
+
+    /**
+     * Return element-wise remainder of division.
+     *
+     * <p>NDArray nd = factory.create(new float[] {-3, -5}, null, new Shape(2)); nd.mod(-2) //
+     * return [-1, -1]
+     *
+     * @param n divisor number
+     * @return copy of {@code NDArray} after division
+     */
+    NDArray mod(Number n);
+
+    /**
+     * Copy element-wise remainder of division.
+     *
+     * @param other the second NDArray to divide
+     * @return the result of the divide
+     */
+    NDArray mod(NDArray other);
+
+    /**
+     * Raises the power of each element in the {@code NDArray}.
+     *
+     * @param n the number to raise the power to
+     * @return the result {@code NDArray}
+     */
+    NDArray pow(Number n);
+
+    /**
+     * Raises the power of each element in the ndarray by the corresponding element in the other
+     * {@code NDArray}.
+     *
+     * @param other the ndarray by which the raise the power by
+     * @return the result {@code NDArray}
+     */
+    NDArray pow(NDArray other);
+
+    /**
+     * Adds a number to each element of the array in place.
+     *
+     * @param n the number to add
+     * @return the result of the addition
+     */
+    NDArray addi(Number n);
+
+    /**
+     * Adds (broadcasting) another NDArray to this NDArray in place.
+     *
+     * @param others the other NDArrays to add
+     * @return the result of the addition
+     * @throws IllegalArgumentException others arrays must have at least one element
+     */
+    NDArray addi(NDArray... others);
+
+    /**
+     * In place scalar subtraction of an array.
+     *
+     * @param n Number to subtract
+     * @return this array after applying subtraction operation
+     */
+    NDArray subi(Number n);
+
+    /**
+     * Performs in place (element wise) subtraction of two NDArrays.
+     *
+     * @param other the second NDArray to subtract
+     * @return the result of the subtraction
+     */
+    NDArray subi(NDArray other);
+
+    /**
+     * In place scalar multiplication of an array.
+     *
+     * @param n The number to multiply by
+     * @return this array after applying scalar multiplication
+     */
+    NDArray muli(Number n);
+
+    /**
+     * element wise multiplication in place of other NDArrays to this NDArray.
+     *
+     * @param others the other NDArrays to multiply with
+     * @return the result of the multiplication
+     * @throws IllegalArgumentException others arrays must have at least one element
+     */
+    NDArray muli(NDArray... others);
+
+    /**
+     * In place scalar division of an array.
+     *
+     * @param n Number to divide values by
+     * @return this array after applying division operation
+     */
+    NDArray divi(Number n);
+
+    /**
+     * in place (element wise) division of two NDArrays.
+     *
+     * @param other the second NDArray to divide
+     * @return the result of the divide
+     */
+    NDArray divi(NDArray other);
+
+    /**
+     * Return element-wise remainder of division.
+     *
+     * @param n divisor number
+     * @return Copy of {@code NDArray} after division
+     */
+    NDArray modi(Number n);
+
+    /**
+     * In place element-wise remainder of division.
+     *
+     * @param other the second NDArray to divide
+     * @return the result of the divide
+     */
+    NDArray modi(NDArray other);
+
+    /**
+     * Raises the power of each element in the ndarray in-place.
+     *
+     * @param n the number to raise the power to
+     * @return the result {@code NDArray}
+     */
+    NDArray powi(Number n);
+
+    /**
+     * Raises the power of each element in the ndarray by the corresponding element in the other
+     * ndarray in-place.
+     *
+     * @param other the ndarray by which the raise the power by
+     * @return the result {@code NDArray}
+     */
+    NDArray powi(NDArray other);
+
+    ////////////////////////////////////////
+    // Operators: Basic Numeric
+    ////////////////////////////////////////
 
     /**
      * Returns the NDArray negative (cloned).
@@ -863,264 +907,197 @@ public interface NDArray extends AutoCloseable {
     NDArray negi();
 
     /**
-     * Divides an array by a number.
+     * Calculates the absolute value element-wise.
      *
-     * @param n Number to divide values by
-     * @return copy of array after division
+     * @return the result {@code NDArray}
      */
-    NDArray div(Number n);
+    NDArray abs();
 
     /**
-     * In place scalar division of an array.
+     * Returns the element-wise square of the input.
      *
-     * @param n Number to divide values by
-     * @return this array after applying division operation
+     * @return the result {@code NDArray}
      */
-    NDArray divi(Number n);
+    NDArray square();
 
     /**
-     * Scalar multiplication of an array (copy).
+     * Returns the cube-root of an array, element-wise.
      *
-     * @param n the number to multiply by
-     * @return a copy of this NDArray multiplied by the given number
+     * @return the result {@code NDArray}
      */
-    NDArray mul(Number n);
+    NDArray cbrt();
 
     /**
-     * In place scalar multiplication of an array.
+     * Returns the floor of the input, element-wise. The floor of the scalar x is the largest
+     * integer i, such that i &lt;= x. It is often denoted as \lfloor x \rfloor.
      *
-     * @param n The number to multiply by
-     * @return this array after applying scalar multiplication
+     * @return the result {@code NDArray}
      */
-    NDArray muli(Number n);
+    NDArray floor();
 
     /**
-     * Scalar subtraction of an array (copied).
+     * Returns the ceiling of the input, element-wise. The ceil of the scalar x is the smallest
+     * integer i, such that i &gt;= x. It is often denoted as \lceil x \rceil.
      *
-     * @param n the number to subtract by
-     * @return Copy of this array after applying subtraction operation
+     * @return the result {@code NDArray}
      */
-    NDArray sub(Number n);
+    NDArray ceil();
 
     /**
-     * In place scalar subtraction of an array.
+     * Returns element-wise rounded value to the nearest integer of the input.
      *
-     * @param n Number to subtract
-     * @return this array after applying subtraction operation
+     * @return the result {@code NDArray}
      */
-    NDArray subi(Number n);
+    NDArray round();
 
     /**
-     * Adds a number to each element of the array.
+     * Returns the element-wise truncated value of the input.
      *
-     * @param n the number to add
-     * @return the result of the addition
+     * @return the result {@code NDArray}
      */
-    NDArray add(Number n);
+    NDArray trunc();
 
     /**
-     * Adds a number to each element of the array in place.
+     * Returns element-wise exponential value of the input.
      *
-     * @param n the number to add
-     * @return the result of the addition
+     * @return the result {@code NDArray}
      */
-    NDArray addi(Number n);
+    NDArray exp();
 
     /**
-     * Adds (broadcasting) other NDArray to this {@code NDArray}.
+     * Returns element-wise Natural logarithmic value of the input.
      *
-     * @param others the other NDArrays to add
-     * @return the result of the addition
-     * @throws IllegalArgumentException others arrays must have at least one element
+     * @return the result {@code NDArray}
      */
-    NDArray add(NDArray... others);
+    NDArray log();
 
     /**
-     * Adds (broadcasting) other NDArrays to this NDArray in place.
+     * Returns element-wise Base-2 logarithmic value of the input.
      *
-     * @param others the other NDArrays to add
-     * @return the result of the addition
-     * @throws IllegalArgumentException others arrays must have at least one element
+     * @return the result {@code NDArray}
      */
-    NDArray addi(NDArray... others);
+    NDArray log10();
 
     /**
-     * Return a mask on whether each element matches the given index.
+     * Returns element-wise Base-2 logarithmic value of the input.
      *
-     * @param index the index of values to set to true.
-     * @return new boolean NDArray where values are {@code true} if it matches the index
+     * @return the result {@code NDArray}
      */
-    NDArray createMask(NDIndex index);
+    NDArray log2();
 
     /**
-     * Return a mask on whether each element matches the given condition.
+     * Computes the element-wise sine of the input array. The input should be in radians ( 2𝜋 rad
+     * equals 360 degrees).
      *
-     * @param predicate a predicate to apply to each element of the array
-     * @return new boolean NDArray where values are {@code true} if it matches the predicate
+     * @return the result {@code NDArray}
      */
-    NDArray createMask(Predicate<Number> predicate);
+    NDArray sin();
 
     /**
-     * Repeats the array in tiles a given number of times.
+     * Computes the element-wise cosine of the input array. The input should be in radians ( 2𝜋 rad
+     * equals 360 degrees).
      *
-     * @param repeats the number of times to repeat for each dimension
-     * @return a NDArray that has been tiled
+     * @return the result {@code NDArray}
      */
-    NDArray tile(long repeats);
+    NDArray cos();
 
     /**
-     * Repeats the array in tiles a given number of times along the given axis.
+     * Computes the element-wise tangent of the input array. The input should be in radians ( 2𝜋
+     * rad equals 360 degrees).
      *
-     * @param axis the axis to repeat
-     * @param repeats the number of times to repeat for each dimension
-     * @return an NDArray that has been tiled
-     * @throws IllegalArgumentException Thrown for invalid axis
+     * @return the result {@code NDArray}
      */
-    NDArray tile(int axis, long repeats);
+    NDArray tan();
 
     /**
-     * Repeats the array in tiles a given number of times.
+     * Returns element-wise inverse sine of the input array. The input should be in the range [-1,
+     * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
      *
-     * @param repeats the number of times to repeat along each axis
-     * @return an NDArray that has been tiled
+     * @return the result {@code NDArray}
      */
-    NDArray tile(long[] repeats);
+    NDArray asin();
 
     /**
-     * Repeats the array in tiles a given number of times to match the desired shape.
+     * Returns element-wise inverse cosine of the input array. The input should be in the range [-1,
+     * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
      *
-     * <p>If the desired shape has fewer dimensions that the array, it will tile against the final
-     * dimensions.
-     *
-     * @param desiredShape the shape that should be converted to
-     * @return an NDArray that has been tiled
+     * @return the result {@code NDArray}
      */
-    NDArray tile(Shape desiredShape);
+    NDArray acos();
 
     /**
-     * Repeats each array element a given number of times.
+     * Returns element-wise inverse tangent of the input array. The input should be in the range
+     * [-1, 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
      *
-     * @param repeats the number of times to repeat for each dimension
-     * @return an NDArray that has been tiled
+     * @return the result {@code NDArray}
      */
-    NDArray repeat(long repeats);
+    NDArray atan();
 
     /**
-     * Repeats each array element a given number of times along the given axis.
+     * Returns the hyperbolic sine of the input array, computed element-wise.
+     * 𝑠𝑖𝑛ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)−𝑒𝑥𝑝(−𝑥))
      *
-     * @param axis the axis to repeat
-     * @param repeats the number of times to repeat for each dimension
-     * @return an NDArray that has been tiled
-     * @throws IllegalArgumentException Thrown for invalid axis
+     * @return the result {@code NDArray}
      */
-    NDArray repeat(int axis, long repeats);
+    NDArray sinh();
 
     /**
-     * Repeats each array element a given number of times for each axis.
+     * Returns the hyperbolic cosine of the input array, computed element-wise.
+     * 𝑐𝑜𝑠ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)+𝑒𝑥𝑝(−𝑥))
      *
-     * @param repeats the number of times to repeat along each axis
-     * @return an NDArray that has been tiled
+     * @return the result {@code NDArray}
      */
-    NDArray repeat(long[] repeats);
+    NDArray cosh();
 
     /**
-     * Repeats each array element to match the desired shape.
+     * Returns the hyperbolic tangent of the input array, computed element-wise.
+     * 𝑡𝑎𝑛ℎ(𝑥)=𝑠𝑖𝑛ℎ(𝑥)/𝑐𝑜𝑠ℎ(𝑥)
      *
-     * <p>If the desired shape has fewer dimensions that the array, it will tile against the final
-     * dimensions.
-     *
-     * @param desiredShape the shape that should be converted to
-     * @return an NDArray that has been tiled
+     * @return the result {@code NDArray}
      */
-    NDArray repeat(Shape desiredShape);
+    NDArray tanh();
 
     /**
-     * Perform a copy matrix multiplication.
+     * Returns the element-wise inverse hyperbolic sine of the input array, computed element-wise.
      *
-     * @param other the other matrix to perform matrix multiply with
-     * @return the result of the matrix multiplication
+     * @return the result {@code NDArray}
      */
-    NDArray mmul(NDArray other);
+    NDArray asinh();
 
     /**
-     * Copy (element wise) division of two NDArrays.
+     * Returns the element-wise inverse hyperbolic cosine of the input array, computed element-wise.
      *
-     * @param other the second NDArray to divide
-     * @return the result of the divide
+     * @return the result {@code NDArray}
      */
-    NDArray div(NDArray other);
+    NDArray acosh();
 
     /**
-     * element wise multiplication of other NDArrays to this NDArray.
+     * Returns the element-wise inverse hyperbolic tangent of the input array, computed
+     * element-wise.
      *
-     * @param others the other NDArrays to multiply with
-     * @return the result of the multiplication
-     * @throws IllegalArgumentException others arrays must have at least one element
+     * @return the result {@code NDArray}
      */
-    NDArray mul(NDArray... others);
+    NDArray atanh();
 
     /**
-     * copy subtraction of two NDArrays.
+     * Converts each element of the input array from radians to degrees.
+     * 𝑑𝑒𝑔𝑟𝑒𝑒𝑠([0,𝜋/2,𝜋,3𝜋/2,2𝜋])=[0,90,180,270,360].
      *
-     * @param other the second NDArray to subtract
-     * @return the result of the addition
+     * @return the result {@code NDArray}
      */
-    NDArray sub(NDArray other);
+    NDArray toDegrees();
 
     /**
-     * in place (element wise) division of two NDArrays.
+     * Converts each element of the input array from degrees to radians.
+     * 𝑟𝑎𝑑𝑖𝑎𝑛𝑠([0,90,180,270,360])=[0,𝜋/2,𝜋,3𝜋/2,2𝜋]
      *
-     * @param other the second NDArray to divide
-     * @return the result of the divide
+     * @return the result {@code NDArray}
      */
-    NDArray divi(NDArray other);
+    NDArray toRadians();
 
-    /**
-     * element wise multiplication in place of other NDArrays to this NDArray.
-     *
-     * @param others the other NDArrays to multiply with
-     * @return the result of the multiplication
-     * @throws IllegalArgumentException others arrays must have at least one element
-     */
-    NDArray muli(NDArray... others);
-
-    /**
-     * Performs in place (element wise) subtraction of two NDArrays.
-     *
-     * @param other the second NDArray to subtract
-     * @return the result of the subtraction
-     */
-    NDArray subi(NDArray other);
-
-    /**
-     * Returns the maximum (absolute) value in this NDArray, along the specified dimensions.
-     *
-     * @param dimension the dimension to getScalar the mean along
-     * @return the mean along the specified dimension of this NDArray
-     */
-    NDArray amax(int... dimension);
-
-    /**
-     * Returns the maximum (absolute) value in this NDArray.
-     *
-     * @return Max absolute value
-     */
-    Number amaxNumber();
-
-    /**
-     * Returns the minimum (absolute) value in this NDArray, along the specified dimensions.
-     *
-     * @param dimension the dimension to getScalar the absolute min along
-     * @return Minimum absolute value
-     */
-    NDArray amin(int... dimension);
-
-    /**
-     * Returns the absolute min value in this NDArray.
-     *
-     * @return Absolute min value
-     */
-    Number aminNumber();
+    ////////////////////////////////////////
+    // Operators: Reduction
+    ////////////////////////////////////////
 
     /**
      * Finds the max of all elements in the {@code NDArray}.
@@ -1261,6 +1238,56 @@ public interface NDArray extends AutoCloseable {
      * @return an NDArray after the mean
      */
     NDArray mean(int[] axes, boolean keepDims);
+
+    ////////////////////////////////////////
+    // Operators: Shapes and Arrays Manipulation
+    ////////////////////////////////////////
+
+    /**
+     * Splits the array into size(0) new NDArrays along the first dimension.
+     *
+     * @return Given this array has shape [n, a, b, c, ...], returns an NDList of n arrays of shape
+     *     [a, b, c, ...]
+     * @see NDArray#split(int, boolean)
+     */
+    default NDList split() {
+        return split(0, true);
+    }
+
+    /**
+     * Splits the array into size(axis) new NDArrays along the given dimension.
+     *
+     * @param axis The axis to split along
+     * @return an NDList with size(axis) NDArrays with shape {@code this.shape.remove(axis) }
+     * @see NDArray#split(int, boolean)
+     */
+    default NDList split(int axis) {
+        return split(axis, true);
+    }
+
+    /**
+     * Splits the array into size(axis) new NDArrays along the given dimension.
+     *
+     * @param axis The axis to split along
+     * @param squeezeAxis whether to remove the specified output from the output NDArrays or leave
+     *     as size 1
+     * @return an NDList with size(axis) NDArrays with shape {@code squeezeAxis ?
+     *     this.shape.remove(axis) : this.shape.set(axis, 1)}
+     * @see NDArray#split(int, boolean)
+     */
+    NDList split(int axis, boolean squeezeAxis);
+
+    /**
+     * Splits the array into a given number of new NDArrays along the given dimension.
+     *
+     * @param axis The axis to split along
+     * @param numOutputs The number of NDArrays to split into. This must equally divide the length
+     *     of the axis.
+     * @return an NDList with numOutputs NDArrays with shape {@code (this.shape.axis /= axis) }
+     * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
+     *     axis
+     */
+    NDList split(int axis, int numOutputs);
 
     /**
      * Flattens the array into a 1D NDArray in row-major order.
@@ -1429,6 +1456,290 @@ public interface NDArray extends AutoCloseable {
         return concat(new NDArray[] {array}, 0);
     }
 
+    ////////////////////////////////////////
+    // Operators: Other
+    ////////////////////////////////////////
+
+    /**
+     * Performs an indirect sort of the NDArray ascending on the last dimension.
+     *
+     * @return an array of indices corresponding to elements in the NDArray on the axis, the output
+     *     DataType is always {@link DataType#INT32}
+     * @see NDArray#argsort(int, boolean)
+     */
+    default NDArray argsort() {
+        return argsort(-1, true);
+    }
+
+    /**
+     * Performs an indirect sort of the NDArray ascending on the given dimension.
+     *
+     * @param axis the axis to sort along
+     * @return an array of indices corresponding to elements in the NDArray on the axis, the output
+     *     DataType is always {@link DataType#INT32}
+     * @see NDArray#argsort(int, boolean)
+     */
+    default NDArray argsort(int axis) {
+        return argsort(axis, true);
+    }
+
+    /**
+     * Performs an indirect sort of the NDArray on the given dimension.
+     *
+     * @param axis the axis to sort along
+     * @param ascending whether to sort ascending
+     * @return an array of indices corresponding to elements in the NDArray on the axis, the output
+     *     DataType is always {@link DataType#INT32}
+     */
+    NDArray argsort(int axis, boolean ascending);
+
+    /**
+     * Returns a sorted copy of an input array along the given axis.
+     *
+     * @param axis axis along which to sort.
+     * @return return sorted NDArray
+     */
+    NDArray sort(int axis);
+
+    /**
+     * Returns a sorted copy of an flattened input array.
+     *
+     * @return return sorted NDArray
+     */
+    NDArray sort();
+
+    /**
+     * Returns the softmax over the entire array.
+     *
+     * @return the softmax over the entire array
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     * @see NDArray#softmax(int[], double)
+     */
+    default NDArray softmax() {
+        return softmax(new int[0]);
+    }
+
+    /**
+     * Returns the softmax on the specified axis.
+     *
+     * @param axis the axis to sort along, -1 for the last axis
+     * @return the softmax
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     * @see NDArray#softmax(int[], double)
+     */
+    default NDArray softmax(int axis) {
+        return softmax(new int[] {axis});
+    }
+
+    /**
+     * Returns the softmax on the specified axis.
+     *
+     * @param axis the axis to sort along, -1 for the last axis
+     * @param temperature the exponent multiplier Beta in the softmax.
+     * @return the softmax
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     * @see NDArray#softmax(int[], double)
+     */
+    default NDArray softmax(int axis, double temperature) {
+        return softmax(new int[] {axis}, temperature);
+    }
+
+    /**
+     * Returns the softmax across the specified axes.
+     *
+     * @param axes the axes to compute the softmax of. An empty array indicates computing the
+     *     softmax for the whole array
+     * @return the softmax
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     */
+    NDArray softmax(int[] axes);
+
+    /**
+     * Returns the softmax across the specified axes.
+     *
+     * @param axes the axes to compute the softmax of. An empty array indicates computing the
+     *     softmax for the whole array
+     * @param temperature The exponent multiplier Beta in the softmax.
+     * @return the softmax
+     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
+     * @see NDArray#softmax(int[], double)
+     */
+    NDArray softmax(int[] axes, double temperature);
+
+    /**
+     * Returns the cumulative sum along a axis. In-place method.
+     *
+     * @param axis axis along which the cumulative sum is computed.
+     * @return this object
+     */
+    NDArray cumsumi(int axis);
+
+    /**
+     * Returns the cumulative sum over the flattened array. In-place method.
+     *
+     * @return this object
+     */
+    NDArray cumsumi();
+
+    /**
+     * Returns the cumulative sum along a axis.
+     *
+     * @param axis axis along which the cumulative sum is computed.
+     * @return the cumulative sum along the specified dimension
+     */
+    NDArray cumsum(int axis);
+
+    /**
+     * Returns the cumulative sum over the flattened array.
+     *
+     * @return the cumulative sum along the specified dimension
+     */
+    NDArray cumsum();
+
+    /**
+     * Returns the binary NDArray with value {@code true} where this array's entries are infinite,
+     * or {@code false} where they are not infinite.
+     *
+     * @return the binary array with value {@code true} if the array's entries are infinite
+     */
+    NDArray isInfinite();
+
+    /**
+     * Returns the binary NDArray with value {@code true} where this array's entries are NaN, or
+     * {@code false} where they are not NaN.
+     *
+     * @return the binary array with value {@code true} if the array's entries are NaN
+     */
+    NDArray isNaN();
+
+    /**
+     * Return a mask on whether each element matches the given index.
+     *
+     * @param index the index of values to set to true.
+     * @return new boolean NDArray where values are {@code true} if it matches the index
+     */
+    NDArray createMask(NDIndex index);
+
+    /**
+     * Return a mask on whether each element matches the given condition.
+     *
+     * @param predicate a predicate to apply to each element of the array
+     * @return new boolean NDArray where values are {@code true} if it matches the predicate
+     */
+    NDArray createMask(Predicate<Number> predicate);
+
+    /**
+     * Repeats the array in tiles a given number of times.
+     *
+     * @param repeats the number of times to repeat for each dimension
+     * @return a NDArray that has been tiled
+     */
+    NDArray tile(long repeats);
+
+    /**
+     * Repeats the array in tiles a given number of times along the given axis.
+     *
+     * @param axis the axis to repeat
+     * @param repeats the number of times to repeat for each dimension
+     * @return an NDArray that has been tiled
+     * @throws IllegalArgumentException Thrown for invalid axis
+     */
+    NDArray tile(int axis, long repeats);
+
+    /**
+     * Repeats the array in tiles a given number of times.
+     *
+     * @param repeats the number of times to repeat along each axis
+     * @return an NDArray that has been tiled
+     */
+    NDArray tile(long[] repeats);
+
+    /**
+     * Repeats the array in tiles a given number of times to match the desired shape.
+     *
+     * <p>If the desired shape has fewer dimensions that the array, it will tile against the final
+     * dimensions.
+     *
+     * @param desiredShape the shape that should be converted to
+     * @return an NDArray that has been tiled
+     */
+    NDArray tile(Shape desiredShape);
+
+    /**
+     * Repeats each array element a given number of times.
+     *
+     * @param repeats the number of times to repeat for each dimension
+     * @return an NDArray that has been tiled
+     */
+    NDArray repeat(long repeats);
+
+    /**
+     * Repeats each array element a given number of times along the given axis.
+     *
+     * @param axis the axis to repeat
+     * @param repeats the number of times to repeat for each dimension
+     * @return an NDArray that has been tiled
+     * @throws IllegalArgumentException Thrown for invalid axis
+     */
+    NDArray repeat(int axis, long repeats);
+
+    /**
+     * Repeats each array element a given number of times for each axis.
+     *
+     * @param repeats the number of times to repeat along each axis
+     * @return an NDArray that has been tiled
+     */
+    NDArray repeat(long[] repeats);
+
+    /**
+     * Repeats each array element to match the desired shape.
+     *
+     * <p>If the desired shape has fewer dimensions that the array, it will tile against the final
+     * dimensions.
+     *
+     * @param desiredShape the shape that should be converted to
+     * @return an NDArray that has been tiled
+     */
+    NDArray repeat(Shape desiredShape);
+
+    /**
+     * Perform a copy matrix multiplication.
+     *
+     * @param other the other matrix to perform matrix multiply with
+     * @return the result of the matrix multiplication
+     */
+    NDArray mmul(NDArray other);
+
+    /**
+     * Returns the maximum (absolute) value in this NDArray, along the specified dimensions.
+     *
+     * @param dimension the dimension to getScalar the mean along
+     * @return the mean along the specified dimension of this NDArray
+     */
+    NDArray amax(int... dimension);
+
+    /**
+     * Returns the maximum (absolute) value in this NDArray.
+     *
+     * @return Max absolute value
+     */
+    Number amaxNumber();
+
+    /**
+     * Returns the minimum (absolute) value in this NDArray, along the specified dimensions.
+     *
+     * @param dimension the dimension to getScalar the absolute min along
+     * @return Minimum absolute value
+     */
+    NDArray amin(int... dimension);
+
+    /**
+     * Returns the absolute min value in this NDArray.
+     *
+     * @return Absolute min value
+     */
+    Number aminNumber();
+
     /**
      * Clips (limit) the values in an array.
      *
@@ -1492,25 +1803,6 @@ public interface NDArray extends AutoCloseable {
     NDArray transpose(int[] dimensions);
 
     /**
-     * Returns the size along a specified dimension.
-     *
-     * @param dimension the dimension to return the size for
-     * @return the size of the array along the specified dimension
-     */
-    default long size(int dimension) {
-        return getShape().size(dimension);
-    }
-
-    /**
-     * Returns the total number of elements in the {@code NDArray}.
-     *
-     * @return the number of elements in the NDArray
-     */
-    default long size() {
-        return getShape().size();
-    }
-
-    /**
      * Broadcasts this NDArray to be the specified shape.
      *
      * @param shape the new shape of this NDArray
@@ -1527,15 +1819,6 @@ public interface NDArray extends AutoCloseable {
     NDArray broadcast(NDArray result);
 
     /**
-     * This method checks 2 NDArrays equality with given eps.
-     *
-     * @param o object to compare with
-     * @param eps Epsilon value to use for the quality operation
-     * @return the result {@code NDArray}
-     */
-    boolean equalsWithEps(Object o, double eps);
-
-    /**
      * Checks 2 NDArrays for equal shapes.
      *
      * <pre>
@@ -1550,39 +1833,11 @@ public interface NDArray extends AutoCloseable {
     boolean equalShapes(NDArray other);
 
     /**
-     * Return element-wise remainder of division.
+     * This method returns index of highest value.
      *
-     * <p>NDArray nd = factory.create(new float[] {-3, -5}, null, new Shape(2)); nd.mod(-2) //
-     * return [-1, -1]
-     *
-     * @param n divisor number
-     * @return copy of {@code NDArray} after division
+     * @return Array containing indices
      */
-    NDArray mod(Number n);
-
-    /**
-     * Return element-wise remainder of division.
-     *
-     * @param n divisor number
-     * @return Copy of {@code NDArray} after division
-     */
-    NDArray modi(Number n);
-
-    /**
-     * Copy element-wise remainder of division.
-     *
-     * @param other the second NDArray to divide
-     * @return the result of the divide
-     */
-    NDArray mod(NDArray other);
-
-    /**
-     * In place element-wise remainder of division.
-     *
-     * @param other the second NDArray to divide
-     * @return the result of the divide
-     */
-    NDArray modi(NDArray other);
+    NDArray argMax();
 
     /**
      * This method returns index of highest value along specified axi(e)s.
@@ -1610,13 +1865,6 @@ public interface NDArray extends AutoCloseable {
      * @return Array containing indices
      */
     NDArray argMin(int axis, boolean keepDims);
-
-    /**
-     * This method returns index of highest value.
-     *
-     * @return Array containing indices
-     */
-    NDArray argMax();
 
     /**
      * Returns percentile value for this {@code NDArray}.
@@ -1706,233 +1954,6 @@ public interface NDArray extends AutoCloseable {
      * @return the result {@code NDArray}
      */
     NDArray logicalNot();
-
-    ////////////////////////////////////////
-    // basic numeric operations
-    ////////////////////////////////////////
-
-    /**
-     * Calculates the absolute value element-wise.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray abs();
-
-    /**
-     * Returns the element-wise square of the input.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray square();
-
-    /**
-     * Returns the cube-root of an array, element-wise.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray cbrt();
-
-    /**
-     * Returns the floor of the input, element-wise. The floor of the scalar x is the largest
-     * integer i, such that i &lt;= x. It is often denoted as \lfloor x \rfloor.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray floor();
-
-    /**
-     * Returns the ceiling of the input, element-wise. The ceil of the scalar x is the smallest
-     * integer i, such that i &gt;= x. It is often denoted as \lceil x \rceil.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray ceil();
-
-    /**
-     * Returns element-wise rounded value to the nearest integer of the input.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray round();
-
-    /**
-     * Returns the element-wise truncated value of the input.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray trunc();
-
-    /**
-     * Returns element-wise exponential value of the input.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray exp();
-
-    /**
-     * Raises the power of each element in the {@code NDArray}.
-     *
-     * @param n the number to raise the power to
-     * @return the result {@code NDArray}
-     */
-    NDArray pow(Number n);
-
-    /**
-     * Raises the power of each element in the ndarray in-place.
-     *
-     * @param n the number to raise the power to
-     * @return the result {@code NDArray}
-     */
-    NDArray powi(Number n);
-
-    /**
-     * Raises the power of each element in the ndarray by the corresponding element in the other
-     * {@code NDArray}.
-     *
-     * @param other the ndarray by which the raise the power by
-     * @return the result {@code NDArray}
-     */
-    NDArray pow(NDArray other);
-
-    /**
-     * Raises the power of each element in the ndarray by the corresponding element in the other
-     * ndarray in-place.
-     *
-     * @param other the ndarray by which the raise the power by
-     * @return the result {@code NDArray}
-     */
-    NDArray powi(NDArray other);
-
-    /**
-     * Returns element-wise Natural logarithmic value of the input.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray log();
-
-    /**
-     * Returns element-wise Base-2 logarithmic value of the input.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray log10();
-
-    /**
-     * Returns element-wise Base-2 logarithmic value of the input.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray log2();
-
-    /**
-     * Computes the element-wise sine of the input array. The input should be in radians ( 2𝜋 rad
-     * equals 360 degrees).
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray sin();
-
-    /**
-     * Computes the element-wise cosine of the input array. The input should be in radians ( 2𝜋 rad
-     * equals 360 degrees).
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray cos();
-
-    /**
-     * Computes the element-wise tangent of the input array. The input should be in radians ( 2𝜋
-     * rad equals 360 degrees).
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray tan();
-
-    /**
-     * Returns element-wise inverse sine of the input array. The input should be in the range [-1,
-     * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray asin();
-
-    /**
-     * Returns element-wise inverse cosine of the input array. The input should be in the range [-1,
-     * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray acos();
-
-    /**
-     * Returns element-wise inverse tangent of the input array. The input should be in the range
-     * [-1, 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray atan();
-
-    /**
-     * Converts each element of the input array from radians to degrees.
-     * 𝑑𝑒𝑔𝑟𝑒𝑒𝑠([0,𝜋/2,𝜋,3𝜋/2,2𝜋])=[0,90,180,270,360].
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray toDegrees();
-
-    /**
-     * Converts each element of the input array from degrees to radians.
-     * 𝑟𝑎𝑑𝑖𝑎𝑛𝑠([0,90,180,270,360])=[0,𝜋/2,𝜋,3𝜋/2,2𝜋]
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray toRadians();
-
-    /**
-     * Returns the hyperbolic sine of the input array, computed element-wise.
-     * 𝑠𝑖𝑛ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)−𝑒𝑥𝑝(−𝑥))
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray sinh();
-
-    /**
-     * Returns the hyperbolic cosine of the input array, computed element-wise.
-     * 𝑐𝑜𝑠ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)+𝑒𝑥𝑝(−𝑥))
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray cosh();
-
-    /**
-     * Returns the hyperbolic tangent of the input array, computed element-wise.
-     * 𝑡𝑎𝑛ℎ(𝑥)=𝑠𝑖𝑛ℎ(𝑥)/𝑐𝑜𝑠ℎ(𝑥)
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray tanh();
-
-    /**
-     * Returns the element-wise inverse hyperbolic sine of the input array, computed element-wise.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray asinh();
-
-    /**
-     * Returns the element-wise inverse hyperbolic cosine of the input array, computed element-wise.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray acosh();
-
-    /**
-     * Returns the element-wise inverse hyperbolic tangent of the input array, computed
-     * element-wise.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray atanh();
 
     /**
      * Returns an internal representative of Native {@code NDArray}.

@@ -186,11 +186,9 @@
         <module name="AvoidInlineConditionals"/>
         -->
         <module name="CovariantEquals"/>
-        <!--
         <module name="DeclarationOrder">
             <property name="ignoreModifiers" value="true"/>
         </module>
-        -->
         <module name="DefaultComesLast"/>
         <module name="EmptyStatement"/>
         <module name="EqualsAvoidNull"/>
@@ -242,9 +240,7 @@
         <module name="NoFinalizer"/>
         -->
         <module name="OneStatementPerLine"/>
-        <!--
         <module name="OverloadMethodsDeclarationOrder"/>
-        -->
         <module name="PackageDeclaration"/>
         <!--
         <module name="ParameterAssignment"/>
