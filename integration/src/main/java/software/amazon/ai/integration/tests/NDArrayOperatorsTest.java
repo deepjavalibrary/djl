@@ -26,7 +26,6 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 
 public class NDArrayOperatorsTest extends AbstractTest {
-
     NDManager manager = NDManager.newBaseManager();
 
     public static void main(String[] args) {

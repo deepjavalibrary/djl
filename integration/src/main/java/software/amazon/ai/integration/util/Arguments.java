@@ -10,7 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
 package software.amazon.ai.integration.util;
 
 import org.apache.commons.cli.CommandLine;
@@ -19,13 +18,15 @@ import org.apache.commons.cli.Options;
 
 public class Arguments {
     private String methodName;
-    private String logDir;
+    private String className;
+    private String packageName;
     private int duration;
     private int iteration = 1;
 
     public Arguments(CommandLine cmd) {
-        logDir = cmd.getOptionValue("log-dir");
+        packageName = cmd.getOptionValue("package-name");
         methodName = cmd.getOptionValue("method-name");
+        className = cmd.getOptionValue("class-name");
 
         if (cmd.hasOption("duration")) {
             duration = Integer.parseInt(cmd.getOptionValue("duration"));
@@ -52,11 +53,11 @@ public class Arguments {
                         .desc("Number of iterations in each test.")
                         .build());
         options.addOption(
-                Option.builder("l")
-                        .longOpt("log-dir")
+                Option.builder("p")
+                        .longOpt("package-name")
                         .hasArg()
-                        .argName("LOG-DIR")
-                        .desc("Directory for output logs.")
+                        .argName("PACKAGE-NAME")
+                        .desc("Name of the package which has the tests")
                         .build());
         options.addOption(
                 Option.builder("c")
@@ -83,8 +84,12 @@ public class Arguments {
         return iteration;
     }
 
-    public String getLogDir() {
-        return logDir;
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public String getClassName() {
+        return className;
     }
 
     public String getMethodName() {
