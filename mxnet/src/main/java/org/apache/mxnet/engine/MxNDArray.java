@@ -68,6 +68,10 @@ public class MxNDArray extends NativeResource implements NDArray {
             MxNDFactory factory, Pointer handle, Context context, Shape shape, DataType dataType) {
         this(factory, handle);
         this.context = context;
+        // shape check
+        if (Arrays.stream(shape.getShape()).anyMatch(s -> s < 0)) {
+            throw new IllegalArgumentException("The shape must be >= 0");
+        }
         this.shape = shape;
         this.dataType = dataType;
     }
@@ -1108,7 +1112,19 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray reshape(Shape shape) {
-        if (shape.size() != -1 && getShape().size() != shape.size()) {
+        long count = shape.getUnknownValueCount();
+        if (count == 0 && getShape().size() != shape.size()) {
+            throw new IllegalArgumentException("The given shape does not match the current shape");
+        }
+        // check multiply -1 in shape
+        if (count > 1) {
+            throw new IllegalArgumentException(
+                    "Shape could only have a single unknown dimension (-1).");
+        }
+        // check size outside the -1 is divisible factor of the original size
+        long sizeWithoutUnknown =
+                Arrays.stream(shape.getShape()).filter(s -> s != -1).reduce(1, Math::multiplyExact);
+        if (getShape().size() % sizeWithoutUnknown != 0) {
             throw new IllegalArgumentException("The given shape does not match the current shape");
         }
         Pointer pointer = JnaUtils.reshape(getHandle(), shape.getShape(), false);
@@ -1511,6 +1527,11 @@ public class MxNDArray extends NativeResource implements NDArray {
                 .append(' ')
                 .append(getDataType())
                 .append(LF);
+        // corner case: 0 dimension
+        if (size() == 0) {
+            sb.append("[]");
+            return sb.toString();
+        }
         if (getShape().dimension() < MAX_DEPTH) {
             dump(sb, 0);
         } else {

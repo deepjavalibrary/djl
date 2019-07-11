@@ -101,6 +101,15 @@ public class Shape {
     }
 
     /**
+     * Return the count of unknown value in this {@code Shape}.
+     *
+     * @return number of unknown value in this {@code Shape}
+     */
+    public long getUnknownValueCount() {
+        return Arrays.stream(shape).filter(s -> s == -1).count();
+    }
+
+    /**
      * Creates a new {@code Shape} whose content is a slice of this shape.
      *
      * <p>The sub shape begins at the specified {@code beginIndex} and extends to {@code endIndex -
@@ -145,8 +154,13 @@ public class Shape {
      * Returns the head index of the shape.
      *
      * @return the head index of the shape
+     * @throws IndexOutOfBoundsException Thrown if the shape is empty
      */
     public long head() {
+        // scalar case
+        if (shape.length == 0) {
+            throw new IndexOutOfBoundsException("can't get value from scalar shape.");
+        }
         return shape[0];
     }
 

@@ -942,6 +942,8 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
         NDArray reshaped = original.reshape(new Shape(2, 3));
         NDArray expected = factory.create(new Shape(2, 3), new float[] {1f, 2f, 3f, 4f, 5f, 6f});
         Assertions.assertEquals(reshaped, expected);
+        reshaped = original.reshape(new Shape(2, -1));
+        Assertions.assertEquals(reshaped, expected);
     }
 
     @RunAsTest
