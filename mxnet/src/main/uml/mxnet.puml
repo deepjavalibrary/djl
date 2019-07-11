@@ -1,34 +1,34 @@
 @startuml
 class MxModel {
-    -MxNDScopedFactory factory;
+    -MxNDManager manager;
     -Symbol
     +void close()
 }
 
 class MxPredictor<I, O> {
-    -NDScopedFactory factory;
+    -NDManager manager;
     +void close()
 }
 
 class TranslatorContext {
-    +NDScopedFactory ctxFactory;
+    +NDManager ctxManager;
     +void close()
 }
 
-class MxNDScopedFactory {
-    -MxNDScopedFactory parent;
+class MxNDManager {
+    -MxNDManager parent;
     +MxNDArray create(Pointer);
-    MxNDScopedFactory newSubFactory()
-    MxNDScopedFactory newSubFactory(Context context)
+    MxNDManager newSubManager()
+    MxNDManager newSubManager(Context context)
     void attach(AutoCloseable resource)
     void detach(AutoCloseable resource)
     +void close()
 }
 
 class MxNDArray {
-    -NDScopedFactory factory;
+    -NDManager manager;
     -Pointer
-    void attach(MxNDScopedFactory factory)
+    void attach(MxNDManager manager)
     void detach()
     +void close()
 }
@@ -40,22 +40,22 @@ class NativeResource {
 
 class Symbol {
     -Pointer
-    -NDScopedFactory factory;
+    -NDManager manager;
     -MxNDArray array
     +void close()
 }
 
 MxModel o-- Symbol : aggregation
-MxModel o-- MxNDScopedFactory : aggregation
+MxModel o-- MxNDManager : aggregation
 Symbol o-right- MxNDArray : aggregation
 
 MxNDArray --|> NativeResource : extends
 Symbol --|> NativeResource : extends
 
 
-MxNDArray o-right- MxNDScopedFactory : aggregation
-MxPredictor o-up- MxNDScopedFactory : aggregation
-TranslatorContext o-up- MxNDScopedFactory : aggregation
+MxNDArray o-right- MxNDManager : aggregation
+MxPredictor o-up- MxNDManager : aggregation
+TranslatorContext o-up- MxNDManager : aggregation
 
 
 

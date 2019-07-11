@@ -38,11 +38,11 @@ import software.amazon.ai.training.GradReq;
 public interface NDArray extends AutoCloseable {
 
     /**
-     * Returns the {@link NDScopedFactory} used to create the {@code NDArray}.
+     * Returns the {@link NDManager} used to create the {@code NDArray}.
      *
-     * @return {@link NDScopedFactory}
+     * @return {@link NDManager}
      */
-    NDScopedFactory getFactory();
+    NDManager getManager();
 
     /**
      * Returns the {@link DataType} of the {@code NDArray}.
@@ -101,25 +101,25 @@ public interface NDArray extends AutoCloseable {
     boolean isSparse();
 
     /**
-     * Attaches this NDArray to specified NDScopedFactory.
+     * Attaches this NDArray to specified NDManager.
      *
-     * <p>Attached resource will be closed when the factory is closed.
+     * <p>Attached resource will be closed when the manager is closed.
      *
-     * @param factory {@link NDScopedFactory} to be attached
+     * @param manager {@link NDManager} to be attached
      */
-    default void attach(NDScopedFactory factory) {
+    default void attach(NDManager manager) {
         detach();
-        getFactory().attach(factory);
+        getManager().attach(manager);
     }
 
     /**
-     * Detaches this NDArray from current NDScopedFactory's lifecycle.
+     * Detaches this NDArray from current NDManager's lifecycle.
      *
      * <p>This NDArray becomes un-managed, it's user's responsibility to close the NDArray. Failed
      * to close the resource has to wait on GC to be freed, and might cause out of native memory.
      */
     default void detach() {
-        getFactory().detach(this);
+        getManager().detach(this);
     }
 
     /**
@@ -756,7 +756,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Return element-wise remainder of division.
      *
-     * <p>NDArray nd = factory.create(new float[] {-3, -5}, null, new Shape(2)); nd.mod(-2) //
+     * <p>NDArray nd = manager.create(new float[] {-3, -5}, null, new Shape(2)); nd.mod(-2) //
      * return [-1, -1]
      *
      * @param n divisor number

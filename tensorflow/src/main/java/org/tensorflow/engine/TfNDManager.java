@@ -22,23 +22,23 @@ import org.tensorflow.Tensors;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
-public class TfNDFactory implements NDScopedFactory, AutoCloseable {
+public class TfNDManager implements NDManager, AutoCloseable {
 
-    public static final TfNDFactory SYSTEM_FACTORY = new SystemFactory();
+    public static final TfNDManager SYSTEM_MANAGER = new SystemManager();
     private static int nameAssignment = 1;
 
-    private NDScopedFactory parent;
+    private NDManager parent;
     private Context context;
     Graph graph;
     Session session;
     private Map<AutoCloseable, AutoCloseable> resources;
 
-    private TfNDFactory(NDScopedFactory parent, Context context, Graph graph) {
+    private TfNDManager(NDManager parent, Context context, Graph graph) {
         this.parent = parent;
         this.context = context;
         this.graph = graph;
@@ -50,9 +50,9 @@ public class TfNDFactory implements NDScopedFactory, AutoCloseable {
     }
 
     Session getSession() {
-        TfNDFactory f = this;
+        TfNDManager f = this;
         while (f.session == null) {
-            f = (TfNDFactory) f.getParentFactory();
+            f = (TfNDManager) f.getParentManager();
         }
         return f.session;
     }
@@ -138,7 +138,7 @@ public class TfNDFactory implements NDScopedFactory, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public NDScopedFactory getParentFactory() {
+    public NDManager getParentManager() {
         return parent;
     }
 
@@ -150,16 +150,16 @@ public class TfNDFactory implements NDScopedFactory, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public TfNDFactory newSubFactory() {
-        return (TfNDFactory) newSubFactory(context);
+    public TfNDManager newSubManager() {
+        return (TfNDManager) newSubManager(context);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDScopedFactory newSubFactory(Context context) {
-        TfNDFactory factory = new TfNDFactory(this, context, graph);
-        resources.put(factory, factory);
-        return factory;
+    public NDManager newSubManager(Context context) {
+        TfNDManager manager = new TfNDManager(this, context, graph);
+        resources.put(manager, manager);
+        return manager;
     }
 
     /** {@inheritDoc} */
@@ -188,9 +188,9 @@ public class TfNDFactory implements NDScopedFactory, AutoCloseable {
         parent.detach(this);
     }
 
-    private static final class SystemFactory extends TfNDFactory {
+    private static final class SystemManager extends TfNDManager {
 
-        SystemFactory() {
+        SystemManager() {
             super(null, Context.defaultContext(), new Graph());
             session = new Session(graph);
         }

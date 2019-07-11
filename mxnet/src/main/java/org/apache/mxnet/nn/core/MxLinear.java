@@ -19,7 +19,7 @@ import org.apache.mxnet.nn.MxNNBlock;
 import software.amazon.ai.Initializer;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
@@ -52,9 +52,9 @@ public class MxLinear extends MxNNBlock implements Linear {
 
     /** {@inheritDoc} */
     @Override
-    public void initialize(NDScopedFactory factory, Initializer initializer) {
-        weight = factory.create(new DataDesc(new Shape(units, inUnits)));
-        bias = factory.create(new DataDesc(new Shape(units)));
+    public void initialize(NDManager manager, Initializer initializer) {
+        weight = manager.create(new DataDesc(new Shape(units, inUnits)));
+        bias = manager.create(new DataDesc(new Shape(units)));
         initializer.initialize(getDirectParameters());
     }
 

@@ -18,7 +18,7 @@ import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -31,7 +31,7 @@ import software.amazon.ai.training.GradReq;
 public class MockNDArray implements NDArray {
 
     @Override
-    public NDScopedFactory getFactory() {
+    public NDManager getManager() {
         return null;
     }
 

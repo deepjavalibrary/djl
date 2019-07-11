@@ -20,7 +20,7 @@ import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 
 public class MockPredictor<I, O> implements Predictor<I, O> {
 
@@ -64,10 +64,10 @@ public class MockPredictor<I, O> implements Predictor<I, O> {
 
     private class PredictorContext implements TranslatorContext {
 
-        private NDScopedFactory ctxFactory;
+        private NDManager ctxManager;
 
         public PredictorContext() {
-            ctxFactory = new MockNDFactory();
+            ctxManager = new MockNDManager();
         }
 
         /** {@inheritDoc} */
@@ -84,8 +84,8 @@ public class MockPredictor<I, O> implements Predictor<I, O> {
 
         /** {@inheritDoc} */
         @Override
-        public NDScopedFactory getNDScopedFactory() {
-            return ctxFactory;
+        public NDManager getNDManager() {
+            return ctxManager;
         }
 
         /** {@inheritDoc} */
@@ -97,7 +97,7 @@ public class MockPredictor<I, O> implements Predictor<I, O> {
         /** {@inheritDoc} */
         @Override
         public void close() {
-            ctxFactory.close();
+            ctxManager.close();
         }
     }
 }

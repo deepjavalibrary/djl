@@ -15,12 +15,12 @@ package software.amazon.ai.test.mock;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
-public class MockNDFactory implements NDScopedFactory {
+public class MockNDManager implements NDManager {
 
     @Override
     public NDArray create(Shape shape, DataType dataType, Context context) {
@@ -70,7 +70,7 @@ public class MockNDFactory implements NDScopedFactory {
     }
 
     @Override
-    public NDScopedFactory getParentFactory() {
+    public NDManager getParentManager() {
         return this;
     }
 
@@ -80,12 +80,12 @@ public class MockNDFactory implements NDScopedFactory {
     }
 
     @Override
-    public NDScopedFactory newSubFactory() {
+    public NDManager newSubManager() {
         return this;
     }
 
     @Override
-    public NDScopedFactory newSubFactory(Context context) {
+    public NDManager newSubManager(Context context) {
         return this;
     }
 

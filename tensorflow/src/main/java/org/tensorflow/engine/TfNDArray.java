@@ -26,7 +26,7 @@ import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -41,37 +41,37 @@ public class TfNDArray implements NDArray {
     private Tensor<?> tensor;
     private Output<?> out;
     private Shape shape;
-    private TfNDFactory factory;
+    private TfNDManager manager;
 
-    TfNDArray(NDScopedFactory factory, Tensor<?> tensor) {
-        this.factory = (TfNDFactory) factory;
-        this.factory.attach(this);
+    TfNDArray(NDManager manager, Tensor<?> tensor) {
+        this.manager = (TfNDManager) manager;
+        this.manager.attach(this);
         this.tensor = tensor;
     }
 
-    TfNDArray(NDScopedFactory factory, Output<?> out) {
-        this.factory = (TfNDFactory) factory;
-        this.factory.attach(this);
+    TfNDArray(NDManager manager, Output<?> out) {
+        this.manager = (TfNDManager) manager;
+        this.manager.attach(this);
         this.out = out;
     }
 
-    public TfNDArray(NDScopedFactory factory, Shape shape, FloatBuffer data) {
-        this.factory = (TfNDFactory) factory;
-        this.factory.attach(this);
+    public TfNDArray(NDManager manager, Shape shape, FloatBuffer data) {
+        this.manager = (TfNDManager) manager;
+        this.manager.attach(this);
         tensor = Tensor.create(shape.getShape(), data);
         this.shape = shape;
     }
 
-    TfNDArray(NDScopedFactory factory, Shape shape, ByteBuffer data) {
-        this.factory = (TfNDFactory) factory;
+    TfNDArray(NDManager manager, Shape shape, ByteBuffer data) {
+        this.manager = (TfNDManager) manager;
         tensor = Tensor.create(UInt8.class, shape.getShape(), data);
         this.shape = shape;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDScopedFactory getFactory() {
-        return factory;
+    public NDManager getManager() {
+        return manager;
     }
 
     /** {@inheritDoc} */
@@ -83,7 +83,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public Context getContext() {
-        return factory.getContext();
+        return manager.getContext();
     }
 
     /** {@inheritDoc} */
@@ -110,7 +110,7 @@ public class TfNDArray implements NDArray {
 
     private void runToTensor() {
         if (tensor == null) {
-            tensor = factory.getSession().runner().fetch(out.op().name()).run().get(0);
+            tensor = manager.getSession().runner().fetch(out.op().name()).run().get(0);
         }
     }
 
@@ -308,24 +308,24 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray zerosLike() {
         Operation op =
-                factory.getGraph()
-                        .opBuilder("ZerosLike", "ZerosLike_" + TfNDFactory.nextNameAssignment())
+                manager.getGraph()
+                        .opBuilder("ZerosLike", "ZerosLike_" + TfNDManager.nextNameAssignment())
                         .setAttr("T", getTfDataType())
                         .addInput(getOutput())
                         .build();
-        return new TfNDArray(factory, op.output(0));
+        return new TfNDArray(manager, op.output(0));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray onesLike() {
         Operation op =
-                factory.getGraph()
-                        .opBuilder("OnesLike", "OnesLike_" + TfNDFactory.nextNameAssignment())
+                manager.getGraph()
+                        .opBuilder("OnesLike", "OnesLike_" + TfNDManager.nextNameAssignment())
                         .setAttr("T", getTfDataType())
                         .addInput(getOutput())
                         .build();
-        return new TfNDArray(factory, op.output(0));
+        return new TfNDArray(manager, op.output(0));
     }
 
     /** {@inheritDoc} */
@@ -805,10 +805,10 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDList split(int axis, boolean squeezeAxis) {
-        TfNDArray axisOp = (TfNDArray) factory.create(axis);
+        TfNDArray axisOp = (TfNDArray) manager.create(axis);
         Operation op =
-                factory.getGraph()
-                        .opBuilder("Split", "Split_" + TfNDFactory.nextNameAssignment())
+                manager.getGraph()
+                        .opBuilder("Split", "Split_" + TfNDManager.nextNameAssignment())
                         .setAttr("T", getTfDataType())
                         .setAttr("num_split", size(axis))
                         .addInput(axisOp.getOutput())
@@ -817,7 +817,7 @@ public class TfNDArray implements NDArray {
 
         NDArray[] result =
                 IntStream.range(0, op.numOutputs())
-                        .mapToObj((int i) -> new TfNDArray(factory, op.output(i)))
+                        .mapToObj((int i) -> new TfNDArray(manager, op.output(i)))
                         .toArray(NDArray[]::new);
         return new NDList(result);
     }
@@ -831,10 +831,10 @@ public class TfNDArray implements NDArray {
         if (numOutputs < 0 || numOutputs > size(axis)) {
             throw new IllegalArgumentException("Invalid numOutputs");
         }
-        TfNDArray axisOp = (TfNDArray) factory.create(axis);
+        TfNDArray axisOp = (TfNDArray) manager.create(axis);
         Operation op =
-                factory.getGraph()
-                        .opBuilder("Split", "Split_" + TfNDFactory.nextNameAssignment())
+                manager.getGraph()
+                        .opBuilder("Split", "Split_" + TfNDManager.nextNameAssignment())
                         .setAttr("T", getTfDataType())
                         .setAttr("num_split", numOutputs)
                         .addInput(axisOp.getOutput())
@@ -843,7 +843,7 @@ public class TfNDArray implements NDArray {
 
         NDArray[] result =
                 IntStream.range(0, op.numOutputs())
-                        .mapToObj((int i) -> new TfNDArray(factory, op.output(i)))
+                        .mapToObj((int i) -> new TfNDArray(manager, op.output(i)))
                         .toArray(NDArray[]::new);
         return new NDList(result);
     }
@@ -912,20 +912,20 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray softmax(int[] axes, double temperature) {
         Operation op =
-                factory.getGraph()
-                        .opBuilder("Softmax", "Softmax_" + TfNDFactory.nextNameAssignment())
+                manager.getGraph()
+                        .opBuilder("Softmax", "Softmax_" + TfNDManager.nextNameAssignment())
                         .setAttr("T", getTfDataType())
                         .addInput(getOutput())
                         .build();
 
-        return new TfNDArray(factory, op.output(0));
+        return new TfNDArray(manager, op.output(0));
     }
 
     Output<?> getOutput() {
         if (out == null) {
             Operation op =
-                    factory.getGraph()
-                            .opBuilder("Const", "Const_" + TfNDFactory.nextNameAssignment())
+                    manager.getGraph()
+                            .opBuilder("Const", "Const_" + TfNDManager.nextNameAssignment())
                             .setAttr("dtype", tensor.dataType())
                             .setAttr("value", tensor)
                             .build();

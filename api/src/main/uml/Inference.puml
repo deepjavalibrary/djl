@@ -23,7 +23,7 @@ interface Model {
     +URL getArtifact(String name)
     +InputStream getArtifactAsStream(String name)
     +void save(File modelPath, String modelName)
-	.. static Factory methods ..
+	.. static Manager methods ..
     +Model loadModel(Path modelPath)
     +Model loadModel(Path modelPath, String modelName)
     +Model loadModel(Path modelPath, String modelName, Map options)
@@ -43,11 +43,11 @@ interface Predictor<I, O> {
 interface TranslatorContext {
     +Model getModel()
     +Context getContext()
-    +NDScopedFactory getNDScopedFactory()
+    +NDManager getNDManager()
     +void close()
 }
 
-interface NDScopedFactory {
+interface NDManager {
     +NDArray create(Context context, ...);
     +NDArray create(DataDesc dataDesc);
 }
@@ -68,7 +68,7 @@ Predictor -right-o Context : aggregation
 Predictor -right-> Translator : uses
 Translator -right-> NDArray : uses
 Translator --> TranslatorContext : uses
-NDScopedFactory -left-> NDArray
+NDManager -left-> NDArray
 NDArray -down-o DataDesc
 
 @enduml

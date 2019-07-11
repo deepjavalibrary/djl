@@ -19,7 +19,7 @@ import software.amazon.ai.Block;
 import software.amazon.ai.Initializer;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 import software.amazon.ai.util.Utils;
@@ -30,19 +30,19 @@ public class Symbol extends NativeResource implements Block {
     //    private String[] auxParams;
     private String[] outputs;
     //    private List<Integer> outputLayouts;
-    private MxNDFactory factory;
+    private MxNDManager manager;
 
-    Symbol(MxNDFactory factory, Pointer pointer) {
+    Symbol(MxNDManager manager, Pointer pointer) {
         super(pointer);
-        this.factory = factory;
-        factory.attach(this);
+        this.manager = manager;
+        manager.attach(this);
         //        argParams = JnaUtils.listSymbolArguments(getHandle());
         //        auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }
 
-    public static Symbol load(MxNDFactory factory, String path) {
+    public static Symbol load(MxNDManager manager, String path) {
         Pointer pointer = JnaUtils.createSymbolFromFile(path);
-        return new Symbol(factory, pointer);
+        return new Symbol(manager, pointer);
     }
 
     /*
@@ -97,7 +97,7 @@ public class Symbol extends NativeResource implements Block {
 
     public Symbol get(int index) {
         Pointer pointer = JnaUtils.getSymbolOutput(getHandle(), index);
-        return new Symbol(factory, pointer);
+        return new Symbol(manager, pointer);
     }
 
     public Symbol get(String name) {
@@ -112,7 +112,7 @@ public class Symbol extends NativeResource implements Block {
     /*
     public Symbol getInternals() {
         Pointer pointer = JnaUtils.getSymbolInternals(getHandle());
-        return new Symbol(factory, pointer);
+        return new Symbol(manager, pointer);
     }
 
     public String debugStr() {
@@ -138,7 +138,7 @@ public class Symbol extends NativeResource implements Block {
     }
 
     public Symbol compose(String name, String[] keys) {
-        return new Symbol(factory, JnaUtils.compose(getHandle(), name, keys));
+        return new Symbol(manager, JnaUtils.compose(getHandle(), name, keys));
     }
 
     public void compose(String name, Map<String, String> symbols) {
@@ -181,7 +181,7 @@ public class Symbol extends NativeResource implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public void initialize(NDScopedFactory factory, Initializer initializer) {}
+    public void initialize(NDManager manager, Initializer initializer) {}
 
     /** {@inheritDoc} */
     @Override

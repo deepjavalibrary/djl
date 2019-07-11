@@ -20,37 +20,37 @@ import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
-public class MxNDFactory implements NDScopedFactory {
+public class MxNDManager implements NDManager {
 
     /**
-     * A global {@link NDScopedFactory} singleton instance.
+     * A global {@link NDManager} singleton instance.
      *
-     * <p>This NDScopedFactory is the root of all the other NDFactories. NDArrays created by this
-     * factory are un-managed, user has to close them manually. Those NDArrays will be released on
+     * <p>This NDManager is the root of all the other {@code NDManager}s. NDArrays created by this
+     * manager are un-managed, user has to close them manually. Those NDArrays will be released on
      * GC, and might be run into out of native memory issue.
      */
-    static final MxNDFactory SYSTEM_FACTORY = new SystemFactory();
+    static final MxNDManager SYSTEM_MANAGER = new SystemManager();
 
     private static final NDList EMPTY = new NDList(0);
 
-    private NDScopedFactory parent;
+    private NDManager parent;
     private Context context;
     private Map<AutoCloseable, AutoCloseable> resources;
     private AtomicBoolean closed = new AtomicBoolean(false);
 
-    private MxNDFactory(NDScopedFactory parent, Context context) {
+    private MxNDManager(NDManager parent, Context context) {
         this.parent = parent;
         this.context = context;
         resources = new ConcurrentHashMap<>();
     }
 
-    public static MxNDFactory getSystemFactory() {
-        return SYSTEM_FACTORY;
+    public static MxNDManager getSystemManager() {
+        return SYSTEM_MANAGER;
     }
 
     public MxNDArray create(Pointer handle) {
@@ -157,22 +157,22 @@ public class MxNDFactory implements NDScopedFactory {
 
     /** {@inheritDoc} */
     @Override
-    public NDScopedFactory getParentFactory() {
+    public NDManager getParentManager() {
         return parent;
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDFactory newSubFactory() {
-        return newSubFactory(context);
+    public MxNDManager newSubManager() {
+        return newSubManager(context);
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDFactory newSubFactory(Context context) {
-        MxNDFactory factory = new MxNDFactory(this, context);
-        attach(factory);
-        return factory;
+    public MxNDManager newSubManager(Context context) {
+        MxNDManager manager = new MxNDManager(this, context);
+        attach(manager);
+        return manager;
     }
 
     /** {@inheritDoc} */
@@ -185,7 +185,7 @@ public class MxNDFactory implements NDScopedFactory {
     @Override
     public synchronized void attach(AutoCloseable resource) {
         if (closed.get()) {
-            throw new IllegalStateException("NDFactor has been closed already.");
+            throw new IllegalStateException("NDManager has been closed already.");
         }
         resources.put(resource, resource);
     }
@@ -194,7 +194,7 @@ public class MxNDFactory implements NDScopedFactory {
     @Override
     public synchronized void detach(AutoCloseable resource) {
         if (closed.get()) {
-            throw new IllegalStateException("NDFactor has been closed already.");
+            throw new IllegalStateException("NDManager has been closed already.");
         }
         resources.remove(resource);
     }
@@ -250,9 +250,9 @@ public class MxNDFactory implements NDScopedFactory {
         return invoke(opName, params);
     }
 
-    private static final class SystemFactory extends MxNDFactory {
+    private static final class SystemManager extends MxNDManager {
 
-        SystemFactory() {
+        SystemManager() {
             super(null, Context.defaultContext());
         }
 

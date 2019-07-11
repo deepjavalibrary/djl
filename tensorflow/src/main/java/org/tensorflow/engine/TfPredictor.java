@@ -24,19 +24,19 @@ import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.util.Pair;
 
 public class TfPredictor<I, O> implements Predictor<I, O> {
 
-    TfNDFactory factory;
+    TfNDManager manager;
     Session session;
     Model model;
     private Translator<I, O> translator;
 
     public TfPredictor(TfModel model, Translator<I, O> translator) {
-        this.factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory();
+        this.manager = TfNDManager.SYSTEM_MANAGER.newSubManager();
         this.translator = translator;
         this.session = model.getSession();
         this.model = model;
@@ -74,7 +74,7 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
 
         NDList resultNDList = new NDList();
         for (int i = 0; i < result.size(); i++) {
-            resultNDList.add(dataDescs[i].getName(), factory.create(result.get(i)));
+            resultNDList.add(dataDescs[i].getName(), manager.create(result.get(i)));
         }
 
         return resultNDList;
@@ -89,10 +89,10 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
     public void close() {}
 
     private class PredictorContext implements TranslatorContext {
-        private TfNDFactory ctxFactory;
+        private TfNDManager ctxManager;
 
         public PredictorContext() {
-            ctxFactory = factory.newSubFactory();
+            ctxManager = manager.newSubManager();
         }
         /** {@inheritDoc} */
         @Override
@@ -108,8 +108,8 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
 
         /** {@inheritDoc} */
         @Override
-        public NDScopedFactory getNDScopedFactory() {
-            return ctxFactory;
+        public NDManager getNDManager() {
+            return ctxManager;
         }
 
         /** {@inheritDoc} */
@@ -121,7 +121,7 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
         /** {@inheritDoc} */
         @Override
         public void close() {
-            ctxFactory.close();
+            ctxManager.close();
         }
     }
 }

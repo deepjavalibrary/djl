@@ -52,36 +52,36 @@ public class CachedOpTest extends PowerMockTestCase {
 
     @Test
     public void testForward() {
-        try (MxNDFactory factory = MxNDFactory.SYSTEM_FACTORY.newSubFactory()) {
+        try (MxNDManager manager = MxNDManager.SYSTEM_MANAGER.newSubManager()) {
             MxNDArray[] params =
                     new MxNDArray[] {
                         null,
-                        (MxNDArray) factory.create(new Shape(2)),
-                        (MxNDArray) factory.create(new Shape(3)),
+                        (MxNDArray) manager.create(new Shape(2)),
+                        (MxNDArray) manager.create(new Shape(3)),
                         null,
                         null,
-                        (MxNDArray) factory.create(new Shape(5)),
-                        (MxNDArray) factory.create(new Shape(6))
+                        (MxNDArray) manager.create(new Shape(5)),
+                        (MxNDArray) manager.create(new Shape(6))
                     };
             List<String> names = Arrays.asList("data0", "data1", "data2");
             List<Integer> locations = Arrays.asList(0, 3, 4);
             PairList<String, Integer> inputNames = new PairList<>(names, locations);
-            CachedOp co = new CachedOp(new PointerArray(), factory, params, inputNames);
+            CachedOp co = new CachedOp(new PointerArray(), manager, params, inputNames);
             logger.info("Test: Positioned input");
             NDList input =
                     new NDList(
-                            factory.create(new Shape(2)),
-                            factory.create(new Shape(4)),
-                            factory.create(new Shape(5)));
+                            manager.create(new Shape(2)),
+                            manager.create(new Shape(4)),
+                            manager.create(new Shape(5)));
             co.forward(input);
             Assert.assertEquals(params[0].getShape(), new Shape(2));
             Assert.assertEquals(params[3].getShape(), new Shape(4));
             Assert.assertEquals(params[4].getShape(), new Shape(5));
             logger.info("Test: Named input");
             input = new NDList();
-            input.add("data2", factory.create(new Shape(2)));
-            input.add("data1", factory.create(new Shape(4)));
-            input.add("data0", factory.create(new Shape(5)));
+            input.add("data2", manager.create(new Shape(2)));
+            input.add("data1", manager.create(new Shape(4)));
+            input.add("data0", manager.create(new Shape(5)));
             co.forward(input);
             Assert.assertEquals(params[0].getShape(), new Shape(5));
             Assert.assertEquals(params[3].getShape(), new Shape(4));

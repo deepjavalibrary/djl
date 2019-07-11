@@ -38,29 +38,29 @@ public class CachedOp extends NativeResource {
     private MxNDArray[] inputNDArray;
     private PairList<String, Integer> inputNames;
     private Map<String, Integer> inputNameMap;
-    private MxNDFactory factory;
+    private MxNDManager manager;
 
     /**
      * Create an instance of {@link CachedOp}.
      *
-     * <p>It can be created by using {@link JnaUtils#createCachedOp(MxModel, MxNDFactory)}
+     * <p>It can be created by using {@link JnaUtils#createCachedOp(MxModel, MxNDManager)}
      *
      * @param handle The C handle of the CachedOp
-     * @param factory factory used to create NDArray
+     * @param manager manager used to create NDArray
      * @param inputNDArray The inputNDArray contains no inputs and all params
      * @param inputNames input names required by the model and their corresponding location
      */
     public CachedOp(
             Pointer handle,
-            MxNDFactory factory,
+            MxNDManager manager,
             MxNDArray[] inputNDArray,
             PairList<String, Integer> inputNames) {
         super(handle);
         this.inputNDArray = inputNDArray;
         this.inputNames = inputNames;
         inputNameMap = inputNames.toMap();
-        this.factory = factory;
-        factory.attach(this);
+        this.manager = manager;
+        manager.attach(this);
     }
 
     /**
@@ -92,10 +92,10 @@ public class CachedOp extends NativeResource {
                 if (!"prob_label".equals(key) && !"softmax_label".equals(key)) {
                     logger.warn("Input " + key + " not found, set NDArray to Shape(1) by default");
                 }
-                inputNDArray[pair.getValue()] = (MxNDArray) factory.create(new Shape(1));
+                inputNDArray[pair.getValue()] = (MxNDArray) manager.create(new Shape(1));
             }
         }
-        MxNDArray[] result = JnaUtils.cachedOpInvoke(factory, getHandle(), inputNDArray);
+        MxNDArray[] result = JnaUtils.cachedOpInvoke(manager, getHandle(), inputNDArray);
         return new NDList(result);
     }
 

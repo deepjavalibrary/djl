@@ -43,14 +43,14 @@ import software.amazon.ai.ndarray.types.SparseFormat;
 public class MxNDArrayTest extends PowerMockTestCase {
 
     private MockMxnetLibrary library;
-    private MxNDFactory factory;
+    private MxNDManager manager;
 
     @BeforeClass
     public void prepare() {
         mockStatic(LibUtils.class);
         library = new MockMxnetLibrary();
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
-        factory = MxNDFactory.SYSTEM_FACTORY;
+        manager = MxNDManager.SYSTEM_MANAGER;
     }
 
     @AfterClass
@@ -61,7 +61,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
     @Test
     public void testNDArrayCreation() {
         // By default the Mock lib will return the following set up
-        try (MxNDArray nd = new MxNDArray(factory, new PointerArray())) {
+        try (MxNDArray nd = new MxNDArray(manager, new PointerArray())) {
             Assert.assertEquals(nd.getShape(), new Shape(1, 2, 3));
             Assert.assertEquals(nd.getContext(), Context.gpu(1));
             Assert.assertEquals(nd.getDataType(), DataType.FLOAT32);
@@ -80,7 +80,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
                     fa[0] = ((Pointer) objects[1]).getFloatArray(0, size);
                     return 0;
                 });
-        try (NDArray nd = factory.create(new Shape(3))) {
+        try (NDArray nd = manager.create(new Shape(3))) {
             float[] input = new float[] {1.0f, 2.0f, 3.0f};
             nd.set(input);
             float[] fArr = fa[0];

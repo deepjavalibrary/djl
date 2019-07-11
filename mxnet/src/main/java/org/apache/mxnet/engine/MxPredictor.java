@@ -24,7 +24,7 @@ import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.util.Pair;
 
 /**
@@ -43,16 +43,16 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     private Translator<I, O> translator;
     Context context;
     private CachedOp cachedOp;
-    MxNDFactory factory;
+    MxNDManager manager;
     Metrics metrics;
     private long timestamp;
 
     MxPredictor(MxModel model, Translator<I, O> translator, Context context) {
-        this.factory = MxNDFactory.SYSTEM_FACTORY.newSubFactory(context);
+        this.manager = MxNDManager.SYSTEM_MANAGER.newSubManager(context);
         this.model = model;
         this.translator = translator;
         this.context = context;
-        cachedOp = JnaUtils.createCachedOp(model, factory);
+        cachedOp = JnaUtils.createCachedOp(model, manager);
     }
 
     /** {@inheritDoc} */
@@ -124,14 +124,14 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     @Override
     public void close() {
         cachedOp.close();
-        factory.close();
+        manager.close();
     }
 
     /** {@inheritDoc} */
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (factory.isOpen()) {
+        if (manager.isOpen()) {
             if (logger.isDebugEnabled()) {
                 logger.warn("Model was not closed explicitly: {}", getClass().getSimpleName());
             }
@@ -142,10 +142,10 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
     private class PredictorContext implements TranslatorContext {
 
-        private NDScopedFactory ctxFactory;
+        private NDManager ctxManager;
 
         public PredictorContext() {
-            ctxFactory = factory.newSubFactory();
+            ctxManager = manager.newSubManager();
         }
 
         /** {@inheritDoc} */
@@ -162,8 +162,8 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
         /** {@inheritDoc} */
         @Override
-        public NDScopedFactory getNDScopedFactory() {
-            return ctxFactory;
+        public NDManager getNDManager() {
+            return ctxManager;
         }
 
         /** {@inheritDoc} */
@@ -175,7 +175,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         /** {@inheritDoc} */
         @Override
         public void close() {
-            ctxFactory.close();
+            ctxManager.close();
         }
     }
 }

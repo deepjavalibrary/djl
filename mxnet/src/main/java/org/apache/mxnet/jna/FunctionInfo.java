@@ -17,9 +17,9 @@ import com.sun.jna.ptr.PointerByReference;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.engine.MxNDArray;
-import org.apache.mxnet.engine.MxNDFactory;
+import org.apache.mxnet.engine.MxNDManager;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.util.PairList;
 
 public class FunctionInfo {
@@ -35,7 +35,7 @@ public class FunctionInfo {
     }
 
     public int invoke(
-            NDScopedFactory factory, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
+            NDManager manager, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
         Pointer[] handles =
                 Arrays.stream(src).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
         PointerArray srcHandles = new PointerArray(handles);
@@ -44,26 +44,26 @@ public class FunctionInfo {
         return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params);
     }
 
-    public NDArray[] invoke(NDScopedFactory factory, NDArray[] src, PairList<String, ?> params) {
+    public NDArray[] invoke(NDManager manager, NDArray[] src, PairList<String, ?> params) {
         Pointer[] handles =
                 Arrays.stream(src).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
         PointerArray srcHandles = new PointerArray(handles);
-        return invoke((MxNDFactory) factory, srcHandles, params);
+        return invoke((MxNDManager) manager, srcHandles, params);
     }
 
-    public NDArray[] invoke(NDScopedFactory factory, NDArray src, PairList<String, ?> params) {
+    public NDArray[] invoke(NDManager manager, NDArray src, PairList<String, ?> params) {
         PointerArray handles = new PointerArray(((MxNDArray) src).getHandle());
-        return invoke((MxNDFactory) factory, handles, params);
+        return invoke((MxNDManager) manager, handles, params);
     }
 
-    private NDArray[] invoke(MxNDFactory factory, PointerArray src, PairList<String, ?> params) {
+    private NDArray[] invoke(MxNDManager manager, PointerArray src, PairList<String, ?> params) {
         PointerByReference destRef = new PointerByReference();
 
         int numOutputs = JnaUtils.imperativeInvoke(handle, src, destRef, params);
         MxNDArray[] result = new MxNDArray[numOutputs];
         Pointer[] ptrArray = destRef.getValue().getPointerArray(0, numOutputs);
         for (int i = 0; i < numOutputs; i++) {
-            result[i] = factory.create(ptrArray[i]);
+            result[i] = manager.create(ptrArray[i]);
         }
         return result;
     }

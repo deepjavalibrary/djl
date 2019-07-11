@@ -30,7 +30,7 @@ import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Model;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -49,7 +49,7 @@ public class MxModel implements Model {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
-    private NDScopedFactory factory;
+    private NDManager manager;
     private Path modelDir;
     private Symbol symbol;
     private PairList<String, MxNDArray> parameters;
@@ -58,12 +58,12 @@ public class MxModel implements Model {
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
     MxModel(
-            NDScopedFactory factory,
+            NDManager manager,
             Path modelDir,
             Symbol symbol,
             PairList<String, MxNDArray> parameters,
             String[] optimizerStates) {
-        this.factory = factory;
+        this.manager = manager;
         this.modelDir = modelDir;
         this.symbol = symbol;
         this.parameters = parameters;
@@ -71,13 +71,13 @@ public class MxModel implements Model {
     }
 
     static MxModel loadModel(String prefix, int epoch) throws IOException {
-        return loadModel(MxNDFactory.SYSTEM_FACTORY.newSubFactory(), prefix, epoch);
+        return loadModel(MxNDManager.SYSTEM_MANAGER.newSubManager(), prefix, epoch);
     }
 
-    static MxModel loadModel(MxNDFactory factory, String prefix, int epoch) throws IOException {
+    static MxModel loadModel(MxNDManager manager, String prefix, int epoch) throws IOException {
         // TODO: Find a better solution to get rid of this line
         JnaUtils.getAllOpNames();
-        Symbol symbol = Symbol.load(factory, prefix + "-symbol.json");
+        Symbol symbol = Symbol.load(manager, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
         String stateFile = String.format("%s-%04d.states", prefix, epoch);
         Path modelDir = Paths.get(paramFile).toAbsolutePath().getParent();
@@ -90,13 +90,13 @@ public class MxModel implements Model {
 
         for (int i = 0; i < names.length; ++i) {
             String[] pair = names[i].split(":", 2);
-            MxNDArray array = factory.create(handles[i]);
+            MxNDArray array = manager.create(handles[i]);
             parameters.add(pair[1], array);
         }
 
         String[] stateNames = Utils.readLines(Paths.get(stateFile)).toArray(JnaUtils.EMPTY_ARRAY);
         // TODO: Check if Symbol has all names that params file have
-        return new MxModel(factory, modelDir, symbol, parameters, stateNames);
+        return new MxModel(manager, modelDir, symbol, parameters, stateNames);
     }
 
     /**
@@ -134,8 +134,8 @@ public class MxModel implements Model {
         for (Pair<String, MxNDArray> pair : parameters) {
             newParam.add(pair.getKey(), pair.getValue().asType(dataType, true));
         }
-        NDScopedFactory newFactory = MxNDFactory.getSystemFactory().newSubFactory();
-        return new MxModel(newFactory, modelDir, symbol, newParam, optimizerStates);
+        NDManager newManager = MxNDManager.getSystemManager().newSubManager();
+        return new MxModel(newManager, modelDir, symbol, newParam, optimizerStates);
     }
 
     /** {@inheritDoc} */
@@ -240,14 +240,14 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        factory.close();
+        manager.close();
     }
 
     /** {@inheritDoc} */
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (((MxNDFactory) factory).isOpen()) {
+        if (((MxNDManager) manager).isOpen()) {
             if (logger.isDebugEnabled()) {
                 logger.warn("Model was not closed explicitly: {}", getClass().getSimpleName());
             }

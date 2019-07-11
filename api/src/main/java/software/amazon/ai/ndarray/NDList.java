@@ -160,9 +160,9 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
         }
     }
 
-    public void attach(NDScopedFactory factory) {
+    public void attach(NDManager manager) {
         for (NDArray array : list.values()) {
-            array.attach(factory);
+            array.attach(manager);
         }
     }
 

@@ -23,14 +23,14 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 import org.tensorflow.engine.TfModel;
 import org.tensorflow.engine.TfNDArray;
-import org.tensorflow.engine.TfNDFactory;
+import org.tensorflow.engine.TfNDManager;
 import org.tensorflow.engine.TfPredictor;
 import software.amazon.ai.TranslateException;
 import software.amazon.ai.Translator;
 import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.Pair;
 
@@ -40,10 +40,10 @@ public final class HelloWorld {
 
     @SuppressWarnings("PMD.SystemPrintln")
     public static void main(String[] args) throws IOException, TranslateException {
-        try (NDScopedFactory factory = TfNDFactory.SYSTEM_FACTORY.newSubFactory()) {
+        try (NDManager manager = TfNDManager.SYSTEM_MANAGER.newSubManager()) {
             NDArray a =
                     new TfNDArray(
-                            factory, new Shape(1, 3), FloatBuffer.wrap(new float[] {1f, 2f, 3f}));
+                            manager, new Shape(1, 3), FloatBuffer.wrap(new float[] {1f, 2f, 3f}));
 
             System.out.println("Input Shape:");
             System.out.println(a.getShape());
@@ -97,7 +97,7 @@ public final class HelloWorld {
             bgr2rgb(data);
             long[] shape = new long[] {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
             TfNDArray tfNDArray =
-                    ((TfNDFactory) ctx.getNDScopedFactory())
+                    ((TfNDManager) ctx.getNDManager())
                             .create(new Shape(shape), ByteBuffer.wrap(data));
             NDList ndList = new NDList();
             ndList.add("image_tensor", tfNDArray);

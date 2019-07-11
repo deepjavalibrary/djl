@@ -77,7 +77,7 @@ public class MxPredictorTest extends PowerMockTestCase {
             if (input == null) {
                 throw new TranslateException("Input is null");
             }
-            NDArray nd = ctx.getNDScopedFactory().create(new DataDesc(new Shape(1, 3)));
+            NDArray nd = ctx.getNDManager().create(new DataDesc(new Shape(1, 3)));
             return new NDList(nd);
         }
 

@@ -13,7 +13,7 @@
 package software.amazon.ai;
 
 import software.amazon.ai.metric.Metrics;
-import software.amazon.ai.ndarray.NDScopedFactory;
+import software.amazon.ai.ndarray.NDManager;
 
 /**
  * The {@code TranslatorContext} interface provides a toolkit for pre-processing and postprocessing
@@ -38,11 +38,11 @@ public interface TranslatorContext extends AutoCloseable {
     Context getContext();
 
     /**
-     * Returns the {@link NDScopedFactory} to create {@link software.amazon.ai.ndarray.NDArray}.
+     * Returns the {@link NDManager} to create {@link software.amazon.ai.ndarray.NDArray}.
      *
-     * @return {@link NDScopedFactory}
+     * @return {@link NDManager}
      */
-    NDScopedFactory getNDScopedFactory();
+    NDManager getNDManager();
 
     /**
      * Returns the Metric tool to do benchmark.

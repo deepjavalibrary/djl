@@ -29,7 +29,7 @@ import org.apache.mxnet.engine.CachedOp;
 import org.apache.mxnet.engine.DeviceType;
 import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDArray;
-import org.apache.mxnet.engine.MxNDFactory;
+import org.apache.mxnet.engine.MxNDManager;
 import org.apache.mxnet.engine.Symbol;
 import software.amazon.ai.Context;
 import software.amazon.ai.engine.EngineException;
@@ -964,7 +964,7 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
-    public static NDArray[] getExecutorOutputs(MxNDFactory factory, Pointer executor) {
+    public static NDArray[] getExecutorOutputs(MxNDManager manager, Pointer executor) {
         IntBuffer outSize = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXExecutorOutputs(executor, outSize, ref));
@@ -972,7 +972,7 @@ public final class JnaUtils {
         Pointer[] pointers = ref.getValue().getPointerArray(0, size);
         NDArray[] ndArrays = new NDArray[size];
         for (int i = 0; i < size; ++i) {
-            ndArrays[i] = factory.create(pointers[i]);
+            ndArrays[i] = manager.create(pointers[i]);
         }
         return ndArrays;
     }
@@ -1432,10 +1432,10 @@ public final class JnaUtils {
      * label param location
      *
      * @param model model that loaded in the backend
-     * @param factory NDScopedFactory to create NDArray
+     * @param manager NDManager to create NDArray
      * @return CachedOp for inference
      */
-    public static CachedOp createCachedOp(MxModel model, MxNDFactory factory) {
+    public static CachedOp createCachedOp(MxModel model, MxNDManager manager) {
         Symbol symbol = model.getSymbol();
         PairList<String, MxNDArray> parameters = model.getParameters();
 
@@ -1462,7 +1462,7 @@ public final class JnaUtils {
                 // parameter NDArray in MxModel is always loaded in CPU context,
                 // we have to copy to desired context to execution.
                 // TODO: use array.dup(ctx) instead
-                inputNDArray[i] = array.asInContext(factory.getContext(), true);
+                inputNDArray[i] = array.asInContext(manager.getContext(), true);
                 paramLoc++;
             } else {
                 inputs.add(paramName, i);
@@ -1480,7 +1480,7 @@ public final class JnaUtils {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
 
-        return new CachedOp(ref.getValue(), factory, inputNDArray, inputs);
+        return new CachedOp(ref.getValue(), manager, inputNDArray, inputs);
     }
 
     public static void freeCachedOp(Pointer handle) {
@@ -1488,7 +1488,7 @@ public final class JnaUtils {
     }
 
     public static MxNDArray[] cachedOpInvoke(
-            MxNDFactory factory, Pointer cachedOpHandle, MxNDArray[] inputs) {
+            MxNDManager manager, Pointer cachedOpHandle, MxNDArray[] inputs) {
         Pointer[] inputHandles = new Pointer[inputs.length];
         for (int i = 0; i < inputs.length; i++) {
             inputHandles[i] = inputs[i].getHandle();
@@ -1501,7 +1501,7 @@ public final class JnaUtils {
         Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
         MxNDArray[] output = new MxNDArray[numOutputs];
         for (int i = 0; i < numOutputs; i++) {
-            output[i] = factory.create(ptrArray[i]);
+            output[i] = manager.create(ptrArray[i]);
         }
         return output;
     }
