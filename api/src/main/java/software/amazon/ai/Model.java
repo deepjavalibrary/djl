@@ -91,6 +91,7 @@ public interface Model extends AutoCloseable {
             throws IOException {
         return Engine.getInstance().loadModel(modelPath, modelName, options);
     }
+
     /**
      * Returns the input descriptor of the model.
      *

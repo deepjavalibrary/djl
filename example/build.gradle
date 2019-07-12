@@ -15,9 +15,9 @@ dependencies {
     compile "commons-cli:commons-cli:1.4"
     compile "org.slf4j:slf4j-simple:1.7.26"
     compile "com.google.code.gson:gson:2.8.5"
-    compile "software.amazon.ai:joule-api:0.1.0-SNAPSHOT"
+    compile "software.amazon.ai:joule-api:0.2.0-SNAPSHOT"
 
-    runtime "org.apache.mxnet:joule:0.1.0-SNAPSHOT"
+    runtime "org.apache.mxnet:mxnet-joule:0.2.0-SNAPSHOT"
     runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:osx-x86_64"
 
     testImplementation 'org.testng:testng:6.14.3'
