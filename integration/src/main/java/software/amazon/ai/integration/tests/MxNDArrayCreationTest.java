@@ -31,7 +31,7 @@ public class MxNDArrayCreationTest extends AbstractTest {
 
     @RunAsTest
     public void testCreateCSRMatrix() throws FailedTestException {
-        try (NDManager factory = MxNDManager.getSystemManager().newSubManager()) {
+        try (NDManager factory = MxNDManager.newBaseManager().newSubManager()) {
             float[] input = new float[] {7, 8, 9};
             FloatBuffer buf = FloatBuffer.wrap(input);
             long[] indptr = new long[] {0, 2, 2, 3};
@@ -47,7 +47,7 @@ public class MxNDArrayCreationTest extends AbstractTest {
 
     @RunAsTest
     public void testCreateRowSparseMatrix() throws FailedTestException {
-        try (NDManager factory = MxNDManager.getSystemManager().newSubManager()) {
+        try (NDManager factory = MxNDManager.newBaseManager().newSubManager()) {
             float[] input = new float[] {1, 2, 3, 4, 5, 6};
             FloatBuffer buf = FloatBuffer.wrap(input);
             long[] indices = new long[] {0, 1, 3};
@@ -65,7 +65,7 @@ public class MxNDArrayCreationTest extends AbstractTest {
 
     @RunAsTest
     public void testCreateNDArrayAndConvertToSparse() throws FailedTestException {
-        try (NDManager factory = MxNDManager.getSystemManager().newSubManager()) {
+        try (NDManager factory = MxNDManager.newBaseManager().newSubManager()) {
             NDArray nd = factory.ones(new Shape(3, 5));
             NDArray sparse = nd.toSparse(SparseFormat.CSR);
             Assertions.assertStatement(sparse.getSparseFormat() == SparseFormat.CSR);
