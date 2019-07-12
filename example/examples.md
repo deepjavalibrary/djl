@@ -1,7 +1,7 @@
 Joule examples
 ==============
 
-This module contains example project to demonstrate how developer can use Joule API.
+This module contains example projects to demonstrate how developers can use the Joule API.
 
 There are three examples in this project:
 
@@ -11,10 +11,10 @@ There are three examples in this project:
 
 ## Prerequisite
 
-We assume you have JDK 8 (or later) and IntelliJ installed on your system. Read [here](setup.md) for more detail.
+You need to have JDK 8 (or later) and IntelliJ installed on your system. Read [here](setup.md) for more detail.
  
 ### Joule API reference
-Please also be familiar with Joule API document: [Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
+You should also be familiar with the Joule API documentation: [Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
 
 
 Getting started: 30 seconds to run an example
@@ -22,7 +22,7 @@ Getting started: 30 seconds to run an example
 
 ## Building with command line
 
-This example project support both gradle and maven build, you can use either one at your choice:
+This example project supports building with both gradle and maven. To build, use the following:
 
 ### gradle
 
@@ -39,9 +39,9 @@ mvn package
 ```
 
 ### Run example code
-With gradle `application` plugin you can execute example code directly with gradle.
+With the gradle `application` plugin you can execute example code directly.
 You can find more detail in each example's detail document.
-Here is an example that execute classification example:
+Here is an example that executes classification:
 
 ```sh
 cd example
@@ -51,22 +51,22 @@ cd example
 ## Import Joule example project with IntelliJ
 
 1. Open IntelliJ and click `Import Project`.
-2. Select the `example` directory in Joule folder, and click "Open".
+2. Select the `example` directory in the Joule folder, and click "Open".
 3. Choose `Import project form existing model`, you can select either `Gradle` or `Maven`
 4. Use the default configuration and click `OK`.
-5. Please go to separate example to continue.
+5. Select an example to continue.
 
 ## Engine selection
 
-Joule is engine agnostic, user can choose different engine provider. We currently
+Joule is engine agnostic, so you can choose different engine providers. We currently
 provide MXNet engine implementation.
 
-With MXNet, user can choose different flavor of native MXNet library.
+With MXNet, you can choose different flavors of the native MXNet library.
 In this example, we use `mxnet-native-mkl` for OSX platform. You might need to 
 change it for your platform in [pom.xml](pom.xml) or [build.gradle](build.gradle).
 
 
-Available mxnet versions are as follows:
+Available MXNet versions are as follows:
 
 | Version  |
 | -------- |

@@ -3,18 +3,16 @@ Joule - examples
 
 ## Overview
 
-Joule API is designed to be extremely easy to get started and simple to
-use deep learning framework for Java developers. Joule does not required user to be ML/DL experts to get started
-and can start from their existing Java expertise as an on-ramp to learn and use ML/DL. They can
-use their favorite IDE to build/train/deploy their models and integrate these models with their
+The Joule API is designed to be an extremely easy to use deep learning framework for Java developers. Joule does not require you to be a Machine Learning/Deep Learning expert to get started. You can use your existing Java expertise as an on-ramp to learn and use ML/DL. You can
+use your favorite IDE to build/train/deploy your models and integrate these models with your
 Java applications. 
 
-Joule API is deep learning framework agnostic, developer does not have to make a choice
-between framework while they started their project. They can switch to different framework at any
-time they want. Joule also provides automatic CPU/GPU chosen based on the hardware configuration to ensure the best performance.
+Joule API is deep learning framework agnostic, so you don't have to make a choice
+between frameworks when starting your project. You can switch to a different framework at any
+time you want. Joule also provides automatic CPU/GPU choice based on the hardware configuration to ensure the best performance.
 
-Joule API provide native Java development experience, just another regular java library.
-Joule's ergonomic API interface is designed to guide developer with best practice to accomplish
+Joule API provides native Java development experience. It functions similarly to any other Java library.
+Joule's ergonomic API interface is designed to guide you with best practices to accomplish your
 deep learning task.
 
 The following is an example of how to write inference code:
@@ -41,11 +39,11 @@ The following is an example of how to write inference code:
 
 ## Joule API reference
 
-Please find more information here: [Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
+You can find more information here: [Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
 
 ## Examples project
 
-Please read [Example project](examples.md) for more detail about how to setup development environment and dependencies.
+Read [Example project](examples.md) for more detail about how to setup development environment and dependencies.
 
 You can also read individual examples: 
 

@@ -1,14 +1,14 @@
 Single-shot Object detection
 ============================
 
-In this tutorial, we will walk through the Single-shot Object detection model trained by MXNet.
+In this tutorial, you walk through the Single-shot Object detection model trained by MXNet.
 
 ## Setup Guide
 
 #### Prepare test image files
 
-You can find test image in project test resource folder: src/test/resources/3dogs.jpg.
-You can also download other images from internet.
+You can find the test image in the project test resource folder: src/test/resources/3dogs.jpg.
+You can also download other images from the internet.
 
 
 ## Build example project
@@ -46,11 +46,11 @@ cd example
 
 ### Run example with parameters
 
-To execute SSD example, you need to specify different Main class with System property: "main":
+To execute the SSD example, you need to specify a different Main class with System property: "main":
 
 ```sh
 cd example
 ./gradlew -Dmain=software.amazon.ai.example.SsdExample run --args="-n resnet50_ssd_model -l build/logs -i src/test/resources/3dogs.jpg"
 ```
 
-With above command, an output image with bounding box will be save at: build/logs/ssd.jpg.
+With the previous command, an output image with bounding box will be saved at: build/logs/ssd.jpg.

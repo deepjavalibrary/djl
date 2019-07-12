@@ -3,10 +3,10 @@ Setup
 
 ## Install jdk
 
-Joule example requires JDK 8 (or later), and we recommend use JDK8 since there are some known glitches with JDK 11+.
+Joule requires JDK 8 (or later). We recommend use JDK8 since there are some known glitches with JDK 11+.
 
-You must make sure java is on available in $PATH environment variable. If you have multiple java installed,
-you can use $JAVA_HOME environment variable to control which java to use.
+Verify Java is available in your $PATH environment variable. If you have multiple versions of Java installed,
+you can use $JAVA_HOME environment variable to control which version of Java to use.
 
 For ubuntu:
 ```bash
@@ -26,13 +26,13 @@ brew cask install adoptopenjdk8
 ```
 
 You can also download and install [Oracle JDK](https://www.oracle.com/technetwork/java/javase/overview/index.html)
-manually if you have trouble with above commands.
+manually if you have trouble with the previous commands.
 
 ## Install IntelliJ (Optional)
 
-You can use any IDE at your choice. We recommend you to use IntelliJ since we are using IntelliJ as examples in our documents.
+You can use the IDE of your choice. We recommend using IntelliJ since we are using IntelliJ for the examples in our documentation.
 
 ## Gradle/Maven (Not required)
 
-We are using gradle and maven wrapper to build our project, you don't need to install gradle or maven.
-However, we assume you have basic knowledge about gradle or maven build system.
+You use gradle and maven wrappers to build the project, so you don't need to install gradle or maven.
+However, you should have basic knowledge about the gradle or maven build system.

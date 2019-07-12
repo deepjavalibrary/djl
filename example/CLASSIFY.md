@@ -1,8 +1,8 @@
 Basic Image Classify Example
 ==============
 
-In this tutorial, we will walk through the Classify model trained by MXNet.
-Users can provide a image and do image classification with different models.
+In this tutorial, you'll walk through the Classify model trained by MXNet.
+You can provide an image and do image classification with different models.
 
 
 ## Setup Guide
@@ -10,9 +10,9 @@ Users can provide a image and do image classification with different models.
 ### Prepare test image files
 
 Two test images can be found in project test resource folder: src/test/resources.
-You can also download cat's image from internet.
+You can also download an image of a cat from internet.
 
-You can run the example either using Intellij or via command line.
+You can run the example using either Intellij or via command line.
 ### IntelliJ
 
 1. Open `ClassifyExample.java`
@@ -70,7 +70,7 @@ The available models are as follows:
 | vgg16             |
 | vgg19             |
 
-you can also download the model from MXNet model zoo: <https://github.com/awslabs/mxnet-model-server/blob/master/docs/model_zoo.md> and unzip it.  
+You can also download the model from MXNet model zoo: <https://github.com/awslabs/mxnet-model-server/blob/master/docs/model_zoo.md> and unzip it.  
 For example
 
 ```

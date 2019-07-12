@@ -1,21 +1,20 @@
 BERT QA Example
 ==============
 
-In this tutorial, we will walk through the BERT QA model trained by MXNet. 
-Users can provide a question with a paragraph contains answer to the model and
-the model will be able to find the best answer from the answer paragraph.
+In this tutorial, you'll walk through the BERT QA model trained by MXNet. 
+You can provide a question and a paragraph containing the answer to the model. The model is then able to find the best answer from the answer paragraph.
 
 Example:
 ```text
 Q: When did BBC Japan start broadcasting?
 ```
 
-Answer paragraph
+Answer paragraph:
 ```text
 BBC Japan was a general entertainment channel, which operated between December 2004 and April 2006.
 It ceased operations after its Japanese distributor folded.
 ```
-And it picked up the right one:
+And it picked the right answer:
 ```text
 A: December 2004
 ```
@@ -24,7 +23,7 @@ A: December 2004
 
 ### Step 1: Download the model
 
-For this tutorial, you can get the model and vocabulary by running following commands:
+For this tutorial, you can get the model and vocabulary by running the following commands:
 
 ```bash
 cd example/build
@@ -45,7 +44,7 @@ The available arguments are as follows:
 | `-p`      | Path to the model directory |
 | `-n`      |  Model name prefix |
 
-You can simply type the followings to run the inference:
+You can type the following to run inference:
 
 ```
 cd example
