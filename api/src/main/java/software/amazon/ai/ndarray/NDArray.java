@@ -902,12 +902,27 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the NDArray negative (cloned).
      *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.neg();
+     * ND: (5) cpu(0) float32
+     * [-0.0000000e+00, -1.0000000e+00, -2.0000000e+00, -3.0000000e+00, -4.0000000e+00],
+     * </pre>
+     *
      * @return Array copy with all values negated
      */
     NDArray neg();
 
     /**
      * Sets the negative version of this NDArray in place.
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.negi();
+     * jshell&gt; array;
+     * ND: (5) cpu(0) float32
+     * [-0.0000000e+00, -1.0000000e+00, -2.0000000e+00, -3.0000000e+00, -4.0000000e+00],
+     * </pre>
      *
      * @return this array with all values negated
      */
@@ -916,6 +931,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Calculates the absolute value element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {-1f, -2f});
+     * jshell&gt; array.abs();
+     * ND: (2) cpu(0) float32
+     * [ 1.0000000e+00,  2.0000000e+00],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray abs();
@@ -923,12 +947,30 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the element-wise square of the input.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {2f, -3f});
+     * jshell&gt; array.square();
+     * ND: (2) cpu(0) float32
+     * [ 4.0000000e+00,  9.0000000e+00],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray square();
 
     /**
      * Returns the cube-root of an array, element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(3), new float[] {1f, 8f, 27f});
+     * jshell&gt; array.cbrt();
+     * ND: (3) cpu(0) float32
+     * [ 1.0000000e+00,  2.0000000e+00,  3.0000000e+00],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -938,6 +980,15 @@ public interface NDArray extends AutoCloseable {
      * Returns the floor of the input, element-wise. The floor of the scalar x is the largest
      * integer i, such that i &lt;= x. It is often denoted as \lfloor x \rfloor.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(7), new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
+     * jshell&gt; array.floor();
+     * ND: (7) cpu(0) float32
+     * [-2.0000000e+00, -2.0000000e+00, -1.0000000e+00,  0.0000000e+00,  1.0000000e+00,  1.0000000e+00,  2.0000000e+00],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray floor();
@@ -946,12 +997,30 @@ public interface NDArray extends AutoCloseable {
      * Returns the ceiling of the input, element-wise. The ceil of the scalar x is the smallest
      * integer i, such that i &gt;= x. It is often denoted as \lceil x \rceil.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(7), new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
+     * jshell&gt; array.ceil();
+     * ND: (7) cpu(0) float32
+     * [-1.0000000e+00, -1.0000000e+00, -0.0000000e+00,  1.0000000e+00,  2.0000000e+00,  2.0000000e+00,  2.0000000e+00],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray ceil();
 
     /**
-     * Returns element-wise rounded value to the nearest integer of the input.
+     * Round elements of the array to the nearest integer.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(7), new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
+     * jshell&gt; array.round();
+     * ND: (7) cpu(0) float32
+     * [-2.0000000e+00, -2.0000000e+00, -0.0000000e+00,  0.0000000e+00,  2.0000000e+00,  2.0000000e+00,  2.0000000e+00],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -960,12 +1029,30 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the element-wise truncated value of the input.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(7), new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
+     * jshell&gt; array.trunc();
+     * ND: (7) cpu(0) float32
+     * [-1.0000000e+00, -1.0000000e+00, -0.0000000e+00,  0.0000000e+00,  1.0000000e+00,  1.0000000e+00,  2.0000000e+00],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray trunc();
 
     /**
      * Returns element-wise exponential value of the input.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {0f, 2.5f});
+     * jshell&gt; array.exp();
+     * ND: (2) cpu(0) float32
+     * [ 1.0000000e+00,  1.2182494e+01],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -974,6 +1061,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns element-wise Natural logarithmic value of the input.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {0f, 2.5f});
+     * jshell&gt; array.exp();
+     * ND: (2) cpu(0) float32
+     * [     -Infinity,  9.1629076e-01],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray log();
@@ -981,12 +1077,30 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns element-wise Base-2 logarithmic value of the input.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(3), new float[] {1000f, 1f, 150f});
+     * jshell&gt; array.log10();
+     * ND: (3) cpu(0) float32
+     * [ 3.0000000e+00,  0.0000000e+00,  2.1760912e+00],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray log10();
 
     /**
      * Returns element-wise Base-2 logarithmic value of the input.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(3), new float[] {8, 1f, 5f});
+     * jshell&gt; array.log2();
+     * ND: (3) cpu(0) float32
+     * [ 3.0000000e+00,  0.0000000e+00,  2.3219280e+00],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -996,6 +1110,16 @@ public interface NDArray extends AutoCloseable {
      * Computes the element-wise sine of the input array. The input should be in radians ( 2𝜋 rad
      * equals 360 degrees).
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(5), new float[] {0f, 30f, 45f, 60f, 90f});
+     * jshell&gt; array = array.mul(Math.PI).div(180f);
+     * jshell&gt; array.sin();
+     * ND: (5) cpu(0) float32
+     * [ 0.0000000e+00,  5.0000000e-01,  7.0710677e-01,  8.6602545e-01,  1.0000000e+00],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray sin();
@@ -1003,6 +1127,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Computes the element-wise cosine of the input array. The input should be in radians ( 2𝜋 rad
      * equals 360 degrees).
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(3), new double[] {0, Math.PI/2, Math.PI});
+     * jshell&gt; array.cos();
+     * ND: (3) cpu(0) float64
+     * [  1.0000000e+00,   6.1232340e-17,  -1.0000000e+00],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -1012,6 +1145,15 @@ public interface NDArray extends AutoCloseable {
      * Computes the element-wise tangent of the input array. The input should be in radians ( 2𝜋
      * rad equals 360 degrees).
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(3), new double[] {-Math.PI, Math.PI/2, Math.PI});
+     * jshell&gt; array.tan();
+     * ND: (3) cpu(0) float64
+     * [  1.2246468e-16,   1.6331239e+16,  -1.2246468e-16],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray tan();
@@ -1019,6 +1161,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns element-wise inverse sine of the input array. The input should be in the range [-1,
      * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(3), new float[] {1f, -1f, 0f});
+     * jshell&gt; array.asin();
+     * ND: (3) cpu(0) float64
+     * [ 1.5707963e+00, -1.5707963e+00,  0.0000000e+00],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -1028,6 +1179,15 @@ public interface NDArray extends AutoCloseable {
      * Returns element-wise inverse cosine of the input array. The input should be in the range [-1,
      * 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {1f, -1f});
+     * jshell&gt; array.acos();
+     * ND: (2) cpu(0) float64
+     * [ 0.0000000e+00,  3.1415925e+00],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray acos();
@@ -1035,6 +1195,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns element-wise inverse tangent of the input array. The input should be in the range
      * [-1, 1]. The output is in the closed interval of [ −𝜋/2 , 𝜋/2 ].
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {0f, 1f});
+     * jshell&gt; array.acos();
+     * ND: (2) cpu(0) float64
+     * [ 0.0000000e+00,  7.8539819e-01],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -1044,6 +1213,15 @@ public interface NDArray extends AutoCloseable {
      * Returns the hyperbolic sine of the input array, computed element-wise.
      * 𝑠𝑖𝑛ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)−𝑒𝑥𝑝(−𝑥))
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {0, Math.PI});
+     * jshell&gt; array.acos();
+     * ND: (2) cpu(0) float64
+     * [  0.0000000e+00,   1.1548739e+01],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray sinh();
@@ -1051,6 +1229,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the hyperbolic cosine of the input array, computed element-wise.
      * 𝑐𝑜𝑠ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)+𝑒𝑥𝑝(−𝑥))
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {0, Math.PI});
+     * jshell&gt; array.cosh();
+     * ND: (2) cpu(0) float64
+     * [  1.0000000e+00,   1.1591953e+01],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -1060,6 +1247,15 @@ public interface NDArray extends AutoCloseable {
      * Returns the hyperbolic tangent of the input array, computed element-wise.
      * 𝑡𝑎𝑛ℎ(𝑥)=𝑠𝑖𝑛ℎ(𝑥)/𝑐𝑜𝑠ℎ(𝑥)
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {0, Math.PI});
+     * jshell&gt; array.tanh();
+     * ND: (2) cpu(0) float64
+     * [  0.0000000e+00,   9.9627208e-01],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray tanh();
@@ -1067,12 +1263,30 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the element-wise inverse hyperbolic sine of the input array, computed element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {Math.E, 10});
+     * jshell&gt; array.asinh();
+     * ND: (2) cpu(0) float64
+     * [  1.7253826e+00,   2.9982230e+00],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray asinh();
 
     /**
      * Returns the element-wise inverse hyperbolic cosine of the input array, computed element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {Math.E, 10});
+     * jshell&gt; array.acosh();
+     * ND: (2) cpu(0) float64
+     * [  1.6574545e+00,   2.9932228e+00],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -1082,6 +1296,15 @@ public interface NDArray extends AutoCloseable {
      * Returns the element-wise inverse hyperbolic tangent of the input array, computed
      * element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {0, -0.5});
+     * jshell&gt; array.atanh();
+     * ND: (2) cpu(0) float64
+     * [  0.0000000e+00,  -5.4930614e-01],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray atanh();
@@ -1090,6 +1313,15 @@ public interface NDArray extends AutoCloseable {
      * Converts each element of the input array from radians to degrees.
      * 𝑑𝑒𝑔𝑟𝑒𝑒𝑠([0,𝜋/2,𝜋,3𝜋/2,2𝜋])=[0,90,180,270,360].
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6).mul(Math.PI / 3);
+     * jshell&gt; array.toDegrees();
+     * ND: (6) cpu(0) float32
+     * [ 0.0000000e+00,  6.0000000e+01,  1.2000000e+02,  1.8000000e+02,  2.4000000e+02,  2.9999997e+02],
+     * </pre>
+     *
      * @return the result {@code NDArray}
      */
     NDArray toDegrees();
@@ -1097,6 +1329,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Converts each element of the input array from degrees to radians.
      * 𝑟𝑎𝑑𝑖𝑎𝑛𝑠([0,90,180,270,360])=[0,𝜋/2,𝜋,3𝜋/2,2𝜋]
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6).mul(60);
+     * jshell&gt; array.toRadians();
+     * ND: (6) cpu(0) float32
+     * [ 0.0000000e+00,  1.0471976e+00,  2.0943952e+00,  3.1415927e+00,  4.1887903e+00,  5.2359877e+00],
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -1975,7 +2216,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns an internal representative of Native {@code NDArray}.
      *
-     * <p>This method should only be used by Engine provider.
+     * <p>This method should only be used by Engine provider
      *
      * @return an internal representative of Native NDArray
      */
