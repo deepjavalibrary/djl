@@ -29,7 +29,7 @@ import software.amazon.ai.util.PairList;
 
 public class TfNDManager implements NDManager, AutoCloseable {
 
-    public static final TfNDManager SYSTEM_MANAGER = new SystemManager();
+    static final TfNDManager SYSTEM_MANAGER = new SystemManager();
     private static int nameAssignment = 1;
 
     private NDManager parent;
@@ -43,6 +43,14 @@ public class TfNDManager implements NDManager, AutoCloseable {
         this.context = context;
         this.graph = graph;
         resources = new ConcurrentHashMap<>();
+    }
+
+    public static TfNDManager newBaseManager() {
+        return SYSTEM_MANAGER.newSubManager();
+    }
+
+    public static TfNDManager newBaseManager(Context context) {
+        return SYSTEM_MANAGER.newSubManager(context);
     }
 
     Graph getGraph() {
@@ -59,6 +67,11 @@ public class TfNDManager implements NDManager, AutoCloseable {
 
     static int nextNameAssignment() {
         return nameAssignment++;
+    }
+
+    @Override
+    public NDArray create(Shape shape, float[] data) {
+        return new TfNDArray(this, Tensors.create(data));
     }
 
     @Override
@@ -151,12 +164,12 @@ public class TfNDManager implements NDManager, AutoCloseable {
     /** {@inheritDoc} */
     @Override
     public TfNDManager newSubManager() {
-        return (TfNDManager) newSubManager(context);
+        return newSubManager(context);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDManager newSubManager(Context context) {
+    public TfNDManager newSubManager(Context context) {
         TfNDManager manager = new TfNDManager(this, context, graph);
         resources.put(manager, manager);
         return manager;

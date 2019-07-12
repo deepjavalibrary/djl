@@ -23,11 +23,10 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 import org.tensorflow.engine.TfModel;
 import org.tensorflow.engine.TfNDArray;
-import org.tensorflow.engine.TfNDManager;
-import org.tensorflow.engine.TfPredictor;
 import software.amazon.ai.TranslateException;
 import software.amazon.ai.Translator;
 import software.amazon.ai.TranslatorContext;
+import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -40,7 +39,7 @@ public final class HelloWorld {
 
     @SuppressWarnings("PMD.SystemPrintln")
     public static void main(String[] args) throws IOException, TranslateException {
-        try (NDManager manager = TfNDManager.SYSTEM_MANAGER.newSubManager()) {
+        try (NDManager manager = NDManager.newBaseManager()) {
             NDArray a =
                     new TfNDArray(
                             manager, new Shape(1, 3), FloatBuffer.wrap(new float[] {1f, 2f, 3f}));
@@ -64,7 +63,7 @@ public final class HelloWorld {
             String filename = "ModelPath/TF-resnet_ssd/mfc.jpg";
             BufferedImage img = ImageIO.read(new File(filename));
             GenericTranslator translator = new GenericTranslator();
-            TfPredictor<BufferedImage, NDList> predictor = new TfPredictor<>(model, translator);
+            Predictor<BufferedImage, NDList> predictor = Predictor.newInstance(model, translator);
             NDList list = predictor.predict(img);
 
             for (Pair<String, NDArray> pair : list) {
@@ -96,11 +95,9 @@ public final class HelloWorld {
             // ImageIO.read seems to produce BGR-encoded images, but the model expects RGB.
             bgr2rgb(data);
             long[] shape = new long[] {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
-            TfNDArray tfNDArray =
-                    ((TfNDManager) ctx.getNDManager())
-                            .create(new Shape(shape), ByteBuffer.wrap(data));
+            NDArray array = ctx.getNDManager().create(new Shape(shape), ByteBuffer.wrap(data));
             NDList ndList = new NDList();
-            ndList.add("image_tensor", tfNDArray);
+            ndList.add("image_tensor", array);
             return ndList;
         }
 

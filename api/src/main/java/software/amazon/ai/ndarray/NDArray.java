@@ -1516,7 +1516,7 @@ public interface NDArray extends AutoCloseable {
      * @see NDArray#softmax(int[], double)
      */
     default NDArray softmax() {
-        return softmax(new int[0]);
+        return softmax(new int[0], 1);
     }
 
     /**
@@ -1528,7 +1528,7 @@ public interface NDArray extends AutoCloseable {
      * @see NDArray#softmax(int[], double)
      */
     default NDArray softmax(int axis) {
-        return softmax(new int[] {axis});
+        return softmax(new int[] {axis}, 1);
     }
 
     /**
@@ -1552,7 +1552,9 @@ public interface NDArray extends AutoCloseable {
      * @return the softmax
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
      */
-    NDArray softmax(int[] axes);
+    default NDArray softmax(int[] axes) {
+        return softmax(axes, 1);
+    }
 
     /**
      * Returns the softmax across the specified axes.

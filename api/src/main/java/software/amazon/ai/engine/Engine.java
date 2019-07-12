@@ -26,6 +26,7 @@ import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.Translator;
 import software.amazon.ai.inference.Predictor;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Trainer;
 
@@ -169,4 +170,21 @@ public abstract class Engine {
      * @return Trainer
      */
     public abstract Trainer newTrainer(Model model, Context context);
+
+    /**
+     * Creates a new top-level {@link NDManager}.
+     *
+     * <p>{@code NDManager} will inherit default {@link Context}.
+     *
+     * @return Returns a new top-level {@code NDManager}
+     */
+    public abstract NDManager newBaseManager();
+
+    /**
+     * Creates a new top-level {@link NDManager} with specified {@link Context}.
+     *
+     * @param context default {@link Context}
+     * @return Returns a new top-level {@code NDManager}
+     */
+    public abstract NDManager newBaseManager(Context context);
 }

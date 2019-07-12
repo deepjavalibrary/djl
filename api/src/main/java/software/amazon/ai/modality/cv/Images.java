@@ -90,7 +90,7 @@ public final class Images {
         g.dispose();
     }
 
-    private static Color randomColor(){
+    private static Color randomColor() {
         return new Color(new Random().nextInt(255));
     }
 

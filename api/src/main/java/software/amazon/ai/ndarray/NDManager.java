@@ -94,6 +94,27 @@ import software.amazon.ai.util.PairList;
 public interface NDManager extends AutoCloseable {
 
     /**
+     * Creates a new top-level {@code NDManager}.
+     *
+     * <p>{@code NDManager} will inherit default {@link Context}.
+     *
+     * @return Returns a new top-level {@code NDManager}
+     */
+    static NDManager newBaseManager() {
+        return Engine.getInstance().newBaseManager();
+    }
+
+    /**
+     * Creates a new top-level {@code NDManager} with specified {@link Context}.
+     *
+     * @param context default {@link Context}
+     * @return Returns a new top-level {@code NDManager}
+     */
+    static NDManager newBaseManager(Context context) {
+        return Engine.getInstance().newBaseManager(context);
+    }
+
+    /**
      * Creates an uninitialized instance of {@link DataType#FLOAT32} {@link NDArray} with specified
      * {@link Shape}.
      *

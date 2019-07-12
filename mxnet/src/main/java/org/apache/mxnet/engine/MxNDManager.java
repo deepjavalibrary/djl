@@ -49,8 +49,12 @@ public class MxNDManager implements NDManager {
         resources = new ConcurrentHashMap<>();
     }
 
-    public static MxNDManager getSystemManager() {
-        return SYSTEM_MANAGER;
+    public static MxNDManager newBaseManager() {
+        return SYSTEM_MANAGER.newSubManager();
+    }
+
+    public static MxNDManager newBaseManager(Context context) {
+        return SYSTEM_MANAGER.newSubManager(context);
     }
 
     public MxNDArray create(Pointer handle) {

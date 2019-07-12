@@ -50,7 +50,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
         mockStatic(LibUtils.class);
         library = new MockMxnetLibrary();
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
-        manager = MxNDManager.SYSTEM_MANAGER;
+        manager = MxNDManager.newBaseManager();
     }
 
     @AfterClass

@@ -904,12 +904,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray softmax(int[] axes, double temperature) {
         Operation op =
                 manager.getGraph()

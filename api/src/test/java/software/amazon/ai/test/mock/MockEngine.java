@@ -23,6 +23,7 @@ import software.amazon.ai.Model;
 import software.amazon.ai.Translator;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.inference.Predictor;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Trainer;
 
@@ -80,6 +81,16 @@ public class MockEngine extends Engine {
 
     @Override
     public Trainer newTrainer(Model model, Context context) {
+        return null;
+    }
+
+    @Override
+    public NDManager newBaseManager() {
+        return null;
+    }
+
+    @Override
+    public NDManager newBaseManager(Context context) {
         return null;
     }
 

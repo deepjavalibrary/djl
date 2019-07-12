@@ -52,7 +52,7 @@ public class CachedOpTest extends PowerMockTestCase {
 
     @Test
     public void testForward() {
-        try (MxNDManager manager = MxNDManager.SYSTEM_MANAGER.newSubManager()) {
+        try (MxNDManager manager = MxNDManager.newBaseManager()) {
             MxNDArray[] params =
                     new MxNDArray[] {
                         null,

@@ -36,7 +36,7 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
     private Translator<I, O> translator;
 
     public TfPredictor(TfModel model, Translator<I, O> translator) {
-        this.manager = TfNDManager.SYSTEM_MANAGER.newSubManager();
+        this.manager = TfNDManager.newBaseManager();
         this.translator = translator;
         this.session = model.getSession();
         this.model = model;

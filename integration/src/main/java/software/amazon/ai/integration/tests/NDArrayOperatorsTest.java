@@ -14,8 +14,6 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
-import org.apache.mxnet.engine.MxNDArray;
-import org.apache.mxnet.engine.MxNDManager;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
@@ -27,12 +25,12 @@ import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 
-public class MxNDArrayOperatorsTest extends AbstractTest {
+public class NDArrayOperatorsTest extends AbstractTest {
 
-    NDManager manager = MxNDManager.getSystemManager();
+    NDManager manager = NDManager.newBaseManager();
 
     public static void main(String[] args) {
-        new MxNDArrayOperatorsTest().runTest(args);
+        new NDArrayOperatorsTest().runTest(args);
     }
 
     @RunAsTest
@@ -96,9 +94,8 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
 
     @RunAsTest
     public void testAddScalarInPlace() throws FailedTestException {
-        MxNDArray addend =
-                (MxNDArray) manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
-        MxNDArray result = (MxNDArray) NDArrays.addi(addend, 2);
+        NDArray addend = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
+        NDArray result = NDArrays.addi(addend, 2);
         Assertions.assertInPlace(result, addend, "In-place summation failed");
         NDArray solution = manager.create(new Shape(1, 4), new float[] {3f, 4f, 5f, 6f});
         Assertions.assertEquals(solution, result, "Incorrect value in summed array");
@@ -127,11 +124,9 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
 
     @RunAsTest
     public void testAddNDArrayInPlace() throws FailedTestException {
-        MxNDArray addend =
-                (MxNDArray) manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
-        MxNDArray addendum =
-                (MxNDArray) manager.create(new Shape(1, 4), new float[] {2f, 3f, 4f, 5f});
-        MxNDArray result = (MxNDArray) NDArrays.addi(addend, addendum);
+        NDArray addend = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
+        NDArray addendum = manager.create(new Shape(1, 4), new float[] {2f, 3f, 4f, 5f});
+        NDArray result = NDArrays.addi(addend, addendum);
         Assertions.assertInPlace(result, addend, "In-place summation failed");
         NDArray solution = manager.create(new Shape(1, 4), new float[] {3f, 5f, 7f, 9f});
         Assertions.assertEquals(solution, result, "Incorrect value in summed array");
@@ -230,18 +225,13 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
 
     @RunAsTest
     public void testCumsumi() throws FailedTestException {
-        MxNDArray expectedND =
-                (MxNDArray)
-                        manager.create(
-                                new Shape(10),
-                                new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
-        MxNDArray actualND =
-                (MxNDArray)
-                        manager.create(
-                                new Shape(10),
-                                new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f});
+        NDArray expectedND =
+                manager.create(new Shape(10), new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
+        NDArray actualND =
+                manager.create(
+                        new Shape(10), new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f});
         Assertions.assertEquals(expectedND.cumsumi(0), actualND);
-        Assertions.assertInPlace((MxNDArray) expectedND.cumsumi(0), expectedND);
+        Assertions.assertInPlace(expectedND.cumsumi(0), expectedND);
     }
 
     @RunAsTest
@@ -308,9 +298,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 solution,
                 "Scalar in-place division: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) dividend,
-                (MxNDArray) inPlaceResult,
-                "Scalar division: In-place operation failed");
+                dividend, inPlaceResult, "Scalar division: In-place operation failed");
     }
 
     @RunAsTest
@@ -327,9 +315,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Scalar in-place division: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) dividend,
-                (MxNDArray) inPlaceResult,
-                "Element wise division: In-place operation failed");
+                dividend, inPlaceResult, "Element wise division: In-place operation failed");
     }
 
     @RunAsTest
@@ -345,9 +331,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Scalar in-place reverse division: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) dividend,
-                (MxNDArray) inPlaceResult,
-                "Scalar reverse division: In-place operation failed");
+                dividend, inPlaceResult, "Scalar reverse division: In-place operation failed");
     }
 
     @RunAsTest
@@ -365,8 +349,8 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 NDArrays.equals(solution, inPlaceResult),
                 "Reverse Element wise in-place division: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) dividend,
-                (MxNDArray) inPlaceResult,
+                dividend,
+                inPlaceResult,
                 "Reverse Element wise division: In-place operation failed");
     }
 
@@ -383,9 +367,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Scalar in-place subtraction: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) minuend,
-                (MxNDArray) inPlaceResult,
-                "Scalar subtraction: In-place operation failed");
+                minuend, inPlaceResult, "Scalar subtraction: In-place operation failed");
     }
 
     @RunAsTest
@@ -402,9 +384,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Scalar in-place subtraction: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) minuend,
-                (MxNDArray) inPlaceResult,
-                "Element wise subtraction: In-place operation failed");
+                minuend, inPlaceResult, "Element wise subtraction: In-place operation failed");
     }
 
     @RunAsTest
@@ -419,9 +399,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 NDArrays.equals(solution, inPlaceResult),
                 "Scalar in-place reverse subtraction: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) minuend,
-                (MxNDArray) inPlaceResult,
-                "Scalar reverse subtraction: In-place operation failed");
+                minuend, inPlaceResult, "Scalar reverse subtraction: In-place operation failed");
     }
 
     @RunAsTest
@@ -440,8 +418,8 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Reverse Element wise in-place subtraction: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) minuend,
-                (MxNDArray) inPlaceResult,
+                minuend,
+                inPlaceResult,
                 "Reverse Element wise subtraction: In-place operation failed");
     }
 
@@ -458,9 +436,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Scalar in-place multiplication: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) multiplicand,
-                (MxNDArray) inPlaceResult,
-                "Scalar multiplication: In-place operation failed");
+                multiplicand, inPlaceResult, "Scalar multiplication: In-place operation failed");
     }
 
     @RunAsTest
@@ -477,8 +453,8 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Scalar in-place multiplication: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) multiplicand,
-                (MxNDArray) inPlaceResult,
+                multiplicand,
+                inPlaceResult,
                 "Element wise multiplication: In-place operation failed");
 
         NDArray[] toMulAll =
@@ -509,9 +485,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 solution,
                 "Scalar in-place Remainder: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) dividend,
-                (MxNDArray) inPlaceResult,
-                "Scalar division: In-place operation failed");
+                dividend, inPlaceResult, "Scalar division: In-place operation failed");
     }
 
     @RunAsTest
@@ -528,9 +502,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Scalar in-place Remainder: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) dividend,
-                (MxNDArray) inPlaceResult,
-                "Element wise Remainder: In-place operation failed");
+                dividend, inPlaceResult, "Element wise Remainder: In-place operation failed");
     }
 
     @RunAsTest
@@ -546,9 +518,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Scalar in-place reverse Remainder: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) dividend,
-                (MxNDArray) inPlaceResult,
-                "Scalar Remainder division: In-place operation failed");
+                dividend, inPlaceResult, "Scalar Remainder division: In-place operation failed");
     }
 
     @RunAsTest
@@ -566,8 +536,8 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 NDArrays.equals(solution, inPlaceResult),
                 "Reverse Element wise in-place Remainder: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) dividend,
-                (MxNDArray) inPlaceResult,
+                dividend,
+                inPlaceResult,
                 "Reverse Element wise Remainder: In-place operation failed");
     }
 
@@ -584,9 +554,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 inPlaceResult,
                 "Scalar in-place subtraction: Incorrect value in result ndarray");
         Assertions.assertInPlace(
-                (MxNDArray) ndArray,
-                (MxNDArray) inPlaceResult,
-                "Scalar subtraction: In-place operation failed");
+                ndArray, inPlaceResult, "Scalar subtraction: In-place operation failed");
     }
 
     @RunAsTest
@@ -1002,10 +970,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 solution,
                 inPlaceResult,
                 "Scalar in-place power: Incorrect value in result ndarray");
-        Assertions.assertInPlace(
-                (MxNDArray) array,
-                (MxNDArray) inPlaceResult,
-                "Scalar power: In-place operation failed");
+        Assertions.assertInPlace(array, inPlaceResult, "Scalar power: In-place operation failed");
     }
 
     @RunAsTest
@@ -1020,10 +985,7 @@ public class MxNDArrayOperatorsTest extends AbstractTest {
                 solution,
                 inPlaceResult,
                 "Scalar in-place power: Incorrect value in result ndarray");
-        Assertions.assertInPlace(
-                (MxNDArray) array,
-                (MxNDArray) inPlaceResult,
-                "Scalar power: In-place operation failed");
+        Assertions.assertInPlace(array, inPlaceResult, "Scalar power: In-place operation failed");
     }
 
     @RunAsTest

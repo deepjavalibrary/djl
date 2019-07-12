@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.integration.util;
 
-import org.apache.mxnet.engine.MxNDArray;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
@@ -84,15 +83,14 @@ public final class Assertions {
         assertNonZeroNumber(array, number, "Assertion failed!");
     }
 
-    public static void assertInPlace(MxNDArray expected, MxNDArray actual, String errorMessage)
+    public static void assertInPlace(NDArray expected, NDArray actual, String errorMessage)
             throws FailedTestException {
-        if (!expected.getHandle().equals(actual.getHandle())) {
+        if (expected != actual) {
             throw new FailedTestException(errorMessage);
         }
     }
 
-    public static void assertInPlace(MxNDArray expected, MxNDArray actual)
-            throws FailedTestException {
+    public static void assertInPlace(NDArray expected, NDArray actual) throws FailedTestException {
         assertInPlace(expected, actual, "Assertion failed!");
     }
 }
