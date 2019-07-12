@@ -165,12 +165,12 @@ public class MxEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager() {
-        return MxNDManager.newBaseManager();
+        return MxNDManager.getSystemManager().newSubManager();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Context context) {
-        return MxNDManager.newBaseManager(context);
+        return MxNDManager.getSystemManager().newSubManager();
     }
 }

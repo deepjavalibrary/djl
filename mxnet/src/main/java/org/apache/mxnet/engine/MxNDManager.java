@@ -36,7 +36,7 @@ public class MxNDManager implements NDManager {
      * manager are un-managed, user has to close them manually. Those NDArrays will be released on
      * GC, and might be run into out of native memory issue.
      */
-    static final MxNDManager SYSTEM_MANAGER = new SystemManager();
+    private static final MxNDManager SYSTEM_MANAGER = new SystemManager();
 
     private static final NDList EMPTY = new NDList(0);
 
@@ -51,12 +51,8 @@ public class MxNDManager implements NDManager {
         resources = new ConcurrentHashMap<>();
     }
 
-    public static MxNDManager newBaseManager() {
-        return SYSTEM_MANAGER.newSubManager();
-    }
-
-    public static MxNDManager newBaseManager(Context context) {
-        return SYSTEM_MANAGER.newSubManager(context);
+    static MxNDManager getSystemManager() {
+        return SYSTEM_MANAGER;
     }
 
     public MxNDArray create(Pointer handle) {

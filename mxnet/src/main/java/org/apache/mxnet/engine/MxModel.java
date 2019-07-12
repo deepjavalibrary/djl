@@ -71,7 +71,7 @@ public class MxModel implements Model {
     }
 
     static MxModel loadModel(String prefix, int epoch) throws IOException {
-        return loadModel(MxNDManager.newBaseManager(), prefix, epoch);
+        return loadModel(MxNDManager.getSystemManager().newSubManager(), prefix, epoch);
     }
 
     static MxModel loadModel(MxNDManager manager, String prefix, int epoch) throws IOException {
@@ -134,7 +134,7 @@ public class MxModel implements Model {
         for (Pair<String, MxNDArray> pair : parameters) {
             newParam.add(pair.getKey(), pair.getValue().asType(dataType, true));
         }
-        NDManager newManager = MxNDManager.newBaseManager();
+        NDManager newManager = MxNDManager.getSystemManager().newSubManager();
         return new MxModel(newManager, modelDir, symbol, newParam, optimizerStates);
     }
 

@@ -48,7 +48,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     private long timestamp;
 
     MxPredictor(MxModel model, Translator<I, O> translator, Context context) {
-        this.manager = MxNDManager.newBaseManager(context);
+        this.manager = MxNDManager.getSystemManager().newSubManager(context);
         this.model = model;
         this.translator = translator;
         this.context = context;
