@@ -29,6 +29,11 @@ import javax.imageio.ImageIO;
 /** {@code Images} is an image processing utility that can load, reshape and convert images. */
 public final class Images {
 
+    static {
+        // disable annoying coffee cup show up on macos
+        System.setProperty("apple.awt.UIElement", "true");
+    }
+
     private Images() {}
 
     /**
