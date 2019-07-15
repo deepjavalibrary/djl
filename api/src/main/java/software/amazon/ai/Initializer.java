@@ -12,9 +12,9 @@
  */
 package software.amazon.ai;
 
-import java.util.Collections;
-import java.util.List;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.Shape;
 
 /**
  * An interface representing an initialization method.
@@ -26,16 +26,9 @@ public interface Initializer {
     /**
      * Initializes a single {@link NDArray}.
      *
-     * @param array the {@link NDArray} to initialize
+     * @param manager the {@link NDManager} to create the new NDArray in
+     * @param shape the {@link Shape} for the new NDArray
+     * @return Returns the NDArray initialized with the manager and shape
      */
-    default void initialize(NDArray array) {
-        initialize(Collections.singletonList(array));
-    }
-
-    /**
-     * Initializes a list of {@link NDArray}s.
-     *
-     * @param parameters the {@link NDArray}s to initialize
-     */
-    void initialize(List<NDArray> parameters);
+    NDArray initialize(NDManager manager, Shape shape);
 }

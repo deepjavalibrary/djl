@@ -20,7 +20,7 @@ public class MxNNIndex extends NNIndex {
 
     /** {@inheritDoc} */
     @Override
-    public Linear linear(int units, int inUnits) {
-        return new MxLinear(units, inUnits);
+    public Linear linear(int units) {
+        return new MxLinear(units);
     }
 }

@@ -16,52 +16,65 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
-import software.amazon.ai.Initializer;
+import software.amazon.ai.Parameter;
+import software.amazon.ai.ParameterType;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
 
 public class MxLinear extends MxNNBlock implements Linear {
 
-    private NDArray weight;
-    private NDArray bias;
-
     private int units;
-    private int inUnits;
+    private Shape inUnits;
 
-    public MxLinear(int units, int inUnits) {
+    private Parameter weight;
+    private Parameter bias;
+
+    public MxLinear(int units) {
         this.opName = "FullyConnected";
         this.units = units;
-        this.inUnits = inUnits;
+        weight = new Parameter("weight", this, ParameterType.WEIGHT);
+        bias = new Parameter("bias", this, ParameterType.BIAS);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Shape getInputShape() {
-        return null;
+    public Shape getOutputShape(Shape... inputs) {
+        return new Shape(inputs[0].get(0), units);
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<NDArray> getDirectParameters() {
+    public List<Parameter> getDirectParameters() {
         return Arrays.asList(weight, bias);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void initialize(NDManager manager, Initializer initializer) {
-        weight = manager.create(new DataDesc(new Shape(units, inUnits)));
-        bias = manager.create(new DataDesc(new Shape(units)));
-        initializer.initialize(getDirectParameters());
+    public void beforeInitialize(NDList inputs) {
+        inUnits = inputs.head().getShape().slice(1);
+        inputShape = new Shape(-1).addAll(inUnits);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape getParameterShape(String name, NDList inputs) {
+        switch (name) {
+            case "weight":
+                return new Shape(units).addAll(inUnits);
+            case "bias":
+                return new Shape(units);
+            default:
+                throw new IllegalArgumentException("Invalid parameter name");
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray forward(NDArray data) {
-        NDList inputs = new NDList(data, weight, bias);
+        ensureInitialized(new NDList(data));
+        NDList inputs = new NDList(data, weight.getArray(), bias.getArray());
         MxOpParams params = new MxOpParams();
         params.add("num_hidden", "1");
         return forward(inputs, params).get(0);

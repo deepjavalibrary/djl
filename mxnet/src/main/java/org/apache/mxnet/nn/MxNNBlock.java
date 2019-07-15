@@ -15,21 +15,47 @@ package org.apache.mxnet.nn;
 import software.amazon.ai.Block;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
 public abstract class MxNNBlock implements Block {
 
     protected String opName;
+    private boolean initialized;
+    protected Shape inputShape;
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(NDList inputs, PairList<String, String> params) {
+        ensureInitialized(inputs);
         NDManager manager = inputs.get(0).getManager();
         return manager.invoke(opName, inputs, params);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void ensureInitialized(NDList inputs) {
+        Block.super.ensureInitialized(inputs);
+        initialized = true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape getInputShape() {
+        return inputShape;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public void backward() {}
 
+    /** {@inheritDoc} */
     @Override
     public byte[] getEncoded() {
         return new byte[0];

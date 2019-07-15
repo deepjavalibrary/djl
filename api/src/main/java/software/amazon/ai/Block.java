@@ -15,7 +15,6 @@ package software.amazon.ai;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
@@ -32,11 +31,38 @@ public interface Block {
 
     void backward();
 
+    boolean isInitialized();
+
     Shape getInputShape();
 
-    List<NDArray> getDirectParameters();
+    Shape getOutputShape(Shape... inputs);
 
-    void initialize(NDManager manager, Initializer initializer);
+    List<Parameter> getDirectParameters();
+
+    default void setInitializer(NDManager manager, Initializer initializer) {
+        for (Parameter parameter : getDirectParameters()) {
+            parameter.setInitializer(manager, initializer);
+        }
+        for (Block child : getChildren()) {
+            child.setInitializer(manager, initializer);
+        }
+    }
+
+    default void ensureInitialized(NDList inputs) {
+        if (!isInitialized()) {
+            beforeInitialize(inputs);
+            for (Parameter parameter : getDirectParameters()) {
+                parameter.initialize(inputs);
+            }
+            for (Block child : getChildren()) {
+                child.ensureInitialized(inputs);
+            }
+        }
+    }
+
+    void beforeInitialize(NDList inputs);
+
+    Shape getParameterShape(String name, NDList inputs);
 
     byte[] getEncoded();
 
@@ -44,15 +70,15 @@ public interface Block {
         return Collections.emptyList();
     }
 
-    default List<NDArray> getParameters() {
-        List<NDArray> parameters = new ArrayList<>();
+    default List<Parameter> getParameters() {
+        List<Parameter> parameters = new ArrayList<>();
         parameters.addAll(getChildrenParameters());
         parameters.addAll(getDirectParameters());
         return parameters;
     }
 
-    default List<NDArray> getChildrenParameters() {
-        List<NDArray> parameters = new ArrayList<>();
+    default List<Parameter> getChildrenParameters() {
+        List<Parameter> parameters = new ArrayList<>();
         for (Block child : getChildren()) {
             parameters.addAll(child.getParameters());
         }

@@ -17,7 +17,7 @@ import java.util.List;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Block;
 import software.amazon.ai.Initializer;
-import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
@@ -163,25 +163,47 @@ public class Symbol extends NativeResource implements Block {
 
     /** {@inheritDoc} */
     @Override
+    public boolean isInitialized() {
+        return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Shape getInputShape() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<NDArray> getDirectParameters() {
+    public Shape getOutputShape(Shape... inputs) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<NDArray> getParameters() {
+    public List<Parameter> getDirectParameters() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void initialize(NDManager manager, Initializer initializer) {}
+    public List<Parameter> getParameters() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setInitializer(NDManager manager, Initializer initializer) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void beforeInitialize(NDList inputs) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape getParameterShape(String name, NDList inputs) {
+        return null;
+    }
 
     /** {@inheritDoc} */
     @Override

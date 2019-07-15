@@ -24,8 +24,6 @@ public interface Linear extends Block {
 
         private int units;
 
-        private int inUnits;
-
         public int getUnits() {
             return units;
         }
@@ -35,17 +33,11 @@ public interface Linear extends Block {
             return this;
         }
 
-        public int getInUnits() {
-            return inUnits;
-        }
-
-        public Builder setInUnits(int inUnits) {
-            this.inUnits = inUnits;
-            return this;
-        }
-
         public Linear build() {
-            return Engine.getInstance().getNNIndex().linear(units, inUnits);
+            if (units == 0) {
+                throw new IllegalStateException("You must specify units");
+            }
+            return Engine.getInstance().getNNIndex().linear(units);
         }
     }
 }
