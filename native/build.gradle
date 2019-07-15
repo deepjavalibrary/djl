@@ -12,7 +12,6 @@ def platformNames = file("src/main/resources").list() ?: []
 def artifactsNames = []
 
 platformNames.each { osName ->
-    artifactsNames.add("${osName}Jar")
     tasks.create(name: "${osName}Jar", type: Jar) {
         doFirst {
             def propFile = file("src/main/resources/${osName}/native/lib/mxnet.properties")
@@ -38,6 +37,7 @@ platformNames.each { osName ->
         from file("src/main/resources/${osName}")
         archiveClassifier = "${osName}-x86_64"
     }
+    artifactsNames.add(tasks["${osName}Jar"])
 }
 
 publishing {

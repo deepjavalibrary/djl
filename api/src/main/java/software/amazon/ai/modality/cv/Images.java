@@ -30,8 +30,10 @@ import javax.imageio.ImageIO;
 public final class Images {
 
     static {
-        // disable annoying coffee cup show up on macos
-        System.setProperty("apple.awt.UIElement", "true");
+        if (System.getProperty("apple.awt.UIElement") == null) {
+            // disable annoying coffee cup show up on macos
+            System.setProperty("apple.awt.UIElement", "true");
+        }
     }
 
     private Images() {}
