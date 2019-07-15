@@ -2,10 +2,10 @@ rootProject.name = 'joule'
 include 'api'
 include 'mxnet'
 include 'jnarator'
-include 'example'
+include 'examples'
 include 'integration'
 include 'tensorflow'
 include 'native'
 
 project(":api").name = "joule-api"
-project(":example").buildFileName = "joule.gradle"
+project(":examples").buildFileName = "joule.gradle"
