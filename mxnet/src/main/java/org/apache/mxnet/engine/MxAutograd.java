@@ -33,12 +33,17 @@ public class MxAutograd implements AutoCloseable{
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close(){
         setRecording(false);
         setTraining(false);
     }
 
+    /**
+     * Run backward and calculate gradient w.r.t previously marked variable (head)
+     * @param array target NDArray to run backward and calculate gradient w.r.t head
+     */
     public void backward(MxNDArray array){
         array.backward();
     }
