@@ -12,6 +12,8 @@
  */
 package software.amazon.ai.integration.tests;
 
+import org.apache.mxnet.engine.MxAutograd;
+import org.apache.mxnet.engine.MxNDArray;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
@@ -30,11 +32,23 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
 
     @RunAsTest
     public void testAddScalar() throws FailedTestException {
-        NDArray addend = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
-        NDArray result = NDArrays.add(addend, 2);
-        Assertions.assertStatement(!NDArrays.equals(addend, result), "In-place summation failed");
-        NDArray solution = manager.create(new Shape(1, 4), new float[] {3f, 4f, 5f, 6f});
-        Assertions.assertEquals(solution, result, "Incorrect value in summed array");
+        NDArray lhs = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
+        lhs.attachGrad();
+        NDArray result;
+        try(MxAutograd autograd = new MxAutograd()){
+            autograd.setRecording(true);
+            result = NDArrays.add(lhs, 2);
+            autograd.backward((MxNDArray) result);
+        }
+        // check add scalar result
+        Assertions.assertFalse(NDArrays.equals(lhs, result), "None in-place operator returned in-place result");
+        NDArray expected = manager.create(new Shape(1, 4), new float[] {3f, 4f, 5f, 6f});
+        Assertions.assertEquals(expected, result, "AddScala: Incorrect value in summed array");
+
+        // check add backward
+        NDArray expectedGradient = manager.create(new Shape(1, 4), new float[] {1f, 1f, 1f, 1f});
+        Assertions.assertEquals(expectedGradient, lhs.getGradient(), "AddScala backward: Incorrect gradient after backward");
+
     }
 
     @RunAsTest
@@ -51,7 +65,7 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
         NDArray addend = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
         NDArray addendum = manager.create(new Shape(1, 4), new float[] {2f, 3f, 4f, 5f});
         NDArray result = NDArrays.add(addend, addendum);
-        Assertions.assertStatement(!NDArrays.equals(addend, result), "In-place summation failed");
+        Assertions.assertFalse(NDArrays.equals(addend, result), "None in-place operator returned in-place result");
         NDArray solution = manager.create(new Shape(1, 4), new float[] {3f, 5f, 7f, 9f});
         Assertions.assertEquals(solution, result, "Incorrect value in summed array");
 
@@ -62,7 +76,7 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
                     manager.create(new Shape(2, 2), new float[] {2, 2, 2, 2})
                 };
         NDArray addAll = NDArrays.add(toAddAll);
-        Assertions.assertStatement(!addAll.equals(toAddAll[0]), "In-place summation failed");
+        Assertions.assertFalse(addAll.equals(toAddAll[0]), "None in-place operator returned in-place result");
         NDArray addAllResult = manager.create(new Shape(2, 2), new float[] {7, 7, 7, 7});
         Assertions.assertEquals(addAllResult, addAll, "Incorrect value in summed array");
     }
@@ -83,7 +97,7 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
                     manager.create(new Shape(2, 2), new float[] {2, 2, 2, 2})
                 };
         NDArray addAll = NDArrays.addi(toAddAll);
-        Assertions.assertStatement(addAll.equals(toAddAll[0]), "In-place summation failed");
+        Assertions.assertTrue(addAll.equals(toAddAll[0]), "In-place summation failed");
         NDArray addAllResult = manager.create(new Shape(2, 2), new float[] {7, 7, 7, 7});
         Assertions.assertEquals(addAllResult, addAll, "Incorrect value in summed array");
     }
@@ -129,7 +143,7 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
         NDArray solution = manager.create(new Shape(1, 5), new float[] {174, 89, 168, -35, 0});
         Assertions.assertEquals(
                 solution, result, "Scalar reverse subtraction: Incorrect value in result ndarray");
-        Assertions.assertStatement(
+        Assertions.assertTrue(
                 NDArrays.equals(solution, inPlaceResult),
                 "Scalar in-place reverse subtraction: Incorrect value in result ndarray");
         Assertions.assertInPlace(
@@ -199,8 +213,8 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
                 };
         NDArray mulAll = NDArrays.mul(toMulAll);
         NDArray mulAllInPlace = NDArrays.muli(toMulAll);
-        Assertions.assertStatement(!mulAll.equals(toMulAll[0]), "In-place summation failed");
-        Assertions.assertStatement(mulAllInPlace.equals(toMulAll[0]), "In-place summation failed");
+        Assertions.assertFalse(mulAll.equals(toMulAll[0]), "None in-place operator returned in-place result");
+        Assertions.assertTrue(mulAllInPlace.equals(toMulAll[0]), "In-place summation failed");
         NDArray mulAllResult = manager.create(new Shape(2, 2), new float[] {8, 12, 12, 8});
         Assertions.assertEquals(mulAllResult, mulAll, "Incorrect value in summed array");
         Assertions.assertEquals(mulAllResult, mulAllInPlace, "Incorrect value in summed array");
@@ -266,7 +280,7 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
                 solution,
                 result,
                 "Reverse Element wise Division: Incorrect value in result ndarray");
-        Assertions.assertStatement(
+        Assertions.assertTrue(
                 NDArrays.equals(solution, inPlaceResult),
                 "Reverse Element wise in-place division: Incorrect value in result ndarray");
         Assertions.assertInPlace(
@@ -335,7 +349,7 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
                 solution,
                 result,
                 "Reverse Element wise Remainder: Incorrect value in result ndarray");
-        Assertions.assertStatement(
+        Assertions.assertTrue(
                 NDArrays.equals(solution, inPlaceResult),
                 "Reverse Element wise in-place Remainder: Incorrect value in result ndarray");
         Assertions.assertInPlace(

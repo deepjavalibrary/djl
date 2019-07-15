@@ -12,6 +12,8 @@
  */
 package software.amazon.ai.integration.tests;
 
+import org.apache.mxnet.engine.MxAutograd;
+import org.apache.mxnet.engine.MxNDArray;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
@@ -59,7 +61,7 @@ public class NDArrayOtherOpTest extends AbstractTest {
         NDArray ndArray2 = manager.create(new Shape(1, 4), new float[] {1f, 2f, 0f, 4f});
         NDArray ndArray3 = manager.create(new Shape(1, 4), new float[] {0f, 0f, 0f, 4f});
         NDArray ndArray4 = manager.create(new Shape(1, 4), new float[] {0f, 0f, 0f, 0f});
-        Assertions.assertStatement(
+        Assertions.assertTrue(
                 ndArray1.nonzero() == 4
                         && ndArray2.nonzero() == 3
                         && ndArray3.nonzero() == 1
@@ -118,7 +120,7 @@ public class NDArrayOtherOpTest extends AbstractTest {
         Assertions.assertEquals(tileAxis, tileAxisExpected, "Incorrect tile on axis");
 
         NDArray tileArray = original.tile(new long[] {3, 1});
-        Assertions.assertStatement(
+        Assertions.assertTrue(
                 tileArray.contentEquals(tileAxisExpected), "Incorrect tile array");
 
         NDArray tileShape = original.tile(new Shape(4));
@@ -219,12 +221,23 @@ public class NDArrayOtherOpTest extends AbstractTest {
 
     @RunAsTest
     public void testMatrixMultiplication() throws FailedTestException {
-        NDArray multiplicand = manager.create(new Shape(2, 3), new float[] {6, -9, -12, 15, 0, 4});
-        NDArray multiplier = manager.create(new Shape(3, 1), new float[] {2, 3, -4});
-        NDArray result = NDArrays.mmul(multiplicand, multiplier);
-        NDArray solution = manager.create(new Shape(2, 1), new float[] {33, 14});
+        NDArray lhs = manager.create(new Shape(2, 3), new float[] {6, -9, -12, 15, 0, 4});
+        NDArray rhs = manager.create(new Shape(3, 1), new float[] {2, 3, -4});
+        NDArray result;
+        lhs.attachGrad();
+        try(MxAutograd autograd = new MxAutograd()){
+            autograd.setRecording(true);
+            result = NDArrays.mmul(lhs, rhs);
+            autograd.backward((MxNDArray) result);
+        }
+        NDArray expected = manager.create(new Shape(2, 1), new float[] {33, 14});
         Assertions.assertEquals(
-                solution, result, "Matrix multiplication: Incorrect value in result ndarray");
+                expected, result, "Matrix multiplication: Incorrect value in result ndarray");
+
+        NDArray expectedGradient = manager.create(new Shape(2, 3), new float[] {2, 3, -4, 2, 3, -4});
+        Assertions.assertEquals(
+                expectedGradient, lhs.getGradient(), "Matrix multiplication: Incorrect gradient after backward");
+
     }
 
     @RunAsTest

@@ -13,11 +13,34 @@
 package org.apache.mxnet.engine;
 
 import org.apache.mxnet.jna.JnaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public final class MxAutograd {
+public class MxAutograd implements AutoCloseable{
 
-    private MxAutograd() {
-        // not callable
+    private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
+
+    public MxAutograd(){
+        Boolean prevRecordingState = setRecording(true);
+        if (prevRecordingState){
+            logger.warn("Autograd Recording is already set to True. " +
+                    "Please use try with resource or call autograd.setRecording(false) after training.");
+        }
+        Boolean prevTrainingState = setTraining(true);
+        if (prevTrainingState){
+            logger.warn("Autograd Training is already set to True. " +
+                    "Please use try with resource or call autograd.setTraining(false) after training.");
+        }
+    }
+
+    @Override
+    public void close(){
+        setRecording(false);
+        setTraining(false);
+    }
+
+    public void backward(MxNDArray array){
+        array.backward();
     }
 
     /**

@@ -20,15 +20,26 @@ public final class Assertions {
 
     private Assertions() {}
 
-    public static void assertStatement(boolean statement, String errorMessage)
+    public static void assertTrue(boolean statement, String errorMessage)
             throws FailedTestException {
         if (!statement) {
             throw new FailedTestException(errorMessage);
         }
     }
 
-    public static void assertStatement(boolean statement) throws FailedTestException {
-        assertStatement(statement, "Assertion failed!");
+    public static void assertTrue(boolean statement) throws FailedTestException {
+        assertTrue(statement, "Statement is not True!");
+    }
+
+    public static void assertFalse(boolean statement, String errorMessage)
+            throws FailedTestException {
+        if (statement) {
+            throw new FailedTestException(errorMessage);
+        }
+    }
+
+    public static void assertFalse(boolean statement) throws FailedTestException {
+        assertFalse(statement, "Statement is not False!");
     }
 
     public static void assertEquals(NDArray expected, NDArray actual, String errorMessage)

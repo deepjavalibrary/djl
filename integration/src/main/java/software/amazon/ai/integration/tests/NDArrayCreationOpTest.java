@@ -38,10 +38,10 @@ public class NDArrayCreationOpTest extends AbstractTest {
             long[] indices = new long[] {0, 2, 1};
             NDArray nd = factory.createCSR(new Shape(3, 4), buf, indptr, indices);
             float[] array = nd.toFloatArray();
-            Assertions.assertStatement(input[0] == array[0]);
-            Assertions.assertStatement(input[1] == array[2]);
-            Assertions.assertStatement(input[2] == array[9]);
-            Assertions.assertStatement(nd.isSparse());
+            Assertions.assertTrue(input[0] == array[0]);
+            Assertions.assertTrue(input[1] == array[2]);
+            Assertions.assertTrue(input[2] == array[9]);
+            Assertions.assertTrue(nd.isSparse());
         }
     }
 
@@ -53,13 +53,13 @@ public class NDArrayCreationOpTest extends AbstractTest {
             long[] indices = new long[] {0, 1, 3};
             NDArray nd = factory.createRowSparse(new Shape(4, 2), buf, new Shape(3, 2), indices);
             float[] array = nd.toFloatArray();
-            Assertions.assertStatement(input[0] == array[0]);
-            Assertions.assertStatement(input[1] == array[1]);
-            Assertions.assertStatement(input[2] == array[2]);
-            Assertions.assertStatement(input[3] == array[3]);
-            Assertions.assertStatement(input[4] == array[6]);
-            Assertions.assertStatement(input[5] == array[7]);
-            Assertions.assertStatement(nd.isSparse());
+            Assertions.assertTrue(input[0] == array[0]);
+            Assertions.assertTrue(input[1] == array[1]);
+            Assertions.assertTrue(input[2] == array[2]);
+            Assertions.assertTrue(input[3] == array[3]);
+            Assertions.assertTrue(input[4] == array[6]);
+            Assertions.assertTrue(input[5] == array[7]);
+            Assertions.assertTrue(nd.isSparse());
         }
     }
 
@@ -68,7 +68,7 @@ public class NDArrayCreationOpTest extends AbstractTest {
         try (NDManager factory = NDManager.newBaseManager()) {
             NDArray nd = factory.ones(new Shape(3, 5));
             NDArray sparse = nd.toSparse(SparseFormat.CSR);
-            Assertions.assertStatement(sparse.getSparseFormat() == SparseFormat.CSR);
+            Assertions.assertTrue(sparse.getSparseFormat() == SparseFormat.CSR);
         }
     }
 
