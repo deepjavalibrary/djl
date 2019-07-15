@@ -109,4 +109,13 @@ public class NDArrayReductionOpTest extends AbstractTest {
         NDArray meanKeepExpected = manager.create(new Shape(1, 2), new float[] {4, 6});
         Assertions.assertEquals(meanKeepExpected, meanKeep, "Incorrect mean keep");
     }
+
+    @RunAsTest
+    public void testTrace() throws FailedTestException {
+        NDArray original = manager.arange(8).reshape(new Shape(2, 2, 2)).trace();
+        NDArray expect = manager.create(new Shape(2), new float[] {6f, 8f});
+        Assertions.assertEquals(original, expect);
+        original = manager.arange(24).reshape(new Shape(2, 2, 2, 3)).trace();
+        Assertions.assertStatement(original.getShape().equals(new Shape(2, 3)));
+    }
 }

@@ -1014,6 +1014,12 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray trace(int offset, int axis1, int axis2) {
+        return array.trace(offset, axis1, axis2);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList split(int axis, boolean squeezeAxis) {
         return array.split(axis, squeezeAxis);
     }

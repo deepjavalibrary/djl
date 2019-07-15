@@ -602,6 +602,11 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray trace(int offset, int axis1, int axis2) {
+        return null;
+    }
+
+    @Override
     public NDList split(int axis, boolean squeezeAxis) {
         return null;
     }

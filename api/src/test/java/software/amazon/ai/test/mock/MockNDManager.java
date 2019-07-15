@@ -56,6 +56,11 @@ public class MockNDManager implements NDManager {
     }
 
     @Override
+    public NDArray eye(int rows, int cols, int k, DataType dataType, Context context) {
+        return null;
+    }
+
+    @Override
     public NDArray linspace(double start, double stop, int num, boolean endPoint, Context context) {
         return null;
     }

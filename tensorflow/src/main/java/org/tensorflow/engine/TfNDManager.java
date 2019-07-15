@@ -132,6 +132,12 @@ public class TfNDManager implements NDManager, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray eye(int rows, int cols, int k, DataType dataType, Context context) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray linspace(double start, double stop, int num, boolean endpoint, Context context) {
         return null;
     }

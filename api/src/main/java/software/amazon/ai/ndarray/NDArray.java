@@ -1487,6 +1487,59 @@ public interface NDArray extends AutoCloseable {
      */
     NDArray mean(int[] axes, boolean keepDims);
 
+    /**
+     * Return the sum along diagonals of the {@link NDArray}.
+     *
+     * <p>If {@link NDArray} is 2-D, the sum along its diagonal is returned. If {@link NDArray} has
+     * more than two dimensions, then the axes specified by axis1 and axis2 are used to determine
+     * the 2-D sub-arrays whose traces are returned. The shape of the resulting {@link NDArray} is
+     * the same as that of a with axis1 and axis2 removed.
+     *
+     * @return If a is 2-D, the sum along the diagonal is returned. If {@link NDArray} has larger
+     *     dimensions, then a {@link NDArray} of sums along diagonals is returned.
+     */
+    default NDArray trace() {
+        return trace(0, 0, 1);
+    }
+
+    /**
+     * Return the sum along diagonals of the array.
+     *
+     * <p>If a is 2-D, the sum along its diagonal with the given offset is returned, i.e., the sum
+     * of elements a[i,i+offset] for all i. If a has more than two dimensions, then the axes
+     * specified by axis1 and axis2 are used to determine the 2-D sub-arrays whose traces are
+     * returned. The shape of the resulting array is the same as that of a with axis1 and axis2
+     * removed.
+     *
+     * @param offset offset of the diagonal from the main diagonal. Can be both positive and
+     *     negative.
+     * @return If a is 2-D, the sum along the diagonal is returned. If a has larger dimensions, then
+     *     an array of sums along diagonals is returned.
+     */
+    default NDArray trace(int offset) {
+        return trace(offset, 0, 1);
+    }
+
+    /**
+     * Return the sum along diagonals of the array.
+     *
+     * <p>If a is 2-D, the sum along its diagonal with the given offset is returned, i.e., the sum
+     * of elements a[i,i+offset] for all i. If a has more than two dimensions, then the axes
+     * specified by axis1 and axis2 are used to determine the 2-D sub-arrays whose traces are
+     * returned. The shape of the resulting array is the same as that of a with axis1 and axis2
+     * removed.
+     *
+     * @param offset offset of the diagonal from the main diagonal. Can be both positive and
+     *     negative.
+     * @param axis1 axes to be used as the first axis of the 2-D sub-arrays from which the diagonals
+     *     should be taken
+     * @param axis2 axes to be used as the second axis of the 2-D sub-arrays from which the
+     *     diagonals should be taken
+     * @return If a is 2-D, the sum along the diagonal is returned. If a has larger dimensions, then
+     *     an array of sums along diagonals is returned.
+     */
+    NDArray trace(int offset, int axis1, int axis2);
+
     ////////////////////////////////////////
     // Operators: Shapes and Arrays Manipulation
     ////////////////////////////////////////

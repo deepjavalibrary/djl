@@ -85,6 +85,22 @@ public class NDArrayCreationOpTest extends AbstractTest {
     }
 
     @RunAsTest
+    public void testEye() throws FailedTestException {
+        NDArray original = manager.eye(2);
+        NDArray expect = manager.create(new Shape(2, 2), new float[] {1f, 0f, 0f, 1f});
+        Assertions.assertEquals(original, expect);
+        original = manager.eye(2, 3, 0);
+        expect = manager.create(new Shape(2, 3), new float[] {1f, 0f, 0f, 0f, 1f, 0f});
+        Assertions.assertEquals(original, expect);
+        original = manager.eye(3, 4, 0);
+        expect =
+                manager.create(
+                        new Shape(3, 4),
+                        new float[] {1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f});
+        Assertions.assertEquals(original, expect);
+    }
+
+    @RunAsTest
     public void testLinspace() throws FailedTestException {
         NDArray expectedND =
                 manager.create(new Shape(10), new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});

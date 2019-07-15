@@ -159,6 +159,18 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray eye(int rows, int cols, int k, DataType dataType, Context context) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("N", rows);
+        params.addParam("M", cols);
+        params.addParam("k", k);
+        params.setDataType(dataType);
+        params.setContext(context);
+        return invoke("_npi_eye", EMPTY, params).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray linspace(double start, double stop, int num, boolean endpoint, Context context) {
         if (num < 0) {
             throw new IllegalArgumentException("Num argument must be non-negative");

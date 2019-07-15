@@ -427,6 +427,58 @@ public interface NDManager extends AutoCloseable {
     NDArray arange(int start, int stop, int step, DataType dataType, Context context);
 
     /**
+     * Return a 2-D array with ones on the diagonal and zeros elsewhere in current context.
+     *
+     * @param rows number of rows and cols in the output
+     * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
+     *     whose values are equal to one.
+     */
+    default NDArray eye(int rows) {
+        return eye(rows, rows, 0, DataType.FLOAT32, getContext());
+    }
+
+    /**
+     * Return a 2-D array with ones on the diagonal and zeros elsewhere in current context.
+     *
+     * @param rows number of rows and cols in the output
+     * @param k index of the diagonal: 0 (the default) refers to the main diagonal, a positive value
+     *     refers to an upper diagonal, and a negative value to a lower diagonal.
+     * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
+     *     whose values are equal to one.
+     */
+    default NDArray eye(int rows, int k) {
+        return eye(rows, rows, k, DataType.FLOAT32, getContext());
+    }
+
+    /**
+     * Return a 2-D array with ones on the diagonal and zeros elsewhere in current context.
+     *
+     * @param rows number of rows in the output
+     * @param cols number of columns in the output
+     * @param k index of the diagonal: 0 (the default) refers to the main diagonal, a positive value
+     *     refers to an upper diagonal, and a negative value to a lower diagonal.
+     * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
+     *     whose values are equal to one.
+     */
+    default NDArray eye(int rows, int cols, int k) {
+        return eye(rows, cols, k, DataType.FLOAT32, getContext());
+    }
+
+    /**
+     * Return a 2-D array with ones on the diagonal and zeros elsewhere.
+     *
+     * @param rows number of rows int the output
+     * @param cols number of columns in the output
+     * @param k index of the diagonal: 0 (the default) refers to the main diagonal, a positive value
+     *     refers to an upper diagonal, and a negative value to a lower diagonal.
+     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
+     *     whose values are equal to one.
+     */
+    NDArray eye(int rows, int cols, int k, DataType dataType, Context context);
+
+    /**
      * Return evenly spaced numbers over a specified interval in current context.
      *
      * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].

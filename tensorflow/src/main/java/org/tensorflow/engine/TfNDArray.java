@@ -814,6 +814,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray trace(int offset, int axis1, int axis2) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList split(int axis, boolean squeezeAxis) {
         TfNDArray axisOp = (TfNDArray) manager.create(axis);
         Operation op =
