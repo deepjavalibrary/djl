@@ -22,10 +22,11 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
 
-public class MxNDArrayCreationTest extends AbstractTest {
+public class NDArrayCreationOpTest extends AbstractTest {
+    NDManager manager = NDManager.newBaseManager();
 
     public static void main(String[] args) {
-        new MxNDArrayCreationTest().runTest(args);
+        new NDArrayCreationOpTest().runTest(args);
     }
 
     @RunAsTest
@@ -69,5 +70,25 @@ public class MxNDArrayCreationTest extends AbstractTest {
             NDArray sparse = nd.toSparse(SparseFormat.CSR);
             Assertions.assertStatement(sparse.getSparseFormat() == SparseFormat.CSR);
         }
+    }
+
+    @RunAsTest
+    public void testArange() throws FailedTestException {
+        NDArray expectedND =
+                manager.create(new Shape(10), new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
+        NDArray testedND = manager.arange(0, 10, 1);
+        Assertions.assertEquals(testedND, expectedND);
+        testedND = manager.arange(0, 10, 1);
+        Assertions.assertEquals(testedND, expectedND);
+        testedND = manager.arange(10);
+        Assertions.assertEquals(testedND, expectedND);
+    }
+
+    @RunAsTest
+    public void testLinspace() throws FailedTestException {
+        NDArray expectedND =
+                manager.create(new Shape(10), new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
+        NDArray testedND = manager.linspace(0.0, 9.0, 10, true, null);
+        Assertions.assertEquals(testedND, expectedND);
     }
 }
