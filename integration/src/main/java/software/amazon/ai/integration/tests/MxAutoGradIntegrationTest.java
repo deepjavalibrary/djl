@@ -12,10 +12,8 @@
  */
 package software.amazon.ai.integration.tests;
 
-
 import org.apache.mxnet.engine.MxAutograd;
 import org.apache.mxnet.engine.MxNDArray;
-import org.apache.mxnet.engine.MxNDManager;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
@@ -33,13 +31,11 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
 
     @RunAsTest
     public void testAutograd() throws FailedTestException {
-        try (
-                NDManager manager = MxNDManager.newBaseManager().newSubManager();
-                MxAutograd autograd = new MxAutograd()
-        ) {
+        try (NDManager manager = NDManager.newBaseManager();
+                MxAutograd autograd = new MxAutograd()) {
 
-            NDArray lhs = manager.create(new Shape(2, 3), new float[]{6, -9, -12, 15, 0, 4});
-            NDArray rhs = manager.create(new Shape(3, 1), new float[]{2, 3, -4});
+            NDArray lhs = manager.create(new Shape(2, 3), new float[] {6, -9, -12, 15, 0, 4});
+            NDArray rhs = manager.create(new Shape(3, 1), new float[] {2, 3, -4});
             lhs.attachGrad();
             // autograd automatically set recording and training during initialization
             Assertions.assertTrue(autograd.isRecording());

@@ -103,8 +103,7 @@ public class NDArrayElementComparisonOpTest extends AbstractTest {
     public void testLesserThanOrEqualToScalar() throws FailedTestException {
         NDArray array = manager.create(new Shape(1, 5), new float[] {1f, 2f, 2f, 4f, 5f});
         NDArray greater = NDArrays.lte(array, 2);
-        Assertions.assertTrue(
-                greater.nonzero() == 3, "lesser_equals_scalar: Incorrect comparison");
+        Assertions.assertTrue(greater.nonzero() == 3, "lesser_equals_scalar: Incorrect comparison");
     }
 
     @RunAsTest

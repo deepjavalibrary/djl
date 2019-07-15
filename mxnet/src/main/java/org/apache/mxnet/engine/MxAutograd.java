@@ -16,35 +16,38 @@ import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MxAutograd implements AutoCloseable{
+public class MxAutograd implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
-    public MxAutograd(){
+    public MxAutograd() {
         Boolean prevRecordingState = setRecording(true);
-        if (prevRecordingState){
-            logger.warn("Autograd Recording is already set to True. " +
-                    "Please use try with resource or call autograd.setRecording(false) after training.");
+        if (prevRecordingState) {
+            logger.warn(
+                    "Autograd Recording is already set to True. "
+                            + "Please use try with resource or call autograd.setRecording(false) after training.");
         }
         Boolean prevTrainingState = setTraining(true);
-        if (prevTrainingState){
-            logger.warn("Autograd Training is already set to True. " +
-                    "Please use try with resource or call autograd.setTraining(false) after training.");
+        if (prevTrainingState) {
+            logger.warn(
+                    "Autograd Training is already set to True. "
+                            + "Please use try with resource or call autograd.setTraining(false) after training.");
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public void close(){
+    public void close() {
         setRecording(false);
         setTraining(false);
     }
 
     /**
-     * Run backward and calculate gradient w.r.t previously marked variable (head)
+     * Run backward and calculate gradient w.r.t previously marked variable (head).
+     *
      * @param array target NDArray to run backward and calculate gradient w.r.t head
      */
-    public void backward(MxNDArray array){
+    public void backward(MxNDArray array) {
         array.backward();
     }
 

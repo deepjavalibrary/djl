@@ -120,8 +120,7 @@ public class NDArrayOtherOpTest extends AbstractTest {
         Assertions.assertEquals(tileAxis, tileAxisExpected, "Incorrect tile on axis");
 
         NDArray tileArray = original.tile(new long[] {3, 1});
-        Assertions.assertTrue(
-                tileArray.contentEquals(tileAxisExpected), "Incorrect tile array");
+        Assertions.assertTrue(tileArray.contentEquals(tileAxisExpected), "Incorrect tile array");
 
         NDArray tileShape = original.tile(new Shape(4));
         NDArray tileShapeExpected =
@@ -225,7 +224,7 @@ public class NDArrayOtherOpTest extends AbstractTest {
         NDArray rhs = manager.create(new Shape(3, 1), new float[] {2, 3, -4});
         NDArray result;
         lhs.attachGrad();
-        try(MxAutograd autograd = new MxAutograd()){
+        try (MxAutograd autograd = new MxAutograd()) {
             autograd.setRecording(true);
             result = NDArrays.mmul(lhs, rhs);
             autograd.backward((MxNDArray) result);
@@ -234,10 +233,12 @@ public class NDArrayOtherOpTest extends AbstractTest {
         Assertions.assertEquals(
                 expected, result, "Matrix multiplication: Incorrect value in result ndarray");
 
-        NDArray expectedGradient = manager.create(new Shape(2, 3), new float[] {2, 3, -4, 2, 3, -4});
+        NDArray expectedGradient =
+                manager.create(new Shape(2, 3), new float[] {2, 3, -4, 2, 3, -4});
         Assertions.assertEquals(
-                expectedGradient, lhs.getGradient(), "Matrix multiplication: Incorrect gradient after backward");
-
+                expectedGradient,
+                lhs.getGradient(),
+                "Matrix multiplication: Incorrect gradient after backward");
     }
 
     @RunAsTest

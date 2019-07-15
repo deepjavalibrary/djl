@@ -61,7 +61,7 @@ public class NDArrayShapesManipulationOpTest extends AbstractTest {
     @RunAsTest
     public void testExpandDim() throws FailedTestException {
         NDArray original = manager.create(new Shape(2), new int[] {1, 2});
-        Assertions.assertStatement(
+        Assertions.assertTrue(
                 Arrays.equals(
                         original.expandDims(0).getShape().getShape(), new Shape(1, 2).getShape()));
     }
