@@ -59,6 +59,14 @@ runtime "org.apache.mxnet:joule:0.1.0"
 runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:osx-x86_64"
 ~~~
 
+These packages can be found by adding the following maven repository to your `build.gradle` file, or corresponding entry in
+                                                                     `pom.xml`:
+~~~
+maven {
+   url 'https://joule.s3.amazonaws.com/repo'
+}
+~~~
+
 ResNet-50 is a convolutional neural network that is trained on images from the 
 [ImageNet database](http://www.image-net.org). The network has 50 layers and can detect objects in images, and classify 
 the objects into different object categories. This tutorial uses MxNet ResNet-50 SSD. This model that has already been 
@@ -155,7 +163,9 @@ You can use the Predictor create above to run inference in one single step!
 List<DetectedObject> predictResult = predictor.predict(img);
 ~~~
 
-The example provided in this module applies the bounding boxes to a copy of the original image, stores the result
+### SSD Sample Implementation
+All instructions above to build inference can be seen in the [Sample SSD implementation](../src/main/java/software/amazon/ai/examples/SsdExample.java). The followings is the build command to try it out.
+The sample SSD code provided in this module applies the bounding boxes to a copy of the original image, stores the result
 a file called ssd.jpg in the provided output directory. 
 
 The model, input image, output directory can all be provided as input. The available arguments are as follows:
