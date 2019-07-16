@@ -14,7 +14,11 @@ package software.amazon.ai.nn;
 
 import software.amazon.ai.nn.core.Linear;
 
+/**
+ * An internal mapping to Engine specific implementations of Neural Network {@link
+ * software.amazon.ai.Block}s.
+ */
 public abstract class NNIndex {
 
-    public abstract Linear linear(int units);
+    public abstract Linear linear(long units, boolean bias);
 }

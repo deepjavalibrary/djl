@@ -12,6 +12,7 @@
  */
 package software.amazon.ai;
 
+import software.amazon.ai.initializer.Initializer;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;

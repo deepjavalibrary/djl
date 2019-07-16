@@ -27,36 +27,41 @@ import software.amazon.ai.util.Pair;
 
 public class MxLinear extends MxNNBlock implements Linear {
 
-    private int units;
-    private Shape inUnits;
+    private long outChannels;
+    private Shape inChannels;
 
     private Parameter weight;
     private Parameter bias;
 
-    public MxLinear(int units) {
+    public MxLinear(long outChannels, boolean bias) {
         this.opName = "FullyConnected";
-        this.units = units;
+        this.outChannels = outChannels;
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
-        bias = new Parameter("bias", this, ParameterType.BIAS);
+        if (bias) {
+            this.bias = new Parameter("bias", this, ParameterType.BIAS);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape getOutputShape(Shape... inputs) {
-        return new Shape(inputs[0].get(0), units);
+        return new Shape(inputs[0].get(0), outChannels);
     }
 
     /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
-        return Arrays.asList(weight, bias);
+        if (bias != null) {
+            return Arrays.asList(weight, bias);
+        }
+        return Arrays.asList(weight);
     }
 
     /** {@inheritDoc} */
     @Override
     public void beforeInitialize(NDList inputs) {
         Shape input = inputs.head().getShape();
-        inUnits = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
+        inChannels = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
         inputShape =
                 input.map(
                         pair ->
@@ -72,9 +77,9 @@ public class MxLinear extends MxNNBlock implements Linear {
     public Shape getParameterShape(String name, NDList inputs) {
         switch (name) {
             case "weight":
-                return new Shape(units).addAll(inUnits);
+                return new Shape(outChannels).addAll(inChannels);
             case "bias":
-                return new Shape(units);
+                return new Shape(outChannels);
             default:
                 throw new IllegalArgumentException("Invalid parameter name");
         }
@@ -84,9 +89,14 @@ public class MxLinear extends MxNNBlock implements Linear {
     @Override
     public NDArray forward(NDArray data) {
         ensureInitialized(new NDList(data));
-        NDList inputs = new NDList(data, weight.getArray(), bias.getArray());
+        NDList inputs =
+                bias != null
+                        ? new NDList(data, weight.getArray(), bias.getArray())
+                        : new NDList(data, weight.getArray());
         MxOpParams params = new MxOpParams();
-        params.add("num_hidden", "1");
+        params.addParam("num_hidden", outChannels);
+        params.addParam("flatten", false);
+        params.addParam("no_bias", bias == null);
         return forward(inputs, params).get(0);
     }
 }

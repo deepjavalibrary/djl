@@ -10,25 +10,17 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai;
+package software.amazon.ai.initializer;
 
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 
-/**
- * An interface representing an initialization method.
- *
- * <p>Used to initialize the {@link NDArray} parameters stored within a {@link Block}.
- */
-public interface Initializer {
+class ZerosInitializer implements Initializer {
 
-    /**
-     * Initializes a single {@link NDArray}.
-     *
-     * @param manager the {@link NDManager} to create the new NDArray in
-     * @param shape the {@link Shape} for the new NDArray
-     * @return Returns the NDArray initialized with the manager and shape
-     */
-    NDArray initialize(NDManager manager, Shape shape);
+    /** {@inheritDoc} */
+    @Override
+    public NDArray initialize(NDManager manager, Shape shape) {
+        return manager.zeros(shape);
+    }
 }

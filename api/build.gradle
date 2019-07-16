@@ -15,9 +15,9 @@ javadoc {
     title "Joule ${project.version} API specification"
     exclude "software/amazon/ai/util/**"
     exclude "software/amazon/ai/ndarray/internal/**"
-    exclude "software/amazon/ai/nn/**/**"
-    exclude "software/amazon/ai/training/**"
     options.overview "src/main/javadoc/overview.html"
+    options.addBooleanOption("-allow-script-in-comments",true)
+    options.header "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>"
 }
 
 task sourcesJar(type: Jar) {

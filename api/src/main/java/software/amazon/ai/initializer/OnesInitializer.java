@@ -10,17 +10,17 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.nn;
+package software.amazon.ai.initializer;
 
-import org.apache.mxnet.nn.core.MxLinear;
-import software.amazon.ai.nn.NNIndex;
-import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.Shape;
 
-public class MxNNIndex extends NNIndex {
+class OnesInitializer implements Initializer {
 
     /** {@inheritDoc} */
     @Override
-    public Linear linear(long outChannels, boolean bias) {
-        return new MxLinear(outChannels, bias);
+    public NDArray initialize(NDManager manager, Shape shape) {
+        return manager.ones(shape);
     }
 }

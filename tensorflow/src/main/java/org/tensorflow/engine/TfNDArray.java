@@ -114,6 +114,7 @@ public class TfNDArray implements NDArray {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public SparseFormat getSparseFormat() {
         return null;

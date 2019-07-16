@@ -16,28 +16,64 @@ import software.amazon.ai.Block;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 
+/**
+ * A Linear block applies a linear transformation \(Y = XW^T + b\).
+ *
+ * <p>It has the following shapes:
+ *
+ * <ul>
+ *   <li>input X: [batchSize..., inChannels]
+ *   <li>weight W: [outChannels, inChannels]
+ *   <li>Bias b: [outChannels]
+ *   <li>output Y: [batchSize..., outChannels]
+ * </ul>
+ *
+ * <p>The Linear block should be constructed using {@link Linear.Builder}.
+ */
 public interface Linear extends Block {
 
     NDArray forward(NDArray data);
 
+    /** The Builder to construct a {@link Linear} type of {@link Block}. */
     class Builder {
 
-        private int units;
+        private long outChannels;
+        private boolean bias = true;
 
-        public int getUnits() {
-            return units;
-        }
-
-        public Builder setUnits(int units) {
-            this.units = units;
+        /**
+         * Sets the <b>Required</b> number of output channels.
+         *
+         * @param outChannels Number of desired output channels
+         * @return Returns this Builder
+         */
+        public Builder setOutChannels(long outChannels) {
+            this.outChannels = outChannels;
             return this;
         }
 
+        /**
+         * Sets the optional parameter of whether to include a bias vector with default of true.
+         *
+         * @param bias Whether to use a bias vector parameter
+         * @return Returns this Builder
+         */
+        public Builder setBias(boolean bias) {
+            this.bias = bias;
+            return this;
+        }
+
+        /**
+         * Returns the constructed {@code Linear}.
+         *
+         * @return Returns the constructed {@code Linear}
+         * @throws IllegalArgumentException Thrown if all required parameters (outChannels) have not
+         *     been set
+         */
         public Linear build() {
-            if (units == 0) {
-                throw new IllegalStateException("You must specify units");
+            if (outChannels == 0) {
+                throw new IllegalArgumentException("You must specify outChannels");
             }
-            return Engine.getInstance().getNNIndex().linear(units);
+            return Engine.getInstance().getNNIndex().linear(outChannels, bias);
         }
     }
 }

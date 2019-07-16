@@ -10,17 +10,12 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.nn;
 
-import org.apache.mxnet.nn.core.MxLinear;
-import software.amazon.ai.nn.NNIndex;
-import software.amazon.ai.nn.core.Linear;
-
-public class MxNNIndex extends NNIndex {
-
-    /** {@inheritDoc} */
-    @Override
-    public Linear linear(long outChannels, boolean bias) {
-        return new MxLinear(outChannels, bias);
-    }
-}
+/**
+ * Contains classes for initializing a {@link software.amazon.ai.Block}'s {@link
+ * software.amazon.ai.Parameter}s.
+ *
+ * <p>It contains a main interface {@link software.amazon.ai.initializer.Initializer} and various
+ * initializers that extend it.
+ */
+package software.amazon.ai.initializer;
