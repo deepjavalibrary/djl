@@ -23,7 +23,6 @@ import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Layout;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
 import software.amazon.ai.training.GradReq;
@@ -74,22 +73,12 @@ public interface NDArray extends AutoCloseable {
     Shape getShape();
 
     /**
-     * Returns the {@link Layout} of the {@code NDArray}.
-     *
-     * <p>{@link Layout} defines the meaning of each dimension in the array.
-     *
-     * @return {@link Layout}
-     */
-    Layout getLayout();
-
-    /**
      * Returns the {@link DataDesc} of the {@code NDArray}.
      *
      * <p>{@link DataDesc} contains all information about NDArray, including {@link Context}, {@link
-     * DataType}, {@link Shape}, {@link Layout}, {@link
-     * software.amazon.ai.ndarray.types.SparseFormat}.
+     * DataType}, {@link Shape}, and {@link software.amazon.ai.ndarray.types.SparseFormat}.
      *
-     * @return {@link Layout}
+     * @return {@link DataDesc}
      */
     DataDesc getDataDescriptor();
 

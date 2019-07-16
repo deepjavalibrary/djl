@@ -20,8 +20,10 @@ import software.amazon.ai.Parameter;
 import software.amazon.ai.ParameterType;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.util.Pair;
 
 public class MxLinear extends MxNNBlock implements Linear {
 
@@ -53,8 +55,16 @@ public class MxLinear extends MxNNBlock implements Linear {
     /** {@inheritDoc} */
     @Override
     public void beforeInitialize(NDList inputs) {
-        inUnits = inputs.head().getShape().slice(1);
-        inputShape = new Shape(-1).addAll(inUnits);
+        Shape input = inputs.head().getShape();
+        inUnits = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
+        inputShape =
+                input.map(
+                        pair ->
+                                new Pair<>(
+                                        pair.getValue().equals(LayoutType.BATCH)
+                                                ? Long.valueOf(-1)
+                                                : pair.getKey(),
+                                        pair.getValue()));
     }
 
     /** {@inheritDoc} */

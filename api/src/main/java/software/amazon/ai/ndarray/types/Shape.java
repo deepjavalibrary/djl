@@ -13,12 +13,19 @@
 package software.amazon.ai.ndarray.types;
 
 import java.util.Arrays;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
+import software.amazon.ai.util.Pair;
+import software.amazon.ai.util.PairList;
 
 /** A class the presents the {@link software.amazon.ai.ndarray.NDArray}'s shape information. */
 public class Shape {
 
     private long[] shape;
+    private LayoutType[] layout;
 
     /**
      * Constructs and initializes a {@code Shape} with specified dimension as {@code (long...
@@ -26,13 +33,57 @@ public class Shape {
      *
      * @param shape dimensions of the shape
      * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
-     *     less than -1
+     *     less than -1. Also thrown if the shape and layout do not have equal sizes.
      */
     public Shape(long... shape) {
+        this(
+                shape,
+                Arrays.stream(shape).mapToObj(x -> LayoutType.UNKNOWN).toArray(LayoutType[]::new));
+    }
+
+    /**
+     * Constructs and initializes a {@code Shape} with specified shape and layout pairList.
+     *
+     * @param shape dimensions and layout of the shape
+     * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
+     *     less than -1 .Also thrown if the shape and layout do not have equal sizes.
+     */
+    public Shape(PairList<Long, LayoutType> shape) {
+        this(
+                shape.keys().stream().mapToLong(l -> l).toArray(),
+                shape.values().toArray(new LayoutType[shape.size()]));
+    }
+
+    /**
+     * Constructs and initializes a {@code Shape} with specified dimension and layout.
+     *
+     * @param shape the size of each axis of the shape
+     * @param layout the {@link LayoutType} of each axis in the shape
+     * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
+     *     less than -1. Also thrown for an invalid layout. Also thrown if the shape and layout do
+     *     not have equal sizes.
+     */
+    public Shape(long[] shape, String layout) {
+        this(shape, LayoutType.fromValue(layout));
+    }
+
+    /**
+     * Constructs and initializes a {@code Shape} with specified dimension and layout.
+     *
+     * @param shape the size of each axis of the shape
+     * @param layout the {@link LayoutType} of each axis in the shape
+     * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
+     *     less than -1. Also thrown if the shape and layout do not have equal sizes.
+     */
+    public Shape(long[] shape, LayoutType[] layout) {
         if (Arrays.stream(shape).anyMatch(s -> s < -1)) {
             throw new IllegalArgumentException("The shape must be >= -1");
         }
+        if (shape.length != layout.length) {
+            throw new IllegalArgumentException("The shape and layout must have the same length");
+        }
         this.shape = shape;
+        this.layout = layout;
     }
 
     /**
@@ -137,6 +188,46 @@ public class Shape {
         long[] out = new long[size];
         System.arraycopy(shape, beginIndex, out, 0, size);
         return new Shape(out);
+    }
+
+    /**
+     * Returns only the axes of the Shape whose layout types match the predicate.
+     *
+     * @param predicate Predicate returning true to Shape axis to be part of the filtered Shape
+     * @return Returns a new filtered Shape
+     */
+    public Shape filterByLayoutType(Predicate<LayoutType> predicate) {
+        return new Shape(
+                new PairList<>(
+                        this.stream()
+                                .filter(pair -> predicate.test(pair.getValue()))
+                                .collect(Collectors.toList())));
+    }
+
+    /**
+     * Returns a mapped shape.
+     *
+     * @param mapper The function to map each element of the Shape by
+     * @return Returns a new filtered Shape
+     */
+    public Shape map(Function<Pair<Long, LayoutType>, Pair<Long, LayoutType>> mapper) {
+        return new Shape(
+                new PairList<>(
+                        this.stream()
+                                .map(pair -> mapper.apply(pair))
+                                .collect(Collectors.toList())));
+    }
+
+    /**
+     * Returns a stream of the Shape.
+     *
+     * @return Returns the stream
+     */
+    public Stream<Pair<Long, LayoutType>> stream() {
+        return new PairList<>(
+                        Arrays.stream(shape).boxed().collect(Collectors.toList()),
+                        Arrays.asList(layout))
+                .stream();
     }
 
     /**

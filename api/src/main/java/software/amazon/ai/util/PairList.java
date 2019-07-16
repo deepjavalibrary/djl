@@ -65,6 +65,19 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
+     * Constructs a {@code PairList} containing the elements of the specified list of Pairs.
+     *
+     * @param list the list whose elements are to be placed into this PairList
+     */
+    public PairList(List<Pair<K, V>> list) {
+        this(list.size());
+        for (Pair<K, V> pair : list) {
+            keys.add(pair.getKey());
+            values.add(pair.getValue());
+        }
+    }
+
+    /**
      * Constructs a {@code PairList} containing the elements of the specified map.
      *
      * @param map the map contains keys and values

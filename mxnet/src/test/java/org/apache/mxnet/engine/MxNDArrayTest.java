@@ -33,7 +33,6 @@ import org.testng.annotations.Test;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Layout;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
 
@@ -66,7 +65,6 @@ public class MxNDArrayTest extends PowerMockTestCase {
             Assert.assertEquals(nd.getContext(), Context.gpu(1));
             Assert.assertEquals(nd.getDataType(), DataType.FLOAT32);
             Assert.assertEquals(nd.getSparseFormat(), SparseFormat.CSR);
-            Assert.assertEquals(nd.getLayout(), Layout.UNDEFINED);
         }
     }
 

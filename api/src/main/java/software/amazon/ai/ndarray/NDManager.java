@@ -210,7 +210,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray create(DataDesc dataDesc) {
-        return create(dataDesc.getShape(), dataDesc.getDataType(), dataDesc.getContext());
+        return create(dataDesc.getShape(), dataDesc.getDataType(), getContext());
     }
 
     /**
@@ -366,7 +366,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray zeros(DataDesc dataDesc) {
-        return zeros(dataDesc.getShape(), dataDesc.getDataType(), dataDesc.getContext());
+        return zeros(dataDesc.getShape(), dataDesc.getDataType(), getContext());
     }
 
     /**
@@ -397,7 +397,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray ones(DataDesc dataDesc) {
-        return ones(dataDesc.getShape(), dataDesc.getDataType(), dataDesc.getContext());
+        return ones(dataDesc.getShape(), dataDesc.getDataType(), getContext());
     }
 
     /**

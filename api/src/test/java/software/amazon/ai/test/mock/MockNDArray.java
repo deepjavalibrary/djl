@@ -23,7 +23,6 @@ import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Layout;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
 import software.amazon.ai.training.GradReq;
@@ -47,11 +46,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public Shape getShape() {
-        return null;
-    }
-
-    @Override
-    public Layout getLayout() {
         return null;
     }
 

@@ -26,16 +26,13 @@ import software.amazon.ai.Context;
  *   <li>{@link software.amazon.ai.ndarray.types.Shape}
  *   <li>{@link software.amazon.ai.ndarray.types.DataType}
  *   <li>{@link software.amazon.ai.ndarray.types.SparseFormat}
- *   <li>{@link software.amazon.ai.ndarray.types.Layout}
  * </ul>
  */
 public class DataDesc {
 
-    private Context context;
     private String name;
     private Shape shape;
     private DataType dataType;
-    private Layout layout;
 
     /**
      * Constructs and initializes a {@code DataDesc} with specified {@link Shape}.
@@ -43,7 +40,7 @@ public class DataDesc {
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape) {
-        this(shape, DataType.FLOAT32, null, Layout.UNDEFINED, null);
+        this(shape, DataType.FLOAT32, null);
     }
 
     /**
@@ -53,7 +50,7 @@ public class DataDesc {
      * @param name the name of the {@link software.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape, String name) {
-        this(shape, DataType.FLOAT32, name, Layout.UNDEFINED, null);
+        this(shape, DataType.FLOAT32, name);
     }
 
     /**
@@ -64,68 +61,21 @@ public class DataDesc {
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape, DataType dataType) {
-        this(shape, dataType, null, Layout.UNDEFINED, null);
+        this(shape, dataType, null);
     }
 
     /**
-     * Constructs and initializes a {@code DataDesc} with specified {@link Shape}, {@link DataType}
-     * and name.
+     * Constructs and initializes a {@code DataDesc} with specified {@link Shape}, {@link DataType},
+     * name, {@link Context} and {@link SparseFormat}.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param name the name of the {@link software.amazon.ai.ndarray.NDArray}
      */
     public DataDesc(Shape shape, DataType dataType, String name) {
-        this(shape, dataType, name, Layout.UNDEFINED, null);
-    }
-
-    /**
-     * Constructs and initializes a {@code DataDesc} with specified {@link Shape}, {@link DataType},
-     * name and {@link Layout}.
-     *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param name the name of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param layout the {@link Layout} of the {@link software.amazon.ai.ndarray.NDArray}
-     */
-    public DataDesc(Shape shape, DataType dataType, String name, Layout layout) {
-        this(shape, dataType, name, layout, null);
-    }
-
-    /**
-     * Constructs and initializes a {@code DataDesc} with specified {@link Shape}, {@link DataType},
-     * name, {@link Layout}, {@link Context} and {@link SparseFormat}.
-     *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param name the name of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param layout the {@link Layout} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
-     */
-    public DataDesc(Shape shape, DataType dataType, String name, Layout layout, Context context) {
-        this.context = context;
         this.name = name;
         this.shape = shape;
         this.dataType = dataType;
-        this.layout = layout;
-    }
-
-    /**
-     * Returns the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}.
-     *
-     * @return the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
-     */
-    public Context getContext() {
-        return context;
-    }
-
-    /**
-     * Sets the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}.
-     *
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
-     */
-    public void setContext(Context context) {
-        this.context = context;
     }
 
     /**
@@ -180,32 +130,5 @@ public class DataDesc {
      */
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
-    }
-
-    /**
-     * Returns the {@link Layout} of the {@link software.amazon.ai.ndarray.NDArray}.
-     *
-     * @return the {@link Layout} of the {@link software.amazon.ai.ndarray.NDArray}
-     */
-    public Layout getLayout() {
-        return layout;
-    }
-
-    /**
-     * Sets the {@link Layout} of the {@link software.amazon.ai.ndarray.NDArray}.
-     *
-     * @param layout the {@link Layout} of the {@link software.amazon.ai.ndarray.NDArray}
-     */
-    public void setLayout(Layout layout) {
-        this.layout = layout;
-    }
-
-    /**
-     * Returns index of 'N' (batch) axis of the {@code DataDesc}.
-     *
-     * @return index of 'N' (batch) axis of the {@code DataDesc}
-     */
-    public int getMajorAxis() {
-        return Layout.getBatchAxis(layout);
     }
 }

@@ -41,7 +41,6 @@ import software.amazon.ai.ndarray.index.NDIndexSlice;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Layout;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
 import software.amazon.ai.training.GradReq;
@@ -128,14 +127,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Layout getLayout() {
-        return Layout.UNDEFINED;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public DataDesc getDataDescriptor() {
-        return new DataDesc(getShape(), getDataType(), null, getLayout(), getContext());
+        return new DataDesc(getShape(), getDataType(), null);
     }
 
     /** {@inheritDoc} */
