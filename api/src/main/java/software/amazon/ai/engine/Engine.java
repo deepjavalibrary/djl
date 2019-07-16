@@ -61,7 +61,7 @@ public abstract class Engine {
         }
 
         Engine engine = list.get(0).getEngine();
-        logger.info("Loading ML engine from: {}", engine.getClass());
+        logger.debug("Loading ML engine from: {}", engine.getClass());
         return engine;
     }
 

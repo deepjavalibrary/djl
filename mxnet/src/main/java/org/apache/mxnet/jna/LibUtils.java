@@ -53,7 +53,7 @@ public class LibUtils {
                 libName = LIB_NAME;
             }
         }
-        logger.info("Loading mxnet library from: {}", libName);
+        logger.debug("Loading mxnet library from: {}", libName);
 
         return Native.load(libName, MxnetLibrary.class);
     }

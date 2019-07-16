@@ -9,7 +9,7 @@ This folder contains jupyter notebooks that demonstrate how to use Joule API in 
 
 ### JDK 9 (not jre)
 
-JDK 9 (or above are required)
+JDK 9 (or above are required), the examples provided in this folder requires JDK 10+.
 
 to confirm the java path is configured properly:
 
