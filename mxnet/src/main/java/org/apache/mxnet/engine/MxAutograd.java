@@ -13,26 +13,21 @@
 package org.apache.mxnet.engine;
 
 import org.apache.mxnet.jna.JnaUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import software.amazon.ai.ndarray.NDArray;
 
 public class MxAutograd implements AutoCloseable {
 
-    private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
-
-
-    //TODO: rename MxAutograd and move to API level
+    // TODO: rename MxAutograd and move to API level
     public MxAutograd() {
         boolean prevRecordingState = setRecording(true);
         if (prevRecordingState) {
-            throw new RuntimeException(
+            throw new IllegalStateException(
                     "Autograd Recording is already set to True. "
                             + "Please create autograd using try with resource ");
         }
         boolean prevTrainingState = setTraining(true);
         if (prevTrainingState) {
-            throw new RuntimeException(
+            throw new IllegalStateException(
                     "Autograd Training is already set to True. "
                             + "Please create autograd using try with resource ");
         }
@@ -46,9 +41,9 @@ public class MxAutograd implements AutoCloseable {
     }
 
     /**
-     * Returns the gradient buffer attached to input {@code NDArray}.
+     * Returns the gradient buffer attached to the target {@code NDArray}.
      *
-     * @param array input {@code NDArray} to get gradient
+     * @param array the target {@code NDArray} to get gradient buffer
      * @return the gradient buffer attached to the input {@code NDArray}
      */
     public MxNDArray getGradient(MxNDArray array) {
@@ -56,10 +51,12 @@ public class MxAutograd implements AutoCloseable {
     }
 
     /**
-     * Attaches a gradient buffer to input {@code NDArray}, so that `backward` can compute the gradient with
-     * respect to it.
+     * Attaches a gradient buffer to input {@code NDArray}, so that `backward` can compute the
+     * gradient with respect to it.
+     *
+     * @param array target {@code NDArray} to attach a gradient buffer
      */
-    public void attachGradient(NDArray array){
+    public void attachGradient(NDArray array) {
         array.attachGradient();
     }
 

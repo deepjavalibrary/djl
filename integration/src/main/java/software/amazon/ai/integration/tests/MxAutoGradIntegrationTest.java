@@ -24,7 +24,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 
 public class MxAutoGradIntegrationTest extends AbstractTest {
-    //TODO use API level integration test once moved Autograd to API package
+    // TODO use API level integration test once moved Autograd to API package
 
     public static void main(String[] args) {
         new MxAutoGradIntegrationTest().runTest(args);

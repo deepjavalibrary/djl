@@ -165,11 +165,11 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void attachGrad() {}
+    public void attachGradient() {}
 
     /** {@inheritDoc} */
     @Override
-    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {}
+    public void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {}
 
     /** {@inheritDoc} */
     @Override

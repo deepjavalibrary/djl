@@ -95,10 +95,10 @@ public class MockNDArray implements NDArray {
     public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {}
 
     @Override
-    public void attachGrad() {}
+    public void attachGradient() {}
 
     @Override
-    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {}
+    public void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {}
 
     @Override
     public NDArray getGradient() {
