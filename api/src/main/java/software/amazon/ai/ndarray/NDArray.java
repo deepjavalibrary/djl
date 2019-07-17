@@ -181,7 +181,7 @@ public interface NDArray extends AutoCloseable {
      * Attaches a gradient buffer to this NDArray, so that `backward` can compute the gradient with
      * respect to it.
      */
-    void attachGrad();
+    void attachGradient();
 
     /**
      * Attaches a gradient buffer to this NDArray, so that `backward` can compute the gradient with
@@ -191,7 +191,7 @@ public interface NDArray extends AutoCloseable {
      * @param sparseFormat {@link SparseFormat} The storage type of the gradient array. Defaults to
      *     the same type of this {@code NDArray}.
      */
-    void attachGrad(GradReq gradReq, SparseFormat sparseFormat);
+    void attachGradient(GradReq gradReq, SparseFormat sparseFormat);
 
     /**
      * Returns the gradient buffer attached to this {@code NDArray}.

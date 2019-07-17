@@ -361,14 +361,14 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public void attachGrad() {
-        array.attachGrad();
+    public void attachGradient() {
+        array.attachGradient();
     }
 
     /** {@inheritDoc} */
     @Override
-    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
-        array.attachGrad(gradReq, sparseFormat);
+    public void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {
+        array.attachGradient(gradReq, sparseFormat);
     }
 
     /** {@inheritDoc} */

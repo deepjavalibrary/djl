@@ -33,9 +33,9 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
     @RunAsTest
     public void testAddScalar() throws FailedTestException {
         NDArray lhs = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
-        lhs.attachGrad();
         NDArray result;
         try (MxAutograd autograd = new MxAutograd()) {
+            autograd.attachGradient(lhs);
             autograd.setRecording(true);
             result = NDArrays.add(lhs, 2);
             autograd.backward((MxNDArray) result);

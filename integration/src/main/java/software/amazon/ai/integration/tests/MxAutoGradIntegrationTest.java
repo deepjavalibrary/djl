@@ -36,7 +36,7 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
 
             NDArray lhs = manager.create(new Shape(2, 3), new float[] {6, -9, -12, 15, 0, 4});
             NDArray rhs = manager.create(new Shape(3, 1), new float[] {2, 3, -4});
-            lhs.attachGrad();
+            autograd.attachGradient(lhs);
             // autograd automatically set recording and training during initialization
             Assertions.assertTrue(autograd.isRecording());
             Assertions.assertTrue(autograd.isTraining());

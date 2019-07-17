@@ -223,8 +223,8 @@ public class NDArrayOtherOpTest extends AbstractTest {
         NDArray lhs = manager.create(new Shape(2, 3), new float[] {6, -9, -12, 15, 0, 4});
         NDArray rhs = manager.create(new Shape(3, 1), new float[] {2, 3, -4});
         NDArray result;
-        lhs.attachGrad();
         try (MxAutograd autograd = new MxAutograd()) {
+            autograd.attachGradient(lhs);
             autograd.setRecording(true);
             result = NDArrays.mmul(lhs, rhs);
             autograd.backward((MxNDArray) result);

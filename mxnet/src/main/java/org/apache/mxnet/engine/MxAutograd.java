@@ -15,23 +15,26 @@ package org.apache.mxnet.engine;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.ai.ndarray.NDArray;
 
 public class MxAutograd implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
+
+    //TODO: rename MxAutograd and move to API level
     public MxAutograd() {
-        Boolean prevRecordingState = setRecording(true);
+        boolean prevRecordingState = setRecording(true);
         if (prevRecordingState) {
-            logger.warn(
+            throw new RuntimeException(
                     "Autograd Recording is already set to True. "
-                            + "Please use try with resource or call autograd.setRecording(false) after training.");
+                            + "Please create autograd using try with resource ");
         }
-        Boolean prevTrainingState = setTraining(true);
+        boolean prevTrainingState = setTraining(true);
         if (prevTrainingState) {
-            logger.warn(
+            throw new RuntimeException(
                     "Autograd Training is already set to True. "
-                            + "Please use try with resource or call autograd.setTraining(false) after training.");
+                            + "Please create autograd using try with resource ");
         }
     }
 
@@ -40,6 +43,24 @@ public class MxAutograd implements AutoCloseable {
     public void close() {
         setRecording(false);
         setTraining(false);
+    }
+
+    /**
+     * Returns the gradient buffer attached to input {@code NDArray}.
+     *
+     * @param array input {@code NDArray} to get gradient
+     * @return the gradient buffer attached to the input {@code NDArray}
+     */
+    public MxNDArray getGradient(MxNDArray array) {
+        return (MxNDArray) array.getGradient();
+    }
+
+    /**
+     * Attaches a gradient buffer to input {@code NDArray}, so that `backward` can compute the gradient with
+     * respect to it.
+     */
+    public void attachGradient(NDArray array){
+        array.attachGradient();
     }
 
     /**

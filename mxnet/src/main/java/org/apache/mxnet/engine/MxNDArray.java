@@ -219,14 +219,13 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void attachGrad() {
-        attachGrad(GradReq.WRITE, null);
+    public void attachGradient() {
+        attachGradient(GradReq.WRITE, null);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void attachGrad(GradReq gradReq, SparseFormat sparseFormat) {
-        // TODO: should we close grad?
+    public void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {
         // Does zerosLike support sparse?
         MxNDArray grad;
         if (sparseFormat == null || sparseFormat == SparseFormat.UNDEFINED) {
