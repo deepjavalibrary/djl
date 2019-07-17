@@ -96,6 +96,9 @@ public final class JnaUtils {
     }
 
     public static FunctionInfo op(String opName) {
+        if (!OPS.containsKey(opName)) {
+            throw new IllegalArgumentException("Unknown operator: " + opName);
+        }
         return OPS.get(opName);
     }
 

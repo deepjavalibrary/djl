@@ -16,14 +16,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import software.amazon.ai.ndarray.types.DataType;
 
-public final class DataTypeMapper {
+public final class TfDataType {
 
-    private static Map<DataType, org.tensorflow.DataType> j2TMap = createJ2T();
-    private static Map<org.tensorflow.DataType, DataType> t2JMap = createT2J();
+    private static Map<DataType, org.tensorflow.DataType> toTf = createMapToTf();
+    private static Map<org.tensorflow.DataType, DataType> fromTf = createMapFromTf();
 
-    private DataTypeMapper() {}
+    private TfDataType() {}
 
-    private static Map<DataType, org.tensorflow.DataType> createJ2T() {
+    private static Map<DataType, org.tensorflow.DataType> createMapToTf() {
         Map<DataType, org.tensorflow.DataType> map = new ConcurrentHashMap<>();
         map.put(DataType.FLOAT32, org.tensorflow.DataType.FLOAT);
         map.put(DataType.FLOAT64, org.tensorflow.DataType.DOUBLE);
@@ -33,7 +33,7 @@ public final class DataTypeMapper {
         return map;
     }
 
-    private static Map<org.tensorflow.DataType, DataType> createT2J() {
+    private static Map<org.tensorflow.DataType, DataType> createMapFromTf() {
         Map<org.tensorflow.DataType, DataType> map = new ConcurrentHashMap<>();
         map.put(org.tensorflow.DataType.FLOAT, DataType.FLOAT32);
         map.put(org.tensorflow.DataType.DOUBLE, DataType.FLOAT64);
@@ -43,11 +43,11 @@ public final class DataTypeMapper {
         return map;
     }
 
-    public static DataType getJoule(org.tensorflow.DataType t) {
-        return t2JMap.get(t);
+    public static DataType fromTf(org.tensorflow.DataType tfType) {
+        return fromTf.get(tfType);
     }
 
-    public static org.tensorflow.DataType getTf(DataType t) {
-        return j2TMap.get(t);
+    public static org.tensorflow.DataType toTf(DataType jType) {
+        return toTf.get(jType);
     }
 }

@@ -39,7 +39,7 @@ public class MxOpParams extends PairList<String, String> {
 
     public void setDataType(DataType dataType) {
         if (dataType != null) {
-            setParam("dtype", dataType.getType());
+            setParam("dtype", MxDataType.toMx(dataType));
         }
     }
 

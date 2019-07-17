@@ -21,20 +21,27 @@ import java.nio.LongBuffer;
 
 /** An enum representing the underlying {@link software.amazon.ai.ndarray.NDArray}'s data type. */
 public enum DataType {
-    FLOAT32("float32", 4),
-    FLOAT64("float64", 8),
-    FLOAT16("float16", 2),
-    UINT8("uint8", 1),
-    INT32("int32", 4),
-    INT8("int8", 1),
-    INT64("int64", 8),
-    UNKNOWN("unknown", 0);
+    FLOAT32(Format.FLOATING, 4),
+    FLOAT64(Format.FLOATING, 8),
+    FLOAT16(Format.FLOATING, 2),
+    UINT8(Format.UINT, 1),
+    INT32(Format.INT, 4),
+    INT8(Format.INT, 1),
+    INT64(Format.INT, 8),
+    UNKNOWN(Format.UNKNOWN, 0);
 
-    private String type;
+    public enum Format {
+        FLOATING,
+        UINT,
+        INT,
+        UNKNOWN
+    }
+
+    private Format format;
     private int numOfBytes;
 
-    DataType(String type, int numOfBytes) {
-        this.type = type;
+    DataType(Format format, int numOfBytes) {
+        this.format = format;
         this.numOfBytes = numOfBytes;
     }
 
@@ -48,21 +55,21 @@ public enum DataType {
     }
 
     /**
-     * Returns name of the data type.
+     * Returns the format of the data type.
      *
-     * @return name of the data type
+     * @return Returns the format of the data type
      */
-    public String getType() {
-        return type;
+    public Format getFormat() {
+        return format;
     }
 
     /**
-     * Checks whether it is a real data type.
+     * Checks whether it is a floating data type.
      *
-     * @return {@code true} if it is a real type
+     * @return {@code true} if it is a floating data type
      */
-    public boolean isReal() {
-        return type.startsWith("float");
+    public boolean isFloating() {
+        return format == Format.FLOATING;
     }
     /**
      * Checks whether it is an integer data type.
@@ -70,7 +77,7 @@ public enum DataType {
      * @return {@code true} if it is an integer type
      */
     public boolean isInteger() {
-        return type.startsWith("int") || type.startsWith("uint");
+        return format == Format.UINT || format == Format.INT;
     }
 
     public static DataType fromBuffer(Buffer data) {
@@ -93,6 +100,6 @@ public enum DataType {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return type;
+        return format.toString().toLowerCase() + (8 * getNumOfBytes());
     }
 }

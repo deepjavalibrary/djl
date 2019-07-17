@@ -76,7 +76,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
-        return DataTypeMapper.getJoule(getTfDataType());
+        return TfDataType.fromTf(getTfDataType());
     }
 
     /** {@inheritDoc} */
