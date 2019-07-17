@@ -1044,6 +1044,12 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray squeeze(int[] axes) {
+        return array.squeeze(axes);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray stack(NDArray[] arrays, int axis) {
         return array.stack(arrays, axis);
     }

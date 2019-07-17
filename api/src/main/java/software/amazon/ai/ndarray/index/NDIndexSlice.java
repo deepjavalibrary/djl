@@ -15,9 +15,9 @@ package software.amazon.ai.ndarray.index;
 /** An NDIndexElement that returns a range of values in the specified dimension. */
 public class NDIndexSlice implements NDIndexElement {
 
-    private Integer min;
-    private Integer max;
-    private Integer step;
+    private Long min;
+    private Long max;
+    private Long step;
 
     /**
      * Constructs a {@code NDIndexSlice} instance with specified range and step.
@@ -26,7 +26,7 @@ public class NDIndexSlice implements NDIndexElement {
      * @param max the end of the range
      * @param step the step between each slice
      */
-    public NDIndexSlice(Integer min, Integer max, Integer step) {
+    public NDIndexSlice(Long min, Long max, Long step) {
         this.min = min;
         this.max = max;
         this.step = step;
@@ -37,7 +37,7 @@ public class NDIndexSlice implements NDIndexElement {
      *
      * @return the start of the range
      */
-    public Integer getMin() {
+    public Long getMin() {
         return min;
     }
 
@@ -46,7 +46,7 @@ public class NDIndexSlice implements NDIndexElement {
      *
      * @return the end of the range
      */
-    public Integer getMax() {
+    public Long getMax() {
         return max;
     }
 
@@ -55,7 +55,7 @@ public class NDIndexSlice implements NDIndexElement {
      *
      * @return the step between each slice
      */
-    public Integer getStep() {
+    public Long getStep() {
         return step;
     }
 

@@ -41,9 +41,15 @@ public class NDArrayOtherOpTest extends AbstractTest {
         NDArray getAtExpected = manager.create(new float[] {1f, 2f});
         Assertions.assertEquals(getAt, getAtExpected);
 
+        Assertions.assertEquals(getAtExpected, original.get("0,:"));
+        Assertions.assertEquals(getAtExpected, original.get("0,*"));
+
         NDArray getSlice = original.get("1:");
         NDArray getSliceExpected = manager.create(new float[] {3f, 4f}, new Shape(1, 2));
         Assertions.assertEquals(getSlice, getSliceExpected);
+
+        NDArray getStepSlice = original.get("1::2");
+        Assertions.assertEquals(getStepSlice, getSliceExpected);
     }
 
     @RunAsTest

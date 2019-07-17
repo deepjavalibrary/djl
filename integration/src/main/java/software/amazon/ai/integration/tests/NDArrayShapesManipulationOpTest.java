@@ -65,6 +65,22 @@ public class NDArrayShapesManipulationOpTest extends AbstractTest {
     }
 
     @RunAsTest
+    public void testSqueeze() throws FailedTestException {
+        NDArray original = manager.ones(new Shape(1, 2, 1, 3, 1));
+        Assertions.assertTrue(
+                Arrays.equals(
+                        original.squeeze().getShape().getShape(), new Shape(2, 3).getShape()));
+        Assertions.assertTrue(
+                Arrays.equals(
+                        original.squeeze(2).getShape().getShape(),
+                        new Shape(1, 2, 3, 1).getShape()));
+        Assertions.assertTrue(
+                Arrays.equals(
+                        original.squeeze(new int[] {0, 4}).getShape().getShape(),
+                        new Shape(2, 1, 3).getShape()));
+    }
+
+    @RunAsTest
     public void testStack() throws FailedTestException {
         NDArray original = manager.create(new float[] {1f, 2f});
         NDArray expect = manager.create(new float[] {1f, 2f, 1f, 2f}, new Shape(2, 2));

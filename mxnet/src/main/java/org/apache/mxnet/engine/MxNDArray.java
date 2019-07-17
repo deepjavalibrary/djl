@@ -21,7 +21,9 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -32,6 +34,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.index.NDIndex;
+import software.amazon.ai.ndarray.index.NDIndexAll;
 import software.amazon.ai.ndarray.index.NDIndexElement;
 import software.amazon.ai.ndarray.index.NDIndexFixed;
 import software.amazon.ai.ndarray.index.NDIndexSlice;
@@ -429,28 +432,52 @@ public class MxNDArray extends NativeResource implements NDArray {
             return this;
         }
 
-        if (index.getRank() == 1) {
-            NDIndexElement ie = index.get(0);
-            if (ie instanceof NDIndexFixed) {
-                Pointer pointer = JnaUtils.ndArrayAt(getHandle(), ((NDIndexFixed) ie).getIndex());
-                return manager.create(pointer);
-            } else if (ie instanceof NDIndexSlice) {
-                NDIndexSlice slice = (NDIndexSlice) ie;
-                int min = Optional.ofNullable(slice.getMin()).orElse(0);
-                int max = Optional.ofNullable(slice.getMax()).orElse((int) size(0));
-                if (slice.getStep() != null) {
-                    throw new UnsupportedOperationException(
-                            "Slicing currently does not support step");
-                }
-                Pointer pointer = JnaUtils.slice(getHandle(), min, max);
-                return manager.create(pointer);
-            } else {
-                throw new UnsupportedOperationException(
-                        "get() currently supports Fixed and Slice indexes");
+        if (index.stream()
+                .allMatch(
+                        ie ->
+                                ie instanceof NDIndexAll
+                                        || ie instanceof NDIndexFixed
+                                        || ie instanceof NDIndexSlice)) {
+            int dimensions = index.getRank();
+            if (dimensions > getShape().dimension()) {
+                throw new IllegalArgumentException("The index has too many dimensions");
             }
-        } else {
-            throw new UnsupportedOperationException("get() currently supports only rank 1");
+            long[] min = new long[dimensions];
+            long[] max = new long[dimensions];
+            long[] step = new long[dimensions];
+            List<Integer> toSqueeze = new ArrayList<>(dimensions);
+            for (int i = 0; i < dimensions; i++) {
+                NDIndexElement ie = index.get(i);
+                if (ie instanceof NDIndexFixed) {
+                    min[i] = ((NDIndexFixed) ie).getIndex();
+                    max[i] = ((NDIndexFixed) ie).getIndex() + 1;
+                    step[i] = 1;
+                    toSqueeze.add(i);
+                } else if (ie instanceof NDIndexSlice) {
+                    NDIndexSlice slice = (NDIndexSlice) ie;
+                    min[i] = Optional.ofNullable(slice.getMin()).orElse(0L);
+                    max[i] = Optional.ofNullable(slice.getMax()).orElse(size(i));
+                    step[i] = Optional.ofNullable(slice.getStep()).orElse(1L);
+                } else if (ie instanceof NDIndexAll) {
+                    min[i] = 0;
+                    max[i] = size(i);
+                    step[i] = 1;
+                }
+            }
+            MxOpParams params = new MxOpParams();
+            params.addTupleParam("begin", min);
+            params.addTupleParam("end", max);
+            params.addTupleParam("step", step);
+            NDArray result = manager.invoke("slice", this, params);
+            if (!toSqueeze.isEmpty()) {
+                NDArray oldResult = result;
+                result = result.squeeze(toSqueeze.stream().mapToInt(i -> i).toArray());
+                oldResult.close();
+            }
+            return result;
         }
+        throw new UnsupportedOperationException(
+                "get() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */
@@ -1146,6 +1173,14 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         return manager.invoke("_npi_expand_dims", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray squeeze(int[] axes) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        return manager.invoke("_np_squeeze", this, params);
     }
 
     /** {@inheritDoc} */

@@ -884,6 +884,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray squeeze(int[] axes) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray stack(NDArray[] arrays, int axis) {
         return null;
     }

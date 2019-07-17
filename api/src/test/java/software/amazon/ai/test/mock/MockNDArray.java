@@ -632,6 +632,11 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray squeeze(int[] axes) {
+        return null;
+    }
+
+    @Override
     public NDArray stack(NDArray[] arrays, int axis) {
         return null;
     }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import software.amazon.ai.ndarray.NDArray;
 
 /**
@@ -39,7 +40,7 @@ import software.amazon.ai.ndarray.NDArray;
 public class NDIndex {
 
     private static final Pattern ITEM_PATTERN =
-            Pattern.compile("(\\*)|((-?\\d+)?:(-?\\d+)?(:-?\\d+)?)|(-?\\d+)");
+            Pattern.compile("(\\*)|((-?\\d+)?:(-?\\d+)?(:(-?\\d+))?)|(-?\\d+)");
 
     private int rank;
     private List<NDIndexElement> indices;
@@ -97,7 +98,7 @@ public class NDIndex {
      * @param indices indices with each index corresponding to the dimensions and negative indices
      *     tarting from the end
      */
-    public NDIndex(int... indices) {
+    public NDIndex(long... indices) {
         rank = 0;
         this.indices = new ArrayList<>(indices.length);
         addIndices(indices);
@@ -145,9 +146,9 @@ public class NDIndex {
      *     from the end
      * @return Returns the updated {@link NDIndex}
      */
-    public final NDIndex addIndices(int... indices) {
+    public final NDIndex addIndices(long... indices) {
         rank += indices.length;
-        for (Integer i : indices) {
+        for (long i : indices) {
             this.indices.add(new NDIndexFixed(i));
         }
         return this;
@@ -175,7 +176,7 @@ public class NDIndex {
      * @param max The maximum of the range
      * @return Returns the updated {@link NDIndex}
      */
-    public NDIndex addSliceDim(int min, int max) {
+    public NDIndex addSliceDim(long min, long max) {
         rank++;
         indices.add(new NDIndexSlice(min, max, null));
         return this;
@@ -189,10 +190,19 @@ public class NDIndex {
      * @param step The step of the slice
      * @return Returns the updated {@link NDIndex}
      */
-    public NDIndex addSliceDim(int min, int max, int step) {
+    public NDIndex addSliceDim(long min, long max, long step) {
         rank++;
         indices.add(new NDIndexSlice(min, max, step));
         return this;
+    }
+
+    /**
+     * Returns a stream of the NDIndexElements.
+     *
+     * @return Returns a stream of the NDIndexElements
+     */
+    public Stream<NDIndexElement> stream() {
+        return indices.stream();
     }
 
     private void addIndexItem(String indexItem) {
@@ -208,16 +218,16 @@ public class NDIndex {
             return;
         }
 
-        String digit = m.group(6);
+        String digit = m.group(7);
         if (digit != null) {
-            indices.add(new NDIndexFixed(Integer.parseInt(digit)));
+            indices.add(new NDIndexFixed(Long.parseLong(digit)));
             return;
         }
 
         // Slice
-        Integer min = m.group(3) != null ? Integer.parseInt(m.group(3)) : null;
-        Integer max = m.group(4) != null ? Integer.parseInt(m.group(4)) : null;
-        Integer step = m.group(5) != null ? Integer.parseInt(m.group(5)) : null;
+        Long min = m.group(3) != null ? Long.parseLong(m.group(3)) : null;
+        Long max = m.group(4) != null ? Long.parseLong(m.group(4)) : null;
+        Long step = m.group(6) != null ? Long.parseLong(m.group(6)) : null;
         if (min == null && max == null && step == null) {
             indices.add(new NDIndexAll());
         } else {

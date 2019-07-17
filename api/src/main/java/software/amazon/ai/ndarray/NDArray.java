@@ -420,7 +420,7 @@ public interface NDArray extends AutoCloseable {
      *     tarting from the end
      * @return the partial NDArray
      */
-    default NDArray get(int... indices) {
+    default NDArray get(long... indices) {
         return get(new NDIndex(indices));
     }
 
@@ -431,7 +431,7 @@ public interface NDArray extends AutoCloseable {
      * @return a zero dimensional NDArray corresponding to the element.
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    default NDArray getElement(int... indices) {
+    default NDArray getElement(long... indices) {
         NDArray value = get(new NDIndex(indices));
         if (value.size() != 1) {
             throw new IllegalArgumentException("The supplied Index does not produce an element");
@@ -446,7 +446,7 @@ public interface NDArray extends AutoCloseable {
      * @return The element in the specified index as a long
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    default long getLong(int... indices) {
+    default long getLong(long... indices) {
         return getElement(indices).toLongArray()[0];
     }
 
@@ -457,7 +457,7 @@ public interface NDArray extends AutoCloseable {
      * @return The element in the specified index as a double
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    default double getDouble(int... indices) {
+    default double getDouble(long... indices) {
         return getElement(indices).toDoubleArray()[0];
     }
 
@@ -468,7 +468,7 @@ public interface NDArray extends AutoCloseable {
      * @return The element in the specified index as a float
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    default float getFloat(int... indices) {
+    default float getFloat(long... indices) {
         return getElement(indices).toFloatArray()[0];
     }
 
@@ -479,7 +479,7 @@ public interface NDArray extends AutoCloseable {
      * @return The element in the specified index as a float
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    default int getInt(int... indices) {
+    default int getInt(long... indices) {
         return getElement(indices).toIntArray()[0];
     }
 
@@ -490,7 +490,7 @@ public interface NDArray extends AutoCloseable {
      * @return The element in the specified index as a float
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    default byte getByte(int... indices) {
+    default byte getByte(long... indices) {
         return getElement(indices).toByteArray()[0];
     }
 
@@ -501,7 +501,7 @@ public interface NDArray extends AutoCloseable {
      * @return The element in the specified index as a float
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    default int getUint8(int... indices) {
+    default int getUint8(long... indices) {
         return getByte(indices) & 0xff;
     }
 
@@ -1620,6 +1620,37 @@ public interface NDArray extends AutoCloseable {
      * @return output array. The number of dimensions is one greater than that of the input array.
      */
     NDArray expandDims(int axis);
+
+    /**
+     * Removes all singleton dimensions from the NDArray shape.
+     *
+     * @return Returns an output array of same size and data without singleton dimensions
+     */
+    default NDArray squeeze() {
+        long[] shape = getShape().getShape();
+        return squeeze(IntStream.range(0, shape.length).filter(i -> shape[i] == 1).toArray());
+    }
+
+    /**
+     * Removes a singleton dimension at axis.
+     *
+     * @param axis The axis at which to remove the singleton dimension
+     * @return Returns an output array of same size and data without the axis at part of the shape
+     * @throws IllegalArgumentException Thrown if the given axis is not a singleton dimension
+     */
+    default NDArray squeeze(int axis) {
+        return squeeze(new int[] {axis});
+    }
+
+    /**
+     * Removes singleton dimensions at the given axes.
+     *
+     * @param axes The axes at which to remove the singleton dimensions
+     * @return Returns an output array of same size and data without the axes at part of the shape
+     * @throws IllegalArgumentException Thrown if any of the given axes are not a singleton
+     *     dimension
+     */
+    NDArray squeeze(int[] axes);
 
     /**
      * Joins a sequence of {@code NDArray} along a new axis.

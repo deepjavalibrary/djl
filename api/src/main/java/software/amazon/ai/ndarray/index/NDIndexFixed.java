@@ -15,14 +15,14 @@ package software.amazon.ai.ndarray.index;
 /** An NDIndexElement that returns only a specific value in the corresponding dimension. */
 public class NDIndexFixed implements NDIndexElement {
 
-    private int index;
+    private long index;
 
     /**
      * Constructs a {@code NDIndexFixed} instance with specified dimension.
      *
      * @param index dimension of the NDArray
      */
-    public NDIndexFixed(int index) {
+    public NDIndexFixed(long index) {
         this.index = index;
     }
 
@@ -31,7 +31,7 @@ public class NDIndexFixed implements NDIndexElement {
      *
      * @return dimension of the index
      */
-    public int getIndex() {
+    public long getIndex() {
         return index;
     }
 
