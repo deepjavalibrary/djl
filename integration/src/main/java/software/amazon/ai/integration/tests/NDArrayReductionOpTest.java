@@ -116,6 +116,6 @@ public class NDArrayReductionOpTest extends AbstractTest {
         NDArray expect = manager.create(new Shape(2), new float[] {6f, 8f});
         Assertions.assertEquals(original, expect);
         original = manager.arange(24).reshape(new Shape(2, 2, 2, 3)).trace();
-        Assertions.assertStatement(original.getShape().equals(new Shape(2, 3)));
+        Assertions.assertTrue(original.getShape().equals(new Shape(2, 3)));
     }
 }
