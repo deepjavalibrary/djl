@@ -94,7 +94,7 @@ public final class ClassifyExample extends AbstractExample {
             BufferedImage image = Images.resizeImage(input, imageWidth, imageHeight);
             FloatBuffer buffer = Images.toFloatBuffer(image);
 
-            return new NDList(ctx.getNDManager().create(dataDesc, buffer));
+            return new NDList(ctx.getNDManager().create(buffer, dataDesc));
         }
 
         @Override

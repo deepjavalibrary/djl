@@ -83,7 +83,7 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public MxSparseNDArray createCSR(
-            Shape shape, Buffer data, long[] indptr, long[] indices, Context context) {
+            Buffer data, long[] indptr, long[] indices, Shape shape, Context context) {
         SparseFormat fmt = SparseFormat.CSR;
         DataType dataType = DataType.fromBuffer(data);
         MxNDArray indptrNd = create(new Shape(indptr.length), DataType.INT64, context);
@@ -111,7 +111,7 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public MxSparseNDArray createRowSparse(
-            Shape shape, Buffer data, Shape dataShape, long[] indices, Context context) {
+            Buffer data, Shape dataShape, long[] indices, Shape shape, Context context) {
         SparseFormat fmt = SparseFormat.ROW_SPARSE;
         DataType dataType = DataType.fromBuffer(data);
         MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64, context);

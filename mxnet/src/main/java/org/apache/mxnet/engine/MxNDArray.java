@@ -863,7 +863,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray square() {
-        return manager.invoke("_np_square", this, null);
+        return manager.invoke("_npi_square", this, null);
     }
 
     /** {@inheritDoc} */
@@ -905,7 +905,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray log() {
-        return manager.invoke("_np_log", this, null);
+        return manager.invoke("_npi_log", this, null);
     }
 
     /** {@inheritDoc} */
@@ -917,7 +917,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray log2() {
-        return manager.invoke("_np_log2", this, null);
+        return manager.invoke("_npi_log2", this, null);
     }
 
     /** {@inheritDoc} */
@@ -941,7 +941,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray asin() {
-        return manager.invoke("_np_arcsin", this, null);
+        return manager.invoke("_npi_arcsin", this, null);
     }
 
     /** {@inheritDoc} */
@@ -995,13 +995,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toDegrees() {
-        return manager.invoke("_np_degrees", this, null);
+        return manager.invoke("_npi_degrees", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray toRadians() {
-        return manager.invoke("_np_radians", this, null);
+        return manager.invoke("_npi_radians", this, null);
     }
 
     /** {@inheritDoc} */

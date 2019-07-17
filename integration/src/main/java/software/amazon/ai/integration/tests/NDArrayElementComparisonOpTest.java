@@ -30,8 +30,8 @@ public class NDArrayElementComparisonOpTest extends AbstractTest {
 
     @RunAsTest
     public void testContentEquals() throws FailedTestException {
-        NDArray original = manager.create(new Shape(2), new float[] {1f, 2f});
-        NDArray expect = manager.create(new Shape(2), new float[] {1f, 2f});
+        NDArray original = manager.create(new float[] {1f, 2f});
+        NDArray expect = manager.create(new float[] {1f, 2f});
         if (!original.contentEquals(expect)) {
             throw new FailedTestException("testContentEquals tests failed!");
         }
@@ -39,8 +39,8 @@ public class NDArrayElementComparisonOpTest extends AbstractTest {
 
     @RunAsTest
     public void testEqualsForEqualNDArray() throws FailedTestException {
-        NDArray ndArray1 = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
-        NDArray ndArray2 = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
+        NDArray ndArray1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
+        NDArray ndArray2 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
         NDArray result = NDArrays.eq(ndArray1, ndArray2);
         Assertions.assertTrue(
                 result.nonzero() == 4 && NDArrays.equals(ndArray1, ndArray2),
@@ -49,15 +49,15 @@ public class NDArrayElementComparisonOpTest extends AbstractTest {
 
     @RunAsTest
     public void testEqualsForScalar() throws FailedTestException {
-        NDArray ndArray = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
+        NDArray ndArray = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
         NDArray result = NDArrays.eq(ndArray, 2);
         Assertions.assertTrue(result.nonzero() == 1, "Incorrect comparison for equal NDArray");
     }
 
     @RunAsTest
     public void testEqualsForUnEqualNDArray() throws FailedTestException {
-        NDArray ndArray1 = manager.create(new Shape(1, 4), new float[] {1f, 2f, 3f, 4f});
-        NDArray ndArray2 = manager.create(new Shape(1, 4), new float[] {1f, 3f, 3f, 4f});
+        NDArray ndArray1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
+        NDArray ndArray2 = manager.create(new float[] {1f, 3f, 3f, 4f}, new Shape(1, 4));
         NDArray result = NDArrays.eq(ndArray1, ndArray2);
         Assertions.assertTrue(
                 result.nonzero() == 3 && !NDArrays.equals(ndArray1, ndArray2),
@@ -66,14 +66,14 @@ public class NDArrayElementComparisonOpTest extends AbstractTest {
 
     @RunAsTest
     public void testGreaterThanScalar() throws FailedTestException {
-        NDArray array = manager.create(new Shape(1, 5), new float[] {1, 0, 2f, 2f, 4f});
+        NDArray array = manager.create(new float[] {1, 0, 2f, 2f, 4f}, new Shape(1, 5));
         NDArray greater = NDArrays.gt(array, 2);
         Assertions.assertTrue(greater.nonzero() == 1, "greater_scalar: Incorrect comparison");
     }
 
     @RunAsTest
     public void testGreaterThanOrEqualToScalar() throws FailedTestException {
-        NDArray array = manager.create(new Shape(1, 4), new float[] {1f, 2f, 2f, 4f});
+        NDArray array = manager.create(new float[] {1f, 2f, 2f, 4f}, new Shape(1, 4));
         NDArray greater = NDArrays.gte(array, 2);
         Assertions.assertTrue(
                 greater.nonzero() == 3, "greater_equals_scalar: Incorrect comparison");
@@ -81,8 +81,8 @@ public class NDArrayElementComparisonOpTest extends AbstractTest {
 
     @RunAsTest
     public void testGreaterThanAndLessThan() throws FailedTestException {
-        NDArray ndArray1 = manager.create(new Shape(1, 6), new float[] {1f, 2f, 2f, 4f, 5f, 4f});
-        NDArray ndArray2 = manager.create(new Shape(1, 6), new float[] {2f, 1f, 2f, 5f, 4f, 5f});
+        NDArray ndArray1 = manager.create(new float[] {1f, 2f, 2f, 4f, 5f, 4f}, new Shape(1, 6));
+        NDArray ndArray2 = manager.create(new float[] {2f, 1f, 2f, 5f, 4f, 5f}, new Shape(1, 6));
         NDArray greater = NDArrays.gt(ndArray1, ndArray2);
         Assertions.assertTrue(greater.nonzero() == 2, "greater: Incorrect comparison");
         NDArray lesser = NDArrays.lt(ndArray1, ndArray2);
@@ -91,8 +91,8 @@ public class NDArrayElementComparisonOpTest extends AbstractTest {
 
     @RunAsTest
     public void testGreaterThanAndLessThanEquals() throws FailedTestException {
-        NDArray ndArray1 = manager.create(new Shape(1, 6), new float[] {1f, 2f, 2f, 4f, 5f, 4f});
-        NDArray ndArray2 = manager.create(new Shape(1, 6), new float[] {2f, 1f, 2f, 5f, 4f, 5f});
+        NDArray ndArray1 = manager.create(new float[] {1f, 2f, 2f, 4f, 5f, 4f}, new Shape(1, 6));
+        NDArray ndArray2 = manager.create(new float[] {2f, 1f, 2f, 5f, 4f, 5f}, new Shape(1, 6));
         NDArray greater = NDArrays.gte(ndArray1, ndArray2);
         Assertions.assertTrue(greater.nonzero() == 3, "greater_equal: Incorrect comparison");
         NDArray lesser = NDArrays.lte(ndArray1, ndArray2);
@@ -101,14 +101,14 @@ public class NDArrayElementComparisonOpTest extends AbstractTest {
 
     @RunAsTest
     public void testLesserThanOrEqualToScalar() throws FailedTestException {
-        NDArray array = manager.create(new Shape(1, 5), new float[] {1f, 2f, 2f, 4f, 5f});
+        NDArray array = manager.create(new float[] {1f, 2f, 2f, 4f, 5f}, new Shape(1, 5));
         NDArray greater = NDArrays.lte(array, 2);
         Assertions.assertTrue(greater.nonzero() == 3, "lesser_equals_scalar: Incorrect comparison");
     }
 
     @RunAsTest
     public void testLesserThanScalar() throws FailedTestException {
-        NDArray array = manager.create(new Shape(1, 5), new float[] {1f, 2f, 2f, 4f, 5f});
+        NDArray array = manager.create(new float[] {1f, 2f, 2f, 4f, 5f}, new Shape(1, 5));
         NDArray greater = NDArrays.lt(array, 2);
         Assertions.assertTrue(greater.nonzero() == 1, "lesser_scalar: Incorrect comparison");
     }

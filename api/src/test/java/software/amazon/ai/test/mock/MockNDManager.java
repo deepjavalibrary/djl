@@ -30,13 +30,13 @@ public class MockNDManager implements NDManager {
 
     @Override
     public NDArray createCSR(
-            Shape shape, Buffer data, long[] indptr, long[] indices, Context context) {
+            Buffer data, long[] indptr, long[] indices, Shape shape, Context context) {
         return null;
     }
 
     @Override
     public NDArray createRowSparse(
-            Shape shape, Buffer data, Shape dataShape, long[] indices, Context context) {
+            Buffer data, Shape dataShape, long[] indices, Shape shape, Context context) {
         return null;
     }
 

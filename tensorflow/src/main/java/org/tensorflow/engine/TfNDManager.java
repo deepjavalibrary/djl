@@ -71,7 +71,7 @@ public class TfNDManager implements NDManager, AutoCloseable {
     }
 
     @Override
-    public NDArray create(Shape shape, float[] data) {
+    public NDArray create(float[] data, Shape shape) {
         return new TfNDArray(this, Tensors.create(data));
     }
 
@@ -88,19 +88,19 @@ public class TfNDManager implements NDManager, AutoCloseable {
         return new TfNDArray(this, tensor);
     }
 
-    public TfNDArray create(Shape shape, ByteBuffer data) {
+    public TfNDArray create(ByteBuffer data, Shape shape) {
         return new TfNDArray(this, shape, data);
     }
 
     @Override
     public NDArray createCSR(
-            Shape shape, Buffer data, long[] indptr, long[] indices, Context context) {
+            Buffer data, long[] indptr, long[] indices, Shape shape, Context context) {
         return null;
     }
 
     @Override
     public NDArray createRowSparse(
-            Shape shape, Buffer data, Shape dataShape, long[] indices, Context context) {
+            Buffer data, Shape dataShape, long[] indices, Shape shape, Context context) {
         return null;
     }
 

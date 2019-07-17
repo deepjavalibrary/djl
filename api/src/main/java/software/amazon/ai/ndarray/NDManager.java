@@ -126,15 +126,65 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Creates and initializes a 1D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(float[] data) {
+        return create(data, new Shape(data.length));
+    }
+
+    /**
+     * Creates and initializes a 1D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(int[] data) {
+        return create(data, new Shape(data.length));
+    }
+
+    /**
+     * Creates and initializes a 1D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(double[] data) {
+        return create(data, new Shape(data.length));
+    }
+
+    /**
+     * Creates and initializes a 1D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(long[] data) {
+        return create(data, new Shape(data.length));
+    }
+
+    /**
+     * Creates and initializes a 1D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(byte[] data) {
+        return create(data, new Shape(data.length));
+    }
+
+    /**
      * Creates and initializes a {@link NDArray} with specified {@link Shape}.
      *
      * <p>{@link DataType} of the NDArray will determined by type of Buffer.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data data to initialize the {@code NDArray}
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray create(Shape shape, Buffer data) {
+    default NDArray create(Buffer data, Shape shape) {
         DataType dataType = DataType.fromBuffer(data);
         NDArray array = create(shape, dataType, getContext());
         array.set(data);
@@ -166,11 +216,11 @@ public interface NDManager extends AutoCloseable {
     /**
      * Creates and initialize an instance of {@link NDArray} with specified {@link DataDesc}.
      *
-     * @param dataDesc the {@link DataDesc} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data data to initialize the {@code NDArray}
+     * @param dataDesc the {@link DataDesc} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray create(DataDesc dataDesc, Buffer data) {
+    default NDArray create(Buffer data, DataDesc dataDesc) {
         NDArray array = create(dataDesc);
         array.set(data);
         return array;
@@ -180,60 +230,60 @@ public interface NDManager extends AutoCloseable {
      * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and float
      * array.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray create(Shape shape, float[] data) {
-        return create(shape, FloatBuffer.wrap(data));
+    default NDArray create(float[] data, Shape shape) {
+        return create(FloatBuffer.wrap(data), shape);
     }
 
     /**
      * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and int
      * array.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray create(Shape shape, int[] data) {
-        return create(shape, IntBuffer.wrap(data));
+    default NDArray create(int[] data, Shape shape) {
+        return create(IntBuffer.wrap(data), shape);
     }
 
     /**
      * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and double
      * array.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray create(Shape shape, double[] data) {
-        return create(shape, DoubleBuffer.wrap(data));
+    default NDArray create(double[] data, Shape shape) {
+        return create(DoubleBuffer.wrap(data), shape);
     }
 
     /**
      * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and long
      * array.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray create(Shape shape, long[] data) {
-        return create(shape, LongBuffer.wrap(data));
+    default NDArray create(long[] data, Shape shape) {
+        return create(LongBuffer.wrap(data), shape);
     }
 
     /**
      * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and byte
      * array.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the float array that needs to be set
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray create(Shape shape, byte[] data) {
-        return create(shape, ByteBuffer.wrap(data));
+    default NDArray create(byte[] data, Shape shape) {
+        return create(ByteBuffer.wrap(data), shape);
     }
 
     /**
@@ -250,52 +300,52 @@ public interface NDManager extends AutoCloseable {
     /**
      * Create a Compressed Sparse Row Storage (CSR) Format Matrix.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the data to set for the CSR Matrix
      * @param indptr The indptr array is what will help identify the rows where the data appears
      * @param indices The indices array stores the column index for each non-zero element in data
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray createCSR(Shape shape, Buffer data, long[] indptr, long[] indices, Context context);
+    NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape, Context context);
 
     /**
      * Create a Compressed Sparse Row Storage (CSR) Format Matrix.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the data to set for the CSR Matrix
      * @param indptr The indptr array is what will help identify the rows where the data appears
      * @param indices The indices array stores the column index for each non-zero element in data
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray createCSR(Shape shape, Buffer data, long[] indptr, long[] indices) {
-        return createCSR(shape, data, indptr, indices, getContext());
+    default NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
+        return createCSR(data, indptr, indices, shape, getContext());
     }
 
     /**
      * RowSparseNDArray stores the matrix in row sparse format.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the data to set for the Row Sparse NDArray
      * @param dataShape the {@link Shape} of the data {@link software.amazon.ai.ndarray.NDArray}
      * @param indices the indices to store the data
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
     NDArray createRowSparse(
-            Shape shape, Buffer data, Shape dataShape, long[] indices, Context context);
+            Buffer data, Shape dataShape, long[] indices, Shape shape, Context context);
 
     /**
      * RowSparseNDArray stores the matrix in row sparse format.
      *
-     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param data the data to set for the Row Sparse NDArray
      * @param dataShape the {@link Shape} of the data {@link software.amazon.ai.ndarray.NDArray}
      * @param indices the indices to store the data
+     * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray createRowSparse(Shape shape, Buffer data, Shape dataShape, long[] indices) {
-        return createRowSparse(shape, data, dataShape, indices, getContext());
+    default NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
+        return createRowSparse(data, dataShape, indices, shape, getContext());
     }
 
     /**

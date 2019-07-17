@@ -54,7 +54,7 @@ public class MxAutograd implements AutoCloseable {
      * Attaches a gradient buffer to input {@code NDArray}, so that `backward` can compute the
      * gradient with respect to it.
      *
-     * @param array target {@code NDArray} to attach a gradient buffer
+     * @param array target {@code NDArray} to attach a gradient
      */
     public void attachGradient(NDArray array) {
         array.attachGradient();

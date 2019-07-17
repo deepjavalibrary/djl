@@ -17,7 +17,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
@@ -95,7 +94,7 @@ public final class HelloWorld {
             // ImageIO.read seems to produce BGR-encoded images, but the model expects RGB.
             bgr2rgb(data);
             long[] shape = new long[] {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
-            NDArray array = ctx.getNDManager().create(new Shape(shape), ByteBuffer.wrap(data));
+            NDArray array = ctx.getNDManager().create(data, new Shape(shape));
             NDList ndList = new NDList();
             ndList.add("image_tensor", array);
             return ndList;
