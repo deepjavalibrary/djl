@@ -164,6 +164,14 @@ public class NDArrayOtherOpTest extends AbstractTest {
     }
 
     @RunAsTest
+    public void testSwapAxes() throws FailedTestException {
+        NDArray original = manager.arange(10).reshape(new Shape(2, 5));
+        NDArray actual =
+                manager.create(new float[] {0, 5, 1, 6, 2, 7, 3, 8, 4, 9}, new Shape(5, 2));
+        Assertions.assertEquals(original.swapAxes(0, 1), actual);
+    }
+
+    @RunAsTest
     public void testTranspose() throws FailedTestException {
         NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 2, 2));
 

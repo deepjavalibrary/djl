@@ -1602,50 +1602,56 @@ public interface NDArray extends AutoCloseable {
     ////////////////////////////////////////
 
     /**
-     * Splits the array into size(0) new NDArrays along the first dimension.
+     * Splits the array into a given sections of new NDArrays along the given axis.
      *
-     * @return Given this array has shape [n, a, b, c, ...], returns an NDList of n arrays of shape
-     *     [a, b, c, ...]
-     * @see NDArray#split(int, boolean)
-     */
-    default NDList split() {
-        return split(0, true);
-    }
-
-    /**
-     * Splits the array into size(axis) new NDArrays along the given dimension.
-     *
-     * @param axis The axis to split along
+     * @param sections the array will be divided into N (sections) equal arrays along axis
      * @return an NDList with size(axis) NDArrays with shape {@code this.shape.remove(axis) }
-     * @see NDArray#split(int, boolean)
+     * @see NDArray#split(int, int)
      */
-    default NDList split(int axis) {
-        return split(axis, true);
+    default NDList split(int sections) {
+        return split(sections, 0);
     }
 
     /**
-     * Splits the array into size(axis) new NDArrays along the given dimension.
+     * Splits the array into a given indices of new NDArrays along the given axis.
      *
-     * @param axis The axis to split along
-     * @param squeezeAxis whether to remove the specified output from the output NDArrays or leave
-     *     as size 1
-     * @return an NDList with size(axis) NDArrays with shape {@code squeezeAxis ?
-     *     this.shape.remove(axis) : this.shape.set(axis, 1)}
-     * @see NDArray#split(int, boolean)
+     * @param indices the entries indicate where along axis the array is split. If an index exceeds
+     *     the dimension of the array along axis, an empty sub-array is returned correspondingly
+     * @return an NDList with size(axis) NDArrays with shape {@code this.shape.remove(axis) }
+     * @see NDArray#split(int[], int)
      */
-    NDList split(int axis, boolean squeezeAxis);
+    default NDList split(int[] indices) {
+        return split(indices, 0);
+    }
 
     /**
-     * Splits the array into a given number of new NDArrays along the given dimension.
+     * Splits the array into a given number of sections of new NDArrays along the given axis.
      *
+     * @param sections the array will be divided into N (sections) equal arrays along axis
      * @param axis The axis to split along
-     * @param numOutputs The number of NDArrays to split into. This must equally divide the length
-     *     of the axis.
      * @return an NDList with numOutputs NDArrays with shape {@code (this.shape.axis /= axis) }
      * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
      *     axis
      */
-    NDList split(int axis, int numOutputs);
+    default NDList split(int sections, int axis) {
+        long axisSize = getShape().getShape()[axis];
+        if (axisSize % sections != 0) {
+            throw new IllegalArgumentException("array split does not result in an equal division");
+        }
+        long sectionSize = axisSize / sections;
+        int[] indices = IntStream.range(0, sections).map(i -> (int) (i * sectionSize)).toArray();
+        return split(indices, axis);
+    }
+
+    /**
+     * Splits the array into a given indices of new NDArrays along the given axis.
+     *
+     * @param indices the entries indicate where along axis the array is split. If an index exceeds
+     *     the dimension of the array along axis, an empty sub-array is returned correspondingly
+     * @param axis The axis to split along
+     * @return an NDList with numOutputs NDArrays with shape {@code (this.shape.axis /= axis) }
+     */
+    NDList split(int[] indices, int axis);
 
     /**
      * Flattens the array into a 1D NDArray in row-major order.
@@ -2140,17 +2146,17 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Transposes one dimension with another one.
+     * Interchange two axes of an array.
      *
-     * @param dimension the dimension to swap
-     * @param with the one to swap it with
+     * @param axis1 first axis
+     * @param axis2 second axis
      * @return the swapped axes view
      */
-    default NDArray swapAxes(int dimension, int with) {
+    default NDArray swapAxes(int axis1, int axis2) {
         int[] dims = IntStream.range(0, getShape().dimension()).toArray();
-        int tmp = dims[dimension];
-        dims[dimension] = dims[with];
-        dims[with] = tmp;
+        int tmp = dims[axis1];
+        dims[axis1] = dims[axis2];
+        dims[axis2] = tmp;
         return transpose(dims);
     }
 

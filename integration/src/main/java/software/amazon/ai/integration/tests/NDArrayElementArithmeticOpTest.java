@@ -41,6 +41,7 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
             autograd.backward((MxNDArray) result);
         }
         // check add scalar result
+
         Assertions.assertFalse(
                 NDArrays.equals(lhs, result), "None in-place operator returned in-place result");
         NDArray expected = manager.create(new float[] {3f, 4f, 5f, 6f}, new Shape(1, 4));

@@ -1036,21 +1036,19 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int axis, boolean squeezeAxis) {
+    public NDList split(int[] indices, int axis) {
         MxOpParams params = new MxOpParams();
-        params.addParam("num_outputs", size(axis));
+        // follow the numpy behavior
+        if (indices[0] != 0) {
+            int[] tempIndices = new int[indices.length + 1];
+            tempIndices[0] = 0;
+            System.arraycopy(indices, 0, tempIndices, 1, indices.length);
+            indices = tempIndices;
+        }
+        params.addTupleParam("indices", indices);
         params.addParam("axis", axis);
-        params.addParam("squeeze_axis", squeezeAxis);
-        return manager.invoke("split", new NDList(this), params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList split(int axis, int numOutputs) throws IllegalArgumentException {
-        MxOpParams params = new MxOpParams();
-        params.addParam("num_outputs", numOutputs);
-        params.addParam("axis", axis);
-        return manager.invoke("split", new NDList(this), params);
+        params.addParam("squeeze_axis", false);
+        return manager.invoke("_npi_split", new NDList(this), params);
     }
 
     /** {@inheritDoc} */
@@ -1326,6 +1324,15 @@ public class MxNDArray extends NativeResource implements NDArray {
         params.addParam("a_min", min);
         params.addParam("a_max", max);
         return manager.invoke("_npi_clip", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray swapAxes(int axis1, int axis2) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("dim1", axis1);
+        params.addParam("dim2", axis2);
+        return manager.invoke("_npi_swapaxes", this, params);
     }
 
     /** {@inheritDoc} */

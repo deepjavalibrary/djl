@@ -954,14 +954,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int axis, boolean squeezeAxis) {
-        return array.split(axis, squeezeAxis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList split(int axis, int numOutputs) {
-        return array.split(axis, numOutputs);
+    public NDList split(int[] indices, int axis) {
+        return array.split(indices, axis);
     }
 
     /** {@inheritDoc} */
@@ -1130,6 +1124,12 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray clip(double min, double max) {
         return array.clip(min, max);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray swapAxes(int axis1, int axis2) {
+        return array.swapAxes(axis1, axis2);
     }
 
     /** {@inheritDoc} */

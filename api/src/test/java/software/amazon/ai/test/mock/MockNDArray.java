@@ -562,12 +562,12 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDList split(int axis, boolean squeezeAxis) {
+    public NDList split(int sections, int axis) {
         return null;
     }
 
     @Override
-    public NDList split(int axis, int numOutputs) {
+    public NDList split(int[] indices, int axis) {
         return null;
     }
 
@@ -723,6 +723,11 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray clip(double min, double max) {
+        return null;
+    }
+
+    @Override
+    public NDArray swapAxes(int axis1, int axis2) {
         return null;
     }
 

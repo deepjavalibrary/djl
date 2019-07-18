@@ -32,8 +32,12 @@ public class NDArrayShapesManipulationOpTest extends AbstractTest {
 
     @RunAsTest
     public void testSplit() throws FailedTestException {
-        NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
-        NDList splitted = original.split();
+        NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f});
+        NDList splitted = original.split(2);
+        Assertions.assertEquals(splitted.head(), manager.create(new float[] {1f, 2f}));
+        Assertions.assertEquals(splitted.get(1), manager.create(new float[] {3f, 4f}));
+        // only test simple case, current numpy split have bug
+        splitted = original.split(new int[] {2});
         Assertions.assertEquals(splitted.head(), manager.create(new float[] {1f, 2f}));
         Assertions.assertEquals(splitted.get(1), manager.create(new float[] {3f, 4f}));
     }

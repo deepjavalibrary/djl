@@ -745,7 +745,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int axis, boolean squeezeAxis) {
+    public NDList split(int[] indices, int axis) {
         TfNDArray axisOp = (TfNDArray) manager.create(axis);
         Operation op =
                 manager.getGraph()
@@ -765,11 +765,11 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int axis, int numOutputs) throws IllegalArgumentException {
+    public NDList split(int sections, int axis) throws IllegalArgumentException {
         if (axis < 0 || axis > getShape().dimension()) {
             throw new IllegalArgumentException("Invalid axis value");
         }
-        if (numOutputs < 0 || numOutputs > size(axis)) {
+        if (sections < 0 || sections > size(axis)) {
             throw new IllegalArgumentException("Invalid numOutputs");
         }
         TfNDArray axisOp = (TfNDArray) manager.create(axis);
@@ -777,7 +777,7 @@ public class TfNDArray implements NDArray {
                 manager.getGraph()
                         .opBuilder("Split", "Split_" + TfNDManager.nextNameAssignment())
                         .setAttr("T", getTfDataType())
-                        .setAttr("num_split", numOutputs)
+                        .setAttr("num_split", sections)
                         .addInput(axisOp.getOutput())
                         .addInput(getOutput())
                         .build();
@@ -980,6 +980,12 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray clip(double min, double max) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray swapAxes(int axis1, int axis2) {
         return null;
     }
 
