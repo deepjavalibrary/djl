@@ -2168,7 +2168,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return Array containing indices
      */
-    NDArray argMax();
+    NDArray argmax();
 
     /**
      * This method returns index of highest value along specified axi(e)s.
@@ -2178,14 +2178,14 @@ public interface NDArray extends AutoCloseable {
      *     false} to squeeze the values out of the output array
      * @return Array containing indices
      */
-    NDArray argMax(int axis, boolean keepDims);
+    NDArray argmax(int axis, boolean keepDims);
 
     /**
      * This method returns index of lowest value.
      *
      * @return Array containing indices
      */
-    NDArray argMin();
+    NDArray argmin();
 
     /**
      * This method returns index of lowest value along specified axi(e)s.
@@ -2195,7 +2195,7 @@ public interface NDArray extends AutoCloseable {
      *     false} to squeeze the values out of the output array
      * @return Array containing indices
      */
-    NDArray argMin(int axis, boolean keepDims);
+    NDArray argmin(int axis, boolean keepDims);
 
     /**
      * Returns percentile value for this {@code NDArray}.

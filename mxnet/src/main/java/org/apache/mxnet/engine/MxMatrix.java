@@ -1253,26 +1253,26 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax() {
-        return array.argMax();
+    public NDArray argmax() {
+        return array.argmax();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax(int axis, boolean keepDims) {
-        return array.argMax(axis, keepDims);
+    public NDArray argmax(int axis, boolean keepDims) {
+        return array.argmax(axis, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin() {
-        return array.argMin();
+    public NDArray argmin() {
+        return array.argmin();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin(int axis, boolean keepDims) {
-        return array.argMin(axis, keepDims);
+    public NDArray argmin(int axis, boolean keepDims) {
+        return array.argmin(axis, keepDims);
     }
 
     /** {@inheritDoc} */

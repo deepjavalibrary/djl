@@ -1107,25 +1107,25 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax() {
+    public NDArray argmax() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax(int axis, boolean keepDims) {
+    public NDArray argmax(int axis, boolean keepDims) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin() {
+    public NDArray argmin() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin(int axis, boolean keepDims) {
+    public NDArray argmin(int axis, boolean keepDims) {
         return null;
     }
 

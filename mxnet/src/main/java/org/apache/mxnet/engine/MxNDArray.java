@@ -1476,12 +1476,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     @Override
-    public NDArray argMax() {
+    public NDArray argmax() {
         return manager.invoke("argmax", this, null);
     }
 
     @Override
-    public NDArray argMax(int axis, boolean keepDims) {
+    public NDArray argmax(int axis, boolean keepDims) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         params.addParam("keepdims", keepDims);
@@ -1489,12 +1489,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     @Override
-    public NDArray argMin() {
+    public NDArray argmin() {
         return manager.invoke("argmin", this, null);
     }
 
     @Override
-    public NDArray argMin(int axis, boolean keepDims) {
+    public NDArray argmin(int axis, boolean keepDims) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         params.addParam("keepdims", keepDims);

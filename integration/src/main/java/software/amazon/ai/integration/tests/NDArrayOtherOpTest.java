@@ -178,28 +178,28 @@ public class NDArrayOtherOpTest extends AbstractTest {
     }
 
     @RunAsTest
-    public void testArgMax() throws FailedTestException {
+    public void testArgmax() throws FailedTestException {
         NDArray original =
                 manager.create(
                         new float[] {
                             1, 2, 3, 4, 4, 5, 6, 23, 54, 234, 54, 23, 54, 4, 34, 34, 23, 54, 4, 3
                         },
                         new Shape(4, 5));
-        NDArray argMax = original.argMax();
+        NDArray argMax = original.argmax();
         NDArray expected = manager.create(new float[] {9});
         Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
-        argMax = original.argMax(0, true);
+        argMax = original.argmax(0, true);
         expected = manager.create(new float[] {2, 2, 2, 1, 1}, new Shape(1, 5));
         Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
-        argMax = original.argMax(1, false);
+        argMax = original.argmax(1, false);
         expected = manager.create(new float[] {3, 4, 0, 2});
         Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
     }
 
     @RunAsTest
-    public void testArgMin() throws FailedTestException {
+    public void testArgmin() throws FailedTestException {
         NDArray original =
                 manager.create(
                         new float[] {
@@ -207,15 +207,15 @@ public class NDArrayOtherOpTest extends AbstractTest {
                             3
                         },
                         new Shape(4, 5));
-        NDArray argMax = original.argMin();
+        NDArray argMax = original.argmin();
         NDArray expected = manager.create(new float[] {8});
         Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
-        argMax = original.argMin(0, false);
+        argMax = original.argmin(0, false);
         expected = manager.create(new float[] {0, 2, 3, 1, 2});
         Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
-        argMax = original.argMin(1, true);
+        argMax = original.argmin(1, true);
         expected = manager.create(new float[] {0, 3, 4, 2}, new Shape(4, 1));
         Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
     }
