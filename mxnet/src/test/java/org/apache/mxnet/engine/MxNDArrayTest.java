@@ -27,7 +27,9 @@ import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
 import org.testng.IObjectFactory;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.Context;
@@ -49,12 +51,22 @@ public class MxNDArrayTest extends PowerMockTestCase {
         mockStatic(LibUtils.class);
         library = new MockMxnetLibrary();
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
-        manager = MxNDManager.getSystemManager().newSubManager();
     }
 
     @AfterClass
     public void postProcessing() {
         library.resetFunctions();
+        manager.close();
+    }
+
+    @BeforeTest
+    public void setUp(){
+        manager = MxNDManager.getSystemManager().newSubManager();
+    }
+
+    @AfterTest
+    public  void tearDown(){
+        manager.close();
     }
 
     @Test

@@ -24,7 +24,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 
 public class NDArrayShapesManipulationOpTest extends AbstractTest {
-    NDManager manager = NDManager.newBaseManager();
 
     public static void main(String[] args) {
         new NDArrayShapesManipulationOpTest().runTest(args);
@@ -32,74 +31,88 @@ public class NDArrayShapesManipulationOpTest extends AbstractTest {
 
     @RunAsTest
     public void testSplit() throws FailedTestException {
-        NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f});
-        NDList splitted = original.split(2);
-        Assertions.assertEquals(splitted.head(), manager.create(new float[] {1f, 2f}));
-        Assertions.assertEquals(splitted.get(1), manager.create(new float[] {3f, 4f}));
-        // only test simple case, current numpy split have bug
-        splitted = original.split(new int[] {2});
-        Assertions.assertEquals(splitted.head(), manager.create(new float[] {1f, 2f}));
-        Assertions.assertEquals(splitted.get(1), manager.create(new float[] {3f, 4f}));
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[]{1f, 2f, 3f, 4f});
+            NDList splitted = original.split(2);
+            Assertions.assertEquals(splitted.head(), manager.create(new float[]{1f, 2f}));
+            Assertions.assertEquals(splitted.get(1), manager.create(new float[]{3f, 4f}));
+            // only test simple case, current numpy split have bug
+            splitted = original.split(new int[]{2});
+            Assertions.assertEquals(splitted.head(), manager.create(new float[]{1f, 2f}));
+            Assertions.assertEquals(splitted.get(1), manager.create(new float[]{3f, 4f}));
+        }
     }
 
     @RunAsTest
     public void testFlatten() throws FailedTestException {
-        NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
-        NDArray flattened = original.flatten();
-        NDArray expected = manager.create(new float[] {1f, 2f, 3f, 4f});
-        Assertions.assertEquals(flattened, expected);
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[]{1f, 2f, 3f, 4f}, new Shape(2, 2));
+            NDArray flattened = original.flatten();
+            NDArray expected = manager.create(new float[]{1f, 2f, 3f, 4f});
+            Assertions.assertEquals(flattened, expected);
+        }
     }
 
     @RunAsTest
     public void testReshape() throws FailedTestException {
-        NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(3, 2));
-        NDArray reshaped = original.reshape(new Shape(2, 3));
-        NDArray expected = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(2, 3));
-        Assertions.assertEquals(reshaped, expected);
-        reshaped = original.reshape(new Shape(2, -1));
-        Assertions.assertEquals(reshaped, expected);
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[]{1f, 2f, 3f, 4f, 5f, 6f}, new Shape(3, 2));
+            NDArray reshaped = original.reshape(new Shape(2, 3));
+            NDArray expected = manager.create(new float[]{1f, 2f, 3f, 4f, 5f, 6f}, new Shape(2, 3));
+            Assertions.assertEquals(reshaped, expected);
+            reshaped = original.reshape(new Shape(2, -1));
+            Assertions.assertEquals(reshaped, expected);
+        }
     }
 
     @RunAsTest
     public void testExpandDim() throws FailedTestException {
-        NDArray original = manager.create(new int[] {1, 2});
-        Assertions.assertTrue(
-                Arrays.equals(
-                        original.expandDims(0).getShape().getShape(), new Shape(1, 2).getShape()));
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new int[]{1, 2});
+            Assertions.assertTrue(
+                    Arrays.equals(
+                            original.expandDims(0).getShape().getShape(), new Shape(1, 2).getShape()));
+        }
     }
 
     @RunAsTest
     public void testSqueeze() throws FailedTestException {
-        NDArray original = manager.ones(new Shape(1, 2, 1, 3, 1));
-        Assertions.assertTrue(
-                Arrays.equals(
-                        original.squeeze().getShape().getShape(), new Shape(2, 3).getShape()));
-        Assertions.assertTrue(
-                Arrays.equals(
-                        original.squeeze(2).getShape().getShape(),
-                        new Shape(1, 2, 3, 1).getShape()));
-        Assertions.assertTrue(
-                Arrays.equals(
-                        original.squeeze(new int[] {0, 4}).getShape().getShape(),
-                        new Shape(2, 1, 3).getShape()));
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.ones(new Shape(1, 2, 1, 3, 1));
+            Assertions.assertTrue(
+                    Arrays.equals(
+                            original.squeeze().getShape().getShape(), new Shape(2, 3).getShape()));
+            Assertions.assertTrue(
+                    Arrays.equals(
+                            original.squeeze(2).getShape().getShape(),
+                            new Shape(1, 2, 3, 1).getShape()));
+            Assertions.assertTrue(
+                    Arrays.equals(
+                            original.squeeze(new int[]{0, 4}).getShape().getShape(),
+                            new Shape(2, 1, 3).getShape()));
+        }
     }
 
     @RunAsTest
     public void testStack() throws FailedTestException {
-        NDArray original = manager.create(new float[] {1f, 2f});
-        NDArray expect = manager.create(new float[] {1f, 2f, 1f, 2f}, new Shape(2, 2));
-        Assertions.assertEquals(original.stack(original), expect);
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[]{1f, 2f});
+            NDArray expect = manager.create(new float[]{1f, 2f, 1f, 2f}, new Shape(2, 2));
+            Assertions.assertEquals(original.stack(original), expect);
+        }
     }
 
     @RunAsTest
     public void testConcat() throws FailedTestException {
-        NDArray concatedND = manager.create(new float[] {1f});
-        NDArray concatedND2 = manager.create(new float[] {2f});
-        NDArray actual = manager.create(new float[] {1f, 2f});
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray concatedND = manager.create(new float[]{1f});
+            NDArray concatedND2 = manager.create(new float[]{2f});
+            NDArray actual = manager.create(new float[]{1f, 2f});
 
-        Assertions.assertEquals(concatedND.concat(new NDArray[] {concatedND2}, 0), actual);
-        Assertions.assertEquals(
-                NDArrays.concat(new NDArray[] {concatedND, concatedND2}, 0), actual);
-        Assertions.assertEquals(concatedND.concat(concatedND2), actual);
+            Assertions.assertEquals(concatedND.concat(new NDArray[]{concatedND2}, 0), actual);
+            Assertions.assertEquals(
+                    NDArrays.concat(new NDArray[]{concatedND, concatedND2}, 0), actual);
+            Assertions.assertEquals(concatedND.concat(concatedND2), actual);
+        }
     }
 }
