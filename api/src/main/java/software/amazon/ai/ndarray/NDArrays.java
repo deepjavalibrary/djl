@@ -210,6 +210,32 @@ public final class NDArrays {
         return a.lte(b);
     }
 
+    /**
+     * Returns element-wise maximum of the input arrays with broadcasting.
+     *
+     * @param a the ndarray holding the elements to be compared. They must have the same shape, or
+     *     shapes that can be broadcast to a single shape.
+     * @param b the ndarray holding the elements to be compared. They must have the same shape, or
+     *     shapes that can be broadcast to a single shape.
+     * @return the maximum of a and b, element-wise
+     */
+    public static NDArray max(NDArray a, NDArray b) {
+        return a.getNDArrayInternal().max(b);
+    }
+
+    /**
+     * Returns element-wise minimum of the input arrays with broadcasting.
+     *
+     * @param a the ndarray holding the elements to be compared. They must have the same shape, or
+     *     shapes that can be broadcast to a single shape.
+     * @param b the ndarray holding the elements to be compared. They must have the same shape, or
+     *     shapes that can be broadcast to a single shape.
+     * @return the minimum of a and b, element-wise
+     */
+    public static NDArray min(NDArray a, NDArray b) {
+        return a.getNDArrayInternal().min(b);
+    }
+
     ////////////////////////////////////////
     // Operators: Element Arithmetic
     ////////////////////////////////////////

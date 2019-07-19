@@ -1027,8 +1027,15 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public Number max() {
+        return manager.invoke("max", this, null).toArray()[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray max(int[] axes) {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("max", this, params).toArray()[0];
+        params.addTupleParam("axis", axes);
+        return manager.invoke("max", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1060,7 +1067,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public Number sum() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("sum", this, params).toArray()[0];
+        return manager.invoke("_np_sum", this, params).toArray()[0];
     }
 
     /** {@inheritDoc} */
@@ -1069,7 +1076,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
         params.addParam("keepdims", keepDims);
-        return manager.invoke("sum", this, params);
+        return manager.invoke("_np_sum", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1092,7 +1099,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public Number mean() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("mean", this, params).toArray()[0];
+        return manager.invoke("_np_mean", this, params).toArray()[0];
     }
 
     /** {@inheritDoc} */
@@ -1101,7 +1108,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
         params.addParam("keepdims", keepDims);
-        return manager.invoke("mean", this, params);
+        return manager.invoke("_np_mean", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1341,7 +1348,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray tile(long[] repeats) {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("reps", repeats);
-        return manager.invoke("tile", this, params);
+        return manager.invoke("_npi_tile", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1396,30 +1403,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray mmul(NDArray other) {
         return manager.invoke("dot", new NDList(this, other), null).head();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray amax(int... dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number amaxNumber() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray amin(int... dimension) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number aminNumber() {
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */

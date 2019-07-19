@@ -113,6 +113,24 @@ public interface NDArrayEx {
      */
     NDArray rmodi(NDArray b);
 
+    /**
+     * Returns element-wise maximum of the input arrays with broadcasting.
+     *
+     * @param other the arrays holding the elements to be compared. They must have the same shape,
+     *     or shapes that can be broadcast to a single shape.
+     * @return the maximum of two {@code NDArray}.
+     */
+    NDArray max(NDArray other);
+
+    /**
+     * Returns element-wise minimum of the input arrays with broadcasting.
+     *
+     * @param other the arrays holding the elements to be compared. They must have the same shape,
+     *     or shapes that can be broadcast to a single shape.
+     * @return the minimum of two {@code NDArray}.
+     */
+    NDArray min(NDArray other);
+
     void sgdUpdate(
             NDArray grad,
             float lr,

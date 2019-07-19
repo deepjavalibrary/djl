@@ -107,6 +107,18 @@ class MxNDArrayEx implements NDArrayEx {
         return array;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public NDArray max(NDArray other) {
+        return manager.invoke("_npi_maximum", new NDList(array, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray min(NDArray other) {
+        return manager.invoke("_npi_minimum", new NDList(array, other), null).head();
+    }
+
     // Sgd update function for non-multi-precision
     @Override
     public void sgdUpdate(

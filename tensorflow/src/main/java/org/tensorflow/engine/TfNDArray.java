@@ -1047,30 +1047,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray amax(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number amaxNumber() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray amin(int... dimension) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number aminNumber() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray clip(double min, double max) {
         return null;
     }

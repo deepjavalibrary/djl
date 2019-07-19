@@ -953,6 +953,12 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray max(int[] axes) {
+        return array.max(axes);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray max(int[] axes, boolean keepDims) {
         return array.max(axes, keepDims);
     }
@@ -961,6 +967,12 @@ public class MxMatrix implements Matrix {
     @Override
     public Number min() {
         return array.min();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray min(int[] axes) {
+        return array.min(axes);
     }
 
     /** {@inheritDoc} */
@@ -1189,30 +1201,6 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray mmul(NDArray other) {
         return array.mmul(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray amax(int... dimension) {
-        return array.amax(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number amaxNumber() {
-        return array.amaxNumber();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray amin(int... dimension) {
-        return array.amin(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Number aminNumber() {
-        return array.aminNumber();
     }
 
     /** {@inheritDoc} */

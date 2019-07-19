@@ -112,4 +112,32 @@ public class NDArrayElementComparisonOpTest extends AbstractTest {
         NDArray greater = NDArrays.lt(array, 2);
         Assertions.assertTrue(greater.nonzero() == 1, "lesser_scalar: Incorrect comparison");
     }
+
+    @RunAsTest
+    public void testMax() throws FailedTestException {
+        NDArray oringal1 = manager.create(new float[] {1f, 2f, 3f, 4f, 5f});
+        NDArray oringal2 = manager.create(new float[] {5f, 4f, 3f, 2f, 1f});
+        NDArray actual = manager.create(new float[] {5f, 4f, 3f, 4f, 5f});
+        Assertions.assertEquals(NDArrays.max(oringal1, oringal2), actual);
+        // test broadcast case
+        oringal1 = manager.arange(10).reshape(new Shape(2, 5));
+        actual =
+                manager.create(
+                        new float[] {5f, 4f, 3f, 3f, 4f, 5f, 6f, 7f, 8f, 9f}, new Shape(2, 5));
+        Assertions.assertEquals(NDArrays.max(oringal1, oringal2), actual);
+    }
+
+    @RunAsTest
+    public void testMin() throws FailedTestException {
+        NDArray oringal1 = manager.create(new float[] {1f, 2f, 3f, 4f, 5f});
+        NDArray oringal2 = manager.create(new float[] {5f, 4f, 3f, 2f, 1f});
+        NDArray actual = manager.create(new float[] {1f, 2f, 3f, 2f, 1f});
+        Assertions.assertEquals(NDArrays.min(oringal1, oringal2), actual);
+        // test broadcast case
+        oringal1 = manager.arange(10).reshape(new Shape(2, 5));
+        actual =
+                manager.create(
+                        new float[] {0f, 1f, 2f, 2f, 1f, 5f, 4f, 3f, 2f, 1f}, new Shape(2, 5));
+        Assertions.assertEquals(NDArrays.min(oringal1, oringal2), actual);
+    }
 }

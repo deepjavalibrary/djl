@@ -28,7 +28,7 @@ public class NDArrayReductionOpTest extends AbstractTest {
     }
 
     @RunAsTest
-    public void testMax() throws FailedTestException {
+    public void testAmax() throws FailedTestException {
         NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
         Float maxAll = (Float) original.max();
@@ -44,7 +44,7 @@ public class NDArrayReductionOpTest extends AbstractTest {
     }
 
     @RunAsTest
-    public void testMin() throws FailedTestException {
+    public void testAmin() throws FailedTestException {
         NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
         Float minAll = (Float) original.min();

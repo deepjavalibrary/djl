@@ -1337,7 +1337,7 @@ public interface NDArray extends AutoCloseable {
     ////////////////////////////////////////
 
     /**
-     * Finds the max of all elements in the {@code NDArray}.
+     * Return the maximum of an {@code NDArray}.
      *
      * @return the max
      */
@@ -1346,7 +1346,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Finds the max over the given axes.
      *
-     * @param axes the axes to find the max over
+     * @param axes the axes along which to operate
      * @return an NDArray with the specified axes removed from the Shape containing the max
      * @see NDArray#max(int[], boolean)
      */
@@ -1357,7 +1357,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Finds the max over the given axes.
      *
-     * @param axes the axes to find the max over
+     * @param axes the axes along which to operate
      * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
      *     false} to squeeze the values out of the output array
      * @return an NDArray after the max
@@ -2040,36 +2040,6 @@ public interface NDArray extends AutoCloseable {
      * @return the result of the matrix multiplication
      */
     NDArray mmul(NDArray other);
-
-    /**
-     * Returns the maximum (absolute) value in this NDArray, along the specified dimensions.
-     *
-     * @param dimension the dimension to getScalar the mean along
-     * @return the mean along the specified dimension of this NDArray
-     */
-    NDArray amax(int... dimension);
-
-    /**
-     * Returns the maximum (absolute) value in this NDArray.
-     *
-     * @return Max absolute value
-     */
-    Number amaxNumber();
-
-    /**
-     * Returns the minimum (absolute) value in this NDArray, along the specified dimensions.
-     *
-     * @param dimension the dimension to getScalar the absolute min along
-     * @return Minimum absolute value
-     */
-    NDArray amin(int... dimension);
-
-    /**
-     * Returns the absolute min value in this NDArray.
-     *
-     * @return Absolute min value
-     */
-    Number aminNumber();
 
     /**
      * Clips (limit) the values in an array.

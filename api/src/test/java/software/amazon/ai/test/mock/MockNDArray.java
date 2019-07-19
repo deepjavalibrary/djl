@@ -766,26 +766,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray amax(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number amaxNumber() {
-        return null;
-    }
-
-    @Override
-    public NDArray amin(int... dimension) {
-        return null;
-    }
-
-    @Override
-    public Number aminNumber() {
-        return null;
-    }
-
-    @Override
     public NDArray clip(double min, double max) {
         return null;
     }
