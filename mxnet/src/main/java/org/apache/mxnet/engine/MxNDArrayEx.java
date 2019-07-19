@@ -144,4 +144,9 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("clip_gradient", clipGradient);
         manager.invoke("sgd_update", new NDList(array, grad, state), new NDList(array), params);
     }
+
+    @Override
+    public NDArray getArray() {
+        return array;
+    }
 }

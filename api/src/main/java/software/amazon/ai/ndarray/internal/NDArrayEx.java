@@ -130,4 +130,32 @@ public interface NDArrayEx {
             float rescaleGrad,
             float clipGradient,
             boolean lazyUpdate);
+
+    NDArray getArray();
+
+    default NDArray l2Loss(NDArray label, float weight, int batchAxis) {
+        NDArray pred = getArray();
+        label = label.reshape(pred.getShape());
+        NDArray loss = label.sub(pred).square().mul(weight);
+        return loss.mean(new int[] {batchAxis});
+    }
+
+    default NDArray softmaxCrossEntropyLoss(
+            NDArray label,
+            float weight,
+            int batchAxis,
+            int axis,
+            boolean sparseLabel,
+            boolean fromLogit) {
+        NDArray pred = getArray();
+        if (!fromLogit) {
+            pred = pred.softmax(axis).log();
+        }
+        if (!sparseLabel) {
+            label = label.toDense();
+        }
+        label = label.reshape(pred.getShape());
+        NDArray loss = pred.mmul(label).sum(new int[] {axis}).mul(-weight);
+        return loss.mean(new int[] {batchAxis});
+    }
 }

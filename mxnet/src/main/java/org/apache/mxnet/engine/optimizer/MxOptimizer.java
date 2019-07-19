@@ -15,8 +15,9 @@ package org.apache.mxnet.engine.optimizer;
 import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.training.Optimizer;
 
-public abstract class MxOptimizer {
+public abstract class MxOptimizer implements Optimizer {
 
     float rescaleGrad;
     float clipGrad;
