@@ -14,6 +14,11 @@ package software.amazon.ai.test.mock;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.util.Arrays;
 import java.util.function.Predicate;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
@@ -21,6 +26,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.index.NDIndex;
+import software.amazon.ai.ndarray.index.NDIndexFixed;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -30,49 +36,71 @@ import software.amazon.ai.training.GradReq;
 
 public class MockNDArray implements NDArray {
 
+    private Context context;
+    private SparseFormat sparseFormat;
+    private DataType dataType;
+    private Shape shape;
+    private NDManager manager;
+    private ByteBuffer data;
+
+    public MockNDArray() {}
+
+    public MockNDArray(
+            NDManager manager,
+            Context context,
+            Shape shape,
+            DataType dataType,
+            SparseFormat sparseFormat) {
+        this.manager = manager;
+        this.context = context;
+        this.shape = shape;
+        this.dataType = dataType;
+        this.sparseFormat = sparseFormat;
+    }
+
     @Override
     public NDManager getManager() {
-        return null;
+        return manager;
     }
 
     @Override
     public DataType getDataType() {
-        return null;
+        return dataType;
     }
 
     @Override
     public Context getContext() {
-        return null;
+        return context;
     }
 
     @Override
     public Shape getShape() {
-        return null;
+        return shape;
     }
 
     @Override
     public DataDesc getDataDescriptor() {
-        return null;
+        return new DataDesc(shape, dataType);
     }
 
     @Override
     public SparseFormat getSparseFormat() {
-        return null;
+        return sparseFormat;
     }
 
     @Override
     public boolean isSparse() {
-        return false;
+        return sparseFormat != SparseFormat.DENSE;
     }
 
     @Override
     public NDArray asInContext(Context ctx, boolean copy) {
-        return null;
+        return this;
     }
 
     @Override
     public NDArray asType(DataType dtype, boolean copy) {
-        return null;
+        return this;
     }
 
     @Override
@@ -102,11 +130,40 @@ public class MockNDArray implements NDArray {
 
     @Override
     public ByteBuffer toByteBuffer() {
-        return null;
+        data.rewind();
+        return data;
     }
 
     @Override
-    public void set(Buffer data) {}
+    public void set(Buffer data) {
+        int size = data.remaining();
+        DataType inputType = DataType.fromBuffer(data);
+
+        int numOfBytes = inputType.getNumOfBytes();
+        this.data = ByteBuffer.allocate(size * numOfBytes);
+
+        switch (inputType) {
+            case FLOAT32:
+                this.data.asFloatBuffer().put((FloatBuffer) data);
+                break;
+            case FLOAT64:
+                this.data.asDoubleBuffer().put((DoubleBuffer) data);
+                break;
+            case INT8:
+                this.data.put((ByteBuffer) data);
+                break;
+            case INT32:
+                this.data.asIntBuffer().put((IntBuffer) data);
+                break;
+            case INT64:
+                this.data.asLongBuffer().put((LongBuffer) data);
+                break;
+            case UINT8:
+            case FLOAT16:
+            default:
+                throw new AssertionError("Show never happen");
+        }
+    }
 
     @Override
     public NDArray set(NDIndex index, NDArray value) {
@@ -140,7 +197,17 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray get(NDIndex index) {
-        return null;
+        NDIndexFixed ie = (NDIndexFixed) index.get(0);
+        int idx = (int) ie.getIndex();
+
+        Shape subShape = shape.slice(1);
+        int size = (int) subShape.size() * dataType.getNumOfBytes();
+        int start = idx * size;
+        data.position(start);
+        Buffer buf = data.slice().limit(size);
+        MockNDArray array = new MockNDArray(manager, context, subShape, dataType, sparseFormat);
+        array.set(buf);
+        return array;
     }
 
     @Override
@@ -383,7 +450,43 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray abs() {
-        return null;
+        Number[] values = toArray();
+        switch (dataType) {
+            case FLOAT64:
+                {
+                    double[] newBuf = new double[values.length];
+                    for (int i = 0; i < values.length; ++i) {
+                        newBuf[i] = Math.abs(values[i].doubleValue());
+                    }
+                    return manager.create(newBuf, shape);
+                }
+            case FLOAT32:
+                {
+                    float[] newBuf = new float[values.length];
+                    for (int i = 0; i < values.length; ++i) {
+                        newBuf[i] = Math.abs(values[i].floatValue());
+                    }
+                    return manager.create(newBuf, shape);
+                }
+            case INT64:
+                {
+                    long[] newBuf = new long[values.length];
+                    for (int i = 0; i < values.length; ++i) {
+                        newBuf[i] = Math.abs(values[i].longValue());
+                    }
+                    return manager.create(newBuf, shape);
+                }
+            case INT32:
+                {
+                    int[] newBuf = new int[values.length];
+                    for (int i = 0; i < values.length; ++i) {
+                        newBuf[i] = Math.abs(values[i].intValue());
+                    }
+                    return manager.create(newBuf, shape);
+                }
+            default:
+                return null;
+        }
     }
 
     @Override
@@ -508,7 +611,9 @@ public class MockNDArray implements NDArray {
 
     @Override
     public Number max() {
-        return null;
+        Number[] values = toArray();
+        Arrays.sort(values);
+        return values[values.length - 1];
     }
 
     @Override
@@ -518,7 +623,9 @@ public class MockNDArray implements NDArray {
 
     @Override
     public Number min() {
-        return null;
+        Number[] values = toArray();
+        Arrays.sort(values);
+        return values[0];
     }
 
     @Override

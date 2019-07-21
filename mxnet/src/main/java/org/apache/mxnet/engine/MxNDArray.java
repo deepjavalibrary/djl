@@ -39,6 +39,7 @@ import software.amazon.ai.ndarray.index.NDIndexElement;
 import software.amazon.ai.ndarray.index.NDIndexFixed;
 import software.amazon.ai.ndarray.index.NDIndexSlice;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.internal.NDFormat;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -47,11 +48,6 @@ import software.amazon.ai.training.GradReq;
 import software.amazon.ai.util.Utils;
 
 public class MxNDArray extends NativeResource implements NDArray {
-
-    private static final int MAX_DEPTH = 10;
-    private static final int MAX_PRINT_ROWS = 10;
-    private static final int MAX_PRINT_ITEMS = 20;
-    private static final String LF = System.getProperty("line.separator");
 
     private Context context;
     private SparseFormat sparseFormat;
@@ -1528,7 +1524,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public String toString() {
         if (Utils.DEBUG) {
-            return dump();
+            return NDFormat.format(this);
         }
         return super.toString();
     }
@@ -1542,59 +1538,5 @@ public class MxNDArray extends NativeResource implements NDArray {
             detach();
             manager = null;
         }
-    }
-
-    public String dump() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("ND: ")
-                .append(getShape())
-                .append(' ')
-                .append(getContext())
-                .append(' ')
-                .append(getDataType())
-                .append(LF);
-        // corner case: 0 dimension
-        if (size() == 0) {
-            sb.append("[]");
-            return sb.toString();
-        }
-        if (getShape().dimension() < MAX_DEPTH) {
-            dump(sb, 0);
-        } else {
-            sb.append("[ Exceed max print dimension ]");
-        }
-        return sb.toString();
-    }
-
-    private void dump(StringBuilder sb, int depth) {
-        Utils.pad(sb, ' ', depth);
-        sb.append('[');
-        long len = getShape().head();
-        if (getShape().dimension() == 1) {
-            long limit = Math.min(getShape().head(), MAX_PRINT_ITEMS);
-            ByteBuffer buf = toByteBuffer().slice();
-            buf.limit(Math.toIntExact(limit * getDataType().getNumOfBytes()));
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            sb.append(Utils.toCharSequence(buf, getDataType()));
-            long remaining = getShape().head() - limit;
-            if (remaining > 0) {
-                sb.append(", ... ").append(remaining).append(" more");
-            }
-        } else {
-            sb.append(LF);
-            long limit = Math.min(len, MAX_PRINT_ROWS);
-            for (int i = 0; i < limit; ++i) {
-                try (MxNDArray nd = (MxNDArray) get(i)) {
-                    nd.dump(sb, depth + 1);
-                }
-            }
-            long remaining = len - limit;
-            if (remaining > 0) {
-                Utils.pad(sb, ' ', depth + 1);
-                sb.append("... ").append(remaining).append(" more");
-            }
-            Utils.pad(sb, ' ', depth);
-        }
-        sb.append("],").append(LF);
     }
 }

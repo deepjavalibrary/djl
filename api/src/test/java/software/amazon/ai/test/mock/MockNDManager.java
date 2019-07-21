@@ -25,7 +25,7 @@ public class MockNDManager implements NDManager {
 
     @Override
     public NDArray create(Shape shape, DataType dataType, Context context) {
-        return new MockNDArray();
+        return new MockNDArray(this, context, shape, dataType, null);
     }
 
     @Override

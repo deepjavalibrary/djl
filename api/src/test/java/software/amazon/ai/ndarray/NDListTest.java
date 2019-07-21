@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 import software.amazon.ai.test.mock.MockNDArray;
 
 public class NDListTest {
+
     @Test
     public void testAdd() {
         NDList list = new NDList(3);

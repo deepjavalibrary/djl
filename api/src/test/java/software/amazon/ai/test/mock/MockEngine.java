@@ -86,12 +86,12 @@ public class MockEngine extends Engine {
 
     @Override
     public NDManager newBaseManager() {
-        return null;
+        return new MockNDManager();
     }
 
     @Override
     public NDManager newBaseManager(Context context) {
-        return null;
+        return new MockNDManager();
     }
 
     public void setGpuCount(int gpuCount) {

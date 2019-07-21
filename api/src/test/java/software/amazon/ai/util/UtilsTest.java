@@ -15,7 +15,6 @@ package software.amazon.ai.util;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,7 +24,6 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import software.amazon.ai.ndarray.types.DataType;
 
 public class UtilsTest {
 
@@ -69,58 +67,6 @@ public class UtilsTest {
 
         Utils.deleteQuietly(dir);
         Assert.assertTrue(Files.notExists(dir));
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testToCharSequence() {
-        ByteBuffer buf = ByteBuffer.allocate(32);
-        buf.asDoubleBuffer()
-                .put(Double.NEGATIVE_INFINITY)
-                .put(Double.MAX_VALUE)
-                .put(Double.NaN)
-                .put(-1d);
-        CharSequence str = Utils.toCharSequence(buf, DataType.FLOAT64);
-        Assert.assertEquals(
-                str.toString(),
-                "      -Infinity,  1.7976931e+308,             NaN,  -1.0000000e+00");
-
-        buf.rewind();
-        buf.asLongBuffer().put(Long.MAX_VALUE).put(Long.MIN_VALUE).put(1L).put(-1L);
-        str = Utils.toCharSequence(buf, DataType.INT64);
-        Assert.assertEquals(
-                str.toString(),
-                "0x7FFFFFFFFFFFFFFF, 0x8000000000000000, 0x0000000000000001, 0xFFFFFFFFFFFFFFFF");
-
-        buf.rewind();
-        buf.limit(16);
-        buf.asFloatBuffer()
-                .put(Float.NEGATIVE_INFINITY)
-                .put(Float.MAX_VALUE)
-                .put(Float.NaN)
-                .put(-1f);
-        str = Utils.toCharSequence(buf, DataType.FLOAT32);
-        Assert.assertEquals(
-                str.toString(), "     -Infinity,  3.4028235e+38,            NaN, -1.0000000e+00");
-
-        buf.rewind();
-        buf.asIntBuffer().put(Integer.MAX_VALUE).put(Integer.MIN_VALUE).put(1).put(-1);
-        str = Utils.toCharSequence(buf, DataType.INT32);
-        Assert.assertEquals(str.toString(), " 2147483647, -2147483648,           1,          -1");
-
-        buf.rewind();
-        buf.limit(4);
-        buf.put(Byte.MAX_VALUE).put(Byte.MIN_VALUE).put((byte) 1).put((byte) -1);
-        buf.rewind();
-        str = Utils.toCharSequence(buf, DataType.INT8);
-        Assert.assertEquals(str.toString(), " 127, -128,    1,   -1");
-
-        buf.rewind();
-        str = Utils.toCharSequence(buf, DataType.UINT8);
-        Assert.assertEquals(str.toString(), "0x7F, 0x80, 0x01, 0xFF");
-
-        buf.rewind();
-        buf.limit(32);
-        Utils.toCharSequence(buf, DataType.FLOAT16);
     }
 
     @Test

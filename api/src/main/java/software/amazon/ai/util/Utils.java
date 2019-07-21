@@ -14,7 +14,6 @@ package software.amazon.ai.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,7 +22,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
-import software.amazon.ai.ndarray.types.DataType;
 
 /** A class containing utility methods. */
 public final class Utils {
@@ -132,55 +130,6 @@ public final class Utils {
             }
         }
         return list;
-    }
-
-    /**
-     * Returns a formatted CharSequence from input ByteBuffer.
-     *
-     * @param buf buffer to read from
-     * @param dataType DataType to be used for formatting
-     * @return formatted CharSequence
-     */
-    public static CharSequence toCharSequence(ByteBuffer buf, DataType dataType) {
-        StringBuilder sb = new StringBuilder();
-        while (buf.hasRemaining()) {
-            int padding;
-            String value;
-            switch (dataType) {
-                case FLOAT32:
-                    value = String.format("%.7e", buf.getFloat());
-                    padding = 14 - value.length();
-                    break;
-                case FLOAT64:
-                    value = String.format("%.7e", buf.getDouble());
-                    padding = 15 - value.length();
-                    break;
-                case INT8:
-                    value = String.valueOf(buf.get());
-                    padding = 4 - value.length();
-                    break;
-                case UINT8:
-                    value = String.format("0x%02X", buf.get());
-                    padding = 0;
-                    break;
-                case INT32:
-                    value = String.valueOf(buf.getInt());
-                    padding = 11 - value.length();
-                    break;
-                case INT64:
-                    value = String.format("0x%016X", buf.getLong());
-                    padding = 18 - value.length();
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unsupported DataType: " + dataType);
-            }
-            Utils.pad(sb, ' ', padding);
-            sb.append(value);
-            if (buf.hasRemaining()) {
-                sb.append(", ");
-            }
-        }
-        return sb;
     }
 
     /**
