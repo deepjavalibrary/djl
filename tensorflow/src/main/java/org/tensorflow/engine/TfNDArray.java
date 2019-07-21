@@ -14,7 +14,6 @@ package org.tensorflow.engine;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -172,56 +171,8 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public byte[] getEncoded() {
-        return new byte[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double[] toDoubleArray() {
-        if (getDataType() != DataType.FLOAT64) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required double" + " Actual " + getDataType());
-        }
-        runToTensor();
-        DoubleBuffer db = DoubleBuffer.allocate(Math.toIntExact(size()));
-        tensor.writeTo(db.duplicate());
-        double[] ret = new double[Math.toIntExact(size())];
-        db.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float[] toFloatArray() {
-        if (getDataType() != DataType.FLOAT32) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required float" + " Actual " + getDataType());
-        }
-        runToTensor();
-        FloatBuffer fb = FloatBuffer.allocate(Math.toIntExact(size()));
-        tensor.writeTo(fb.duplicate());
-        float[] ret = new float[Math.toIntExact(size())];
-        fb.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] toIntArray() {
-        return new int[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long[] toLongArray() {
-        return new long[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public byte[] toByteArray() {
-        return new byte[0];
+    public ByteBuffer toByteBuffer() {
+        return null;
     }
 
     /** {@inheritDoc} */
@@ -229,26 +180,6 @@ public class TfNDArray implements NDArray {
     public void set(Buffer data) {
         throw new UnsupportedOperationException("Tensor cannot be modified after creation");
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(float[] data) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(int[] data) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(double[] data) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(long[] data) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(byte[] data) {}
 
     /** {@inheritDoc} */
     @Override

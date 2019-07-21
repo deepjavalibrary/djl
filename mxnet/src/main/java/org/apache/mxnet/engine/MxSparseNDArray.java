@@ -14,6 +14,7 @@ package org.apache.mxnet.engine;
 
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.types.SparseFormat;
@@ -36,39 +37,8 @@ public class MxSparseNDArray extends MxNDArray {
         return toDense().get(index);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public String toString() {
-        return toDense().toString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float[] toFloatArray() {
-        return toDense().toFloatArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public byte[] toByteArray() {
-        return toDense().toByteArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] toIntArray() {
-        return toDense().toIntArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long[] toLongArray() {
-        return toDense().toLongArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double[] toDoubleArray() {
-        return toDense().toDoubleArray();
+    public ByteBuffer toByteBuffer() {
+        return toDense().toByteBuffer();
     }
 }

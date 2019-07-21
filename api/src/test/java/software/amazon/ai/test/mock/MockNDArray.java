@@ -13,6 +13,7 @@
 package software.amazon.ai.test.mock;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.function.Predicate;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
@@ -100,52 +101,12 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public byte[] getEncoded() {
-        return new byte[0];
-    }
-
-    @Override
-    public double[] toDoubleArray() {
-        return new double[0];
-    }
-
-    @Override
-    public float[] toFloatArray() {
-        return new float[0];
-    }
-
-    @Override
-    public int[] toIntArray() {
-        return new int[0];
-    }
-
-    @Override
-    public long[] toLongArray() {
-        return new long[0];
-    }
-
-    @Override
-    public byte[] toByteArray() {
-        return new byte[0];
+    public ByteBuffer toByteBuffer() {
+        return null;
     }
 
     @Override
     public void set(Buffer data) {}
-
-    @Override
-    public void set(float[] data) {}
-
-    @Override
-    public void set(int[] data) {}
-
-    @Override
-    public void set(double[] data) {}
-
-    @Override
-    public void set(long[] data) {}
-
-    @Override
-    public void set(byte[] data) {}
 
     @Override
     public NDArray set(NDIndex index, NDArray value) {
@@ -657,11 +618,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray sort() {
-        return null;
-    }
-
-    @Override
-    public NDArray softmax(int[] axes) {
         return null;
     }
 

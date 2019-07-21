@@ -15,6 +15,11 @@ package software.amazon.ai.ndarray;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -194,7 +199,9 @@ public interface NDArray extends AutoCloseable {
      *
      * @return the encoded NDArray
      */
-    byte[] getEncoded();
+    default byte[] getEncoded() {
+        return toByteArray();
+    }
 
     /**
      * Encodes NDArray to an {@link OutputStream}.
@@ -230,35 +237,79 @@ public interface NDArray extends AutoCloseable {
      *
      * @return a double array
      */
-    double[] toDoubleArray();
+    default double[] toDoubleArray() {
+        if (getDataType() != DataType.FLOAT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required double" + " Actual " + getDataType());
+        }
+        DoubleBuffer db = toByteBuffer().asDoubleBuffer();
+        double[] ret = new double[db.remaining()];
+        db.get(ret);
+        return ret;
+    }
 
     /**
      * Converts this NDArray to a float array.
      *
      * @return a float array
      */
-    float[] toFloatArray();
+    default float[] toFloatArray() {
+        if (getDataType() != DataType.FLOAT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required float, Actual " + getDataType());
+        }
+        FloatBuffer fb = toByteBuffer().asFloatBuffer();
+        float[] ret = new float[fb.remaining()];
+        fb.get(ret);
+        return ret;
+    }
 
     /**
      * Converts this NDArray to a int array.
      *
      * @return a int array
      */
-    int[] toIntArray();
+    default int[] toIntArray() {
+        if (getDataType() != DataType.INT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required int" + " Actual " + getDataType());
+        }
+        IntBuffer ib = toByteBuffer().asIntBuffer();
+        int[] ret = new int[ib.remaining()];
+        ib.get(ret);
+        return ret;
+    }
 
     /**
      * Converts this NDArray to a long array.
      *
      * @return a long array
      */
-    long[] toLongArray();
+    default long[] toLongArray() {
+        if (getDataType() != DataType.INT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required long" + " Actual " + getDataType());
+        }
+        LongBuffer lb = toByteBuffer().asLongBuffer();
+        long[] ret = new long[lb.remaining()];
+        lb.get(ret);
+        return ret;
+    }
 
     /**
-     * Converts this NDArray to a long array.
+     * Converts this NDArray to a byte array.
      *
      * @return a long array
      */
-    byte[] toByteArray();
+    default byte[] toByteArray() {
+        ByteBuffer bb = toByteBuffer();
+        if (bb.hasArray()) {
+            return bb.array();
+        }
+        byte[] buf = new byte[bb.remaining()];
+        bb.get(buf);
+        return buf;
+    }
 
     /**
      * Converts this NDArray to a Number array based on its data type.
@@ -284,6 +335,13 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
+     * Converts this NDArray to a ByteBuffer.
+     *
+     * @return a long array
+     */
+    ByteBuffer toByteBuffer();
+
+    /**
      * Sets the NDArray value from {@link Buffer}.
      *
      * @param data The input buffered data
@@ -295,35 +353,45 @@ public interface NDArray extends AutoCloseable {
      *
      * @param data array of floats to set
      */
-    void set(float[] data);
+    default void set(float[] data) {
+        set(FloatBuffer.wrap(data));
+    }
 
     /**
      * Sets the NDArray value from an array of ints.
      *
      * @param data array of integers to set
      */
-    void set(int[] data);
+    default void set(int[] data) {
+        set(IntBuffer.wrap(data));
+    }
 
     /**
      * Sets the NDArray value from an array of doubles.
      *
      * @param data array of doubles to set
      */
-    void set(double[] data);
+    default void set(double[] data) {
+        set(DoubleBuffer.wrap(data));
+    }
 
     /**
      * Sets the NDArray value from an array of longs.
      *
      * @param data array of longs to set
      */
-    void set(long[] data);
+    default void set(long[] data) {
+        set(LongBuffer.wrap(data));
+    }
 
     /**
      * Sets the NDArray value from an array of bytes.
      *
      * @param data array of bytes to set
      */
-    void set(byte[] data);
+    default void set(byte[] data) {
+        set(ByteBuffer.wrap(data));
+    }
 
     /**
      * Sets the specified index in a new NDArray with the given values.

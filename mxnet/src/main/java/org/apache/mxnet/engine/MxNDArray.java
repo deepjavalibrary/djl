@@ -244,72 +244,16 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public byte[] getEncoded() {
-        return toByteArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double[] toDoubleArray() {
-        if (getDataType() != DataType.FLOAT64) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required double" + " Actual " + getDataType());
-        }
-        DoubleBuffer db = toByteBuffer().asDoubleBuffer();
-        double[] ret = new double[db.remaining()];
-        db.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float[] toFloatArray() {
-        if (getDataType() != DataType.FLOAT32) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required float, Actual " + getDataType());
-        }
-        FloatBuffer fb = toByteBuffer().asFloatBuffer();
-        float[] ret = new float[fb.remaining()];
-        fb.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] toIntArray() {
-        if (getDataType() != DataType.INT32) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required int" + " Actual " + getDataType());
-        }
-        IntBuffer ib = toByteBuffer().asIntBuffer();
-        int[] ret = new int[ib.remaining()];
-        ib.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long[] toLongArray() {
-        if (getDataType() != DataType.INT64) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required long" + " Actual " + getDataType());
-        }
-        LongBuffer lb = toByteBuffer().asLongBuffer();
-        long[] ret = new long[lb.remaining()];
-        lb.get(ret);
-        return ret;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public byte[] toByteArray() {
-        ByteBuffer bb = toByteBuffer();
-        if (bb.hasArray()) {
-            return bb.array();
-        }
-        byte[] buf = new byte[bb.remaining()];
-        bb.get(buf);
-        return buf;
+    public ByteBuffer toByteBuffer() {
+        Shape sh = getShape();
+        DataType dType = getDataType();
+        long product = sh.size();
+        long len = dType.getNumOfBytes() * product;
+        ByteBuffer bb = ByteBuffer.allocateDirect(Math.toIntExact(len));
+        Pointer pointer = Native.getDirectBufferPointer(bb);
+        JnaUtils.syncCopyToCPU(getHandle(), pointer, Math.toIntExact(product));
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        return bb;
     }
 
     /** {@inheritDoc} */
@@ -350,36 +294,6 @@ public class MxNDArray extends NativeResource implements NDArray {
                 throw new AssertionError("Show never happen");
         }
         JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(float[] data) {
-        set(FloatBuffer.wrap(data));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(int[] data) {
-        set(IntBuffer.wrap(data));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(double[] data) {
-        set(DoubleBuffer.wrap(data));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(long[] data) {
-        set(LongBuffer.wrap(data));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(byte[] data) {
-        set(ByteBuffer.wrap(data));
     }
 
     /** {@inheritDoc} */
@@ -1588,19 +1502,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
     }
 
-    private ByteBuffer toByteBuffer() {
-        Shape sh = getShape();
-        DataType dType = getDataType();
-        long product = sh.size();
-        long len = dType.getNumOfBytes() * product;
-        ByteBuffer bb = ByteBuffer.allocateDirect(Math.toIntExact(len));
-        Pointer pointer = Native.getDirectBufferPointer(bb);
-        JnaUtils.syncCopyToCPU(getHandle(), pointer, Math.toIntExact(product));
-        bb.order(ByteOrder.LITTLE_ENDIAN);
-        return bb;
-    }
-
-    /** {@inheritDoc} */
     public void waitToRead() {
         JnaUtils.waitToRead(getHandle());
     }

@@ -13,6 +13,7 @@
 package org.apache.mxnet.engine;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.function.Predicate;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
@@ -372,85 +373,13 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public byte[] getEncoded() {
-        return array.getEncoded();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long size(int dimension) {
-        return array.size(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long size() {
-        return array.size();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double[] toDoubleArray() {
-        return array.toDoubleArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float[] toFloatArray() {
-        return array.toFloatArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] toIntArray() {
-        return array.toIntArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long[] toLongArray() {
-        return array.toLongArray();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public byte[] toByteArray() {
-        return array.toByteArray();
+    public ByteBuffer toByteBuffer() {
+        return array.toByteBuffer();
     }
 
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        array.set(data);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(float[] data) {
-        array.set(data);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(int[] data) {
-        array.set(data);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(double[] data) {
-        array.set(data);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(long[] data) {
-        array.set(data);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(byte[] data) {
         array.set(data);
     }
 
@@ -1087,12 +1016,6 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray sort() {
         return array.sort();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray softmax(int[] axes) {
-        return array.softmax(axes);
     }
 
     /** {@inheritDoc} */
