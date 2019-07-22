@@ -100,6 +100,6 @@ public enum DataType {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return format.toString().toLowerCase() + (8 * getNumOfBytes());
+        return name().toLowerCase();
     }
 }

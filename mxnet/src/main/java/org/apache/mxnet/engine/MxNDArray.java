@@ -279,6 +279,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             case FLOAT64:
                 buf.asDoubleBuffer().put((DoubleBuffer) data);
                 break;
+            case UINT8:
             case INT8:
                 buf.put((ByteBuffer) data);
                 break;
@@ -288,7 +289,6 @@ public class MxNDArray extends NativeResource implements NDArray {
             case INT64:
                 buf.asLongBuffer().put((LongBuffer) data);
                 break;
-            case UINT8:
             case FLOAT16:
             default:
                 throw new AssertionError("Show never happen");
@@ -1499,7 +1499,10 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     private void validate(DataType inputType, int size) {
-        if (getDataType() != inputType) {
+        if (getDataType() != inputType
+                && (dataType != DataType.UINT8 || inputType != DataType.INT8)) {
+            // Infer DataType from Buffer always return INI8, make this a special case that
+            // allows set UNIT array with regular ByteBuffer.
             throw new IllegalStateException(
                     "DataType mismatch, required: " + dataType + ", actual: " + inputType);
         }

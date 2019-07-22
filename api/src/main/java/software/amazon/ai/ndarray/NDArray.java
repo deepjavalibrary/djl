@@ -312,6 +312,20 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
+     * Converts this NDArray to a byte array.
+     *
+     * @return a long array
+     */
+    default int[] toUint8Array() {
+        ByteBuffer bb = toByteBuffer();
+        int[] buf = new int[bb.remaining()];
+        for (int i = 0; i < buf.length; ++i) {
+            buf[i] = bb.get() & 0xff;
+        }
+        return buf;
+    }
+
+    /**
      * Converts this NDArray to a Number array based on its data type.
      *
      * @return a Number array
@@ -329,6 +343,15 @@ public interface NDArray extends AutoCloseable {
                 return Arrays.stream(toIntArray()).boxed().toArray(Integer[]::new);
             case INT64:
                 return Arrays.stream(toLongArray()).boxed().toArray(Long[]::new);
+            case INT8:
+                ByteBuffer bb = toByteBuffer();
+                Byte[] ret = new Byte[bb.remaining()];
+                for (int i = 0; i < ret.length; ++i) {
+                    ret[i] = bb.get();
+                }
+                return ret;
+            case UINT8:
+                return Arrays.stream(toUint8Array()).boxed().toArray(Integer[]::new);
             default:
                 throw new IllegalStateException("Unsupported DataType: " + getDataType());
         }
