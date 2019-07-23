@@ -145,18 +145,14 @@ public final class BertQaInferenceExample extends AbstractExample {
 
             int seqLength = input.getSeqLength();
             NDManager manager = ctx.getNDManager();
-            NDArray data0 = manager.create(new DataDesc(new Shape(1, seqLength)));
-            NDArray data1 = manager.create(new DataDesc(new Shape(1, seqLength)));
-            NDArray data2 = manager.create(new DataDesc(new Shape(1)));
-
-            data0.set(indexesFloat);
-            data1.set(types);
-            data2.set(new float[] {validLength});
+            NDArray data0 = manager.create(indexesFloat, new Shape(1, seqLength));
+            NDArray data1 = manager.create(types, new Shape(1, seqLength));
+            NDArray data2 = manager.create(new float[]{validLength});
 
             NDList list = new NDList(3);
-            list.add("data0", data0.asType(DataType.FLOAT32, false));
+            list.add("data0", data0);
             list.add("data1", data1);
-            list.add("data2", data2.asType(DataType.FLOAT32, false));
+            list.add("data2", data2);
 
             return list;
         }
