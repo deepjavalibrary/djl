@@ -34,8 +34,6 @@ import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataDesc;
-import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.Utils;
 
@@ -147,7 +145,7 @@ public final class BertQaInferenceExample extends AbstractExample {
             NDManager manager = ctx.getNDManager();
             NDArray data0 = manager.create(indexesFloat, new Shape(1, seqLength));
             NDArray data1 = manager.create(types, new Shape(1, seqLength));
-            NDArray data2 = manager.create(new float[]{validLength});
+            NDArray data2 = manager.create(new float[] {validLength});
 
             NDList list = new NDList(3);
             list.add("data0", data0);

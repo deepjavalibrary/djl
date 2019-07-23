@@ -74,7 +74,8 @@ public class NDArrayCreationOpTest extends AbstractTest {
     @RunAsTest
     public void testArange() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray expectedND = manager.create(new float[]{0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
+            NDArray expectedND =
+                    manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
             NDArray testedND = manager.arange(0, 10, 1);
             Assertions.assertEquals(testedND, expectedND);
             testedND = manager.arange(0, 10, 1);
@@ -88,15 +89,15 @@ public class NDArrayCreationOpTest extends AbstractTest {
     public void testEye() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.eye(2);
-            NDArray expect = manager.create(new float[]{1f, 0f, 0f, 1f}, new Shape(2, 2));
+            NDArray expect = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
             Assertions.assertEquals(original, expect);
             original = manager.eye(2, 3, 0);
-            expect = manager.create(new float[]{1f, 0f, 0f, 0f, 1f, 0f}, new Shape(2, 3));
+            expect = manager.create(new float[] {1f, 0f, 0f, 0f, 1f, 0f}, new Shape(2, 3));
             Assertions.assertEquals(original, expect);
             original = manager.eye(3, 4, 0);
             expect =
                     manager.create(
-                            new float[]{1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f},
+                            new float[] {1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f},
                             new Shape(3, 4));
             Assertions.assertEquals(original, expect);
         }
@@ -105,7 +106,8 @@ public class NDArrayCreationOpTest extends AbstractTest {
     @RunAsTest
     public void testLinspace() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray expectedND = manager.create(new float[]{0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
+            NDArray expectedND =
+                    manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
             NDArray testedND = manager.linspace(0.0, 9.0, 10, true, null);
             Assertions.assertEquals(testedND, expectedND);
         }

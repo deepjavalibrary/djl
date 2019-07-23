@@ -409,13 +409,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray zerosLike() {
-        return manager.invoke("zeros_like", this, null);
+        return manager.invoke("_np_zeros_like", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray onesLike() {
-        return manager.invoke("ones_like", this, null);
+        return manager.invoke("_np_ones_like", this, null);
     }
 
     /** {@inheritDoc} */
@@ -447,15 +447,15 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(Number other) {
-        try (NDArray numbers = zerosLike()) {
-            numbers.addi(other);
-            return eq(numbers);
-        }
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return manager.invoke("_equal_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
+
         return manager.invoke("_equal", new NDList(this, other), null).head();
     }
 
@@ -474,13 +474,15 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neq(Number other) {
-        return eq(other).eq(0);
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", other.toString());
+        return manager.invoke("_npi_not_equal", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
-        return eq(other).eq(0);
+        return manager.invoke("_npi_equal", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -488,13 +490,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray gt(Number other) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", other.toString());
-        return manager.invoke("_greater_scalar", this, params);
+        return manager.invoke("_npi_greater_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
-        return manager.invoke("_greater", new NDList(this, other), null).head();
+        return manager.invoke("_npi_greater", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -502,13 +504,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray gte(Number other) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", other.toString());
-        return manager.invoke("_greater_equal_scalar", this, params);
+        return manager.invoke("_npi_greater_equal_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
-        return manager.invoke("_greater_equal", new NDList(this, other), null).head();
+        return manager.invoke("_npi_greater_equal", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -530,7 +532,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray lte(Number other) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", other.toString());
-        return manager.invoke("_lesser_equal_scalar", this, params);
+        return manager.invoke("_npi_less_equal_scalar", this, params);
     }
 
     /** {@inheritDoc} */
@@ -555,7 +557,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (others.length == 0) {
             throw new IllegalArgumentException("Passed in arrays must have at least one element");
         } else if (others.length == 1) {
-            return manager.invoke("_plus", toAdd, null).head();
+            return manager.invoke("_npi_add", toAdd, null).head();
         } else {
             return manager.invoke("add_n", toAdd, null).head();
         }
@@ -566,13 +568,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray sub(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_minus_scalar", this, params);
+        return manager.invoke("_npi_subtract_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
-        return manager.invoke("_sub", new NDList(this, other), null).head();
+        return manager.invoke("_npi_subtract", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -580,7 +582,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray mul(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_mul_scalar", this, params);
+        return manager.invoke("_npi_multiply_scalar", this, params);
     }
 
     /** {@inheritDoc} */
@@ -591,7 +593,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
         NDArray current = this;
         for (NDArray other : others) {
-            NDArray next = manager.invoke("_mul", new NDList(current, other), null).head();
+            NDArray next = manager.invoke("_npi_multiply", new NDList(current, other), null).head();
             if (current != this) {
                 current.close();
             }
@@ -629,13 +631,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray div(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_div_scalar", this, params);
+        return manager.invoke("_npi_true_divide_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray div(NDArray other) {
-        return manager.invoke("elemwise_div", new NDList(this, other), null).head();
+        return manager.invoke("_npi_true_divide", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -656,12 +658,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray pow(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_power_scalar", this, params);
+        return manager.invoke("_npi_power_scalar", this, params);
     }
 
     @Override
     public NDArray pow(NDArray other) {
-        return manager.invoke("_power", new NDList(this, other), null).head();
+        return manager.invoke("_npi_power", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -669,7 +671,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray addi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        manager.invoke("_plus_scalar", new NDList(this), new NDList(this), params);
+        manager.invoke("_npi_add_scalar", new NDList(this), new NDList(this), params);
         return this;
     }
 
@@ -681,7 +683,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (others.length == 0) {
             throw new IllegalArgumentException("Passed in arrays must have at least one element");
         } else if (others.length == 1) {
-            manager.invoke("_plus", toAdd, new NDList(this), null);
+            manager.invoke("_npi_add", toAdd, new NDList(this), null);
         } else {
             manager.invoke("add_n", toAdd, new NDList(this), null);
         }
@@ -693,14 +695,14 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray subi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        manager.invoke("_minus_scalar", new NDList(this), new NDList(this), params);
+        manager.invoke("_npi_subtract_scalar", new NDList(this), new NDList(this), params);
         return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray subi(NDArray other) {
-        manager.invoke("_sub", new NDList(this, other), new NDList(this), null);
+        manager.invoke("_npi_subtract", new NDList(this, other), new NDList(this), null);
         return this;
     }
 
@@ -711,7 +713,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             throw new IllegalArgumentException("Passed in arrays must have at least one element");
         }
         for (NDArray other : others) {
-            manager.invoke("_mul", new NDList(this, other), new NDList(this), null);
+            manager.invoke("_npi_multiply", new NDList(this, other), new NDList(this), null);
         }
         return this;
     }
@@ -721,7 +723,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray muli(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        manager.invoke("_mul_scalar", new NDList(this), new NDList(this), params);
+        manager.invoke("_npi_multiply_scalar", new NDList(this), new NDList(this), params);
         return this;
     }
 
@@ -730,7 +732,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray divi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        manager.invoke("_div_scalar", new NDList(this), new NDList(this), params);
+        manager.invoke("_npi_true_divide_scalar", new NDList(this), new NDList(this), params);
         return this;
     }
 
@@ -761,13 +763,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray powi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        manager.invoke("_power_scalar", new NDList(this), new NDList(this), params);
+        manager.invoke("_npi_power_scalar", new NDList(this), new NDList(this), params);
         return this;
     }
 
     @Override
     public NDArray powi(NDArray other) {
-        manager.invoke("_power", new NDList(this, other), new NDList(this), null);
+        manager.invoke("_npi_power", new NDList(this, other), new NDList(this), null);
         return this;
     }
 
@@ -945,7 +947,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray max(int[] axes) {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
-        return manager.invoke("max", this, params);
+        return manager.invoke("_np_max", this, params);
     }
 
     /** {@inheritDoc} */
@@ -954,7 +956,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
         params.addParam("keepdims", keepDims);
-        return manager.invoke("max", this, params);
+        return manager.invoke("_np_max", this, params);
     }
 
     /** {@inheritDoc} */
@@ -993,7 +995,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public Number prod() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("prod", this, params).toArray()[0];
+        return manager.invoke("_np_prod", this, params).toArray()[0];
     }
 
     /** {@inheritDoc} */
@@ -1002,14 +1004,14 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
         params.addParam("keepdims", keepDims);
-        return manager.invoke("prod", this, params);
+        return manager.invoke("_np_prod", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public Number mean() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("_np_mean", this, params).toArray()[0];
+        return manager.invoke("_npi_mean", this, params).toArray()[0];
     }
 
     /** {@inheritDoc} */
@@ -1018,7 +1020,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
         params.addParam("keepdims", keepDims);
-        return manager.invoke("_np_mean", this, params);
+        return manager.invoke("_npi_mean", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1125,9 +1127,10 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray argsort(int axis, boolean ascending) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
+        // be careful that MXNet numpy argsort op didn't officially support this param
         params.addParam("is_ascend", ascending);
         params.setDataType(DataType.INT32);
-        return manager.invoke("argsort", this, params);
+        return manager.invoke("_npi_argsort", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1154,7 +1157,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axes[0]);
-        return manager.invoke("softmax", this, params);
+        return manager.invoke("_npx_softmax", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1292,7 +1295,7 @@ public class MxNDArray extends NativeResource implements NDArray {
                 MxOpParams params = new MxOpParams();
                 params.addParam("repeats", repeats[i]);
                 params.addParam("axis", baseAxis + i);
-                array = manager.invoke("repeat", array, params);
+                array = manager.invoke("_np_repeat", array, params);
                 if (previousArray != this) {
                     previousArray.close();
                 }
@@ -1310,7 +1313,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mmul(NDArray other) {
-        return manager.invoke("dot", new NDList(this, other), null).head();
+        return manager.invoke("_np_dot", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -1335,7 +1338,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray transpose() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("transpose", this, params);
+        return manager.invoke("_np_transpose", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1354,7 +1357,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axes", dimensions);
-        return manager.invoke("transpose", this, params);
+        return manager.invoke("_np_transpose", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1377,7 +1380,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray argmax() {
-        return manager.invoke("argmax", this, null);
+        return manager.invoke("_npi_argmax", this, null);
     }
 
     @Override
@@ -1385,7 +1388,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         params.addParam("keepdims", keepDims);
-        return manager.invoke("argmax", this, params);
+        return manager.invoke("_npi_argmax", this, params);
     }
 
     @Override
