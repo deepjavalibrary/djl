@@ -56,40 +56,57 @@ import software.amazon.ai.ndarray.types.DataType;
 public interface Model extends AutoCloseable {
 
     /**
-     * Loads the model from the {@link Path}.
+     * Loads the model from the {@code modelPath}.
      *
-     * @param modelPath path that points to the model file object
-     * @return {@link Model} object
+     * @param modelPath the directory or file path of the model location
+     * @return {@code Model} object
      * @throws IOException IO exception happened in loading
      */
     static Model loadModel(Path modelPath) throws IOException {
-        return loadModel(modelPath, modelPath.toFile().getName(), null);
+        return loadModel(modelPath, modelPath.toFile().getName(), null, null);
     }
 
     /**
-     * Loads the model from the {@link Path} and the given name.
+     * Loads the model from the {@code modelPath} and the given name.
      *
-     * @param modelPath Directory/prefix of the file
+     * @param modelPath the directory or file path of the model location
      * @param modelName model file name or assigned name
-     * @return {@link Model} object
+     * @return {@code Model} object
      * @throws IOException IO exception happened in loading
      */
     static Model loadModel(Path modelPath, String modelName) throws IOException {
-        return loadModel(modelPath, modelName, null);
+        return loadModel(modelPath, modelName, null, null);
     }
 
     /**
-     * Loads the model from a {@link Path} object with the name and epoch provided.
+     * Loads the model from the {@code modelPath} with the name and options provided.
      *
-     * @param modelPath Directory/prefix of the file
+     * @param modelPath the directory or file path of the model location
      * @param modelName model file name or assigned name
      * @param options engine specific load model options, see document for each engine
-     * @return {@link Model} object
+     * @return {@code Model} object
      * @throws IOException IO exception happened in loading
      */
     static Model loadModel(Path modelPath, String modelName, Map<String, String> options)
             throws IOException {
-        return Engine.getInstance().loadModel(modelPath, modelName, options);
+        return Engine.getInstance().loadModel(modelPath, modelName, null, options);
+    }
+
+    /**
+     * Loads the model on specified {@code context} from the {@code modelPath} with the name and
+     * options provided.
+     *
+     * @param modelPath the directory or file path of the model location
+     * @param modelName model file name or assigned name
+     * @param context the context that model to be loaded
+     * @param options engine specific load model options, see document for each engine
+     * @return {@link Model} object
+     * @throws IOException IO exception happened in loading
+     */
+    static Model loadModel(
+            Path modelPath, String modelName, Context context, Map<String, String> options)
+            throws IOException {
+        return Engine.getInstance().loadModel(modelPath, modelName, context, options);
     }
 
     /**

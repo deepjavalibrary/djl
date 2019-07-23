@@ -134,11 +134,13 @@ public abstract class Engine {
      *
      * @param modelPath Directory of the model
      * @param modelName Name/Prefix of the model
+     * @param context the context that model to be loaded
      * @param options load model options, check document for specific engine
      * @return {@link Model} contains the model information
      * @throws IOException Exception for file loading
      */
-    public abstract Model loadModel(Path modelPath, String modelName, Map<String, String> options)
+    public abstract Model loadModel(
+            Path modelPath, String modelName, Context context, Map<String, String> options)
             throws IOException;
 
     /**

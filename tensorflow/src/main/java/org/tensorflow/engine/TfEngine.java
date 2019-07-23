@@ -61,7 +61,8 @@ public class TfEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model loadModel(Path modelPath, String modelName, Map<String, String> options) {
+    public Model loadModel(
+            Path modelPath, String modelName, Context context, Map<String, String> options) {
         return null;
     }
 

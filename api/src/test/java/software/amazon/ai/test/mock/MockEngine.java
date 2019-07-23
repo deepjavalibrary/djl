@@ -60,7 +60,8 @@ public class MockEngine extends Engine {
     }
 
     @Override
-    public Model loadModel(Path modelPath, String modelName, Map<String, String> options)
+    public Model loadModel(
+            Path modelPath, String modelName, Context context, Map<String, String> options)
             throws IOException {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException("File not found: " + modelPath);

@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -71,10 +72,16 @@ public class MxModel implements Model {
     }
 
     static MxModel loadModel(String prefix, int epoch) throws IOException {
-        return loadModel(MxNDManager.getSystemManager().newSubManager(), prefix, epoch);
+        return loadModel(MxNDManager.getSystemManager().newSubManager(), prefix, epoch, null);
     }
 
-    static MxModel loadModel(MxNDManager manager, String prefix, int epoch) throws IOException {
+    static MxModel loadModel(String prefix, int epoch, Context context) throws IOException {
+        return loadModel(MxNDManager.getSystemManager().newSubManager(), prefix, epoch, context);
+    }
+
+    @SuppressWarnings("unused")
+    static MxModel loadModel(MxNDManager manager, String prefix, int epoch, Context context)
+            throws IOException {
         // TODO: Find a better solution to get rid of this line
         JnaUtils.getAllOpNames();
         Symbol symbol = Symbol.load(manager, prefix + "-symbol.json");
@@ -83,6 +90,8 @@ public class MxModel implements Model {
         Path modelDir = Paths.get(paramFile).toAbsolutePath().getParent();
 
         PointerByReference namesRef = new PointerByReference();
+
+        // TODO: MXNet engine to support load NDArray on specific context.
         Pointer[] handles = JnaUtils.loadNdArray(paramFile, namesRef);
         String[] names = namesRef.getValue().getStringArray(0, handles.length);
 
