@@ -27,9 +27,7 @@ import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
 import org.testng.IObjectFactory;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.Context;
@@ -44,7 +42,6 @@ import software.amazon.ai.ndarray.types.SparseFormat;
 public class MxNDArrayTest extends PowerMockTestCase {
 
     private MockMxnetLibrary library;
-    private MxNDManager manager;
 
     @BeforeClass
     public void prepare() {
@@ -56,23 +53,13 @@ public class MxNDArrayTest extends PowerMockTestCase {
     @AfterClass
     public void postProcessing() {
         library.resetFunctions();
-        manager.close();
-    }
-
-    @BeforeTest
-    public void setUp(){
-        manager = MxNDManager.getSystemManager().newSubManager();
-    }
-
-    @AfterTest
-    public  void tearDown(){
-        manager.close();
     }
 
     @Test
     public void testNDArrayCreation() {
         // By default the Mock lib will return the following set up
-        try (MxNDArray nd = new MxNDArray(manager, new PointerArray())) {
+        try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager();
+                MxNDArray nd = new MxNDArray(manager, new PointerArray())) {
             Assert.assertEquals(nd.getShape(), new Shape(1, 2, 3));
             Assert.assertEquals(nd.getContext(), Context.gpu(1));
             Assert.assertEquals(nd.getDataType(), DataType.FLOAT32);
@@ -90,7 +77,8 @@ public class MxNDArrayTest extends PowerMockTestCase {
                     fa[0] = ((Pointer) objects[1]).getFloatArray(0, size);
                     return 0;
                 });
-        try (NDArray nd = manager.create(new Shape(3))) {
+        try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager();
+                NDArray nd = manager.create(new Shape(3))) {
             float[] input = new float[] {1.0f, 2.0f, 3.0f};
             nd.set(input);
             float[] fArr = fa[0];
