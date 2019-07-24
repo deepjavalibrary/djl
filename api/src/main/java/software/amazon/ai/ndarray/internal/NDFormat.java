@@ -55,7 +55,12 @@ public abstract class NDFormat {
                 .append(LF);
         // corner case: 0 dimension
         if (array.size() == 0) {
-            sb.append("[]");
+            sb.append("[]").append(LF);
+            return sb.toString();
+        }
+        // scalar case
+        if (array.getShape().dimension() == 0) {
+            sb.append(format(array.toArray()[0])).append(LF);
             return sb.toString();
         }
         if (array.getShape().dimension() < MAX_DEPTH) {
@@ -72,11 +77,10 @@ public abstract class NDFormat {
         }
         sb.append('[');
         Shape shape = array.getShape();
-        long len = shape.head();
         if (shape.dimension() == 1) {
             append(sb, array.toArray());
         } else {
-            // sb.append(LF);
+            long len = shape.head();
             long limit = Math.min(len, MAX_PRINT_ROWS);
             for (int i = 0; i < limit; ++i) {
                 try (NDArray nd = array.get(i)) {
@@ -90,7 +94,12 @@ public abstract class NDFormat {
             }
             Utils.pad(sb, ' ', depth);
         }
-        sb.append("],").append(LF);
+        // last "]"
+        if (depth == 0) {
+            sb.append(']').append(LF);
+        } else {
+            sb.append("],").append(LF);
+        }
     }
 
     private void append(StringBuilder sb, Number[] values) {

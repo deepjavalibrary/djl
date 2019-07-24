@@ -27,7 +27,7 @@ public class NDArrayReductionOpTest extends AbstractTest {
     }
 
     @RunAsTest
-    public void testAmax() throws FailedTestException {
+    public void testMax() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
@@ -45,7 +45,7 @@ public class NDArrayReductionOpTest extends AbstractTest {
     }
 
     @RunAsTest
-    public void testAmin() throws FailedTestException {
+    public void testMin() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 

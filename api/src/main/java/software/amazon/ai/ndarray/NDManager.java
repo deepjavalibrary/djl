@@ -126,6 +126,56 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Creates and initializes a scalar {@link NDArray}.
+     *
+     * @param data the float that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(float data) {
+        return create(new float[] {data}, new Shape());
+    }
+
+    /**
+     * Creates and initializes a scalar {@link NDArray}.
+     *
+     * @param data the float data that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(int data) {
+        return create(new int[] {data}, new Shape());
+    }
+
+    /**
+     * Creates and initializes a scalar {@link NDArray}.
+     *
+     * @param data the double data that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(double data) {
+        return create(new double[] {data}, new Shape());
+    }
+
+    /**
+     * Creates and initializes a scalar {@link NDArray}.
+     *
+     * @param data the long data that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(long data) {
+        return create(new long[] {data}, new Shape());
+    }
+
+    /**
+     * Creates and initializes a scalar {@link NDArray}.
+     *
+     * @param data the byte data that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(byte data) {
+        return create(new byte[] {data}, new Shape());
+    }
+
+    /**
      * Creates and initializes a 1D {@link NDArray}.
      *
      * @param data the float array that needs to be set

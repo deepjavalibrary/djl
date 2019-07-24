@@ -80,6 +80,7 @@ public class TfNDManager implements NDManager, AutoCloseable {
         return null;
     }
 
+    @Override
     public NDArray create(int data) {
         return new TfNDArray(this, Tensors.create(data));
     }
