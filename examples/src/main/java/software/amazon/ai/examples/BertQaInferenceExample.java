@@ -163,21 +163,11 @@ public final class BertQaInferenceExample extends AbstractExample {
             NDArray startLogits = output.get(0).reshape(new Shape(1, -1));
             NDArray endLogits = output.get(1).reshape(new Shape(1, -1));
             // Get Probability distribution
-            float[] startProb = startLogits.softmax(-1).toFloatArray();
-            float[] endProb = endLogits.softmax(-1).toFloatArray();
-            int startIdx = argmax(startProb);
-            int endIdx = argmax(endProb);
+            NDArray startProb = startLogits.softmax(-1);
+            NDArray endProb = endLogits.softmax(-1);
+            int startIdx = (int) startProb.argmax(1, true).getFloat(0);
+            int endIdx = (int) endProb.argmax(1, true).getFloat(0);
             return tokens.subList(startIdx, endIdx + 1).toString();
-        }
-
-        private static int argmax(float[] prob) {
-            int maxIdx = 0;
-            for (int i = 0; i < prob.length; i++) {
-                if (prob[maxIdx] < prob[i]) {
-                    maxIdx = i;
-                }
-            }
-            return maxIdx;
         }
     }
 
