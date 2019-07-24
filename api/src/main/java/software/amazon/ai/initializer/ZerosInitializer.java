@@ -14,13 +14,14 @@ package software.amazon.ai.initializer;
 
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 
 class ZerosInitializer implements Initializer {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray initialize(NDManager manager, Shape shape) {
-        return manager.zeros(shape);
+    public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
+        return manager.zeros(shape, dataType, manager.getContext());
     }
 }

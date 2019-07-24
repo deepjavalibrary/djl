@@ -795,7 +795,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray square() {
-        return manager.invoke("_npi_square", this, null);
+        return manager.invoke("_np_square", this, null);
     }
 
     /** {@inheritDoc} */

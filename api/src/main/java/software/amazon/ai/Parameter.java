@@ -60,6 +60,10 @@ public class Parameter {
         if (isInitialized()) {
             throw new IllegalStateException("This parameter is already initialized");
         }
-        array = initializer.initialize(manager, block.getParameterShape(name, inputs));
+        array =
+                initializer.initialize(
+                        manager,
+                        block.getParameterShape(name, inputs),
+                        inputs.head().getDataType());
     }
 }
