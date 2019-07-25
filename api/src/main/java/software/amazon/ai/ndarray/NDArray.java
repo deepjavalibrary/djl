@@ -505,16 +505,16 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Returns a zero dimensional NDArray corresponding to a single element.
+     * Returns a scalar NDArray corresponding to a single element.
      *
-     * @param indices The index of the element to return. Must return only a single element.
-     * @return a zero dimensional NDArray corresponding to the element.
+     * @param indices The index of the scalar to return. Must return only a single item.
+     * @return a scalar NDArray corresponding to the element.
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
-    default NDArray getElement(long... indices) {
+    default NDArray getScalar(long... indices) {
         NDArray value = get(new NDIndex(indices));
         if (value.size() != 1) {
-            throw new IllegalArgumentException("The supplied Index does not produce an element");
+            throw new IllegalArgumentException("The supplied Index does not produce a scalar");
         }
         return value;
     }
@@ -527,7 +527,7 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
     default long getLong(long... indices) {
-        return getElement(indices).toLongArray()[0];
+        return getScalar(indices).toLongArray()[0];
     }
 
     /**
@@ -538,7 +538,7 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
     default double getDouble(long... indices) {
-        return getElement(indices).toDoubleArray()[0];
+        return getScalar(indices).toDoubleArray()[0];
     }
 
     /**
@@ -549,7 +549,7 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
     default float getFloat(long... indices) {
-        return getElement(indices).toFloatArray()[0];
+        return getScalar(indices).toFloatArray()[0];
     }
 
     /**
@@ -560,7 +560,7 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
     default int getInt(long... indices) {
-        return getElement(indices).toIntArray()[0];
+        return getScalar(indices).toIntArray()[0];
     }
 
     /**
@@ -571,7 +571,7 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException Thrown if the result is not a single element
      */
     default byte getByte(long... indices) {
-        return getElement(indices).toByteArray()[0];
+        return getScalar(indices).toByteArray()[0];
     }
 
     /**
@@ -1432,7 +1432,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return the max
      */
-    Number max();
+    NDArray max();
 
     /**
      * Finds the max over the given axes.
@@ -1460,7 +1460,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return the min
      */
-    Number min();
+    NDArray min();
 
     /**
      * Finds the min over the given axes.
@@ -1488,7 +1488,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return the sum
      */
-    Number sum();
+    NDArray sum();
 
     /**
      * Sums over the given axes.
@@ -1516,7 +1516,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return the product
      */
-    Number prod();
+    NDArray prod();
 
     /**
      * Finds the product over the given axes.
@@ -1544,7 +1544,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return the mean
      */
-    Number mean();
+    NDArray mean();
 
     /**
      * Finds the mean over the given axes.

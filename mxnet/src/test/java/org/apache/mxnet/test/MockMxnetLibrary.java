@@ -632,6 +632,10 @@ public class MockMxnetLibrary implements MxnetLibrary {
                     .get("MXNDArrayGetShapeEx")
                     .apply(new Object[] {handle, out_dim, out_pdata});
         }
+
+        out_dim.put(0, 3);
+        Pointer ptr = TestHelper.toPointer(new int[] {1, 2, 3});
+        out_pdata.setValue(ptr);
         return 0;
     }
 

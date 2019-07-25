@@ -876,7 +876,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public Number max() {
+    public NDArray max() {
         return array.max();
     }
 
@@ -894,7 +894,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public Number min() {
+    public NDArray min() {
         return array.min();
     }
 
@@ -912,7 +912,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public Number sum() {
+    public NDArray sum() {
         return array.sum();
     }
 
@@ -924,7 +924,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public Number prod() {
+    public NDArray prod() {
         return array.prod();
     }
 
@@ -936,7 +936,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public Number mean() {
+    public NDArray mean() {
         return array.mean();
     }
 

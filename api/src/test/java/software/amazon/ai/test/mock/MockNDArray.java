@@ -18,7 +18,6 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.util.Arrays;
 import java.util.function.Predicate;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
@@ -610,10 +609,8 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public Number max() {
-        Number[] values = toArray();
-        Arrays.sort(values);
-        return values[values.length - 1];
+    public NDArray max() {
+        return null;
     }
 
     @Override
@@ -622,10 +619,8 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public Number min() {
-        Number[] values = toArray();
-        Arrays.sort(values);
-        return values[0];
+    public NDArray min() {
+        return null;
     }
 
     @Override
@@ -634,7 +629,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public Number sum() {
+    public NDArray sum() {
         return null;
     }
 
@@ -644,7 +639,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public Number prod() {
+    public NDArray prod() {
         return null;
     }
 
@@ -654,7 +649,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public Number mean() {
+    public NDArray mean() {
         return null;
     }
 

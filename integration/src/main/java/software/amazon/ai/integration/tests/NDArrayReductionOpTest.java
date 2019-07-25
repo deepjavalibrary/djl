@@ -30,8 +30,7 @@ public class NDArrayReductionOpTest extends AbstractTest {
     public void testMax() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
-
-            Float maxAll = (Float) original.max();
+            float maxAll = original.max().getFloat();
             Assertions.assertEquals(8, maxAll, "Incorrect max all");
 
             NDArray maxAxes = original.max(new int[] {1});
@@ -49,7 +48,7 @@ public class NDArrayReductionOpTest extends AbstractTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
-            Float minAll = (Float) original.min();
+            Float minAll = original.min().getFloat();
             Assertions.assertEquals(2, minAll, "Incorrect min all");
 
             NDArray minAxes = original.min(new int[] {1});
@@ -67,7 +66,7 @@ public class NDArrayReductionOpTest extends AbstractTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
-            Float sumAll = (Float) original.sum();
+            Float sumAll = original.sum().getFloat();
             Assertions.assertEquals(20, sumAll, "Incorrect sum all");
             NDArray sumAxes = original.sum(new int[] {1});
             NDArray sumAxesExpected = manager.create(new float[] {6, 14});
@@ -84,7 +83,7 @@ public class NDArrayReductionOpTest extends AbstractTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
-            Float prodAll = (Float) original.prod();
+            float prodAll = original.prod().getFloat();
             Assertions.assertEquals(384, prodAll, "Incorrect max axes");
             if (prodAll != 384) {
                 throw new FailedTestException("Incorrect prod all");
@@ -105,7 +104,7 @@ public class NDArrayReductionOpTest extends AbstractTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
-            Float meanAll = (Float) original.mean();
+            float meanAll = original.mean().getFloat();
             Assertions.assertEquals(5, meanAll, "Incorrect mean all");
             NDArray meanAxes = original.mean(new int[] {1});
             NDArray meanAxesExpected = manager.create(new float[] {3, 7});

@@ -679,7 +679,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number max() {
+    public NDArray max() {
         return null;
     }
 
@@ -691,7 +691,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number min() {
+    public NDArray min() {
         return null;
     }
 
@@ -703,7 +703,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number sum() {
+    public NDArray sum() {
         return null;
     }
 
@@ -715,7 +715,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number prod() {
+    public NDArray prod() {
         return null;
     }
 
@@ -727,7 +727,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number mean() {
+    public NDArray mean() {
         return null;
     }
 

@@ -795,7 +795,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray square() {
-        return manager.invoke("_np_square", this, null);
+        return manager.invoke("_npi_square", this, null);
     }
 
     /** {@inheritDoc} */
@@ -938,8 +938,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number max() {
-        return manager.invoke("max", this, null).toArray()[0];
+    public NDArray max() {
+        return manager.invoke("_np_max", this, null);
     }
 
     /** {@inheritDoc} */
@@ -961,9 +961,9 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number min() {
+    public NDArray min() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("min", this, params).toArray()[0];
+        return manager.invoke("min", this, params);
     }
 
     /** {@inheritDoc} */
@@ -977,9 +977,9 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number sum() {
+    public NDArray sum() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("_np_sum", this, params).toArray()[0];
+        return manager.invoke("_np_sum", this, params);
     }
 
     /** {@inheritDoc} */
@@ -993,9 +993,9 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number prod() {
+    public NDArray prod() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("_np_prod", this, params).toArray()[0];
+        return manager.invoke("_np_prod", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1009,9 +1009,9 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number mean() {
+    public NDArray mean() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("_npi_mean", this, params).toArray()[0];
+        return manager.invoke("_npi_mean", this, params);
     }
 
     /** {@inheritDoc} */

@@ -460,8 +460,13 @@ public final class JnaUtils {
     public static Shape getShape(Pointer ndArray) {
         IntBuffer dim = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
-        checkCall(LIB.MXNDArrayGetShape(ndArray, dim, ref));
-        int[] shape = ref.getValue().getIntArray(0, dim.get());
+        checkCall(LIB.MXNDArrayGetShapeEx(ndArray, dim, ref));
+        int nDim = dim.get();
+        // scalar case TODO(Jake) it should be -1 when numpy flag is on
+        if (nDim == 0) {
+            return new Shape();
+        }
+        int[] shape = ref.getValue().getIntArray(0, nDim);
         return new Shape(Arrays.stream(shape).asLongStream().toArray());
     }
 
