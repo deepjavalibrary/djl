@@ -81,7 +81,7 @@ public class NDArrayOtherOpTest extends AbstractTest {
     }
 
     @RunAsTest
-    public void testArgsort() throws FailedTestException {}
+    public void testArgsort() {}
 
     @RunAsTest
     public void testSort() throws FailedTestException {
@@ -93,7 +93,7 @@ public class NDArrayOtherOpTest extends AbstractTest {
     }
 
     @RunAsTest
-    public void testSoftmax() throws FailedTestException {}
+    public void testSoftmax() {}
 
     @RunAsTest
     public void testCumsum() throws FailedTestException {
@@ -269,7 +269,7 @@ public class NDArrayOtherOpTest extends AbstractTest {
             NDArray result;
             try (MxAutograd autograd = new MxAutograd()) {
                 autograd.attachGradient(lhs);
-                autograd.setRecording(true);
+                MxAutograd.setRecording(true);
                 result = NDArrays.mmul(lhs, rhs);
                 autograd.backward((MxNDArray) result);
             }

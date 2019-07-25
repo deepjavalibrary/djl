@@ -13,7 +13,6 @@
 package software.amazon.ai.integration.tests;
 
 import java.util.List;
-import java.util.Random;
 import java.util.function.Function;
 import org.apache.mxnet.engine.MxAutograd;
 import org.apache.mxnet.engine.MxNDArray;
@@ -33,10 +32,11 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.util.PairList;
+import software.amazon.ai.util.RandomUtils;
 
 public class MxAutoGradIntegrationTest extends AbstractTest {
-    // TODO use API level integration test once moved Autograd to API package
 
+    // TODO use API level integration test once moved Autograd to API package
     public static void main(String[] args) {
         new MxAutoGradIntegrationTest().runTest(args);
     }
@@ -50,18 +50,16 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             autograd.attachGradient(lhs);
             // autograd automatically set recording and training during initialization
-            Assertions.assertTrue(autograd.isRecording());
-            Assertions.assertTrue(autograd.isTraining());
+            Assertions.assertTrue(MxAutograd.isRecording());
+            Assertions.assertTrue(MxAutograd.isTraining());
             NDArray result = NDArrays.mmul(lhs, rhs);
             autograd.backward((MxNDArray) result);
         }
     }
 
     @RunAsTest
-    public void testTrain() throws FailedTestException {
-
+    public void testTrain() {
         try (NDManager manager = NDManager.newBaseManager()) {
-
             int numOfData = 1000;
             int epochs = 5;
 
@@ -89,7 +87,7 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
                         optimizer.update(0, weight, grad.reshape(weight.getShape()), null);
                     }
                     autograd.close();
-                    System.out.println("Epoch " + (epoch + 1) + " loss " + loss.toString());
+                    System.out.println("Epoch " + (epoch + 1) + " loss " + loss); // NOPMD
                 }
             }
         }
@@ -101,7 +99,7 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
         for (int i = 0; i < num; i++) {
             double x = (Math.random() * ((max - min) + 1)) + min;
             double y = function.apply(x);
-            y = y + new Random().nextGaussian() * noiseScale;
+            y = y + RandomUtils.nextGaussian() * noiseScale;
             pairList.add(x, y);
         }
         return pairList;

@@ -36,7 +36,7 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
             NDArray result;
             try (MxAutograd autograd = new MxAutograd()) {
                 autograd.attachGradient(lhs);
-                autograd.setRecording(true);
+                MxAutograd.setRecording(true);
                 result = NDArrays.add(lhs, 2);
                 autograd.backward((MxNDArray) result);
             }

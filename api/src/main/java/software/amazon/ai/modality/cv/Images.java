@@ -23,8 +23,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Random;
 import javax.imageio.ImageIO;
+import software.amazon.ai.util.RandomUtils;
 
 /** {@code Images} is an image processing utility that can load, reshape and convert images. */
 public final class Images {
@@ -98,7 +98,7 @@ public final class Images {
     }
 
     private static Color randomColor() {
-        return new Color(new Random().nextInt(255));
+        return new Color(RandomUtils.nextInt(255));
     }
 
     /**

@@ -104,8 +104,7 @@ public final class TestRunner {
     }
 
     private static int[] runAllTests()
-            throws InstantiationException, NoSuchMethodException, IllegalAccessException,
-                    InvocationTargetException {
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
         int failure = 0;
         int total = 0;
         for (Map.Entry<String, Class<?>> entry : TEST_CLASSES.entrySet()) {
@@ -117,8 +116,7 @@ public final class TestRunner {
     }
 
     private static int[] runAllTestsIn(Map<String, Class<?>> classes)
-            throws InstantiationException, NoSuchMethodException, IllegalAccessException,
-                    InvocationTargetException {
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
         int failure = 0;
         int total = 0;
         for (Map.Entry<String, Class<?>> entry : classes.entrySet()) {
@@ -130,8 +128,7 @@ public final class TestRunner {
     }
 
     private static int[] runAllTestsIn(Class<?> klass)
-            throws InstantiationException, NoSuchMethodException, IllegalAccessException,
-                    InvocationTargetException {
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
         int failure = 0;
         int total = 0;
         Method[] methods = klass.getMethods();
@@ -213,7 +210,7 @@ public final class TestRunner {
                 dirs.add(new File(resource.getFile()));
             }
         } catch (IOException e) {
-            logger.error("IOException: cause={}", e.getCause());
+            logger.error("", e);
         }
         for (File directory : dirs) {
             addAll(classes, findClasses(directory, packageName));
