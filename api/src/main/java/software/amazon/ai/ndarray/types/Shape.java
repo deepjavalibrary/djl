@@ -367,6 +367,15 @@ public class Shape {
         return dimension() == 0;
     }
 
+    /**
+     * Returns {@code true} if a layout is set.
+     *
+     * @return whether a layout has been set
+     */
+    public boolean isLayoutKnown() {
+        return !Arrays.asList(layout).stream().allMatch(l -> l == LayoutType.UNKNOWN);
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {

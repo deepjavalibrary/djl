@@ -45,7 +45,6 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
     public void testAutograd() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager();
                 MxAutograd autograd = new MxAutograd()) {
-
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             autograd.attachGradient(lhs);
@@ -69,9 +68,10 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
             block.setInitializer(manager, Initializer.ONES);
 
             MxOptimizer optimizer =
-                    new Sgd(1.0f, 0.f, 0.f, MxLearningRateTracker.fixedLR(0.01f), 0, 0.f, true);
+                    new Sgd(1.0f, 0.f, -1, MxLearningRateTracker.fixedLR(0.0001f), 0, 0.f, true);
 
             for (int epoch = 0; epoch < epochs; epoch++) {
+                String lossString = "";
                 for (int i = 0; i < numOfData; i++) {
                     MxAutograd autograd = new MxAutograd();
                     NDArray x = manager.create(new double[] {pairList.keyAt(i)});
@@ -87,8 +87,11 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
                         optimizer.update(0, weight, grad.reshape(weight.getShape()), null);
                     }
                     autograd.close();
-                    System.out.println("Epoch " + (epoch + 1) + " loss " + loss); // NOPMD
+                    if (i == numOfData - 1) {
+                        lossString = loss.toString();
+                    }
                 }
+                System.out.println("Epoch = " + (epoch + 1) + "  loss = " + lossString); // NOPMD
             }
         }
     }

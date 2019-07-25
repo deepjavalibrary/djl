@@ -18,6 +18,7 @@ import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.initializer.Initializer;
@@ -33,6 +34,32 @@ public class BlockCoreTest extends AbstractTest {
     @RunAsTest
     public void testLinear() throws FailedTestException {
         NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+        long outSize = 3;
+
+        Linear linearWithBias = new Linear.Builder().setOutChannels(outSize).build();
+        linearWithBias.setInitializer(manager, Initializer.ONES);
+        NDArray outBias = linearWithBias.forward(input);
+        NDArray expectedBias =
+                input.mmul(manager.ones(new Shape(outSize, 2)).transpose())
+                        .add(manager.ones(new Shape(2, outSize)));
+        Assertions.assertEquals(expectedBias, outBias);
+
+        Linear linearWithoutBias =
+                new Linear.Builder().setOutChannels(outSize).setBias(false).build();
+        linearWithoutBias.setInitializer(manager, Initializer.ONES);
+        NDArray outNoBias = linearWithoutBias.forward(input);
+        NDArray expectedNoBias = input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
+        Assertions.assertEquals(expectedNoBias, outNoBias);
+    }
+
+    // @RunAsTest
+    public void testLinearWithDefinedLayout() throws FailedTestException {
+        NDArray input =
+                manager.create(
+                        new float[] {1, 2, 3, 4},
+                        new Shape(
+                                new long[] {2, 2},
+                                new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL}));
         long outSize = 3;
 
         Linear linearWithBias = new Linear.Builder().setOutChannels(outSize).build();

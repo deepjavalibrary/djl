@@ -61,15 +61,25 @@ public class MxLinear extends MxNNBlock implements Linear {
     @Override
     public void beforeInitialize(NDList inputs) {
         Shape input = inputs.head().getShape();
-        inChannels = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
-        inputShape =
-                input.map(
-                        pair ->
-                                new Pair<>(
-                                        pair.getValue().equals(LayoutType.BATCH)
-                                                ? Long.valueOf(-1)
-                                                : pair.getKey(),
-                                        pair.getValue()));
+        if (input.isLayoutKnown()) {
+            inChannels = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
+            inputShape =
+                    input.map(
+                            pair ->
+                                    new Pair<>(
+                                            pair.getValue().equals(LayoutType.BATCH)
+                                                    ? Long.valueOf(-1)
+                                                    : pair.getKey(),
+                                            pair.getValue()));
+        } else if (input.dimension() > 1) {
+            inChannels = input.slice(1);
+            inputShape =
+                    new Shape(new long[] {-1}, new LayoutType[] {LayoutType.BATCH})
+                            .addAll(input.slice(1));
+        } else {
+            inChannels = input.slice(0);
+            inputShape = input;
+        }
     }
 
     /** {@inheritDoc} */

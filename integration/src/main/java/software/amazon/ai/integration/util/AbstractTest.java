@@ -47,8 +47,10 @@ public class AbstractTest {
         }
 
         int failed = 0;
+        int testCount = 0;
         for (Method method : methods) {
             if (method.isAnnotationPresent(RunAsTest.class)) {
+                testCount++;
                 // TODO: collect performance data
                 for (int i = 0; i < iteration; i++) {
                     try {
@@ -63,9 +65,9 @@ public class AbstractTest {
             }
         }
         if (failed > 0) {
-            logger.error("Failed {} out of {} tests", failed, methods.size());
+            logger.error("Failed {} out of {} tests", failed, testCount);
         } else {
-            logger.info("Passed all {} tests", methods.size());
+            logger.info("Passed all {} tests", testCount);
         }
     }
 

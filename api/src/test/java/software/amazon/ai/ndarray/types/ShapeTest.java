@@ -49,4 +49,15 @@ public class ShapeTest {
         Assert.assertEquals(shape.columns(), 1);
         Assert.assertNotEquals(shape, null);
     }
+
+    @Test
+    public void testHasLayout() {
+        Shape withLayout =
+                new Shape(
+                        new long[] {2, 2}, new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL});
+        Shape withoutLayout = new Shape(2, 2);
+
+        Assert.assertTrue(withLayout.isLayoutKnown());
+        Assert.assertFalse(withoutLayout.isLayoutKnown());
+    }
 }
