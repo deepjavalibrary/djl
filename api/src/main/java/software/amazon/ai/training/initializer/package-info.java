@@ -10,18 +10,12 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.initializer;
 
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-
-class ZerosInitializer implements Initializer {
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
-        return manager.zeros(shape, dataType, manager.getContext());
-    }
-}
+/**
+ * Contains classes for initializing a {@link software.amazon.ai.Block}'s {@link
+ * software.amazon.ai.Parameter}s.
+ *
+ * <p>It contains a main interface {@link software.amazon.ai.training.initializer.Initializer} and
+ * various initializers that extend it.
+ */
+package software.amazon.ai.training.initializer;

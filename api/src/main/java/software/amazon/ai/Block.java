@@ -15,10 +15,10 @@ package software.amazon.ai;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import software.amazon.ai.initializer.Initializer;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 /** An interface defining neural-network layers. */

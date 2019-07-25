@@ -20,7 +20,6 @@ import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
 import org.apache.mxnet.engine.optimizer.MxOptimizer;
 import org.apache.mxnet.engine.optimizer.Sgd;
 import software.amazon.ai.Parameter;
-import software.amazon.ai.initializer.Initializer;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
@@ -31,6 +30,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Loss;
+import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 import software.amazon.ai.util.RandomUtils;
 

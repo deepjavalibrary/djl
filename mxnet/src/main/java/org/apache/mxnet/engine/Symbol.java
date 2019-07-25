@@ -17,10 +17,10 @@ import java.util.List;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Block;
 import software.amazon.ai.Parameter;
-import software.amazon.ai.initializer.Initializer;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 import software.amazon.ai.util.Utils;
 

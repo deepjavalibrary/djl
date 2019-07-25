@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.initializer;
+package software.amazon.ai.training.initializer;
 
 import software.amazon.ai.Block;
 import software.amazon.ai.ndarray.NDArray;
@@ -25,8 +25,8 @@ import software.amazon.ai.ndarray.types.Shape;
  */
 public interface Initializer {
 
-    Initializer ZEROS = new ZerosInitializer();
-    Initializer ONES = new OnesInitializer();
+    Initializer ZEROS = (m, s, t) -> m.zeros(s, t, m.getContext());
+    Initializer ONES = (m, s, t) -> m.ones(s, t, m.getContext());
 
     /**
      * Initializes a single {@link NDArray}.

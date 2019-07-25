@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.integration.tests;
 
-import software.amazon.ai.initializer.Initializer;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
@@ -21,6 +20,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.training.initializer.Initializer;
 
 public class BlockCoreTest extends AbstractTest {
 
