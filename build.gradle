@@ -5,6 +5,8 @@ plugins {
 // workaround gradle bug
 ext.SpotBugsTask = com.github.spotbugs.SpotBugsTask
 
+defaultTasks 'build'
+
 allprojects {
     group 'software.amazon.ai'
     version = '0.2.0-SNAPSHOT'
@@ -31,8 +33,6 @@ configure(javaProjects()) {
     apply plugin: 'java'
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    defaultTasks 'jar'
 
 	apply from: file("${rootProject.projectDir}/tools/gradle/formatter.gradle")
 	apply from: file("${rootProject.projectDir}/tools/gradle/check.gradle")
@@ -81,9 +81,9 @@ def getClassifier() {
     } else if (osName.startsWith("Mac")) {
         osPrefix = "osx"
     } else if (osName.startsWith("Linux")) {
-        classifierName = "linux"
+        osPrefix = "linux"
     } else {
         throw new GradleException("Unsupported os: " + osName)
     }
-    return osPrefix + "-" + System.getProperty("os.arch")
+    return osPrefix + "-x86_64"
 }
