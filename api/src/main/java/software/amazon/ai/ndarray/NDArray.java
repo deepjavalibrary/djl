@@ -986,7 +986,7 @@ public interface NDArray extends AutoCloseable {
      * jshell&gt; NDArray array = manager.arange(5);
      * jshell&gt; array.neg();
      * ND: (5) cpu(0) float32
-     * [-0.0000000e+00, -1.0000000e+00, -2.0000000e+00, -3.0000000e+00, -4.0000000e+00],
+     * [-0., -1., -2., -3., -4.]
      * </pre>
      *
      * @return Array copy with all values negated
@@ -1001,7 +1001,7 @@ public interface NDArray extends AutoCloseable {
      * jshell&gt; array.negi();
      * jshell&gt; array;
      * ND: (5) cpu(0) float32
-     * [-0.0000000e+00, -1.0000000e+00, -2.0000000e+00, -3.0000000e+00, -4.0000000e+00],
+     * [-0., -1., -2., -3., -4.]
      * </pre>
      *
      * @return this array with all values negated
@@ -1014,10 +1014,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {-1f, -2f});
+     * jshell&gt; NDArray array = manager.create(new float[] {-1f, -2f});
      * jshell&gt; array.abs();
      * ND: (2) cpu(0) float32
-     * [ 1.0000000e+00,  2.0000000e+00],
+     * [1., 2.]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1030,10 +1030,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {2f, -3f});
+     * jshell&gt; NDArray array = manager.create(new float[] {2f, -3f});
      * jshell&gt; array.square();
      * ND: (2) cpu(0) float32
-     * [ 4.0000000e+00,  9.0000000e+00],
+     * [4., 9.]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1046,10 +1046,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(3), new float[] {1f, 8f, 27f});
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 8f, 27f});
      * jshell&gt; array.cbrt();
      * ND: (3) cpu(0) float32
-     * [ 1.0000000e+00,  2.0000000e+00,  3.0000000e+00],
+     * [1., 2., 3.]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1063,10 +1063,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(7), new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
+     * jshell&gt; NDArray array = manager.create(new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
      * jshell&gt; array.floor();
      * ND: (7) cpu(0) float32
-     * [-2.0000000e+00, -2.0000000e+00, -1.0000000e+00,  0.0000000e+00,  1.0000000e+00,  1.0000000e+00,  2.0000000e+00],
+     * [-2., -2., -1.,  0.,  1.,  1.,  2.]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1080,10 +1080,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(7), new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
+     * jshell&gt; NDArray array = manager.create(new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
      * jshell&gt; array.ceil();
      * ND: (7) cpu(0) float32
-     * [-1.0000000e+00, -1.0000000e+00, -0.0000000e+00,  1.0000000e+00,  2.0000000e+00,  2.0000000e+00,  2.0000000e+00],
+     * [-1., -1., -0.,  1.,  2.,  2.,  2.]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1096,10 +1096,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(7), new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
+     * jshell&gt; NDArray array = manager.create(new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
      * jshell&gt; array.round();
      * ND: (7) cpu(0) float32
-     * [-2.0000000e+00, -2.0000000e+00, -0.0000000e+00,  0.0000000e+00,  2.0000000e+00,  2.0000000e+00,  2.0000000e+00],
+     * [-2., -2., -0.,  0.,  2.,  2.,  2.]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1112,10 +1112,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(7), new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
+     * jshell&gt; NDArray array = manager.create(new float[] {-1.7f, -1.5f, -0.2f, 0.2f, 1.5f, 1.7f, 2.0f});
      * jshell&gt; array.trunc();
      * ND: (7) cpu(0) float32
-     * [-1.0000000e+00, -1.0000000e+00, -0.0000000e+00,  0.0000000e+00,  1.0000000e+00,  1.0000000e+00,  2.0000000e+00],
+     * [-1., -1., -0.,  0.,  1.,  1.,  2.]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1128,10 +1128,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {0f, 2.5f});
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 2.5f});
      * jshell&gt; array.exp();
      * ND: (2) cpu(0) float32
-     * [ 1.0000000e+00,  1.2182494e+01],
+     * [ 1.    , 12.1825]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1144,10 +1144,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {0f, 2.5f});
-     * jshell&gt; array.exp();
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 2.5f});
+     * jshell&gt; array.log();
      * ND: (2) cpu(0) float32
-     * [     -Infinity,  9.1629076e-01],
+     * [  -inf, 0.9163]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1160,10 +1160,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(3), new float[] {1000f, 1f, 150f});
+     * jshell&gt; NDArray array = manager.create(new float[] {1000f, 1f, 150f});
      * jshell&gt; array.log10();
      * ND: (3) cpu(0) float32
-     * [ 3.0000000e+00,  0.0000000e+00,  2.1760912e+00],
+     * [3.    , 0.    , 2.1761]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1176,10 +1176,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(3), new float[] {8, 1f, 5f});
+     * jshell&gt; NDArray array = manager.create(new float[] {8, 1f, 5f});
      * jshell&gt; array.log2();
      * ND: (3) cpu(0) float32
-     * [ 3.0000000e+00,  0.0000000e+00,  2.3219280e+00],
+     * [3.    , 0.    , 2.3219]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1193,11 +1193,11 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(5), new float[] {0f, 30f, 45f, 60f, 90f});
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 30f, 45f, 60f, 90f});
      * jshell&gt; array = array.mul(Math.PI).div(180f);
      * jshell&gt; array.sin();
      * ND: (5) cpu(0) float32
-     * [ 0.0000000e+00,  5.0000000e-01,  7.0710677e-01,  8.6602545e-01,  1.0000000e+00],
+     * [0.    , 0.5   , 0.7071, 0.866 , 1.    ]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1211,7 +1211,7 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(3), new double[] {0, Math.PI/2, Math.PI});
+     * jshell&gt; NDArray array = manager.create(new double[] {0, Math.PI/2, Math.PI});
      * jshell&gt; array.cos();
      * ND: (3) cpu(0) float64
      * [  1.0000000e+00,   6.1232340e-17,  -1.0000000e+00],
@@ -1228,7 +1228,7 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(3), new double[] {-Math.PI, Math.PI/2, Math.PI});
+     * jshell&gt; NDArray array = manager.create(new double[] {-Math.PI, Math.PI/2, Math.PI});
      * jshell&gt; array.tan();
      * ND: (3) cpu(0) float64
      * [  1.2246468e-16,   1.6331239e+16,  -1.2246468e-16],
@@ -1245,10 +1245,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(3), new float[] {1f, -1f, 0f});
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, -1f, 0f});
      * jshell&gt; array.asin();
      * ND: (3) cpu(0) float64
-     * [ 1.5707963e+00, -1.5707963e+00,  0.0000000e+00],
+     * [ 1.5708, -1.5708,  0.    ]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1262,10 +1262,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {1f, -1f});
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, -1f});
      * jshell&gt; array.acos();
      * ND: (2) cpu(0) float64
-     * [ 0.0000000e+00,  3.1415925e+00],
+     * [0.    , 3.1416]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1279,10 +1279,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new float[] {0f, 1f});
-     * jshell&gt; array.acos();
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f});
+     * jshell&gt; array.atan();
      * ND: (2) cpu(0) float64
-     * [ 0.0000000e+00,  7.8539819e-01],
+     * [0.    , 0.7854]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1296,10 +1296,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {0, Math.PI});
-     * jshell&gt; array.acos();
+     * jshell&gt; NDArray array = manager.create(new double[] {0, Math.PI});
+     * jshell&gt; array.sinh();
      * ND: (2) cpu(0) float64
-     * [  0.0000000e+00,   1.1548739e+01],
+     * [ 0.    , 11.5487]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1313,10 +1313,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {0, Math.PI});
+     * jshell&gt; NDArray array = manager.create(new double[] {0, Math.PI});
      * jshell&gt; array.cosh();
      * ND: (2) cpu(0) float64
-     * [  1.0000000e+00,   1.1591953e+01],
+     * [ 1.    , 11.592 ]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1330,10 +1330,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {0, Math.PI});
+     * jshell&gt; NDArray array = manager.create(new double[] {0, Math.PI});
      * jshell&gt; array.tanh();
      * ND: (2) cpu(0) float64
-     * [  0.0000000e+00,   9.9627208e-01],
+     * [0.    , 0.9963]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1346,10 +1346,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {Math.E, 10});
+     * jshell&gt; NDArray array = manager.create(new double[] {Math.E, 10});
      * jshell&gt; array.asinh();
      * ND: (2) cpu(0) float64
-     * [  1.7253826e+00,   2.9982230e+00],
+     * [1.7254, 2.9982]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1362,10 +1362,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {Math.E, 10});
+     * jshell&gt; NDArray array = manager.create(new double[] {Math.E, 10});
      * jshell&gt; array.acosh();
      * ND: (2) cpu(0) float64
-     * [  1.6574545e+00,   2.9932228e+00],
+     * [1.6575, 2.9932]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1379,10 +1379,10 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new Shape(2), new double[] {0, -0.5});
+     * jshell&gt; NDArray array = manager.create(new double[] {0, -0.5});
      * jshell&gt; array.atanh();
      * ND: (2) cpu(0) float64
-     * [  0.0000000e+00,  -5.4930614e-01],
+     * [ 0.    , -0.5493]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1399,7 +1399,7 @@ public interface NDArray extends AutoCloseable {
      * jshell&gt; NDArray array = manager.arange(6).mul(Math.PI / 3);
      * jshell&gt; array.toDegrees();
      * ND: (6) cpu(0) float32
-     * [ 0.0000000e+00,  6.0000000e+01,  1.2000000e+02,  1.8000000e+02,  2.4000000e+02,  2.9999997e+02],
+     * [  0.,  60., 120., 180., 240., 300.]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1416,7 +1416,7 @@ public interface NDArray extends AutoCloseable {
      * jshell&gt; NDArray array = manager.arange(6).mul(60);
      * jshell&gt; array.toRadians();
      * ND: (6) cpu(0) float32
-     * [ 0.0000000e+00,  1.0471976e+00,  2.0943952e+00,  3.1415927e+00,  4.1887903e+00,  5.2359877e+00],
+     * [0.    , 1.0472, 2.0944, 3.1416, 4.1888, 5.236 ]
      * </pre>
      *
      * @return the result {@code NDArray}
@@ -1430,12 +1430,43 @@ public interface NDArray extends AutoCloseable {
     /**
      * Return the maximum of an {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
+     * jshell&gt; array
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [2., 3.],
+     * ]
+     * jshell&gt; array.max() // Maximum of the flattened array
+     * ND: () cpu(0) float32
+     * 3.
+     * </pre>
+     *
      * @return the max
      */
     NDArray max();
 
     /**
      * Finds the max over the given axes.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
+     * jshell&gt; array
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [2., 3.],
+     * ]
+     * jshell&gt; array.max(new int[]{0}) // Maximum along the first axis
+     * ND: (2) cpu(0) float32
+     * [2., 3.]
+     * jshell&gt; array.max(new int[]{1}) // Maximum along the first axis
+     * ND: (2) cpu(0) float32
+     * [1., 3.]
+     * </pre>
      *
      * @param axes the axes along which to operate
      * @return an NDArray with the specified axes removed from the Shape containing the max
@@ -1447,6 +1478,26 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Finds the max over the given axes.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
+     * jshell&gt; array
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [2., 3.],
+     * ]
+     * jshell&gt; array.max(new int[]{0}, true) // Maximum along the first axis and keep dimension
+     * ND: (1, 2) cpu(0) float32
+     * [[2., 3.],
+     * ]
+     * jshell&gt; array.max(new int[]{1}, true) // Maximum along the first axis and keep dimension
+     * ND: (2, 1) cpu(0) float32
+     * [[1.],
+     *  [3.],
+     * ]
+     * </pre>
      *
      * @param axes the axes along which to operate
      * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
@@ -1684,6 +1735,18 @@ public interface NDArray extends AutoCloseable {
      * @return 1 1D NDArray of equal size
      */
     NDArray flatten();
+
+    /**
+     * Reshapes the NDArray to the given shape.
+     *
+     * @param newShape the long array to reshape into. Must have equal size to the current shape.
+     * @return a reshaped NDArray
+     * @throws IllegalArgumentException Thrown if the given shape does not match the size of the
+     *     current shape
+     */
+    default NDArray reshape(long... newShape) {
+        return reshape(new Shape(newShape));
+    }
 
     /**
      * Reshapes the NDArray to the given shape.
