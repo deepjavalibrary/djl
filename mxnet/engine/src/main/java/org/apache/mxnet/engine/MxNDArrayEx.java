@@ -28,6 +28,20 @@ class MxNDArrayEx implements NDArrayEx {
         this.manager = (MxNDManager) parent.getManager();
     }
 
+    @Override
+    public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        params.addParam("keepdims", keepDims);
+        params.add("mode", mode);
+        return manager.invoke("pick", new NDList(array, index), params).head();
+    }
+
+    @Override
+    public NDArray relu() {
+        return manager.invoke("relu", array, null);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray rdiv(Number n) {
@@ -299,7 +313,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("lazy_update", lazyUpdate);
         params.addParam("rescale_grad", rescaleGrad);
         params.addParam("clip_gradient", clipGradient);
-        manager.invoke("sgd_update", new NDList(array, grad, state), new NDList(array), params);
+        manager.invoke("sgd_mom_update", new NDList(array, grad, state), new NDList(array), params);
     }
 
     @Override

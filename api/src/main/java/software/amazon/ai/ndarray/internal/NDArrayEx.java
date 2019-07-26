@@ -12,12 +12,49 @@
  */
 package software.amazon.ai.ndarray.internal;
 
+import java.util.stream.IntStream;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.pooling.PoolingConvention;
 
 /** An internal interface that encapsulate engine specific operator methods. */
 public interface NDArrayEx {
+
+    /**
+     * Picks elements from an input array according to the input indices along the given axis.
+     *
+     * @param index The index array
+     * @param axis The axis to picking the elements. Negative values means indexing from right to
+     *     left. If is `None`, the elements in the index w.r.t the flattened input will be picked.
+     * @param keepDims If true, the axis where we pick the elements is left in the result as
+     *     dimension with size one.
+     * @param mode Specify how out-of-bound indices behave. "clip" means clip to the range. So, if
+     *     all indices mentioned are too large, they are replaced by the index that addresses the
+     *     last element along an axis. "wrap" means to wrap around.
+     * @return copy of array
+     */
+    NDArray pick(NDArray index, int axis, boolean keepDims, String mode);
+
+    /**
+     * Picks elements from an input array according to the input indices along the given axis.
+     *
+     * @param index The index array
+     * @param axis The axis to picking the elements. Negative values means indexing from right to
+     *     left. If is `None`, the elements in the index w.r.t the flattened input will be picked.
+     * @param keepDims If true, the axis where we pick the elements is left in the result as
+     *     dimension with size one.
+     * @return copy of array
+     */
+    default NDArray pick(NDArray index, int axis, boolean keepDims) {
+        return pick(index, axis, keepDims, "clip");
+    }
+
+    /**
+     * Computes rectified linear activation.
+     *
+     * @return copy of array after applying relu
+     */
+    NDArray relu();
 
     /**
      * Reverse division with a scalar - i.e., (n / thisArrayValues).
@@ -203,18 +240,24 @@ public interface NDArrayEx {
             NDArray label,
             float weight,
             int batchAxis,
-            int axis,
+            int classAxis,
             boolean sparseLabel,
             boolean fromLogit) {
         NDArray pred = getArray();
         if (!fromLogit) {
-            pred = pred.softmax(axis).log();
+            pred = pred.softmax(classAxis).log();
         }
-        if (!sparseLabel) {
-            label = label.toDense();
+        NDArray loss;
+        if (sparseLabel) {
+            loss = pred.getNDArrayInternal().pick(label, classAxis, true).neg();
+        } else {
+            label = label.reshape(pred.getShape());
+            loss = pred.mul(label).sum(new int[] {classAxis}).mul(-weight);
         }
-        label = label.reshape(pred.getShape());
-        NDArray loss = pred.mmul(label).sum(new int[] {axis}).mul(-weight);
-        return loss.mean(new int[] {batchAxis});
+        int[] axes =
+                IntStream.range(0, loss.getShape().dimension())
+                        .filter(axis -> axis != batchAxis)
+                        .toArray();
+        return loss.mean(axes);
     }
 }

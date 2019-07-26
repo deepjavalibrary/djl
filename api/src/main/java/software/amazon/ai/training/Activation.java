@@ -12,26 +12,13 @@
  */
 package software.amazon.ai.training;
 
+import software.amazon.ai.Block;
 import software.amazon.ai.ndarray.NDArray;
 
-public final class Loss {
+public interface Activation extends Block {
+    // TODO: Add more static Activation functions, sigmoid, tanh, softrelu, softsign
 
-    private Loss() {}
-
-    public static NDArray l2Loss(NDArray pred, NDArray label, float weight, int batchAxis) {
-        return pred.getNDArrayInternal().l2Loss(label, weight, batchAxis);
-    }
-
-    public static NDArray softmaxCrossEntropyLoss(
-            NDArray pred,
-            NDArray label,
-            float weight,
-            int batchAxis,
-            int classAxis,
-            boolean sparseLabel,
-            boolean fromLogit) {
-        return pred.getNDArrayInternal()
-                .softmaxCrossEntropyLoss(
-                        label, weight, batchAxis, classAxis, sparseLabel, fromLogit);
+    public static NDArray relu(NDArray array) {
+        return array.getNDArrayInternal().relu();
     }
 }

@@ -62,13 +62,12 @@ public class Parameter {
             throw new IllegalStateException("This parameter is already initialized");
         }
 
-        Objects.requireNonNull(initializer, "No initializer has been set.");
+        Objects.requireNonNull(initializer, "No initializer has been set");
         array =
                 initializer.initialize(
                         manager,
                         block.getParameterShape(name, inputs),
                         inputs.head().getDataType());
-
         array.attachGradient();
     }
 }

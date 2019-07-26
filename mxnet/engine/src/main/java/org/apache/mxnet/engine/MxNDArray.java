@@ -1060,7 +1060,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray reshape(Shape shape) {
         long count = shape.getUnknownValueCount();
         if (count == 0 && getShape().size() != shape.size()) {
-            throw new IllegalArgumentException("The given shape does not match the current shape");
+            throw new IllegalArgumentException(
+                    "The given shape " + shape + " does not match the current shape " + getShape());
         }
         // check multiply -1 in shape
         if (count > 1) {
