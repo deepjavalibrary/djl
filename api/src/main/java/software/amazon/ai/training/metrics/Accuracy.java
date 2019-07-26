@@ -79,7 +79,7 @@ public class Accuracy extends TrainingMetrics {
         } else {
             predictionReduced = predictions;
         }
-        int numCorrect = labels.eq(predictionReduced).sum().getInt();
+        int numCorrect = (int) labels.eq(predictionReduced).sum().getFloat();
         addNumInstances(numCorrect);
         addTotalInstances(labels.size());
     }

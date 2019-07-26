@@ -106,6 +106,16 @@ public class Shape {
     }
 
     /**
+     * Returns the layout type in the given dimension.
+     *
+     * @param dimension the dimension to get the layout type in
+     * @return Returns the layout type in the given dimension
+     */
+    public LayoutType getLayoutType(int dimension) {
+        return layout[dimension];
+    }
+
+    /**
      * Returns the size of a specific dimension or several specific dimensions.
      *
      * @param dimensions The dimension or dimensions to find the size of

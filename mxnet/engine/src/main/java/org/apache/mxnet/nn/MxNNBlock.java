@@ -23,6 +23,7 @@ public abstract class MxNNBlock implements Block {
     protected String opName;
     private boolean initialized;
     protected Shape inputShape;
+    protected Shape inChannels;
 
     /** {@inheritDoc} */
     @Override

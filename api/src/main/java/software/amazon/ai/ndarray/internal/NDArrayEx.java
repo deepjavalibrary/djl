@@ -13,6 +13,8 @@
 package software.amazon.ai.ndarray.internal;
 
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.pooling.PoolingConvention;
 
 /** An internal interface that encapsulate engine specific operator methods. */
 public interface NDArrayEx {
@@ -146,6 +148,29 @@ public interface NDArrayEx {
      * @return the minimum of two {@code NDArray}.
      */
     NDArray min(NDArray other);
+
+    NDArray maxPool(Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention);
+
+    NDArray globalMaxPool(Shape stride, Shape pad, PoolingConvention poolingConvention);
+
+    NDArray sumPool(Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention);
+
+    NDArray globalSumPool(Shape stride, Shape pad, PoolingConvention poolingConvention);
+
+    NDArray avgPool(
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            PoolingConvention poolingConvention,
+            boolean countIncludePad);
+
+    NDArray globalAvgPool(
+            Shape stride, Shape pad, PoolingConvention poolingConvention, boolean countIncludePad);
+
+    NDArray lpPool(
+            Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue);
+
+    NDArray globalLpPool(Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue);
 
     void sgdUpdate(
             NDArray grad,

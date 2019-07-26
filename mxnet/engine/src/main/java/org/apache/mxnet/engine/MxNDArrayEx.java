@@ -15,6 +15,8 @@ package org.apache.mxnet.engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.pooling.PoolingConvention;
 
 class MxNDArrayEx implements NDArrayEx {
 
@@ -134,6 +136,132 @@ class MxNDArrayEx implements NDArrayEx {
     @Override
     public NDArray min(NDArray other) {
         return manager.invoke("_npi_minimum", new NDList(array, other), null).head();
+    }
+
+    @Override
+    public NDArray maxPool(
+            Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
+        MxOpParams params = new MxOpParams();
+        params.setShape("kernel", kernel);
+        params.add("pool_type", "max");
+        params.setShape("stride", stride);
+        params.setShape("pad", pad);
+        if (poolingConvention != null) {
+            params.add("pooling_convention", poolingConvention.name().toLowerCase());
+        }
+        return pool(params);
+    }
+
+    @Override
+    public NDArray globalMaxPool(Shape stride, Shape pad, PoolingConvention poolingConvention) {
+        MxOpParams params = new MxOpParams();
+        params.setShape("stride", stride);
+        params.add("pool_type", "max");
+        params.setShape("pad", pad);
+        params.addParam("global_pool", true);
+        if (poolingConvention != null) {
+            params.add("pooling_convention", poolingConvention.name().toLowerCase());
+        }
+        return pool(params);
+    }
+
+    @Override
+    public NDArray sumPool(
+            Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
+        MxOpParams params = new MxOpParams();
+        params.setShape("kernel", kernel);
+        params.add("pool_type", "sum");
+        params.setShape("stride", stride);
+        params.setShape("pad", pad);
+        if (poolingConvention != null) {
+            params.add("pooling_convention", poolingConvention.name().toLowerCase());
+        }
+        return pool(params);
+    }
+
+    @Override
+    public NDArray globalSumPool(Shape stride, Shape pad, PoolingConvention poolingConvention) {
+        MxOpParams params = new MxOpParams();
+        params.add("pool_type", "sum");
+        params.setShape("stride", stride);
+        params.setShape("pad", pad);
+        params.addParam("global_pool", true);
+        if (poolingConvention != null) {
+            params.add("pooling_convention", poolingConvention.name().toLowerCase());
+        }
+        return pool(params);
+    }
+
+    @Override
+    public NDArray avgPool(
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            PoolingConvention poolingConvention,
+            boolean countIncludePad) {
+        MxOpParams params = new MxOpParams();
+        params.setShape("kernel", kernel);
+        params.add("pool_type", "avg");
+        params.setShape("stride", stride);
+        params.setShape("pad", pad);
+        params.addParam("count_include_pad", countIncludePad);
+        if (poolingConvention != null) {
+            params.add("pooling_convention", poolingConvention.name().toLowerCase());
+        }
+        return pool(params);
+    }
+
+    @Override
+    public NDArray globalAvgPool(
+            Shape stride, Shape pad, PoolingConvention poolingConvention, boolean countIncludePad) {
+        MxOpParams params = new MxOpParams();
+        params.add("pool_type", "avg");
+        params.setShape("stride", stride);
+        params.setShape("pad", pad);
+        params.addParam("global_pool", true);
+        params.addParam("count_include_pad", countIncludePad);
+        if (poolingConvention != null) {
+            params.add("pooling_convention", poolingConvention.name().toLowerCase());
+        }
+        return pool(params);
+    }
+
+    @Override
+    public NDArray lpPool(
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            PoolingConvention poolingConvention,
+            int pValue) {
+        MxOpParams params = new MxOpParams();
+        params.setShape("kernel", kernel);
+        params.add("pool_type", "lp");
+        params.setShape("stride", stride);
+        params.setShape("pad", pad);
+        params.addParam("p_value", pValue);
+        if (poolingConvention != null) {
+            params.add("pooling_convention", poolingConvention.name().toLowerCase());
+        }
+        return pool(params);
+    }
+
+    @Override
+    public NDArray globalLpPool(
+            Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue) {
+        MxOpParams params = new MxOpParams();
+        params.add("pool_type", "lp");
+        params.setShape("stride", stride);
+        params.setShape("pad", pad);
+        if (poolingConvention != null) {
+            params.add("pooling_convention", poolingConvention.name().toLowerCase());
+        }
+        params.addParam("p_value", pValue);
+        params.addParam("global_pool", true);
+        return pool(params);
+    }
+
+    private NDArray pool(MxOpParams params) {
+        return manager.invoke("Pooling", getArray(), params);
     }
 
     // Sgd update function for non-multi-precision

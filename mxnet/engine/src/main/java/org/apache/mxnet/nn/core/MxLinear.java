@@ -28,7 +28,6 @@ import software.amazon.ai.util.Pair;
 public class MxLinear extends MxNNBlock implements Linear {
 
     private long outChannels;
-    private Shape inChannels;
 
     private Parameter weight;
     private Parameter bias;
