@@ -114,6 +114,22 @@ public interface NDArrayEx {
     NDArray rmodi(NDArray b);
 
     /**
+     * Reverse the power of each element being raised in the {@code NDArray}.
+     *
+     * @param n Value to use for reverse power
+     * @return copy of array after applying reverse power
+     */
+    NDArray rpow(Number n);
+
+    /**
+     * In place reverse the power of each element being raised in the {@code NDArray}.
+     *
+     * @param n Value to use for reverse power
+     * @return copy of array after applying reverse power
+     */
+    NDArray rpowi(Number n);
+
+    /**
      * Returns element-wise maximum of the input arrays with broadcasting.
      *
      * @param other the arrays holding the elements to be compared. They must have the same shape,

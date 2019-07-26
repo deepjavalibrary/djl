@@ -109,6 +109,23 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray rpow(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return manager.invoke("_npi_rpower_scalar", array, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rpowi(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        manager.invoke("_npi_rpower_scalar", new NDList(array), new NDList(array), params);
+        return array;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray max(NDArray other) {
         return manager.invoke("_npi_maximum", new NDList(array, other), null).head();
     }

@@ -418,6 +418,24 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
     }
 
     @RunAsTest
+    public void testPowerScalar() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.create(new float[] {6, 0, -1, 5, 2}, new Shape(1, 5));
+            NDArray result = array.pow(2);
+            NDArray inPlaceResult = array.powi(2);
+            NDArray solution = manager.create(new float[] {36, 0, 1, 25, 4}, new Shape(1, 5));
+            Assertions.assertEquals(
+                    solution, result, "Scalar power: Incorrect value in result ndarray");
+            Assertions.assertEquals(
+                    solution,
+                    inPlaceResult,
+                    "Scalar in-place power: Incorrect value in result ndarray");
+            Assertions.assertInPlace(
+                    array, inPlaceResult, "Scalar power: In-place operation failed");
+        }
+    }
+
+    @RunAsTest
     public void testPower() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {6, 9, 12, 2, 0}, new Shape(1, 5));
@@ -437,20 +455,20 @@ public class NDArrayElementArithmeticOpTest extends AbstractTest {
     }
 
     @RunAsTest
-    public void testPowerScalar() throws FailedTestException {
+    public void testReversePowerScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.create(new float[] {6, 0, -1, 5, 2}, new Shape(1, 5));
-            NDArray result = array.pow(2);
-            NDArray inPlaceResult = array.powi(2);
-            NDArray solution = manager.create(new float[] {36, 0, 1, 25, 4}, new Shape(1, 5));
+            NDArray array = manager.create(new float[] {3, 4, 5, 6, 7});
+            NDArray power = NDArrays.pow(2, array);
+            NDArray inPlaceResult = NDArrays.powi(2, array);
+            NDArray solution = manager.create(new float[] {8, 16, 32, 64, 128});
             Assertions.assertEquals(
-                    solution, result, "Scalar power: Incorrect value in result ndarray");
+                    solution, power, "Scalar reverse power: Incorrect value in result ndarray");
             Assertions.assertEquals(
                     solution,
                     inPlaceResult,
-                    "Scalar in-place power: Incorrect value in result ndarray");
+                    "Scalar in-place reverse power: Incorrect value in result ndarray");
             Assertions.assertInPlace(
-                    array, inPlaceResult, "Scalar power: In-place operation failed");
+                    array, inPlaceResult, "Scalar reverse division: In-place operation failed");
         }
     }
 }

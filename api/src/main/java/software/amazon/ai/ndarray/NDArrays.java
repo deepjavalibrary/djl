@@ -435,6 +435,17 @@ public final class NDArrays {
     }
 
     /**
+     * Raises the power of a number by the corresponding element in the {@code NDArray}.
+     *
+     * @param n number to be operated on
+     * @param a the {@code NDArray} by which the raise the power by
+     * @return the result {@code NDArray}
+     */
+    public static NDArray pow(Number n, NDArray a) {
+        return a.getNDArrayInternal().rpow(n);
+    }
+
+    /**
      * In place Adds a number to each element of an {@link NDArray}.
      *
      * @param a the NDArray that will be added to.
@@ -610,10 +621,21 @@ public final class NDArrays {
      *
      * @param a ndarray to be operated on
      * @param n the number to raise the power to
-     * @return the result {@code NDArray}
+     * @return this {@code NDArray} after applying raising power
      */
     public static NDArray powi(NDArray a, Number n) {
         return a.powi(n);
+    }
+
+    /**
+     * Raises the power of a number by the corresponding element in the {@code NDArray}.
+     *
+     * @param n number to be operated on
+     * @param a the {@code NDArray} by which the raise the power by
+     * @return this {@code NDArray} after applying raising power
+     */
+    public static NDArray powi(Number n, NDArray a) {
+        return a.getNDArrayInternal().rpowi(n);
     }
 
     /**
