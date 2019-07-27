@@ -996,6 +996,30 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray logicalAnd(NDArray other) {
+        return array.logicalAnd(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalOr(NDArray other) {
+        return array.logicalOr(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalXor(NDArray other) {
+        return array.logicalXor(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalNot() {
+        return array.logicalNot();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray argsort(int axis, boolean ascending) {
         return array.argsort(axis, ascending);
     }
@@ -1220,12 +1244,6 @@ public class MxMatrix implements Matrix {
     @Override
     public boolean isEmpty() {
         return array.isEmpty();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray logicalNot() {
-        return array.logicalNot();
     }
 
     /** {@inheritDoc} */

@@ -833,6 +833,30 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray logicalAnd(NDArray n) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalOr(NDArray n) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalXor(NDArray n) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalNot() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray argsort(int axis, boolean ascending) {
         return null;
     }
@@ -1089,12 +1113,6 @@ public class TfNDArray implements NDArray {
     @Override
     public boolean none() {
         return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray logicalNot() {
-        return null;
     }
 
     /** {@inheritDoc} */

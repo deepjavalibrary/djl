@@ -755,4 +755,40 @@ public final class NDArrays {
     public static NDArray concat(NDList arrays) {
         return concat(arrays.toArray(), 0);
     }
+
+    /**
+     * Compute the truth value of {@code NDArray} a AND {@code NDArray} b element-wise.
+     *
+     * @param a input {@code NDArray}
+     * @param b the other input {@code NDArray}
+     * @return boolean result of the logical AND operation applied to the elements of two {@code
+     *     NDArray}
+     */
+    public static NDArray logicalAnd(NDArray a, NDArray b) {
+        return a.logicalAnd(b);
+    }
+
+    /**
+     * Compute the truth value of {@code NDArray} a OR {@code NDArray} b element-wise.
+     *
+     * @param a input {@code NDArray}
+     * @param b the other input {@code NDArray}
+     * @return boolean result of the logical OR operation applied to the elements of two {@code
+     *     NDArray}
+     */
+    public static NDArray logicalOr(NDArray a, NDArray b) {
+        return a.logicalOr(b);
+    }
+
+    /**
+     * Compute the truth value of {@code NDArray} a XOR {@code NDArray} b element-wise.
+     *
+     * @param a input {@code NDArray}
+     * @param b the other input {@code NDArray}
+     * @return boolean result of the logical XOR operation applied to the elements of two {@code
+     *     NDArray}
+     */
+    public static NDArray logicalXor(NDArray a, NDArray b) {
+        return a.logicalXor(b);
+    }
 }

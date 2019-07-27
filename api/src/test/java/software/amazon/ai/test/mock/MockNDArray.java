@@ -709,6 +709,26 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray logicalAnd(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray logicalOr(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray logicalXor(NDArray other) {
+        return null;
+    }
+
+    @Override
+    public NDArray logicalNot() {
+        return null;
+    }
+
+    @Override
     public NDArray argsort(int axis, boolean ascending) {
         return null;
     }
@@ -906,11 +926,6 @@ public class MockNDArray implements NDArray {
     @Override
     public boolean isEmpty() {
         return false;
-    }
-
-    @Override
-    public NDArray logicalNot() {
-        return null;
     }
 
     @Override

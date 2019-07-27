@@ -739,7 +739,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray divi(NDArray other) {
-        manager.invoke("elemwise_div", new NDList(this, other), new NDList(this), null);
+        manager.invoke("_npi_true_divide", new NDList(this, other), new NDList(this), null);
         return this;
     }
 
@@ -1124,6 +1124,30 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray logicalAnd(NDArray other) {
+        return manager.invoke("broadcast_logical_and", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalOr(NDArray other) {
+        return manager.invoke("broadcast_logical_or", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalXor(NDArray other) {
+        return manager.invoke("broadcast_logical_xor", new NDList(this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray logicalNot() {
+        return manager.invoke("_np_logical_not", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray argsort(int axis, boolean ascending) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
@@ -1458,12 +1482,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public boolean none() {
         throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray logicalNot() {
-        return manager.invoke("_np_logical_not", this, null);
     }
 
     /** {@inheritDoc} */

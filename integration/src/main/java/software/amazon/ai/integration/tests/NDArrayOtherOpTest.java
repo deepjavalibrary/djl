@@ -285,15 +285,4 @@ public class NDArrayOtherOpTest extends AbstractTest {
                     "Matrix multiplication: Incorrect gradient after backward");
         }
     }
-
-    @RunAsTest
-    public void testLogicalNot() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {-2., 0., 1.};
-            NDArray testedND = manager.create(testedData);
-            double[] boolData = new double[] {0.0, 1.0, 0.0};
-            NDArray expectedND = manager.create(boolData);
-            Assertions.assertAlmostEquals(testedND.logicalNot(), expectedND);
-        }
-    }
 }

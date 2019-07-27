@@ -1938,6 +1938,44 @@ public interface NDArray extends AutoCloseable {
     }
 
     ////////////////////////////////////////
+    // Operators: Logical Op
+    ////////////////////////////////////////
+
+    /**
+     * Compute the truth value of this {@code NDArray} AND other {@code NDArray} element-wise.
+     *
+     * @param other the second NDArray to operate on
+     * @return boolean result of the logical OR operation applied to the elements of this {@code
+     *     NDArray}.
+     */
+    NDArray logicalAnd(NDArray other);
+
+    /**
+     * Compute the truth value of this {@code NDArray} OR other {@code NDArray} element-wise..
+     *
+     * @param other the second NDArray to operate on
+     * @return boolean result of the logical OR operation applied to the elements of this {@code
+     *     NDArray}.
+     */
+    NDArray logicalOr(NDArray other);
+
+    /**
+     * Compute the truth value of this {@code NDArray} XOR other {@code NDArray} element-wise..
+     *
+     * @param other the second NDArray to operate on
+     * @return boolean result of the logical XOR operation applied to the elements of this {@code
+     *     NDArray}.
+     */
+    NDArray logicalXor(NDArray other);
+
+    /**
+     * Computes the truth value of NOT this {@code NDArray} element-wise.
+     *
+     * @return the result {@code NDArray}
+     */
+    NDArray logicalNot();
+
+    ////////////////////////////////////////
     // Operators: Other
     ////////////////////////////////////////
 
@@ -2408,13 +2446,6 @@ public interface NDArray extends AutoCloseable {
     default boolean none() {
         return nonzero() == 0;
     }
-
-    /**
-     * Computes the truth value of NOT x element-wise.
-     *
-     * @return the result {@code NDArray}
-     */
-    NDArray logicalNot();
 
     /**
      * Returns an internal representative of Native {@code NDArray}.
