@@ -1,10 +1,11 @@
 rootProject.name = 'joule'
 include ':api'
+include ':repository'
+include ':examples'
+include ':integration'
 include ':mxnet:engine'
 include ':mxnet:jnarator'
 include ':mxnet:native'
-include ':examples'
-include ':integration'
 include ':tensorflow:engine'
 
 project(":api").name = "joule-api"
