@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import org.apache.mxnet.jna.LibUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
@@ -110,7 +112,8 @@ public class MxModelTest extends PowerMockTestCase {
         // Test: Add subDir
         Files.createDirectories(Paths.get(dir + "inner/"));
         Files.createFile(Paths.get(dir + "inner/innerFiles"));
-        Assert.assertEquals(model.getArtifactNames()[0], "inner/innerFiles");
+        List<String> fileNames = Arrays.asList(model.getArtifactNames());
+        Assert.assertTrue(fileNames.contains("inner/innerFiles"));
 
         // Test: Get Artifacts
         InputStream stream = model.getArtifactAsStream(synset);
