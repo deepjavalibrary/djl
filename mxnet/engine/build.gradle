@@ -29,9 +29,9 @@ compileTestJava.dependsOn tasks.getByPath(':joule-api:testClasses')
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'
 
-task jnarator(dependsOn: ":jnarator:jar") {
+task jnarator(dependsOn: ":mxnet:jnarator:jar") {
     doLast {
-        File jnaGenerator = project(":jnarator").jar.outputs.files.singleFile
+        File jnaGenerator = project(":mxnet:jnarator").jar.outputs.files.singleFile
         javaexec {
             main = "-jar"
             args = [

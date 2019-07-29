@@ -1,11 +1,11 @@
 rootProject.name = 'joule'
-include 'api'
-include 'mxnet'
-include 'jnarator'
-include 'examples'
-include 'integration'
-include 'tensorflow'
-include 'native'
+include ':api'
+include ':mxnet:engine'
+include ':mxnet:jnarator'
+include ':mxnet:native'
+include ':examples'
+include ':integration'
+include ':tensorflow:engine'
 
 project(":api").name = "joule-api"
 project(":examples").buildFileName = "joule.gradle"
