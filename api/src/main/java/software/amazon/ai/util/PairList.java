@@ -243,6 +243,16 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         return keys.contains(key);
     }
 
+    /**
+     * Removes all duplicate values from the list.
+     *
+     * @return Returns a new list with the duplicate values removed, taking the latest value for
+     *     each key.
+     */
+    public PairList<K, V> unique() {
+        return new PairList<>(toMap(false));
+    }
+
     /** {@inheritDoc} */
     @Override
     public Iterator<Pair<K, V>> iterator() {

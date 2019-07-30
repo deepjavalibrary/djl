@@ -19,7 +19,7 @@ import software.amazon.ai.ndarray.types.SparseFormat;
 import software.amazon.ai.util.PairList;
 
 /** Helper for creating the MXNet operator parameters. */
-public class MxOpParams extends PairList<String, String> {
+public class MxOpParams extends PairList<String, Object> {
 
     public void setShape(Shape shape) {
         setShape("shape", shape);

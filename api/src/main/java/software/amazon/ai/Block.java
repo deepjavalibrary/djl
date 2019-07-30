@@ -24,13 +24,13 @@ import software.amazon.ai.util.PairList;
 /** An interface defining neural-network layers. */
 public interface Block {
 
-    NDList forward(NDList inputs, PairList<String, String> params);
+    NDList forward(NDList inputs, PairList<String, Object> params);
 
     default NDList forward(NDList inputs) {
         return forward(inputs, new PairList<>());
     }
 
-    void backward();
+    default void backward() {}
 
     boolean isInitialized();
 
@@ -54,9 +54,6 @@ public interface Block {
             beforeInitialize(inputs);
             for (Parameter parameter : getDirectParameters()) {
                 parameter.initialize(inputs);
-            }
-            for (Block child : getChildren().values()) {
-                child.ensureInitialized(inputs);
             }
         }
     }

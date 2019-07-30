@@ -24,6 +24,7 @@ import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.util.Pair;
+import software.amazon.ai.util.PairList;
 
 public class MxLinear extends MxNNBlock implements Linear {
 
@@ -97,15 +98,33 @@ public class MxLinear extends MxNNBlock implements Linear {
     /** {@inheritDoc} */
     @Override
     public NDArray forward(NDArray data) {
-        ensureInitialized(new NDList(data));
-        NDList inputs =
+        return forward(new NDList(data)).get(0);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected NDList opInputs(NDList inputs) {
+        if (inputs.size() != 1) {
+            throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
+        }
+        NDList additional =
                 bias != null
-                        ? new NDList(data, weight.getArray(), bias.getArray())
-                        : new NDList(data, weight.getArray());
-        MxOpParams params = new MxOpParams();
-        params.addParam("num_hidden", outChannels);
-        params.addParam("flatten", false);
-        params.addParam("no_bias", bias == null);
-        return forward(inputs, params).get(0);
+                        ? new NDList(weight.getArray(), bias.getArray())
+                        : new NDList(weight.getArray());
+        NDList result = new NDList();
+        result.addAll(inputs);
+        result.addAll(additional);
+        return result;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected PairList<String, Object> opParams(PairList<String, Object> params) {
+        MxOpParams result = new MxOpParams();
+        result.addParam("num_hidden", outChannels);
+        result.addParam("flatten", false);
+        result.addParam("no_bias", bias == null);
+        result.addAll(params);
+        return result;
     }
 }

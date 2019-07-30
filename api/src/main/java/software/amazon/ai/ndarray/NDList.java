@@ -22,7 +22,7 @@ import software.amazon.ai.util.PairList;
  * <p>Each {@link NDArray} in this list can optionally have a name. You can use the name to look up
  * NDArray in the NDList.
  */
-public class NDList implements Iterable<Pair<String, NDArray>> {
+public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
 
     protected PairList<String, NDArray> list;
 
@@ -191,5 +191,12 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
     @Override
     public Iterator<Pair<String, NDArray>> iterator() {
         return list.iterator();
+    }
+
+    @Override
+    public void close() {
+        for (NDArray array : list.values()) {
+            array.close();
+        }
     }
 }

@@ -153,7 +153,7 @@ public class Symbol extends NativeResource implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(NDList inputs, PairList<String, String> params) {
+    public NDList forward(NDList inputs, PairList<String, Object> params) {
         return null;
     }
 

@@ -27,11 +27,15 @@ public abstract class MxNNBlock implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(NDList inputs, PairList<String, String> params) {
+    public NDList forward(NDList inputs, PairList<String, Object> params) {
         ensureInitialized(inputs);
         NDManager manager = inputs.get(0).getManager();
-        return manager.invoke(opName, inputs, params);
+        return manager.invoke(opName, opInputs(inputs), opParams(params).unique());
     }
+
+    protected abstract NDList opInputs(NDList inputs);
+
+    protected abstract PairList<String, Object> opParams(PairList<String, Object> params);
 
     /** {@inheritDoc} */
     @Override

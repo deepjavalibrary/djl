@@ -22,6 +22,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.norm.BatchNorm;
+import software.amazon.ai.util.PairList;
 
 public class MxBatchNorm extends MxNNBlock implements BatchNorm {
 
@@ -42,35 +43,25 @@ public class MxBatchNorm extends MxNNBlock implements BatchNorm {
         runningVar = new Parameter("runningVar", this, ParameterType.OTHER);
     }
 
-    @Override
-    public NDArray forward(NDArray data) {
-        ensureInitialized(new NDList(data));
-        NDArray gamma = data.getManager().ones(new Shape(inChannels));
-        NDArray beta = data.getManager().zeros(new Shape(inChannels));
-        NDList inputs =
-                new NDList(data, gamma, beta, runningMean.getArray(), runningVar.getArray());
-        MxOpParams params = new MxOpParams();
-        params.addParam("eps", epsilon);
-        params.addParam("momentum", momentum);
-        params.addParam("axis", axis);
-        return forward(inputs, params).get(0);
-    }
-
+    /** {@inheritDoc} */
     @Override
     public Shape getOutputShape(Shape... inputs) {
         return inputs[0];
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         return Arrays.asList(runningMean, runningVar);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void beforeInitialize(NDList inputs) {
         inChannels = inputs.get(0).size(axis);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, NDList inputs) {
         switch (name) {
@@ -80,5 +71,34 @@ public class MxBatchNorm extends MxNNBlock implements BatchNorm {
             default:
                 throw new IllegalArgumentException("Invalid parameter name");
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray forward(NDArray data) {
+        return forward(new NDList(data)).get(0);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected NDList opInputs(NDList inputs) {
+        if (inputs.size() != 1) {
+            throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
+        }
+        NDArray data = inputs.get(0);
+        NDArray gamma = data.getManager().ones(new Shape(inChannels));
+        NDArray beta = data.getManager().zeros(new Shape(inChannels));
+        return new NDList(data, gamma, beta, runningMean.getArray(), runningVar.getArray());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected PairList<String, Object> opParams(PairList<String, Object> params) {
+        MxOpParams result = new MxOpParams();
+        result.addParam("eps", epsilon);
+        result.addParam("momentum", momentum);
+        result.addParam("axis", axis);
+        result.addAll(params);
+        return result;
     }
 }

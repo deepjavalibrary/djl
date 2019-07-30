@@ -23,6 +23,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.convolutional.Conv2D;
+import software.amazon.ai.util.PairList;
 
 public class MxConv2D extends MxNNBlock implements Conv2D {
     private static final LayoutType[] EXPECTED_LAYOUT =
@@ -121,18 +122,30 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
 
     @Override
     public NDArray forward(final NDArray data) {
-        ensureInitialized(new NDList(data));
-        NDList inputs =
-                bias != null
-                        ? new NDList(data, weight.getArray(), bias.getArray())
-                        : new NDList(data, weight.getArray());
-        MxOpParams params = new MxOpParams();
-        params.addParam("kernel", kernel);
-        params.addParam("stride", stride);
-        params.addParam("pad", pad);
-        params.addParam("num_filter", numFilters);
-        params.addParam("num_group", numGroups);
-        params.add("layout", LAYOUT);
-        return forward(inputs, params).get(0);
+        return forward(new NDList(data)).get(0);
+    }
+
+    @Override
+    protected NDList opInputs(NDList inputs) {
+        if (inputs.size() != 1) {
+            throw new IllegalArgumentException("Conv2D requires exactly 1 NDArray");
+        }
+        NDArray data = inputs.get(0);
+        return bias != null
+                ? new NDList(data, weight.getArray(), bias.getArray())
+                : new NDList(data, weight.getArray());
+    }
+
+    @Override
+    protected PairList<String, Object> opParams(PairList<String, Object> params) {
+        MxOpParams result = new MxOpParams();
+        result.addParam("kernel", kernel);
+        result.addParam("stride", stride);
+        result.addParam("pad", pad);
+        result.addParam("num_filter", numFilters);
+        result.addParam("num_group", numGroups);
+        result.add("layout", LAYOUT);
+        result.addAll(params);
+        return result;
     }
 }
