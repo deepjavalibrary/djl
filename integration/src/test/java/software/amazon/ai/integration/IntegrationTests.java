@@ -10,20 +10,16 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.integration.exceptions;
+package software.amazon.ai.integration;
 
-public class FailedTestException extends Exception {
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-    private static final long serialVersionUID = 1L;
+public class IntegrationTests {
 
-    /**
-     * Constructs a new exception with the specified detail message. The cause is not initialized,
-     * and may subsequently be initialized by a call to {@link #initCause}.
-     *
-     * @param message the detail message. The detail message is saved for later retrieval by the
-     *     {@link #getMessage()} method.
-     */
-    public FailedTestException(String message) {
-        super(message);
+    @Test
+    public void runIntegrionTests() {
+        String[] args = new String[] {};
+        Assert.assertTrue(new IntegrationTest().runTests(args));
     }
 }

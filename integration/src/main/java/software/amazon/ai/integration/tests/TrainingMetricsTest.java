@@ -13,8 +13,8 @@
 
 package software.amazon.ai.integration.tests;
 
+import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
-import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
@@ -23,10 +23,11 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.metrics.Accuracy;
 
-public class TrainingMetricsTest extends AbstractTest {
+public class TrainingMetricsTest {
 
     public static void main(String[] args) {
-        new TrainingMetricsTest().runTest(args);
+        String[] cmd = new String[] {"-c", TrainingMetricsTest.class.getName()};
+        new IntegrationTest().runTests(cmd);
     }
 
     @RunAsTest

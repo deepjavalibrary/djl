@@ -12,8 +12,8 @@
  */
 package software.amazon.ai.integration.tests;
 
+import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
-import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
@@ -21,9 +21,11 @@ import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 
-public class NDArrayLogicalOpTest extends AbstractTest {
+public class NDArrayLogicalOpTest {
+
     public static void main(String[] args) {
-        new NDArrayLogicalOpTest().runTest(args);
+        String[] cmd = new String[] {"-c", NDArrayLogicalOpTest.class.getName()};
+        new IntegrationTest().runTests(cmd);
     }
 
     @RunAsTest

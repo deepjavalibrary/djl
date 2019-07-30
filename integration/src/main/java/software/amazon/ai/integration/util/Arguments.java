@@ -17,14 +17,13 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 public class Arguments {
+
     private String methodName;
     private String className;
-    private String packageName;
     private int duration;
     private int iteration = 1;
 
     public Arguments(CommandLine cmd) {
-        packageName = cmd.getOptionValue("package-name");
         methodName = cmd.getOptionValue("method-name");
         className = cmd.getOptionValue("class-name");
 
@@ -53,13 +52,6 @@ public class Arguments {
                         .desc("Number of iterations in each test.")
                         .build());
         options.addOption(
-                Option.builder("p")
-                        .longOpt("package-name")
-                        .hasArg()
-                        .argName("PACKAGE-NAME")
-                        .desc("Name of the package which has the tests")
-                        .build());
-        options.addOption(
                 Option.builder("c")
                         .longOpt("class-name")
                         .hasArg()
@@ -82,10 +74,6 @@ public class Arguments {
 
     public int getIteration() {
         return iteration;
-    }
-
-    public String getPackageName() {
-        return packageName;
     }
 
     public String getClassName() {

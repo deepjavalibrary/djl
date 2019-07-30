@@ -13,8 +13,8 @@
 package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
+import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
-import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
@@ -23,10 +23,11 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 
-public class NDArrayShapesManipulationOpTest extends AbstractTest {
+public class NDArrayShapesManipulationOpTest {
 
     public static void main(String[] args) {
-        new NDArrayShapesManipulationOpTest().runTest(args);
+        String[] cmd = new String[] {"-c", NDArrayShapesManipulationOpTest.class.getName()};
+        new IntegrationTest().runTests(cmd);
     }
 
     @RunAsTest

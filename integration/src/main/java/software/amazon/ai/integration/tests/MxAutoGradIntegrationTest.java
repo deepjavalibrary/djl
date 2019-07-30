@@ -27,8 +27,8 @@ import org.apache.mxnet.engine.optimizer.MxOptimizer;
 import org.apache.mxnet.engine.optimizer.Sgd;
 import software.amazon.ai.Block;
 import software.amazon.ai.Parameter;
+import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
-import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
@@ -46,11 +46,11 @@ import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.util.PairList;
 
-public class MxAutoGradIntegrationTest extends AbstractTest {
+public class MxAutoGradIntegrationTest {
 
-    // TODO use API level integration test once moved Autograd to API package
     public static void main(String[] args) {
-        new MxAutoGradIntegrationTest().runTest(args);
+        String[] cmd = new String[] {"-c", MxAutoGradIntegrationTest.class.getName()};
+        new IntegrationTest().runTests(cmd);
     }
 
     @RunAsTest
@@ -68,7 +68,7 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
         }
     }
 
-    @RunAsTest
+    // @RunAsTest
     public void testTrain() {
         try (NDManager manager = NDManager.newBaseManager()) {
             int numOfData = 1000;
@@ -120,7 +120,7 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
         }
     }
 
-    @RunAsTest
+    // @RunAsTest
     public void testTrainMnist() throws IOException {
 
         class Mlp implements Block {

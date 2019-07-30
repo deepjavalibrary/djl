@@ -12,8 +12,8 @@
  */
 package software.amazon.ai.integration.tests;
 
+import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
-import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
@@ -21,9 +21,11 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.pooling.Pool;
 
-public class PoolingOperatorsTest extends AbstractTest {
+public class PoolingOperatorsTest {
+
     public static void main(String[] args) {
-        new PoolingOperatorsTest().runTest(args);
+        String[] cmd = new String[] {"-c", PoolingOperatorsTest.class.getName()};
+        new IntegrationTest().runTests(cmd);
     }
 
     @RunAsTest

@@ -13,8 +13,8 @@
 package software.amazon.ai.integration.tests;
 
 import java.nio.FloatBuffer;
+import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
-import software.amazon.ai.integration.util.AbstractTest;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
@@ -22,10 +22,11 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
 
-public class NDArrayCreationOpTest extends AbstractTest {
+public class NDArrayCreationOpTest {
 
     public static void main(String[] args) {
-        new NDArrayCreationOpTest().runTest(args);
+        String[] cmd = new String[] {"-c", NDArrayCreationOpTest.class.getName()};
+        new IntegrationTest().runTests(cmd);
     }
 
     @RunAsTest
