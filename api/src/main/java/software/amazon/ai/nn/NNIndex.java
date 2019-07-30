@@ -13,6 +13,7 @@
 package software.amazon.ai.nn;
 
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.nn.norm.BatchNorm;
 
 /**
  * An internal mapping to Engine specific implementations of Neural Network {@link
@@ -21,4 +22,6 @@ import software.amazon.ai.nn.core.Linear;
 public abstract class NNIndex {
 
     public abstract Linear linear(long units, boolean bias);
+
+    public abstract BatchNorm batchNorm2D(int axis, float epsilon, float momentum);
 }

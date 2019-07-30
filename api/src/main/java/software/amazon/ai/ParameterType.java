@@ -14,5 +14,6 @@ package software.amazon.ai;
 
 public enum ParameterType {
     WEIGHT,
-    BIAS
+    BIAS,
+    OTHER
 }

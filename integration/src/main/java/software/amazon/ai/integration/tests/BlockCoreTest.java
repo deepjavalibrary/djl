@@ -21,6 +21,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.training.initializer.Initializer;
 
 public class BlockCoreTest extends AbstractTest {
@@ -76,5 +77,15 @@ public class BlockCoreTest extends AbstractTest {
         NDArray outNoBias = linearWithoutBias.forward(input);
         NDArray expectedNoBias = input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
         Assertions.assertEquals(expectedNoBias, outNoBias);
+    }
+
+    @RunAsTest
+    public void testBatchNorm() throws FailedTestException {
+        NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+        NDArray expected = manager.create(new float[] {0, 1, 2, 3}, new Shape(2, 2));
+        BatchNorm bn = new BatchNorm.Builder().setAxis(1).build();
+        bn.setInitializer(manager, Initializer.ONES);
+        NDArray out = bn.forward(input);
+        Assertions.assertAlmostEquals(expected, out);
     }
 }

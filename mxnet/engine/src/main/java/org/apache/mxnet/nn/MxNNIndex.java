@@ -13,8 +13,10 @@
 package org.apache.mxnet.nn;
 
 import org.apache.mxnet.nn.core.MxLinear;
+import org.apache.mxnet.nn.norm.MxBatchNorm;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.nn.norm.BatchNorm;
 
 public class MxNNIndex extends NNIndex {
 
@@ -22,5 +24,11 @@ public class MxNNIndex extends NNIndex {
     @Override
     public Linear linear(long outChannels, boolean bias) {
         return new MxLinear(outChannels, bias);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BatchNorm batchNorm2D(int axis, float epsilon, float momentum) {
+        return new MxBatchNorm(axis, epsilon, momentum);
     }
 }
