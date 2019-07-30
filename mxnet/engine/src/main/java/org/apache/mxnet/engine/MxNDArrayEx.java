@@ -142,10 +142,10 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray maxPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
         MxOpParams params = new MxOpParams();
-        params.setShape("kernel", kernel);
+        params.addParam("kernel", kernel);
         params.add("pool_type", "max");
-        params.setShape("stride", stride);
-        params.setShape("pad", pad);
+        params.addParam("stride", stride);
+        params.addParam("pad", pad);
         if (poolingConvention != null) {
             params.add("pooling_convention", poolingConvention.name().toLowerCase());
         }
@@ -155,9 +155,9 @@ class MxNDArrayEx implements NDArrayEx {
     @Override
     public NDArray globalMaxPool(Shape stride, Shape pad, PoolingConvention poolingConvention) {
         MxOpParams params = new MxOpParams();
-        params.setShape("stride", stride);
+        params.addParam("stride", stride);
         params.add("pool_type", "max");
-        params.setShape("pad", pad);
+        params.addParam("pad", pad);
         params.addParam("global_pool", true);
         if (poolingConvention != null) {
             params.add("pooling_convention", poolingConvention.name().toLowerCase());
@@ -169,10 +169,10 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray sumPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
         MxOpParams params = new MxOpParams();
-        params.setShape("kernel", kernel);
+        params.addParam("kernel", kernel);
         params.add("pool_type", "sum");
-        params.setShape("stride", stride);
-        params.setShape("pad", pad);
+        params.addParam("stride", stride);
+        params.addParam("pad", pad);
         if (poolingConvention != null) {
             params.add("pooling_convention", poolingConvention.name().toLowerCase());
         }
@@ -183,8 +183,8 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray globalSumPool(Shape stride, Shape pad, PoolingConvention poolingConvention) {
         MxOpParams params = new MxOpParams();
         params.add("pool_type", "sum");
-        params.setShape("stride", stride);
-        params.setShape("pad", pad);
+        params.addParam("stride", stride);
+        params.addParam("pad", pad);
         params.addParam("global_pool", true);
         if (poolingConvention != null) {
             params.add("pooling_convention", poolingConvention.name().toLowerCase());
@@ -200,10 +200,10 @@ class MxNDArrayEx implements NDArrayEx {
             PoolingConvention poolingConvention,
             boolean countIncludePad) {
         MxOpParams params = new MxOpParams();
-        params.setShape("kernel", kernel);
+        params.addParam("kernel", kernel);
         params.add("pool_type", "avg");
-        params.setShape("stride", stride);
-        params.setShape("pad", pad);
+        params.addParam("stride", stride);
+        params.addParam("pad", pad);
         params.addParam("count_include_pad", countIncludePad);
         if (poolingConvention != null) {
             params.add("pooling_convention", poolingConvention.name().toLowerCase());
@@ -216,8 +216,8 @@ class MxNDArrayEx implements NDArrayEx {
             Shape stride, Shape pad, PoolingConvention poolingConvention, boolean countIncludePad) {
         MxOpParams params = new MxOpParams();
         params.add("pool_type", "avg");
-        params.setShape("stride", stride);
-        params.setShape("pad", pad);
+        params.addParam("stride", stride);
+        params.addParam("pad", pad);
         params.addParam("global_pool", true);
         params.addParam("count_include_pad", countIncludePad);
         if (poolingConvention != null) {
@@ -234,10 +234,10 @@ class MxNDArrayEx implements NDArrayEx {
             PoolingConvention poolingConvention,
             int pValue) {
         MxOpParams params = new MxOpParams();
-        params.setShape("kernel", kernel);
+        params.addParam("kernel", kernel);
         params.add("pool_type", "lp");
-        params.setShape("stride", stride);
-        params.setShape("pad", pad);
+        params.addParam("stride", stride);
+        params.addParam("pad", pad);
         params.addParam("p_value", pValue);
         if (poolingConvention != null) {
             params.add("pooling_convention", poolingConvention.name().toLowerCase());
@@ -250,8 +250,8 @@ class MxNDArrayEx implements NDArrayEx {
             Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue) {
         MxOpParams params = new MxOpParams();
         params.add("pool_type", "lp");
-        params.setShape("stride", stride);
-        params.setShape("pad", pad);
+        params.addParam("stride", stride);
+        params.addParam("pad", pad);
         if (poolingConvention != null) {
             params.add("pooling_convention", poolingConvention.name().toLowerCase());
         }

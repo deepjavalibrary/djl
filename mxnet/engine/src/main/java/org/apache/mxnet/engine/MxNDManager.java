@@ -192,7 +192,7 @@ public class MxNDManager implements NDManager {
         MxOpParams params = new MxOpParams();
         params.addParam("low", low);
         params.addParam("high", high);
-        params.setShape(shape);
+        params.addParam("shape", shape);
         params.setContext(context);
         params.setDataType(dataType);
         return invoke("_npi_random_uniform", EMPTY, params).head();
@@ -205,7 +205,7 @@ public class MxNDManager implements NDManager {
         MxOpParams params = new MxOpParams();
         params.addParam("loc", loc);
         params.addParam("scale", scale);
-        params.setShape(shape);
+        params.addParam("shape", shape);
         params.setContext(context);
         params.setDataType(dataType);
         return invoke("_npi_random_normal", EMPTY, params).head();
@@ -216,7 +216,7 @@ public class MxNDManager implements NDManager {
     public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
         MxOpParams params = new MxOpParams();
         params.addParam("n", n);
-        params.setShape("size", shape);
+        params.addParam("size", shape);
         return invoke("_npi_multinomial", pValues, params);
     }
 
@@ -317,7 +317,7 @@ public class MxNDManager implements NDManager {
         if (shape == null) {
             throw new IllegalArgumentException("Shape is required for " + opName.substring(1));
         }
-        params.setShape(shape);
+        params.addParam("shape", shape);
         params.setContext(context == null ? this.context : context);
         params.setDataType(dataType);
         return invoke(opName, params);

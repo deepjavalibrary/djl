@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 public enum LayoutType {
     BATCH('N'),
     CHANNEL('C'),
+    DEPTH('D'),
     HEIGHT('H'),
     WIDTH('W'),
     TIME('T'),
@@ -42,5 +43,9 @@ public enum LayoutType {
         return IntStream.range(0, layout.length())
                 .mapToObj(i -> fromValue(layout.charAt(i)))
                 .toArray(LayoutType[]::new);
+    }
+
+    public char getValue() {
+        return value;
     }
 }

@@ -12,9 +12,12 @@
  */
 package org.apache.mxnet.nn;
 
+import org.apache.mxnet.nn.convolutional.MxConv2D;
 import org.apache.mxnet.nn.core.MxLinear;
 import org.apache.mxnet.nn.norm.MxBatchNorm;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.NNIndex;
+import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.norm.BatchNorm;
 
@@ -30,5 +33,18 @@ public class MxNNIndex extends NNIndex {
     @Override
     public BatchNorm batchNorm2D(int axis, float epsilon, float momentum) {
         return new MxBatchNorm(axis, epsilon, momentum);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Conv2D conv2D(
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            Shape dilate,
+            int numFilters,
+            int numGroups,
+            boolean noBias) {
+        return new MxConv2D(kernel, stride, pad, dilate, numFilters, numGroups, noBias);
     }
 }

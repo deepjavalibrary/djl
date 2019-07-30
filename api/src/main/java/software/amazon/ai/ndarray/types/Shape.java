@@ -386,6 +386,10 @@ public class Shape {
         return !Arrays.asList(layout).stream().allMatch(l -> l == LayoutType.UNKNOWN);
     }
 
+    public LayoutType[] getLayout() {
+        return layout;
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {

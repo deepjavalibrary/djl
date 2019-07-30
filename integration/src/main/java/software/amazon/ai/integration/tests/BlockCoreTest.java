@@ -20,6 +20,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.training.initializer.Initializer;
@@ -53,7 +54,7 @@ public class BlockCoreTest extends AbstractTest {
         Assertions.assertEquals(expectedNoBias, outNoBias);
     }
 
-    // @RunAsTest
+    @RunAsTest
     public void testLinearWithDefinedLayout() throws FailedTestException {
         NDArray input =
                 manager.create(
@@ -84,6 +85,22 @@ public class BlockCoreTest extends AbstractTest {
         NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
         NDArray expected = manager.create(new float[] {0, 1, 2, 3}, new Shape(2, 2));
         BatchNorm bn = new BatchNorm.Builder().setAxis(1).build();
+        bn.setInitializer(manager, Initializer.ONES);
+        NDArray out = bn.forward(input);
+        Assertions.assertAlmostEquals(expected, out);
+    }
+
+    @RunAsTest
+    public void testConv2D() throws FailedTestException {
+        NDArray input =
+                manager.create(
+                        new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
+                        new Shape(1, 1, 4, 4));
+        NDArray expected =
+                manager.create(
+                        new float[] {23, 25, 26, 22, 27, 24, 40, 32, 20}, new Shape(1, 1, 3, 3));
+        Conv2D bn =
+                (Conv2D) new Conv2D.Builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
         bn.setInitializer(manager, Initializer.ONES);
         NDArray out = bn.forward(input);
         Assertions.assertAlmostEquals(expected, out);
