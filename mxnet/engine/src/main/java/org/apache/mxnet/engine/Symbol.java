@@ -187,12 +187,6 @@ public class Symbol extends NativeResource implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getParameters() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void setInitializer(NDManager manager, Initializer initializer) {}
 
     /** {@inheritDoc} */

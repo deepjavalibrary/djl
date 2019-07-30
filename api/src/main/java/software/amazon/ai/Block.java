@@ -15,6 +15,8 @@ package software.amazon.ai;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
@@ -44,7 +46,7 @@ public interface Block {
         for (Parameter parameter : getDirectParameters()) {
             parameter.setInitializer(manager, initializer);
         }
-        for (Block child : getChildren()) {
+        for (Block child : getChildren().values()) {
             child.setInitializer(manager, initializer);
         }
     }
@@ -55,7 +57,7 @@ public interface Block {
             for (Parameter parameter : getDirectParameters()) {
                 parameter.initialize(inputs);
             }
-            for (Block child : getChildren()) {
+            for (Block child : getChildren().values()) {
                 child.ensureInitialized(inputs);
             }
         }
@@ -67,22 +69,34 @@ public interface Block {
 
     byte[] getEncoded();
 
-    default List<Block> getChildren() {
-        return Collections.emptyList();
+    default Map<String, Block> getChildren() {
+        return Collections.emptyMap();
     }
 
-    default List<Parameter> getParameters() {
-        List<Parameter> parameters = new ArrayList<>();
-        parameters.addAll(getChildrenParameters());
-        parameters.addAll(getDirectParameters());
+    default Map<List<String>, Parameter> getParameters() {
+        Map<List<String>, Parameter> parameters = new ConcurrentHashMap<>();
+        for (Parameter param : getDirectParameters()) {
+            parameters.put(Collections.emptyList(), param);
+        }
+        parameters.putAll(getChildrenParameters());
         return parameters;
     }
 
-    default List<Parameter> getChildrenParameters() {
-        List<Parameter> parameters = new ArrayList<>();
-        for (Block child : getChildren()) {
-            parameters.addAll(child.getParameters());
-        }
+    default Map<List<String>, Parameter> getChildrenParameters() {
+        Map<List<String>, Parameter> parameters = new ConcurrentHashMap<>();
+        getChildren()
+                .forEach(
+                        (nameFirst, child) -> {
+                            child.getParameters()
+                                    .forEach(
+                                            (nameRest, param) -> {
+                                                List<String> name =
+                                                        new ArrayList<>(1 + nameRest.size());
+                                                name.add(nameFirst);
+                                                name.addAll(nameRest);
+                                                parameters.put(name, param);
+                                            });
+                        });
         return parameters;
     }
 }

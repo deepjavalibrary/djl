@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.integration.tests;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.function.Function;
 import org.apache.mxnet.engine.MxAutograd;
 import org.apache.mxnet.engine.MxNDArray;
@@ -80,7 +80,7 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
                     NDArray label = manager.create(new double[] {pairList.valueAt(i)});
                     NDArray loss = Loss.l2Loss(pred, label, 1, 0);
                     autograd.backward((MxNDArray) loss);
-                    List<Parameter> params = block.getParameters();
+                    Collection<Parameter> params = block.getParameters().values();
                     for (Parameter param : params) {
                         NDArray weight = param.getArray();
                         NDArray grad = autograd.getGradient((MxNDArray) x);
