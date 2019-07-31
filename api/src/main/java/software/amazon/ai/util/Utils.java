@@ -53,12 +53,12 @@ public final class Utils {
     }
 
     /**
-     * Returns @{code true} if the {@code array} contains the specified element.
+     * Returns {@code true} if the {@code array} contains the specified element.
      *
      * @param array input array
      * @param value element whose presence in {@code array} is to be tested
      * @param <T> array type
-     * @return @{code true} if this list contains the specified element
+     * @return {@code true} if this list contains the specified element
      */
     public static <T> boolean contains(T[] array, T value) {
         return indexOf(array, value) >= 0;

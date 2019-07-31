@@ -225,10 +225,10 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Returns @{code true} if this list contains the specified key.
+     * Returns {@code true} if this list contains the specified key.
      *
      * @param key key whose presence in this list is to be tested
-     * @return @{code true} if this list contains the specified key
+     * @return {@code true} if this list contains the specified key
      */
     public boolean contains(K key) {
         return keys.contains(key);
