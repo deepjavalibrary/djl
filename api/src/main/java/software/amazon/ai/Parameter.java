@@ -12,6 +12,7 @@
  */
 package software.amazon.ai;
 
+import java.util.Objects;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -60,10 +61,14 @@ public class Parameter {
         if (isInitialized()) {
             throw new IllegalStateException("This parameter is already initialized");
         }
+
+        Objects.requireNonNull(initializer, "No initializer has been set.");
         array =
                 initializer.initialize(
                         manager,
                         block.getParameterShape(name, inputs),
                         inputs.head().getDataType());
+
+        array.attachGradient();
     }
 }
