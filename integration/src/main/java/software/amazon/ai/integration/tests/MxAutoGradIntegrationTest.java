@@ -13,7 +13,6 @@
 package software.amazon.ai.integration.tests;
 
 import java.util.Collection;
-import java.util.function.Function;
 import org.apache.mxnet.engine.MxAutograd;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
@@ -27,12 +26,12 @@ import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.index.NDIndex;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.initializer.Initializer;
-import software.amazon.ai.util.PairList;
-import software.amazon.ai.util.RandomUtils;
 
 public class MxAutoGradIntegrationTest extends AbstractTest {
 
@@ -60,51 +59,51 @@ public class MxAutoGradIntegrationTest extends AbstractTest {
     public void testTrain() {
         try (NDManager manager = NDManager.newBaseManager()) {
             int numOfData = 1000;
-            int epochs = 5;
+            int batchSize = 10;
+            int epochs = 10;
 
-            PairList<Double, Double> pairList = randomGen(100, 1000, 3, numOfData, Math::sqrt);
-
+            NDArray weight = manager.create(new float[] {2.f, -3.4f}, new Shape(2, 1));
+            float bias = 4.2f;
+            NDArray data = manager.randomNormal(new Shape(numOfData, weight.size(0)));
+            // y = w * x + b
+            NDArray label = data.mmul(weight).add(bias);
+            // add noise
+            label.add(
+                    manager.randomNormal(
+                            0, 0.01, label.getShape(), DataType.FLOAT32, manager.getContext()));
             Linear block = new Linear.Builder().setOutChannels(1).build();
             block.setInitializer(manager, Initializer.ONES);
 
             MxOptimizer optimizer =
-                    new Sgd(1.0f, 0.f, -1, MxLearningRateTracker.fixedLR(0.0001f), 0, 0.f, true);
+                    new Sgd(
+                            1.0f / batchSize,
+                            0.f,
+                            -1,
+                            MxLearningRateTracker.fixedLR(0.03f),
+                            0,
+                            0.f,
+                            true);
+            NDArray loss = manager.create(0.f);
 
             for (int epoch = 0; epoch < epochs; epoch++) {
-                String lossString = "";
-                for (int i = 0; i < numOfData; i++) {
-                    MxAutograd autograd = new MxAutograd();
-                    NDArray x = manager.create(new double[] {pairList.keyAt(i)});
-                    autograd.attachGradient(x);
-                    NDArray pred = block.forward(x);
-                    NDArray label = manager.create(new double[] {pairList.valueAt(i)});
-                    NDArray loss = Loss.l2Loss(pred, label, 1, 0);
-                    autograd.backward((MxNDArray) loss);
+                for (int i = 0; i < numOfData / batchSize; i++) {
+                    try (MxAutograd autograd = new MxAutograd()) {
+                        NDIndex indices = new NDIndex(i * batchSize + ":" + batchSize * (i + 1));
+                        NDArray x = data.get(indices);
+                        NDArray y = label.get(indices);
+                        NDArray yHat = block.forward(x);
+                        loss = Loss.l2Loss(yHat, y, 1, 0);
+                        autograd.backward((MxNDArray) loss);
+                    }
                     Collection<Parameter> params = block.getParameters().values();
                     for (Parameter param : params) {
-                        NDArray weight = param.getArray();
-                        NDArray grad = autograd.getGradient((MxNDArray) x);
-                        optimizer.update(0, weight, grad.reshape(weight.getShape()), null);
-                    }
-                    autograd.close();
-                    if (i == numOfData - 1) {
-                        lossString = loss.toString();
+                        NDArray paramArray = param.getArray();
+                        NDArray grad = paramArray.getGradient();
+                        optimizer.update(0, paramArray, grad, null);
                     }
                 }
-                System.out.println("Epoch = " + (epoch + 1) + "  loss = " + lossString); // NOPMD
             }
+            assert loss.toFloatArray()[0] < 0.001f;
         }
-    }
-
-    private PairList<Double, Double> randomGen(
-            int min, int max, int noiseScale, int num, Function<Double, Double> function) {
-        PairList<Double, Double> pairList = new PairList<>();
-        for (int i = 0; i < num; i++) {
-            double x = (Math.random() * ((max - min) + 1)) + min;
-            double y = function.apply(x);
-            y = y + RandomUtils.nextGaussian() * noiseScale;
-            pairList.add(x, y);
-        }
-        return pairList;
     }
 }
