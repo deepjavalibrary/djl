@@ -417,62 +417,30 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Sets the specified index in a new NDArray with the given values.
-     *
-     * @param index The locations to update
-     * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
-     *     index
-     * @return a new NDArray with the updated values
-     */
-    NDArray set(NDIndex index, NDArray value);
-
-    /**
-     * Sets the specified index in a new NDArray with the given value.
-     *
-     * @param index The locations to update
-     * @param value The value to replace with
-     * @return a new NDArray with the updated values
-     */
-    NDArray set(NDIndex index, Number value);
-
-    /**
-     * Sets the specified index in a new NDArray with the given value.
-     *
-     * @param index The single index to update
-     * @param value The value to replace with
-     * @return a new NDArray with the updated value
-     * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
-     */
-    NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException;
-
-    /**
      * Sets the specified index in the NDArray with the given values.
      *
      * @param index The locations to update
      * @param value The value to replace with. Can broadcast if given a smaller dimensions than the
      *     index
-     * @return the updated NDArray
      */
-    NDArray seti(NDIndex index, NDArray value);
+    void set(NDIndex index, NDArray value);
 
     /**
      * Sets the specified index in the NDArray with the given value.
      *
      * @param index The locations to update
      * @param value The value to replace with
-     * @return the updated NDArray
      */
-    NDArray seti(NDIndex index, Number value);
+    void set(NDIndex index, Number value);
 
     /**
      * Sets the specified index in the NDArray with the given value.
      *
      * @param index The single index to update
      * @param value The value to replace with
-     * @return the updated NDArray
      * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
      */
-    NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException;
+    void setScalar(NDIndex index, Number value) throws IllegalArgumentException;
 
     /**
      * Returns a partial {@code NDArray}.
@@ -2307,15 +2275,7 @@ public interface NDArray extends AutoCloseable {
      * @param shape the new shape of this NDArray
      * @return the broadcasted NDArray
      */
-    NDArray broadcast(long... shape);
-
-    /**
-     * Broadcasts this NDArray to be the specified shape.
-     *
-     * @param result the result array
-     * @return the broadcasted {@code NDArray}
-     */
-    NDArray broadcast(NDArray result);
+    NDArray broadcast(Shape shape);
 
     /**
      * Checks 2 NDArrays for equal shapes.

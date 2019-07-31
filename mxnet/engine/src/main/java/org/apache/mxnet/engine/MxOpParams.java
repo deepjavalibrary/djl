@@ -70,6 +70,10 @@ public class MxOpParams extends PairList<String, String> {
         add(paramName, value ? "True" : "False");
     }
 
+    public void addParam(String paramName, Number value) {
+        add(paramName, String.valueOf(value));
+    }
+
     public void addTupleParam(String paramName, int... tuple) {
         StringBuilder sb = new StringBuilder();
         sb.append('(');

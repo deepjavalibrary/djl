@@ -385,38 +385,20 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray set(NDIndex index, NDArray value) {
-        return array.set(index, value);
+    public void set(NDIndex index, NDArray value) {
+        array.set(index, value);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray set(NDIndex index, Number value) {
-        return array.set(index, value);
+    public void set(NDIndex index, Number value) {
+        array.set(index, value);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException {
-        return array.setElement(index, value);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray seti(NDIndex index, NDArray value) {
-        return array.seti(index, value);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray seti(NDIndex index, Number value) {
-        return array.seti(index, value);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException {
-        return array.setElementi(index, value);
+    public void setScalar(NDIndex index, Number value) throws IllegalArgumentException {
+        array.setScalar(index, value);
     }
 
     /** {@inheritDoc} */
@@ -1170,14 +1152,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray broadcast(long... shape) {
+    public NDArray broadcast(Shape shape) {
         return array.broadcast(shape);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray broadcast(NDArray result) {
-        return array.broadcast(result);
     }
 
     /** {@inheritDoc} */

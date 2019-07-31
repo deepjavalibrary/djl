@@ -184,39 +184,15 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray set(NDIndex index, NDArray value) {
-        return null;
-    }
+    public void set(NDIndex index, NDArray value) {}
 
     /** {@inheritDoc} */
     @Override
-    public NDArray set(NDIndex index, Number value) {
-        return null;
-    }
+    public void set(NDIndex index, Number value) {}
 
     /** {@inheritDoc} */
     @Override
-    public NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray seti(NDIndex index, NDArray value) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray seti(NDIndex index, Number value) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException {
-        return null;
-    }
+    public void setScalar(NDIndex index, Number value) throws IllegalArgumentException {}
 
     /** {@inheritDoc} */
     @Override
@@ -1027,13 +1003,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray broadcast(long... shape) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray broadcast(NDArray result) {
+    public NDArray broadcast(Shape shape) {
         return null;
     }
 

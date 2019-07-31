@@ -165,34 +165,13 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray set(NDIndex index, NDArray value) {
-        return null;
-    }
+    public void set(NDIndex index, NDArray value) {}
 
     @Override
-    public NDArray set(NDIndex index, Number value) {
-        return null;
-    }
+    public void set(NDIndex index, Number value) {}
 
     @Override
-    public NDArray setElement(NDIndex index, Number value) {
-        return null;
-    }
-
-    @Override
-    public NDArray seti(NDIndex index, NDArray value) {
-        return null;
-    }
-
-    @Override
-    public NDArray seti(NDIndex index, Number value) {
-        return null;
-    }
-
-    @Override
-    public NDArray setElementi(NDIndex index, Number value) {
-        return null;
-    }
+    public void setScalar(NDIndex index, Number value) {}
 
     @Override
     public NDArray get(NDIndex index) {
@@ -864,12 +843,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray broadcast(long... shape) {
-        return null;
-    }
-
-    @Override
-    public NDArray broadcast(NDArray result) {
+    public NDArray broadcast(Shape shape) {
         return null;
     }
 

@@ -21,10 +21,9 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import org.apache.mxnet.jna.JnaUtils;
@@ -34,10 +33,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.index.NDIndex;
-import software.amazon.ai.ndarray.index.NDIndexAll;
-import software.amazon.ai.ndarray.index.NDIndexElement;
-import software.amazon.ai.ndarray.index.NDIndexFixed;
-import software.amazon.ai.ndarray.index.NDIndexSlice;
+import software.amazon.ai.ndarray.index.NDIndexFullSlice;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.internal.NDFormat;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -294,38 +290,68 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray set(NDIndex index, NDArray value) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public void set(NDIndex index, NDArray value) {
+        Optional<NDIndexFullSlice> hasFullSlice = index.getAsFullSlice(getShape());
+        if (hasFullSlice.isPresent()) {
+            NDIndexFullSlice fullSlice = hasFullSlice.get();
+            MxOpParams params = new MxOpParams();
+            params.addTupleParam("begin", fullSlice.getMin());
+            params.addTupleParam("end", fullSlice.getMax());
+            params.addTupleParam("step", fullSlice.getStep());
+
+            Stack<NDArray> prepareValue = new Stack<>();
+            prepareValue.add(value);
+            prepareValue.add(prepareValue.peek().asInContext(getContext(), false));
+            // prepareValue.add(prepareValue.peek().asType(getDataType(), false));
+            prepareValue.add(prepareValue.peek().broadcast(fullSlice.getShape()));
+
+            manager.invoke(
+                    "_slice_assign",
+                    new NDList(this, prepareValue.peek()),
+                    new NDList(this),
+                    params);
+            for (NDArray toClean : prepareValue) {
+                if (toClean != value) {
+                    toClean.close();
+                }
+            }
+            return;
+        }
+        throw new UnsupportedOperationException(
+                "set() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray set(NDIndex index, Number value) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public void set(NDIndex index, Number value) {
+        Optional<NDIndexFullSlice> hasFullSlice = index.getAsFullSlice(getShape());
+        if (hasFullSlice.isPresent()) {
+            NDIndexFullSlice fullSlice = hasFullSlice.get();
+            MxOpParams params = new MxOpParams();
+            params.addTupleParam("begin", fullSlice.getMin());
+            params.addTupleParam("end", fullSlice.getMax());
+            params.addTupleParam("step", fullSlice.getStep());
+            params.addParam("scalar", value);
+            manager.invoke("_slice_assign_scalar", new NDList(this), new NDList(this), params);
+            return;
+        }
+        throw new UnsupportedOperationException(
+                "set() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray setElement(NDIndex index, Number value) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray seti(NDIndex index, NDArray value) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray seti(NDIndex index, Number value) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray setElementi(NDIndex index, Number value) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public void setScalar(NDIndex index, Number value) throws IllegalArgumentException {
+        Optional<NDIndexFullSlice> hasFullSlice = index.getAsFullSlice(getShape());
+        if (hasFullSlice.isPresent()) {
+            if (hasFullSlice.get().getShape().size() != 1) {
+                throw new IllegalArgumentException("The provided index does not set a scalar");
+            }
+            set(index, value);
+            return;
+        }
+        throw new UnsupportedOperationException(
+                "setScalar() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */
@@ -335,46 +361,19 @@ public class MxNDArray extends NativeResource implements NDArray {
             return this;
         }
 
-        if (index.stream()
-                .allMatch(
-                        ie ->
-                                ie instanceof NDIndexAll
-                                        || ie instanceof NDIndexFixed
-                                        || ie instanceof NDIndexSlice)) {
-            int dimensions = index.getRank();
-            if (dimensions > getShape().dimension()) {
-                throw new IllegalArgumentException("The index has too many dimensions");
-            }
-            long[] min = new long[dimensions];
-            long[] max = new long[dimensions];
-            long[] step = new long[dimensions];
-            List<Integer> toSqueeze = new ArrayList<>(dimensions);
-            for (int i = 0; i < dimensions; i++) {
-                NDIndexElement ie = index.get(i);
-                if (ie instanceof NDIndexFixed) {
-                    min[i] = ((NDIndexFixed) ie).getIndex();
-                    max[i] = ((NDIndexFixed) ie).getIndex() + 1;
-                    step[i] = 1;
-                    toSqueeze.add(i);
-                } else if (ie instanceof NDIndexSlice) {
-                    NDIndexSlice slice = (NDIndexSlice) ie;
-                    min[i] = Optional.ofNullable(slice.getMin()).orElse(0L);
-                    max[i] = Optional.ofNullable(slice.getMax()).orElse(size(i));
-                    step[i] = Optional.ofNullable(slice.getStep()).orElse(1L);
-                } else if (ie instanceof NDIndexAll) {
-                    min[i] = 0;
-                    max[i] = size(i);
-                    step[i] = 1;
-                }
-            }
+        Optional<NDIndexFullSlice> hasFullSlice = index.getAsFullSlice(getShape());
+        if (hasFullSlice.isPresent()) {
+            NDIndexFullSlice fullSlice = hasFullSlice.get();
             MxOpParams params = new MxOpParams();
-            params.addTupleParam("begin", min);
-            params.addTupleParam("end", max);
-            params.addTupleParam("step", step);
+            params.addTupleParam("begin", fullSlice.getMin());
+            params.addTupleParam("end", fullSlice.getMax());
+            params.addTupleParam("step", fullSlice.getStep());
             NDArray result = manager.invoke("slice", this, params);
-            if (!toSqueeze.isEmpty()) {
+            if (!fullSlice.getToSqueeze().isEmpty()) {
                 NDArray oldResult = result;
-                result = result.squeeze(toSqueeze.stream().mapToInt(i -> i).toArray());
+                result =
+                        result.squeeze(
+                                fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
                 oldResult.close();
             }
             return result;
@@ -1387,14 +1386,10 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray broadcast(long... shape) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray broadcast(NDArray result) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public NDArray broadcast(Shape shape) {
+        MxOpParams params = new MxOpParams();
+        params.setShape(shape);
+        return manager.invoke("_np_broadcast_to", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1403,11 +1398,13 @@ public class MxNDArray extends NativeResource implements NDArray {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray argmax() {
         return manager.invoke("_npi_argmax", this, null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray argmax(int axis, boolean keepDims) {
         MxOpParams params = new MxOpParams();
@@ -1416,11 +1413,13 @@ public class MxNDArray extends NativeResource implements NDArray {
         return manager.invoke("_npi_argmax", this, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray argmin() {
         return manager.invoke("argmin", this, null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray argmin(int axis, boolean keepDims) {
         MxOpParams params = new MxOpParams();

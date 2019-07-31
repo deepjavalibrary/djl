@@ -104,4 +104,25 @@ public final class Assertions {
     public static void assertInPlace(NDArray expected, NDArray actual) throws FailedTestException {
         assertInPlace(expected, actual, "Assertion failed!");
     }
+
+    @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DoNotUseThreads"})
+    public static void assertThrows(Runnable function, Class<?> exceptionClass, String errorMessage)
+            throws FailedTestException {
+        try {
+            function.run();
+        } catch (Exception e) {
+            if (exceptionClass.isInstance(e)) {
+                return;
+            } else {
+                throw new FailedTestException(errorMessage + " - wrong exception type thrown");
+            }
+        }
+        throw new FailedTestException(errorMessage + " - did not throw an exception");
+    }
+
+    @SuppressWarnings("PMD.DoNotUseThreads")
+    public static void assertThrows(Runnable function, Class<?> exceptionClass)
+            throws FailedTestException {
+        assertThrows(function, exceptionClass, "Assertion failed!");
+    }
 }

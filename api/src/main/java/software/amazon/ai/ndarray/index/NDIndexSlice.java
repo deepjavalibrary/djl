@@ -25,11 +25,15 @@ public class NDIndexSlice implements NDIndexElement {
      * @param min the start of the range
      * @param max the end of the range
      * @param step the step between each slice
+     * @throws IllegalArgumentException Thrown if the step is zero
      */
     public NDIndexSlice(Long min, Long max, Long step) {
         this.min = min;
         this.max = max;
         this.step = step;
+        if (step != null && step == 0) {
+            throw new IllegalArgumentException("The step can not be zero");
+        }
     }
 
     /**

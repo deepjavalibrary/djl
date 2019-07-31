@@ -13,6 +13,7 @@
 package software.amazon.ai.ndarray.types;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -39,6 +40,19 @@ public class Shape {
         this(
                 shape,
                 Arrays.stream(shape).mapToObj(x -> LayoutType.UNKNOWN).toArray(LayoutType[]::new));
+    }
+
+    /**
+     * Constructs and initializes a {@code Shape} with specified dimension.
+     *
+     * @param shape dimensions of the shape
+     * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
+     *     less than -1. Also thrown if the shape and layout do not have equal sizes.
+     */
+    public Shape(List<Long> shape) {
+        this(
+                shape.stream().mapToLong(l -> l).toArray(),
+                shape.stream().map(x -> LayoutType.UNKNOWN).toArray(LayoutType[]::new));
     }
 
     /**

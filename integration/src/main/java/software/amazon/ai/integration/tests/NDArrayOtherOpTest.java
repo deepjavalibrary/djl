@@ -55,6 +55,48 @@ public class NDArrayOtherOpTest {
     }
 
     @RunAsTest
+    public void testSetArray() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+            NDArray expected = manager.create(new float[] {9, 10, 3, 4}, new Shape(2, 2));
+            NDArray value = manager.create(new float[] {9, 10});
+            original.set(new NDIndex(0), value);
+            Assertions.assertEquals(expected, original);
+        }
+    }
+
+    @RunAsTest
+    public void testSetArrayBroadcast() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2, 1));
+            NDArray expected = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2, 1));
+            NDArray value = manager.create(new float[] {9});
+            original.set(new NDIndex(0), value);
+            Assertions.assertEquals(expected, original);
+        }
+    }
+
+    @RunAsTest
+    public void testSetNumber() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+            NDArray expected = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2));
+            original.set(new NDIndex(0), 9);
+            Assertions.assertEquals(expected, original);
+        }
+    }
+
+    @RunAsTest
+    public void testSetScalar() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+            original.setScalar(new NDIndex(0, 0), 0);
+            Assertions.assertThrows(
+                    () -> original.setScalar(new NDIndex(0), 1), IllegalArgumentException.class);
+        }
+    }
+
+    @RunAsTest
     public void testCopyTo() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray ndArray1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
@@ -211,6 +253,17 @@ public class NDArrayOtherOpTest {
             Assertions.assertEquals(transpose, transposeExpected, "Incorrect transpose all");
             Assertions.assertEquals(
                     original.swapAxes(0, 1), transposeExpected, "Incorrect swap axes");
+        }
+    }
+
+    @RunAsTest
+    public void testBroadcast() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1, 2});
+
+            NDArray broadcasted = original.broadcast(new Shape(2, 2));
+            NDArray expected = manager.create(new float[] {1, 2, 1, 2}, new Shape(2, 2));
+            Assertions.assertEquals(expected, broadcasted);
         }
     }
 

@@ -14,10 +14,12 @@ package software.amazon.ai.ndarray.index;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.types.Shape;
 
 /**
  * The {@code NDIndex} allows you to specify a subset of an NDArray that can be used for fetching or
@@ -233,5 +235,69 @@ public class NDIndex {
         } else {
             indices.add(new NDIndexSlice(min, max, step));
         }
+    }
+
+    public Optional<NDIndexFullSlice> getAsFullSlice(Shape target) {
+        if (!stream().allMatch(
+                        ie ->
+                                ie instanceof NDIndexAll
+                                        || ie instanceof NDIndexFixed
+                                        || ie instanceof NDIndexSlice)) {
+            return Optional.empty();
+        }
+        int indDimensions = getRank();
+        int targetDimensions = target.dimension();
+        if (indDimensions > target.dimension()) {
+            throw new IllegalArgumentException(
+                    "The index has too many dimensions - "
+                            + indDimensions
+                            + " dimensions for array with "
+                            + targetDimensions
+                            + " dimensions");
+        }
+        long[] min = new long[targetDimensions];
+        long[] max = new long[targetDimensions];
+        long[] step = new long[targetDimensions];
+        List<Integer> toSqueeze = new ArrayList<>(targetDimensions);
+        long[] shape = new long[targetDimensions];
+        List<Long> squeezedShape = new ArrayList<>(targetDimensions);
+        for (int i = 0; i < indDimensions; i++) {
+            NDIndexElement ie = get(i);
+            if (ie instanceof NDIndexFixed) {
+                min[i] = ((NDIndexFixed) ie).getIndex();
+                max[i] = ((NDIndexFixed) ie).getIndex() + 1;
+                step[i] = 1;
+                toSqueeze.add(i);
+                shape[i] = 1;
+            } else if (ie instanceof NDIndexSlice) {
+                NDIndexSlice slice = (NDIndexSlice) ie;
+                min[i] = Optional.ofNullable(slice.getMin()).orElse(0L);
+                max[i] = Optional.ofNullable(slice.getMax()).orElse(target.size(i));
+                step[i] = Optional.ofNullable(slice.getStep()).orElse(1L);
+                if (step[i] > 0) {
+                    shape[i] = (max[i] - min[i] - 1) / (step[i] + 1);
+                } else {
+                    shape[i] = (min[i] - max[i]) / (-step[i] + 1);
+                }
+                squeezedShape.add(shape[i]);
+            } else if (ie instanceof NDIndexAll) {
+                min[i] = 0;
+                max[i] = target.size(i);
+                step[i] = 1;
+                shape[i] = target.size(i);
+                squeezedShape.add(target.size(i));
+            }
+        }
+        for (int i = indDimensions; i < target.dimension(); i++) {
+            min[i] = 0;
+            max[i] = target.size(i);
+            step[i] = 1;
+            shape[i] = target.size(i);
+            squeezedShape.add(target.size(i));
+        }
+        NDIndexFullSlice fullSlice =
+                new NDIndexFullSlice(
+                        min, max, step, toSqueeze, new Shape(shape), new Shape(squeezedShape));
+        return Optional.of(fullSlice);
     }
 }
