@@ -50,8 +50,6 @@ configure(javaProjects()) {
         doFirst {
             systemProperty "org.slf4j.simpleLogger.defaultLogLevel", 'debug'
         }
-
-        finalizedBy project.tasks.jacocoTestReport
     }
 
     compileJava {
@@ -60,16 +58,6 @@ configure(javaProjects()) {
 
     compileTestJava {
         options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static" << "-Werror"
-    }
-
-    jacocoTestCoverageVerification {
-        violationRules {
-            rule {
-                limit {
-                    minimum = 0.1
-                }
-            }
-        }
     }
 }
 

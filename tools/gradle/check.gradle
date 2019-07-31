@@ -46,18 +46,4 @@ tasks.withType(Checkstyle) {
     }
 }
 
-apply plugin: "jacoco"
-jacoco {
-    toolVersion = "0.8.4"
-}
-jacocoTestReport {
-    group = "Reporting"
-    reports {
-        xml.enabled true
-        csv.enabled false
-    }
-}
-
-check.dependsOn jacocoTestReport
-check.dependsOn jacocoTestCoverageVerification
 build.dependsOn javadoc
