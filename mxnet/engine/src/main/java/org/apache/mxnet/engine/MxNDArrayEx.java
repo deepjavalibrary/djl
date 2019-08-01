@@ -28,19 +28,9 @@ class MxNDArrayEx implements NDArrayEx {
         this.manager = (MxNDManager) parent.getManager();
     }
 
-    @Override
-    public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("axis", axis);
-        params.addParam("keepdims", keepDims);
-        params.add("mode", mode);
-        return manager.invoke("pick", new NDList(array, index), params).head();
-    }
-
-    @Override
-    public NDArray relu() {
-        return manager.invoke("relu", array, null);
-    }
+    ////////////////////////////////////////
+    // NDArrays
+    ////////////////////////////////////////
 
     /** {@inheritDoc} */
     @Override
@@ -65,6 +55,7 @@ class MxNDArrayEx implements NDArrayEx {
         return array;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rdivi(NDArray b) {
         manager.invoke("elemwise_div", new NDList(b, array), new NDList(array), null);
@@ -77,6 +68,7 @@ class MxNDArrayEx implements NDArrayEx {
         return array.sub(n).negi();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rsub(NDArray b) {
         return array.sub(b).negi();
@@ -88,6 +80,7 @@ class MxNDArrayEx implements NDArrayEx {
         return array.subi(n).negi();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rsubi(NDArray b) {
         return array.subi(b).negi();
@@ -151,6 +144,79 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray min(NDArray other) {
         return manager.invoke("_npi_minimum", new NDList(array, other), null).head();
     }
+
+    ////////////////////////////////////////
+    // Activations
+    ////////////////////////////////////////
+
+    @Override
+    public NDArray relu() {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "relu");
+        return manager.invoke("Activation", array, params);
+    }
+
+    @Override
+    public NDArray sigmoid() {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "sigmoid");
+        return manager.invoke("Activation", array, params);
+    }
+
+    @Override
+    public NDArray tanh() {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "tanh");
+        return manager.invoke("Activation", array, params);
+    }
+
+    @Override
+    public NDArray softrelu() {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "softrelu");
+        return manager.invoke("Activation", array, params);
+    }
+
+    @Override
+    public NDArray softsign() {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "softsign");
+        return manager.invoke("Activation", array, params);
+    }
+
+    @Override
+    public NDArray leakyRelu(float alpha) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "leaky");
+        params.addParam("slope", alpha);
+        return manager.invoke("LeakyReLU", array, params);
+    }
+
+    @Override
+    public NDArray elu(float alpha) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "elu");
+        params.addParam("slope", alpha);
+        return manager.invoke("LeakyReLU", array, params);
+    }
+
+    @Override
+    public NDArray selu() {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "selu");
+        return manager.invoke("LeakyReLU", array, params);
+    }
+
+    @Override
+    public NDArray gelu() {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "gelu");
+        return manager.invoke("LeakyReLU", array, params);
+    }
+
+    ////////////////////////////////////////
+    // Pooling Operations
+    ////////////////////////////////////////
 
     @Override
     public NDArray maxPool(
@@ -278,6 +344,10 @@ class MxNDArrayEx implements NDArrayEx {
         return manager.invoke("Pooling", getArray(), params);
     }
 
+    ////////////////////////////////////////
+    // Optimizers
+    ////////////////////////////////////////
+
     // Sgd update function for non-multi-precision
     @Override
     public void sgdUpdate(
@@ -314,6 +384,20 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("rescale_grad", rescaleGrad);
         params.addParam("clip_gradient", clipGradient);
         manager.invoke("sgd_mom_update", new NDList(array, grad, state), new NDList(array), params);
+    }
+
+    ////////////////////////////////////////
+    // Miscellaneous
+    ////////////////////////////////////////
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        params.addParam("keepdims", keepDims);
+        params.add("mode", mode);
+        return manager.invoke("pick", new NDList(array, index), params).head();
     }
 
     @Override

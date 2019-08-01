@@ -15,6 +15,7 @@ package software.amazon.ai.integration.util;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
+import software.amazon.ai.ndarray.NDList;
 
 public final class Assertions {
 
@@ -42,11 +43,29 @@ public final class Assertions {
         assertFalse(statement, "Statement is not False!");
     }
 
+    public static void assertEquals(NDList expected, NDList actual, String errorMessage)
+            throws FailedTestException {
+        assertEquals(expected.size(), actual.size(), "The NDLists have different sizes");
+        int size = expected.size();
+        for (int i = 0; i < size; i++) {
+            assertEquals(expected.get(i), actual.get(i), "The NDLists differ on element " + i);
+        }
+    }
+
+    public static void assertEquals(NDList expected, NDList actual) throws FailedTestException {
+        assertEquals(expected, actual, "Two NDArrays are different!");
+    }
+
     public static void assertEquals(NDArray expected, NDArray actual, String errorMessage)
             throws FailedTestException {
         if (!NDArrays.equals(expected, actual)) {
-            throw new FailedTestException(errorMessage);
+            throw new FailedTestException(
+                    errorMessage + "\nExpected: " + expected + "\n Actual: " + actual);
         }
+    }
+
+    public static void assertEquals(NDArray expected, NDArray actual) throws FailedTestException {
+        assertEquals(expected, actual, "Two NDArrays are different!");
     }
 
     public static void assertEquals(float expected, float actual, String errorMessage)
@@ -56,8 +75,18 @@ public final class Assertions {
         }
     }
 
-    public static void assertEquals(NDArray expected, NDArray actual) throws FailedTestException {
-        assertEquals(expected, actual, "Two NDArrays are different!");
+    public static void assertAlmostEquals(NDList expected, NDList actual, double rtol, double atol)
+            throws FailedTestException {
+        assertEquals(expected.size(), actual.size(), "The NDLists have different sizes");
+        int size = expected.size();
+        for (int i = 0; i < size; i++) {
+            assertAlmostEquals(expected.get(i), actual.get(i), rtol, atol);
+        }
+    }
+
+    public static void assertAlmostEquals(NDList expected, NDList actual)
+            throws FailedTestException {
+        assertAlmostEquals(expected, actual, 1e-5, 1e-3);
     }
 
     public static void assertAlmostEquals(

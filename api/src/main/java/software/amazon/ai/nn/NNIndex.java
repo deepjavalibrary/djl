@@ -17,6 +17,7 @@ import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.convolutional.Conv3D;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.nn.norm.BatchNorm;
 
 /**
@@ -28,6 +29,8 @@ public abstract class NNIndex {
     public abstract Linear linear(long units, boolean bias);
 
     public abstract BatchNorm batchNorm2D(int axis, float epsilon, float momentum);
+
+    public abstract Prelu prelu();
 
     public abstract Conv1D conv1D(
             Shape kernel,

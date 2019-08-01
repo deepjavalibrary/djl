@@ -168,9 +168,9 @@ public class MxAutoGradIntegrationTest {
 
             SequentialBlock mlp = new SequentialBlock();
             mlp.add(new Linear.Builder().setOutChannels(128).build());
-            mlp.add(arrays -> new NDList(Activation.relu(arrays.get(0))));
+            mlp.add(Activation.reluBlock());
             mlp.add(new Linear.Builder().setOutChannels(64).build());
-            mlp.add(arrays -> new NDList(Activation.relu(arrays.get(0))));
+            mlp.add(Activation.reluBlock());
             mlp.add(new Linear.Builder().setOutChannels(10).build());
             mlp.setInitializer(manager, new NormalInitializer(0.01));
 

@@ -60,6 +60,10 @@ public class MxOpParams extends PairList<String, Object> {
         }
     }
 
+    public void addParam(String paramName, String value) {
+        add(paramName, value);
+    }
+
     public void addParam(String paramName, int value) {
         add(paramName, String.valueOf(value));
     }

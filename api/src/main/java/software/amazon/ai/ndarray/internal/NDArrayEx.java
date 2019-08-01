@@ -16,45 +16,14 @@ import java.util.stream.IntStream;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.pooling.PoolingConvention;
+import software.amazon.ai.training.Activation;
 
 /** An internal interface that encapsulate engine specific operator methods. */
 public interface NDArrayEx {
 
-    /**
-     * Picks elements from an input array according to the input indices along the given axis.
-     *
-     * @param index The index array
-     * @param axis The axis to picking the elements. Negative values means indexing from right to
-     *     left. If is `None`, the elements in the index w.r.t the flattened input will be picked.
-     * @param keepDims If true, the axis where we pick the elements is left in the result as
-     *     dimension with size one.
-     * @param mode Specify how out-of-bound indices behave. "clip" means clip to the range. So, if
-     *     all indices mentioned are too large, they are replaced by the index that addresses the
-     *     last element along an axis. "wrap" means to wrap around.
-     * @return copy of array
-     */
-    NDArray pick(NDArray index, int axis, boolean keepDims, String mode);
-
-    /**
-     * Picks elements from an input array according to the input indices along the given axis.
-     *
-     * @param index The index array
-     * @param axis The axis to picking the elements. Negative values means indexing from right to
-     *     left. If is `None`, the elements in the index w.r.t the flattened input will be picked.
-     * @param keepDims If true, the axis where we pick the elements is left in the result as
-     *     dimension with size one.
-     * @return copy of array
-     */
-    default NDArray pick(NDArray index, int axis, boolean keepDims) {
-        return pick(index, axis, keepDims, "clip");
-    }
-
-    /**
-     * Computes rectified linear activation.
-     *
-     * @return copy of array after applying relu
-     */
-    NDArray relu();
+    ////////////////////////////////////////
+    // NDArrays
+    ////////////////////////////////////////
 
     /**
      * Reverse division with a scalar - i.e., (n / thisArrayValues).
@@ -186,6 +155,41 @@ public interface NDArrayEx {
      */
     NDArray min(NDArray other);
 
+    ////////////////////////////////////////
+    // Activations
+    ////////////////////////////////////////
+
+    /**
+     * Computes rectified linear activation.
+     *
+     * @return copy of array after applying relu
+     */
+    NDArray relu();
+
+    NDArray sigmoid();
+
+    NDArray tanh();
+
+    NDArray softrelu();
+
+    NDArray softsign();
+
+    NDArray leakyRelu(float alpha);
+
+    NDArray elu(float alpha);
+
+    NDArray selu();
+
+    NDArray gelu();
+
+    default NDArray swish(float beta) {
+        return Activation.sigmoid(getArray().mul(beta)).mul(getArray());
+    }
+
+    ////////////////////////////////////////
+    // Pooling Operations
+    ////////////////////////////////////////
+
     NDArray maxPool(Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention);
 
     NDArray globalMaxPool(Shape stride, Shape pad, PoolingConvention poolingConvention);
@@ -209,6 +213,10 @@ public interface NDArrayEx {
 
     NDArray globalLpPool(Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue);
 
+    ////////////////////////////////////////
+    // Optimizers
+    ////////////////////////////////////////
+
     void sgdUpdate(
             NDArray grad,
             float lr,
@@ -227,7 +235,9 @@ public interface NDArrayEx {
             float clipGradient,
             boolean lazyUpdate);
 
-    NDArray getArray();
+    ////////////////////////////////////////
+    // Loss
+    ////////////////////////////////////////
 
     default NDArray l2Loss(NDArray label, float weight, int batchAxis) {
         NDArray pred = getArray();
@@ -261,4 +271,39 @@ public interface NDArrayEx {
                         .toArray();
         return loss.mean(axes);
     }
+
+    ////////////////////////////////////////
+    // Miscellaneous
+    ////////////////////////////////////////
+
+    /**
+     * Picks elements from an input array according to the input indices along the given axis.
+     *
+     * @param index The index array
+     * @param axis The axis to picking the elements. Negative values means indexing from right to
+     *     left. If is `None`, the elements in the index w.r.t the flattened input will be picked.
+     * @param keepDims If true, the axis where we pick the elements is left in the result as
+     *     dimension with size one.
+     * @param mode Specify how out-of-bound indices behave. "clip" means clip to the range. So, if
+     *     all indices mentioned are too large, they are replaced by the index that addresses the
+     *     last element along an axis. "wrap" means to wrap around.
+     * @return copy of array
+     */
+    NDArray pick(NDArray index, int axis, boolean keepDims, String mode);
+
+    /**
+     * Picks elements from an input array according to the input indices along the given axis.
+     *
+     * @param index The index array
+     * @param axis The axis to picking the elements. Negative values means indexing from right to
+     *     left. If is `None`, the elements in the index w.r.t the flattened input will be picked.
+     * @param keepDims If true, the axis where we pick the elements is left in the result as
+     *     dimension with size one.
+     * @return copy of array
+     */
+    default NDArray pick(NDArray index, int axis, boolean keepDims) {
+        return pick(index, axis, keepDims, "clip");
+    }
+
+    NDArray getArray();
 }
