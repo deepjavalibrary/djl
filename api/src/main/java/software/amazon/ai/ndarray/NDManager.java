@@ -226,6 +226,76 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Creates and initializes a 2D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(float[][] data) {
+        FloatBuffer buffer = FloatBuffer.allocate(data.length * data[0].length);
+        for (float[] d : data) {
+            buffer.put(d);
+        }
+        return create(buffer, new Shape(data.length, data[0].length));
+    }
+
+    /**
+     * Creates and initializes a 2D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(int[][] data) {
+        IntBuffer buffer = IntBuffer.allocate(data.length * data[0].length);
+        for (int[] d : data) {
+            buffer.put(d);
+        }
+        return create(buffer, new Shape(data.length, data[0].length));
+    }
+
+    /**
+     * Creates and initializes a 2D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(double[][] data) {
+        DoubleBuffer buffer = DoubleBuffer.allocate(data.length * data[0].length);
+        for (double[] d : data) {
+            buffer.put(d);
+        }
+        return create(buffer, new Shape(data.length, data[0].length));
+    }
+
+    /**
+     * Creates and initializes a 2D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(long[][] data) {
+        LongBuffer buffer = LongBuffer.allocate(data.length * data[0].length);
+        for (long[] d : data) {
+            buffer.put(d);
+        }
+        return create(buffer, new Shape(data.length, data[0].length));
+    }
+
+    /**
+     * Creates and initializes a 2D {@link NDArray}.
+     *
+     * @param data the float array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(byte[][] data) {
+        ByteBuffer buffer = ByteBuffer.allocate(data.length * data[0].length);
+        for (byte[] d : data) {
+            buffer.put(d);
+        }
+        return create(buffer, new Shape(data.length, data[0].length));
+    }
+
+    /**
      * Creates and initializes a {@link NDArray} with specified {@link Shape}.
      *
      * <p>{@link DataType} of the NDArray will determined by type of Buffer.

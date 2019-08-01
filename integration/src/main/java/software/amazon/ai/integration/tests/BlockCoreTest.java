@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.integration.tests;
 
+import java.util.Arrays;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -23,6 +24,7 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.convolutional.Conv3D;
+import software.amazon.ai.nn.core.Embedding;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.nn.norm.Dropout;
@@ -105,6 +107,22 @@ public class BlockCoreTest {
             Dropout dropout = new Dropout.Builder().setProbability(.5f).build();
             NDArray out = dropout.forward(input);
             Assertions.assertTrue(out.lte(out).all());
+        }
+    }
+
+    @RunAsTest
+    public void testEmbedding() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Embedding<Character> block =
+                    new Embedding.Builder<Character>()
+                            .setItems(Arrays.asList('a', 'b', 'c'))
+                            .setEmbeddingSize(2)
+                            .build();
+            block.setInitializer(manager, Initializer.ONES);
+            Assertions.assertEquals(manager.create(new int[] {1, 1}), block.forward(manager, 'x'));
+            Assertions.assertEquals(
+                    manager.create(new int[] {1, 1, 1, 1}, new Shape(2, 2)),
+                    block.forward(manager, new Character[] {'a', 'b'}));
         }
     }
 

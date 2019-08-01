@@ -12,10 +12,13 @@
  */
 package software.amazon.ai.nn;
 
+import java.util.Collection;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.convolutional.Conv3D;
+import software.amazon.ai.nn.core.Embedding;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.nn.norm.BatchNorm;
@@ -32,6 +35,9 @@ public abstract class NNIndex {
     public abstract BatchNorm batchNorm2D(int axis, float epsilon, float momentum);
 
     public abstract Dropout dropout(float probability, int[] sharedAxes);
+
+    public abstract <T> Embedding<T> embedding(
+            Collection<T> items, int embeddingSize, boolean useDefault, DataType dataType);
 
     public abstract Prelu prelu();
 

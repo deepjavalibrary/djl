@@ -12,18 +12,22 @@
  */
 package org.apache.mxnet.nn;
 
+import java.util.Collection;
 import org.apache.mxnet.nn.convolutional.MxConv1D;
 import org.apache.mxnet.nn.convolutional.MxConv2D;
 import org.apache.mxnet.nn.convolutional.MxConv3D;
+import org.apache.mxnet.nn.core.MxEmbedding;
 import org.apache.mxnet.nn.core.MxLinear;
 import org.apache.mxnet.nn.core.MxPrelu;
 import org.apache.mxnet.nn.norm.MxBatchNorm;
 import org.apache.mxnet.nn.norm.MxDropout;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.convolutional.Conv3D;
+import software.amazon.ai.nn.core.Embedding;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.nn.norm.BatchNorm;
@@ -47,6 +51,13 @@ public class MxNNIndex extends NNIndex {
     @Override
     public Dropout dropout(float probability, int[] sharedAxes) {
         return new MxDropout(probability, sharedAxes);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T> Embedding<T> embedding(
+            Collection<T> items, int embeddingSize, boolean useDefault, DataType dataType) {
+        return new MxEmbedding<>(items, embeddingSize, useDefault, dataType);
     }
 
     /** {@inheritDoc} */
