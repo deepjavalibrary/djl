@@ -12,11 +12,9 @@
  */
 package software.amazon.ai;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
@@ -73,28 +71,26 @@ public interface Block {
         return Collections.emptyMap();
     }
 
-    default Map<List<String>, Parameter> getParameters() {
-        Map<List<String>, Parameter> parameters = new ConcurrentHashMap<>();
-        for (Parameter param : getDirectParameters()) {
-            parameters.put(Collections.emptyList(), param);
-        }
-        parameters.putAll(getChildrenParameters());
+    default PairList<String, Parameter> getParameters() {
+        PairList<String, Parameter> parameters = new PairList<>();
+        List<Parameter> directParams = this.getDirectParameters();
+        directParams.forEach(param -> parameters.add(param.getName(), param));
+        PairList<String, Parameter> childrenParameters = getChildrenParameters();
+        childrenParameters.forEach(pair -> parameters.add(pair));
         return parameters;
     }
 
-    default Map<List<String>, Parameter> getChildrenParameters() {
-        Map<List<String>, Parameter> parameters = new ConcurrentHashMap<>();
+    default PairList<String, Parameter> getChildrenParameters() {
+        PairList<String, Parameter> parameters = new PairList<>();
         getChildren()
                 .forEach(
-                        (nameFirst, child) -> {
+                        (childName, child) -> {
                             child.getParameters()
                                     .forEach(
-                                            (nameRest, param) -> {
-                                                List<String> name =
-                                                        new ArrayList<>(1 + nameRest.size());
-                                                name.add(nameFirst);
-                                                name.addAll(nameRest);
-                                                parameters.put(name, param);
+                                            pair -> {
+                                                parameters.add(
+                                                        childName + "_" + pair.getKey(),
+                                                        pair.getValue());
                                             });
                         });
         return parameters;

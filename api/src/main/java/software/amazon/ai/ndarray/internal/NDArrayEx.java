@@ -254,6 +254,7 @@ public interface NDArrayEx {
             label = label.reshape(pred.getShape());
             loss = pred.mul(label).sum(new int[] {classAxis}).mul(-weight);
         }
+        // apply mean on all axes except the batchAxis
         int[] axes =
                 IntStream.range(0, loss.getShape().dimension())
                         .filter(axis -> axis != batchAxis)

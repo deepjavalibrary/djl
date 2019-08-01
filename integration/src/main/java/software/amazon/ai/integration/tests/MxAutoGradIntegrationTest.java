@@ -12,14 +12,22 @@
  */
 package software.amazon.ai.integration.tests;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.apache.mxnet.engine.MxAutograd;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
@@ -68,8 +76,8 @@ public class MxAutoGradIntegrationTest {
         }
     }
 
-    // @RunAsTest
-    public void testTrain() {
+    @RunAsTest
+    public void testTrain() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             int numOfData = 1000;
             int batchSize = 10;
@@ -116,12 +124,19 @@ public class MxAutoGradIntegrationTest {
                     }
                 }
             }
-            assert loss.toFloatArray()[0] < 0.001f;
+            float lossValue = loss.getFloat();
+            float expectedLoss = 0.001f;
+            Assertions.assertTrue(
+                    lossValue < expectedLoss,
+                    String.format(
+                            "Loss did not improve, loss value: %f, expected "
+                                    + "max loss value: %f",
+                            lossValue, expectedLoss));
         }
     }
 
-    // @RunAsTest
-    public void testTrainMnist() throws IOException {
+    @RunAsTest
+    public void testTrainMnist() throws IOException, FailedTestException {
 
         class Mlp implements Block {
 
@@ -194,17 +209,23 @@ public class MxAutoGradIntegrationTest {
 
         try (NDManager manager = NDManager.newBaseManager()) {
 
-            // URL to Download: http://data.mxnet.io/mxnet/data/mnist.zip
-
-            // TODO: Remove this line with DataLoader
-            byte[] imageBytesRaw =
-                    Files.readAllBytes(
-                            Paths.get(
-                                    "/Users/qingla/testEnv/testMX/mnist/train-images-idx3-ubyte"));
-            byte[] labelBytesRaw =
-                    Files.readAllBytes(
-                            Paths.get(
-                                    "/Users/qingla/testEnv/testMX/mnist/train-labels-idx1-ubyte"));
+            // TODO: Remove loading mnist with DataLoader
+            String source = "http://data.mxnet.io/mxnet/data/mnist.zip";
+            String dataDir = System.getProperty("user.home") + "/.joule_data";
+            String downloadDestination = dataDir + "/mnist.zip";
+            String extractDestination = dataDir + "/mnist";
+            Path trainImages = Paths.get(extractDestination + "/train-images-idx3-ubyte");
+            Path trainLabels = Paths.get(extractDestination + "/train-labels-idx1-ubyte");
+            // download and unzip data if not exist
+            if (!Files.exists(trainImages) || !Files.exists(trainLabels)) {
+                if (!Files.exists(Paths.get(downloadDestination))) {
+                    download(source, dataDir, "mnist.zip");
+                }
+                unzip(downloadDestination, extractDestination);
+                deleteFileOrDir(downloadDestination);
+            }
+            byte[] imageBytesRaw = Files.readAllBytes(trainImages);
+            byte[] labelBytesRaw = Files.readAllBytes(trainLabels);
 
             byte[] imageBytes = new byte[imageBytesRaw.length - 16];
             System.arraycopy(imageBytesRaw, 16, imageBytes, 0, imageBytes.length);
@@ -236,15 +257,18 @@ public class MxAutoGradIntegrationTest {
                             0.9f,
                             true);
 
+            float lossSum = 0.f;
+            Accuracy acc = new Accuracy();
             for (int epoch = 0; epoch < numEpoch; epoch++) {
-                String lossString = "";
-                Accuracy acc = new Accuracy();
+                // reset loss and accuracy
+                acc.reset();
+                lossSum = 0.f;
+                NDArray loss;
                 for (int i = 0; i < numBatches; i++) {
                     String expression = i * batchSize + ":" + (i + 1) * batchSize;
                     NDArray batch =
                             data.get(expression).reshape(new Shape(batchSize, 28 * 28)).div(255f);
                     NDArray labelBatch = label.get(expression);
-                    NDArray loss;
                     NDArray pred;
                     try (MxAutograd autograd = new MxAutograd()) {
                         pred = mlp.forward(new NDList(batch)).head();
@@ -261,17 +285,98 @@ public class MxAutoGradIntegrationTest {
                         optimizer.update(0, weight, grad, new NDList(state));
                     }
                     acc.update(labelBatch, pred);
-                    if (i == numBatches - 1) {
-                        lossString = String.valueOf(loss.toFloatArray()[0]);
+                    // sum all loss for the batch
+                    lossSum += loss.sum().getFloat();
+                }
+            }
+            // final loss is sum of all loss divided by num of data
+            float lossValue = lossSum / data.getShape().get(0);
+            float accuracy = acc.getMetric().getValue().floatValue();
+            float expectedLoss = 0.1f;
+            float expectedAccuracy = 0.9f;
+            if (lossValue > expectedLoss) {
+                throw new FailedTestException(
+                        String.format(
+                                "Loss did not improve, loss value: %f, expected "
+                                        + "maximal loss value: %f",
+                                lossValue, expectedLoss));
+            }
+            if (accuracy < expectedAccuracy) {
+                throw new FailedTestException(
+                        String.format(
+                                "Accuracy did not improve, accuracy value: %f, expected "
+                                        + "minimal accuracy value: %f",
+                                accuracy, expectedAccuracy));
+            }
+        }
+    }
+
+    public void download(String source, String destination, String fileName) throws IOException {
+        URL url = new URL(source);
+        InputStream in = url.openStream();
+        File destDir = new File(destination);
+        if (!destDir.exists()) {
+            if (!destDir.mkdir()) {
+                throw new IOException("Failed to create directory: " + destDir);
+            }
+        }
+        Files.copy(
+                in, Paths.get(destination + "/" + fileName), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public void unzip(String zipFilePath, String destDirectory) throws IOException {
+        File destDir = new File(destDirectory);
+        if (!destDir.exists()) {
+            if (!destDir.mkdir()) {
+                throw new IOException("Failed to create directory: " + destDirectory);
+            }
+        }
+        ZipInputStream zipIn = new ZipInputStream(Files.newInputStream(Paths.get(zipFilePath)));
+        ZipEntry entry = zipIn.getNextEntry();
+        // iterates over entries in the zip file
+        while (entry != null) {
+            String filePath = destDirectory + File.separator + entry.getName();
+            if (!entry.isDirectory()) {
+                // if the entry is a file, extracts it
+                extractFile(zipIn, filePath);
+            } else {
+                // if the entry is a directory, make the directory
+                File dir = new File(filePath);
+                if (!dir.mkdir()) {
+                    throw new IOException("Failed to create directory: " + filePath);
+                }
+            }
+            zipIn.closeEntry();
+            entry = zipIn.getNextEntry();
+        }
+        zipIn.close();
+    }
+
+    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+        OutputStream out = Files.newOutputStream(Paths.get(filePath));
+        byte[] bytesIn = new byte[4096];
+        int read;
+        while ((read = zipIn.read(bytesIn)) != -1) {
+            out.write(bytesIn, 0, read);
+        }
+        out.close();
+    }
+
+    public void deleteFileOrDir(String target) throws IOException {
+        File dir = new File(target);
+        if (Files.isDirectory(dir.toPath())) {
+            String[] entries = dir.list();
+            if (entries != null) {
+                for (String s : entries) {
+                    File currentFile = new File(dir.getPath(), s);
+                    if (!currentFile.delete()) {
+                        throw new IOException("Failed to delete " + s);
                     }
                 }
-                System.out.println("Epoch = " + (epoch + 1) + "  loss = " + lossString); // NOPMD
-                System.out.println( // NOPMD
-                        "Epoch = "
-                                + (epoch + 1)
-                                + "  acc = "
-                                + acc.getMetric().getValue().toString()); // NOPMD
             }
+        }
+        if (!dir.delete()) {
+            throw new IOException("Failed to delete " + target);
         }
     }
 }
