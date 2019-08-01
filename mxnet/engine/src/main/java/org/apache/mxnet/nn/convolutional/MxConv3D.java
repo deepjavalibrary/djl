@@ -22,14 +22,18 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.convolutional.Conv2D;
+import software.amazon.ai.nn.convolutional.Conv3D;
 
-public class MxConv2D extends MxNNBlock implements Conv2D {
-    private static final LayoutType[] EXPECTED_LAYOUT =
+public class MxConv3D extends MxNNBlock implements Conv3D {
+    private static final LayoutType[] LAYOUT =
             new LayoutType[] {
-                LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.HEIGHT, LayoutType.WIDTH
+                LayoutType.BATCH,
+                LayoutType.CHANNEL,
+                LayoutType.DEPTH,
+                LayoutType.HEIGHT,
+                LayoutType.WIDTH
             };
-    private static final String LAYOUT = "NCHW";
+    private static final String LAYOUT_STRING = "NCDHW";
     private Shape kernel;
     private Shape stride;
     private Shape pad;
@@ -40,7 +44,7 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
     private Parameter weight;
     private Parameter bias;
 
-    public MxConv2D(
+    public MxConv3D(
             final Shape kernel,
             final Shape stride,
             final Shape pad,
@@ -50,9 +54,9 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
             final boolean noBias) {
         this.opName = "Convolution";
         this.kernel = kernel;
-        this.stride = stride == null ? new Shape(1, 1) : stride;
-        this.pad = pad == null ? new Shape(0, 0) : pad;
-        this.dilate = dilate == null ? new Shape(1, 1) : dilate;
+        this.stride = stride == null ? new Shape(1, 1, 1) : stride;
+        this.pad = pad == null ? new Shape(0, 0, 0) : pad;
+        this.dilate = dilate == null ? new Shape(1, 1, 1) : dilate;
         this.numFilters = numFilters;
         this.numGroups = numGroups;
 
@@ -64,10 +68,10 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
 
     @Override
     public Shape getOutputShape(final Shape... inputs) {
-        long[] shape = new long[4];
+        long[] shape = new long[5];
         shape[0] = inputs[0].get(0);
         shape[1] = numFilters;
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             shape[2 + i] =
                     (inputs[0].get(2 + i)
                                             + 2 * pad.get(i)
@@ -89,16 +93,16 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
         if (!isLayoutSupported(inputShape.getLayout())) {
-            throw new UnsupportedOperationException("Conv2D requires NCHW layout");
+            throw new UnsupportedOperationException("Conv3D requires NCDHW layout");
         }
     }
 
     private boolean isLayoutSupported(final LayoutType[] layout) {
-        if (layout.length != EXPECTED_LAYOUT.length) {
+        if (layout.length != LAYOUT.length) {
             return false;
         }
-        for (int i = 0; i < layout.length; i++) {
-            if (layout[i] != LayoutType.UNKNOWN && layout[i] != EXPECTED_LAYOUT[i]) {
+        for (int i = 0; i < LAYOUT.length; i++) {
+            if (layout[i] != LayoutType.UNKNOWN && layout[i] != LAYOUT[i]) {
                 return false;
             }
         }
@@ -111,7 +115,8 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
         Shape inputShape = input.getShape();
         switch (name) {
             case "weight":
-                return new Shape(numFilters, inputShape.get(1), kernel.get(0), kernel.get(1));
+                return new Shape(
+                        numFilters, inputShape.get(1), kernel.get(0), kernel.get(1), kernel.get(2));
             case "bias":
                 return new Shape(numFilters);
             default:
@@ -132,7 +137,7 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
         params.addParam("pad", pad);
         params.addParam("num_filter", numFilters);
         params.addParam("num_group", numGroups);
-        params.add("layout", LAYOUT);
+        params.add("layout", LAYOUT_STRING);
         return forward(inputs, params).get(0);
     }
 }

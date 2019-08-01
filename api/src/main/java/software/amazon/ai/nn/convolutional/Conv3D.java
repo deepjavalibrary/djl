@@ -16,8 +16,9 @@ import software.amazon.ai.Block;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.types.Shape;
 
-public interface Conv2D extends Block, Convolution {
-    /** The Builder to construct a {@link Conv2D} type of {@link Block}. */
+public interface Conv3D extends Block, Convolution {
+
+    /** The Builder to construct a {@link Conv3D} type of {@link Block}. */
     class Builder {
         Shape kernel;
         Shape stride;
@@ -105,19 +106,19 @@ public interface Conv2D extends Block, Convolution {
         }
 
         /**
-         * Returns the constructed {@code Conv2D}.
+         * Returns the constructed {@code Conv3D}.
          *
-         * @return Returns the constructed {@code Conv2D}
+         * @return Returns the constructed {@code Conv3D}
          * @throws IllegalArgumentException Thrown if all required parameters (outChannels) have not
          *     been set
          */
-        public Conv2D build() {
+        public Conv3D build() {
             if (kernel == null || numFilters == 0) {
                 throw new IllegalArgumentException("Kernel and numFilters must be set");
             }
             return Engine.getInstance()
                     .getNNIndex()
-                    .conv2D(kernel, stride, pad, dilate, numFilters, numGroups, noBias);
+                    .conv3D(kernel, stride, pad, dilate, numFilters, numGroups, noBias);
         }
     }
 }

@@ -20,7 +20,9 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.nn.convolutional.Conv2D;
+import software.amazon.ai.nn.convolutional.Conv3D;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.training.initializer.Initializer;
@@ -96,6 +98,22 @@ public class BlockCoreTest {
     }
 
     @RunAsTest
+    public void testConv1D() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray input =
+                    manager.create(
+                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
+                            new Shape(1, 4, 4));
+            NDArray expected = manager.create(new float[] {62, 56, 45}, new Shape(1, 1, 3));
+            Conv1D bn = new Conv1D.Builder().setKernel(new Shape(2)).setNumFilters(1).build();
+            bn.setInitializer(manager, Initializer.ONES);
+            NDArray out = bn.forward(input);
+            Assertions.assertEquals(expected, out);
+            Assertions.assertTrue(out.getShape().equals(bn.getOutputShape(new Shape(1, 4, 4))));
+        }
+    }
+
+    @RunAsTest
     public void testConv2D() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray input =
@@ -106,15 +124,32 @@ public class BlockCoreTest {
                     manager.create(
                             new float[] {23, 25, 26, 22, 27, 24, 40, 32, 20},
                             new Shape(1, 1, 3, 3));
-            Conv2D bn =
-                    (Conv2D)
-                            new Conv2D.Builder()
-                                    .setKernel(new Shape(2, 2))
-                                    .setNumFilters(1)
-                                    .build();
+            Conv2D bn = new Conv2D.Builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
             bn.setInitializer(manager, Initializer.ONES);
             NDArray out = bn.forward(input);
             Assertions.assertAlmostEquals(expected, out);
+        }
+    }
+
+    @RunAsTest
+    public void testConv3D() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray input =
+                    manager.create(
+                            new float[] {
+                                9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4, 4, 9, 7, 5, 11,
+                                2, 5, 13, 10, 8, 4
+                            },
+                            new Shape(1, 1, 3, 3, 3));
+            NDArray expected =
+                    manager.create(
+                            new float[] {61, 42, 55, 49, 56, 60, 57, 62}, new Shape(1, 1, 2, 2, 2));
+            Conv3D bn = new Conv3D.Builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
+            bn.setInitializer(manager, Initializer.ONES);
+            NDArray out = bn.forward(input);
+            Assertions.assertEquals(expected, out);
+            Assertions.assertTrue(
+                    out.getShape().equals(bn.getOutputShape(new Shape(1, 1, 3, 3, 3))));
         }
     }
 }
