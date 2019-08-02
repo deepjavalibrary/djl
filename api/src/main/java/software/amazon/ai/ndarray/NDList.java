@@ -160,6 +160,17 @@ public class NDList implements Iterable<Pair<String, NDArray>> {
         }
     }
 
+    /**
+     * Appends all of the pairs in the specified PairList to the end of this NDList, in the order
+     * that they are returned by the specified PairList's iterator.
+     *
+     * @param other PairList containing String NDArray pair to be added to this list
+     * @throws UnsupportedOperationException if this NDList is read only
+     */
+    public void addAll(PairList<String, NDArray> other) {
+        list.addAll(other);
+    }
+
     public void attach(NDManager manager) {
         for (NDArray array : list.values()) {
             array.attach(manager);

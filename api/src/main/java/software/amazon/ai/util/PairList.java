@@ -113,6 +113,16 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
+     * Appends all of the elements in the specified pair list to the end of this list.
+     *
+     * @param other {@code PairList} containing elements to be added to this list
+     */
+    public void addAll(PairList<K, V> other) {
+        keys.addAll(other.keys());
+        values.addAll(other.values());
+    }
+
+    /**
      * Returns the size of the list.
      *
      * @return the size of the list
@@ -220,8 +230,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
      * @return {@link Stream} of PairList
      */
     public Stream<Pair<K, V>> stream() {
-        Iterable<Pair<K, V>> iterable = () -> iterator();
-        return StreamSupport.stream(iterable.spliterator(), false);
+        return StreamSupport.stream(spliterator(), false);
     }
 
     /**
