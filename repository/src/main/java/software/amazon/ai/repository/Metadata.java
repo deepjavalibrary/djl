@@ -14,7 +14,8 @@ package software.amazon.ai.repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Metadata {
 
@@ -24,21 +25,17 @@ public class Metadata {
     private String name;
     private String description;
     private String website;
-    private List<String> versions;
+    private List<Artifact> artifacts;
     private String checksum;
     private Date lastUpdated;
 
-    private transient List<Version> cache = new CopyOnWriteArrayList<>();
-
-    public Version resolve(VersionRange versionRange) {
-        if (cache.isEmpty() && versions != null) {
-            for (String v : versions) {
-                cache.add(new Version(v));
-            }
-            cache.sort(null);
+    public List<Artifact> search(VersionRange versionRange, Map<String, String> filter) {
+        List<Artifact> results = versionRange.matches(artifacts);
+        if (filter == null) {
+            return results;
         }
 
-        return versionRange.matchVersion(cache);
+        return results.stream().filter(a -> a.hasProperties(filter)).collect(Collectors.toList());
     }
 
     public String getMetadataVersion() {
@@ -89,12 +86,12 @@ public class Metadata {
         this.website = website;
     }
 
-    public List<String> getVersions() {
-        return versions;
+    public List<Artifact> getArtifacts() {
+        return artifacts;
     }
 
-    public void setVersions(List<String> versions) {
-        this.versions = versions;
+    public void setArtifacts(List<Artifact> artifacts) {
+        this.artifacts = artifacts;
     }
 
     public String getChecksum() {

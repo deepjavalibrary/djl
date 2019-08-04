@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class VersionRange {
 
@@ -146,20 +147,21 @@ final class VersionRange {
         return restriction;
     }
 
-    public Version matchVersion(List<Version> versions) {
-        Version matched = null;
-        for (Version version : versions) {
-            if (containsVersion(version)) {
-                // valid - check if it is greater than the currently matched version
-                if (matched == null || version.compareTo(matched) > 0) {
-                    matched = version;
-                }
-            }
-        }
-        return matched;
+    public List<Artifact> matches(List<Artifact> artifacts) {
+        return artifacts.stream().filter(this::contains).collect(Collectors.toList());
     }
 
-    public boolean containsVersion(Version version) {
+    public boolean contains(Version version) {
+        for (Restriction restriction : restrictions) {
+            if (restriction.containsVersion(version)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean contains(Artifact artifact) {
+        Version version = artifact.getParsedVersion();
         for (Restriction restriction : restrictions) {
             if (restriction.containsVersion(version)) {
                 return true;

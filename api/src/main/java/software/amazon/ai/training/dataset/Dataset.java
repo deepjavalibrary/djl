@@ -12,30 +12,56 @@
  */
 package software.amazon.ai.training.dataset;
 
+import java.io.IOException;
+import java.util.Iterator;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.util.Pair;
 
 public interface Dataset {
 
     /**
      * Create an iterator for the specified {@code usage}, with random iteration order.
      *
-     * @param batchSize batch size for the iterator
      * @param usage The dataset (train or test)
+     * @param batchSize batch size for the iterator
      * @return an iterator for the specified {@code usage}
+     * @throws IOException if IO error occurs
      */
-    default Iterable<NDList> getData(Usage usage, int batchSize) {
-        return getData(usage, batchSize, -1);
+    default Iterator<Pair<NDList, NDList>> getData(Usage usage, int batchSize) throws IOException {
+        return getData(usage, batchSize, true);
     }
 
     /**
      * Create an iterator for the specified {@code usage}, with random iteration order.
      *
-     * @param batchSize batch size for the iterator
      * @param usage the dataset (train or test)
-     * @param seed the random seed
+     * @param batchSize batch size for the iterator
+     * @param shuffle shuffle the dataset
      * @return an iterator for the specified {@code usage}
+     * @throws IOException if IO error occurs
      */
-    Iterable<NDList> getData(Usage usage, int batchSize, int seed);
+    default Iterator<Pair<NDList, NDList>> getData(Usage usage, int batchSize, boolean shuffle)
+            throws IOException {
+        Sampler sampler;
+        if (shuffle) {
+            sampler = new RandomSampler();
+        } else {
+            sampler = new SequenceSampler();
+        }
+        return getData(usage, batchSize, sampler);
+    }
+
+    /**
+     * Create an iterator for the specified {@code usage}, with specified {@link Sampler}.
+     *
+     * @param usage the dataset (train or test)
+     * @param batchSize batch size for the iterator
+     * @param sampler a {@link Sampler} to selecting results
+     * @return an iterator for the specified {@code usage}
+     * @throws IOException if IO error occurs
+     */
+    Iterator<Pair<NDList, NDList>> getData(Usage usage, int batchSize, Sampler sampler)
+            throws IOException;
 
     enum Usage {
         TRAIN,

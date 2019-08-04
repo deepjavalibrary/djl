@@ -12,13 +12,16 @@
  */
 package org.apache.mxnet.dataset;
 
+import java.util.Iterator;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.training.dataset.Sampler;
+import software.amazon.ai.util.Pair;
 
 public class ImageNet implements Dataset {
 
     @Override
-    public Iterable<NDList> getData(Usage usage, int batchSize, int seed) {
+    public Iterator<Pair<NDList, NDList>> getData(Usage usage, int batchSize, Sampler sampler) {
         return null;
     }
 }

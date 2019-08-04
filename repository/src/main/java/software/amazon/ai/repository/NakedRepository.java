@@ -12,8 +12,9 @@
  */
 package software.amazon.ai.repository;
 
+import java.net.URI;
 import java.nio.file.Path;
-import java.util.Date;
+import java.util.Map;
 
 public class NakedRepository implements Repository {
 
@@ -35,14 +36,17 @@ public class NakedRepository implements Repository {
     }
 
     @Override
-    public Artifact resolve(Anchor anchor) {
-        Path base = path.resolve(anchor.getBaseUri());
+    public URI getBaseUri() {
+        return path.toUri();
+    }
+
+    @Override
+    public Artifact resolve(MRL mrl, String version, Map<String, String> filter) {
         Artifact artifact = new Artifact();
-        artifact.setArtifactId(anchor.getArtifactId());
-        artifact.setGroupId(anchor.getGroupId());
-        artifact.setLastUpdated(new Date());
-        artifact.setVersion(anchor.getVersion());
-        artifact.setBaseUri(base.toUri());
+        artifact.setGroupId(mrl.getGroupId());
+        artifact.setArtifactId(mrl.getArtifactId());
+        artifact.setVersion(version);
+        artifact.setBaseUri(path.toUri());
         return artifact;
     }
 

@@ -12,15 +12,27 @@
  */
 package software.amazon.ai.training.dataset;
 
-import java.util.Iterator;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.util.Pair;
 
-public class ImageRecord implements Dataset {
+public interface Batchifier {
 
-    /** {@inheritDoc} */
-    @Override
-    public Iterator<Pair<NDList, NDList>> getData(Usage usage, int batchSize, Sampler sampler) {
-        return null;
+    Batchifier STACK_BATCHIFIER = NDArrays::stack;
+    Batchifier LIST_BATCHIFIER = NDArrays::concat;
+
+    default NDList batch(NDList[] inputs) {
+        NDList list = new NDList(inputs.length);
+        for (NDList input : inputs) {
+            list.add(batch(input));
+        }
+
+        return list;
     }
+
+    default NDArray batch(NDArray[] arrays) {
+        return batch(new NDList(arrays));
+    }
+
+    NDArray batch(NDList list);
 }

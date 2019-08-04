@@ -18,6 +18,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 public class RemoteRepository implements Repository {
 
@@ -35,41 +37,31 @@ public class RemoteRepository implements Repository {
     }
 
     @Override
-    public Artifact resolve(Anchor anchor) throws IOException {
+    public URI getBaseUri() {
+        return uri;
+    }
+
+    @Override
+    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
+            throws IOException {
+        URI mrlUri = mrl.toURI();
+        URI base = uri.resolve(mrlUri.getPath());
+        URI file = base.resolve("metadata.json");
         // TODO:
         // 1. check cache first
         // 2. check if offline mode or not
         // 3. download metadata if needed
-        URI base = uri.resolve(anchor.getBaseUri());
-        URI file = base.resolve("metadata.json");
-        Version version;
+
         try (InputStream is = file.toURL().openStream();
                 Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             Metadata metadata = GSON.fromJson(reader, Metadata.class);
-            VersionRange range = VersionRange.parse(anchor.getVersion());
-            version = metadata.resolve(range);
-            if (version == null) {
+            VersionRange range = VersionRange.parse(version);
+            List<Artifact> artifacts = metadata.search(range, filter);
+            if (artifacts.isEmpty()) {
                 return null;
             }
-        } catch (IOException e) {
-            return null;
+            // TODO: find hightest version.
+            return artifacts.get(0);
         }
-
-        URI path = base.resolve(version.toString()).resolve("artifact.json");
-        try (InputStream is = file.toURL().openStream();
-                Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            Artifact artifact = GSON.fromJson(reader, Artifact.class);
-            artifact.setBaseUri(path);
-            return artifact;
-        }
-    }
-
-    @Override
-    public void prepare(Artifact artifact) throws IOException {
-        // TODO:
-        // 1. check cache if need download.
-        // 2. Check offline mode or not
-        // 3. Download from remote and set lastUpdated in metadata.
-        // 4. Unzip or some process if needed by configuration.
     }
 }

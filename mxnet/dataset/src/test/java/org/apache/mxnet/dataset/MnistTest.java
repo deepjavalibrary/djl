@@ -13,17 +13,43 @@
 package org.apache.mxnet.dataset;
 
 import java.io.IOException;
+import java.util.Iterator;
+import org.apache.mxnet.jna.JnaUtils;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.util.Pair;
 
 public class MnistTest {
 
+    @BeforeClass
+    public void setup() {
+        JnaUtils.setNumpyMode(true);
+    }
+
+    @AfterClass
+    public void tearDown() {
+        JnaUtils.setNumpyMode(false);
+    }
+
     @Test
     public void testMnist() throws IOException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/repo");
-        Mnist dataset = Mnist.newInstance(repository);
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Repository repository = Repository.newInstance("test", "src/test/resources/repo");
+            Mnist mnist = Mnist.newInstance(manager, repository);
+            mnist.prepare();
+            Iterator<Pair<NDList, NDList>> it = mnist.getData(Dataset.Usage.TRAIN, 32);
 
-        Assert.assertNotNull(dataset);
+            Assert.assertTrue(it.hasNext());
+
+            Pair<NDList, NDList> pair = it.next();
+
+            Assert.assertEquals(pair.getKey().size(), 1);
+        }
     }
 }

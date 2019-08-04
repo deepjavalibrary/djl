@@ -14,8 +14,11 @@ package software.amazon.ai.repository;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
 public class LocalRepository implements Repository {
 
@@ -37,30 +40,30 @@ public class LocalRepository implements Repository {
     }
 
     @Override
-    public Artifact resolve(Anchor anchor) throws IOException {
-        Path base = path.resolve(anchor.getBaseUri());
+    public URI getBaseUri() {
+        return path.toUri();
+    }
+
+    @Override
+    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
+            throws IOException {
+        URI uri = mrl.toURI();
+        Path base = path.resolve(uri.getPath());
         Path file = base.resolve("metadata.json");
         if (!Files.isRegularFile(file)) {
             return null;
         }
         try (Reader reader = Files.newBufferedReader(file)) {
             Metadata metadata = GSON.fromJson(reader, Metadata.class);
-            VersionRange range = VersionRange.parse(anchor.getVersion());
-            Version version = metadata.resolve(range);
-            if (version == null) {
+            VersionRange range = VersionRange.parse(version);
+            List<Artifact> artifacts = metadata.search(range, filter);
+            if (artifacts.isEmpty()) {
                 return null;
             }
-            Path p = base.resolve(version.toString()).resolve("artifact.json");
-            try (Reader r = Files.newBufferedReader(file)) {
-                Artifact artifact = GSON.fromJson(r, Artifact.class);
-                artifact.setBaseUri(p.toUri());
-                return artifact;
-            }
+            // TODO: find hightest version.
+            Artifact artifact = artifacts.get(0);
+            artifact.setBaseUri(uri);
+            return artifact;
         }
-    }
-
-    @Override
-    public void prepare(Artifact artifact) {
-        // Do nothing
     }
 }

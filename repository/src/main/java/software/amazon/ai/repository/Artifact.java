@@ -13,22 +13,22 @@
 package software.amazon.ai.repository;
 
 import java.net.URI;
-import java.util.Date;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+@SuppressWarnings("PMD.LooseCoupling")
 public class Artifact {
 
-    private String metadataVersion;
-    private String groupId;
-    private String artifactId;
+    private transient String metadataVersion;
+    private transient String groupId;
+    private transient String artifactId;
     private String version;
     private boolean snapshot;
-    private Date lastUpdated;
-    private Map<String, String> properties;
-    private List<Item> files;
+    private LinkedHashMap<String, String> properties;
+    private Map<String, Item> files;
 
     private URI baseUri;
+    private transient Version cache;
 
     public String getMetadataVersion() {
         return metadataVersion;
@@ -62,14 +62,6 @@ public class Artifact {
         this.version = version;
     }
 
-    public Date getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Date lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
     public boolean isSnapshot() {
         return snapshot;
     }
@@ -82,7 +74,7 @@ public class Artifact {
         return properties;
     }
 
-    public void setProperties(Map<String, String> properties) {
+    public void setProperties(LinkedHashMap<String, String> properties) {
         this.properties = properties;
     }
 
@@ -90,22 +82,60 @@ public class Artifact {
         return baseUri;
     }
 
+    public URI getResourceUri() {
+        URI uri = baseUri;
+        if (properties != null) {
+            for (String key : properties.keySet()) {
+                uri = uri.resolve(key);
+            }
+        }
+        return uri.resolve(version);
+    }
+
     public void setBaseUri(URI baseUri) {
         this.baseUri = baseUri;
     }
 
-    public List<Item> getFiles() {
+    public Map<String, Item> getFiles() {
+        files.forEach((k, v) -> v.setArtifact(this));
         return files;
     }
 
-    public void setFiles(List<Item> files) {
+    public void setFiles(Map<String, Item> files) {
         this.files = files;
+    }
+
+    public boolean hasProperties(Map<String, String> filter) {
+        if (filter == null || filter.isEmpty()) {
+            return true;
+        }
+
+        if (properties == null || properties.isEmpty()) {
+            return false;
+        }
+
+        for (Map.Entry<String, String> entry : filter.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if (!value.equals(properties.get(key))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Version getParsedVersion() {
+        if (cache == null) {
+            cache = new Version(version);
+        }
+        return cache;
     }
 
     public static final class Item {
 
         private String uri;
-        private String hash;
+        private String sha1Hash;
+        private Artifact artifact;
 
         public String getUri() {
             return uri;
@@ -115,12 +145,20 @@ public class Artifact {
             this.uri = uri;
         }
 
-        public String getHash() {
-            return hash;
+        public String getSha1Hash() {
+            return sha1Hash;
         }
 
-        public void setHash(String hash) {
-            this.hash = hash;
+        public void setSha1Hash(String sha1Hash) {
+            this.sha1Hash = sha1Hash;
+        }
+
+        public Artifact getArtifact() {
+            return artifact;
+        }
+
+        public void setArtifact(Artifact artifact) {
+            this.artifact = artifact;
         }
     }
 }

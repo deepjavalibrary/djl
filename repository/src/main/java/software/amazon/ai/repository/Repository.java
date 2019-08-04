@@ -15,8 +15,12 @@ package software.amazon.ai.repository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public interface Repository {
 
@@ -38,11 +42,65 @@ public interface Repository {
 
     String getName();
 
-    default Artifact resolve(String anchor) throws IOException {
-        return resolve(Anchor.parse(anchor));
+    URI getBaseUri();
+
+    Artifact resolve(MRL mrk, String version, Map<String, String> filter) throws IOException;
+
+    default InputStream openStream(Artifact.Item item) throws IOException {
+        Artifact artifact = item.getArtifact();
+        URI artifactUri = artifact.getResourceUri();
+
+        URI fileUri = URI.create(item.getUri());
+        if (fileUri.isAbsolute()) {
+            Path cacheDir = getCacheDirectory();
+            Path resourceDir = cacheDir.resolve(artifactUri.getPath());
+            Path cachedFile = resourceDir.resolve(item.getSha1Hash());
+            return Files.newInputStream(cachedFile);
+        }
+        URI itemUri = getBaseUri().resolve(artifactUri.resolve(item.getUri()));
+        return itemUri.toURL().openStream();
     }
 
-    Artifact resolve(Anchor anchor) throws IOException;
+    default void prepare(Artifact artifact) throws IOException {
+        Path cacheDir = getCacheDirectory();
+        URI resourceUri = artifact.getResourceUri();
+        Path resourceDir = cacheDir.resolve(resourceUri.getPath());
+        if (!Files.exists(resourceDir)) {
+            Files.createDirectories(resourceDir);
+        }
 
-    void prepare(Artifact artifact) throws IOException;
+        Map<String, Artifact.Item> files = artifact.getFiles();
+        for (Map.Entry<String, Artifact.Item> entry : files.entrySet()) {
+            Artifact.Item item = entry.getValue();
+            URI fileUri = URI.create(item.getUri());
+            if (fileUri.isAbsolute()) {
+                Path cachedFile = resourceDir.resolve(item.getSha1Hash());
+                if (Files.exists(cachedFile)) {
+                    continue;
+                }
+                try (InputStream is = fileUri.toURL().openStream()) {
+                    // TODO: save to tmp file first.
+                    Files.copy(is, cachedFile);
+                }
+            }
+        }
+
+        // TODO: clean up obsoleted files
+    }
+
+    default Path getCacheDirectory() throws IOException {
+        String cacheDir = System.getProperty("JOULE_CACHE_DIR");
+        if (cacheDir == null) {
+            String userHome = System.getProperty("user.home");
+            cacheDir = userHome + "/.joule/cache";
+        }
+
+        Path dir = Paths.get(cacheDir, "repo");
+        if (Files.notExists(dir)) {
+            Files.createDirectories(dir);
+        } else if (!Files.isDirectory(dir)) {
+            throw new IOException("Failed initialize cache directory: " + dir.toString());
+        }
+        return dir;
+    }
 }

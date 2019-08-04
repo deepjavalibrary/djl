@@ -12,15 +12,39 @@
  */
 package software.amazon.ai.training.dataset;
 
-import java.util.Iterator;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.util.Pair;
+import java.util.NoSuchElementException;
 
-public class ImageRecord implements Dataset {
+public class SequenceSampler implements Sampler {
+
+    private int size;
+    private int current;
+
+    public SequenceSampler() {
+        size = Integer.MAX_VALUE;
+    }
+
+    public SequenceSampler(int size) {
+        init(size);
+    }
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<Pair<NDList, NDList>> getData(Usage usage, int batchSize, Sampler sampler) {
-        return null;
+    public final void init(int size) {
+        this.size = size;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasNext() {
+        return current < size;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Integer next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return current++;
     }
 }

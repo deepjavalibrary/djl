@@ -12,57 +12,52 @@
  */
 package software.amazon.ai.repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class Anchor {
 
-    private String type;
-    private String category;
-    private String groupId;
-    private String artifactId;
-    private String version;
+    private String[] path;
 
-    public Anchor(String type, String category, String groupId, String artifactId, String version) {
-        this.type = type;
-        this.category = category;
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
+    public Anchor(String... path) {
+        this.path = path;
     }
 
     public static Anchor parse(String anchor) {
-        String[] tokens = anchor.split(":");
-        if (tokens.length < 4) {
-            throw new IllegalArgumentException("Invalid anchor syntax: " + anchor);
+        String[] tokens = anchor.split("[:/]");
+        return new Anchor(tokens);
+    }
+
+    public Anchor normalize() {
+        List<String> parts = new ArrayList<>();
+        for (String s : path) {
+            String[] tokens = s.split("/");
+            Collections.addAll(parts, tokens);
         }
+        return new Anchor(parts.toArray(new String[0]));
+    }
 
-        String version = null;
-        if (tokens.length == 5) {
-            version = tokens[4];
+    public String get(int index) {
+        return path[index];
+    }
+
+    public String getPath() {
+        return String.join("/", path);
+    }
+
+    public Anchor resolve(Anchor other) {
+        String[] newPath = new String[path.length + other.path.length];
+        System.arraycopy(path, 0, newPath, 0, path.length);
+        System.arraycopy(other.path, 0, newPath, path.length, other.path.length);
+        return new Anchor(newPath);
+    }
+
+    public Anchor resolve(String... others) {
+        Anchor anchor = this;
+        for (String other : others) {
+            anchor = anchor.resolve(Anchor.parse(other));
         }
-
-        return new Anchor(tokens[0], tokens[1], tokens[2], tokens[3], version);
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public String getBaseUri() {
-        return type + '/' + category + '/' + groupId.replace('.', '/') + '/' + artifactId;
+        return anchor;
     }
 }
