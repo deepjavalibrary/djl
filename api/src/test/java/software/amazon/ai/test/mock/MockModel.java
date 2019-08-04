@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import software.amazon.ai.Block;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -77,6 +78,11 @@ public class MockModel implements Model {
             return null;
         }
         return url.openStream();
+    }
+
+    @Override
+    public Block getBlock() {
+        return null;
     }
 
     @Override

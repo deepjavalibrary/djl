@@ -15,6 +15,7 @@ package org.apache.mxnet.nn;
 import software.amazon.ai.Block;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
@@ -44,16 +45,15 @@ public abstract class MxNNBlock implements Block {
         initialized = true;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean isInitialized() {
-        return initialized;
+    public DataDesc[] describeInput() {
+        return new DataDesc[] {new DataDesc(inputShape)};
     }
 
     /** {@inheritDoc} */
     @Override
-    public Shape getInputShape() {
-        return inputShape;
+    public boolean isInitialized() {
+        return initialized;
     }
 
     /** {@inheritDoc} */

@@ -12,9 +12,9 @@
  */
 package org.apache.mxnet.engine;
 
-import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.TranslateException;
@@ -42,7 +42,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     MxModel model;
     private Translator<I, O> translator;
     Context context;
-    private CachedOp cachedOp;
+    private Block block;
     MxNDManager manager;
     Metrics metrics;
     private long timestamp;
@@ -52,7 +52,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         this.model = model;
         this.translator = translator;
         this.context = context;
-        cachedOp = JnaUtils.createCachedOp(model, manager);
+        this.block = model.getBlock();
     }
 
     /** {@inheritDoc} */
@@ -86,7 +86,7 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     }
 
     private NDList forward(NDList ndList) {
-        return cachedOp.forward(ndList);
+        return block.forward(ndList);
     }
 
     private void preprocessEnd() {
@@ -123,7 +123,6 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        cachedOp.close();
         manager.close();
     }
 

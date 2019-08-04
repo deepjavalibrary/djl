@@ -15,6 +15,7 @@ package software.amazon.ai.zoo;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.function.Function;
+import software.amazon.ai.Block;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -54,6 +55,11 @@ public class PretrainedModel implements Model {
 
     @Override
     public InputStream getArtifactAsStream(String name) {
+        return null;
+    }
+
+    @Override
+    public Block getBlock() {
         return null;
     }
 

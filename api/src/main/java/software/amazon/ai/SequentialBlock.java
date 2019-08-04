@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
@@ -73,14 +75,6 @@ public class SequentialBlock implements Block {
     }
 
     @Override
-    public Shape getInputShape() {
-        if (blocks.isEmpty()) {
-            throw new IllegalArgumentException("The sequential block is empty");
-        }
-        return blocks.get(0).getInputShape();
-    }
-
-    @Override
     public Shape getOutputShape(Shape... inputs) {
         if (blocks.isEmpty()) {
             throw new IllegalArgumentException("The sequential block is empty");
@@ -100,6 +94,21 @@ public class SequentialBlock implements Block {
     @Override
     public void beforeInitialize(NDList inputs) {
         isInitialized = true;
+    }
+
+    @Override
+    public Block cast(DataType dataType) {
+        SequentialBlock newBlock = new SequentialBlock();
+        blocks.forEach(ele -> newBlock.add(ele.cast(dataType)));
+        return newBlock;
+    }
+
+    @Override
+    public DataDesc[] describeInput() {
+        if (blocks.isEmpty()) {
+            throw new IllegalArgumentException("The sequential block is empty");
+        }
+        return blocks.get(0).describeInput();
     }
 
     @Override

@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
@@ -38,11 +39,6 @@ public class LambdaBlock implements Block {
     }
 
     @Override
-    public Shape getInputShape() {
-        return null;
-    }
-
-    @Override
     public Shape getOutputShape(Shape... inputs) {
         return null;
     }
@@ -54,6 +50,11 @@ public class LambdaBlock implements Block {
 
     @Override
     public void beforeInitialize(NDList inputs) {}
+
+    @Override
+    public DataDesc[] describeInput() {
+        return new DataDesc[0];
+    }
 
     @Override
     public Shape getParameterShape(String name, NDList inputs) {

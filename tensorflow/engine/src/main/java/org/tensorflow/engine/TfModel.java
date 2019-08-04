@@ -28,6 +28,7 @@ import org.tensorflow.framework.MetaGraphDef;
 import org.tensorflow.framework.SignatureDef;
 import org.tensorflow.framework.TensorInfo;
 import org.tensorflow.framework.TensorShapeProto;
+import software.amazon.ai.Block;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -143,6 +144,11 @@ public class TfModel implements Model {
     /** {@inheritDoc} */
     @Override
     public InputStream getArtifactAsStream(String name) {
+        return null;
+    }
+
+    @Override
+    public Block getBlock() {
         return null;
     }
 

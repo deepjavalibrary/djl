@@ -27,10 +27,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.engine.CachedOp;
 import org.apache.mxnet.engine.DeviceType;
-import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDManager;
 import org.apache.mxnet.engine.Symbol;
+import org.apache.mxnet.engine.SymbolBlock;
 import software.amazon.ai.Context;
 import software.amazon.ai.engine.EngineException;
 import software.amazon.ai.ndarray.types.DataType;
@@ -1498,13 +1498,15 @@ public final class JnaUtils {
      * <p>data_indices : [0, 2, 4] Used to label input location, param_indices : [1, 3] Used to
      * label param location
      *
-     * @param model model that loaded in the backend
+     * @param block {@link SymbolBlock} that loaded in the backend
      * @param manager NDManager to create NDArray
      * @return CachedOp for inference
      */
-    public static CachedOp createCachedOp(MxModel model, MxNDManager manager) {
-        Symbol symbol = model.getSymbol();
-        PairList<String, MxNDArray> parameters = model.getParameters();
+    public static CachedOp createCachedOp(SymbolBlock block, MxNDManager manager) {
+        Symbol symbol = block.getSymbol();
+        PairList<String, MxNDArray> parameters = new PairList<>();
+        block.getDirectParameters()
+                .forEach(param -> parameters.add(param.getName(), (MxNDArray) param.getArray()));
 
         String[] allNames = symbol.getAllNames();
 

@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
@@ -33,8 +35,6 @@ public interface Block {
     default void backward() {}
 
     boolean isInitialized();
-
-    Shape getInputShape();
 
     Shape getOutputShape(Shape... inputs);
 
@@ -59,6 +59,12 @@ public interface Block {
     }
 
     void beforeInitialize(NDList inputs);
+
+    default Block cast(DataType dataType) {
+        throw new UnsupportedOperationException("Unimplemented method cast");
+    }
+
+    DataDesc[] describeInput();
 
     Shape getParameterShape(String name, NDList inputs);
 

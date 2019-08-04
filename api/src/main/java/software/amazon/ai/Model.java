@@ -175,6 +175,13 @@ public interface Model extends AutoCloseable {
     InputStream getArtifactAsStream(String name) throws IOException;
 
     /**
+     * Get the block from the Model.
+     *
+     * @return {@link Block} from
+     */
+    Block getBlock();
+
+    /**
      * Casts the model to support a different precision level.
      *
      * <p>For example, you can cast the precision from Float to Int

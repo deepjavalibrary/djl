@@ -61,8 +61,9 @@ public class MxModelTest extends PowerMockTestCase {
         String prefix = "A";
         int epoch = 122;
         try (MxModel model = MxModel.loadModel(prefix, epoch)) {
-            Assert.assertEquals(model.getParameters().get(0).getKey(), "A-0122.params");
-            Symbol sym = model.getSymbol();
+            Assert.assertEquals(
+                    model.getBlock().getDirectParameters().get(0).getName(), "A-0122.params");
+            Symbol sym = ((SymbolBlock) model.getBlock()).getSymbol();
             Assert.assertNotNull(sym);
         }
     }
@@ -84,11 +85,13 @@ public class MxModelTest extends PowerMockTestCase {
         int epoch = 122;
         MxModel model = MxModel.loadModel(prefix, epoch);
         MxModel casted = (MxModel) model.cast(DataType.FLOAT32);
-        Assert.assertEquals(casted.getParameters(), model.getParameters());
+        Assert.assertEquals(
+                casted.getBlock().getDirectParameters(), model.getBlock().getDirectParameters());
 
         casted = (MxModel) model.cast(DataType.FLOAT64);
         Assert.assertEquals(
-                casted.getParameters().get(0).getValue().getDataType(), DataType.FLOAT64);
+                casted.getBlock().getDirectParameters().get(0).getArray().getDataType(),
+                DataType.FLOAT64);
         model.close();
     }
 

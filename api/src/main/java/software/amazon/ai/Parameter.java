@@ -18,19 +18,24 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.initializer.Initializer;
 
-public class Parameter {
+public class Parameter implements AutoCloseable {
 
-    String name;
-    Block block;
-    ParameterType type;
-    NDManager manager;
-    Initializer initializer;
-    NDArray array;
+    private String name;
+    private Block block;
+    private ParameterType type;
+    private NDManager manager;
+    private Initializer initializer;
+    private NDArray array;
 
     public Parameter(String name, Block block, ParameterType type) {
         this.name = name;
         this.block = block;
         this.type = type;
+    }
+
+    public Parameter(String name, NDArray array) {
+        this.name = name;
+        this.array = array;
     }
 
     public String getName() {
@@ -69,5 +74,10 @@ public class Parameter {
                         block.getParameterShape(name, inputs),
                         inputs.head().getDataType());
         array.attachGradient();
+    }
+
+    @Override
+    public void close() {
+        array.close();
     }
 }
