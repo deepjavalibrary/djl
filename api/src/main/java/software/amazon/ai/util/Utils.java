@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -97,6 +98,35 @@ public final class Utils {
         } catch (IOException ignore) {
             // ignore
         }
+    }
+
+    /**
+     * Read {@code is} as UTF-8 string.
+     *
+     * @param is the InputStream to be read
+     * @return UTF-8 encoded string
+     * @throws IOException if IO error occurs
+     */
+    public static String toString(InputStream is) throws IOException {
+        return new String(toByteArray(is), StandardCharsets.UTF_8.name());
+    }
+
+    /**
+     * Read {@code is} as byte array.
+     *
+     * @param is the InputStream to be read
+     * @return bytes
+     * @throws IOException if IO error occurs
+     */
+    public static byte[] toByteArray(InputStream is) throws IOException {
+        byte[] buf = new byte[81920];
+        int read;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(81920);
+        while ((read = is.read(buf)) != -1) {
+            bos.write(buf, 0, read);
+        }
+        bos.close();
+        return bos.toByteArray();
     }
 
     /**
