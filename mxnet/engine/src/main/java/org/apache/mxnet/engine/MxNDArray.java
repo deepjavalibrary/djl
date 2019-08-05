@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.Matrix;
@@ -1113,6 +1114,20 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray concat(NDArray[] arrays, int axis) {
+        if (Stream.of(arrays).allMatch(array -> array.getShape().dimension() == 0)) {
+            throw new IllegalArgumentException(
+                    "scalar(zero-dimensional) arrays cannot be concatenated");
+        }
+        int dimension = arrays[0].getShape().dimension();
+        for (int i = 1; i < arrays.length; i++) {
+            if (arrays[i].getShape().dimension() != dimension) {
+                throw new IllegalArgumentException(
+                        "all the input arrays must have same number of dimensions, "
+                                + String.format(
+                                        "but the array at index 0 has %d dimension(s) and the array at index %d has %d dimension(s)",
+                                        dimension, i, arrays[i].getShape().dimension()));
+            }
+        }
         MxOpParams params = new MxOpParams();
         // MXNet backend use dim as argument name
         params.addParam("dim", axis);

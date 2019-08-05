@@ -112,7 +112,6 @@ public class NDArrayShapesManipulationOpTest {
             NDArray concatedND = manager.create(new float[] {1f});
             NDArray concatedND2 = manager.create(new float[] {2f});
             NDArray actual = manager.create(new float[] {1f, 2f});
-
             Assertions.assertEquals(concatedND.concat(new NDArray[] {concatedND2}, 0), actual);
             Assertions.assertEquals(
                     NDArrays.concat(new NDArray[] {concatedND, concatedND2}, 0), actual);
