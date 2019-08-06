@@ -25,6 +25,7 @@ import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.convolutional.Conv3D;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.norm.BatchNorm;
+import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.training.initializer.Initializer;
 
 public class BlockCoreTest {
@@ -94,6 +95,16 @@ public class BlockCoreTest {
             bn.setInitializer(manager, Initializer.ONES);
             NDArray out = bn.forward(input);
             Assertions.assertAlmostEquals(expected, out);
+        }
+    }
+
+    @RunAsTest
+    public void testDropout() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+            Dropout dropout = new Dropout.Builder().setProbability(.5f).build();
+            NDArray out = dropout.forward(input);
+            Assertions.assertTrue(out.lte(out).all());
         }
     }
 

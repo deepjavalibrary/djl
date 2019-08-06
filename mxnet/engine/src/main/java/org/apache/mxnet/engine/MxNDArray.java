@@ -1483,24 +1483,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean all() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean any() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean none() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArrayEx getNDArrayInternal() {
         return mxNDArrayEx;
     }

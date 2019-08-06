@@ -18,6 +18,7 @@ import org.apache.mxnet.nn.convolutional.MxConv3D;
 import org.apache.mxnet.nn.core.MxLinear;
 import org.apache.mxnet.nn.core.MxPrelu;
 import org.apache.mxnet.nn.norm.MxBatchNorm;
+import org.apache.mxnet.nn.norm.MxDropout;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.nn.convolutional.Conv1D;
@@ -26,6 +27,7 @@ import software.amazon.ai.nn.convolutional.Conv3D;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.nn.norm.BatchNorm;
+import software.amazon.ai.nn.norm.Dropout;
 
 public class MxNNIndex extends NNIndex {
 
@@ -39,6 +41,12 @@ public class MxNNIndex extends NNIndex {
     @Override
     public BatchNorm batchNorm2D(int axis, float epsilon, float momentum) {
         return new MxBatchNorm(axis, epsilon, momentum);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Dropout dropout(float probability, int[] sharedAxes) {
+        return new MxDropout(probability, sharedAxes);
     }
 
     /** {@inheritDoc} */

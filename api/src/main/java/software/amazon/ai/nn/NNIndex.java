@@ -19,6 +19,7 @@ import software.amazon.ai.nn.convolutional.Conv3D;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.nn.norm.BatchNorm;
+import software.amazon.ai.nn.norm.Dropout;
 
 /**
  * An internal mapping to Engine specific implementations of Neural Network {@link
@@ -29,6 +30,8 @@ public abstract class NNIndex {
     public abstract Linear linear(long units, boolean bias);
 
     public abstract BatchNorm batchNorm2D(int axis, float epsilon, float momentum);
+
+    public abstract Dropout dropout(float probability, int[] sharedAxes);
 
     public abstract Prelu prelu();
 

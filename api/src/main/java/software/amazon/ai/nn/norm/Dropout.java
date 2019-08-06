@@ -16,33 +16,27 @@ import software.amazon.ai.Block;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 
-public interface BatchNorm extends Block {
+public interface Dropout extends Block {
 
     NDArray forward(NDArray data);
 
     final class Builder {
 
-        private int axis = 1;
-        private float epsilon = 1E-5f;
-        private float momentum = .9f;
+        private float probability = 0.5f;
+        private int[] sharedAxes = new int[] {};
 
-        public Builder setAxis(int val) {
-            axis = val;
+        public Builder setProbability(float probability) {
+            this.probability = probability;
             return this;
         }
 
-        public Builder setEpsilon(float val) {
-            epsilon = val;
+        public Builder setSharedAxes(int[] sharedAxes) {
+            this.sharedAxes = sharedAxes;
             return this;
         }
 
-        public Builder setMomentum(float val) {
-            momentum = val;
-            return this;
-        }
-
-        public BatchNorm build() {
-            return Engine.getInstance().getNNIndex().batchNorm2D(axis, epsilon, momentum);
+        public Dropout build() {
+            return Engine.getInstance().getNNIndex().dropout(probability, sharedAxes);
         }
     }
 }
