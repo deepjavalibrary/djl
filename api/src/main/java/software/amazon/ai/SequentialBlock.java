@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -122,12 +120,12 @@ public class SequentialBlock implements Block {
     }
 
     @Override
-    public Map<String, Block> getChildren() {
-        Map<String, Block> children = new ConcurrentHashMap<>(blocks.size());
+    public PairList<String, Block> getChildren() {
+        PairList<String, Block> children = new PairList<>(blocks.size());
         for (int i = 0; i < blocks.size(); i++) {
             Block block = blocks.get(i);
             String name = String.format("%02d:%s", i, block.getClass().getSimpleName());
-            children.put(name, block);
+            children.add(name, block);
         }
         return children;
     }

@@ -12,15 +12,14 @@
  */
 package software.amazon.ai;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
 /** An interface defining neural-network layers. */
@@ -70,8 +69,8 @@ public interface Block {
 
     byte[] getEncoded();
 
-    default Map<String, Block> getChildren() {
-        return Collections.emptyMap();
+    default PairList<String, Block> getChildren() {
+        return new PairList<>();
     }
 
     default PairList<String, Parameter> getParameters() {
@@ -85,17 +84,11 @@ public interface Block {
 
     default PairList<String, Parameter> getChildrenParameters() {
         PairList<String, Parameter> parameters = new PairList<>();
-        getChildren()
-                .forEach(
-                        (childName, child) -> {
-                            child.getParameters()
-                                    .forEach(
-                                            pair -> {
-                                                parameters.add(
-                                                        childName + "_" + pair.getKey(),
-                                                        pair.getValue());
-                                            });
-                        });
+        for (Pair<String, Block> childPair : getChildren()) {
+            for (Pair<String, Parameter> paramPair : childPair.getValue().getParameters()) {
+                parameters.add(childPair.getKey() + "_" + paramPair.getKey(), paramPair.getValue());
+            }
+        }
         return parameters;
     }
 }
