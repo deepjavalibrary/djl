@@ -26,6 +26,7 @@ public class Parameter implements AutoCloseable {
     private NDManager manager;
     private Initializer initializer;
     private NDArray array;
+    private boolean gradientAttached;
 
     public Parameter(String name, Block block, ParameterType type) {
         this.name = name;
@@ -36,6 +37,16 @@ public class Parameter implements AutoCloseable {
     public Parameter(String name, NDArray array) {
         this.name = name;
         this.array = array;
+    }
+
+    public void attachGradient() {
+        if (!isInitialized()) {
+            throw new IllegalStateException("This parameter is not initialized");
+        }
+        if (!gradientAttached) {
+            array.attachGradient();
+            gradientAttached = true;
+        }
     }
 
     public String getName() {
@@ -62,6 +73,15 @@ public class Parameter implements AutoCloseable {
         this.initializer = initializer;
     }
 
+    public void reinitialize() {
+        if (!isInitialized()) {
+            throw new IllegalStateException("This parameter is not initialized");
+        }
+        Objects.requireNonNull(initializer, "No initializer has been set");
+        array = initializer.initialize(manager, array.getShape(), array.getDataType());
+        attachGradient();
+    }
+
     public void initialize(NDList inputs) {
         if (isInitialized()) {
             throw new IllegalStateException("This parameter is already initialized");
@@ -73,7 +93,7 @@ public class Parameter implements AutoCloseable {
                         manager,
                         block.getParameterShape(name, inputs),
                         inputs.head().getDataType());
-        array.attachGradient();
+        attachGradient();
     }
 
     @Override

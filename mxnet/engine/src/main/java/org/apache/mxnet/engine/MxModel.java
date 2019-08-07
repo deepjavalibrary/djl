@@ -55,11 +55,11 @@ public class MxModel implements Model {
         this.manager = manager;
     }
 
-    static MxModel loadModel(String prefix, int epoch) throws IOException {
+    static MxModel loadModel(String prefix, int epoch) {
         return loadModel(MxNDManager.getSystemManager(), prefix, epoch, null);
     }
 
-    static MxModel loadModel(String prefix, int epoch, Context context) throws IOException {
+    static MxModel loadModel(String prefix, int epoch, Context context) {
         return loadModel(MxNDManager.getSystemManager(), prefix, epoch, context);
     }
 

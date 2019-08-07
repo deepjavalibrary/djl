@@ -13,6 +13,11 @@
 package org.apache.mxnet.engine;
 
 import com.sun.jna.Pointer;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.util.Utils;
 
@@ -54,7 +59,7 @@ public class Symbol extends NativeResource {
 
     public String[] getOutputs() {
         if (outputs == null) {
-            outputs = JnaUtils.listSymbolOutputs(getHandle());
+            outputs = JnaUtils.listSymbolOutputs(getInternals().getHandle());
         }
         return outputs;
     }
@@ -88,7 +93,7 @@ public class Symbol extends NativeResource {
     }
 
     public Symbol get(int index) {
-        Pointer pointer = JnaUtils.getSymbolOutput(getHandle(), index);
+        Pointer pointer = JnaUtils.getSymbolOutput(getInternals().getHandle(), index);
         return new Symbol(manager, pointer);
     }
 
@@ -101,11 +106,22 @@ public class Symbol extends NativeResource {
         return get(index);
     }
 
-    /*
     public Symbol getInternals() {
         Pointer pointer = JnaUtils.getSymbolInternals(getHandle());
         return new Symbol(manager, pointer);
     }
+
+    public List<String> getLayerNames() {
+        String[] outputNames = getOutputs();
+        String[] allNames = getAllNames();
+        Set<String> allNamesSet = new LinkedHashSet<>(Arrays.asList(allNames));
+        // Kill all params field and keep the output layer
+        return Arrays.stream(outputNames)
+                .filter(n -> !allNamesSet.contains(n))
+                .collect(Collectors.toList());
+    }
+
+    /*
 
     public String debugStr() {
         return JnaUtils.getSymbolDebugString(getHandle());

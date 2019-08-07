@@ -694,7 +694,6 @@ public final class JnaUtils {
         PointerByReference ref = new PointerByReference();
 
         checkCall(LIB.MXSymbolListOutputs(symbol, size, ref));
-
         return toStringArray(ref, size.get());
     }
 
@@ -777,6 +776,12 @@ public final class JnaUtils {
         checkCall(LIB.NNSymbolListInputNames(symbol, 0, size, ref));
 
         return toStringArray(ref, size.get());
+    }
+
+    public static Pointer getSymbolInternals(Pointer symbol) {
+        PointerByReference ref = new PointerByReference();
+        checkCall(LIB.MXSymbolGetInternals(symbol, ref));
+        return ref.getValue();
     }
 
     /* Need tests
@@ -1531,7 +1536,7 @@ public final class JnaUtils {
                 // parameter NDArray in MxModel is always loaded in CPU context,
                 // we have to copy to desired context to execution.
                 // TODO: use array.dup(ctx) instead
-                inputNDArray[i] = array.asInContext(manager.getContext(), true);
+                inputNDArray[i] = array.asInContext(manager.getContext(), false);
                 paramLoc++;
             } else {
                 inputs.add(paramName, i);

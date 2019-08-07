@@ -13,6 +13,8 @@
 
 package org.apache.mxnet.engine;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +30,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 // TODO: Need to add Memory management for all params
@@ -39,11 +42,54 @@ public class SymbolBlock implements Block {
     private Symbol symbol;
     private MxNDManager manager;
     private List<Parameter> params;
+    private boolean forTraining;
 
-    public SymbolBlock(Symbol symbol, List<Parameter> params, NDManager manager) {
+    SymbolBlock(Symbol symbol, List<Parameter> params, NDManager manager) {
         this.symbol = symbol;
         this.params = params;
         this.manager = (MxNDManager) manager;
+    }
+
+    /**
+     * return layers' name.
+     *
+     * @return an List of String contains layers' nanme
+     */
+    public List<String> getLayerNames() {
+        return symbol.getLayerNames();
+    }
+
+    /**
+     * Extract the middle layer of SymbolBlock.
+     *
+     * @param name the layer name. Can be found in {@link SymbolBlock#getLayerNames()}
+     * @return sliced SymbolBlock
+     */
+    public SymbolBlock getLayer(String name) {
+        Symbol sliced = symbol.get(name);
+        HashSet<String> set = new HashSet<>(Arrays.asList(sliced.getAllNames()));
+        List<Parameter> slicedParams =
+                params.stream()
+                        .filter(ele -> set.contains(ele.getName()))
+                        .collect(Collectors.toList());
+        return new SymbolBlock(sliced, slicedParams, manager);
+    }
+
+    public void setForTraining() {
+        forTraining = true;
+    }
+
+    public void setForInference() {
+        forTraining = false;
+    }
+
+    /**
+     * Returns the Symbolic graph from the model.
+     *
+     * @return {@link Symbol} object
+     */
+    public Symbol getSymbol() {
+        return symbol;
     }
 
     @Override
@@ -89,20 +135,14 @@ public class SymbolBlock implements Block {
         return new SymbolBlock(symbol, newParams, manager);
     }
 
-    /**
-     * Returns the Symbolic graph from the model.
-     *
-     * @return {@link Symbol} object
-     */
-    public Symbol getSymbol() {
-        return symbol;
-    }
-
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
-        // TODO: if user would like to reinitialize param and create cachedOp
-        // TODO: the existing one won't update
         if (op == null) {
+            if (forTraining) {
+                this.params.forEach(Parameter::attachGradient);
+            }
+            // TODO: If the context change (CPU -> GPU), CachedOp will create a copy
+            // This will lose the gradient tracking
             op = JnaUtils.createCachedOp(this, manager);
         }
         return op.forward(inputs);
@@ -124,6 +164,14 @@ public class SymbolBlock implements Block {
     @Override
     public List<Parameter> getDirectParameters() {
         return params;
+    }
+
+    @Override
+    public void setInitializer(NDManager manager, Initializer initializer) {
+        for (Parameter param : params) {
+            param.setInitializer(manager, initializer);
+            param.reinitialize();
+        }
     }
 
     @Override
