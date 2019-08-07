@@ -49,23 +49,29 @@ application {
 jacoco {
     toolVersion = "0.8.4"
 }
+
 jacocoTestReport {
     group = "Reporting"
-    sourceSets {
-        main {
-            java {
-                srcDirs = ['../api/src/main/java',
-                           '../repository/src/main/java',
-                           '../model-zoo/src/main/java',
-                           '../mxnet/dataset/src/main/java',
-                           '../mxnet/engine/src/main/java',
-                           'src/main/java']
-            }
-        }
-    }
+    sourceDirectories = files()
+    classDirectories = files()
+
     reports {
         xml.enabled true
         csv.enabled false
+    }
+
+    // Work-around to allow us to build list of executionData files in doFirst
+    onlyIf = {
+        true
+    }
+
+    doFirst {
+        javaProjects().findAll { p ->
+            ![":mxnet:jnarator", ":tensorflow:engine"].contains(p.getPath())
+        }.each { p ->
+            additionalSourceDirs files((Set<File>) p.sourceSets.main.allJava.srcDirs)
+            additionalClassDirs((FileCollection) p.sourceSets.main.output)
+        }
     }
 }
 
