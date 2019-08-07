@@ -15,6 +15,7 @@ package software.amazon.ai.training;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
+import software.amazon.ai.training.optimizer.Optimizer;
 
 public interface Trainer {
 

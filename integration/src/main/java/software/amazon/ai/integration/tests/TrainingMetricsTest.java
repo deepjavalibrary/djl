@@ -13,6 +13,8 @@
 
 package software.amazon.ai.integration.tests;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -27,7 +29,10 @@ public class TrainingMetricsTest {
 
     public static void main(String[] args) {
         String[] cmd = new String[] {"-c", TrainingMetricsTest.class.getName()};
-        new IntegrationTest().runTests(cmd);
+        new IntegrationTest()
+                .runTests(
+                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
+                                .toArray(String[]::new));
     }
 
     @RunAsTest

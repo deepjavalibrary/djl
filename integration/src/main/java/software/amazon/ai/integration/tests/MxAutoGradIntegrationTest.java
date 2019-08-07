@@ -13,14 +13,8 @@
 package software.amazon.ai.integration.tests;
 
 import java.io.IOException;
-import java.util.Collection;
-import org.apache.mxnet.engine.MxAutograd;
-import org.apache.mxnet.engine.MxNDArray;
-import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
-import org.apache.mxnet.engine.optimizer.MxOptimizer;
-import org.apache.mxnet.engine.optimizer.Sgd;
+import org.apache.mxnet.engine.MxGradient;
 import org.apache.mxnet.jna.JnaUtils;
-import software.amazon.ai.Parameter;
 import software.amazon.ai.SequentialBlock;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -35,11 +29,15 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Activation;
+import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.LossMetric;
+import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.training.optimizer.Sgd;
+import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
 import software.amazon.ai.util.Pair;
 
 public class MxAutoGradIntegrationTest {
@@ -54,15 +52,17 @@ public class MxAutoGradIntegrationTest {
     @RunAsTest
     public void testAutograd() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager();
-                MxAutograd autograd = new MxAutograd()) {
+                Gradient.Collector gradCol = Gradient.newCollector()) {
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
-            autograd.attachGradient(lhs);
+            gradCol.collectFor(lhs);
             // autograd automatically set recording and training during initialization
-            Assertions.assertTrue(MxAutograd.isRecording());
-            Assertions.assertTrue(MxAutograd.isTraining());
+            if (gradCol instanceof MxGradient.Collector) {
+                Assertions.assertTrue(MxGradient.isRecording());
+                Assertions.assertTrue(MxGradient.isTraining());
+            }
             NDArray result = NDArrays.mmul(lhs, rhs);
-            autograd.backward((MxNDArray) result);
+            gradCol.collect(result);
         }
     }
 
@@ -85,15 +85,11 @@ public class MxAutoGradIntegrationTest {
             Linear block = new Linear.Builder().setOutChannels(1).build();
             block.setInitializer(manager, Initializer.ONES);
 
-            MxOptimizer optimizer =
-                    new Sgd(
-                            1.0f / batchSize,
-                            0.f,
-                            -1,
-                            MxLearningRateTracker.fixedLR(0.03f),
-                            0,
-                            0.f,
-                            true);
+            Optimizer optimizer =
+                    new Sgd.Builder(block.getParameters())
+                            .setRescaleGrad(1.0f / batchSize)
+                            .setLrScheduler(LrScheduler.fixedLR(.03f))
+                            .build();
             NDArray loss;
             LossMetric lossMetric = new LossMetric("l2loss");
 
@@ -107,19 +103,14 @@ public class MxAutoGradIntegrationTest {
             for (int epoch = 0; epoch < epochs; epoch++) {
                 lossMetric.reset();
                 for (Pair<NDList, NDList> batch : dataset.getData()) {
-                    try (MxAutograd autograd = new MxAutograd()) {
+                    try (Gradient.Collector gradCol = Gradient.newCollector()) {
+                        Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);
 
                         NDArray x = batch.getKey().head();
                         NDArray y = batch.getValue().head();
                         NDArray yHat = block.forward(x);
                         loss = Loss.l2Loss(y, yHat, 1, 0);
-                        autograd.backward((MxNDArray) loss);
-                    }
-                    Collection<Parameter> params = block.getParameters().values();
-                    for (Parameter param : params) {
-                        NDArray paramArray = param.getArray();
-                        NDArray grad = paramArray.getGradient();
-                        optimizer.update(0, paramArray, grad, null);
+                        optimizer.step(gradCol.collect(loss).get(optKey));
                     }
                     lossMetric.update(loss);
                 }

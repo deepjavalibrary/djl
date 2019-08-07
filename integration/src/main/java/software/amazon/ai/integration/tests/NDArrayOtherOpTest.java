@@ -12,8 +12,8 @@
  */
 package software.amazon.ai.integration.tests;
 
-import org.apache.mxnet.engine.MxAutograd;
-import org.apache.mxnet.engine.MxNDArray;
+import java.util.Arrays;
+import java.util.stream.Stream;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -24,12 +24,16 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.training.Gradient;
 
 public class NDArrayOtherOpTest {
 
     public static void main(String[] args) {
         String[] cmd = new String[] {"-c", NDArrayOtherOpTest.class.getName()};
-        new IntegrationTest().runTests(cmd);
+        new IntegrationTest()
+                .runTests(
+                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
+                                .toArray(String[]::new));
     }
 
     @RunAsTest
@@ -321,22 +325,23 @@ public class NDArrayOtherOpTest {
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             NDArray result;
-            try (MxAutograd autograd = new MxAutograd()) {
-                autograd.attachGradient(lhs);
-                MxAutograd.setRecording(true);
+            try (Gradient.Collector gradCol = Gradient.newCollector()) {
+                Gradient.NDArrayKey lhsKey = gradCol.collectFor(lhs);
                 result = NDArrays.mmul(lhs, rhs);
-                autograd.backward((MxNDArray) result);
-            }
-            NDArray expected = manager.create(new float[] {33, 14}, new Shape(2, 1));
-            Assertions.assertEquals(
-                    expected, result, "Matrix multiplication: Incorrect value in result ndarray");
+                Gradient.Dict grads = gradCol.collect(result);
+                NDArray expected = manager.create(new float[] {33, 14}, new Shape(2, 1));
+                Assertions.assertEquals(
+                        expected,
+                        result,
+                        "Matrix multiplication: Incorrect value in result ndarray");
 
-            NDArray expectedGradient =
-                    manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
-            Assertions.assertEquals(
-                    expectedGradient,
-                    lhs.getGradient(),
-                    "Matrix multiplication: Incorrect gradient after backward");
+                NDArray expectedGradient =
+                        manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
+                Assertions.assertEquals(
+                        expectedGradient,
+                        grads.get(lhsKey).get(),
+                        "Matrix multiplication: Incorrect gradient after backward");
+            }
         }
     }
 }

@@ -30,7 +30,6 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
-import software.amazon.ai.training.GradReq;
 
 /**
  * An interface representing an n-dimensional array.
@@ -148,51 +147,6 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalStateException Thrown if the NDArray is not a 2D matrix
      */
     Matrix asMatrix();
-
-    /** Computes the gradients of the NDArray w.r.t variables. */
-    void backward();
-
-    /**
-     * Computes the gradients of the NDArray w.r.t variables.
-     *
-     * @param retainGraph Whether to retain the computation graph for another backward pass on the
-     *     same graph. By default the computation history is cleared.
-     * @param isTraining Whether to compute gradient for training or inference.
-     */
-    void backward(boolean retainGraph, boolean isTraining);
-
-    /**
-     * Computes the gradients of the NDArray w.r.t variables.
-     *
-     * @param outGrad Gradient with respect to head
-     * @param retainGraph Whether to retain the computation graph for another backward pass on the
-     *     same graph. By default the computation history is cleared.
-     * @param isTraining Whether to compute gradient for training or inference.
-     */
-    void backward(NDArray outGrad, boolean retainGraph, boolean isTraining);
-
-    /**
-     * Attaches a gradient buffer to this NDArray, so that `backward` can compute the gradient with
-     * respect to it.
-     */
-    void attachGradient();
-
-    /**
-     * Attaches a gradient buffer to this NDArray, so that `backward` can compute the gradient with
-     * respect to it.
-     *
-     * @param gradReq {@link GradReq} How gradient will be accumulated.
-     * @param sparseFormat {@link SparseFormat} The storage type of the gradient array. Defaults to
-     *     the same type of this {@code NDArray}.
-     */
-    void attachGradient(GradReq gradReq, SparseFormat sparseFormat);
-
-    /**
-     * Returns the gradient buffer attached to this {@code NDArray}.
-     *
-     * @return the gradient buffer attached to this {@code NDArray}.
-     */
-    NDArray getGradient();
 
     /**
      * Returns the encoding format of the NDArray, or null.

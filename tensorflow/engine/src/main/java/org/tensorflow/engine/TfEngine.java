@@ -23,6 +23,7 @@ import software.amazon.ai.engine.Engine;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
+import software.amazon.ai.training.Gradient.Collector;
 import software.amazon.ai.training.Trainer;
 
 public class TfEngine extends Engine {
@@ -70,6 +71,11 @@ public class TfEngine extends Engine {
     @Override
     public <I, O> Predictor<I, O> newPredictor(
             Model model, Translator<I, O> translator, Context context) {
+        return null;
+    }
+
+    @Override
+    public Collector newGradientCollector() {
         return null;
     }
 

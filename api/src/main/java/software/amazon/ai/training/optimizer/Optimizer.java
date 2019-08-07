@@ -10,16 +10,19 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.engine.lrscheduler;
+package software.amazon.ai.training.optimizer;
 
-class FixedLr extends MxLearningRateTracker {
+import software.amazon.ai.Parameter;
+import software.amazon.ai.training.Gradient.OptimizerGrad;
+import software.amazon.ai.util.PairList;
 
-    public FixedLr(float baseLr) {
-        super(baseLr, 0, baseLr, WarmupMode.CONSTANT);
-    }
+/**
+ * An optimizer updates a set of parameters based on gradients collected with a {@link
+ * software.amazon.ai.training.Gradient.Collector}.
+ */
+public interface Optimizer {
 
-    @Override
-    public float getNewLearningRate(int numUpdate) {
-        return baseLr;
-    }
+    PairList<String, Parameter> getParameters();
+
+    void step(OptimizerGrad grads);
 }

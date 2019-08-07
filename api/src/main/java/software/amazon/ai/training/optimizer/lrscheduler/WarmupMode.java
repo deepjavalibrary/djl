@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.engine.lrscheduler;
+package software.amazon.ai.training.optimizer.lrscheduler;
 
 public enum WarmupMode {
     LINEAR,

@@ -25,6 +25,7 @@ import software.amazon.ai.engine.Engine;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
+import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Trainer;
 
 public class MockEngine extends Engine {
@@ -73,6 +74,11 @@ public class MockEngine extends Engine {
     public <I, O> Predictor<I, O> newPredictor(
             Model model, Translator<I, O> translator, Context context) {
         return new MockPredictor<>(model, translator, context);
+    }
+
+    @Override
+    public Gradient.Collector newGradientCollector() {
+        return null;
     }
 
     @Override

@@ -348,7 +348,7 @@ class MxNDArrayEx implements NDArrayEx {
     // Optimizers
     ////////////////////////////////////////
 
-    // Sgd update function for non-multi-precision
+    // MxSgd update function for non-multi-precision
     @Override
     public void sgdUpdate(
             NDArray grad,

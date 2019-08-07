@@ -31,6 +31,7 @@ import software.amazon.ai.engine.Engine;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
+import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Trainer;
 
 public class MxEngine extends Engine {
@@ -162,6 +163,12 @@ public class MxEngine extends Engine {
     public <I, O> Predictor<I, O> newPredictor(
             Model model, Translator<I, O> translator, Context context) {
         return new MxPredictor<>((MxModel) model, translator, context);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Gradient.Collector newGradientCollector() {
+        return new MxGradient.Collector();
     }
 
     /** {@inheritDoc} */

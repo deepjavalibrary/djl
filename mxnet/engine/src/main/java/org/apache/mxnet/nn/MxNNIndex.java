@@ -13,6 +13,7 @@
 package org.apache.mxnet.nn;
 
 import java.util.Collection;
+import org.apache.mxnet.engine.optimizer.MxSgd;
 import org.apache.mxnet.nn.convolutional.MxConv1D;
 import org.apache.mxnet.nn.convolutional.MxConv2D;
 import org.apache.mxnet.nn.convolutional.MxConv3D;
@@ -24,6 +25,7 @@ import org.apache.mxnet.nn.norm.MxDropout;
 import org.apache.mxnet.nn.recurrent.MxGRU;
 import org.apache.mxnet.nn.recurrent.MxLSTM;
 import org.apache.mxnet.nn.recurrent.MxRNN;
+import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.NNIndex;
@@ -38,8 +40,15 @@ import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.nn.recurrent.RNN;
+import software.amazon.ai.training.optimizer.Sgd;
+import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
+import software.amazon.ai.util.PairList;
 
 public class MxNNIndex extends NNIndex {
+
+    ////////////////////////////////////////
+    // Blocks
+    ////////////////////////////////////////
 
     /** {@inheritDoc} */
     @Override
@@ -171,5 +180,31 @@ public class MxNNIndex extends NNIndex {
                 useSequenceLength,
                 useBidirectional,
                 stateOutputs);
+    }
+
+    ////////////////////////////////////////
+    // Optimizers
+    ////////////////////////////////////////
+
+    /** {@inheritDoc} */
+    @Override
+    public Sgd sgd(
+            PairList<String, Parameter> parameters,
+            float rescaleGrad,
+            float weightDecays,
+            float clipGrad,
+            LrScheduler lrScheduler,
+            int beginNumUpdate,
+            float momentum,
+            boolean lazyUpdate) {
+        return new MxSgd(
+                parameters,
+                rescaleGrad,
+                weightDecays,
+                clipGrad,
+                lrScheduler,
+                beginNumUpdate,
+                momentum,
+                lazyUpdate);
     }
 }

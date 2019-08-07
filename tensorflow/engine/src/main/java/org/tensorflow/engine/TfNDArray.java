@@ -32,7 +32,6 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
-import software.amazon.ai.training.GradReq;
 
 public class TfNDArray implements NDArray {
 
@@ -141,32 +140,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public Matrix asMatrix() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward() {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward(boolean retainGraph, boolean isTraining) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient() {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getGradient() {
         return null;
     }
 

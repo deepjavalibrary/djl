@@ -15,6 +15,8 @@ package software.amazon.ai.integration.tests;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.stream.Stream;
 import org.apache.mxnet.engine.SymbolBlock;
 import software.amazon.ai.Block;
 import software.amazon.ai.Model;
@@ -36,7 +38,10 @@ import software.amazon.ai.training.initializer.NormalInitializer;
 public class SymbolBlockTest {
     public static void main(String[] args) {
         String[] cmd = new String[] {"-c", SymbolBlockTest.class.getName()};
-        new IntegrationTest().runTests(cmd);
+        new IntegrationTest()
+                .runTests(
+                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
+                                .toArray(String[]::new));
     }
 
     @RunAsTest
@@ -71,8 +76,7 @@ public class SymbolBlockTest {
             Path modelPathPrefix = Paths.get(MnistUtils.prepareModel() + "/mnist");
             Model mnistmlp = Model.loadModel(modelPathPrefix);
             Block mlp = mnistmlp.getBlock();
-            ((SymbolBlock) mlp).setForTraining();
-            MnistUtils.trainMnist(mlp, manager, 1, 0.1f, 0.9f);
+            MnistUtils.trainMnist(mlp, manager, 2, 0.1f, 0.9f);
             mnistmlp.close();
         }
     }

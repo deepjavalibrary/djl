@@ -10,12 +10,12 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.engine.lrscheduler;
+package software.amazon.ai.training.optimizer.lrscheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FactorTracker extends MxLearningRateTracker {
+public class FactorTracker extends LrScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(FactorTracker.class);
 

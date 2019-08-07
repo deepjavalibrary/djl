@@ -28,6 +28,7 @@ import software.amazon.ai.Translator;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
+import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Trainer;
 
 /**
@@ -155,6 +156,13 @@ public abstract class Engine {
      */
     public abstract <I, O> Predictor<I, O> newPredictor(
             Model model, Translator<I, O> translator, Context context);
+
+    /**
+     * Creates a new {@link Gradient.Collector} instance for this Engine.
+     *
+     * @return Returns the Gradient Collector
+     */
+    public abstract Gradient.Collector newGradientCollector();
 
     /**
      * An internal helper to get the Engine specific implementations for the blocks in {@link

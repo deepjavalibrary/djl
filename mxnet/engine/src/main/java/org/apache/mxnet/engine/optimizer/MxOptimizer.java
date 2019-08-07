@@ -12,25 +12,31 @@
  */
 package org.apache.mxnet.engine.optimizer;
 
-import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
+import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.training.Optimizer;
+import software.amazon.ai.training.Gradient.OptimizerGrad;
+import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
+import software.amazon.ai.util.PairList;
 
+/** MXNet helper containing base implementations for optimizers. */
 public abstract class MxOptimizer implements Optimizer {
 
+    PairList<String, Parameter> parameters;
     float rescaleGrad;
     float clipGrad;
     float weightDecays;
-    private MxLearningRateTracker lrscheduler;
+    private LrScheduler lrscheduler;
     private int numUpdate;
 
     public MxOptimizer(
+            PairList<String, Parameter> parameters,
             float rescaleGrad,
             float weightDecays,
             float clipGrad,
-            MxLearningRateTracker lrScheduler,
+            LrScheduler lrScheduler,
             int beginNumUpdate) {
+        this.parameters = parameters;
         this.rescaleGrad = rescaleGrad;
         this.lrscheduler = lrScheduler;
         this.weightDecays = weightDecays;
@@ -38,11 +44,24 @@ public abstract class MxOptimizer implements Optimizer {
         this.numUpdate = beginNumUpdate;
     }
 
+    @Override
+    public void step(OptimizerGrad grads) {
+        PairList<String, NDArray> paramGrads = grads.get();
+        for (int i = 0; i < parameters.size(); i++) {
+            NDArray paramArray = parameters.get(i).getValue().getArray();
+            NDArray grad = paramGrads.get(i).getValue();
+            update(i, paramArray, grad);
+        }
+    }
+
     public float getLearningRate() {
         return lrscheduler.getNewLearningRate(numUpdate);
     }
 
-    public abstract NDList createState(int index, NDArray weight);
+    @Override
+    public PairList<String, Parameter> getParameters() {
+        return parameters;
+    }
 
-    public abstract void update(int index, NDArray weight, NDArray grad, NDList state);
+    public abstract void update(int index, NDArray weight, NDArray grad);
 }

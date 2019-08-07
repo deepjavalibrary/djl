@@ -169,20 +169,30 @@ public class MxNDArray extends NativeResource implements NDArray {
         return new MxMatrix(this);
     }
 
-    /** {@inheritDoc} */
-    @Override
+    /** Computes the gradients of the NDArray w.r.t variables. */
     public void backward() {
         backward(null, false, true);
     }
 
-    /** {@inheritDoc} */
-    @Override
+    /**
+     * Computes the gradients of the NDArray w.r.t variables.
+     *
+     * @param retainGraph Whether to retain the computation graph for another backward pass on the
+     *     same graph. By default the computation history is cleared.
+     * @param isTraining Whether to compute gradient for training or inference.
+     */
     public void backward(boolean retainGraph, boolean isTraining) {
         backward(null, retainGraph, isTraining);
     }
 
-    /** {@inheritDoc} */
-    @Override
+    /**
+     * Computes the gradients of the NDArray w.r.t variables.
+     *
+     * @param outGrad Gradient with respect to head
+     * @param retainGraph Whether to retain the computation graph for another backward pass on the
+     *     same graph. By default the computation history is cleared.
+     * @param isTraining Whether to compute gradient for training or inference.
+     */
     public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {
         Pointer outGradHandle;
         if (outGrad != null) {
@@ -205,15 +215,11 @@ public class MxNDArray extends NativeResource implements NDArray {
                 null);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient() {
+    void attachGradient() {
         attachGradient(GradReq.WRITE, null);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {
+    void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {
         // Does zerosLike support sparse?
         MxNDArray grad;
         if (sparseFormat == null || sparseFormat == SparseFormat.UNDEFINED) {
@@ -227,9 +233,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getGradient() {
+    NDArray getGradient() {
         Pointer pointer = JnaUtils.getGradient(getHandle());
         return manager.create(pointer);
     }

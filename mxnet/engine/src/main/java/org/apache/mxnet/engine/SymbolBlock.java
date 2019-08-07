@@ -42,7 +42,6 @@ public class SymbolBlock implements Block {
     private Symbol symbol;
     private MxNDManager manager;
     private List<Parameter> params;
-    private boolean forTraining;
 
     SymbolBlock(Symbol symbol, List<Parameter> params, NDManager manager) {
         this.symbol = symbol;
@@ -73,14 +72,6 @@ public class SymbolBlock implements Block {
                         .filter(ele -> set.contains(ele.getName()))
                         .collect(Collectors.toList());
         return new SymbolBlock(sliced, slicedParams, manager);
-    }
-
-    public void setForTraining() {
-        forTraining = true;
-    }
-
-    public void setForInference() {
-        forTraining = false;
     }
 
     /**
@@ -138,9 +129,6 @@ public class SymbolBlock implements Block {
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
         if (op == null) {
-            if (forTraining) {
-                this.params.forEach(Parameter::attachGradient);
-            }
             // TODO: If the context change (CPU -> GPU), CachedOp will create a copy
             // This will lose the gradient tracking
             op = JnaUtils.createCachedOp(this, manager);

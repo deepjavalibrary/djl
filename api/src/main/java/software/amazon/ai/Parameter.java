@@ -16,6 +16,7 @@ import java.util.Objects;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.initializer.Initializer;
 
 public class Parameter implements AutoCloseable {
@@ -25,7 +26,7 @@ public class Parameter implements AutoCloseable {
     private NDManager manager;
     private Initializer initializer;
     private NDArray array;
-    private boolean gradientAttached;
+    private Gradient.Collector gradCol;
 
     public Parameter(String name, Block block, ParameterType type) {
         this.name = name;
@@ -36,16 +37,6 @@ public class Parameter implements AutoCloseable {
     public Parameter(String name, NDArray array) {
         this.name = name;
         this.array = array;
-    }
-
-    public void attachGradient() {
-        if (!isInitialized()) {
-            throw new IllegalStateException("This parameter is not initialized");
-        }
-        if (!gradientAttached) {
-            array.attachGradient();
-            gradientAttached = true;
-        }
     }
 
     public String getName() {
@@ -78,7 +69,9 @@ public class Parameter implements AutoCloseable {
         }
         Objects.requireNonNull(initializer, "No initializer has been set");
         array = initializer.initialize(manager, array.getShape(), array.getDataType());
-        attachGradient();
+        if (gradCol != null) {
+            gradCol.collectFor(array);
+        }
     }
 
     public void initialize(NDList inputs) {
@@ -92,7 +85,20 @@ public class Parameter implements AutoCloseable {
                         manager,
                         block.getParameterShape(name, inputs),
                         inputs.head().getDataType());
-        attachGradient();
+        if (gradCol != null) {
+            gradCol.collectFor(array);
+        }
+    }
+
+    public void startGradientCollection(Gradient.Collector gradCol) {
+        if (this.gradCol == null && array != null) {
+            gradCol.collectFor(array);
+        }
+        this.gradCol = gradCol;
+    }
+
+    public void stopGradientCollection() {
+        gradCol = null;
     }
 
     @Override

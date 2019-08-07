@@ -10,9 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.engine.lrscheduler;
+package software.amazon.ai.training.optimizer.lrscheduler;
 
-public abstract class MxLearningRateTracker {
+public abstract class LrScheduler {
 
     // TODO: Add abstraction on Joule level
     float baseLr;
@@ -32,8 +32,7 @@ public abstract class MxLearningRateTracker {
      *     each step in equal increments 'constant' mode keeps lr at warmup_begin_lr for
      *     warmup_steps
      */
-    MxLearningRateTracker(
-            float baseLR, int warmupSteps, float warmupBeginLr, WarmupMode warmupMode) {
+    LrScheduler(float baseLR, int warmupSteps, float warmupBeginLr, WarmupMode warmupMode) {
         this.baseLr = baseLR;
         this.warmupSteps = warmupSteps;
         this.warmupBeginLr = warmupBeginLr;
@@ -50,7 +49,7 @@ public abstract class MxLearningRateTracker {
 
     public abstract float getNewLearningRate(int numUpdate);
 
-    public static final MxLearningRateTracker fixedLR(float lr) {
+    public static final LrScheduler fixedLR(float lr) {
         return new FixedLr(lr);
     }
 }

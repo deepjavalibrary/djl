@@ -31,7 +31,6 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
-import software.amazon.ai.training.GradReq;
 
 public class MockNDArray implements NDArray {
 
@@ -104,26 +103,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public Matrix asMatrix() {
-        return null;
-    }
-
-    @Override
-    public void backward() {}
-
-    @Override
-    public void backward(boolean retainGraph, boolean isTraining) {}
-
-    @Override
-    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {}
-
-    @Override
-    public void attachGradient() {}
-
-    @Override
-    public void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {}
-
-    @Override
-    public NDArray getGradient() {
         return null;
     }
 

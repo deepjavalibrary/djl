@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 public class IntegrationTests {
 
     @Test
-    public void runIntegrionTests() {
+    public void runIntegrationTests() {
         String[] args = new String[] {};
         Assert.assertTrue(new IntegrationTest().runTests(args));
     }

@@ -12,8 +12,8 @@
  */
 package software.amazon.ai.integration.tests;
 
-import org.apache.mxnet.engine.MxAutograd;
-import org.apache.mxnet.engine.MxNDArray;
+import java.util.Arrays;
+import java.util.stream.Stream;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -22,12 +22,16 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.training.Gradient;
 
 public class NDArrayElementArithmeticOpTest {
 
     public static void main(String[] args) {
         String[] cmd = new String[] {"-c", NDArrayElementArithmeticOpTest.class.getName()};
-        new IntegrationTest().runTests(cmd);
+        new IntegrationTest()
+                .runTests(
+                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
+                                .toArray(String[]::new));
     }
 
     @RunAsTest
@@ -35,27 +39,27 @@ public class NDArrayElementArithmeticOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray lhs = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
             NDArray result;
-            try (MxAutograd autograd = new MxAutograd()) {
-                autograd.attachGradient(lhs);
-                MxAutograd.setRecording(true);
+            try (Gradient.Collector gradCol = Gradient.newCollector()) {
+                Gradient.NDArrayKey lhsKey = gradCol.collectFor(lhs);
                 result = NDArrays.add(lhs, 2);
-                autograd.backward((MxNDArray) result);
+                Gradient.Dict grads = gradCol.collect(result);
+                // check add scalar result
+
+                Assertions.assertFalse(
+                        NDArrays.equals(lhs, result),
+                        "None in-place operator returned in-place result");
+                NDArray expected = manager.create(new float[] {3f, 4f, 5f, 6f}, new Shape(1, 4));
+                Assertions.assertEquals(
+                        expected, result, "AddScala: Incorrect value in summed array");
+
+                // check add backward
+                NDArray expectedGradient =
+                        manager.create(new float[] {1f, 1f, 1f, 1f}, new Shape(1, 4));
+                Assertions.assertEquals(
+                        expectedGradient,
+                        grads.get(lhsKey).get(),
+                        "AddScala backward: Incorrect gradient after backward");
             }
-            // check add scalar result
-
-            Assertions.assertFalse(
-                    NDArrays.equals(lhs, result),
-                    "None in-place operator returned in-place result");
-            NDArray expected = manager.create(new float[] {3f, 4f, 5f, 6f}, new Shape(1, 4));
-            Assertions.assertEquals(expected, result, "AddScala: Incorrect value in summed array");
-
-            // check add backward
-            NDArray expectedGradient =
-                    manager.create(new float[] {1f, 1f, 1f, 1f}, new Shape(1, 4));
-            Assertions.assertEquals(
-                    expectedGradient,
-                    lhs.getGradient(),
-                    "AddScala backward: Incorrect gradient after backward");
         }
     }
 

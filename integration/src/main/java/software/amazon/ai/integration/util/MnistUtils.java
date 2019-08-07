@@ -17,24 +17,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import org.apache.mxnet.dataset.Mnist;
-import org.apache.mxnet.engine.MxAutograd;
-import org.apache.mxnet.engine.MxNDArray;
-import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
-import org.apache.mxnet.engine.optimizer.MxOptimizer;
-import org.apache.mxnet.engine.optimizer.Sgd;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Block;
-import software.amazon.ai.Parameter;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
+import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.training.optimizer.Sgd;
+import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
 import software.amazon.ai.util.Pair;
 
 public final class MnistUtils {
@@ -49,16 +46,12 @@ public final class MnistUtils {
 
         int batchSize = 100;
 
-        MxOptimizer optimizer =
-                new Sgd(
-                        1.0f / batchSize,
-                        0.f,
-                        -1f,
-                        MxLearningRateTracker.fixedLR(0.1f),
-                        0,
-                        0.9f,
-                        true);
-
+        Optimizer optimizer =
+                new Sgd.Builder(mlp.getParameters())
+                        .setRescaleGrad(1.0f / batchSize)
+                        .setLrScheduler(LrScheduler.fixedLR(0.1f))
+                        .setMomentum(0.9f)
+                        .build();
         Accuracy acc = new Accuracy();
         LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
@@ -77,17 +70,11 @@ public final class MnistUtils {
                 NDArray data = batch.getKey().head().reshape(batchSize, 28 * 28).div(255f);
                 NDArray label = batch.getValue().head();
                 NDArray pred;
-                try (MxAutograd autograd = new MxAutograd()) {
+                try (Gradient.Collector gradCol = Gradient.newCollector()) {
+                    Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);
                     pred = mlp.forward(new NDList(data)).head();
                     loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
-                    autograd.backward((MxNDArray) loss);
-                }
-                Collection<Parameter> params = mlp.getParameters().values();
-                for (Parameter param : params) {
-                    NDArray weight = param.getArray();
-                    NDArray state = optimizer.createState(0, weight).head();
-                    NDArray grad = weight.getGradient();
-                    optimizer.update(0, weight, grad, new NDList(state));
+                    optimizer.step(gradCol.collect(loss).get(optKey));
                 }
                 acc.update(label, pred);
                 lossMetric.update(loss);

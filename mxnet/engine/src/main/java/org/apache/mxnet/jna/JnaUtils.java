@@ -524,7 +524,7 @@ public final class JnaUtils {
     }
 
     /////////////////////////////////
-    // MxAutograd
+    // MxGradientCollector
     /////////////////////////////////
     public static boolean autogradSetIsRecording(boolean isRecording) {
         IntBuffer prev = IntBuffer.allocate(1);

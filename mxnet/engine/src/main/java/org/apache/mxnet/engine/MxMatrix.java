@@ -26,7 +26,6 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
-import software.amazon.ai.training.GradReq;
 
 public class MxMatrix implements Matrix {
 
@@ -333,42 +332,6 @@ public class MxMatrix implements Matrix {
     @Override
     public Matrix asMatrix() {
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward() {
-        array.backward();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward(boolean retainGraph, boolean isTraining) {
-        array.backward(retainGraph, isTraining);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {
-        array.backward(outGrad, retainGraph, isTraining);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient() {
-        array.attachGradient();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {
-        array.attachGradient(gradReq, sparseFormat);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray getGradient() {
-        return array.getGradient();
     }
 
     /** {@inheritDoc} */

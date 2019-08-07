@@ -12,45 +12,48 @@
  */
 package org.apache.mxnet.engine.optimizer;
 
-import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
+import java.util.ArrayList;
+import java.util.List;
+import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.training.optimizer.Sgd;
+import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
+import software.amazon.ai.util.PairList;
 
-public class Sgd extends MxOptimizer {
+public class MxSgd extends MxOptimizer implements Sgd {
 
     private float momentum;
     private boolean lazyUpdate;
+    private List<NDArray> momentumStates;
 
-    public Sgd(
+    public MxSgd(
+            PairList<String, Parameter> parameters,
             float rescaleGrad,
             float weightDecays,
             float clipGrad,
-            MxLearningRateTracker lrScheduler,
+            LrScheduler lrScheduler,
             int beginNumUpdate,
             float momentum,
             boolean lazyUpdate) {
-        super(rescaleGrad, weightDecays, clipGrad, lrScheduler, beginNumUpdate);
+        super(parameters, rescaleGrad, weightDecays, clipGrad, lrScheduler, beginNumUpdate);
         this.momentum = momentum;
         this.lazyUpdate = lazyUpdate;
     }
 
     @Override
-    public NDList createState(int index, NDArray weight) {
-        // TODO: Support Mixed precision and Sparse
-        if (momentum != 0.0) {
-            return new NDList(weight.zerosLike());
-        }
-        return null;
-    }
-
-    @Override
-    public void update(int index, NDArray weight, NDArray grad, NDList state) {
+    public void update(int index, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
-        if (state != null) {
+        if (momentum != 0) {
+            if (momentumStates == null) {
+                momentumStates = new ArrayList<>(parameters.size());
+                for (Parameter param : parameters.values()) {
+                    momentumStates.add(param.getArray().zerosLike());
+                }
+            }
             weight.getNDArrayInternal()
                     .sgdMomUpdate(
                             grad,
-                            state.head(),
+                            momentumStates.get(index),
                             getLearningRate(),
                             weightDecays,
                             momentum,
