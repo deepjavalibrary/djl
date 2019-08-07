@@ -12,8 +12,6 @@
  */
 package software.amazon.ai;
 
-import software.amazon.ai.ndarray.NDList;
-
 /**
  * The {@code Translator} interface provides model pre-processing and postprocessing functionality.
  *
@@ -70,27 +68,4 @@ import software.amazon.ai.ndarray.NDList;
  * @param <I> input type
  * @param <O> output type
  */
-public interface Translator<I, O> {
-
-    /**
-     * Processes the input and converts it to NDList.
-     *
-     * @param ctx Toolkit that would help to creating input NDArray
-     * @param input Input Object
-     * @return {@link NDList}
-     * @throws Exception if an error occurs during processing input
-     */
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    NDList processInput(TranslatorContext ctx, I input) throws Exception;
-
-    /**
-     * Processes the output NDList to the corresponding Output Object.
-     *
-     * @param ctx Toolkit used to do postprocessing
-     * @param list Output NDList after inference
-     * @return output object
-     * @throws Exception if an error occurs during processing output
-     */
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    O processOutput(TranslatorContext ctx, NDList list) throws Exception;
-}
+public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {}
