@@ -37,7 +37,13 @@ public class MxEngine extends Engine {
 
     public static final NNIndex NN_INDEX = new MxNNIndex();
 
-    MxEngine() {}
+    MxEngine() {
+        // Workaround MXNet engine lazy initialization issue
+        JnaUtils.getAllOpNames();
+
+        // TODO: Enable numpy mode when numpy bug is fixed.
+        // JnaUtils.setNumpyMode(true);
+    }
 
     /** {@inheritDoc} */
     @Override

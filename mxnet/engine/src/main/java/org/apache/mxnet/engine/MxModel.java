@@ -64,10 +64,7 @@ public class MxModel implements Model {
     }
 
     @SuppressWarnings("unused")
-    static MxModel loadModel(MxNDManager manager, String prefix, int epoch, Context context)
-            throws IOException {
-        // TODO: Find a better solution to get rid of this line
-        JnaUtils.getAllOpNames();
+    static MxModel loadModel(MxNDManager manager, String prefix, int epoch, Context context) {
         MxNDManager subManager = manager.newSubManager();
         Symbol symbol = Symbol.load(subManager, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
