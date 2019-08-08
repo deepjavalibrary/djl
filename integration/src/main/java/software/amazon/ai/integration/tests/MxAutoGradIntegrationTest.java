@@ -13,6 +13,8 @@
 package software.amazon.ai.integration.tests;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxGradient;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Batch;
@@ -44,7 +46,10 @@ public class MxAutoGradIntegrationTest {
     public static void main(String[] args) {
         String[] cmd = new String[] {"-c", MxAutoGradIntegrationTest.class.getName()};
         JnaUtils.setNumpyMode(true);
-        new IntegrationTest().runTests(cmd);
+        new IntegrationTest()
+                .runTests(
+                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
+                                .toArray(String[]::new));
         JnaUtils.setNumpyMode(false);
     }
 

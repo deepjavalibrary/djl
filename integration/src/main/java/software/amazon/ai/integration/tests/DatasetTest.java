@@ -13,9 +13,11 @@
 package software.amazon.ai.integration.tests;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Batch;
 import software.amazon.ai.integration.IntegrationTest;
@@ -35,7 +37,10 @@ public class DatasetTest {
         // TODO remove this once NumpyMode is defualt
         JnaUtils.setNumpyMode(true);
         String[] cmd = new String[] {"-c", DatasetTest.class.getName()};
-        new IntegrationTest().runTests(cmd);
+        new IntegrationTest()
+                .runTests(
+                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
+                                .toArray(String[]::new));
         JnaUtils.setNumpyMode(true);
     }
 

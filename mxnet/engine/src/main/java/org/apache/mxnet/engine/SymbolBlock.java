@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
@@ -155,11 +156,26 @@ public class SymbolBlock implements Block {
     }
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer) {
+    public Block setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
         for (Parameter param : params) {
-            param.setInitializer(manager, initializer);
+            param.setInitializer(manager, initializer, overwrite);
             param.reinitialize();
         }
+        return this;
+    }
+
+    @Override
+    public Block setInitializer(NDManager manager, Initializer initializer, String paramName) {
+        Optional<Parameter> parameter =
+                params.stream().filter(pair -> pair.getName().equals(paramName)).findFirst();
+        if (parameter.isPresent()) {
+            Parameter param = parameter.get();
+            param.setInitializer(manager, initializer);
+            param.reinitialize();
+        } else {
+            throw new IllegalArgumentException("Could not find parameter " + paramName);
+        }
+        return this;
     }
 
     @Override

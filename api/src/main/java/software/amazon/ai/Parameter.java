@@ -28,6 +28,13 @@ public class Parameter implements AutoCloseable {
     private NDArray array;
     private Gradient.Collector gradCol;
 
+    public Parameter(String name, Block block, ParameterType type, Initializer initializer) {
+        this.name = name;
+        this.block = block;
+        this.type = type;
+        this.initializer = initializer;
+    }
+
     public Parameter(String name, Block block, ParameterType type) {
         this.name = name;
         this.block = block;
@@ -58,9 +65,17 @@ public class Parameter implements AutoCloseable {
         return array != null;
     }
 
-    public void setInitializer(NDManager manager, Initializer initializer) {
+    public Parameter setInitializer(NDManager manager, Initializer initializer) {
+        setInitializer(manager, initializer, false);
+        return this;
+    }
+
+    public Parameter setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
         this.manager = manager;
-        this.initializer = initializer;
+        if (overwrite || this.initializer == null) {
+            this.initializer = initializer;
+        }
+        return this;
     }
 
     public void reinitialize() {
@@ -75,11 +90,17 @@ public class Parameter implements AutoCloseable {
     }
 
     public void initialize(NDList inputs) {
-        if (isInitialized()) {
+        initialize(inputs, false);
+    }
+
+    public void initialize(NDList inputs, boolean overwrite) {
+        if (!overwrite && isInitialized()) {
             throw new IllegalStateException("This parameter is already initialized");
         }
 
         Objects.requireNonNull(initializer, "No initializer has been set");
+        Objects.requireNonNull(manager, "No initializer has been set");
+
         array =
                 initializer.initialize(
                         manager,

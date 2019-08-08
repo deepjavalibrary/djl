@@ -13,6 +13,7 @@
 package software.amazon.ai;
 
 import java.util.List;
+import java.util.Optional;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -38,13 +39,37 @@ public interface Block {
 
     List<Parameter> getDirectParameters();
 
-    default void setInitializer(NDManager manager, Initializer initializer) {
+    default Block setInitializer(NDManager manager, Initializer initializer) {
+        return setInitializer(manager, initializer, false);
+    }
+
+    default Block setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
         for (Parameter parameter : getDirectParameters()) {
-            parameter.setInitializer(manager, initializer);
+            parameter.setInitializer(manager, initializer, overwrite);
         }
         for (Block child : getChildren().values()) {
-            child.setInitializer(manager, initializer);
+            child.setInitializer(manager, initializer, overwrite);
         }
+        return this;
+    }
+
+    default Block setInitializer(NDManager manager, Initializer initializer, String paramName) {
+        return setInitializer(manager, initializer, paramName, false);
+    }
+
+    default Block setInitializer(
+            NDManager manager, Initializer initializer, String paramName, boolean overwrite) {
+        Optional<Parameter> parameter =
+                getDirectParameters()
+                        .stream()
+                        .filter(pair -> pair.getName().equals(paramName))
+                        .findFirst();
+        if (parameter.isPresent()) {
+            parameter.get().setInitializer(manager, initializer, overwrite);
+        } else {
+            throw new IllegalArgumentException("Could not find parameter " + paramName);
+        }
+        return this;
     }
 
     default void ensureInitialized(NDList inputs) {

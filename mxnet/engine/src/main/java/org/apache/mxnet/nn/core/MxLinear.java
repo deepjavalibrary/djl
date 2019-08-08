@@ -23,6 +23,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -38,7 +39,7 @@ public class MxLinear extends MxNNBlock implements Linear {
         this.outChannels = outChannels;
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (bias) {
-            this.bias = new Parameter("bias", this, ParameterType.BIAS);
+            this.bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);
         }
     }
 

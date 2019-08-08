@@ -52,7 +52,7 @@ public class BlockCoreTest {
             long outSize = 3;
 
             Linear linearWithBias = new Linear.Builder().setOutChannels(outSize).build();
-            linearWithBias.setInitializer(manager, Initializer.ONES);
+            linearWithBias.setInitializer(manager, Initializer.ONES, true);
             NDArray outBias = linearWithBias.forward(input);
             NDArray expectedBias =
                     input.mmul(manager.ones(new Shape(outSize, 2)).transpose())
@@ -61,7 +61,7 @@ public class BlockCoreTest {
 
             Linear linearWithoutBias =
                     new Linear.Builder().setOutChannels(outSize).setBias(false).build();
-            linearWithoutBias.setInitializer(manager, Initializer.ONES);
+            linearWithoutBias.setInitializer(manager, Initializer.ONES, true);
             NDArray outNoBias = linearWithoutBias.forward(input);
             NDArray expectedNoBias = input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
             Assertions.assertEquals(expectedNoBias, outNoBias);
@@ -80,7 +80,7 @@ public class BlockCoreTest {
             long outSize = 3;
 
             Linear linearWithBias = new Linear.Builder().setOutChannels(outSize).build();
-            linearWithBias.setInitializer(manager, Initializer.ONES);
+            linearWithBias.setInitializer(manager, Initializer.ONES, true);
             NDArray outBias = linearWithBias.forward(input);
             NDArray expectedBias =
                     input.mmul(manager.ones(new Shape(outSize, 2)).transpose())
@@ -89,7 +89,7 @@ public class BlockCoreTest {
 
             Linear linearWithoutBias =
                     new Linear.Builder().setOutChannels(outSize).setBias(false).build();
-            linearWithoutBias.setInitializer(manager, Initializer.ONES);
+            linearWithoutBias.setInitializer(manager, Initializer.ONES, true);
             NDArray outNoBias = linearWithoutBias.forward(input);
             NDArray expectedNoBias = input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
             Assertions.assertEquals(expectedNoBias, outNoBias);
@@ -148,7 +148,7 @@ public class BlockCoreTest {
                             .setNumFilters(1)
                             .setBias(false)
                             .build();
-            bn.setInitializer(manager, Initializer.ONES);
+            bn.setInitializer(manager, Initializer.ONES, true);
             NDArray out = bn.forward(input);
             Assertions.assertEquals(expected, out);
             Assertions.assertTrue(out.getShape().equals(bn.getOutputShape(new Shape(1, 4, 4))));
@@ -167,7 +167,7 @@ public class BlockCoreTest {
                             new float[] {23, 25, 26, 22, 27, 24, 40, 32, 20},
                             new Shape(1, 1, 3, 3));
             Conv2D bn = new Conv2D.Builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
-            bn.setInitializer(manager, Initializer.ONES);
+            bn.setInitializer(manager, Initializer.ONES, true);
             NDArray out = bn.forward(input);
             Assertions.assertAlmostEquals(expected, out);
         }
@@ -187,7 +187,7 @@ public class BlockCoreTest {
                     manager.create(
                             new float[] {61, 42, 55, 49, 56, 60, 57, 62}, new Shape(1, 1, 2, 2, 2));
             Conv3D bn = new Conv3D.Builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
-            bn.setInitializer(manager, Initializer.ONES);
+            bn.setInitializer(manager, Initializer.ONES, true);
             NDArray out = bn.forward(input);
             Assertions.assertEquals(expected, out);
             Assertions.assertTrue(

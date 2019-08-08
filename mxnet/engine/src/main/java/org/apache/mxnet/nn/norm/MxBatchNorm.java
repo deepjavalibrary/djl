@@ -22,6 +22,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.norm.BatchNorm;
+import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 public class MxBatchNorm extends MxNNBlock implements BatchNorm {
@@ -39,8 +40,8 @@ public class MxBatchNorm extends MxNNBlock implements BatchNorm {
         this.axis = axis;
         this.epsilon = epsilon;
         this.momentum = momentum;
-        runningMean = new Parameter("runningMean", this, ParameterType.OTHER);
-        runningVar = new Parameter("runningVar", this, ParameterType.OTHER);
+        runningMean = new Parameter("runningMean", this, ParameterType.OTHER, Initializer.ONES);
+        runningVar = new Parameter("runningVar", this, ParameterType.OTHER, Initializer.ONES);
     }
 
     /** {@inheritDoc} */

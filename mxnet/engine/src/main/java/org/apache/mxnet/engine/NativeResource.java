@@ -31,6 +31,10 @@ public abstract class NativeResource implements AutoCloseable {
         }
     }
 
+    public boolean isReleased() {
+        return handle.get() == null;
+    }
+
     public Pointer getHandle() {
         Pointer pointer = handle.get();
         if (pointer == null) {
@@ -49,7 +53,7 @@ public abstract class NativeResource implements AutoCloseable {
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (getHandle() != null) {
+        if (handle.get() != null) {
             logger.warn("Resource was not closed explicitly: {}", getClass().getSimpleName());
             if (exception != null) {
                 logger.warn("Resource was created:", exception);

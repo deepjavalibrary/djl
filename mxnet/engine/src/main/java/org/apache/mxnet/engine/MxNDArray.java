@@ -1544,6 +1544,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String toString() {
+        if (isReleased()) {
+            return "This array is already closed";
+        }
         if (Utils.DEBUG) {
             return NDFormat.format(this);
         }

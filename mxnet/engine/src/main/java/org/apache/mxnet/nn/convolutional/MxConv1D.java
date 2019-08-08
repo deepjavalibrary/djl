@@ -23,6 +23,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.convolutional.Conv1D;
+import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 public class MxConv1D extends MxNNBlock implements Conv1D {
@@ -59,7 +60,7 @@ public class MxConv1D extends MxNNBlock implements Conv1D {
 
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (includeBias) {
-            bias = new Parameter("bias", this, ParameterType.BIAS);
+            bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);
         }
     }
 
