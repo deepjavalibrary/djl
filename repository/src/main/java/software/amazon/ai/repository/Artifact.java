@@ -12,12 +12,16 @@
  */
 package software.amazon.ai.repository;
 
+import java.io.Serializable;
 import java.net.URI;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @SuppressWarnings("PMD.LooseCoupling")
 public class Artifact {
+
+    public static final VersionComparator COMPARATOR = new VersionComparator();
 
     private transient String metadataVersion;
     private transient String groupId;
@@ -27,7 +31,7 @@ public class Artifact {
     private LinkedHashMap<String, String> properties;
     private Map<String, Item> files;
 
-    private URI baseUri;
+    private transient URI baseUri;
     private transient Version cache;
 
     public String getMetadataVersion() {
@@ -85,8 +89,8 @@ public class Artifact {
     public URI getResourceUri() {
         URI uri = baseUri;
         if (properties != null) {
-            for (String key : properties.keySet()) {
-                uri = uri.resolve(key);
+            for (String values : properties.values()) {
+                uri = uri.resolve(values + '/');
             }
         }
         return uri.resolve(version);
@@ -159,6 +163,16 @@ public class Artifact {
 
         public void setArtifact(Artifact artifact) {
             this.artifact = artifact;
+        }
+    }
+
+    public static final class VersionComparator implements Comparator<Artifact>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public int compare(Artifact o1, Artifact o2) {
+            return o1.getParsedVersion().compareTo(o2.getParsedVersion());
         }
     }
 }

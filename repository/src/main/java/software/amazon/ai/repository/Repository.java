@@ -44,7 +44,9 @@ public interface Repository {
 
     URI getBaseUri();
 
-    Artifact resolve(MRL mrk, String version, Map<String, String> filter) throws IOException;
+    Metadata locate(MRL mrl) throws IOException;
+
+    Artifact resolve(MRL mrl, String version, Map<String, String> filter) throws IOException;
 
     default InputStream openStream(Artifact.Item item) throws IOException {
         Artifact artifact = item.getArtifact();

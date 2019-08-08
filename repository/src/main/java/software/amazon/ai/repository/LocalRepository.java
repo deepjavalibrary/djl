@@ -45,8 +45,7 @@ public class LocalRepository implements Repository {
     }
 
     @Override
-    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
-            throws IOException {
+    public Metadata locate(MRL mrl) throws IOException {
         URI uri = mrl.toURI();
         Path base = path.resolve(uri.getPath());
         Path file = base.resolve("metadata.json");
@@ -54,16 +53,22 @@ public class LocalRepository implements Repository {
             return null;
         }
         try (Reader reader = Files.newBufferedReader(file)) {
-            Metadata metadata = GSON.fromJson(reader, Metadata.class);
-            VersionRange range = VersionRange.parse(version);
-            List<Artifact> artifacts = metadata.search(range, filter);
-            if (artifacts.isEmpty()) {
-                return null;
-            }
-            // TODO: find hightest version.
-            Artifact artifact = artifacts.get(0);
-            artifact.setBaseUri(uri);
-            return artifact;
+            return GSON.fromJson(reader, Metadata.class);
         }
+    }
+
+    @Override
+    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
+            throws IOException {
+        Metadata metadata = locate(mrl);
+        VersionRange range = VersionRange.parse(version);
+        List<Artifact> artifacts = metadata.search(range, filter);
+        if (artifacts.isEmpty()) {
+            return null;
+        }
+        // TODO: find hightest version.
+        Artifact artifact = artifacts.get(0);
+        artifact.setBaseUri(mrl.toURI());
+        return artifact;
     }
 }

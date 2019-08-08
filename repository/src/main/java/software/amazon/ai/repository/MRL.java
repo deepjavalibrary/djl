@@ -33,7 +33,7 @@ public class MRL {
     public URI toURI() {
         String groupIdPath = groupId.replace('.', '/');
         Anchor anchor = baseAnchor.resolve(groupIdPath, artifactId);
-        return URI.create(anchor.getPath());
+        return URI.create(anchor.getPath() + '/');
     }
 
     public Anchor getBaseAnchor() {

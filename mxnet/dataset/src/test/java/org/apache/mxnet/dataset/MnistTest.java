@@ -38,10 +38,25 @@ public class MnistTest {
     }
 
     @Test
-    public void testMnist() throws IOException {
+    public void testMnistLocal() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
             Mnist mnist = Mnist.newInstance(manager, repository);
+            mnist.prepare();
+            Iterator<Pair<NDList, NDList>> it = mnist.getData(Dataset.Usage.TRAIN, 32);
+
+            Assert.assertTrue(it.hasNext());
+
+            Pair<NDList, NDList> pair = it.next();
+
+            Assert.assertEquals(pair.getKey().size(), 1);
+        }
+    }
+
+    @Test
+    public void testMnistRemote() throws IOException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Mnist mnist = Mnist.newInstance(manager);
             mnist.prepare();
             Iterator<Pair<NDList, NDList>> it = mnist.getData(Dataset.Usage.TRAIN, 32);
 

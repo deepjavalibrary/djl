@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-final class VersionRange {
+public final class VersionRange {
 
     private static final VersionRange ANY = new VersionRange(null, Collections.emptyList());
 

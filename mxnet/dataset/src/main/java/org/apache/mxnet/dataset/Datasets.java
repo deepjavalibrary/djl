@@ -16,7 +16,7 @@ import software.amazon.ai.repository.Repository;
 
 public interface Datasets {
 
-    String MXNET_REPO_URL = "https://joule.s3.amazonaws.com/mlrepo";
+    String MXNET_REPO_URL = "https://joule.s3.amazonaws.com/mlrepo/";
 
     Repository REPOSITORY = Repository.newInstance("MxNet", MXNET_REPO_URL);
 

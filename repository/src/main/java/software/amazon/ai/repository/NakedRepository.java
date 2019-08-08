@@ -41,6 +41,12 @@ public class NakedRepository implements Repository {
     }
 
     @Override
+    public Metadata locate(MRL mrl) {
+        // return new MatchAllMetadata();
+        return null;
+    }
+
+    @Override
     public Artifact resolve(MRL mrl, String version, Map<String, String> filter) {
         Artifact artifact = new Artifact();
         artifact.setGroupId(mrl.getGroupId());

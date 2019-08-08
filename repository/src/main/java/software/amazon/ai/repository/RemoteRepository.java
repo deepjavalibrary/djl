@@ -14,14 +14,20 @@ package software.amazon.ai.repository;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import software.amazon.ai.util.Utils;
 
 public class RemoteRepository implements Repository {
+
+    private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
     private String name;
     private URI uri;
@@ -42,26 +48,47 @@ public class RemoteRepository implements Repository {
     }
 
     @Override
+    public Metadata locate(MRL mrl) throws IOException {
+        URI mrlUri = mrl.toURI();
+        URI file = uri.resolve(mrlUri.getPath() + "/metadata.json");
+        Path cacheDir = getCacheDirectory().resolve(mrlUri.getPath());
+        if (!Files.exists(cacheDir)) {
+            Files.createDirectories(cacheDir);
+        }
+        Path cacheFile = cacheDir.resolve("metadata.json");
+        if (Files.exists(cacheFile)) {
+            try (Reader reader = Files.newBufferedReader(cacheFile)) {
+                Metadata metadata = GSON.fromJson(reader, Metadata.class);
+                Date lastUpdated = metadata.getLastUpdated();
+                if (System.currentTimeMillis() - lastUpdated.getTime() < ONE_DAY) {
+                    return metadata;
+                }
+            }
+        }
+
+        try (InputStream is = file.toURL().openStream()) {
+            String json = Utils.toString(is);
+            Metadata metadata = GSON.fromJson(json, Metadata.class);
+            metadata.setLastUpdated(new Date());
+            try (Writer writer = Files.newBufferedWriter(cacheFile)) {
+                writer.write(GSON.toJson(metadata));
+            }
+            return metadata;
+        }
+    }
+
+    @Override
     public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
             throws IOException {
-        URI mrlUri = mrl.toURI();
-        URI base = uri.resolve(mrlUri.getPath());
-        URI file = base.resolve("metadata.json");
-        // TODO:
-        // 1. check cache first
-        // 2. check if offline mode or not
-        // 3. download metadata if needed
-
-        try (InputStream is = file.toURL().openStream();
-                Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            Metadata metadata = GSON.fromJson(reader, Metadata.class);
-            VersionRange range = VersionRange.parse(version);
-            List<Artifact> artifacts = metadata.search(range, filter);
-            if (artifacts.isEmpty()) {
-                return null;
-            }
-            // TODO: find hightest version.
-            return artifacts.get(0);
+        Metadata metadata = locate(mrl);
+        VersionRange range = VersionRange.parse(version);
+        List<Artifact> artifacts = metadata.search(range, filter);
+        if (artifacts.isEmpty()) {
+            return null;
         }
+        // TODO: find hightest version.
+        Artifact artifact = artifacts.get(0);
+        artifact.setBaseUri(mrl.toURI());
+        return artifact;
     }
 }
