@@ -12,11 +12,11 @@
  */
 package org.apache.mxnet.engine.optimizer;
 
+import java.util.Arrays;
 import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.training.Gradient.OptimizerGrad;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 import software.amazon.ai.util.PairList;
 
 /** MXNet helper containing base implementations for optimizers. */
@@ -25,23 +25,24 @@ public abstract class MxOptimizer implements Optimizer {
     PairList<String, Parameter> parameters;
     float rescaleGrad;
     float clipGrad;
-    float weightDecays;
-    private LrTracker lrTracker;
-    private int numUpdate;
+    private float weightDecays;
+    int numUpdate;
 
-    public MxOptimizer(
-            PairList<String, Parameter> parameters,
-            float rescaleGrad,
-            float weightDecays,
-            float clipGrad,
-            LrTracker lrTracker,
-            int beginNumUpdate) {
-        this.parameters = parameters;
-        this.rescaleGrad = rescaleGrad;
-        this.lrTracker = lrTracker;
-        this.weightDecays = weightDecays;
-        this.clipGrad = clipGrad;
-        this.numUpdate = beginNumUpdate;
+    private int[] updateCounts;
+
+    public MxOptimizer(BaseBuilder<?> builder) {
+        this.parameters = builder.getParameters();
+        this.rescaleGrad = builder.getRescaleGrad();
+        this.weightDecays = builder.getWeightDecays();
+        this.clipGrad = builder.getClipGrad();
+        this.numUpdate = builder.getBeginNumUpdate();
+
+        if (rescaleGrad == 0) {
+            throw new IllegalArgumentException("The rescaleGrad should be set");
+        }
+
+        updateCounts = new int[parameters.size()];
+        Arrays.fill(updateCounts, numUpdate);
     }
 
     @Override
@@ -55,13 +56,19 @@ public abstract class MxOptimizer implements Optimizer {
         numUpdate++;
     }
 
-    public float getLearningRate() {
-        return lrTracker.getNewLearningRate(numUpdate);
-    }
-
     @Override
     public PairList<String, Parameter> getParameters() {
         return parameters;
+    }
+
+    float getWeightDecay(int index) {
+        return weightDecays;
+    }
+
+    int updateCount(int index) {
+        int count = ++updateCounts[index];
+        numUpdate = Math.max(numUpdate, count);
+        return count;
     }
 
     public abstract void update(int index, NDArray weight, NDArray grad);

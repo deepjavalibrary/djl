@@ -20,31 +20,26 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
-import software.amazon.ai.util.PairList;
 
 public class MxSgd extends MxOptimizer implements Sgd {
 
+    private LrTracker lrTracker;
     private float momentum;
     private boolean lazyUpdate;
+
     private List<NDArray> momentumStates;
 
-    public MxSgd(
-            PairList<String, Parameter> parameters,
-            float rescaleGrad,
-            float weightDecays,
-            float clipGrad,
-            LrTracker lrTracker,
-            int beginNumUpdate,
-            float momentum,
-            boolean lazyUpdate) {
-        super(parameters, rescaleGrad, weightDecays, clipGrad, lrTracker, beginNumUpdate);
-        this.momentum = momentum;
-        this.lazyUpdate = lazyUpdate;
+    public MxSgd(Sgd.Builder builder) {
+        super(builder);
+        lrTracker = builder.getLrTracker();
+        momentum = builder.getMomentum();
+        lazyUpdate = builder.isLazyUpdate();
     }
 
     @Override
     public void update(int index, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
+        float learningRate = lrTracker.getNewLearningRate(updateCount(index));
         if (momentum != 0) {
             if (momentumStates == null) {
                 momentumStates = new ArrayList<>(parameters.size());
@@ -53,12 +48,13 @@ public class MxSgd extends MxOptimizer implements Sgd {
                 }
             }
             MxOpParams params = new MxOpParams();
-            params.addParam("lr", getLearningRate());
-            params.addParam("wd", weightDecays);
-            params.addParam("momentum", momentum);
-            params.addParam("lazy_update", lazyUpdate);
+            params.addParam("wd", getWeightDecay(index));
             params.addParam("rescale_grad", rescaleGrad);
             params.addParam("clip_gradient", clipGrad);
+
+            params.addParam("lr", learningRate);
+            params.addParam("momentum", momentum);
+            params.addParam("lazy_update", lazyUpdate);
             weight.getManager()
                     .invoke(
                             "sgd_mom_update",
@@ -67,11 +63,12 @@ public class MxSgd extends MxOptimizer implements Sgd {
                             params);
         } else {
             MxOpParams params = new MxOpParams();
-            params.addParam("lr", getLearningRate());
-            params.addParam("wd", weightDecays);
-            params.addParam("lazy_update", lazyUpdate);
+            params.addParam("wd", getWeightDecay(index));
             params.addParam("rescale_grad", rescaleGrad);
             params.addParam("clip_gradient", clipGrad);
+
+            params.addParam("lr", learningRate);
+            params.addParam("lazy_update", lazyUpdate);
             weight.getManager()
                     .invoke("sgd_update", new NDList(weight, grad), new NDList(weight), params);
         }

@@ -21,23 +21,17 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
-import software.amazon.ai.util.PairList;
 
 public class MxNag extends MxOptimizer implements Nag {
 
+    private LrTracker lrTracker;
     private float momentum;
     private List<NDArray> momentumStates;
 
-    public MxNag(
-            PairList<String, Parameter> parameters,
-            float rescaleGrad,
-            float weightDecays,
-            float clipGrad,
-            LrTracker lrTracker,
-            int beginNumUpdate,
-            float momentum) {
-        super(parameters, rescaleGrad, weightDecays, clipGrad, lrTracker, beginNumUpdate);
-        this.momentum = momentum;
+    public MxNag(Nag.Builder builder) {
+        super(builder);
+        lrTracker = builder.getLrTracker();
+        momentum = builder.getMomentum();
     }
 
     @Override
@@ -51,8 +45,8 @@ public class MxNag extends MxOptimizer implements Nag {
                 }
             }
             MxOpParams params = new MxOpParams();
-            params.addParam("lr", getLearningRate());
-            params.addParam("wd", weightDecays);
+            params.addParam("lr", lrTracker.getNewLearningRate(updateCount(index)));
+            params.addParam("wd", getWeightDecay(index));
             params.addParam("momentum", momentum);
             params.addParam("rescale_grad", rescaleGrad);
             params.addParam("clip_gradient", clipGrad);
@@ -64,8 +58,8 @@ public class MxNag extends MxOptimizer implements Nag {
                             params);
         } else {
             MxOpParams params = new MxOpParams();
-            params.addParam("lr", getLearningRate());
-            params.addParam("wd", weightDecays);
+            params.addParam("lr", lrTracker.getNewLearningRate(updateCount(index)));
+            params.addParam("wd", getWeightDecay(index));
             params.addParam("rescale_grad", rescaleGrad);
             params.addParam("clip_gradient", clipGrad);
             weight.getManager()

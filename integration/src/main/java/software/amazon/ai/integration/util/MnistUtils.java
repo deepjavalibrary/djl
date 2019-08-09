@@ -50,7 +50,7 @@ public final class MnistUtils {
                 new Sgd.Builder(mlp.getParameters())
                         .setRescaleGrad(1.0f / batchSize)
                         .setLrTracker(LrTracker.fixedLR(0.1f))
-                        .setMomentum(0.9f)
+                        .optMomentum(0.9f)
                         .build();
         Accuracy acc = new Accuracy();
         LossMetric lossMetric = new LossMetric("softmaxCELoss");

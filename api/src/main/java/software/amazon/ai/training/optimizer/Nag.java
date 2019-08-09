@@ -21,61 +21,46 @@ import software.amazon.ai.util.PairList;
 /** An NAG optimizer. Build with {@link Nag.Builder}. */
 public interface Nag extends Optimizer {
 
-    class Builder {
+    class Builder extends BaseBuilder<Builder> {
 
-        PairList<String, Parameter> parameters;
-        float rescaleGrad;
-        float weightDecays;
-        float clipGrad = -1;
-        LrTracker lrTracker;
-        int beginNumUpdate;
-        float momentum;
+        private LrTracker lrTracker;
+        private float momentum;
 
         public Builder(PairList<String, Parameter> parameters) {
-            this.parameters = parameters;
+            super(parameters);
         }
 
-        public Nag.Builder setRescaleGrad(float rescaleGrad) {
-            this.rescaleGrad = rescaleGrad;
-            return this;
-        }
-
-        public Nag.Builder setWeightDecays(float weightDecays) {
-            this.weightDecays = weightDecays;
-            return this;
-        }
-
-        public Nag.Builder setClipGrad(float clipGrad) {
-            this.clipGrad = clipGrad;
-            return this;
-        }
-
-        public Nag.Builder setLrTracker(LrTracker lrTracker) {
+        public Builder setLrTracker(LrTracker lrTracker) {
             this.lrTracker = lrTracker;
             return this;
         }
 
-        public Nag.Builder setBeginNumUpdate(int beginNumUpdate) {
-            this.beginNumUpdate = beginNumUpdate;
-            return this;
-        }
-
-        public Nag.Builder setMomentum(float momentum) {
+        public Builder setMomentum(float momentum) {
             this.momentum = momentum;
             return this;
         }
 
+        public LrTracker getLrTracker() {
+            return lrTracker;
+        }
+
+        public float getMomentum() {
+            return momentum;
+        }
+
+        @Override
+        public Builder self() {
+            return this;
+        }
+
         public Nag build() {
-            return Engine.getInstance()
-                    .getNNIndex()
-                    .nag(
-                            parameters,
-                            rescaleGrad,
-                            weightDecays,
-                            clipGrad,
-                            lrTracker,
-                            beginNumUpdate,
-                            momentum);
+            if (lrTracker == null) {
+                throw new IllegalArgumentException("No lrTracker set");
+            }
+            if (momentum == 0) {
+                throw new IllegalArgumentException("The momentum should be set");
+            }
+            return Engine.getInstance().getNNIndex().nag(this);
         }
     }
 }

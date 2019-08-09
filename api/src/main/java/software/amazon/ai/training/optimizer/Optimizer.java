@@ -25,4 +25,60 @@ public interface Optimizer {
     PairList<String, Parameter> getParameters();
 
     void step(OptimizerGrad grads);
+
+    @SuppressWarnings("rawtypes")
+    abstract class BaseBuilder<B extends BaseBuilder> {
+
+        private PairList<String, Parameter> parameters;
+        private float rescaleGrad;
+        private float weightDecays;
+        private float clipGrad = -1;
+        private int beginNumUpdate;
+
+        BaseBuilder(PairList<String, Parameter> parameters) {
+            this.parameters = parameters;
+        }
+
+        public B setRescaleGrad(float rescaleGrad) {
+            this.rescaleGrad = rescaleGrad;
+            return self();
+        }
+
+        public B optWeightDecays(float weightDecays) {
+            this.weightDecays = weightDecays;
+            return self();
+        }
+
+        public B optClipGrad(float clipGrad) {
+            this.clipGrad = clipGrad;
+            return self();
+        }
+
+        public B optBeginNumUpdate(int beginNumUpdate) {
+            this.beginNumUpdate = beginNumUpdate;
+            return self();
+        }
+
+        public PairList<String, Parameter> getParameters() {
+            return parameters;
+        }
+
+        public float getRescaleGrad() {
+            return rescaleGrad;
+        }
+
+        public float getWeightDecays() {
+            return weightDecays;
+        }
+
+        public float getClipGrad() {
+            return clipGrad;
+        }
+
+        public int getBeginNumUpdate() {
+            return beginNumUpdate;
+        }
+
+        abstract B self();
+    }
 }

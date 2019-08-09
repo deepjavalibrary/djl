@@ -14,16 +14,16 @@ package software.amazon.ai.training.optimizer;
 
 import software.amazon.ai.Parameter;
 import software.amazon.ai.engine.Engine;
-import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 import software.amazon.ai.util.PairList;
 
-/** An SGD optimizer. Build with {@link Sgd.Builder}. */
-public interface Sgd extends Optimizer {
+public interface Adam extends Optimizer {
 
     class Builder extends BaseBuilder<Builder> {
 
-        private LrTracker lrTracker;
-        private float momentum;
+        private float learningRate = 0.001f;
+        private float beta1 = 0.9f;
+        private float beta2 = 0.999f;
+        private float epsilon = 1e-8f;
         private boolean lazyUpdate = true;
 
         public Builder(PairList<String, Parameter> parameters) {
@@ -35,13 +35,23 @@ public interface Sgd extends Optimizer {
             return this;
         }
 
-        public Builder setLrTracker(LrTracker lrTracker) {
-            this.lrTracker = lrTracker;
+        public Builder optLearningRate(float learningRate) {
+            this.learningRate = learningRate;
             return this;
         }
 
-        public Builder optMomentum(float momentum) {
-            this.momentum = momentum;
+        public Builder optBeta1(float beta1) {
+            this.beta1 = beta1;
+            return this;
+        }
+
+        public Builder optBeta2(float beta2) {
+            this.beta2 = beta2;
+            return this;
+        }
+
+        public Builder optEpsilon(float epsilon) {
+            this.epsilon = epsilon;
             return this;
         }
 
@@ -50,23 +60,28 @@ public interface Sgd extends Optimizer {
             return this;
         }
 
-        public LrTracker getLrTracker() {
-            return lrTracker;
+        public float getLearningRate() {
+            return learningRate;
         }
 
-        public float getMomentum() {
-            return momentum;
+        public float getBeta1() {
+            return beta1;
+        }
+
+        public float getBeta2() {
+            return beta2;
+        }
+
+        public float getEpsilon() {
+            return epsilon;
         }
 
         public boolean isLazyUpdate() {
             return lazyUpdate;
         }
 
-        public Sgd build() {
-            if (lrTracker == null) {
-                throw new IllegalArgumentException("No lrTracker set");
-            }
-            return Engine.getInstance().getNNIndex().sgd(this);
+        public Adam build() {
+            return Engine.getInstance().getNNIndex().adam(this);
         }
     }
 }

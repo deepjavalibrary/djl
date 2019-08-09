@@ -13,7 +13,6 @@
 package software.amazon.ai.nn;
 
 import java.util.Collection;
-import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.convolutional.Conv1D;
@@ -27,10 +26,9 @@ import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.nn.recurrent.RNN;
+import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Sgd;
-import software.amazon.ai.training.optimizer.learningrate.LrTracker;
-import software.amazon.ai.util.PairList;
 
 /**
  * An internal mapping to Engine specific implementations of Neural Network {@link
@@ -112,22 +110,9 @@ public abstract class NNIndex {
     // Optimizers
     ////////////////////////////////////////
 
-    public abstract Sgd sgd(
-            PairList<String, Parameter> parameters,
-            float rescaleGrad,
-            float weightDecays,
-            float clipGrad,
-            LrTracker lrTracker,
-            int beginNumUpdate,
-            float momentum,
-            boolean lazyUpdate);
+    public abstract Sgd sgd(Sgd.Builder builder);
 
-    public abstract Nag nag(
-            PairList<String, Parameter> parameters,
-            float rescaleGrad,
-            float weightDecays,
-            float clipGrad,
-            LrTracker lrTracker,
-            int beginNumUpdate,
-            float momentum);
+    public abstract Nag nag(Nag.Builder builder);
+
+    public abstract Adam adam(Adam.Builder builder);
 }

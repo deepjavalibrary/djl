@@ -13,6 +13,7 @@
 package org.apache.mxnet.nn;
 
 import java.util.Collection;
+import org.apache.mxnet.engine.optimizer.MxAdam;
 import org.apache.mxnet.engine.optimizer.MxNag;
 import org.apache.mxnet.engine.optimizer.MxSgd;
 import org.apache.mxnet.nn.convolutional.MxConv1D;
@@ -26,7 +27,6 @@ import org.apache.mxnet.nn.norm.MxDropout;
 import org.apache.mxnet.nn.recurrent.MxGRU;
 import org.apache.mxnet.nn.recurrent.MxLSTM;
 import org.apache.mxnet.nn.recurrent.MxRNN;
-import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.NNIndex;
@@ -41,9 +41,10 @@ import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.nn.recurrent.RNN;
+import software.amazon.ai.training.optimizer.Adam;
+import software.amazon.ai.training.optimizer.Adam.Builder;
+import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Sgd;
-import software.amazon.ai.training.optimizer.learningrate.LrTracker;
-import software.amazon.ai.util.PairList;
 
 public class MxNNIndex extends NNIndex {
 
@@ -189,42 +190,19 @@ public class MxNNIndex extends NNIndex {
 
     /** {@inheritDoc} */
     @Override
-    public Sgd sgd(
-            PairList<String, Parameter> parameters,
-            float rescaleGrad,
-            float weightDecays,
-            float clipGrad,
-            LrTracker lrTracker,
-            int beginNumUpdate,
-            float momentum,
-            boolean lazyUpdate) {
-        return new MxSgd(
-                parameters,
-                rescaleGrad,
-                weightDecays,
-                clipGrad,
-                lrTracker,
-                beginNumUpdate,
-                momentum,
-                lazyUpdate);
+    public Sgd sgd(Sgd.Builder builder) {
+        return new MxSgd(builder);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public MxNag nag(
-            PairList<String, Parameter> parameters,
-            float rescaleGrad,
-            float weightDecays,
-            float clipGrad,
-            LrTracker lrTracker,
-            int beginNumUpdate,
-            float momentum) {
-        return new MxNag(
-                parameters,
-                rescaleGrad,
-                weightDecays,
-                clipGrad,
-                lrTracker,
-                beginNumUpdate,
-                momentum);
+    public Nag nag(Nag.Builder builder) {
+        return new MxNag(builder);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Adam adam(Builder builder) {
+        return new MxAdam(builder);
     }
 }
