@@ -15,20 +15,16 @@ package software.amazon.ai.examples;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.examples.util.AbstractExample;
-import software.amazon.ai.examples.util.ModelInfo;
 import software.amazon.ai.modality.Classification;
 
 public class ClassifyExampleTest {
 
-    private static final String MODEL_NAME = "squeezenet_v1.1";
+    private static final String MODEL_NAME = "resnet18_v1";
 
     @Test
     public void testClassifyExample() {
-        ModelInfo modelInfo = ModelInfo.getModel(MODEL_NAME);
         String[] args =
                 new String[] {
-                    "-u",
-                    modelInfo.getUrl(),
                     "-n",
                     MODEL_NAME,
                     "-i",
@@ -40,7 +36,7 @@ public class ClassifyExampleTest {
                 };
         Assert.assertTrue(new ClassifyExample().runExample(args));
         Classification result = (Classification) AbstractExample.getPredictResult();
-        Assert.assertEquals(result.getClassName(), "tabby, tabby cat");
-        Assert.assertTrue(Double.compare(result.getProbability(), 0.7) > 0);
+        Assert.assertEquals(result.getClassName(), "n02123045 tabby, tabby cat");
+        Assert.assertTrue(Double.compare(result.getProbability(), 0.4) > 0);
     }
 }

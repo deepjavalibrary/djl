@@ -34,6 +34,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.slf4j.Logger;
 import software.amazon.ai.Context;
 import software.amazon.ai.TranslateException;
@@ -57,10 +58,11 @@ public abstract class AbstractExample {
      * @param iteration number of prediction iteration to run
      * @return prediction result
      * @throws IOException if io error occurs when loading model.
+     * @throws ModelNotFoundException if specified model not found
      * @throws TranslateException if error occurs when processing input or output
      */
     protected abstract Object predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, TranslateException;
+            throws IOException, ModelNotFoundException, TranslateException;
 
     /**
      * Returns command line options.

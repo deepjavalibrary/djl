@@ -21,6 +21,7 @@ dependencies {
     compile "com.google.code.gson:gson:${gson_version}"
     compile project(":joule-api")
     compile project(":mxnet:engine")
+    compile project(":mxnet:model-zoo")
 
     runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
 

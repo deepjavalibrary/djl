@@ -15,20 +15,16 @@ package software.amazon.ai.examples;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.examples.util.AbstractExample;
-import software.amazon.ai.examples.util.ModelInfo;
 import software.amazon.ai.modality.cv.DetectedObject;
 
 public class SsdExampleTest {
 
-    private static final String MODEL_NAME = "resnet50_ssd_model";
+    private static final String MODEL_NAME = "resnet50_v1";
 
     @Test
     public void testSsdExample() {
-        String url = ModelInfo.getModel(MODEL_NAME).getUrl();
         String[] args =
                 new String[] {
-                    "-u",
-                    url,
                     "-n",
                     MODEL_NAME,
                     "-i",

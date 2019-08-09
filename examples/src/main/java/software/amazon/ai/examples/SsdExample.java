@@ -17,23 +17,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
+import org.apache.mxnet.zoo.ModelNotFoundException;
+import org.apache.mxnet.zoo.ModelZoo;
+import org.apache.mxnet.zoo.ZooModel;
 import software.amazon.ai.Context;
-import software.amazon.ai.Model;
 import software.amazon.ai.TranslateException;
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.examples.util.AbstractExample;
 import software.amazon.ai.examples.util.Arguments;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.cv.DetectedObject;
-import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Images;
-import software.amazon.ai.modality.cv.Rectangle;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
 
 public final class SsdExample extends AbstractExample {
 
@@ -43,28 +41,29 @@ public final class SsdExample extends AbstractExample {
 
     @Override
     public DetectedObject predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, TranslateException {
+            throws IOException, ModelNotFoundException, TranslateException {
         List<DetectedObject> predictResult = null;
-        Path modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
         Path imageFile = arguments.getImageFile();
         BufferedImage img = Images.loadImageFromFile(imageFile);
 
-        Model model = Model.loadModel(modelDir, modelName);
-
-        SsdTranslator translator = new SsdTranslator(0.2f, 512, 512);
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        criteria.put("size", "512");
+        criteria.put("backbone", modelName);
+        criteria.put("dataset", "voc");
+        ZooModel<BufferedImage, List<DetectedObject>> model = ModelZoo.SSD.loadModel(criteria);
 
         // Following context is not not required, default context will be used by Predictor without
         // passing context to Predictor.newInstance(model, translator)
         // Change to a specific context if needed.
         Context context = Context.defaultContext();
 
-        try (Predictor<BufferedImage, List<DetectedObject>> ssd =
-                Predictor.newInstance(model, translator, context)) {
-            ssd.setMetrics(metrics); // Let predictor collect metrics
+        try (Predictor<BufferedImage, List<DetectedObject>> predictor =
+                model.newPredictor(context)) {
+            predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
-                predictResult = ssd.predict(img);
+                predictResult = predictor.predict(img);
                 printProgress(iteration, i);
                 collectMemoryInfo(metrics);
             }
@@ -89,60 +88,5 @@ public final class SsdExample extends AbstractExample {
 
         Path out = Paths.get(logDir, "ssd.jpg");
         ImageIO.write(img, "jpg", out.toFile());
-    }
-
-    private static final class SsdTranslator extends ImageTranslator<List<DetectedObject>> {
-
-        private float threshold;
-        private int imageWidth;
-        private int imageHeight;
-
-        public SsdTranslator(float threshold, int imageWidth, int imageHeight) {
-            this.threshold = threshold;
-            this.imageWidth = imageWidth;
-            this.imageHeight = imageHeight;
-        }
-
-        @Override
-        public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-            BufferedImage image = Images.resizeImage(input, imageWidth, imageHeight);
-            return super.processInput(ctx, image);
-        }
-
-        @Override
-        public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list)
-                throws IOException {
-            Model model = ctx.getModel();
-            NDArray array = list.get(0);
-
-            List<DetectedObject> ret = new ArrayList<>();
-
-            String[] synset = model.getArtifact("synset.txt", AbstractExample::loadSynset);
-            NDArray nd = array.get(0);
-            long length = nd.getShape().head();
-            for (int i = 0; i < length; ++i) {
-                try (NDArray item = nd.get(i)) {
-                    float[] values = item.toFloatArray();
-                    int classId = (int) values[0];
-                    float probability = values[1];
-                    if (classId > 0 && probability > threshold) {
-                        if (classId >= synset.length) {
-                            throw new AssertionError("Unexpected index: " + classId);
-                        }
-                        String className = synset[classId];
-
-                        double x = values[2];
-                        double y = values[3];
-                        double w = values[4] - x;
-                        double h = values[5] - y;
-
-                        Rectangle rect = new Rectangle(x, y, w, h);
-                        ret.add(new DetectedObject(className, probability, rect));
-                    }
-                }
-            }
-
-            return ret;
-        }
     }
 }
