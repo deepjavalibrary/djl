@@ -15,6 +15,8 @@ package software.amazon.ai.training.metrics;
 
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.util.Pair;
 
 /**
  * Computes accuracy classification score.
@@ -24,13 +26,15 @@ import software.amazon.ai.ndarray.NDList;
  */
 public class Accuracy extends TrainingMetrics {
 
-    private int axis;
+    private int correctInstances;
+    private int totalInstances;
+    protected int axis;
 
     /**
      * Creates Accuracy metric.
      *
      * @param name name of the metric, default is "Accuracy"
-     * @param axis axis used for performing argmax on prediction result
+     * @param axis axis the axis that represent classes in prediction, default 1
      */
     public Accuracy(String name, int axis) {
         super(name);
@@ -41,32 +45,15 @@ public class Accuracy extends TrainingMetrics {
         this("Accuracy", 1);
     }
 
+    public Accuracy(String name) {
+        this(name, 1);
+    }
+
     /** {@inheritDoc} */
     @Override
-    public void update(NDList labels, NDList predictions) {
-        // number of labels and predictions should be the same
-        checkLabelShapes(labels, predictions);
-
-        for (int i = 0; i < labels.size(); i++) {
-            NDArray label = labels.get(i);
-            NDArray prediction = predictions.get(i);
-            NDArray predictionReduced;
-            if (prediction.getShape() != label.getShape()) {
-                // axis always 0 for calculating predictions in NDList
-                predictionReduced = prediction.argmax(0, false);
-            } else {
-                predictionReduced = prediction;
-            }
-            float[] labelArray = label.toFloatArray();
-            float[] predictionArray = predictionReduced.toFloatArray();
-            assert labelArray.length == predictionArray.length;
-            for (int j = 0; j < labelArray.length; j++) {
-                if (labelArray[j] == predictionArray[j]) {
-                    addNumInstances(1);
-                }
-            }
-        }
-        addTotalInstances(labels.size());
+    public void reset() {
+        correctInstances = 0;
+        totalInstances = 0;
     }
 
     /** {@inheritDoc} */
@@ -79,8 +66,60 @@ public class Accuracy extends TrainingMetrics {
         } else {
             predictionReduced = predictions;
         }
-        int numCorrect = (int) labels.eq(predictionReduced).sum().getFloat();
-        addNumInstances(numCorrect);
-        addTotalInstances(labels.size());
+        // TODO: remove asType after bug in numpy argmax is fixed. argmax should return int values.
+        int numCorrect =
+                labels.asType(DataType.INT32, false)
+                        .eq(predictionReduced.asType(DataType.INT32, false))
+                        .sum()
+                        .getInt();
+        addCorrectInstances(numCorrect);
+        addTotalInstances((int) labels.size());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void update(NDList labels, NDList predictions) {
+        // Accuracy only support one type of label/prediction
+        if (labels.size() != 1 || predictions.size() != 1) {
+            throw new IllegalArgumentException(
+                    "NDList labels and prediction size "
+                            + "must be 1 for Accuracy. For batch data please use a NDArray with first"
+                            + "dimension as batch axis.");
+        }
+        update(labels.get(0), predictions.get(0));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void update(NDArray loss) {
+        throw new UnsupportedOperationException(
+                "Accuracy does not support update based on loss NDArray.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Pair<String, Float> getMetric() {
+        if (totalInstances == 0) {
+            return new Pair<>(getName(), Float.NaN);
+        }
+        return new Pair<>(getName(), (float) correctInstances / totalInstances);
+    }
+
+    /**
+     * Add number to correct instances.
+     *
+     * @param numInstances the number to increment
+     */
+    public void addCorrectInstances(int numInstances) {
+        this.correctInstances += numInstances;
+    }
+
+    /**
+     * Add number to total instances.
+     *
+     * @param totalInstances the number to increment
+     */
+    public void addTotalInstances(int totalInstances) {
+        this.totalInstances += totalInstances;
     }
 }

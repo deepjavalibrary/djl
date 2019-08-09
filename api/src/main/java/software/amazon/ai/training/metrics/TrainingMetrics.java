@@ -19,8 +19,7 @@ import software.amazon.ai.util.Pair;
 
 /** Base class for all training metrics. */
 abstract class TrainingMetrics {
-    private int numInstances;
-    private float totalInstances;
+
     private String name;
 
     /**
@@ -33,82 +32,40 @@ abstract class TrainingMetrics {
     }
 
     /**
-     * Update training metrics based on NDList of labels and predictions.
+     * Update training metrics based on {@link NDList} of labels and predictions.
      *
-     * @param labels {@link NDList} of labels
-     * @param predictions {@link NDList} of predictions
+     * @param labels {@code NDList} of labels
+     * @param predictions {@code NDList} of predictions
      */
     protected abstract void update(NDList labels, NDList predictions);
 
     /**
-     * Update training metrics based on NDArray of labels and predictions.
+     * Update training metrics based on {@link NDArray} of labels and predictions.
      *
-     * @param labels {@link NDArray} of labels
-     * @param predictions {@link NDArray} of predictions
+     * @param labels {@code NDArray} of labels
+     * @param predictions {@code NDArray} of predictions
      */
     protected abstract void update(NDArray labels, NDArray predictions);
 
+    /**
+     * Update training metric based on {@code NDArray} of loss.
+     *
+     * @param loss {@code NDArray} of loss
+     */
+    protected abstract void update(NDArray loss);
+
     /** reset metric values. */
-    public void reset() {
-        this.numInstances = 0;
-        this.totalInstances = 0.0f;
-    }
+    public abstract void reset();
 
     /**
      * calculate metric values.
      *
      * @return {@link Pair} of metric name and value
      */
-    public Pair<String, Number> getMetric() {
-        if (totalInstances == 0) {
-            return new Pair<>(name, Float.NaN);
-        }
-        return new Pair<>(name, numInstances / totalInstances);
-    }
-
-    public int getNumInstances() {
-        return numInstances;
-    }
-
-    public float getTotalInstances() {
-        return totalInstances;
-    }
+    public abstract Pair<String, Float> getMetric();
 
     public String getName() {
         return name;
-    }
-
-    /**
-     * Add number to instances.
-     *
-     * @param numInstances the number to increment
-     */
-    public void addNumInstances(int numInstances) {
-        this.numInstances += numInstances;
-    }
-
-    /**
-     * Add number to total instances.
-     *
-     * @param totalInstances the number to increment
-     */
-    public void addTotalInstances(float totalInstances) {
-        this.totalInstances += totalInstances;
-    }
-
-    /**
-     * Check if the two input {@code NDList} have the same size.
-     *
-     * @param labels {@code NDList} of labels
-     * @param predictions {@code NDList} of predictions
-     */
-    protected void checkLabelShapes(NDList labels, NDList predictions) {
-        if (labels.size() != predictions.size()) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "The size of labels(%d) does not match that of predictions(%d)",
-                            labels.size(), predictions.size()));
-        }
     }
 
     /**

@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.ndarray.internal;
 
-import java.util.stream.IntStream;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.pooling.PoolingConvention;
@@ -234,43 +233,6 @@ public interface NDArrayEx {
             float rescaleGrad,
             float clipGradient,
             boolean lazyUpdate);
-
-    ////////////////////////////////////////
-    // Loss
-    ////////////////////////////////////////
-
-    default NDArray l2Loss(NDArray label, float weight, int batchAxis) {
-        NDArray pred = getArray();
-        label = label.reshape(pred.getShape());
-        NDArray loss = label.sub(pred).square().mul(weight);
-        return loss.mean(new int[] {batchAxis});
-    }
-
-    default NDArray softmaxCrossEntropyLoss(
-            NDArray label,
-            float weight,
-            int batchAxis,
-            int classAxis,
-            boolean sparseLabel,
-            boolean fromLogit) {
-        NDArray pred = getArray();
-        if (!fromLogit) {
-            pred = pred.softmax(classAxis).log();
-        }
-        NDArray loss;
-        if (sparseLabel) {
-            loss = pred.getNDArrayInternal().pick(label, classAxis, true).neg();
-        } else {
-            label = label.reshape(pred.getShape());
-            loss = pred.mul(label).sum(new int[] {classAxis}).mul(-weight);
-        }
-        // apply mean on all axes except the batchAxis
-        int[] axes =
-                IntStream.range(0, loss.getShape().dimension())
-                        .filter(axis -> axis != batchAxis)
-                        .toArray();
-        return loss.mean(axes);
-    }
 
     ////////////////////////////////////////
     // Miscellaneous

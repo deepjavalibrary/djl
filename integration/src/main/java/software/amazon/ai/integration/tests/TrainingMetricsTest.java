@@ -18,10 +18,10 @@ import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.metrics.Accuracy;
+import software.amazon.ai.training.metrics.TopKAccuracy;
 
 public class TrainingMetricsTest {
 
@@ -33,43 +33,44 @@ public class TrainingMetricsTest {
     @RunAsTest
     public void testAccuracy() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            // test NDList
-            NDList predictions = new NDList();
-            predictions.add(manager.create(new float[] {0.3f, 0.7f}, new Shape(2, 1)));
-            predictions.add(manager.create(new float[] {0, 1}, new Shape(2, 1)));
-            predictions.add(manager.create(new float[] {0.4f, 0.6f}, new Shape(2, 1)));
 
-            NDList labels = new NDList();
-            labels.add(manager.create(new float[] {0}));
-            labels.add(manager.create(new float[] {1}));
-            labels.add(manager.create(new float[] {1}));
-
-            NDArray predictionsNDArray =
+            NDArray predictions =
                     manager.create(new float[] {0.3f, 0.7f, 0, 1, 0.4f, 0.6f}, new Shape(3, 2));
-            NDArray labelsNDArray = manager.create(new float[] {0, 1, 1}, new Shape(3));
+            NDArray labels = manager.create(new int[] {0, 1, 1}, new Shape(3));
 
             Accuracy acc = new Accuracy();
             acc.update(labels, predictions);
-            float accuracy = acc.getMetric().getValue().floatValue();
-            float expectedAccuracy =
-                    predictionsNDArray.argmax(1, false).eq(labelsNDArray).sum().getFloat()
-                            / predictions.size();
+            float accuracy = acc.getMetric().getValue();
+            float expectedAccuracy = 2.f / 3;
             Assertions.assertEquals(
                     expectedAccuracy,
                     accuracy,
                     String.format(
                             "Wrong accuracy, expected: %f, actual: %f",
                             expectedAccuracy, accuracy));
+        }
+    }
 
-            Accuracy accND = new Accuracy();
-            accND.update(labelsNDArray, predictionsNDArray);
-            float accuracy2 = accND.getMetric().getValue().floatValue();
+    @RunAsTest
+    public void testTopKAccuracy() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray predictions =
+                    manager.create(
+                            new float[] {
+                                0.1f, 0.2f, 0.3f, 0.4f, 0, 1, 0, 0, 0.3f, 0.5f, 0.1f, 0.1f
+                            },
+                            new Shape(3, 4));
+            NDArray labels = manager.create(new int[] {0, 1, 2}, new Shape(3));
+            TopKAccuracy topKAccuracy = new TopKAccuracy(2);
+            topKAccuracy.update(labels, predictions);
+            float expectedAccuracy = 1.f / 3;
+            float accuracy = topKAccuracy.getMetric().getValue();
             Assertions.assertEquals(
                     expectedAccuracy,
                     accuracy,
                     String.format(
                             "Wrong accuracy, expected: %f, actual: %f",
-                            expectedAccuracy, accuracy2));
+                            expectedAccuracy, accuracy));
         }
     }
 }

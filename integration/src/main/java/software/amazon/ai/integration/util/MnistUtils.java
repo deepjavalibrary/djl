@@ -33,6 +33,7 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.metrics.Accuracy;
+import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.util.Pair;
 
 public final class MnistUtils {
@@ -60,13 +61,13 @@ public final class MnistUtils {
                         0.9f,
                         true);
 
-        float lossSum = 0.f;
         Accuracy acc = new Accuracy();
+        LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
         for (int epoch = 0; epoch < numEpoch; epoch++) {
             // reset loss and accuracy
             acc.reset();
-            lossSum = 0.f;
+            lossMetric.reset();
             NDArray loss;
             for (int i = 0; i < numBatches; i++) {
                 String expression = i * batchSize + ":" + (i + 1) * batchSize;
@@ -76,7 +77,7 @@ public final class MnistUtils {
                 NDArray pred;
                 try (MxAutograd autograd = new MxAutograd()) {
                     pred = mlp.forward(new NDList(batch)).head();
-                    loss = Loss.softmaxCrossEntropyLoss(pred, labelBatch, 1.f, 0, -1, true, false);
+                    loss = Loss.softmaxCrossEntropyLoss(labelBatch, pred, 1.f, 0, -1, true, false);
                     autograd.backward((MxNDArray) loss);
                 }
                 Collection<Parameter> params = mlp.getParameters().values();
@@ -87,13 +88,12 @@ public final class MnistUtils {
                     optimizer.update(0, weight, grad, new NDList(state));
                 }
                 acc.update(labelBatch, pred);
-                // sum all loss for the batch
-                lossSum += loss.sum().getFloat();
+                lossMetric.update(loss);
             }
         }
         // final loss is sum of all loss divided by num of data
-        float lossValue = lossSum / data.getShape().get(0);
-        float accuracy = acc.getMetric().getValue().floatValue();
+        float lossValue = lossMetric.getMetric().getValue();
+        float accuracy = acc.getMetric().getValue();
         Assertions.assertTrue(
                 lossValue <= expectedLoss,
                 String.format(

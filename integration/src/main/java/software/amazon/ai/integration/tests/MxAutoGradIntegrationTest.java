@@ -37,6 +37,7 @@ import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.initializer.NormalInitializer;
+import software.amazon.ai.training.metrics.LossMetric;
 
 public class MxAutoGradIntegrationTest {
 
@@ -88,16 +89,18 @@ public class MxAutoGradIntegrationTest {
                             0,
                             0.f,
                             true);
-            NDArray loss = manager.create(0.f);
+            NDArray loss;
+            LossMetric lossMetric = new LossMetric("l2loss");
 
             for (int epoch = 0; epoch < epochs; epoch++) {
+                lossMetric.reset();
                 for (int i = 0; i < numOfData / batchSize; i++) {
                     try (MxAutograd autograd = new MxAutograd()) {
                         NDIndex indices = new NDIndex(i * batchSize + ":" + batchSize * (i + 1));
                         NDArray x = data.get(indices);
                         NDArray y = label.get(indices);
                         NDArray yHat = block.forward(x);
-                        loss = Loss.l2Loss(yHat, y, 1, 0);
+                        loss = Loss.l2Loss(y, yHat, 1, 0);
                         autograd.backward((MxNDArray) loss);
                     }
                     Collection<Parameter> params = block.getParameters().values();
@@ -106,9 +109,10 @@ public class MxAutoGradIntegrationTest {
                         NDArray grad = paramArray.getGradient();
                         optimizer.update(0, paramArray, grad, null);
                     }
+                    lossMetric.update(loss);
                 }
             }
-            float lossValue = loss.getFloat();
+            float lossValue = lossMetric.getMetric().getValue();
             float expectedLoss = 0.001f;
             Assertions.assertTrue(
                     lossValue < expectedLoss,
