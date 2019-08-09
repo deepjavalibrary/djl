@@ -26,7 +26,7 @@ import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.util.PairList;
 
 public class MxConv1D extends MxNNBlock implements Conv1D {
-    private static final LayoutType[] LAYOUT =
+    private static final LayoutType[] EXPECTED_LAYOUT =
             new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.WIDTH};
     private static final String LAYOUT_STRING = "NCW";
     private Shape kernel;
@@ -80,21 +80,9 @@ public class MxConv1D extends MxNNBlock implements Conv1D {
     public void beforeInitialize(final NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
-        if (!isLayoutSupported(inputShape.getLayout())) {
+        if (!isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
             throw new UnsupportedOperationException("Conv1D requires NCW layout");
         }
-    }
-
-    private boolean isLayoutSupported(final LayoutType[] layout) {
-        if (layout.length != LAYOUT.length) {
-            return false;
-        }
-        for (int i = 0; i < LAYOUT.length; i++) {
-            if (layout[i] != LayoutType.UNKNOWN && layout[i] != LAYOUT[i]) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

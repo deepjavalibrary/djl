@@ -87,6 +87,7 @@ public class IntegrationTest {
     }
 
     private void runTests(Map<Object, List<Method>> tests, int iteration) {
+        long totalMethodCount = 0;
         for (Map.Entry<Object, List<Method>> entry : tests.entrySet()) {
             Object testObject = entry.getKey();
             String testClass = testObject.getClass().getName();
@@ -99,8 +100,11 @@ public class IntegrationTest {
                 // TODO: collect performance data
                 for (int i = 0; i < iteration; i++) {
                     try {
-                        method.invoke(testObject);
-                        logger.info("Test {}.{} PASSED", testClass, method.getName());
+                        if (method.isAnnotationPresent(RunAsTest.class)) {
+                            totalMethodCount++;
+                            method.invoke(testObject);
+                            logger.info("Test {}.{} PASSED", testClass, method.getName());
+                        }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         logger.error("Test {}.{} FAILED", testClass, method.getName());
                         logger.error("", e.getCause());
@@ -109,12 +113,12 @@ public class IntegrationTest {
                     }
                 }
             }
-            if (failed > 0) {
-                logger.error("Failed {} out of {} tests", failed, methods.size());
-            } else {
-                logger.info("Passed all {} tests", methods.size());
-            }
             totalFailed += failed;
+        }
+        if (totalFailed > 0) {
+            logger.error("Failed {} out of {} tests", totalFailed, totalMethodCount);
+        } else {
+            logger.info("Passed all {} tests", totalMethodCount);
         }
     }
 

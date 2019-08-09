@@ -21,6 +21,9 @@ import org.apache.mxnet.nn.core.MxLinear;
 import org.apache.mxnet.nn.core.MxPrelu;
 import org.apache.mxnet.nn.norm.MxBatchNorm;
 import org.apache.mxnet.nn.norm.MxDropout;
+import org.apache.mxnet.nn.recurrent.MxGRU;
+import org.apache.mxnet.nn.recurrent.MxLSTM;
+import org.apache.mxnet.nn.recurrent.MxRNN;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.NNIndex;
@@ -32,6 +35,9 @@ import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.nn.norm.Dropout;
+import software.amazon.ai.nn.recurrent.GRU;
+import software.amazon.ai.nn.recurrent.LSTM;
+import software.amazon.ai.nn.recurrent.RNN;
 
 public class MxNNIndex extends NNIndex {
 
@@ -103,5 +109,67 @@ public class MxNNIndex extends NNIndex {
             int numGroups,
             boolean noBias) {
         return new MxConv3D(kernel, stride, pad, dilate, numFilters, numGroups, noBias);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public RNN rnn(
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            RNN.Activation activation,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs) {
+        return new MxRNN(
+                stateSize,
+                dropRate,
+                numStackedLayers,
+                activation,
+                useSequenceLength,
+                useBidirectional,
+                stateOutputs);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public LSTM lstm(
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            double lstmStateClipMin,
+            double lstmStateClipMax,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs,
+            boolean clipLstmState) {
+        return new MxLSTM(
+                stateSize,
+                dropRate,
+                numStackedLayers,
+                lstmStateClipMin,
+                lstmStateClipMax,
+                useSequenceLength,
+                useBidirectional,
+                stateOutputs,
+                clipLstmState);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public GRU gru(
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs) {
+        return new MxGRU(
+                stateSize,
+                dropRate,
+                numStackedLayers,
+                useSequenceLength,
+                useBidirectional,
+                stateOutputs);
     }
 }

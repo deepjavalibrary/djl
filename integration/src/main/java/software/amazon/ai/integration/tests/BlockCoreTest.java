@@ -18,6 +18,7 @@ import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -28,6 +29,9 @@ import software.amazon.ai.nn.core.Embedding;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.nn.norm.Dropout;
+import software.amazon.ai.nn.recurrent.GRU;
+import software.amazon.ai.nn.recurrent.LSTM;
+import software.amazon.ai.nn.recurrent.RNN;
 import software.amazon.ai.training.initializer.Initializer;
 
 public class BlockCoreTest {
@@ -179,6 +183,91 @@ public class BlockCoreTest {
             Assertions.assertEquals(expected, out);
             Assertions.assertTrue(
                     out.getShape().equals(bn.getOutputShape(new Shape(1, 1, 3, 3, 3))));
+        }
+    }
+
+    @RunAsTest
+    public void testRNNTanh() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray input = manager.arange(0, 48, 1).reshape(new Shape(3, 4, 4));
+            RNN rnn =
+                    new RNN.Builder()
+                            .setStateSize(5)
+                            .setNumStackedLayers(1)
+                            .setActivation(RNN.Activation.TANH)
+                            .build();
+            rnn.setInitializer(manager, Initializer.ONES);
+            NDList outputs = rnn.forward(new NDList(input));
+            NDArray out = outputs.get(0);
+            Assertions.assertEquals(manager.ones(new Shape(3, 4, 5)), out);
+        }
+    }
+
+    @RunAsTest
+    public void testRNNRelu() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray input = manager.arange(0, 8, 1).reshape(new Shape(1, 2, 4));
+            RNN rnn =
+                    new RNN.Builder()
+                            .setStateSize(5)
+                            .setNumStackedLayers(1)
+                            .setActivation(RNN.Activation.RELU)
+                            .build();
+            rnn.setInitializer(manager, Initializer.ONES);
+            NDList outputs = rnn.forward(new NDList(input));
+            NDArray out = outputs.get(0);
+            NDArray expected =
+                    manager.create(
+                            new float[] {13, 13, 13, 13, 13, 29, 29, 29, 29, 29},
+                            new Shape(1, 2, 5));
+            Assertions.assertEquals(expected, out);
+        }
+    }
+
+    @RunAsTest
+    public void testLSTM() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray input = manager.arange(0, 8, 1).reshape(new Shape(1, 2, 4));
+            LSTM lstm =
+                    new LSTM.Builder()
+                            .setStateSize(4)
+                            .setNumStackedLayers(1)
+                            .setActivation(RNN.Activation.RELU)
+                            .build();
+            lstm.setInitializer(manager, Initializer.ONES);
+            NDList outputs = lstm.forward(new NDList(input));
+            NDArray out = outputs.get(0);
+            NDArray expected =
+                    manager.create(
+                            new float[] {
+                                0.9640276f,
+                                0.9640276f,
+                                0.9640276f,
+                                0.9640276f,
+                                0.9640276f,
+                                0.9640276f,
+                                0.9640276f,
+                                0.9640276f
+                            },
+                            new Shape(1, 2, 4));
+            Assertions.assertAlmostEquals(expected, out);
+        }
+    }
+
+    @RunAsTest
+    public void testGRU() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray input = manager.arange(0, 8, 1).reshape(new Shape(1, 2, 4));
+            GRU lstm =
+                    new GRU.Builder()
+                            .setStateSize(4)
+                            .setNumStackedLayers(1)
+                            .setActivation(RNN.Activation.RELU)
+                            .build();
+            lstm.setInitializer(manager, Initializer.ONES);
+            NDList outputs = lstm.forward(new NDList(input));
+            NDArray out = outputs.get(0);
+            Assertions.assertAlmostEquals(manager.ones(new Shape(1, 2, 4)), out);
         }
     }
 }

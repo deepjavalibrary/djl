@@ -19,7 +19,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.initializer.Initializer;
 
 public class Parameter implements AutoCloseable {
-
     private String name;
     private Block block;
     private ParameterType type;

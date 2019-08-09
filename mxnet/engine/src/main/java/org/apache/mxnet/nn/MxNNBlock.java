@@ -16,6 +16,7 @@ import software.amazon.ai.Block;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
@@ -64,5 +65,17 @@ public abstract class MxNNBlock implements Block {
     @Override
     public byte[] getEncoded() {
         return new byte[0];
+    }
+
+    protected boolean isLayoutSupported(LayoutType[] expectedLayout, LayoutType[] actualLayout) {
+        if (actualLayout.length != expectedLayout.length) {
+            return false;
+        }
+        for (int i = 0; i < actualLayout.length; i++) {
+            if (actualLayout[i] != LayoutType.UNKNOWN && actualLayout[i] != expectedLayout[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 }

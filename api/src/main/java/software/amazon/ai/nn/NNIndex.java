@@ -23,6 +23,9 @@ import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.nn.norm.Dropout;
+import software.amazon.ai.nn.recurrent.GRU;
+import software.amazon.ai.nn.recurrent.LSTM;
+import software.amazon.ai.nn.recurrent.RNN;
 
 /**
  * An internal mapping to Engine specific implementations of Neural Network {@link
@@ -67,4 +70,32 @@ public abstract class NNIndex {
             int numFilters,
             int numGroups,
             boolean noBias);
+
+    public abstract RNN rnn(
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            RNN.Activation activation,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs);
+
+    public abstract LSTM lstm(
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            double lstmStateClipMin,
+            double lstmStateClipMax,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs,
+            boolean clipLstmState);
+
+    public abstract GRU gru(
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs);
 }

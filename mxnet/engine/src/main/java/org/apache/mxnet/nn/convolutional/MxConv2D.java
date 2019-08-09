@@ -89,21 +89,9 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
     public void beforeInitialize(final NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
-        if (!isLayoutSupported(inputShape.getLayout())) {
+        if (!isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
             throw new UnsupportedOperationException("Conv2D requires NCHW layout");
         }
-    }
-
-    private boolean isLayoutSupported(final LayoutType[] layout) {
-        if (layout.length != EXPECTED_LAYOUT.length) {
-            return false;
-        }
-        for (int i = 0; i < layout.length; i++) {
-            if (layout[i] != LayoutType.UNKNOWN && layout[i] != EXPECTED_LAYOUT[i]) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

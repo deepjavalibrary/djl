@@ -26,7 +26,7 @@ import software.amazon.ai.nn.convolutional.Conv3D;
 import software.amazon.ai.util.PairList;
 
 public class MxConv3D extends MxNNBlock implements Conv3D {
-    private static final LayoutType[] LAYOUT =
+    private static final LayoutType[] EXPECTED_LAYOUT =
             new LayoutType[] {
                 LayoutType.BATCH,
                 LayoutType.CHANNEL,
@@ -93,21 +93,9 @@ public class MxConv3D extends MxNNBlock implements Conv3D {
     public void beforeInitialize(final NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
-        if (!isLayoutSupported(inputShape.getLayout())) {
+        if (!isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
             throw new UnsupportedOperationException("Conv3D requires NCDHW layout");
         }
-    }
-
-    private boolean isLayoutSupported(final LayoutType[] layout) {
-        if (layout.length != LAYOUT.length) {
-            return false;
-        }
-        for (int i = 0; i < LAYOUT.length; i++) {
-            if (layout[i] != LayoutType.UNKNOWN && layout[i] != LAYOUT[i]) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
