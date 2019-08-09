@@ -61,6 +61,7 @@ public class RemoteRepository implements Repository {
                 Metadata metadata = GSON.fromJson(reader, Metadata.class);
                 Date lastUpdated = metadata.getLastUpdated();
                 if (System.currentTimeMillis() - lastUpdated.getTime() < ONE_DAY) {
+                    metadata.setRepositoryUri(mrlUri);
                     return metadata;
                 }
             }
@@ -73,6 +74,7 @@ public class RemoteRepository implements Repository {
             try (Writer writer = Files.newBufferedWriter(cacheFile)) {
                 writer.write(GSON.toJson(metadata));
             }
+            metadata.setRepositoryUri(mrlUri);
             return metadata;
         }
     }
@@ -87,8 +89,6 @@ public class RemoteRepository implements Repository {
             return null;
         }
         // TODO: find hightest version.
-        Artifact artifact = artifacts.get(0);
-        artifact.setBaseUri(mrl.toURI());
-        return artifact;
+        return artifacts.get(0);
     }
 }

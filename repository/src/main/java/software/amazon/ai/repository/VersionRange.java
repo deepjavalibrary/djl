@@ -152,6 +152,9 @@ public final class VersionRange {
     }
 
     public boolean contains(Version version) {
+        if (recommendedVersion != null) {
+            return recommendedVersion.equals(version);
+        }
         for (Restriction restriction : restrictions) {
             if (restriction.containsVersion(version)) {
                 return true;
@@ -161,13 +164,7 @@ public final class VersionRange {
     }
 
     public boolean contains(Artifact artifact) {
-        Version version = artifact.getParsedVersion();
-        for (Restriction restriction : restrictions) {
-            if (restriction.containsVersion(version)) {
-                return true;
-            }
-        }
-        return false;
+        return contains(artifact.getParsedVersion());
     }
 
     @Override

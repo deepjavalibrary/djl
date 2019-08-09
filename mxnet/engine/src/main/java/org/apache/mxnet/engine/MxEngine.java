@@ -111,14 +111,14 @@ public class MxEngine extends Engine {
             throws IOException {
         Path modelDir;
         if (Files.isDirectory(modelPath)) {
-            modelDir = modelPath;
+            modelDir = modelPath.toAbsolutePath();
         } else {
             modelDir = modelPath.toAbsolutePath().getParent();
             if (modelDir == null) {
                 throw new AssertionError("Invalid path: " + modelPath.toString());
             }
         }
-        String modelPrefix = modelDir.resolve(modelName).toAbsolutePath().toString();
+        String modelPrefix = modelDir.resolve(modelName).toString();
 
         String epochOption = null;
         if (options != null) {

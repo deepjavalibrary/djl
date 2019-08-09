@@ -53,7 +53,9 @@ public class LocalRepository implements Repository {
             return null;
         }
         try (Reader reader = Files.newBufferedReader(file)) {
-            return GSON.fromJson(reader, Metadata.class);
+            Metadata metadata = GSON.fromJson(reader, Metadata.class);
+            metadata.setRepositoryUri(uri);
+            return metadata;
         }
     }
 
@@ -67,8 +69,6 @@ public class LocalRepository implements Repository {
             return null;
         }
         // TODO: find hightest version.
-        Artifact artifact = artifacts.get(0);
-        artifact.setBaseUri(mrl.toURI());
-        return artifact;
+        return artifacts.get(0);
     }
 }

@@ -28,10 +28,11 @@ public class Artifact {
     private transient String artifactId;
     private String version;
     private boolean snapshot;
+    private String name;
     private LinkedHashMap<String, String> properties;
     private Map<String, Item> files;
 
-    private transient URI baseUri;
+    private transient Metadata metadata;
     private transient Version cache;
 
     public String getMetadataVersion() {
@@ -74,6 +75,14 @@ public class Artifact {
         this.snapshot = snapshot;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Map<String, String> getProperties() {
         return properties;
     }
@@ -82,22 +91,22 @@ public class Artifact {
         this.properties = properties;
     }
 
-    public URI getBaseUri() {
-        return baseUri;
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
     }
 
     public URI getResourceUri() {
-        URI uri = baseUri;
+        URI uri = metadata.getRepositoryUri();
         if (properties != null) {
             for (String values : properties.values()) {
                 uri = uri.resolve(values + '/');
             }
         }
         return uri.resolve(version);
-    }
-
-    public void setBaseUri(URI baseUri) {
-        this.baseUri = baseUri;
     }
 
     public Map<String, Item> getFiles() {

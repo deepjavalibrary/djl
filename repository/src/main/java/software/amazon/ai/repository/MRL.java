@@ -60,6 +60,11 @@ public class MRL {
         this.artifactId = artifactId;
     }
 
+    @Override
+    public String toString() {
+        return toURI().toString();
+    }
+
     public interface Dataset {
 
         Anchor CV = new Anchor("dataset/cv");

@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.repository;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ public class Metadata {
     private List<Artifact> artifacts;
     private String checksum;
     private Date lastUpdated;
+
+    private transient URI repositoryUri;
 
     public List<Artifact> search(VersionRange versionRange, Map<String, String> filter) {
         List<Artifact> results = versionRange.matches(artifacts);
@@ -108,5 +111,18 @@ public class Metadata {
 
     public void setLastUpdated(Date lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public URI getRepositoryUri() {
+        return repositoryUri;
+    }
+
+    public void setRepositoryUri(URI repositoryUri) {
+        this.repositoryUri = repositoryUri;
+        if (artifacts != null) {
+            for (Artifact artifact : artifacts) {
+                artifact.setMetadata(this);
+            }
+        }
     }
 }

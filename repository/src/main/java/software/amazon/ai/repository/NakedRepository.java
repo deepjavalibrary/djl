@@ -48,11 +48,13 @@ public class NakedRepository implements Repository {
 
     @Override
     public Artifact resolve(MRL mrl, String version, Map<String, String> filter) {
+        Metadata metadata = new Metadata();
+        metadata.setRepositoryUri(path.toUri());
         Artifact artifact = new Artifact();
         artifact.setGroupId(mrl.getGroupId());
         artifact.setArtifactId(mrl.getArtifactId());
         artifact.setVersion(version);
-        artifact.setBaseUri(path.toUri());
+        artifact.setMetadata(metadata);
         return artifact;
     }
 
