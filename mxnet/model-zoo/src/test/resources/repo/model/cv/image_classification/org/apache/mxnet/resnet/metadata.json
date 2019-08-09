@@ -1,0 +1,45 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "org.apache.mxnet",
+  "artifactId": "resnet",
+  "type": "cv",
+  "name": "Resnet",
+  "description": "Resnet image classification",
+  "website": "http://www.mxnet.io",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "http://aws.amazon.com/apache2.0/"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet18_v1",
+      "properties": {
+        "layers": "18",
+        "flavor": "v1",
+        "dataset": "imagenet"
+      },
+      "files": {
+        "synset": {
+          "uri": "synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "name": "synset.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/resnet18_v1-symbol.json",
+          "sha1Hash": "3ef33232be4450d308c58320295517a20a38a2ef",
+          "name": "resnet18_v1-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/resnet/0.0.1/resnet18_v1-0000.params.zip",
+          "sha1Hash": "16de8809400f201b480927115eb03db1dcec839f",
+          "name": "resnet18_v1-0000.params",
+          "type": "file"
+        }
+      }
+    }
+  ]
+}

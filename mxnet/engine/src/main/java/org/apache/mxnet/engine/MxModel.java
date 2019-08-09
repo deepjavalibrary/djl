@@ -81,7 +81,11 @@ public class MxModel implements Model {
         for (int i = 0; i < names.length; ++i) {
             String[] pair = names[i].split(":", 2);
             MxNDArray array = subManager.create(handles[i]);
-            parameters.add(new Parameter(pair[1], array));
+            if (pair.length == 2) {
+                parameters.add(new Parameter(pair[1], array));
+            } else {
+                parameters.add(new Parameter(pair[0], array));
+            }
         }
         // TODO: Check if Symbol has all names that params file have
         return new MxModel(modelDir, new SymbolBlock(symbol, parameters, subManager), subManager);

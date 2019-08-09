@@ -10,14 +10,16 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.zoo.cv.objectdetection;
+package org.apache.mxnet.zoo;
 
-import software.amazon.ai.Model;
-import software.amazon.ai.zoo.NetworkSpec;
+import org.apache.mxnet.zoo.cv.objectdetection.SingleShotDetection;
+import software.amazon.ai.repository.Repository;
 
-public class Ssd {
+public interface ModelZoo {
 
-    Model loadSsd(int size, NetworkSpec backbone, boolean pretrained) {
-        return null;
-    }
+    String MXNET_REPO_URL = "https://joule.s3.amazonaws.com/mlrepo/";
+    Repository REPOSITORY = Repository.newInstance("MxNet", MXNET_REPO_URL);
+    String GROUP_ID = "org.apache.mxnet";
+
+    SingleShotDetection SSD = SingleShotDetection.newInstance();
 }

@@ -1,0 +1,393 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "org.apache.mxnet",
+  "artifactId": "ssd",
+  "type": "cv",
+  "name": "SSD",
+  "description": "Single-shot object detection",
+  "website": "http://www.mxnet.io",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "http://aws.amazon.com/apache2.0/"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_300_vgg16_coco",
+      "properties": {
+        "size": "300",
+        "backbone": "vgg16",
+        "flavor": "atrous",
+        "dataset": "coco"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_coco.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_300_vgg16-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_300_vgg16_coco-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_300_vgg16_atrous_coco-b302ad8a.zip",
+          "sha1Hash": "b302ad8a8660345c368448141d8acf30b5a3801d",
+          "name": "ssd_300_vgg16_coco-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_300_vgg16_voc",
+      "properties": {
+        "size": "300",
+        "backbone": "vgg16",
+        "flavor": "atrous",
+        "dataset": "voc"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_300_vgg16-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_300_vgg16_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_300_vgg16_atrous_voc-0e169fbb.zip",
+          "sha1Hash": "0e169fbb64efdee6985c3c175ec4298c4bda0298",
+          "name": "ssd_300_vgg16_voc-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_mobilenet1_0_coco",
+      "properties": {
+        "size": "512",
+        "backbone": "mobilenet1_0",
+        "flavor": "none",
+        "dataset": "coco"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_coco.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_mobilenet1_0-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_512_mobilenet1_0_coco-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_mobilenet1_0_coco-da9756fa.zip",
+          "sha1Hash": "da9756faa5b9b4e34dedcf83ee0733d5895796ad",
+          "name": "ssd_512_mobilenet1_0_coco-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_mobilenet1_0_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "mobilenet1_0",
+        "flavor": "none",
+        "dataset": "voc"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_mobilenet1_0-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_512_mobilenet1_0_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_mobilenet1_0_voc-37c18076.zip",
+          "sha1Hash": "37c180765a4eb3e67751d6bacac47bb9156f5fff",
+          "name": "ssd_512_mobilenet1_0_voc-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_resnet101_v2_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "resnet101_v2",
+        "flavor": "none",
+        "dataset": "voc"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_resnet101_v2-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_512_resnet101_v2_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_resnet101_v2_voc-2cc0f93e.zip",
+          "sha1Hash": "2cc0f93edf1467f428018cc7261d3246dfa15259",
+          "name": "ssd_512_resnet101_v2_voc-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_resnet152_v2_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "resnet152_v2",
+        "flavor": "none",
+        "dataset": "voc"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_resnet152_v2-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_512_resnet152_v2_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_resnet152_v2_voc-xxxxxxx.zip",
+          "sha1Hash": "NOT_FOUND",
+          "name": "ssd_512_resnet152_v2_voc-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_resnet18_v1_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "resnet18_v1",
+        "flavor": "none",
+        "dataset": "coco"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_coco.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_resnet18_v1-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_512_resnet18_v1_coco-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_resnet18_v1_coco-xxxxxxx.zip",
+          "sha1Hash": "NOT_FOUND",
+          "name": "ssd_512_resnet18_v1_coco-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "properties": {
+        "size": "512",
+        "backbone": "resnet18_v1",
+        "flavor": "none",
+        "dataset": "voc"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_resnet18_v1-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_512_resnet18_v1_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_resnet18_v1_voc-xxxxxxx.zip",
+          "sha1Hash": "NOT_FOUND",
+          "name": "ssd_512_resnet18_v1_voc-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_resnet50_v1_coco",
+      "properties": {
+        "size": "512",
+        "backbone": "resnet50_v1",
+        "flavor": "none",
+        "dataset": "coco"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_coco.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_resnet50_v1-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_512_resnet50_v1_coco-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_resnet50_v1_coco-c4835162.zip",
+          "sha1Hash": "c48351620d4f0cbc49e4f7a84c8e67ef8fdc6e09",
+          "name": "ssd_512_resnet50_v1_coco-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_resnet50_v1_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "resnet50_v1",
+        "flavor": "none",
+        "dataset": "voc"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_resnet50_v1-symbol.json",
+          "sha1Hash": "0518131d1361dddaa2d2471595fa758bae15b754",
+          "name": "ssd_512_resnet50_v1_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_resnet50_v1_voc-9c8b225a.zip",
+          "sha1Hash": "9c8b225a552614e4284a0f647331bfdc6940eb4a",
+          "name": "ssd_512_resnet50_v1_voc-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.2",
+      "snapshot": false,
+      "name": "ssd_512_resnet50_v1_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "resnet50_v1",
+        "flavor": "none",
+        "dataset": "voc"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.2/ssd_512_resnet50_v1-symbol.json",
+          "sha1Hash": "ca1e3c3c7575097418b64a745bde5b3984f4ca4b",
+          "name": "ssd_512_resnet50_v1_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/object_detection/org/apache/mxnet/ssd/0.0.2/ssd_512_resnet50_v1_voc-0000.params.zip",
+          "sha1Hash": "b7219dd3b239391c9c388ee9ff9d84de28dec83a",
+          "name": "ssd_512_resnet50_v1_voc-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_vgg16_coco",
+      "properties": {
+        "size": "512",
+        "backbone": "vgg16",
+        "flavor": "atrous",
+        "dataset": "coco"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_coco.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_vgg16-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_512_vgg16_coco-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_vgg16_atrous_coco-5c860642.zip",
+          "sha1Hash": "5c86064290c05eccbdd88475376c71c595c8325c",
+          "name": "ssd_512_vgg16_coco-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_vgg16_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "vgg16",
+        "flavor": "atrous",
+        "dataset": "voc"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_vgg16-symbol.json",
+          "sha1Hash": "NOT_YET",
+          "name": "ssd_512_vgg16_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/models/ssd_512_vgg16_atrous_voc-daf8181b.zip",
+          "sha1Hash": "daf8181b615b480236fcb8474545077891276945",
+          "name": "ssd_512_vgg16_voc-0000.params",
+          "type": "file"
+        }
+      }
+    }
+  ]
+}

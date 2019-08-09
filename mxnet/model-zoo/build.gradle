@@ -2,13 +2,13 @@ plugins {
     id 'java'
 }
 
-group 'software.amazon.ai.repository'
+group 'org.apache.mxnet'
 version '0.2.0-SNAPSHOT'
 
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
-    compile "com.google.code.gson:gson:${gson_version}"
-    compile project(":joule-api")
+    compile project(":repository")
+    compile project(":mxnet:engine")
 
     testCompile "org.testng:testng:${testng_version}"
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
