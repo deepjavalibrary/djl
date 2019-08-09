@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.RandomAccess;
-import java.util.zip.GZIPInputStream;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -120,13 +119,12 @@ public class Mnist implements Dataset, RandomAccess {
     }
 
     private NDArray readData(Artifact.Item item, long length) throws IOException {
-        try (InputStream is = repository.openStream(item);
-                GZIPInputStream zis = new GZIPInputStream(is)) {
-            if (zis.skip(16) != 16) {
+        try (InputStream is = repository.openStream(item, null)) {
+            if (is.skip(16) != 16) {
                 throw new AssertionError("Failed skip data.");
             }
 
-            byte[] buf = Utils.toByteArray(zis);
+            byte[] buf = Utils.toByteArray(is);
             try (NDArray array = manager.create(new Shape(length, 28, 28), DataType.UINT8)) {
                 array.set(buf);
                 return array.asType(DataType.FLOAT32, true);
@@ -135,13 +133,12 @@ public class Mnist implements Dataset, RandomAccess {
     }
 
     private NDArray readLabel(Artifact.Item item) throws IOException {
-        try (InputStream is = repository.openStream(item);
-                GZIPInputStream zis = new GZIPInputStream(is)) {
-            if (zis.skip(8) != 8) {
+        try (InputStream is = repository.openStream(item, null)) {
+            if (is.skip(8) != 8) {
                 throw new AssertionError("Failed skip data.");
             }
 
-            byte[] buf = Utils.toByteArray(zis);
+            byte[] buf = Utils.toByteArray(is);
             try (NDArray array = manager.create(new Shape(buf.length), DataType.UINT8)) {
                 array.set(buf);
                 return array.asType(DataType.FLOAT32, true);

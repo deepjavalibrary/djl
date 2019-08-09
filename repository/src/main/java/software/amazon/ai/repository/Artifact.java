@@ -139,6 +139,9 @@ public class Artifact {
 
         private String uri;
         private String sha1Hash;
+        private String name;
+        private String type;
+        private String extension;
         private Artifact artifact;
 
         public String getUri() {
@@ -155,6 +158,67 @@ public class Artifact {
 
         public void setSha1Hash(String sha1Hash) {
             this.sha1Hash = sha1Hash;
+        }
+
+        public String getType() {
+            if (type == null) {
+                getExtension();
+                if ("tgz".equals(extension) || "tar".equals(extension)) {
+                    type = "dir";
+                } else {
+                    type = "file";
+                }
+            }
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getName() {
+            if (name == null) {
+                if ("dir".equals(getType())) {
+                    name = "";
+                } else {
+                    int pos = uri.lastIndexOf('/');
+                    if (pos >= 0) {
+                        name = uri.substring(pos + 1);
+                    } else {
+                        name = uri;
+                    }
+                    pos = name.lastIndexOf('.');
+                    if (pos > 0) {
+                        name = name.substring(0, pos);
+                    }
+                }
+            }
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getExtension() {
+            if (extension == null) {
+                if (uri.endsWith(".tar.gz") || uri.endsWith(".tgz") || uri.endsWith(".tar.z")) {
+                    extension = "tgz";
+                } else if (uri.endsWith(".tar")) {
+                    extension = "tar";
+                } else if (uri.endsWith(".zip")) {
+                    extension = "zip";
+                } else if (uri.endsWith(".gz") || uri.endsWith(".z")) {
+                    extension = "gzip";
+                } else {
+                    extension = "";
+                }
+            }
+            return extension;
+        }
+
+        public void setExtension(String extension) {
+            this.extension = extension;
         }
 
         public Artifact getArtifact() {
