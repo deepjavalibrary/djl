@@ -263,6 +263,11 @@ public abstract class NDFormat {
 
         public IntFormat(NDArray array) {
             Number[] values = array.toArray();
+            // scalar case
+            if (values.length == 1) {
+                totalLength = 1;
+                return;
+            }
             long max = 0;
             long negativeMax = 0;
             for (Number n : values) {

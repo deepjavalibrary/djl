@@ -14,7 +14,9 @@ package software.amazon.ai.training.dataset;
 
 import java.util.Iterator;
 
-public interface Sampler extends Iterator<Integer> {
+/** An interface for all the indices sampler. */
+public interface Sampler<T> extends Iterator<T> {
 
-    void init(int size);
+    // TODO have a good reason to have size
+    long size();
 }

@@ -12,16 +12,14 @@
  */
 package org.apache.mxnet.dataset;
 
-import java.util.Iterator;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.Sampler;
 import software.amazon.ai.util.Pair;
 
 public class MinstFashion implements Dataset {
 
     @Override
-    public Iterator<Pair<NDList, NDList>> getData(Usage usage, int batchSize, Sampler sampler) {
+    public Iterable<Pair<NDList, NDList>> getData() {
         return null;
     }
 }

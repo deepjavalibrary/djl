@@ -13,7 +13,6 @@
 package org.apache.mxnet.dataset;
 
 import java.io.IOException;
-import java.util.Iterator;
 import org.apache.mxnet.jna.JnaUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -41,30 +40,30 @@ public class MnistTest {
     public void testMnistLocal() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
-            Mnist mnist = Mnist.newInstance(manager, repository);
-            mnist.prepare();
-            Iterator<Pair<NDList, NDList>> it = mnist.getData(Dataset.Usage.TRAIN, 32);
-
-            Assert.assertTrue(it.hasNext());
-
-            Pair<NDList, NDList> pair = it.next();
-
-            Assert.assertEquals(pair.getKey().size(), 1);
+            Mnist mnist =
+                    new Mnist.Builder(manager, repository)
+                            .setUsage(Dataset.Usage.TEST)
+                            .setDataLoading(false, 32, false)
+                            .build();
+            for (Pair<NDList, NDList> batch : mnist.getData()) {
+                Assert.assertEquals(batch.getKey().size(), 1);
+                Assert.assertEquals(batch.getValue().size(), 1);
+            }
         }
     }
 
     @Test
     public void testMnistRemote() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            Mnist mnist = Mnist.newInstance(manager);
-            mnist.prepare();
-            Iterator<Pair<NDList, NDList>> it = mnist.getData(Dataset.Usage.TRAIN, 32);
-
-            Assert.assertTrue(it.hasNext());
-
-            Pair<NDList, NDList> pair = it.next();
-
-            Assert.assertEquals(pair.getKey().size(), 1);
+            Mnist mnist =
+                    new Mnist.Builder(manager)
+                            .setUsage(Dataset.Usage.TEST)
+                            .setDataLoading(false, 32, false)
+                            .build();
+            for (Pair<NDList, NDList> batch : mnist.getData()) {
+                Assert.assertEquals(batch.getKey().size(), 1);
+                Assert.assertEquals(batch.getValue().size(), 1);
+            }
         }
     }
 }

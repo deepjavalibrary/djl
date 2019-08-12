@@ -14,10 +14,7 @@ package org.apache.mxnet.dataset;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.RandomAccess;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -26,96 +23,69 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.dataset.Batchifier;
-import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.Sampler;
+import software.amazon.ai.training.dataset.DataIterable;
+import software.amazon.ai.training.dataset.DataLoadingConfiguration;
+import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
 
-public class Mnist implements Dataset, RandomAccess {
+// TODO we will have download dataset that CIFAR10, MNIST would extend from
+public final class Mnist implements RandomAccessDataset {
 
     private static final String ARTIFACT_ID = "mnist";
 
-    private Repository repository;
-    private NDManager manager;
-    private Artifact artifact;
-    private boolean prepared;
-    private NDArray trainData;
-    private NDArray trainLabels;
-    private NDArray testData;
-    private NDArray testLabels;
+    private final Repository repository;
+    private final NDManager manager;
+    private final Artifact artifact;
+    private final DataLoadingConfiguration config;
+    private NDArray data;
+    private NDArray labels;
+    private long size;
 
-    public Mnist(NDManager manager, Repository repository, Artifact artifact) {
-        this.manager = manager;
-        this.repository = repository;
-        this.artifact = artifact;
+    private Mnist(Builder builder) throws IOException {
+        this.repository = builder.repository;
+        this.manager = builder.manager;
+        this.artifact = builder.artifact;
+        this.config = builder.config;
+        repository.prepare(artifact);
+        loadData(builder.usage);
     }
 
-    public static Mnist newInstance(NDManager manager) throws IOException {
-        return newInstance(manager, Datasets.REPOSITORY);
-    }
-
-    public static Mnist newInstance(NDManager manager, Repository repository) throws IOException {
-        MRL mrl = new MRL(MRL.Dataset.CV, Datasets.GROUP_ID, ARTIFACT_ID);
-        Artifact artifact = repository.resolve(mrl, "1.0", null);
-        if (artifact == null) {
-            throw new IOException("MMIST dataset not found.");
-        }
-        return new Mnist(manager, repository, artifact);
-    }
-
-    public void prepare() throws IOException {
-        if (!prepared) {
-            repository.prepare(artifact);
-            loadTrainData();
-            loadTestData();
-            prepared = true;
-        }
-    }
-
-    // TODO: Does label concept applies to all dataset?
     @Override
-    public Iterator<Pair<NDList, NDList>> getData(Usage usage, int batchSize, Sampler sampler) {
-        // TODO: How to batch should be determind by each dataset, right?
-        Batchifier batchifier = Batchifier.STACK_BATCHIFIER;
+    public Iterable<Pair<NDList, NDList>> getData() {
+        return new DataIterable(this, config);
+    }
+
+    @Override
+    public Pair<NDList, NDList> get(long index) {
+        return new Pair<>(new NDList(data.get(index)), new NDList(labels.get(index)));
+    }
+
+    @Override
+    public long size() {
+        return size;
+    }
+
+    private void loadData(Usage usage) throws IOException {
+        Map<String, Artifact.Item> map = artifact.getFiles();
+        Artifact.Item imageItem;
+        Artifact.Item labelItem;
         switch (usage) {
             case TRAIN:
-                sampler.init((int) trainLabels.size());
-                return new DataIterator(trainData, trainLabels, sampler, batchSize, batchifier);
+                imageItem = map.get("train_data");
+                labelItem = map.get("train_labels");
+                break;
             case TEST:
-                sampler.init((int) testLabels.size());
-                return new DataIterator(testData, testLabels, sampler, batchSize, batchifier);
+                imageItem = map.get("test_data");
+                labelItem = map.get("test_labels");
+                break;
             case VALIDATION:
             default:
                 throw new UnsupportedOperationException("Validation data not available.");
         }
-    }
-
-    // Multithreading may not make sense for all dataset, it's update to each dataset's
-    // implementation to honor concurrentWorker.
-    public Iterator<Pair<NDList, NDList>> getData(
-            Usage usage, int batchSize, Sampler sampler, int concurrentWorker) {
-        return null;
-    }
-
-    void loadTrainData() throws IOException {
-        if (trainData == null) {
-            Map<String, Artifact.Item> map = artifact.getFiles();
-            Artifact.Item imageItem = map.get("train_data");
-            Artifact.Item labelItem = map.get("train_labels");
-            trainLabels = readLabel(labelItem);
-            trainData = readData(imageItem, trainLabels.size());
-        }
-    }
-
-    void loadTestData() throws IOException {
-        if (testData == null) {
-            Map<String, Artifact.Item> map = artifact.getFiles();
-            Artifact.Item imageItem = map.get("test_data");
-            Artifact.Item labelItem = map.get("test_labels");
-            testLabels = readLabel(labelItem);
-            testData = readData(imageItem, testLabels.size());
-        }
+        labels = readLabel(labelItem);
+        size = labels.size();
+        data = readData(imageItem, labels.size());
     }
 
     private NDArray readData(Artifact.Item item, long length) throws IOException {
@@ -146,64 +116,70 @@ public class Mnist implements Dataset, RandomAccess {
         }
     }
 
-    private static class DataIterator implements Iterator<Pair<NDList, NDList>> {
+    public static final class Builder {
+        private NDManager manager;
+        private Repository repository;
+        private Artifact artifact;
+        private Usage usage;
+        private DataLoadingConfiguration config;
 
-        private Sampler sampler;
-        private int batchSize;
-        private Batchifier batchifier;
-        private NDArray[] d;
-        private NDArray[] l;
-        private NDArray data;
-        private NDArray labels;
-        private Pair<NDList, NDList> current;
-
-        DataIterator(
-                NDArray data,
-                NDArray labels,
-                Sampler sampler,
-                int batchSize,
-                Batchifier batchifier) {
-            this.data = data;
-            this.labels = labels;
-            this.sampler = sampler;
-            this.batchSize = batchSize;
-            this.batchifier = batchifier;
-            d = new NDArray[batchSize];
-            l = new NDArray[batchSize];
+        public Builder(NDManager manager) {
+            this.manager = manager;
+            this.repository = Datasets.REPOSITORY;
         }
 
-        @Override
-        public boolean hasNext() {
-            if (current == null) {
-                current = nextInternal();
-            }
-            return current != null;
+        public Builder(NDManager manager, Repository repository) {
+            this.manager = manager;
+            this.repository = repository;
         }
 
-        @Override
-        public Pair<NDList, NDList> next() {
-            if (current == null) {
-                current = nextInternal();
-            }
-            if (current == null) {
-                throw new NoSuchElementException();
-            }
-            return current;
+        public Builder setUsage(Usage usage) {
+            this.usage = usage;
+            return this;
         }
 
-        private Pair<NDList, NDList> nextInternal() {
-            for (int i = 0; i < batchSize; ++i) {
-                if (!sampler.hasNext()) {
-                    return null;
+        public Builder setArtifact(Artifact artifact) {
+            this.artifact = artifact;
+            return this;
+        }
+
+        public Builder setDataLoading(boolean shuffle, int batchSize, boolean dropLast) {
+            this.config =
+                    new DataLoadingConfiguration.Builder()
+                            .setShuffle(shuffle)
+                            .setBatchSize(batchSize)
+                            .setDropLast(dropLast)
+                            .build();
+            return this;
+        }
+
+        public Builder setDataLoadingConfig(DataLoadingConfiguration config) {
+            if (this.config != null) {
+                throw new IllegalArgumentException(
+                        "either setDataLoading or setDataLoadingConfig, not both");
+            }
+            this.config = config;
+            return this;
+        }
+
+        public Mnist build() throws IOException {
+            if (artifact == null) {
+                MRL mrl = new MRL(MRL.Dataset.CV, Datasets.GROUP_ID, ARTIFACT_ID);
+                artifact = repository.resolve(mrl, "1.0", null);
+                // TODO to be refactored
+                if (artifact == null) {
+                    throw new IOException("MMIST dataset not found.");
                 }
-
-                int index = sampler.next();
-                d[i] = data.get(index);
-                l[i] = labels.get(index);
             }
-            NDList key = new NDList(batchifier.batch(d));
-            NDList value = new NDList(batchifier.batch(l));
-            return new Pair<>(key, value);
+            if (this.config == null) {
+                this.config =
+                        new DataLoadingConfiguration.Builder()
+                                .setShuffle(false)
+                                .setBatchSize(1)
+                                .setDropLast(false)
+                                .build();
+            }
+            return new Mnist(this);
         }
     }
 }

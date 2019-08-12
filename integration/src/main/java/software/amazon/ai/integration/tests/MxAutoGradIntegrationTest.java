@@ -19,6 +19,7 @@ import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
 import org.apache.mxnet.engine.optimizer.MxOptimizer;
 import org.apache.mxnet.engine.optimizer.Sgd;
+import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Parameter;
 import software.amazon.ai.SequentialBlock;
 import software.amazon.ai.integration.IntegrationTest;
@@ -43,7 +44,9 @@ public class MxAutoGradIntegrationTest {
 
     public static void main(String[] args) {
         String[] cmd = new String[] {"-c", MxAutoGradIntegrationTest.class.getName()};
+        JnaUtils.setNumpyMode(true);
         new IntegrationTest().runTests(cmd);
+        JnaUtils.setNumpyMode(false);
     }
 
     @RunAsTest
@@ -126,7 +129,6 @@ public class MxAutoGradIntegrationTest {
     @RunAsTest
     public void testTrainMnist() throws IOException, FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-
             SequentialBlock mlp = new SequentialBlock();
             mlp.add(new Linear.Builder().setOutChannels(128).build());
             mlp.add(Activation.reluBlock());

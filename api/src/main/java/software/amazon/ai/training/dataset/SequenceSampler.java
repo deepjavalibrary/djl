@@ -14,22 +14,17 @@ package software.amazon.ai.training.dataset;
 
 import java.util.NoSuchElementException;
 
-public class SequenceSampler implements Sampler {
+/** Sampler the data from [0, dataset.size) sequentially. */
+public class SequenceSampler implements Sampler<Long> {
 
-    private int size;
-    private int current;
+    private long size;
+    private long current;
 
     public SequenceSampler() {
-        size = Integer.MAX_VALUE;
+        size = Long.MAX_VALUE;
     }
 
-    public SequenceSampler(int size) {
-        init(size);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public final void init(int size) {
+    public SequenceSampler(long size) {
         this.size = size;
     }
 
@@ -41,10 +36,16 @@ public class SequenceSampler implements Sampler {
 
     /** {@inheritDoc} */
     @Override
-    public Integer next() {
+    public Long next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
         return current++;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long size() {
+        return size;
     }
 }

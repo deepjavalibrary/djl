@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.training.dataset;
 
-import java.util.Iterator;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.util.Pair;
 
@@ -20,7 +19,7 @@ public class ImageRecord implements Dataset {
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<Pair<NDList, NDList>> getData(Usage usage, int batchSize, Sampler sampler) {
+    public Iterable<Pair<NDList, NDList>> getData() {
         return null;
     }
 }

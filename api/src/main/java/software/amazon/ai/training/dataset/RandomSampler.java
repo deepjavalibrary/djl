@@ -14,55 +14,63 @@ package software.amazon.ai.training.dataset;
 
 import java.util.NoSuchElementException;
 import java.util.Random;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import software.amazon.ai.util.RandomUtils;
 
-public class RandomSampler implements Sampler {
+public class RandomSampler implements Sampler<Long> {
 
-    private int[] indices;
-    private int pos;
-    private Integer seed;
+    private long[] indices;
+    private long current;
+    private long size;
 
-    public RandomSampler() {}
-
-    public RandomSampler(int seed) {
-        this.seed = seed;
+    public RandomSampler(long size) {
+        this.size = size;
+        current = 0;
+        indices = LongStream.range(0, size).toArray();
+        // java array didn't support index greater than max integer
+        // so cast to int for now
+        for (int i = Math.toIntExact(size) - 1; i > 0; --i) {
+            swap(indices, i, RandomUtils.nextInt(i));
+        }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public final void init(int size) {
-        pos = 0;
-        indices = IntStream.range(0, size).toArray();
-        if (seed == null) {
-            for (int i = size; i > 1; --i) {
-                swap(indices, i - 1, RandomUtils.nextInt(i));
-            }
-        } else {
-            Random rnd = new Random(seed);
-            for (int i = size; i > 1; --i) {
-                swap(indices, i - 1, rnd.nextInt(i));
-            }
+    public RandomSampler(long size, int seed) {
+        this.size = size;
+        current = 0;
+        indices = LongStream.range(0, size).toArray();
+        Random rnd = new Random(seed);
+        // java array didn't support index greater than max integer
+        // so cast to int for now
+        for (int i = Math.toIntExact(size) - 1; i > 0; --i) {
+            swap(indices, i, rnd.nextInt(i));
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean hasNext() {
-        return pos < indices.length;
+        return current < indices.length;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Integer next() {
+    public Long next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
-        return indices[pos++];
+        // java array didn't support index greater than max integer
+        // so cast to int for now
+        return indices[Math.toIntExact(current++)];
     }
 
-    private static void swap(int[] arr, int i, int j) {
-        int tmp = arr[i];
+    /** {@inheritDoc} */
+    @Override
+    public long size() {
+        return size;
+    }
+
+    private static void swap(long[] arr, int i, int j) {
+        long tmp = arr[i];
         arr[i] = arr[j];
         arr[j] = tmp;
     }
