@@ -1109,7 +1109,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose(int[] dimensions) {
+    public NDArray transpose(int... dimensions) {
         return array.transpose(dimensions);
     }
 

@@ -8,6 +8,7 @@ version '0.2.0-SNAPSHOT'
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
     compile "com.google.code.gson:gson:${gson_version}"
+    compile "org.apache.commons:commons-compress:${commons_compress_version}"
     compile project(":joule-api")
 
     testCompile "org.testng:testng:${testng_version}"

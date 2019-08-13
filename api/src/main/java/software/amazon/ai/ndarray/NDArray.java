@@ -2210,7 +2210,7 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException thrown when passing a dimension that is greater than the
      *     actual number of dimensions
      */
-    NDArray transpose(int[] dimensions);
+    NDArray transpose(int... dimensions);
 
     /**
      * Broadcasts this NDArray to be the specified shape.

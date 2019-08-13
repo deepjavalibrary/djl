@@ -1385,7 +1385,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose(int[] dimensions) {
+    public NDArray transpose(int... dimensions) {
         if (Arrays.stream(dimensions).anyMatch((int d) -> d < 0)) {
             throw new UnsupportedOperationException(
                     "Passing -1 for broadcasting the dimension is not currently supported");

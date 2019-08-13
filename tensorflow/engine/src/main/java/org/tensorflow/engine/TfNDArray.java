@@ -970,7 +970,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose(int[] dimensions) {
+    public NDArray transpose(int... dimensions) {
         return null;
     }
 

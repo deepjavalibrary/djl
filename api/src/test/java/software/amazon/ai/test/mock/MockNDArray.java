@@ -817,7 +817,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray transpose(int[] dimensions) {
+    public NDArray transpose(int... dimensions) {
         return null;
     }
 

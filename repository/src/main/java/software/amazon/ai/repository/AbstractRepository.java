@@ -21,6 +21,9 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 public abstract class AbstractRepository implements Repository {
 
@@ -84,6 +87,22 @@ public abstract class AbstractRepository implements Repository {
                     Files.createDirectories(dir);
                 } else {
                     dir = resourceDir;
+                }
+                if ("tgz".equals(extension)) {
+                    try (InputStream is = fileUri.toURL().openStream()) {
+                        try (TarArchiveInputStream fin =
+                                new TarArchiveInputStream(new GzipCompressorInputStream(is))) {
+                            TarArchiveEntry tarArchiveEntry;
+                            while ((tarArchiveEntry = fin.getNextTarEntry()) != null) {
+                                if (tarArchiveEntry.isDirectory()) {
+                                    continue;
+                                }
+                                Path file = resourceDir.resolve(tarArchiveEntry.getName());
+                                Files.copy(fin, file);
+                            }
+                        }
+                    }
+                    return;
                 }
                 if (!"zip".equals(extension)) {
                     throw new UnsupportedOperationException(

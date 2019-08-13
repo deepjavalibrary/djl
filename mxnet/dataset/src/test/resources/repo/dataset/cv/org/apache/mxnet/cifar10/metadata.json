@@ -1,0 +1,51 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "org.apache.mxnet",
+  "artifactId": "cifar10",
+  "type": "cv",
+  "name": "CIFAR10",
+  "description": "CIFAR10",
+  "website": "http://www.mxnet.io",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "http://aws.amazon.com/apache2.0/"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "properties": {
+        "engine": "MXNet"
+      },
+      "files": {
+        "data_batch_1.bin": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/cifar10/cifar-10-binary.tar.gz",
+          "sha1Hash": "fab780a1e191a7eda0f345501ccd62d20f7ed891"
+        },
+        "data_batch_2.bin": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/cifar10/cifar-10-binary.tar.gz",
+          "sha1Hash": "fab780a1e191a7eda0f345501ccd62d20f7ed891"
+        },
+        "data_batch_3.bin": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/cifar10/cifar-10-binary.tar.gz",
+          "sha1Hash": "fab780a1e191a7eda0f345501ccd62d20f7ed891"
+        },
+        "data_batch_4.bin": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/cifar10/cifar-10-binary.tar.gz",
+          "sha1Hash": "fab780a1e191a7eda0f345501ccd62d20f7ed891"
+        },
+        "data_batch_5.bin": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/cifar10/cifar-10-binary.tar.gz",
+          "sha1Hash": "fab780a1e191a7eda0f345501ccd62d20f7ed891"
+        },
+        "test_batch.bin": {
+          "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/cifar10/cifar-10-binary.tar.gz",
+          "sha1Hash": "fab780a1e191a7eda0f345501ccd62d20f7ed891"
+        }
+      }
+    }
+  ],
+  "snapshot": true
+}
