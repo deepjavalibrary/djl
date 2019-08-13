@@ -45,29 +45,20 @@ public class SingleShotDetection {
     private Repository repository;
     private Metadata metadata;
 
-    public SingleShotDetection(Repository repository, Metadata metadata) {
+    public SingleShotDetection(Repository repository) {
         this.repository = repository;
-        this.metadata = metadata;
     }
 
-    public static SingleShotDetection newInstance() {
-        return newInstance(ModelZoo.REPOSITORY);
-    }
-
-    public static SingleShotDetection newInstance(Repository repository) {
-        try {
-            Metadata metadata = repository.locate(SSD);
-            if (metadata == null) {
-                throw new ModelNotFoundException("SingleShotDetection models not found.");
-            }
-            return new SingleShotDetection(repository, metadata);
-        } catch (IOException e) {
-            throw new ModelNotFoundException("SingleShotDetection models not found.", e);
+    private void locateMetadata() throws ModelNotFoundException, IOException {
+        metadata = repository.locate(SSD);
+        if (metadata == null) {
+            throw new ModelNotFoundException("SingleShotDetection models not found.");
         }
     }
 
     public ZooModel<BufferedImage, List<DetectedObject>> loadModel(Map<String, String> criteria)
-            throws IOException {
+            throws IOException, ModelNotFoundException {
+        locateMetadata();
         Artifact artifact = match(criteria);
         if (artifact == null) {
             throw new ModelNotFoundException("Model not found.");

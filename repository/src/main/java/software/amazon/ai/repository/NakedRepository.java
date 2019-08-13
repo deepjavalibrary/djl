@@ -16,7 +16,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class NakedRepository implements Repository {
+public class NakedRepository extends AbstractRepository {
 
     private String name;
     private Path path;

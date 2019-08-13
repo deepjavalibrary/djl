@@ -1957,7 +1957,7 @@ public interface NDArray extends AutoCloseable {
      * @see NDArray#softmax(int[], double)
      */
     default NDArray softmax() {
-        return softmax(new int[0], 1);
+        return softmax(new int[] {-1}, 1);
     }
 
     /**

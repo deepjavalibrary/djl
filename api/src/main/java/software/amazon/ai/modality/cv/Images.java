@@ -67,6 +67,67 @@ public final class Images {
         return resizedImage;
     }
 
+    public static BufferedImage centerCorp(BufferedImage img) {
+        int w = img.getWidth();
+        int h = img.getHeight();
+
+        if (w == h) {
+            return img;
+        }
+
+        if (w > h) {
+            return centerCorp(img, h, h);
+        }
+
+        return centerCorp(img, w, w);
+    }
+
+    public static BufferedImage centerCorp(BufferedImage img, int width, int height) {
+        BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        int w = img.getWidth();
+        int h = img.getHeight();
+
+        int sx1;
+        int sx2;
+        int sy1;
+        int sy2;
+        int dx1;
+        int dx2;
+        int dy1;
+        int dy2;
+        int dw = (w - width) / 2;
+        if (dw > 0) {
+            sx1 = dw;
+            sx2 = sx1 + width;
+            dx1 = 0;
+            dx2 = width;
+        } else {
+            sx1 = 0;
+            sx2 = w;
+            dx1 = -dw;
+            dx2 = dx1 + w;
+        }
+        int dh = (h - height) / 2;
+        if (dh > 0) {
+            sy1 = dh;
+            sy2 = sy1 + height;
+            dy1 = 0;
+            dy2 = height;
+        } else {
+            sy1 = 0;
+            sy2 = h;
+            dy1 = -dh;
+            dy2 = dy1 + w;
+        }
+
+        Graphics2D g = ret.createGraphics();
+        g.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
+        g.dispose();
+
+        return ret;
+    }
+
     /**
      * Draws the bounding box on an image.
      *

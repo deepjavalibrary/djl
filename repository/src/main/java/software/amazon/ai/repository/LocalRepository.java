@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-public class LocalRepository implements Repository {
+public class LocalRepository extends AbstractRepository {
 
     private String name;
     private Path path;

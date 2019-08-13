@@ -47,29 +47,22 @@ public class Resnet {
     private Repository repository;
     private Metadata metadata;
 
-    public Resnet(Repository repository, Metadata metadata) {
+    public Resnet(Repository repository) {
         this.repository = repository;
-        this.metadata = metadata;
     }
 
-    public static Resnet newInstance() {
-        return newInstance(ModelZoo.REPOSITORY);
-    }
-
-    public static Resnet newInstance(Repository repository) {
-        try {
-            Metadata metadata = repository.locate(RESNET);
+    private void locateMetadata() throws IOException, ModelNotFoundException {
+        if (metadata == null) {
+            metadata = repository.locate(RESNET);
             if (metadata == null) {
                 throw new ModelNotFoundException("Resnet models not found.");
             }
-            return new Resnet(repository, metadata);
-        } catch (IOException e) {
-            throw new ModelNotFoundException("Resnet models not found.", e);
         }
     }
 
     public ZooModel<BufferedImage, List<Classification>> loadModel(Map<String, String> criteria)
-            throws IOException {
+            throws IOException, ModelNotFoundException {
+        locateMetadata();
         Artifact artifact = match(criteria);
         if (artifact == null) {
             throw new ModelNotFoundException("Model not found.");
@@ -91,7 +84,8 @@ public class Resnet {
 
                     @Override
                     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-                        BufferedImage image = Images.resizeImage(input, imageWidth, imageHeight);
+                        BufferedImage image = Images.centerCorp(input);
+                        image = Images.resizeImage(image, imageWidth, imageHeight);
                         FloatBuffer buffer = Images.toFloatBuffer(image);
                         NDArray array = ctx.getNDManager().create(buffer, dataDesc);
                         array.divi(255);
@@ -111,7 +105,7 @@ public class Resnet {
                         NDArray sorted = array.argsort(-1, false);
                         NDArray top = sorted.get(":" + topK);
 
-                        float[] probabilities = array.toFloatArray();
+                        float[] probabilities = array.softmax().toFloatArray();
                         int[] indices = top.toIntArray();
 
                         List<String> synset = model.getArtifact("synset.txt", Utils::readLines);

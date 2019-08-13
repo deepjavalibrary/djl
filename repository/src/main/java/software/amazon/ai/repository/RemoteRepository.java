@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import software.amazon.ai.util.Utils;
 
-public class RemoteRepository implements Repository {
+public class RemoteRepository extends AbstractRepository {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 

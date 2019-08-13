@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.zoo;
 
+import org.apache.mxnet.zoo.cv.image_classification.Resnet;
 import org.apache.mxnet.zoo.cv.objectdetection.SingleShotDetection;
 import software.amazon.ai.repository.Repository;
 
@@ -21,5 +22,6 @@ public interface ModelZoo {
     Repository REPOSITORY = Repository.newInstance("MxNet", MXNET_REPO_URL);
     String GROUP_ID = "org.apache.mxnet";
 
-    SingleShotDetection SSD = SingleShotDetection.newInstance();
+    SingleShotDetection SSD = new SingleShotDetection(REPOSITORY);
+    Resnet RESNET = new Resnet(REPOSITORY);
 }

@@ -13,7 +13,7 @@
 package org.apache.mxnet.zoo;
 
 /** /** Thrown when an application tries to load a model from repository search path. */
-public class ModelNotFoundException extends RuntimeException {
+public class ModelNotFoundException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
