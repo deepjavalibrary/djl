@@ -228,6 +228,13 @@ public class MxNDManager implements NDManager {
         return invoke("_npi_multinomial", pValues, params);
     }
 
+    public NDArray imread(String path, int flag) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("filename", path);
+        params.addParam("flag", flag);
+        return invoke("_npi_cvimread", params);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDManager getParentManager() {
