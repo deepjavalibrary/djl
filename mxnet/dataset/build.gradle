@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'maven-publish'
 }
 
 group 'org.apache.mxnet'
@@ -23,4 +23,43 @@ dependencies {
     testCompile project(":mxnet:engine")
 
     testRuntime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId project.getGroup()
+            artifactId 'mxnet-dataset'
+            version rootProject.getVersion()
+            from components.java
+            artifacts = [jar, javadocJar, sourcesJar]
+            pom {
+                name = "MXNet dataset for Joule"
+                description = "MXNet dataset for Joule API"
+                url = "http://aws.amazon.com/Joule"
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://aws.amazon.com/apache2.0/'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "local"
+            url = project.buildDir.absolutePath + '/repo'
+        }
+    }
 }

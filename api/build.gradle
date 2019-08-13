@@ -41,7 +41,7 @@ publishing {
             pom {
                 name = "Joule API"
                 description = "A Deep Learning API in Java"
-                url = "http://aws.com/Joule"
+                url = "http://aws.amazon.com/Joule"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
