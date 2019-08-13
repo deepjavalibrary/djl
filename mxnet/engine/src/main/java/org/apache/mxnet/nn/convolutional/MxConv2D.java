@@ -12,7 +12,7 @@
  */
 package org.apache.mxnet.nn.convolutional;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
@@ -37,6 +37,7 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
     private Shape dilate;
     private int numFilters;
     private int numGroups;
+    private boolean includeBias;
 
     private Parameter weight;
     private Parameter bias;
@@ -48,7 +49,7 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
             final Shape dilate,
             final int numFilters,
             final int numGroups,
-            final boolean noBias) {
+            final boolean includeBias) {
         this.opName = "Convolution";
         this.kernel = kernel;
         this.stride = stride == null ? new Shape(1, 1) : stride;
@@ -56,9 +57,10 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
         this.dilate = dilate == null ? new Shape(1, 1) : dilate;
         this.numFilters = numFilters;
         this.numGroups = numGroups;
+        this.includeBias = includeBias;
 
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
-        if (!noBias) {
+        if (includeBias) {
             bias = new Parameter("bias", this, ParameterType.BIAS);
         }
     }
@@ -82,7 +84,12 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
 
     @Override
     public List<Parameter> getDirectParameters() {
-        return Arrays.asList(weight, bias);
+        List<Parameter> parameters = new ArrayList<>();
+        parameters.add(weight);
+        if (includeBias) {
+            parameters.add(bias);
+        }
+        return parameters;
     }
 
     @Override
@@ -133,6 +140,7 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
         result.addParam("num_filter", numFilters);
         result.addParam("num_group", numGroups);
         result.add("layout", LAYOUT);
+        result.add("no_bias", !includeBias);
         result.addAll(params);
         return result;
     }

@@ -81,8 +81,8 @@ public class MxNNIndex extends NNIndex {
             Shape dilate,
             int numFilters,
             int numGroups,
-            boolean noBias) {
-        return new MxConv1D(kernel, stride, pad, dilate, numFilters, numGroups, noBias);
+            boolean includeBias) {
+        return new MxConv1D(kernel, stride, pad, dilate, numFilters, numGroups, includeBias);
     }
 
     /** {@inheritDoc} */
@@ -94,8 +94,8 @@ public class MxNNIndex extends NNIndex {
             Shape dilate,
             int numFilters,
             int numGroups,
-            boolean noBias) {
-        return new MxConv2D(kernel, stride, pad, dilate, numFilters, numGroups, noBias);
+            boolean includeBias) {
+        return new MxConv2D(kernel, stride, pad, dilate, numFilters, numGroups, includeBias);
     }
 
     /** {@inheritDoc} */
@@ -107,8 +107,8 @@ public class MxNNIndex extends NNIndex {
             Shape dilate,
             int numFilters,
             int numGroups,
-            boolean noBias) {
-        return new MxConv3D(kernel, stride, pad, dilate, numFilters, numGroups, noBias);
+            boolean includeBias) {
+        return new MxConv3D(kernel, stride, pad, dilate, numFilters, numGroups, includeBias);
     }
 
     /** {@inheritDoc} */

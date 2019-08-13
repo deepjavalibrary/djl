@@ -51,7 +51,7 @@ public abstract class NNIndex {
             Shape dilate,
             int numFilters,
             int numGroups,
-            boolean noBias);
+            boolean includeBias);
 
     public abstract Conv2D conv2D(
             Shape kernel,
@@ -60,7 +60,7 @@ public abstract class NNIndex {
             Shape dilate,
             int numFilters,
             int numGroups,
-            boolean noBias);
+            boolean includeBias);
 
     public abstract Conv3D conv3D(
             Shape kernel,
@@ -69,7 +69,7 @@ public abstract class NNIndex {
             Shape dilate,
             int numFilters,
             int numGroups,
-            boolean noBias);
+            boolean includeBias);
 
     public abstract RNN rnn(
             long stateSize,

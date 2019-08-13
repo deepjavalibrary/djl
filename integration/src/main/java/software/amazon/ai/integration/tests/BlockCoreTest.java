@@ -137,8 +137,13 @@ public class BlockCoreTest {
                     manager.create(
                             new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
                             new Shape(1, 4, 4));
-            NDArray expected = manager.create(new float[] {62, 56, 45}, new Shape(1, 1, 3));
-            Conv1D bn = new Conv1D.Builder().setKernel(new Shape(2)).setNumFilters(1).build();
+            NDArray expected = manager.create(new float[] {61, 55, 44}, new Shape(1, 1, 3));
+            Conv1D bn =
+                    new Conv1D.Builder()
+                            .setKernel(new Shape(2))
+                            .setNumFilters(1)
+                            .setBias(false)
+                            .build();
             bn.setInitializer(manager, Initializer.ONES);
             NDArray out = bn.forward(input);
             Assertions.assertEquals(expected, out);

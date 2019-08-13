@@ -19,6 +19,7 @@ public interface RNN extends RecurrentCell {
 
     /** The Builder to construct a {@link RNN} type of {@link Block}. */
     class Builder extends RecurrentCell.Builder<RNN> {
+        /** {@inheritDoc} */
         @Override
         public RNN build() {
             if (stateSize == -1 || numStackedLayers == -1) {

@@ -14,7 +14,105 @@ package software.amazon.ai.nn.convolutional;
 
 import software.amazon.ai.Block;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.types.Shape;
 
 public interface Convolution extends Block {
     NDArray forward(NDArray data);
+
+    abstract class Builder<C extends Convolution> {
+        Shape kernel;
+        Shape stride;
+        Shape pad;
+        Shape dilate;
+        int numFilters;
+        int numGroups = 1;
+        boolean includeBias = true;
+
+        /**
+         * Sets the shape of the kernel.
+         *
+         * @param kernel Shape of the kernel
+         * @return Returns this Builder
+         */
+        public Builder<C> setKernel(Shape kernel) {
+            this.kernel = kernel;
+            return this;
+        }
+
+        /**
+         * Sets the stride of the convolution. Defaults to 1 in each dimension.
+         *
+         * @param stride Shape of the stride
+         * @return Returns this Builder
+         */
+        public Builder<C> setStride(Shape stride) {
+            this.stride = stride;
+            return this;
+        }
+
+        /**
+         * Sets the padding along each dimension. Defaults to zero along each dimension
+         *
+         * @param pad Padding along each dimension
+         * @return Returns this Builder
+         */
+        public Builder<C> setPad(Shape pad) {
+            this.pad = pad;
+            return this;
+        }
+
+        /**
+         * Sets the padding along each dimension. Defaults to zero along each dimension
+         *
+         * @param dilate Padding along each dimension
+         * @return Returns this Builder
+         */
+        public Builder<C> setDilate(Shape dilate) {
+            this.dilate = dilate;
+            return this;
+        }
+
+        /**
+         * Sets the <b>Required</b> number of filters.
+         *
+         * @param numFilters Number of convolution filter(channel)
+         * @return Returns this Builder
+         */
+        public Builder<C> setNumFilters(int numFilters) {
+            this.numFilters = numFilters;
+            return this;
+        }
+
+        /**
+         * Sets the number of group partitions.
+         *
+         * @param numGroups Number of group partitions
+         * @return Returns this Builder
+         */
+        public Builder<C> setNumGroups(int numGroups) {
+            this.numGroups = numGroups;
+            return this;
+        }
+
+        /**
+         * Sets the optional parameter of whether to include a bias vector. Includes bias by
+         * default.
+         *
+         * @param includeBias Whether to use a bias vector parameter
+         * @return Returns this Builder
+         */
+        public Builder<C> setBias(boolean includeBias) {
+            this.includeBias = includeBias;
+            return this;
+        }
+
+        /**
+         * Returns the constructed {@code Convolution}.
+         *
+         * @return Returns the constructed {@code Convolution}
+         * @throws IllegalArgumentException Thrown if all required parameters (outChannels) have not
+         *     been set
+         */
+        public abstract C build();
+    }
 }
