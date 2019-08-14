@@ -115,6 +115,16 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     }
 
     /**
+     * Get NDArray with Tag.
+     *
+     * @param index numeric index to get
+     * @return tag and ndarray
+     */
+    public Pair<String, NDArray> getWithTag(int index) {
+        return list.get(index);
+    }
+
+    /**
      * Returns the head index of the NDList.
      *
      * @return the head NDArray

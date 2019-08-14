@@ -196,7 +196,7 @@ public class MxEngine extends Engine {
      *
      * @param numpy True to use numpy mode
      */
-    private void setNumpyMode(boolean numpy) {
+    public void setNumpyMode(boolean numpy) {
         // Helper to avoid race condition with MxEngine initialization
         JnaUtils.setNumpyMode(numpy);
     }

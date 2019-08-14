@@ -20,11 +20,13 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.StreamSupport;
 import org.apache.mxnet.engine.CachedOp;
 import org.apache.mxnet.engine.DeviceType;
 import org.apache.mxnet.engine.MxNDArray;
@@ -33,9 +35,12 @@ import org.apache.mxnet.engine.Symbol;
 import org.apache.mxnet.engine.SymbolBlock;
 import software.amazon.ai.Context;
 import software.amazon.ai.engine.EngineException;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
+import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
 public final class JnaUtils {
@@ -350,20 +355,59 @@ public final class JnaUtils {
     }
      */
 
-    public static Pointer[] loadNdArray(String file, PointerByReference namesRef) {
-        IntBuffer size = IntBuffer.allocate(1);
-        PointerByReference ref = new PointerByReference();
+    public static NDList loadNdArray(MxNDManager manager, Path path) {
+        IntBuffer handlesSize = IntBuffer.allocate(1);
+        PointerByReference handlesRef = new PointerByReference();
+        PointerByReference namesRef = new PointerByReference();
         IntBuffer namesSize = IntBuffer.allocate(1);
-        checkCall(LIB.MXNDArrayLoad(file, size, ref, namesSize, namesRef));
-
-        int ndArrayCount = size.get();
+        checkCall(LIB.MXNDArrayLoad(path.toString(), handlesSize, handlesRef, namesSize, namesRef));
+        int ndArrayCount = handlesSize.get();
         int nameCount = namesSize.get();
-        if (ndArrayCount != nameCount) {
+        if (nameCount > 0 && ndArrayCount != nameCount) {
             throw new IllegalStateException(
-                    "Mismatch between names and arrays in checkpoint file: " + file);
+                    "Mismatch between names and arrays in checkpoint file: " + path.toString());
         }
+        Pointer[] handles = handlesRef.getValue().getPointerArray(0, ndArrayCount);
+        NDList ndList = new NDList();
+        if (nameCount == 0) {
+            for (Pointer handle : handles) {
+                ndList.add(manager.create(handle));
+            }
+        } else {
+            assert namesRef.getValue() != null;
+            String[] names = namesRef.getValue().getStringArray(0, nameCount);
+            for (int i = 0; i < ndArrayCount; i++) {
+                ndList.add(names[i], manager.create(handles[i]));
+            }
+        }
+        return ndList;
+    }
 
-        return ref.getValue().getPointerArray(0, ndArrayCount);
+    public static void saveNdArray(Path path, NDList ndList) {
+        IntBuffer handlesSize = IntBuffer.allocate(1);
+        handlesSize.put(ndList.size());
+        boolean namesProvided =
+                StreamSupport.stream(ndList.spliterator(), false)
+                        .map((Pair<String, NDArray> x) -> x.getKey())
+                        .allMatch((String x) -> x != null);
+        Pointer[] handles =
+                StreamSupport.stream(ndList.spliterator(), false)
+                        .map(
+                                (Pair<String, NDArray> x) -> {
+                                    MxNDArray ary = (MxNDArray) x.getValue();
+                                    return ary.getHandle();
+                                })
+                        .toArray(Pointer[]::new);
+        String[] names =
+                StreamSupport.stream(ndList.spliterator(), false)
+                        .map((Pair<String, NDArray> x) -> x.getKey())
+                        .toArray(String[]::new);
+        if (!namesProvided) {
+            names = null;
+        }
+        checkCall(
+                LIB.MXNDArraySave(
+                        path.toString(), ndList.size(), new PointerArray(handles), names));
     }
 
     /* Need tests

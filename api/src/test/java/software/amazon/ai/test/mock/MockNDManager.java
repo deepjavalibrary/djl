@@ -13,6 +13,7 @@
 package software.amazon.ai.test.mock;
 
 import java.nio.Buffer;
+import java.nio.file.Path;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -39,6 +40,14 @@ public class MockNDManager implements NDManager {
             Buffer data, Shape dataShape, long[] indices, Shape shape, Context context) {
         return null;
     }
+
+    @Override
+    public NDList load(Path path) {
+        return null;
+    }
+
+    @Override
+    public void save(Path path, NDList ndList) {}
 
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Context context) {

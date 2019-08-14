@@ -14,6 +14,7 @@ package org.tensorflow.engine;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.tensorflow.Graph;
@@ -114,6 +115,16 @@ public class TfNDManager implements NDManager, AutoCloseable {
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
         return null;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList load(Path path) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void save(Path path, NDList ndList) {}
 
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Context context) {

@@ -12,8 +12,6 @@
  */
 package org.apache.mxnet.engine;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -26,13 +24,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.Parameter;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.util.Pair;
 
 /**
  * {@code MxModel} is MXNet implementation of {@link Model}.
@@ -63,30 +65,33 @@ public class MxModel implements Model {
         return loadModel(MxNDManager.getSystemManager(), prefix, epoch, context);
     }
 
-    @SuppressWarnings("unused")
-    static MxModel loadModel(MxNDManager manager, String prefix, int epoch, Context context) {
+    static MxModel loadModel(
+            MxNDManager manager, final String prefix, final int epoch, final Context context) {
         MxNDManager subManager = manager.newSubManager();
         Symbol symbol = Symbol.load(subManager, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
         Path modelDir = Paths.get(paramFile).toAbsolutePath().getParent();
-
-        PointerByReference namesRef = new PointerByReference();
-
-        // TODO: MXNet engine to support load NDArray on specific context.
-        Pointer[] handles = JnaUtils.loadNdArray(paramFile, namesRef);
-        String[] names = namesRef.getValue().getStringArray(0, handles.length);
-
-        List<Parameter> parameters = new ArrayList<>();
-
-        for (int i = 0; i < names.length; ++i) {
-            String[] pair = names[i].split(":", 2);
-            MxNDArray array = subManager.create(handles[i]);
-            if (pair.length == 2) {
-                parameters.add(new Parameter(pair[1], array));
-            } else {
-                parameters.add(new Parameter(pair[0], array));
-            }
+        NDList paramNDlist = JnaUtils.loadNdArray(subManager, Paths.get(paramFile));
+        if (!StreamSupport.stream(paramNDlist.spliterator(), false)
+                .allMatch(x -> x.getKey() != null)) {
+            throw new IllegalArgumentException("Array names must be present in parameter file");
         }
+
+        Function<String, String> paramName = x -> x.split(":", 2)[1];
+        List<Parameter> parameters =
+                StreamSupport.stream(paramNDlist.spliterator(), false)
+                        .map(
+                                (Pair<String, NDArray> x) -> {
+                                    if (context == Context.gpu()) {
+                                        return new Parameter(
+                                                paramName.apply(x.getKey()),
+                                                x.getValue().asInContext(Context.gpu(), true));
+                                    } else {
+                                        return new Parameter(
+                                                paramName.apply(x.getKey()), x.getValue());
+                                    }
+                                })
+                        .collect(Collectors.toList());
         // TODO: Check if Symbol has all names that params file have
         return new MxModel(modelDir, new SymbolBlock(symbol, parameters, subManager), subManager);
     }

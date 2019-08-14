@@ -18,6 +18,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.file.Path;
 import software.amazon.ai.Context;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -467,6 +468,22 @@ public interface NDManager extends AutoCloseable {
     default NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
         return createRowSparse(data, dataShape, indices, shape, getContext());
     }
+
+    /**
+     * Load NDArrays from file.
+     *
+     * @param path path to load from
+     * @return list of NDArray. Tags might be present or be null.
+     */
+    public NDList load(Path path);
+
+    /**
+     * Save NDArray to file.
+     *
+     * @param path path save to
+     * @param ndList list of NDArray to save
+     */
+    public void save(Path path, NDList ndList);
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
