@@ -43,7 +43,7 @@ public class MnistTest {
             Mnist mnist =
                     new Mnist.Builder(manager, repository)
                             .setUsage(Dataset.Usage.TEST)
-                            .setDataLoading(false, 32, false)
+                            .setDataLoadingProperty(false, 32, false)
                             .build();
             for (Pair<NDList, NDList> batch : mnist.getData()) {
                 Assert.assertEquals(batch.getKey().size(), 1);
@@ -58,7 +58,7 @@ public class MnistTest {
             Mnist mnist =
                     new Mnist.Builder(manager)
                             .setUsage(Dataset.Usage.TEST)
-                            .setDataLoading(false, 32, false)
+                            .setDataLoadingProperty(false, 32, false)
                             .build();
             for (Pair<NDList, NDList> batch : mnist.getData()) {
                 Assert.assertEquals(batch.getKey().size(), 1);

@@ -30,6 +30,12 @@ import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
 
 // TODO we will have download dataset that CIFAR10, MNIST would extend from
+
+/**
+ * MNIST handwritten digits dataset from http://yann.lecun.com/exdb/mnist
+ *
+ * <p>Each sample is an image (in 3D NDArray) with shape (28, 28, 1).
+ */
 public final class Mnist implements RandomAccessDataset {
 
     private static final String ARTIFACT_ID = "mnist";
@@ -143,7 +149,7 @@ public final class Mnist implements RandomAccessDataset {
             return this;
         }
 
-        public Builder setDataLoading(boolean shuffle, int batchSize, boolean dropLast) {
+        public Builder setDataLoadingProperty(boolean shuffle, int batchSize, boolean dropLast) {
             this.config =
                     new DataLoadingConfiguration.Builder()
                             .setShuffle(shuffle)
@@ -153,7 +159,7 @@ public final class Mnist implements RandomAccessDataset {
             return this;
         }
 
-        public Builder setDataLoadingConfig(DataLoadingConfiguration config) {
+        public Builder setDataLoadingProperty(DataLoadingConfiguration config) {
             if (this.config != null) {
                 throw new IllegalArgumentException(
                         "either setDataLoading or setDataLoadingConfig, not both");

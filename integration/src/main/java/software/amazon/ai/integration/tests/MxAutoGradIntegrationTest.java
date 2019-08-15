@@ -29,16 +29,18 @@ import software.amazon.ai.integration.util.MnistUtils;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Loss;
+import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.LossMetric;
+import software.amazon.ai.util.Pair;
 
 public class MxAutoGradIntegrationTest {
 
@@ -95,13 +97,20 @@ public class MxAutoGradIntegrationTest {
             NDArray loss;
             LossMetric lossMetric = new LossMetric("l2loss");
 
+            ArrayDataset dataset =
+                    new ArrayDataset.Builder()
+                            .setData(data)
+                            .setLabels(label)
+                            .setDataLoadingProperty(true, batchSize, false)
+                            .build();
+
             for (int epoch = 0; epoch < epochs; epoch++) {
                 lossMetric.reset();
-                for (int i = 0; i < numOfData / batchSize; i++) {
+                for (Pair<NDList, NDList> batch : dataset.getData()) {
                     try (MxAutograd autograd = new MxAutograd()) {
-                        NDIndex indices = new NDIndex(i * batchSize + ":" + batchSize * (i + 1));
-                        NDArray x = data.get(indices);
-                        NDArray y = label.get(indices);
+
+                        NDArray x = batch.getKey().head();
+                        NDArray y = batch.getValue().head();
                         NDArray yHat = block.forward(x);
                         loss = Loss.l2Loss(y, yHat, 1, 0);
                         autograd.backward((MxNDArray) loss);

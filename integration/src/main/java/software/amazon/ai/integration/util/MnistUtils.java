@@ -18,20 +18,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import org.apache.mxnet.dataset.Mnist;
 import org.apache.mxnet.engine.MxAutograd;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.lrscheduler.MxLearningRateTracker;
 import org.apache.mxnet.engine.optimizer.MxOptimizer;
 import org.apache.mxnet.engine.optimizer.Sgd;
+import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Block;
 import software.amazon.ai.Parameter;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.Loss;
+import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.util.Pair;
@@ -43,13 +44,10 @@ public final class MnistUtils {
     public static void trainMnist(
             Block mlp, NDManager manager, int numEpoch, float expectedLoss, float expectedAccuracy)
             throws FailedTestException, IOException {
-        // TODO: Remove loading mnist with DataLoader
-        Pair<NDArray, NDArray> dataLabel = mnistSetup(manager);
-        NDArray data = dataLabel.getKey();
-        NDArray label = dataLabel.getValue();
+        // TODO remove numpy flag
+        JnaUtils.setNumpyMode(true);
 
         int batchSize = 100;
-        int numBatches = 60000 / batchSize;
 
         MxOptimizer optimizer =
                 new Sgd(
@@ -64,20 +62,24 @@ public final class MnistUtils {
         Accuracy acc = new Accuracy();
         LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
+        Mnist mnist =
+                new Mnist.Builder(manager)
+                        .setUsage(Dataset.Usage.TRAIN)
+                        .setDataLoadingProperty(true, batchSize, false)
+                        .build();
+
         for (int epoch = 0; epoch < numEpoch; epoch++) {
             // reset loss and accuracy
             acc.reset();
             lossMetric.reset();
             NDArray loss;
-            for (int i = 0; i < numBatches; i++) {
-                String expression = i * batchSize + ":" + (i + 1) * batchSize;
-                NDArray batch =
-                        data.get(expression).reshape(new Shape(batchSize, 28 * 28)).div(255f);
-                NDArray labelBatch = label.get(expression);
+            for (Pair<NDList, NDList> batch : mnist.getData()) {
+                NDArray data = batch.getKey().head().reshape(batchSize, 28 * 28).div(255f);
+                NDArray label = batch.getValue().head();
                 NDArray pred;
                 try (MxAutograd autograd = new MxAutograd()) {
-                    pred = mlp.forward(new NDList(batch)).head();
-                    loss = Loss.softmaxCrossEntropyLoss(labelBatch, pred, 1.f, 0, -1, true, false);
+                    pred = mlp.forward(new NDList(data)).head();
+                    loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
                     autograd.backward((MxNDArray) loss);
                 }
                 Collection<Parameter> params = mlp.getParameters().values();
@@ -87,7 +89,7 @@ public final class MnistUtils {
                     NDArray grad = weight.getGradient();
                     optimizer.update(0, weight, grad, new NDList(state));
                 }
-                acc.update(labelBatch, pred);
+                acc.update(label, pred);
                 lossMetric.update(loss);
             }
         }
@@ -106,6 +108,8 @@ public final class MnistUtils {
                         "Accuracy did not improve, accuracy value: %f, expected "
                                 + "minimal accuracy value: %f",
                         accuracy, expectedAccuracy));
+        // TODO remove numpy flag
+        JnaUtils.setNumpyMode(false);
     }
 
     public static String prepareModel() throws IOException {
@@ -124,39 +128,5 @@ public final class MnistUtils {
             FileUtils.deleteFileOrDir(downloadDestination);
         }
         return extractDestination;
-    }
-
-    public static Pair<NDArray, NDArray> mnistSetup(NDManager manager) throws IOException {
-        String source = "http://data.mxnet.io/mxnet/data/mnist.zip";
-        String dataDir = System.getProperty("user.home") + "/.joule_data";
-        String downloadDestination = dataDir + "/mnist.zip";
-        String extractDestination = dataDir + "/mnist";
-        Path trainImages = Paths.get(extractDestination + "/train-images-idx3-ubyte");
-        Path trainLabels = Paths.get(extractDestination + "/train-labels-idx1-ubyte");
-        // download and unzip data if not exist
-        if (!Files.exists(trainImages) || !Files.exists(trainLabels)) {
-            if (!Files.exists(Paths.get(downloadDestination))) {
-                FileUtils.download(source, dataDir, "mnist.zip");
-            }
-            FileUtils.unzip(downloadDestination, extractDestination);
-            FileUtils.deleteFileOrDir(downloadDestination);
-        }
-        byte[] imageBytesRaw = Files.readAllBytes(trainImages);
-        byte[] labelBytesRaw = Files.readAllBytes(trainLabels);
-
-        byte[] imageBytes = new byte[imageBytesRaw.length - 16];
-        System.arraycopy(imageBytesRaw, 16, imageBytes, 0, imageBytes.length);
-        byte[] labelBytes = new byte[labelBytesRaw.length - 8];
-        System.arraycopy(labelBytesRaw, 8, labelBytes, 0, labelBytes.length);
-
-        NDArray data = manager.create(new Shape(labelBytes.length, 28, 28), DataType.UINT8);
-        data.set(imageBytes);
-        data = data.asType(DataType.FLOAT32, true);
-
-        NDArray label = manager.create(new Shape(labelBytes.length), DataType.UINT8);
-        label.set(labelBytes);
-        label = label.asType(DataType.FLOAT32, true);
-
-        return new Pair<>(data, label);
     }
 }
