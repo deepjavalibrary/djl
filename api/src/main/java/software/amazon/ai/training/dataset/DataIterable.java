@@ -35,7 +35,7 @@ public class DataIterable implements Iterable<Record> {
 
     private static class DataIterator implements Iterator<Record> {
         private RandomAccessDataset dataset;
-        private int batchSize;
+        private long batchSize;
         private boolean shuffle;
         private Sampler<Long> sampler;
         private Sampler<List<Long>> batchSampler;

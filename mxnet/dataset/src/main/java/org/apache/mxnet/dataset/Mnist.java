@@ -150,7 +150,7 @@ public final class Mnist implements RandomAccessDataset {
             return this;
         }
 
-        public Builder setDataLoadingProperty(boolean shuffle, int batchSize, boolean dropLast) {
+        public Builder setDataLoadingProperty(boolean shuffle, long batchSize, boolean dropLast) {
             this.config =
                     new DataLoadingConfiguration.Builder()
                             .setShuffle(shuffle)

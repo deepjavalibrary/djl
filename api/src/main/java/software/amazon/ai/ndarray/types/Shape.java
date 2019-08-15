@@ -437,4 +437,10 @@ public class Shape {
         sb.append(')');
         return sb.toString();
     }
+
+    public String toLayoutString() {
+        StringBuilder builder = new StringBuilder();
+        Arrays.stream(layout).forEach(layoutType -> builder.append(layoutType.getValue()));
+        return builder.toString();
+    }
 }

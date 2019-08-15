@@ -1,0 +1,5 @@
+dependencies {
+    compile project(":joule-api")
+
+    testCompile "org.testng:testng:${testng_version}"
+}

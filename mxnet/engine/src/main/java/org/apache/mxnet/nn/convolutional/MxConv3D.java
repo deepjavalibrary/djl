@@ -63,7 +63,6 @@ public class MxConv3D extends MxNNBlock implements Conv3D {
         this.numFilters = numFilters;
         this.numGroups = numGroups;
         this.includeBias = includeBias;
-
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (includeBias) {
             bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);

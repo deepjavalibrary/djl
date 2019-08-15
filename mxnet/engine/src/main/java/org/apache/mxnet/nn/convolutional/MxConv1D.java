@@ -57,7 +57,6 @@ public class MxConv1D extends MxNNBlock implements Conv1D {
         this.numFilters = numFilters;
         this.numGroups = numGroups;
         this.includeBias = includeBias;
-
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (includeBias) {
             bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);

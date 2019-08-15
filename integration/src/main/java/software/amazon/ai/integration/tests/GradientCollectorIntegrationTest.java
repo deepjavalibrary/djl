@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxGradient;
 import org.apache.mxnet.jna.JnaUtils;
+import software.amazon.ai.Block;
+import software.amazon.ai.Parameter;
 import software.amazon.ai.SequentialBlock;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -25,6 +27,7 @@ import software.amazon.ai.integration.util.MnistUtils;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -40,11 +43,13 @@ import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
+import software.amazon.ai.util.PairList;
+import software.amazon.ai.zoo.cv.image_classification.ResNetV1;
 
-public class MxAutoGradIntegrationTest {
+public class GradientCollectorIntegrationTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", MxAutoGradIntegrationTest.class.getName()};
+        String[] cmd = new String[] {"-c", GradientCollectorIntegrationTest.class.getName()};
         JnaUtils.setNumpyMode(true);
         new IntegrationTest()
                 .runTests(
@@ -143,6 +148,40 @@ public class MxAutoGradIntegrationTest {
 
             int numEpoch = 3;
             MnistUtils.trainMnist(mlp, manager, numEpoch, 0.3f, 0.9f);
+        }
+    }
+
+    @RunAsTest
+    public void testTrainResNet() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Block resNet50 =
+                    new ResNetV1.Builder()
+                            .setImageShape(new Shape(1, 28, 28))
+                            .setNumLayers(50)
+                            .setOutSize(10)
+                            .build();
+            resNet50.setInitializer(manager, Initializer.ONES);
+            Optimizer optimizer =
+                    new Sgd.Builder(resNet50.getParameters())
+                            .setRescaleGrad(1.0f / 100)
+                            .setLrScheduler(LrScheduler.fixedLR(0.1f))
+                            .setMomentum(0.9f)
+                            .build();
+            NDArray input = manager.ones(new Shape(100, 1, 28, 28));
+            NDArray label = manager.ones(new Shape(100, 1));
+            try (Gradient.Collector gradCol = Gradient.newCollector()) {
+                Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);
+                NDArray pred = resNet50.forward(new NDList(input)).head();
+                NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
+                optimizer.step(gradCol.collect(loss).get(optKey));
+            }
+            PairList<String, Parameter> parameters = optimizer.getParameters();
+            NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
+            NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(1.7576532f);
+            NDArray expectedAtIndex87 = manager.ones(new Shape(32, 32, 3, 3));
+            Assertions.assertEquals(expectedAtIndex0, parameters.get(0).getValue().getArray());
+            Assertions.assertEquals(expectedAtIndex1, parameters.get(1).getValue().getArray());
+            Assertions.assertEquals(expectedAtIndex87, parameters.get(87).getValue().getArray());
         }
     }
 }

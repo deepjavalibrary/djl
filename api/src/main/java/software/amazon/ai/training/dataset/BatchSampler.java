@@ -19,11 +19,11 @@ import java.util.List;
 public class BatchSampler implements Sampler<List<Long>> {
 
     private Sampler<Long> sampler;
-    private int batchSize;
+    private long batchSize;
     private long current;
     private long size;
 
-    public BatchSampler(Sampler<Long> sampler, int batchSize, boolean dropLast) {
+    public BatchSampler(Sampler<Long> sampler, long batchSize, boolean dropLast) {
         this.sampler = sampler;
         this.batchSize = batchSize;
         this.current = 0;

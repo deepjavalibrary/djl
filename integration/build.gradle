@@ -15,6 +15,7 @@ dependencies {
     compile "commons-cli:commons-cli:${commons_cli_version}"
     compile "org.slf4j:slf4j-simple:${slf4j_version}"
     compile project(":repository")
+    compile project(":model-zoo")
     compile project(":mxnet:dataset")
     compile project(":mxnet:engine")
 

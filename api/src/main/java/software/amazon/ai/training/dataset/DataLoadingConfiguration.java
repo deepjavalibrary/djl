@@ -20,7 +20,7 @@ import java.util.List;
  * pining.
  */
 public final class DataLoadingConfiguration {
-    private int batchSize;
+    private long batchSize;
     private boolean shuffle;
     private Sampler<Long> sampler;
     private Sampler<List<Long>> batchSampler;
@@ -40,7 +40,7 @@ public final class DataLoadingConfiguration {
         this.dropLast = builder.dropLast;
     }
 
-    public int getBatchSize() {
+    public long getBatchSize() {
         return batchSize;
     }
 
@@ -73,7 +73,7 @@ public final class DataLoadingConfiguration {
     }
 
     public static final class Builder {
-        private int batchSize;
+        private long batchSize;
         private boolean shuffle;
         private Sampler<Long> sampler;
         private Sampler<List<Long>> batchSampler;
@@ -90,7 +90,7 @@ public final class DataLoadingConfiguration {
             this.dropLast = false;
         }
 
-        public Builder setBatchSize(int batchSize) {
+        public Builder setBatchSize(long batchSize) {
             this.batchSize = batchSize;
             return this;
         }
