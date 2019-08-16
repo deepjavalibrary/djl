@@ -1950,17 +1950,6 @@ public interface NDArray extends AutoCloseable {
     NDArray sort();
 
     /**
-     * Returns the softmax over the entire array.
-     *
-     * @return the softmax over the entire array
-     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(int[], double)
-     */
-    default NDArray softmax() {
-        return softmax(new int[] {-1}, 1);
-    }
-
-    /**
      * Returns the softmax on the specified axis.
      *
      * @param axis the axis to sort along, -1 for the last axis

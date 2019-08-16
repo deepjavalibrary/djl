@@ -84,7 +84,7 @@ public class Resnet {
 
                     @Override
                     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-                        BufferedImage image = Images.centerCorp(input);
+                        BufferedImage image = Images.centerCrop(input);
                         image = Images.resizeImage(image, imageWidth, imageHeight);
                         FloatBuffer buffer = Images.toFloatBuffer(image);
                         NDArray array = ctx.getNDManager().create(buffer, dataDesc);
@@ -105,7 +105,7 @@ public class Resnet {
                         NDArray sorted = array.argsort(-1, false);
                         NDArray top = sorted.get(":" + topK);
 
-                        float[] probabilities = array.softmax().toFloatArray();
+                        float[] probabilities = array.softmax(-1).toFloatArray();
                         int[] indices = top.toIntArray();
 
                         List<String> synset = model.getArtifact("synset.txt", Utils::readLines);

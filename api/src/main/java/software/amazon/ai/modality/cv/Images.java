@@ -67,7 +67,7 @@ public final class Images {
         return resizedImage;
     }
 
-    public static BufferedImage centerCorp(BufferedImage img) {
+    public static BufferedImage centerCrop(BufferedImage img) {
         int w = img.getWidth();
         int h = img.getHeight();
 
@@ -76,13 +76,13 @@ public final class Images {
         }
 
         if (w > h) {
-            return centerCorp(img, h, h);
+            return centerCrop(img, h, h);
         }
 
-        return centerCorp(img, w, w);
+        return centerCrop(img, w, w);
     }
 
-    public static BufferedImage centerCorp(BufferedImage img, int width, int height) {
+    public static BufferedImage centerCrop(BufferedImage img, int width, int height) {
         BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
         int w = img.getWidth();

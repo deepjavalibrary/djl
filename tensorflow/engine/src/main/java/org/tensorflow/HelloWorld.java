@@ -47,7 +47,7 @@ public final class HelloWorld {
             System.out.println(a.getShape());
 
             System.out.println("Softmax:");
-            System.out.println(Arrays.toString(a.softmax().toFloatArray()));
+            System.out.println(Arrays.toString(a.softmax(-1).toFloatArray()));
 
             System.out.println("ZerosLike:");
             System.out.println(Arrays.toString(a.zerosLike().toFloatArray()));
