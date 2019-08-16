@@ -22,13 +22,13 @@ import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
 import software.amazon.ai.Context;
-import software.amazon.ai.TranslateException;
 import software.amazon.ai.examples.util.AbstractExample;
 import software.amazon.ai.examples.util.Arguments;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.modality.cv.Images;
+import software.amazon.ai.translate.TranslateException;
 
 public final class ClassifyExample extends AbstractExample {
 

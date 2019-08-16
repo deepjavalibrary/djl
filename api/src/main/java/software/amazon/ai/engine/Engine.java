@@ -24,12 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.Translator;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.translate.Translator;
 
 /**
  * The {@code Engine} interface shadows differences between each deep learning framework.

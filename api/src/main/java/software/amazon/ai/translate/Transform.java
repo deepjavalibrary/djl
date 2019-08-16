@@ -10,11 +10,15 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package software.amazon.ai.translate;
 
-/**
- * Contains top level common classes shared for both inference and training.
- *
- * @see software.amazon.ai.Model
- * @see software.amazon.ai.Context
- */
-package software.amazon.ai;
+import software.amazon.ai.ndarray.NDArray;
+
+public interface Transform {
+
+    default NDArray transform(NDArray array) {
+        return transform(array, false);
+    }
+
+    NDArray transform(NDArray array, boolean close);
+}

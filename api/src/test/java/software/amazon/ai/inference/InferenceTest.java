@@ -22,9 +22,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.TranslateException;
-import software.amazon.ai.Translator;
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.modality.cv.BoundingBox;
@@ -32,6 +29,9 @@ import software.amazon.ai.modality.cv.DetectedObject;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.test.mock.EchoTranslator;
 import software.amazon.ai.test.mock.MockImageTranslator;
+import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.translate.Translator;
+import software.amazon.ai.translate.TranslatorContext;
 
 public class InferenceTest {
 

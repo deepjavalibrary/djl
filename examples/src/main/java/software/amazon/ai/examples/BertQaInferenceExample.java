@@ -22,9 +22,6 @@ import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.TranslateException;
-import software.amazon.ai.Translator;
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.examples.util.AbstractExample;
 import software.amazon.ai.examples.util.Arguments;
 import software.amazon.ai.examples.util.BertDataParser;
@@ -35,6 +32,9 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.translate.Translator;
+import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Utils;
 
 public final class BertQaInferenceExample extends AbstractExample {

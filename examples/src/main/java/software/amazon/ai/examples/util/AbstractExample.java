@@ -37,10 +37,10 @@ import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.slf4j.Logger;
 import software.amazon.ai.Context;
-import software.amazon.ai.TranslateException;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.metric.Metric;
 import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.util.Utils;
 
 /** Abstract class that encapsulate command line options for example project. */

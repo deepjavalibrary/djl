@@ -10,20 +10,25 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai;
+package software.amazon.ai.translate;
 
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 
-public interface PreProcessor<I> {
+public abstract class SingleOutputProcessor<O> implements PostProcessor<O> {
 
-    /**
-     * Processes the input and converts it to NDList.
-     *
-     * @param ctx Toolkit that would help to creating input NDArray
-     * @param input Input Object
-     * @return {@link NDList}
-     * @throws Exception if an error occurs during processing input
-     */
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    NDList processInput(TranslatorContext ctx, I input) throws Exception;
+    private Transform transform;
+
+    public SingleOutputProcessor(Transform transform) {
+        this.transform = transform;
+    }
+
+    @Override
+    public O processOutput(TranslatorContext ctx, NDList list) {
+        NDArray array = list.get(0);
+        array = transform.transform(array, false);
+        return encode(ctx, array);
+    }
+
+    protected abstract O encode(TranslatorContext ctx, NDArray array);
 }

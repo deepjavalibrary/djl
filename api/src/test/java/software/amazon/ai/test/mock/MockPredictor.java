@@ -14,13 +14,13 @@ package software.amazon.ai.test.mock;
 
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.TranslateException;
-import software.amazon.ai.Translator;
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.translate.Translator;
+import software.amazon.ai.translate.TranslatorContext;
 
 public class MockPredictor<I, O> implements Predictor<I, O> {
 

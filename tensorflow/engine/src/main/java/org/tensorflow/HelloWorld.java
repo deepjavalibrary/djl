@@ -22,14 +22,14 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 import org.tensorflow.engine.TfModel;
 import org.tensorflow.engine.TfNDArray;
-import software.amazon.ai.TranslateException;
-import software.amazon.ai.Translator;
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.translate.Translator;
+import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
 public final class HelloWorld {

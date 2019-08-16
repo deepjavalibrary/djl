@@ -14,12 +14,12 @@ package software.amazon.ai.modality.cv;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
-import software.amazon.ai.Translator;
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.translate.Translator;
+import software.amazon.ai.translate.TranslatorContext;
 
 /**
  * Built-in {@code Translator} that provides default image pre-processing.

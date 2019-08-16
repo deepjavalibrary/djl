@@ -12,10 +12,10 @@
  */
 package software.amazon.ai.test.mock;
 
-import software.amazon.ai.TranslateException;
-import software.amazon.ai.Translator;
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.translate.Translator;
+import software.amazon.ai.translate.TranslatorContext;
 
 public class EchoTranslator<T> implements Translator<T, T> {
 

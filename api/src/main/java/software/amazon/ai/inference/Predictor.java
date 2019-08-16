@@ -14,10 +14,10 @@ package software.amazon.ai.inference;
 
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.TranslateException;
-import software.amazon.ai.Translator;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.translate.Translator;
 
 /**
  * The {@code Predictor} interface provides model inference functionality.

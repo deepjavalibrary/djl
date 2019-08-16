@@ -10,11 +10,20 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package software.amazon.ai.translate;
 
-/**
- * Contains top level common classes shared for both inference and training.
- *
- * @see software.amazon.ai.Model
- * @see software.amazon.ai.Context
- */
-package software.amazon.ai;
+import software.amazon.ai.ndarray.NDList;
+
+public interface PreProcessor<I> {
+
+    /**
+     * Processes the input and converts it to NDList.
+     *
+     * @param ctx Toolkit that would help to creating input NDArray
+     * @param input Input Object
+     * @return {@link NDList}
+     * @throws Exception if an error occurs during processing input
+     */
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    NDList processInput(TranslatorContext ctx, I input) throws Exception;
+}

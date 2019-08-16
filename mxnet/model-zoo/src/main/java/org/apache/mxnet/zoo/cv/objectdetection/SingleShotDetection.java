@@ -22,7 +22,6 @@ import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
 import software.amazon.ai.Model;
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.modality.cv.DetectedObject;
 import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Images;
@@ -34,6 +33,7 @@ import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Metadata;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.repository.VersionRange;
+import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Utils;
 
 public class SingleShotDetection {

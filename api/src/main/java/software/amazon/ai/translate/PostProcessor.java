@@ -10,11 +10,20 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package software.amazon.ai.translate;
 
-/**
- * Contains top level common classes shared for both inference and training.
- *
- * @see software.amazon.ai.Model
- * @see software.amazon.ai.Context
- */
-package software.amazon.ai;
+import software.amazon.ai.ndarray.NDList;
+
+public interface PostProcessor<O> {
+
+    /**
+     * Processes the output NDList to the corresponding Output Object.
+     *
+     * @param ctx Toolkit used to do postprocessing
+     * @param list Output NDList after inference
+     * @return output object
+     * @throws Exception if an error occurs during processing output
+     */
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    O processOutput(TranslatorContext ctx, NDList list) throws Exception;
+}

@@ -12,8 +12,8 @@
  */
 package software.amazon.ai.modality.cv;
 
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.translate.TranslatorContext;
 
 public class DefaultImageTranslator extends ImageTranslator<NDList> {
 

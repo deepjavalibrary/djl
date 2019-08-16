@@ -21,6 +21,7 @@ import java.util.function.Function;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.translate.Translator;
 
 /**
  * A model is a collection of artifacts that is created by the training process.

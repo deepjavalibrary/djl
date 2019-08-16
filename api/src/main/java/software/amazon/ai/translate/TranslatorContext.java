@@ -10,8 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai;
+package software.amazon.ai.translate;
 
+import software.amazon.ai.Context;
+import software.amazon.ai.Model;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDManager;
 

@@ -17,15 +17,15 @@ import org.tensorflow.Session;
 import org.tensorflow.Tensor;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.TranslateException;
-import software.amazon.ai.Translator;
-import software.amazon.ai.TranslatorContext;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.translate.Translator;
+import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
 public class TfPredictor<I, O> implements Predictor<I, O> {
