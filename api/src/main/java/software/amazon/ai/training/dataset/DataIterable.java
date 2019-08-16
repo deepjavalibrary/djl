@@ -14,12 +14,13 @@ package software.amazon.ai.training.dataset;
 
 import java.util.Iterator;
 import java.util.List;
+import software.amazon.ai.Batch;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.util.Pair;
 
 // TODO abstract a interface that could be inherited by this and Stream DataIterable
 // where the random reads is expensive
-public class DataIterable implements Iterable<Pair<NDList, NDList>> {
+public class DataIterable implements Iterable<Batch> {
     private RandomAccessDataset dataset;
     private DataLoadingConfiguration config;
 
@@ -29,11 +30,11 @@ public class DataIterable implements Iterable<Pair<NDList, NDList>> {
     }
 
     @Override
-    public Iterator<Pair<NDList, NDList>> iterator() {
+    public Iterator<Batch> iterator() {
         return new DataIterator(dataset, config);
     }
 
-    private static class DataIterator implements Iterator<Pair<NDList, NDList>> {
+    private static class DataIterator implements Iterator<Batch> {
         private RandomAccessDataset dataset;
         private int batchSize;
         private boolean shuffle;
@@ -101,16 +102,16 @@ public class DataIterable implements Iterable<Pair<NDList, NDList>> {
         }
 
         @Override
-        public Pair<NDList, NDList> next() {
+        public Batch next() {
             List<Long> indices = batchSampler.next();
             NDList[] data = new NDList[indices.size()];
             NDList[] labels = new NDList[indices.size()];
             for (int i = 0; i < indices.size(); i++) {
-                Pair<NDList, NDList> batch = dataset.get(indices.get(i));
-                data[i] = batch.getKey();
-                labels[i] = batch.getValue();
+                Pair<NDList, NDList> dataItem = dataset.get(indices.get(i));
+                data[i] = dataItem.getKey();
+                labels[i] = dataItem.getValue();
             }
-            return new Pair<>(batchifier.batchify(data), batchifier.batchify(labels));
+            return new Batch(batchifier.batchify(data), batchifier.batchify(labels));
         }
     }
 }

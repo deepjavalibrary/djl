@@ -10,15 +10,25 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.dataset;
+package software.amazon.ai;
 
-import software.amazon.ai.Batch;
-import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.ndarray.NDList;
 
-public class MinstFashion implements Dataset {
+/** Batch is used to get a batch of data and labels. */
+public class Batch {
+    private NDList data;
+    private NDList labels;
 
-    @Override
-    public Iterable<Batch> getData() {
-        return null;
+    public Batch(NDList data, NDList labels) {
+        this.data = data;
+        this.labels = labels;
+    }
+
+    public NDList getData() {
+        return this.data;
+    }
+
+    public NDList getLabels() {
+        return this.labels;
     }
 }

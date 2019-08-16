@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import software.amazon.ai.Batch;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
@@ -58,7 +59,7 @@ public final class Cifar10 implements RandomAccessDataset {
     }
 
     @Override
-    public Iterable<Pair<NDList, NDList>> getData() {
+    public Iterable<Batch> getData() {
         return new DataIterable(this, config);
     }
 

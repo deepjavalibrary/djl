@@ -13,17 +13,13 @@
 package software.amazon.ai.training.dataset;
 
 import java.io.IOException;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.util.Pair;
+import software.amazon.ai.Batch;
 
 /** An interface to represent Dataset. All the datasets should implement this interface. */
 public interface Dataset {
 
-    // TODO we should create getData, getLabels in Pair class
-    // or create DataItem, Batch class to have getData, getLabels methods
-
     // TODO skip tranlator, since we are changing the interface
-    Iterable<Pair<NDList, NDList>> getData() throws IOException;
+    Iterable<Batch> getData() throws IOException;
 
     enum Usage {
         TRAIN,

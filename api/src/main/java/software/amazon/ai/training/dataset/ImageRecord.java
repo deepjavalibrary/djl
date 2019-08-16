@@ -12,14 +12,13 @@
  */
 package software.amazon.ai.training.dataset;
 
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.util.Pair;
+import software.amazon.ai.Batch;
 
 public class ImageRecord implements Dataset {
 
     /** {@inheritDoc} */
     @Override
-    public Iterable<Pair<NDList, NDList>> getData() {
+    public Iterable<Batch> getData() {
         return null;
     }
 }

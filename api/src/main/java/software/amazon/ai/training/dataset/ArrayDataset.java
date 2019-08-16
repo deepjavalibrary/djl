@@ -13,6 +13,7 @@
 package software.amazon.ai.training.dataset;
 
 import java.util.stream.Stream;
+import software.amazon.ai.Batch;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.util.Pair;
@@ -69,7 +70,7 @@ public final class ArrayDataset implements RandomAccessDataset {
 
     /** {@inheritDoc} */
     @Override
-    public Iterable<Pair<NDList, NDList>> getData() {
+    public Iterable<Batch> getData() {
         return new DataIterable(this, config);
     }
 

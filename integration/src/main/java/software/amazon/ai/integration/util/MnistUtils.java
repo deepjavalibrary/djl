@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.mxnet.dataset.Mnist;
 import org.apache.mxnet.jna.JnaUtils;
+import software.amazon.ai.Batch;
 import software.amazon.ai.Block;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
@@ -32,7 +33,6 @@ import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
-import software.amazon.ai.util.Pair;
 
 public final class MnistUtils {
 
@@ -66,9 +66,9 @@ public final class MnistUtils {
             acc.reset();
             lossMetric.reset();
             NDArray loss;
-            for (Pair<NDList, NDList> batch : mnist.getData()) {
-                NDArray data = batch.getKey().head().reshape(batchSize, 28 * 28).div(255f);
-                NDArray label = batch.getValue().head();
+            for (Batch batch : mnist.getData()) {
+                NDArray data = batch.getData().head().reshape(batchSize, 28 * 28).div(255f);
+                NDArray label = batch.getLabels().head();
                 NDArray pred;
                 try (Gradient.Collector gradCol = Gradient.newCollector()) {
                     Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);

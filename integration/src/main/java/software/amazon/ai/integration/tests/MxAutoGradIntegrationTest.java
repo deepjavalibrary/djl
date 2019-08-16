@@ -15,6 +15,7 @@ package software.amazon.ai.integration.tests;
 import java.io.IOException;
 import org.apache.mxnet.engine.MxGradient;
 import org.apache.mxnet.jna.JnaUtils;
+import software.amazon.ai.Batch;
 import software.amazon.ai.SequentialBlock;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -23,7 +24,6 @@ import software.amazon.ai.integration.util.MnistUtils;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
-import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -38,7 +38,6 @@ import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
-import software.amazon.ai.util.Pair;
 
 public class MxAutoGradIntegrationTest {
 
@@ -102,12 +101,12 @@ public class MxAutoGradIntegrationTest {
 
             for (int epoch = 0; epoch < epochs; epoch++) {
                 lossMetric.reset();
-                for (Pair<NDList, NDList> batch : dataset.getData()) {
+                for (Batch batch : dataset.getData()) {
                     try (Gradient.Collector gradCol = Gradient.newCollector()) {
                         Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);
 
-                        NDArray x = batch.getKey().head();
-                        NDArray y = batch.getValue().head();
+                        NDArray x = batch.getData().head();
+                        NDArray y = batch.getLabels().head();
                         NDArray yHat = block.forward(x);
                         loss = Loss.l2Loss(y, yHat, 1, 0);
                         optimizer.step(gradCol.collect(loss).get(optKey));

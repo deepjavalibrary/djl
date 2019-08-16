@@ -12,14 +12,13 @@
  */
 package org.apache.mxnet.dataset;
 
-import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.Batch;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.util.Pair;
 
 public class Cifar100 implements Dataset {
 
     @Override
-    public Iterable<Pair<NDList, NDList>> getData() {
+    public Iterable<Batch> getData() {
         return null;
     }
 }
