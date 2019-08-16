@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.dataset;
 
+import java.io.IOException;
 import org.apache.mxnet.engine.MxImages;
 import org.testng.annotations.Test;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -22,12 +23,9 @@ import software.amazon.ai.ndarray.NDManager;
 public class ImageFolderTest {
 
     @Test
-    public void testImageFolder() throws FailedTestException {
+    public void testImageFolder() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            ImageFolder dataset =
-                    new ImageFolder.Builder(manager)
-                            .setPath("src/test/resources/imagefolder")
-                            .build();
+            ImageFolder dataset = new ImageFolder(manager, "src/test/resources/imagefolder", null);
             NDArray cat = MxImages.read(manager, "src/test/resources/imagefolder/cat/cat2.jpeg");
             NDArray dog = MxImages.read(manager, "src/test/resources/imagefolder/dog/puppy1.jpg");
             Assertions.assertAlmostEquals(cat, dataset.get(0).getKey().head());

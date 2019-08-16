@@ -16,7 +16,7 @@ import java.io.IOException;
 
 /** An interface to represent Dataset. All the datasets should implement this interface. */
 public interface Dataset {
-
+    // TODO add tranlator
     Iterable<Record> getRecords() throws IOException;
 
     enum Usage {

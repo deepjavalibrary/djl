@@ -26,6 +26,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.BatchSampler;
+import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.dataset.Sampler;
@@ -44,8 +45,7 @@ public class DatasetTest {
     @RunAsTest
     public void testSequenceSampler() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            ArrayDataset dataset = new ArrayDataset.Builder().setData(manager.arange(100)).build();
-            Sampler<Long> sequenceSampler = new SequenceSampler(dataset.size());
+            Sampler<Long> sequenceSampler = new SequenceSampler(manager.arange(100).size());
             List<Long> original = new ArrayList<>();
             sequenceSampler.forEachRemaining(original::add);
             List<Long> expected = LongStream.range(0, 100).boxed().collect(Collectors.toList());
@@ -56,8 +56,7 @@ public class DatasetTest {
     @RunAsTest
     public void testRandomSampler() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            ArrayDataset dataset = new ArrayDataset.Builder().setData(manager.arange(10)).build();
-            Sampler<Long> randomSampler = new RandomSampler(dataset.size());
+            Sampler<Long> randomSampler = new RandomSampler(manager.arange(10).size());
             List<Long> original = new ArrayList<>();
             randomSampler.forEachRemaining(original::add);
             Assertions.assertTrue(original.size() == 10, "SequentialSampler test failed");
@@ -67,26 +66,26 @@ public class DatasetTest {
     @RunAsTest
     public void testBatchSampler() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            ArrayDataset dataset = new ArrayDataset.Builder().setData(manager.arange(100)).build();
+            NDArray data = manager.arange(100);
             Sampler<List<Long>> batchSampler =
-                    new BatchSampler(new SequenceSampler(dataset.size()), 27, false);
+                    new BatchSampler(new SequenceSampler(data.size()), 27, false);
             List<List<Long>> originalList = new ArrayList<>();
             batchSampler.forEachRemaining(originalList::add);
             Assertions.assertTrue(originalList.size() == 4, "size of BatchSampler is not correct");
             List<Long> expected = LongStream.range(0, 27).boxed().collect(Collectors.toList());
             Assertions.assertTrue(
                     originalList.get(0).equals(expected), "data from BatchSampler is not correct");
-            Sampler<Long> randomSampler = new RandomSampler(dataset.size());
+            Sampler<Long> randomSampler = new RandomSampler(data.size());
             batchSampler = new BatchSampler(randomSampler, 33, true);
             originalList = new ArrayList<>();
             batchSampler.forEachRemaining(originalList::add);
             Assertions.assertTrue(originalList.size() == 3, "size of BatchSampler is not correct");
             // test case when dataset is smaller than batchSize
-            batchSampler = new BatchSampler(new SequenceSampler(dataset.size()), 101, true);
+            batchSampler = new BatchSampler(new SequenceSampler(data.size()), 101, true);
             originalList = new ArrayList<>();
             batchSampler.forEachRemaining(originalList::add);
             Assertions.assertTrue(originalList.isEmpty());
-            batchSampler = new BatchSampler(new SequenceSampler(dataset.size()), 101, false);
+            batchSampler = new BatchSampler(new SequenceSampler(data.size()), 101, false);
             originalList = new ArrayList<>();
             batchSampler.forEachRemaining(originalList::add);
             Assertions.assertTrue(
@@ -102,11 +101,10 @@ public class DatasetTest {
             // TODO this should be (100) not (100, 1) due to NumpyShape off
             NDArray label = manager.arange(100).reshape(100, 1);
             ArrayDataset dataset =
-                    new ArrayDataset.Builder()
-                            .setData(data)
-                            .setLabels(label)
-                            .setDataLoadingProperty(false, 20, false)
-                            .build();
+                    new ArrayDataset(
+                            data,
+                            label,
+                            new DataLoadingConfiguration.Builder().setBatchSize(20).build());
             int index = 0;
             for (Record record : dataset.getRecords()) {
                 Assertions.assertEquals(
@@ -118,11 +116,10 @@ public class DatasetTest {
                 index += 20;
             }
             dataset =
-                    new ArrayDataset.Builder()
-                            .setData(data)
-                            .setLabels(label)
-                            .setDataLoadingProperty(false, 15, false)
-                            .build();
+                    new ArrayDataset(
+                            data,
+                            label,
+                            new DataLoadingConfiguration.Builder().setBatchSize(15).build());
             index = 0;
             for (Record record : dataset.getRecords()) {
                 if (index != 90) {

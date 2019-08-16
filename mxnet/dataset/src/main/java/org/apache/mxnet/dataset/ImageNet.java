@@ -16,7 +16,6 @@ import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 
 public class ImageNet implements Dataset {
-
     @Override
     public Iterable<Record> getRecords() {
         return null;

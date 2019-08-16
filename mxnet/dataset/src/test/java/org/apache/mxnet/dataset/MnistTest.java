@@ -17,6 +17,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 
@@ -26,11 +27,13 @@ public class MnistTest {
     public void testMnistLocal() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
-            Mnist mnist =
-                    new Mnist.Builder(manager, repository)
-                            .setUsage(Dataset.Usage.TEST)
-                            .setDataLoadingProperty(false, 32, false)
-                            .build();
+            SimpleDataset mnist =
+                    new Mnist(
+                            manager,
+                            repository,
+                            Dataset.Usage.TEST,
+                            new DataLoadingConfiguration.Builder().setBatchSize(32).build());
+            mnist.prepare();
             for (Record record : mnist.getRecords()) {
                 Assert.assertEquals(record.getData().size(), 1);
                 Assert.assertEquals(record.getLabels().size(), 1);
@@ -41,11 +44,12 @@ public class MnistTest {
     @Test
     public void testMnistRemote() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            Mnist mnist =
-                    new Mnist.Builder(manager)
-                            .setUsage(Dataset.Usage.TEST)
-                            .setDataLoadingProperty(false, 32, false)
-                            .build();
+            SimpleDataset mnist =
+                    new Mnist(
+                            manager,
+                            Dataset.Usage.TEST,
+                            new DataLoadingConfiguration.Builder().setBatchSize(32).build());
+            mnist.prepare();
             for (Record record : mnist.getRecords()) {
                 Assert.assertEquals(record.getData().size(), 1);
                 Assert.assertEquals(record.getLabels().size(), 1);

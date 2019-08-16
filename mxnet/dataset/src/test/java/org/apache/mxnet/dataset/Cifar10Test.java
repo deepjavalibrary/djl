@@ -17,6 +17,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 
@@ -26,11 +27,13 @@ public class Cifar10Test {
     public void testCifar10Local() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
-            Cifar10 cifar10 =
-                    new Cifar10.Builder(manager, repository)
-                            .setUsage(Dataset.Usage.TEST)
-                            .setDataLoadingProperty(false, 1000, false)
-                            .build();
+            SimpleDataset cifar10 =
+                    new Cifar10(
+                            manager,
+                            repository,
+                            Dataset.Usage.TEST,
+                            new DataLoadingConfiguration.Builder().setBatchSize(32).build());
+            cifar10.prepare();
             for (Record batch : cifar10.getRecords()) {
                 Assert.assertEquals(batch.getData().size(), 1);
                 Assert.assertEquals(batch.getLabels().size(), 1);
@@ -41,11 +44,12 @@ public class Cifar10Test {
     @Test
     public void testCifar10Remote() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            Cifar10 cifar10 =
-                    new Cifar10.Builder(manager)
-                            .setUsage(Dataset.Usage.TEST)
-                            .setDataLoadingProperty(false, 32, false)
-                            .build();
+            SimpleDataset cifar10 =
+                    new Cifar10(
+                            manager,
+                            Dataset.Usage.TEST,
+                            new DataLoadingConfiguration.Builder().setBatchSize(32).build());
+            cifar10.prepare();
             for (Record batch : cifar10.getRecords()) {
                 Assert.assertEquals(batch.getData().size(), 1);
                 Assert.assertEquals(batch.getLabels().size(), 1);

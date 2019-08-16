@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.mxnet.dataset.Mnist;
+import org.apache.mxnet.dataset.SimpleDataset;
 import software.amazon.ai.Block;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
@@ -25,6 +26,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
+import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.metrics.Accuracy;
@@ -53,12 +55,15 @@ public final class MnistUtils {
         Accuracy acc = new Accuracy();
         LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
-        Mnist mnist =
-                new Mnist.Builder(manager)
-                        .setUsage(Dataset.Usage.TRAIN)
-                        .setDataLoadingProperty(true, batchSize, false)
-                        .build();
-
+        SimpleDataset mnist =
+                new Mnist(
+                        manager,
+                        Dataset.Usage.TRAIN,
+                        new DataLoadingConfiguration.Builder()
+                                .setBatchSize(batchSize)
+                                .setShuffle(true)
+                                .build());
+        mnist.prepare();
         for (int epoch = 0; epoch < numEpoch; epoch++) {
             // reset loss and accuracy
             acc.reset();

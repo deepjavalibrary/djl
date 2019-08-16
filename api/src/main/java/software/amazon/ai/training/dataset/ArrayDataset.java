@@ -24,30 +24,55 @@ import software.amazon.ai.util.Pair;
  * <p>The following is an example of how to use ArrayDataset:
  *
  * <pre>
- *     ArrayDataset = new ArrayDataset.Builder()
- *             .setData(data1, data2)
- *             .setLabels(label1, label2, label3)
- *             .setDataLoadingProperty(false, 20, false)
- *             .build();
+ *     ArrayDataset dataset = new ArrayDataset(
+ *                      new NDArray[]{data1, data2},
+ *                      new NDArray[]{label1, label2, label3},
+ *                      new DataLoadingConfiguration.builder
+ *                              .setBatchSize(20)
+ *                              .build())
  * </pre>
  *
  * @see Dataset
  */
-public final class ArrayDataset implements RandomAccessDataset {
+public final class ArrayDataset extends RandomAccessDataset {
 
     private final NDArray[] data;
     private final NDArray[] labels;
-    private final Long size;
-    private final DataLoadingConfiguration config;
+    private long size;
 
-    private ArrayDataset(Builder builder) {
-        this.data = builder.data;
-        this.labels = builder.labels;
-        this.size = builder.size;
-        this.config = builder.config;
+    public ArrayDataset(NDArray data, DataLoadingConfiguration config) {
+        this(new NDArray[] {data}, config);
     }
 
-    /** {@inheritDoc} */
+    public ArrayDataset(NDArray[] data, DataLoadingConfiguration config) {
+        this(data, null, config);
+    }
+
+    public ArrayDataset(NDArray data, NDArray labels, DataLoadingConfiguration config) {
+        this(new NDArray[] {data}, new NDArray[] {labels}, config);
+    }
+
+    public ArrayDataset(NDArray[] data, NDArray[] labels, DataLoadingConfiguration config) {
+        super(config);
+        if (data != null && data.length != 0) {
+            size = data[0].size(0);
+        } else if (labels != null && labels.length != 0) {
+            size = labels[0].size(0);
+        } else {
+            throw new IllegalArgumentException("Either data or labels must have NDArray");
+        }
+        // check data and labels have the same size
+        if (data != null && Stream.of(data).anyMatch(array -> array.size(0) != size)) {
+            throw new IllegalArgumentException("All the NDArray must have the same length!");
+        }
+        if (labels != null && Stream.of(labels).anyMatch(array -> array.size(0) != size)) {
+            throw new IllegalArgumentException("All the NDArray must have the same length!");
+        }
+        setSize(size);
+        this.data = data;
+        this.labels = labels;
+    }
+
     @Override
     public Pair<NDList, NDList> get(long index) {
         NDList datum = new NDList();
@@ -59,83 +84,5 @@ public final class ArrayDataset implements RandomAccessDataset {
             label.add(array.get(index));
         }
         return new Pair<>(datum, label);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long size() {
-        return size;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Iterable<Record> getRecords() {
-        return new DataIterable(this, config);
-    }
-
-    public static final class Builder {
-
-        private NDArray[] data;
-        private NDArray[] labels;
-        private DataLoadingConfiguration config;
-        private Long size;
-
-        public Builder() {
-            this.data = new NDArray[0];
-            this.labels = new NDArray[0];
-        }
-
-        public Builder setData(NDArray... data) {
-            if (size == null) {
-                size = data[0].size(0);
-            }
-            if (Stream.of(data).anyMatch(array -> array.size(0) != size)) {
-                throw new IllegalArgumentException("All the NDArray must have the same length!");
-            }
-            this.data = data;
-            return this;
-        }
-
-        public Builder setLabels(NDArray... labels) {
-            if (size == null) {
-                size = labels[0].size(0);
-            }
-            if (Stream.of(labels).anyMatch(array -> array.size(0) != size)) {
-                throw new IllegalArgumentException("All the NDArray must have the same length!");
-            }
-            this.labels = labels;
-            return this;
-        }
-        // TODO overload this function for other common params combination
-        public Builder setDataLoadingProperty(boolean shuffle, int batchSize, boolean dropLast) {
-            this.config =
-                    new DataLoadingConfiguration.Builder()
-                            .setShuffle(shuffle)
-                            .setBatchSize(batchSize)
-                            .setDropLast(dropLast)
-                            .build();
-            return this;
-        }
-
-        public Builder setDataLoadingProperty(DataLoadingConfiguration config) {
-            if (this.config != null) {
-                throw new IllegalArgumentException(
-                        "either setDataLoading or setDataLoadingConfig, not both");
-            }
-            this.config = config;
-            return this;
-        }
-
-        public ArrayDataset build() {
-            if (this.config == null) {
-                this.config =
-                        new DataLoadingConfiguration.Builder()
-                                .setShuffle(false)
-                                .setBatchSize(1)
-                                .setDropLast(false)
-                                .build();
-            }
-            return new ArrayDataset(this);
-        }
     }
 }

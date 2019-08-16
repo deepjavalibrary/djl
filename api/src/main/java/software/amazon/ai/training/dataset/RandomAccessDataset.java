@@ -20,9 +20,30 @@ import software.amazon.ai.util.Pair;
  * RandomAccessDataset represent the dataset that support random access reads. i.e. it could access
  * certain data item given the index
  */
-public interface RandomAccessDataset extends Dataset, RandomAccess {
+public abstract class RandomAccessDataset implements Dataset, RandomAccess {
+    private long size;
+    private DataLoadingConfiguration config;
 
-    Pair<NDList, NDList> get(long index);
+    public RandomAccessDataset(DataLoadingConfiguration config) {
+        this.config = config;
+    }
 
-    long size();
+    public abstract Pair<NDList, NDList> get(long index);
+
+    @Override
+    public Iterable<Record> getRecords() {
+        return new DataIterable(this, config);
+    }
+
+    public long size() {
+        return size;
+    }
+
+    protected void setSize(long size) {
+        this.size = size;
+    }
+
+    protected DataLoadingConfiguration getDataLoadingConfiguration() {
+        return config;
+    }
 }
