@@ -47,6 +47,14 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXLoadLib(String path) {
+        if (functions.containsKey("MXLoadLib")) {
+            return functions.get("MXLoadLib").apply(new Object[] {path});
+        }
+        return 0;
+    }
+
+    @Override
     public int MXLibInfoFeatures(LibFeature.ByReference[] libFeature, NativeSizeByReference size) {
         if (functions.containsKey("MXLibInfoFeatures")) {
             return functions.get("MXLibInfoFeatures").apply(new Object[] {libFeature, size});
@@ -334,6 +342,14 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXLoadTVMOp(String libpath) {
+        if (functions.containsKey("MXLoadTVMOp")) {
+            return functions.get("MXLoadTVMOp").apply(new Object[] {libpath});
+        }
+        return 0;
+    }
+
+    @Override
     public int MXNDArrayCreateNone(PointerByReference out) {
         if (functions.containsKey("MXNDArrayCreateNone")) {
             return functions.get("MXNDArrayCreateNone").apply(new Object[] {out});
@@ -377,6 +393,23 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXNDArrayCreateEx64(
+            long[] shape,
+            int ndim,
+            int dev_type,
+            int dev_id,
+            int delay_alloc,
+            int dtype,
+            PointerByReference out) {
+        if (functions.containsKey("MXNDArrayCreateEx64")) {
+            return functions
+                    .get("MXNDArrayCreateEx64")
+                    .apply(new Object[] {shape, ndim, dev_type, dev_id, delay_alloc, dtype, out});
+        }
+        return 0;
+    }
+
+    @Override
     public int MXNDArrayCreateSparseEx(
             int storage_type,
             int[] shape,
@@ -393,6 +426,42 @@ public class MockMxnetLibrary implements MxnetLibrary {
         if (functions.containsKey("MXNDArrayCreateSparseEx")) {
             return functions
                     .get("MXNDArrayCreateSparseEx")
+                    .apply(
+                            new Object[] {
+                                storage_type,
+                                shape,
+                                ndim,
+                                dev_type,
+                                dev_id,
+                                delay_alloc,
+                                dtype,
+                                num_aux,
+                                aux_type,
+                                aux_ndims,
+                                aux_shape,
+                                out
+                            });
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXNDArrayCreateSparseEx64(
+            int storage_type,
+            long[] shape,
+            int ndim,
+            int dev_type,
+            int dev_id,
+            int delay_alloc,
+            int dtype,
+            int num_aux,
+            IntBuffer aux_type,
+            IntBuffer aux_ndims,
+            long[] aux_shape,
+            PointerByReference out) {
+        if (functions.containsKey("MXNDArrayCreateSparseEx64")) {
+            return functions
+                    .get("MXNDArrayCreateSparseEx64")
                     .apply(
                             new Object[] {
                                 storage_type,
@@ -472,6 +541,38 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXNDArrayLoad64(
+            String fname,
+            LongBuffer out_size,
+            PointerByReference out_arr,
+            LongBuffer out_name_size,
+            PointerByReference out_names) {
+        if (functions.containsKey("MXNDArrayLoad64")) {
+            return functions
+                    .get("MXNDArrayLoad64")
+                    .apply(new Object[] {fname, out_size, out_arr, out_name_size, out_names});
+        }
+
+        out_size.put(0, 3);
+        out_name_size.put(0, 3);
+
+        PointerArray ndarrays =
+                new PointerArray(
+                        TestHelper.toPointer("A:" + fname),
+                        TestHelper.toPointer("B:b"),
+                        TestHelper.toPointer("C:c"));
+        PointerArray names =
+                new PointerArray(
+                        TestHelper.toPointer("A:" + fname),
+                        TestHelper.toPointer("B:b"),
+                        TestHelper.toPointer("C:c"));
+
+        out_arr.setValue(ndarrays);
+        out_names.setValue(names);
+        return 0;
+    }
+
+    @Override
     public int MXNDArrayLoadFromBuffer(
             Pointer ndarray_buffer,
             NativeSize size,
@@ -482,6 +583,25 @@ public class MockMxnetLibrary implements MxnetLibrary {
         if (functions.containsKey("MXNDArrayLoadFromBuffer")) {
             return functions
                     .get("MXNDArrayLoadFromBuffer")
+                    .apply(
+                            new Object[] {
+                                ndarray_buffer, size, out_size, out_arr, out_name_size, out_names
+                            });
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXNDArrayLoadFromBuffer64(
+            Pointer ndarray_buffer,
+            NativeSize size,
+            LongBuffer out_size,
+            PointerByReference out_arr,
+            LongBuffer out_name_size,
+            PointerByReference out_names) {
+        if (functions.containsKey("MXNDArrayLoadFromBuffer64")) {
+            return functions
+                    .get("MXNDArrayLoadFromBuffer64")
                     .apply(
                             new Object[] {
                                 ndarray_buffer, size, out_size, out_arr, out_name_size, out_names
@@ -625,11 +745,41 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXNDArrayGetShape64(
+            Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
+        if (functions.containsKey("MXNDArrayGetShape64")) {
+            return functions
+                    .get("MXNDArrayGetShape64")
+                    .apply(new Object[] {handle, out_dim, out_pdata});
+        }
+
+        out_dim.put(0, 3);
+        Pointer ptr = TestHelper.toPointer(new int[] {1, 2, 3});
+        out_pdata.setValue(ptr);
+        return 0;
+    }
+
+    @Override
     public int MXNDArrayGetShapeEx(
             Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
         if (functions.containsKey("MXNDArrayGetShapeEx")) {
             return functions
                     .get("MXNDArrayGetShapeEx")
+                    .apply(new Object[] {handle, out_dim, out_pdata});
+        }
+
+        out_dim.put(0, 3);
+        Pointer ptr = TestHelper.toPointer(new int[] {1, 2, 3});
+        out_pdata.setValue(ptr);
+        return 0;
+    }
+
+    @Override
+    public int MXNDArrayGetShapeEx64(
+            Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
+        if (functions.containsKey("MXNDArrayGetShapeEx64")) {
+            return functions
+                    .get("MXNDArrayGetShapeEx64")
                     .apply(new Object[] {handle, out_dim, out_pdata});
         }
 
@@ -699,9 +849,25 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXNDArrayGetAuxType64(Pointer handle, long i, IntBuffer out_type) {
+        if (functions.containsKey("MXNDArrayGetAuxType64")) {
+            return functions.get("MXNDArrayGetAuxType64").apply(new Object[] {handle, i, out_type});
+        }
+        return 0;
+    }
+
+    @Override
     public int MXNDArrayGetAuxNDArray(Pointer handle, int i, PointerByReference out) {
         if (functions.containsKey("MXNDArrayGetAuxNDArray")) {
             return functions.get("MXNDArrayGetAuxNDArray").apply(new Object[] {handle, i, out});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXNDArrayGetAuxNDArray64(Pointer handle, long i, PointerByReference out) {
+        if (functions.containsKey("MXNDArrayGetAuxNDArray64")) {
+            return functions.get("MXNDArrayGetAuxNDArray64").apply(new Object[] {handle, i, out});
         }
         return 0;
     }
@@ -763,6 +929,14 @@ public class MockMxnetLibrary implements MxnetLibrary {
     public int MXListFunctions(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("MXListFunctions")) {
             return functions.get("MXListFunctions").apply(new Object[] {out_size, out_array});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXListFunctions64(LongBuffer out_size, PointerByReference out_array) {
+        if (functions.containsKey("MXListFunctions64")) {
+            return functions.get("MXListFunctions64").apply(new Object[] {out_size, out_array});
         }
         return 0;
     }
@@ -1145,10 +1319,34 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXListAllOpNames64(LongBuffer out_size, PointerByReference out_array) {
+        if (functions.containsKey("MXListAllOpNames64")) {
+            return functions.get("MXListAllOpNames64").apply(new Object[] {out_size, out_array});
+        }
+
+        PointerArray pa =
+                new PointerArray(TestHelper.toPointer("softmax"), TestHelper.toPointer("_copyto"));
+        out_size.put(0, 2);
+        out_array.setValue(pa);
+        return 0;
+    }
+
+    @Override
     public int MXSymbolListAtomicSymbolCreators(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("MXSymbolListAtomicSymbolCreators")) {
             return functions
                     .get("MXSymbolListAtomicSymbolCreators")
+                    .apply(new Object[] {out_size, out_array});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXSymbolListAtomicSymbolCreators64(
+            LongBuffer out_size, PointerByReference out_array) {
+        if (functions.containsKey("MXSymbolListAtomicSymbolCreators64")) {
+            return functions
+                    .get("MXSymbolListAtomicSymbolCreators64")
                     .apply(new Object[] {out_size, out_array});
         }
         return 0;
@@ -1365,11 +1563,33 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXSymbolListArguments64(
+            Pointer symbol, NativeSizeByReference out_size, PointerByReference out_str_array) {
+        if (functions.containsKey("MXSymbolListArguments64")) {
+            return functions
+                    .get("MXSymbolListArguments64")
+                    .apply(new Object[] {symbol, out_size, out_str_array});
+        }
+        return 0;
+    }
+
+    @Override
     public int MXSymbolListOutputs(
             Pointer symbol, IntBuffer out_size, PointerByReference out_str_array) {
         if (functions.containsKey("MXSymbolListOutputs")) {
             return functions
                     .get("MXSymbolListOutputs")
+                    .apply(new Object[] {symbol, out_size, out_str_array});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXSymbolListOutputs64(
+            Pointer symbol, NativeSizeByReference out_size, PointerByReference out_str_array) {
+        if (functions.containsKey("MXSymbolListOutputs64")) {
+            return functions
+                    .get("MXSymbolListOutputs64")
                     .apply(new Object[] {symbol, out_size, out_str_array});
         }
         return 0;
@@ -1415,6 +1635,17 @@ public class MockMxnetLibrary implements MxnetLibrary {
         if (functions.containsKey("MXSymbolListAuxiliaryStates")) {
             return functions
                     .get("MXSymbolListAuxiliaryStates")
+                    .apply(new Object[] {symbol, out_size, out_str_array});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXSymbolListAuxiliaryStates64(
+            Pointer symbol, NativeSizeByReference out_size, PointerByReference out_str_array) {
+        if (functions.containsKey("MXSymbolListAuxiliaryStates64")) {
+            return functions
+                    .get("MXSymbolListAuxiliaryStates64")
                     .apply(new Object[] {symbol, out_size, out_str_array});
         }
         return 0;
@@ -1482,6 +1713,48 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXSymbolInferShape64(
+            Pointer sym,
+            int num_args,
+            String[] keys,
+            long[] arg_ind_ptr,
+            long[] arg_shape_data,
+            NativeSizeByReference in_shape_size,
+            PointerByReference in_shape_ndim,
+            PointerByReference in_shape_data,
+            NativeSizeByReference out_shape_size,
+            PointerByReference out_shape_ndim,
+            PointerByReference out_shape_data,
+            NativeSizeByReference aux_shape_size,
+            PointerByReference aux_shape_ndim,
+            PointerByReference aux_shape_data,
+            IntBuffer complete) {
+        if (functions.containsKey("MXSymbolInferShape64")) {
+            return functions
+                    .get("MXSymbolInferShape64")
+                    .apply(
+                            new Object[] {
+                                sym,
+                                num_args,
+                                keys,
+                                arg_ind_ptr,
+                                arg_shape_data,
+                                in_shape_size,
+                                in_shape_ndim,
+                                in_shape_data,
+                                out_shape_size,
+                                out_shape_ndim,
+                                out_shape_data,
+                                aux_shape_size,
+                                aux_shape_ndim,
+                                aux_shape_data,
+                                complete
+                            });
+        }
+        return 0;
+    }
+
+    @Override
     public int MXSymbolInferShapeEx(
             Pointer sym,
             int num_args,
@@ -1501,6 +1774,48 @@ public class MockMxnetLibrary implements MxnetLibrary {
         if (functions.containsKey("MXSymbolInferShapeEx")) {
             return functions
                     .get("MXSymbolInferShapeEx")
+                    .apply(
+                            new Object[] {
+                                sym,
+                                num_args,
+                                keys,
+                                arg_ind_ptr,
+                                arg_shape_data,
+                                in_shape_size,
+                                in_shape_ndim,
+                                in_shape_data,
+                                out_shape_size,
+                                out_shape_ndim,
+                                out_shape_data,
+                                aux_shape_size,
+                                aux_shape_ndim,
+                                aux_shape_data,
+                                complete
+                            });
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXSymbolInferShapeEx64(
+            Pointer sym,
+            int num_args,
+            String[] keys,
+            long[] arg_ind_ptr,
+            long[] arg_shape_data,
+            NativeSizeByReference in_shape_size,
+            PointerByReference in_shape_ndim,
+            PointerByReference in_shape_data,
+            NativeSizeByReference out_shape_size,
+            PointerByReference out_shape_ndim,
+            PointerByReference out_shape_data,
+            NativeSizeByReference aux_shape_size,
+            PointerByReference aux_shape_ndim,
+            PointerByReference aux_shape_data,
+            IntBuffer complete) {
+        if (functions.containsKey("MXSymbolInferShapeEx64")) {
+            return functions
+                    .get("MXSymbolInferShapeEx64")
                     .apply(
                             new Object[] {
                                 sym,
@@ -1566,6 +1881,48 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXSymbolInferShapePartial64(
+            Pointer sym,
+            int num_args,
+            String[] keys,
+            long[] arg_ind_ptr,
+            long[] arg_shape_data,
+            NativeSizeByReference in_shape_size,
+            PointerByReference in_shape_ndim,
+            PointerByReference in_shape_data,
+            NativeSizeByReference out_shape_size,
+            PointerByReference out_shape_ndim,
+            PointerByReference out_shape_data,
+            NativeSizeByReference aux_shape_size,
+            PointerByReference aux_shape_ndim,
+            PointerByReference aux_shape_data,
+            IntBuffer complete) {
+        if (functions.containsKey("MXSymbolInferShapePartial64")) {
+            return functions
+                    .get("MXSymbolInferShapePartial64")
+                    .apply(
+                            new Object[] {
+                                sym,
+                                num_args,
+                                keys,
+                                arg_ind_ptr,
+                                arg_shape_data,
+                                in_shape_size,
+                                in_shape_ndim,
+                                in_shape_data,
+                                out_shape_size,
+                                out_shape_ndim,
+                                out_shape_data,
+                                aux_shape_size,
+                                aux_shape_ndim,
+                                aux_shape_data,
+                                complete
+                            });
+        }
+        return 0;
+    }
+
+    @Override
     public int MXSymbolInferShapePartialEx(
             Pointer sym,
             int num_args,
@@ -1585,6 +1942,48 @@ public class MockMxnetLibrary implements MxnetLibrary {
         if (functions.containsKey("MXSymbolInferShapePartialEx")) {
             return functions
                     .get("MXSymbolInferShapePartialEx")
+                    .apply(
+                            new Object[] {
+                                sym,
+                                num_args,
+                                keys,
+                                arg_ind_ptr,
+                                arg_shape_data,
+                                in_shape_size,
+                                in_shape_ndim,
+                                in_shape_data,
+                                out_shape_size,
+                                out_shape_ndim,
+                                out_shape_data,
+                                aux_shape_size,
+                                aux_shape_ndim,
+                                aux_shape_data,
+                                complete
+                            });
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXSymbolInferShapePartialEx64(
+            Pointer sym,
+            int num_args,
+            String[] keys,
+            long[] arg_ind_ptr,
+            long[] arg_shape_data,
+            NativeSizeByReference in_shape_size,
+            PointerByReference in_shape_ndim,
+            PointerByReference in_shape_data,
+            NativeSizeByReference out_shape_size,
+            PointerByReference out_shape_ndim,
+            PointerByReference out_shape_data,
+            NativeSizeByReference aux_shape_size,
+            PointerByReference aux_shape_ndim,
+            PointerByReference aux_shape_data,
+            IntBuffer complete) {
+        if (functions.containsKey("MXSymbolInferShapePartialEx64")) {
+            return functions
+                    .get("MXSymbolInferShapePartialEx64")
                     .apply(
                             new Object[] {
                                 sym,
@@ -1698,6 +2097,64 @@ public class MockMxnetLibrary implements MxnetLibrary {
                                 offline_params,
                                 quantized_dtype,
                                 calib_quantize
+                            });
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXReducePrecisionSymbol(
+            Pointer sym_handle,
+            PointerByReference ret_sym_handle,
+            int num_args,
+            int[] arg_type_data,
+            int num_ind_ptr,
+            int[] ind_ptr,
+            int[] target_dtype,
+            int cast_optional_params,
+            int num_target_dtype_op_names,
+            int num_fp32_op_names,
+            int num_widest_dtype_op_names,
+            int num_conditional_fp32_op_names,
+            int num_excluded_symbols,
+            int num_model_params,
+            String[] target_dtype_op_names,
+            String[] fp32_op_names,
+            String[] widest_dtype_op_names,
+            String[] conditional_fp32_op_names,
+            String[] excluded_symbols,
+            String[] conditional_param_names,
+            String[] conditional_param_vals,
+            String[] model_param_names,
+            String[] arg_names) {
+        if (functions.containsKey("MXReducePrecisionSymbol")) {
+            return functions
+                    .get("MXReducePrecisionSymbol")
+                    .apply(
+                            new Object[] {
+                                sym_handle,
+                                ret_sym_handle,
+                                num_args,
+                                arg_type_data,
+                                num_ind_ptr,
+                                ind_ptr,
+                                target_dtype,
+                                cast_optional_params,
+                                num_target_dtype_op_names,
+                                num_fp32_op_names,
+                                num_widest_dtype_op_names,
+                                num_conditional_fp32_op_names,
+                                num_excluded_symbols,
+                                num_model_params,
+                                target_dtype_op_names,
+                                fp32_op_names,
+                                widest_dtype_op_names,
+                                conditional_fp32_op_names,
+                                excluded_symbols,
+                                conditional_param_names,
+                                conditional_param_vals,
+                                model_param_names,
+                                arg_names
                             });
         }
         return 0;
@@ -2971,14 +3428,30 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXShallowCopyNDArray(Pointer src, PointerByReference out) {
+        if (functions.containsKey("MXShallowCopyNDArray")) {
+            return functions.get("MXShallowCopyNDArray").apply(new Object[] {src, out});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXShallowCopySymbol(Pointer src, PointerByReference out) {
+        if (functions.containsKey("MXShallowCopySymbol")) {
+            return functions.get("MXShallowCopySymbol").apply(new Object[] {src, out});
+        }
+        return 0;
+    }
+
+    @Override
     public int MXEnginePushAsyncND(
             EngineAsyncFunc async_func,
             Pointer func_param,
             EngineFuncParamDeleter deleter,
             Pointer ctx_handle,
-            Pointer const_nds_handle,
+            PointerByReference const_nds_handle,
             int num_const_nds,
-            Pointer mutable_nds_handle,
+            PointerByReference mutable_nds_handle,
             int num_mutable_nds,
             Pointer prop_handle,
             int priority,
@@ -3012,9 +3485,9 @@ public class MockMxnetLibrary implements MxnetLibrary {
             Pointer func_param,
             EngineFuncParamDeleter deleter,
             Pointer ctx_handle,
-            Pointer const_nds_handle,
+            PointerByReference const_nds_handle,
             int num_const_nds,
-            Pointer mutable_nds_handle,
+            PointerByReference mutable_nds_handle,
             int num_mutable_nds,
             Pointer prop_handle,
             int priority,

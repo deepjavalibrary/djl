@@ -244,6 +244,7 @@ public class DataType {
             case "int64_t":
             case "long":
                 return "long";
+            case "uint32_t":
             case "unsigned int":
             case "unsigned":
             case "int":
