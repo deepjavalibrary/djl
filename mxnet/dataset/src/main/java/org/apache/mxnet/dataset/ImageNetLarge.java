@@ -12,13 +12,13 @@
  */
 package org.apache.mxnet.dataset;
 
-import software.amazon.ai.Batch;
 import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.training.dataset.Record;
 
 public class ImageNetLarge implements Dataset {
 
     @Override
-    public Iterable<Batch> getData() {
+    public Iterable<Record> getRecords() {
         return null;
     }
 }

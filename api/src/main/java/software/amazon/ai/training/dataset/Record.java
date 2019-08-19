@@ -10,16 +10,17 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai;
+package software.amazon.ai.training.dataset;
 
 import software.amazon.ai.ndarray.NDList;
 
-/** Batch is used to get a batch of data and labels. */
-public class Batch {
+/** Record is used to get a batch of data and labels from {@link Dataset}. */
+public class Record {
+
     private NDList data;
     private NDList labels;
 
-    public Batch(NDList data, NDList labels) {
+    public Record(NDList data, NDList labels) {
         this.data = data;
         this.labels = labels;
     }

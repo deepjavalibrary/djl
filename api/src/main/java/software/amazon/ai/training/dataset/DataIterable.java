@@ -14,13 +14,12 @@ package software.amazon.ai.training.dataset;
 
 import java.util.Iterator;
 import java.util.List;
-import software.amazon.ai.Batch;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.util.Pair;
 
 // TODO abstract a interface that could be inherited by this and Stream DataIterable
 // where the random reads is expensive
-public class DataIterable implements Iterable<Batch> {
+public class DataIterable implements Iterable<Record> {
     private RandomAccessDataset dataset;
     private DataLoadingConfiguration config;
 
@@ -30,11 +29,11 @@ public class DataIterable implements Iterable<Batch> {
     }
 
     @Override
-    public Iterator<Batch> iterator() {
+    public Iterator<Record> iterator() {
         return new DataIterator(dataset, config);
     }
 
-    private static class DataIterator implements Iterator<Batch> {
+    private static class DataIterator implements Iterator<Record> {
         private RandomAccessDataset dataset;
         private int batchSize;
         private boolean shuffle;
@@ -102,7 +101,7 @@ public class DataIterable implements Iterable<Batch> {
         }
 
         @Override
-        public Batch next() {
+        public Record next() {
             List<Long> indices = batchSampler.next();
             NDList[] data = new NDList[indices.size()];
             NDList[] labels = new NDList[indices.size()];
@@ -111,7 +110,7 @@ public class DataIterable implements Iterable<Batch> {
                 data[i] = dataItem.getKey();
                 labels[i] = dataItem.getValue();
             }
-            return new Batch(batchifier.batchify(data), batchifier.batchify(labels));
+            return new Record(batchifier.batchify(data), batchifier.batchify(labels));
         }
     }
 }

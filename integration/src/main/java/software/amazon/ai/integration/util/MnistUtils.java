@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.mxnet.dataset.Mnist;
 import org.apache.mxnet.jna.JnaUtils;
-import software.amazon.ai.Batch;
 import software.amazon.ai.Block;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
@@ -28,6 +27,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -66,9 +66,9 @@ public final class MnistUtils {
             acc.reset();
             lossMetric.reset();
             NDArray loss;
-            for (Batch batch : mnist.getData()) {
-                NDArray data = batch.getData().head().reshape(batchSize, 28 * 28).div(255f);
-                NDArray label = batch.getLabels().head();
+            for (Record record : mnist.getRecords()) {
+                NDArray data = record.getData().head().reshape(batchSize, 28 * 28).div(255f);
+                NDArray label = record.getLabels().head();
                 NDArray pred;
                 try (Gradient.Collector gradCol = Gradient.newCollector()) {
                     Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);

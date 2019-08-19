@@ -15,7 +15,6 @@ package org.apache.mxnet.dataset;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import software.amazon.ai.Batch;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -27,6 +26,7 @@ import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.dataset.DataIterable;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
+import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
 
@@ -59,7 +59,7 @@ public final class Mnist implements RandomAccessDataset {
     }
 
     @Override
-    public Iterable<Batch> getData() {
+    public Iterable<Record> getRecords() {
         return new DataIterable(this, config);
     }
 

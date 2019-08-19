@@ -19,13 +19,13 @@ import java.util.List;
 import org.apache.mxnet.engine.MxImages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Batch;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.dataset.DataIterable;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
+import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -68,7 +68,7 @@ public final class ImageFolder implements RandomAccessDataset {
     }
 
     @Override
-    public Iterable<Batch> getData() {
+    public Iterable<Record> getRecords() {
         return new DataIterable(this, config);
     }
 

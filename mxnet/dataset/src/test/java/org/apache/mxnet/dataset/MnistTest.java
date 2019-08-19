@@ -18,10 +18,10 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import software.amazon.ai.Batch;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.training.dataset.Record;
 
 public class MnistTest {
 
@@ -44,9 +44,9 @@ public class MnistTest {
                             .setUsage(Dataset.Usage.TEST)
                             .setDataLoadingProperty(false, 32, false)
                             .build();
-            for (Batch batch : mnist.getData()) {
-                Assert.assertEquals(batch.getData().size(), 1);
-                Assert.assertEquals(batch.getLabels().size(), 1);
+            for (Record record : mnist.getRecords()) {
+                Assert.assertEquals(record.getData().size(), 1);
+                Assert.assertEquals(record.getLabels().size(), 1);
             }
         }
     }
@@ -59,9 +59,9 @@ public class MnistTest {
                             .setUsage(Dataset.Usage.TEST)
                             .setDataLoadingProperty(false, 32, false)
                             .build();
-            for (Batch batch : mnist.getData()) {
-                Assert.assertEquals(batch.getData().size(), 1);
-                Assert.assertEquals(batch.getLabels().size(), 1);
+            for (Record record : mnist.getRecords()) {
+                Assert.assertEquals(record.getData().size(), 1);
+                Assert.assertEquals(record.getLabels().size(), 1);
             }
         }
     }

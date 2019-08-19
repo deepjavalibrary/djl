@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import org.apache.mxnet.jna.JnaUtils;
-import software.amazon.ai.Batch;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -29,6 +28,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.BatchSampler;
 import software.amazon.ai.training.dataset.RandomSampler;
+import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.dataset.Sampler;
 import software.amazon.ai.training.dataset.SequenceSampler;
 
@@ -111,12 +111,13 @@ public class DatasetTest {
                             .setDataLoadingProperty(false, 20, false)
                             .build();
             int index = 0;
-            for (Batch batch : dataset.getData()) {
+            for (Record record : dataset.getRecords()) {
                 Assertions.assertEquals(
-                        batch.getData().get(0),
+                        record.getData().get(0),
                         manager.arange(2 * index, 2 * index + 40).reshape(20, 2));
                 Assertions.assertEquals(
-                        batch.getLabels().get(0), manager.arange(index, index + 20).reshape(20, 1));
+                        record.getLabels().get(0),
+                        manager.arange(index, index + 20).reshape(20, 1));
                 index += 20;
             }
             dataset =
@@ -126,21 +127,21 @@ public class DatasetTest {
                             .setDataLoadingProperty(false, 15, false)
                             .build();
             index = 0;
-            for (Batch batch : dataset.getData()) {
+            for (Record record : dataset.getRecords()) {
                 if (index != 90) {
                     Assertions.assertEquals(
-                            batch.getData().get(0),
+                            record.getData().get(0),
                             manager.arange(2 * index, 2 * index + 30).reshape(15, 2));
                     Assertions.assertEquals(
-                            batch.getLabels().get(0),
+                            record.getLabels().get(0),
                             manager.arange(index, index + 15).reshape(15, 1));
                 } else {
                     // last batch
                     Assertions.assertEquals(
-                            batch.getData().get(0),
+                            record.getData().get(0),
                             manager.arange(2 * index, 2 * index + 20).reshape(10, 2));
                     Assertions.assertEquals(
-                            batch.getLabels().get(0),
+                            record.getLabels().get(0),
                             manager.arange(index, index + 10).reshape(10, 1));
                 }
                 index += 15;

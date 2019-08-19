@@ -12,13 +12,11 @@
  */
 package software.amazon.ai.training.dataset;
 
-import software.amazon.ai.Batch;
-
 public class ImageRecord implements Dataset {
 
     /** {@inheritDoc} */
     @Override
-    public Iterable<Batch> getData() {
+    public Iterable<Record> getRecords() {
         return null;
     }
 }

@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxGradient;
 import org.apache.mxnet.jna.JnaUtils;
-import software.amazon.ai.Batch;
 import software.amazon.ai.SequentialBlock;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -34,6 +33,7 @@ import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.dataset.ArrayDataset;
+import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.LossMetric;
@@ -106,12 +106,12 @@ public class MxAutoGradIntegrationTest {
 
             for (int epoch = 0; epoch < epochs; epoch++) {
                 lossMetric.reset();
-                for (Batch batch : dataset.getData()) {
+                for (Record record : dataset.getRecords()) {
                     try (Gradient.Collector gradCol = Gradient.newCollector()) {
                         Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);
 
-                        NDArray x = batch.getData().head();
-                        NDArray y = batch.getLabels().head();
+                        NDArray x = record.getData().head();
+                        NDArray y = record.getLabels().head();
                         NDArray yHat = block.forward(x);
                         loss = Loss.l2Loss(y, yHat, 1, 0);
                         optimizer.step(gradCol.collect(loss).get(optKey));
