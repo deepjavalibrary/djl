@@ -24,6 +24,7 @@ import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 
 public class Cifar10Test {
+
     @BeforeClass
     public void setup() {
         JnaUtils.setNumpyMode(true);

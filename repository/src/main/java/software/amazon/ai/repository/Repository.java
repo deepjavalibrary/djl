@@ -14,7 +14,6 @@ package software.amazon.ai.repository;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -24,10 +23,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.compress.utils.IOUtils;
 
 public interface Repository {
 
@@ -101,22 +96,6 @@ public interface Repository {
                 try (InputStream is = fileUri.toURL().openStream()) {
                     if ("zip".equals(extension)) {
                         ZipUtils.unzip(is, dir);
-                    } else if ("tgz".equals(extension)) {
-                        try (TarArchiveInputStream fin =
-                                new TarArchiveInputStream(new GzipCompressorInputStream(is))) {
-                            TarArchiveEntry tarArchiveEntry;
-                            while ((tarArchiveEntry = fin.getNextTarEntry()) != null) {
-                                if (tarArchiveEntry.isDirectory()) {
-                                    continue;
-                                }
-                                Path file = resourceDir.resolve(fileName);
-                                File currentFile =
-                                        new File(file.toString(), tarArchiveEntry.getName());
-                                IOUtils.copy(
-                                        fin,
-                                        Files.newOutputStream(Paths.get(currentFile.getName())));
-                            }
-                        }
                     }
                 }
                 return;

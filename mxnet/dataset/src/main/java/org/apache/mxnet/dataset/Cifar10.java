@@ -14,12 +14,8 @@ package org.apache.mxnet.dataset;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
@@ -39,7 +35,10 @@ import software.amazon.ai.util.Utils;
  * is an image (in 3D NDArray) with shape (32, 32, 3).
  */
 public final class Cifar10 implements RandomAccessDataset {
+
     private static final String ARTIFACT_ID = "cifar10";
+    // 3072 = 32 * 32 * 3, i.e. one image size, +1 here is label
+    private static final int DATA_AND_LABLE_SIZE = 32 * 32 * 3 + 1;
 
     private final Repository repository;
     private final NDManager manager;
@@ -75,40 +74,21 @@ public final class Cifar10 implements RandomAccessDataset {
 
     private void loadData(Usage usage) throws IOException {
         Map<String, Artifact.Item> map = artifact.getFiles();
-        List<String> names;
+        Artifact.Item item;
         switch (usage) {
             case TRAIN:
-                names =
-                        Arrays.asList(
-                                "data_batch_1.bin",
-                                "data_batch_2.bin",
-                                "data_batch_3.bin",
-                                "data_batch_4.bin",
-                                "data_batch_5.bin");
+                item = map.get("data_batch.bin");
                 break;
             case TEST:
-                names = Arrays.asList("test_batch.bin");
+                item = map.get("test_batch.bin");
                 break;
             case VALIDATION:
             default:
                 throw new UnsupportedOperationException("Validation data not available.");
         }
-        NDArray[] dataArr = new NDArray[names.size()];
-        NDArray[] labelsArr = new NDArray[names.size()];
-        for (int i = 0; i < names.size(); i++) {
-            NDArray dataAndLabels = readData(map.get(names.get(i)));
-            dataArr[i] = dataAndLabels.get(":, 1:").reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1);
-            labelsArr[i] = dataAndLabels.get(":,0");
-        }
-        if (dataArr.length != 1) {
-            data = NDArrays.concat(dataArr);
-            labels = NDArrays.concat(labelsArr);
-            // free the memory
-            Stream.concat(Arrays.stream(dataArr), Arrays.stream(labelsArr)).forEach(NDArray::close);
-        } else {
-            data = dataArr[0];
-            labels = labelsArr[0];
-        }
+        NDArray dataAndLabels = readData(item);
+        data = dataAndLabels.get(":, 1:").reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1);
+        labels = dataAndLabels.get(":,0");
         // check if data and labels have the same size
         if (data.size(0) != labels.size(0)) {
             throw new IOException(
@@ -120,9 +100,11 @@ public final class Cifar10 implements RandomAccessDataset {
     }
 
     public NDArray readData(Artifact.Item item) throws IOException {
-        try (InputStream is = repository.openStream(item, "data_batch_1.bin")) {
+        try (InputStream is = repository.openStream(item, null)) {
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(new Shape(10000, 3072 + 1), DataType.UINT8)) {
+            int length = buf.length / DATA_AND_LABLE_SIZE;
+            try (NDArray array =
+                    manager.create(new Shape(length, DATA_AND_LABLE_SIZE), DataType.UINT8)) {
                 array.set(buf);
                 return array.asType(DataType.FLOAT32, true);
             }
