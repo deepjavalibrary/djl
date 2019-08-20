@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.mxnet.dataset.Mnist;
-import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Block;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
@@ -42,7 +41,6 @@ public final class MnistUtils {
             Block mlp, NDManager manager, int numEpoch, float expectedLoss, float expectedAccuracy)
             throws FailedTestException, IOException {
         // TODO remove numpy flag
-        JnaUtils.setNumpyMode(true);
 
         int batchSize = 100;
 
@@ -95,8 +93,6 @@ public final class MnistUtils {
                         "Accuracy did not improve, accuracy value: %f, expected "
                                 + "minimal accuracy value: %f",
                         accuracy, expectedAccuracy));
-        // TODO remove numpy flag
-        JnaUtils.setNumpyMode(false);
     }
 
     public static String prepareModel() throws IOException {

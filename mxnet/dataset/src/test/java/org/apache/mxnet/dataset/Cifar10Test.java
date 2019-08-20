@@ -13,10 +13,7 @@
 package org.apache.mxnet.dataset;
 
 import java.io.IOException;
-import org.apache.mxnet.jna.JnaUtils;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
@@ -24,16 +21,6 @@ import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 
 public class Cifar10Test {
-
-    @BeforeClass
-    public void setup() {
-        JnaUtils.setNumpyMode(true);
-    }
-
-    @AfterClass
-    public void tearDown() {
-        JnaUtils.setNumpyMode(false);
-    }
 
     @Test
     public void testCifar10Local() throws IOException {

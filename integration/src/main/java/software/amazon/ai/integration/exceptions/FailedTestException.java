@@ -26,4 +26,12 @@ public class FailedTestException extends Exception {
     public FailedTestException(String message) {
         super(message);
     }
+
+    public FailedTestException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public FailedTestException(Throwable cause) {
+        super(cause);
+    }
 }

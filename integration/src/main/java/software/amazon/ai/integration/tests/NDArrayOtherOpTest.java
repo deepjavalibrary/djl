@@ -282,7 +282,7 @@ public class NDArrayOtherOpTest {
                             },
                             new Shape(4, 5));
             NDArray argMax = original.argmax();
-            NDArray expected = manager.create(new float[] {9});
+            NDArray expected = manager.create(9f);
             Assertions.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             argMax = original.argmax(0, true);

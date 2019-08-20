@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxGradient;
-import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Block;
 import software.amazon.ai.Parameter;
 import software.amazon.ai.SequentialBlock;
@@ -50,12 +49,10 @@ public class GradientCollectorIntegrationTest {
 
     public static void main(String[] args) {
         String[] cmd = new String[] {"-c", GradientCollectorIntegrationTest.class.getName()};
-        JnaUtils.setNumpyMode(true);
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
                                 .toArray(String[]::new));
-        JnaUtils.setNumpyMode(false);
     }
 
     @RunAsTest

@@ -42,8 +42,7 @@ public class MxEngine extends Engine {
         // Workaround MXNet engine lazy initialization issue
         JnaUtils.getAllOpNames();
 
-        // TODO: Enable numpy mode when numpy bug is fixed.
-        // JnaUtils.setNumpyMode(true);
+        JnaUtils.setNumpyMode(true);
     }
 
     /** {@inheritDoc} */
@@ -110,6 +109,7 @@ public class MxEngine extends Engine {
     public Model loadModel(
             Path modelPath, String modelName, Context context, Map<String, String> options)
             throws IOException {
+        ((MxEngine) Engine.getInstance()).setNumpyMode(false);
         Path modelDir;
         if (Files.isDirectory(modelPath)) {
             modelDir = modelPath.toAbsolutePath();
@@ -149,7 +149,9 @@ public class MxEngine extends Engine {
             epoch = Integer.parseInt(epochOption);
         }
 
-        return MxModel.loadModel(modelPrefix, epoch, context);
+        Model result = MxModel.loadModel(modelPrefix, epoch, context);
+        ((MxEngine) Engine.getInstance()).setNumpyMode(true);
+        return result;
     }
 
     /** {@inheritDoc} */
@@ -187,5 +189,15 @@ public class MxEngine extends Engine {
     @Override
     public NDManager newBaseManager(Context context) {
         return MxNDManager.getSystemManager().newSubManager();
+    }
+
+    /**
+     * Sets whether to run the MxEngine in numpy mode.
+     *
+     * @param numpy True to use numpy mode
+     */
+    private void setNumpyMode(boolean numpy) {
+        // Helper to avoid race condition with MxEngine initialization
+        JnaUtils.setNumpyMode(numpy);
     }
 }

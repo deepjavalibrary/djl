@@ -13,9 +13,6 @@
 package org.apache.mxnet.dataset;
 
 import org.apache.mxnet.engine.MxImages;
-import org.apache.mxnet.jna.JnaUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -23,16 +20,6 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 
 public class ImageFolderTest {
-
-    @BeforeClass
-    public void setup() {
-        JnaUtils.setNumpyMode(true);
-    }
-
-    @AfterClass
-    public void tearDown() {
-        JnaUtils.setNumpyMode(false);
-    }
 
     @Test
     public void testImageFolder() throws FailedTestException {
