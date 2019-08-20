@@ -14,9 +14,6 @@
 package software.amazon.ai.integration.util;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.apache.mxnet.dataset.Mnist;
 import org.apache.mxnet.dataset.SimpleDataset;
 import software.amazon.ai.Block;
@@ -98,23 +95,5 @@ public final class MnistUtils {
                         "Accuracy did not improve, accuracy value: %f, expected "
                                 + "minimal accuracy value: %f",
                         accuracy, expectedAccuracy));
-    }
-
-    public static String prepareModel() throws IOException {
-        String source = "https://joule.s3.amazonaws.com/other+resources/mnistmlp.zip";
-        String dataDir = System.getProperty("user.home") + "/.joule_data";
-        String downloadDestination = dataDir + "/mnistmlp.zip";
-        String extractDestination = dataDir + "/mnist";
-        Path params = Paths.get(extractDestination + "/mnist-0000.params");
-        Path symbol = Paths.get(extractDestination + "/mnist-symbol.json");
-        // download and unzip data if not exist
-        if (!Files.exists(params) || !Files.exists(symbol)) {
-            if (!Files.exists(Paths.get(downloadDestination))) {
-                FileUtils.download(source, dataDir, "mnistmlp.zip");
-            }
-            FileUtils.unzip(downloadDestination, extractDestination);
-            FileUtils.deleteFileOrDir(downloadDestination);
-        }
-        return extractDestination;
     }
 }
