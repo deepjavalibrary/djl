@@ -31,7 +31,7 @@ import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
-import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
+import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 
 public final class MnistUtils {
 
@@ -47,7 +47,7 @@ public final class MnistUtils {
         Optimizer optimizer =
                 new Sgd.Builder(mlp.getParameters())
                         .setRescaleGrad(1.0f / batchSize)
-                        .setLrScheduler(LrScheduler.fixedLR(0.1f))
+                        .setLrTracker(LrTracker.fixedLR(0.1f))
                         .setMomentum(0.9f)
                         .build();
         Accuracy acc = new Accuracy();

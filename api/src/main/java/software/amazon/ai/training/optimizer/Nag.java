@@ -10,6 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
 package software.amazon.ai.training.optimizer;
 
 import software.amazon.ai.Parameter;
@@ -17,8 +18,8 @@ import software.amazon.ai.engine.Engine;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 import software.amazon.ai.util.PairList;
 
-/** An SGD optimizer. Build with {@link Sgd.Builder}. */
-public interface Sgd extends Optimizer {
+/** An NAG optimizer. Build with {@link Nag.Builder}. */
+public interface Nag extends Optimizer {
 
     class Builder {
 
@@ -29,59 +30,52 @@ public interface Sgd extends Optimizer {
         LrTracker lrTracker;
         int beginNumUpdate;
         float momentum;
-        boolean lazyUpdate = true;
 
         public Builder(PairList<String, Parameter> parameters) {
             this.parameters = parameters;
         }
 
-        public Builder setRescaleGrad(float rescaleGrad) {
+        public Nag.Builder setRescaleGrad(float rescaleGrad) {
             this.rescaleGrad = rescaleGrad;
             return this;
         }
 
-        public Builder setWeightDecays(float weightDecays) {
+        public Nag.Builder setWeightDecays(float weightDecays) {
             this.weightDecays = weightDecays;
             return this;
         }
 
-        public Builder setClipGrad(float clipGrad) {
+        public Nag.Builder setClipGrad(float clipGrad) {
             this.clipGrad = clipGrad;
             return this;
         }
 
-        public Builder setLrTracker(LrTracker lrTracker) {
+        public Nag.Builder setLrTracker(LrTracker lrTracker) {
             this.lrTracker = lrTracker;
             return this;
         }
 
-        public Builder setBeginNumUpdate(int beginNumUpdate) {
+        public Nag.Builder setBeginNumUpdate(int beginNumUpdate) {
             this.beginNumUpdate = beginNumUpdate;
             return this;
         }
 
-        public Builder setMomentum(float momentum) {
+        public Nag.Builder setMomentum(float momentum) {
             this.momentum = momentum;
             return this;
         }
 
-        public Builder setLazyUpdate(boolean lazyUpdate) {
-            this.lazyUpdate = lazyUpdate;
-            return this;
-        }
-
-        public Sgd build() {
+        public Nag build() {
             return Engine.getInstance()
                     .getNNIndex()
-                    .sgd(
+                    .nag(
                             parameters,
                             rescaleGrad,
                             weightDecays,
                             clipGrad,
                             lrTracker,
                             beginNumUpdate,
-                            momentum,
-                            lazyUpdate);
+                            momentum);
         }
     }
 }

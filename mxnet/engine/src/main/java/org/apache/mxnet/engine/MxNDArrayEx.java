@@ -345,48 +345,6 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     ////////////////////////////////////////
-    // Optimizers
-    ////////////////////////////////////////
-
-    // MxSgd update function for non-multi-precision
-    @Override
-    public void sgdUpdate(
-            NDArray grad,
-            float lr,
-            float wd,
-            float rescaleGrad,
-            float clipGradient,
-            boolean lazyUpdate) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("lr", lr);
-        params.addParam("wd", wd);
-        params.addParam("lazy_update", lazyUpdate);
-        params.addParam("rescale_grad", rescaleGrad);
-        params.addParam("clip_gradient", clipGradient);
-        manager.invoke("sgd_update", new NDList(array, grad), new NDList(array), params);
-    }
-
-    @Override
-    public void sgdMomUpdate(
-            NDArray grad,
-            NDArray state,
-            float lr,
-            float wd,
-            float momentum,
-            float rescaleGrad,
-            float clipGradient,
-            boolean lazyUpdate) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("lr", lr);
-        params.addParam("wd", wd);
-        params.addParam("momentum", momentum);
-        params.addParam("lazy_update", lazyUpdate);
-        params.addParam("rescale_grad", rescaleGrad);
-        params.addParam("clip_gradient", clipGradient);
-        manager.invoke("sgd_mom_update", new NDList(array, grad, state), new NDList(array), params);
-    }
-
-    ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////
 

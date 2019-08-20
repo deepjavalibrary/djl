@@ -16,7 +16,7 @@ import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.training.Gradient.OptimizerGrad;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
+import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 import software.amazon.ai.util.PairList;
 
 /** MXNet helper containing base implementations for optimizers. */
@@ -26,7 +26,7 @@ public abstract class MxOptimizer implements Optimizer {
     float rescaleGrad;
     float clipGrad;
     float weightDecays;
-    private LrScheduler lrscheduler;
+    private LrTracker lrTracker;
     private int numUpdate;
 
     public MxOptimizer(
@@ -34,11 +34,11 @@ public abstract class MxOptimizer implements Optimizer {
             float rescaleGrad,
             float weightDecays,
             float clipGrad,
-            LrScheduler lrScheduler,
+            LrTracker lrTracker,
             int beginNumUpdate) {
         this.parameters = parameters;
         this.rescaleGrad = rescaleGrad;
-        this.lrscheduler = lrScheduler;
+        this.lrTracker = lrTracker;
         this.weightDecays = weightDecays;
         this.clipGrad = clipGrad;
         this.numUpdate = beginNumUpdate;
@@ -52,10 +52,11 @@ public abstract class MxOptimizer implements Optimizer {
             NDArray grad = paramGrads.get(i).getValue();
             update(i, paramArray, grad);
         }
+        numUpdate++;
     }
 
     public float getLearningRate() {
-        return lrscheduler.getNewLearningRate(numUpdate);
+        return lrTracker.getNewLearningRate(numUpdate);
     }
 
     @Override

@@ -10,9 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.training.optimizer.lrscheduler;
+package software.amazon.ai.training.optimizer.learningrate;
 
-public abstract class LrScheduler {
+public abstract class LrTracker {
 
     // TODO: Add abstraction on Joule level
     float baseLr;
@@ -22,7 +22,7 @@ public abstract class LrScheduler {
     WarmupMode warmupMode;
 
     /**
-     * A scheduler returns a new learning rate based on the number of updates that have been
+     * A tracker returns a new learning rate based on the number of updates that have been
      * performed.
      *
      * @param baseLR The initial learning rate
@@ -32,7 +32,7 @@ public abstract class LrScheduler {
      *     each step in equal increments 'constant' mode keeps lr at warmup_begin_lr for
      *     warmup_steps
      */
-    LrScheduler(float baseLR, int warmupSteps, float warmupBeginLr, WarmupMode warmupMode) {
+    LrTracker(float baseLR, int warmupSteps, float warmupBeginLr, WarmupMode warmupMode) {
         this.baseLr = baseLR;
         this.warmupSteps = warmupSteps;
         this.warmupBeginLr = warmupBeginLr;
@@ -49,7 +49,7 @@ public abstract class LrScheduler {
 
     public abstract float getNewLearningRate(int numUpdate);
 
-    public static final LrScheduler fixedLR(float lr) {
+    public static final LrTracker fixedLR(float lr) {
         return new FixedLr(lr);
     }
 }

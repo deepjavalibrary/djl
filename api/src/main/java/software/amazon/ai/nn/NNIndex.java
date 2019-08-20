@@ -27,8 +27,9 @@ import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.nn.recurrent.RNN;
+import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Sgd;
-import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
+import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 import software.amazon.ai.util.PairList;
 
 /**
@@ -116,8 +117,17 @@ public abstract class NNIndex {
             float rescaleGrad,
             float weightDecays,
             float clipGrad,
-            LrScheduler lrScheduler,
+            LrTracker lrTracker,
             int beginNumUpdate,
             float momentum,
             boolean lazyUpdate);
+
+    public abstract Nag nag(
+            PairList<String, Parameter> parameters,
+            float rescaleGrad,
+            float weightDecays,
+            float clipGrad,
+            LrTracker lrTracker,
+            int beginNumUpdate,
+            float momentum);
 }

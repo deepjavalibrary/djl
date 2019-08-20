@@ -39,9 +39,10 @@ import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.LossMetric;
+import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
-import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
+import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 import software.amazon.ai.util.PairList;
 import software.amazon.ai.zoo.cv.image_classification.ResNetV1;
 
@@ -94,7 +95,7 @@ public class GradientCollectorIntegrationTest {
             Optimizer optimizer =
                     new Sgd.Builder(block.getParameters())
                             .setRescaleGrad(1.0f / batchSize)
-                            .setLrScheduler(LrScheduler.fixedLR(.03f))
+                            .setLrTracker(LrTracker.fixedLR(.03f))
                             .build();
             NDArray loss;
             LossMetric lossMetric = new LossMetric("l2loss");
@@ -159,9 +160,9 @@ public class GradientCollectorIntegrationTest {
                             .build();
             resNet50.setInitializer(manager, Initializer.ONES);
             Optimizer optimizer =
-                    new Sgd.Builder(resNet50.getParameters())
+                    new Nag.Builder(resNet50.getParameters())
                             .setRescaleGrad(1.0f / 100)
-                            .setLrScheduler(LrScheduler.fixedLR(0.1f))
+                            .setLrTracker(LrTracker.fixedLR(0.1f))
                             .setMomentum(0.9f)
                             .build();
             NDArray input = manager.ones(new Shape(100, 1, 28, 28));

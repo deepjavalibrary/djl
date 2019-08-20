@@ -10,16 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.training.optimizer.lrscheduler;
+package software.amazon.ai.training.optimizer.learningrate;
 
-class FixedLr extends LrScheduler {
-
-    public FixedLr(float baseLr) {
-        super(baseLr, 0, baseLr, WarmupMode.CONSTANT);
-    }
-
-    @Override
-    public float getNewLearningRate(int numUpdate) {
-        return baseLr;
-    }
+public enum WarmupMode {
+    LINEAR,
+    CONSTANT
 }

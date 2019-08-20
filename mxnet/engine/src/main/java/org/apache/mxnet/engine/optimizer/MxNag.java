@@ -10,6 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
 package org.apache.mxnet.engine.optimizer;
 
 import java.util.ArrayList;
@@ -18,28 +19,25 @@ import org.apache.mxnet.engine.MxOpParams;
 import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.training.optimizer.Sgd;
+import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 import software.amazon.ai.util.PairList;
 
-public class MxSgd extends MxOptimizer implements Sgd {
+public class MxNag extends MxOptimizer implements Nag {
 
     private float momentum;
-    private boolean lazyUpdate;
     private List<NDArray> momentumStates;
 
-    public MxSgd(
+    public MxNag(
             PairList<String, Parameter> parameters,
             float rescaleGrad,
             float weightDecays,
             float clipGrad,
             LrTracker lrTracker,
             int beginNumUpdate,
-            float momentum,
-            boolean lazyUpdate) {
+            float momentum) {
         super(parameters, rescaleGrad, weightDecays, clipGrad, lrTracker, beginNumUpdate);
         this.momentum = momentum;
-        this.lazyUpdate = lazyUpdate;
     }
 
     @Override
@@ -56,12 +54,11 @@ public class MxSgd extends MxOptimizer implements Sgd {
             params.addParam("lr", getLearningRate());
             params.addParam("wd", weightDecays);
             params.addParam("momentum", momentum);
-            params.addParam("lazy_update", lazyUpdate);
             params.addParam("rescale_grad", rescaleGrad);
             params.addParam("clip_gradient", clipGrad);
             weight.getManager()
                     .invoke(
-                            "sgd_mom_update",
+                            "nag_mom_update",
                             new NDList(weight, grad, momentumStates.get(index)),
                             new NDList(weight),
                             params);
@@ -69,7 +66,6 @@ public class MxSgd extends MxOptimizer implements Sgd {
             MxOpParams params = new MxOpParams();
             params.addParam("lr", getLearningRate());
             params.addParam("wd", weightDecays);
-            params.addParam("lazy_update", lazyUpdate);
             params.addParam("rescale_grad", rescaleGrad);
             params.addParam("clip_gradient", clipGrad);
             weight.getManager()

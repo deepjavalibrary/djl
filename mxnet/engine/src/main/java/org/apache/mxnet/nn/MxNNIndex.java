@@ -13,6 +13,7 @@
 package org.apache.mxnet.nn;
 
 import java.util.Collection;
+import org.apache.mxnet.engine.optimizer.MxNag;
 import org.apache.mxnet.engine.optimizer.MxSgd;
 import org.apache.mxnet.nn.convolutional.MxConv1D;
 import org.apache.mxnet.nn.convolutional.MxConv2D;
@@ -41,7 +42,7 @@ import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.nn.recurrent.RNN;
 import software.amazon.ai.training.optimizer.Sgd;
-import software.amazon.ai.training.optimizer.lrscheduler.LrScheduler;
+import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 import software.amazon.ai.util.PairList;
 
 public class MxNNIndex extends NNIndex {
@@ -193,7 +194,7 @@ public class MxNNIndex extends NNIndex {
             float rescaleGrad,
             float weightDecays,
             float clipGrad,
-            LrScheduler lrScheduler,
+            LrTracker lrTracker,
             int beginNumUpdate,
             float momentum,
             boolean lazyUpdate) {
@@ -202,9 +203,28 @@ public class MxNNIndex extends NNIndex {
                 rescaleGrad,
                 weightDecays,
                 clipGrad,
-                lrScheduler,
+                lrTracker,
                 beginNumUpdate,
                 momentum,
                 lazyUpdate);
+    }
+
+    @Override
+    public MxNag nag(
+            PairList<String, Parameter> parameters,
+            float rescaleGrad,
+            float weightDecays,
+            float clipGrad,
+            LrTracker lrTracker,
+            int beginNumUpdate,
+            float momentum) {
+        return new MxNag(
+                parameters,
+                rescaleGrad,
+                weightDecays,
+                clipGrad,
+                lrTracker,
+                beginNumUpdate,
+                momentum);
     }
 }

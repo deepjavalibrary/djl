@@ -213,28 +213,6 @@ public interface NDArrayEx {
     NDArray globalLpPool(Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue);
 
     ////////////////////////////////////////
-    // Optimizers
-    ////////////////////////////////////////
-
-    void sgdUpdate(
-            NDArray grad,
-            float lr,
-            float wd,
-            float rescaleGrad,
-            float clipGradient,
-            boolean lazyUpdate);
-
-    void sgdMomUpdate(
-            NDArray grad,
-            NDArray state,
-            float lr,
-            float wd,
-            float momentum,
-            float rescaleGrad,
-            float clipGradient,
-            boolean lazyUpdate);
-
-    ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////
 
