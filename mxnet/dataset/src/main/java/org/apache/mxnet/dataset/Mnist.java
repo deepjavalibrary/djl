@@ -102,7 +102,7 @@ public final class Mnist implements RandomAccessDataset {
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(new Shape(length, 28, 28), DataType.UINT8)) {
+            try (NDArray array = manager.create(new Shape(length, 28, 28, 1), DataType.UINT8)) {
                 array.set(buf);
                 return array.asType(DataType.FLOAT32, true);
             }
