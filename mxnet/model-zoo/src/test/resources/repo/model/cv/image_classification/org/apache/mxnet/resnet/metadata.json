@@ -24,7 +24,7 @@
       },
       "files": {
         "synset": {
-          "uri": "synset.txt",
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/synset.txt",
           "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
           "name": "synset.txt"
         },
@@ -37,6 +37,34 @@
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/resnet/0.0.1/resnet18_v1-0000.params.zip",
           "sha1Hash": "16de8809400f201b480927115eb03db1dcec839f",
           "name": "resnet18_v1-0000.params",
+          "type": "file"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet152_v1d",
+      "properties": {
+        "layers": "152",
+        "flavor": "v1d",
+        "dataset": "imagenet"
+      },
+      "files": {
+        "synset": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "name": "synset.txt"
+        },
+        "symbol": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/resnet/0.0.1/resnet152_v1d-symbol.json",
+          "sha1Hash": "ffbb5c459fd0a0ca51138af95bc22978561f5246",
+          "name": "resnet152_v1d-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/resnet/0.0.1/resnet152_v1d-0000.params.zip",
+          "sha1Hash": "eafd691cb76c544c069c6370841b817d9e4dd61a",
+          "name": "resnet152_v1d-0000.params",
           "type": "file"
         }
       }
