@@ -178,7 +178,9 @@ public final class Images {
 
         // 3 times height and width for R,G,B channels
         ByteBuffer bb = ByteBuffer.allocateDirect(4 * 3 * height * width);
-        bb.order(ByteOrder.LITTLE_ENDIAN);
+
+        // FIXME: make engine agnostic, current implementation is MXNet specific.
+        bb.order(ByteOrder.nativeOrder());
         FloatBuffer buf = bb.asFloatBuffer();
         for (int row = 0; row < height; ++row) {
             for (int col = 0; col < width; ++col) {

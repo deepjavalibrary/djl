@@ -248,7 +248,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         ByteBuffer bb = ByteBuffer.allocateDirect(Math.toIntExact(len));
         Pointer pointer = Native.getDirectBufferPointer(bb);
         JnaUtils.syncCopyToCPU(getHandle(), pointer, Math.toIntExact(product));
-        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.order(ByteOrder.nativeOrder());
         return bb;
     }
 
@@ -266,7 +266,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
         int numOfBytes = inputType.getNumOfBytes();
         ByteBuffer buf = ByteBuffer.allocateDirect(size * numOfBytes);
-        buf.order(ByteOrder.LITTLE_ENDIAN); // MXNet use little endian
+        buf.order(ByteOrder.nativeOrder()); // MXNet use native byte order
 
         switch (inputType) {
             case FLOAT32:

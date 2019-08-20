@@ -31,7 +31,7 @@ public final class TestHelper {
 
     public static Pointer toPointer(int[] arr) {
         ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
-        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.order(ByteOrder.nativeOrder());
         bb.asIntBuffer().put(arr);
         bb.rewind();
         return Native.getDirectBufferPointer(bb);
@@ -39,7 +39,7 @@ public final class TestHelper {
 
     public static Pointer toPointer(byte[] buf) {
         ByteBuffer bb = ByteBuffer.allocateDirect(buf.length);
-        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.order(ByteOrder.nativeOrder());
         bb.put(buf);
         bb.rewind();
         return Native.getDirectBufferPointer(bb);
