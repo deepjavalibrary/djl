@@ -1,0 +1,71 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "org.apache.mxnet",
+  "artifactId": "se_resnext",
+  "type": "cv",
+  "name": "Senet and Resnext",
+  "description": "Senet and Resnext image classification",
+  "website": "http://www.mxnet.io",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "http://aws.amazon.com/apache2.0/"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "se_resnext101_32x4d",
+      "properties": {
+        "layers": "101",
+        "flavor": "32x4d",
+        "dataset": "imagenet"
+      },
+      "files": {
+        "synset": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "name": "synset.txt"
+        },
+        "symbol": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/se_resnext/0.0.1/se_resnext101_32x4d-symbol.json",
+          "sha1Hash": "a2dd662c3b849e63977bfb83b7b317528726535c",
+          "name": "se_resnext101_32x4d-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/se_resnext/0.0.1/se_resnext101_32x4d-0000.params.gz",
+          "sha1Hash": "66678545f940331f7cbd1b11ceea89ec8bd1655c",
+          "name": "se_resnext101_32x4d-0000.params"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "se_resnext101_64x4d",
+      "properties": {
+        "layers": "101",
+        "flavor": "64x4d",
+        "dataset": "imagenet"
+      },
+      "files": {
+        "synset": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "name": "synset.txt"
+        },
+        "symbol": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/se_resnext/0.0.1/se_resnext101_64x4d-symbol.json",
+          "sha1Hash": "859fcfe8c3c3c38359892d11fdf1e844c8785988",
+          "name": "se_resnext101_64x4d-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/se_resnext/0.0.1/se_resnext101_64x4d-0000.params.gz",
+          "sha1Hash": "3cba46daf11e882005103676497e407a93341397",
+          "name": "se_resnext101_64x4d-0000.params"
+        }
+      }
+    }
+  ]
+}

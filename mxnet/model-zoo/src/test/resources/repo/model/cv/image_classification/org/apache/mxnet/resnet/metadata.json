@@ -64,8 +64,7 @@
         "parameters": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/resnet/0.0.1/resnet152_v1d-0000.params.zip",
           "sha1Hash": "eafd691cb76c544c069c6370841b817d9e4dd61a",
-          "name": "resnet152_v1d-0000.params",
-          "type": "file"
+          "name": "resnet152_v1d-0000.params"
         }
       }
     }

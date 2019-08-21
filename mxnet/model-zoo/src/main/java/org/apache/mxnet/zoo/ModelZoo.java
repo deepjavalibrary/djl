@@ -25,4 +25,6 @@ public interface ModelZoo {
     SingleShotDetection SSD = new SingleShotDetection(REPOSITORY);
     ImageNetModel RESNET = new ImageNetModel(REPOSITORY, "resnet");
     ImageNetModel RESNEXT = new ImageNetModel(REPOSITORY, "resnext");
+    ImageNetModel SENET = new ImageNetModel(REPOSITORY, "senet");
+    ImageNetModel SE_RESNEXT = new ImageNetModel(REPOSITORY, "se_resnext");
 }

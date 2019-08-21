@@ -1,10 +1,10 @@
 {
   "metadataVersion": "0.1",
   "groupId": "org.apache.mxnet",
-  "artifactId": "resnext",
+  "artifactId": "senet",
   "type": "cv",
-  "name": "Resnext",
-  "description": "Resnext image classification",
+  "name": "Senet",
+  "description": "Senet image classification",
   "website": "http://www.mxnet.io",
   "licenses": {
     "license": {
@@ -16,10 +16,9 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "resnext101_64x4d",
+      "name": "senet_154",
       "properties": {
-        "layers": "101",
-        "flavor": "64x4d",
+        "layers": "154",
         "dataset": "imagenet"
       },
       "files": {
@@ -29,14 +28,14 @@
           "name": "synset.txt"
         },
         "symbol": {
-          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/resnext/0.0.1/resnext101_64x4d-symbol.json",
-          "sha1Hash": "32764db8700037254af6b7afc0ee0058e975bae8",
-          "name": "resnext101_64x4d-symbol.json"
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/senet/0.0.1/senet_154-symbol.json",
+          "sha1Hash": "92c5d6ac1930473e69aca89c0fa745d2013d26b8",
+          "name": "senet_154-symbol.json"
         },
         "parameters": {
-          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/resnext/0.0.1/resnext101_64x4d-0000.params.gz",
-          "sha1Hash": "855502721fad8d78932342bf6b4a04f76afb00b6",
-          "name": "resnext101_64x4d-0000.params"
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/senet/0.0.1/senet_154-0000.params.gz",
+          "sha1Hash": "a02d48a0f734adc0c0413ca071486b9b661a8d7b",
+          "name": "senet_154-0000.params"
         }
       }
     }
