@@ -28,6 +28,22 @@ public final class MxImages {
         return ((MxNDManager) manager).imread(path, flag.ordinal());
     }
 
+    public static NDArray toTensor(NDArray image) {
+        return ((MxNDArray) image).toTensor();
+    }
+
+    public static NDArray normalize(NDArray image, float[] mean, float[] std) {
+        return ((MxNDArray) image).normalize(mean, std);
+    }
+
+    public static NDArray resize(NDArray image, int[] size) {
+        return ((MxNDArray) image).resize(size);
+    }
+
+    public static NDArray crop(NDArray image, int x, int y, int width, int height) {
+        return ((MxNDArray) image).crop(x, y, width, height);
+    }
+
     public enum Flag {
         GRAYSCALE,
         COLOR
