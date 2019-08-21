@@ -15,14 +15,14 @@ package software.amazon.ai.training.dataset;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 
-/** Record is used to get a single element of data and labels from {@link Dataset}. */
-public class Record implements AutoCloseable {
+/** Batch is used to get a batch of data and labels from {@link Dataset}. */
+public class Batch implements AutoCloseable {
 
     private NDManager manager;
     private NDList data;
     private NDList labels;
 
-    public Record(NDManager baseManager, NDList data, NDList labels) {
+    public Batch(NDManager baseManager, NDList data, NDList labels) {
         manager = baseManager.newSubManager();
         data.attach(manager);
         labels.attach(manager);
@@ -30,7 +30,7 @@ public class Record implements AutoCloseable {
         this.labels = labels;
     }
 
-    public Record(NDList data, NDList labels) {
+    public Batch(NDList data, NDList labels) {
         this.data = data;
         this.labels = labels;
     }

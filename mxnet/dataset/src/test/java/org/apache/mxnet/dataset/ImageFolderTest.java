@@ -24,7 +24,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.dataset.Record;
+import software.amazon.ai.training.dataset.Batch;
 
 public class ImageFolderTest {
 
@@ -43,17 +43,17 @@ public class ImageFolderTest {
             NDArray cat = MxImages.read(manager, "src/test/resources/imagefolder/cat/cat2.jpeg");
             NDArray dog = MxImages.read(manager, "src/test/resources/imagefolder/dog/puppy1.jpg");
 
-            Iterator<Record> ds = trainer.iterateDataset(dataset).iterator();
+            Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
 
-            Record catRecord = ds.next();
-            Assertions.assertAlmostEquals(cat, catRecord.getData().head());
-            Assertions.assertEquals(manager.create(new int[] {0}), catRecord.getLabels().head());
-            catRecord.close();
+            Batch catBatch = ds.next();
+            Assertions.assertAlmostEquals(cat, catBatch.getData().head());
+            Assertions.assertEquals(manager.create(new int[] {0}), catBatch.getLabels().head());
+            catBatch.close();
 
-            Record dogRecord = ds.next();
-            Assertions.assertAlmostEquals(dog, dogRecord.getData().head());
-            Assertions.assertEquals(manager.create(new int[] {1}), dogRecord.getLabels().head());
-            dogRecord.close();
+            Batch dogBatch = ds.next();
+            Assertions.assertAlmostEquals(dog, dogBatch.getData().head());
+            Assertions.assertEquals(manager.create(new int[] {1}), dogBatch.getLabels().head());
+            dogBatch.close();
         }
     }
 }

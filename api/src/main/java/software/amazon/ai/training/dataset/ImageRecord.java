@@ -19,7 +19,7 @@ import software.amazon.ai.training.Trainer;
 public class ImageRecord implements Dataset<BufferedImage, Long> {
 
     @Override
-    public Iterable<Record> getRecords(Trainer<BufferedImage, Long, ?> trainer) throws IOException {
+    public Iterable<Batch> getData(Trainer<BufferedImage, Long, ?> trainer) throws IOException {
         return null;
     }
 }

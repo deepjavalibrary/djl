@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.util.Optional;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.TranslatorContext;
@@ -28,8 +28,8 @@ public interface Trainer<I, L, O> extends AutoCloseable {
 
     TranslatorContext getPreprocessContext();
 
-    default Iterable<Record> iterateDataset(Dataset<I, L> dataset) throws IOException {
-        return dataset.getRecords(this);
+    default Iterable<Batch> iterateDataset(Dataset<I, L> dataset) throws IOException {
+        return dataset.getData(this);
     }
 
     /**

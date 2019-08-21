@@ -28,7 +28,7 @@ import software.amazon.ai.training.Trainer;
 import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
-public class MultithreadingDataIterable<I, L> implements Iterable<Record> {
+public class MultithreadingDataIterable<I, L> implements Iterable<Batch> {
     private RandomAccessDataset<I, L> dataset;
     private Trainer<I, L, ?> trainer;
     private Sampler sampler;
@@ -47,18 +47,18 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Record> {
     }
 
     @Override
-    public Iterator<Record> iterator() {
+    public Iterator<Batch> iterator() {
         return new MultithreadingDataIterator<>(dataset, trainer, sampler, config);
     }
 
-    private static class MultithreadingDataIterator<I, L> implements Iterator<Record> {
+    private static class MultithreadingDataIterator<I, L> implements Iterator<Batch> {
         private RandomAccessDataset<I, L> dataset;
         private Trainer<I, L, ?> trainer;
         private Iterator<List<Long>> sample;
         private Batchifier batchifier;
         private boolean pinMemory;
         private ExecutorService executor;
-        private Queue<Future<Record>> queue;
+        private Queue<Future<Batch>> queue;
 
         public MultithreadingDataIterator(
                 RandomAccessDataset<I, L> dataset,
@@ -94,9 +94,9 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Record> {
         }
 
         @Override
-        public Record next() {
+        public Batch next() {
             preFetch();
-            Future<Record> future = queue.poll();
+            Future<Batch> future = queue.poll();
             try {
                 return future.get();
             } catch (InterruptedException | ExecutionException e) {
@@ -112,12 +112,12 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Record> {
             } else {
                 return;
             }
-            Callable<Record> task = new PreFetchCallable(indices);
-            Future<Record> result = executor.submit(task);
+            Callable<Batch> task = new PreFetchCallable(indices);
+            Future<Batch> result = executor.submit(task);
             queue.offer(result);
         }
 
-        class PreFetchCallable implements Callable<Record> {
+        class PreFetchCallable implements Callable<Batch> {
             private List<Long> indices;
 
             public PreFetchCallable(List<Long> indices) {
@@ -125,7 +125,7 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Record> {
             }
 
             @Override
-            public Record call() {
+            public Batch call() {
                 NDList[] data = new NDList[indices.size()];
                 NDList[] labels = new NDList[indices.size()];
                 TranslatorContext ctx = trainer.getPreprocessContext();
@@ -140,13 +140,13 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Record> {
                     data[i] = record.getData();
                     labels[i] = record.getLabels();
                 }
-                Record record =
-                        new Record(
+                Batch batch =
+                        new Batch(
                                 trainer.getManager(),
                                 batchifier.batchify(data),
                                 batchifier.batchify(labels));
                 ctx.close();
-                return record;
+                return batch;
             }
         }
     }

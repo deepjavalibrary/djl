@@ -14,6 +14,8 @@ package software.amazon.ai.nn;
 
 import java.util.List;
 import java.util.Optional;
+import software.amazon.ai.BlockList;
+import software.amazon.ai.ParameterList;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
@@ -69,13 +71,13 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public PairList<String, Block> getChildren() {
-        return new PairList<>();
+    public BlockList getChildren() {
+        return new BlockList();
     }
 
     @Override
-    public PairList<String, Parameter> getParameters() {
-        PairList<String, Parameter> parameters = new PairList<>();
+    public ParameterList getParameters() {
+        ParameterList parameters = new ParameterList();
         List<Parameter> directParams = getDirectParameters();
         directParams.forEach(param -> parameters.add(param.getName(), param));
         PairList<String, Parameter> childrenParameters = getChildrenParameters();
@@ -84,8 +86,8 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public PairList<String, Parameter> getChildrenParameters() {
-        PairList<String, Parameter> parameters = new PairList<>();
+    public ParameterList getChildrenParameters() {
+        ParameterList parameters = new ParameterList();
         for (Pair<String, Block> childPair : getChildren()) {
             for (Pair<String, Parameter> paramPair : childPair.getValue().getParameters()) {
                 parameters.add(childPair.getKey() + "_" + paramPair.getKey(), paramPair.getValue());

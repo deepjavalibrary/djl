@@ -38,10 +38,10 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.ArrayDataset;
+import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.BatchSampler;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomSampler;
-import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.dataset.SequenceSampler;
 
 public class DatasetTest {
@@ -197,12 +197,12 @@ public class DatasetTest {
             Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDList, NDList, NDList> trainer =
                     testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
-                for (Record record : trainer.iterateDataset(dataset)) {
+                for (Batch batch : trainer.iterateDataset(dataset)) {
                     Assertions.assertEquals(
-                            record.getData().get(0),
+                            batch.getData().get(0),
                             manager.arange(2 * index, 2 * index + 40).reshape(20, 2));
                     Assertions.assertEquals(
-                            record.getLabels().get(0),
+                            batch.getLabels().get(0),
                             manager.arange(index, index + 20).reshape(20));
                     index += 20;
                 }
@@ -214,21 +214,21 @@ public class DatasetTest {
                                 .setSampling(15, false)
                                 .build();
                 index = 0;
-                for (Record record : trainer.iterateDataset(dataset)) {
+                for (Batch batch : trainer.iterateDataset(dataset)) {
                     if (index != 90) {
                         Assertions.assertEquals(
-                                record.getData().get(0),
+                                batch.getData().get(0),
                                 manager.arange(2 * index, 2 * index + 30).reshape(15, 2));
                         Assertions.assertEquals(
-                                record.getLabels().get(0),
+                                batch.getLabels().get(0),
                                 manager.arange(index, index + 15).reshape(15));
                     } else {
                         // last batch
                         Assertions.assertEquals(
-                                record.getData().get(0),
+                                batch.getData().get(0),
                                 manager.arange(2 * index, 2 * index + 20).reshape(10, 2));
                         Assertions.assertEquals(
-                                record.getLabels().get(0),
+                                batch.getLabels().get(0),
                                 manager.arange(index, index + 10).reshape(10));
                     }
                     index += 15;
@@ -265,8 +265,8 @@ public class DatasetTest {
             Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     testModel.newTrainer(new SimpleDataset.DefaultTranslator())) {
-                for (Record record : trainer.iterateDataset(cifar10)) {
-                    record.close();
+                for (Batch batch : trainer.iterateDataset(cifar10)) {
+                    batch.close();
                 }
                 // user have to shutdown the executor
                 executor.shutdown();

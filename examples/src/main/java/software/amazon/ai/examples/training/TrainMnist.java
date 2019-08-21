@@ -31,8 +31,8 @@ import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
+import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
@@ -99,10 +99,9 @@ public final class TrainMnist {
                     // reset loss and accuracy
                     acc.reset();
                     lossMetric.reset();
-                    for (Record record : trainer.iterateDataset(mnist)) {
-                        NDArray data =
-                                record.getData().head().reshape(batchSize, 28 * 28).div(255f);
-                        NDArray label = record.getLabels().head();
+                    for (Batch batch : trainer.iterateDataset(mnist)) {
+                        NDArray data = batch.getData().head().reshape(batchSize, 28 * 28).div(255f);
+                        NDArray label = batch.getLabels().head();
                         NDArray pred;
                         NDArray loss;
                         try (Gradient.Collector gradCol = Gradient.newCollector()) {
@@ -115,7 +114,7 @@ public final class TrainMnist {
                         controller.step();
                         acc.update(label, pred);
                         lossMetric.update(loss);
-                        record.close();
+                        batch.close();
                     }
                     lossValue = lossMetric.getMetric().getValue();
                     accuracy = acc.getMetric().getValue();

@@ -21,7 +21,7 @@ import software.amazon.ai.util.Pair;
 
 // TODO abstract a interface that could be inherited by this and Stream DataIterable
 // where the random reads is expensive
-public class DataIterable<I, L> implements Iterable<Record> {
+public class DataIterable<I, L> implements Iterable<Batch> {
     private RandomAccessDataset<I, L> dataset;
     private Trainer<I, L, ?> trainer;
     private Sampler sampler;
@@ -39,11 +39,11 @@ public class DataIterable<I, L> implements Iterable<Record> {
     }
 
     @Override
-    public Iterator<Record> iterator() {
+    public Iterator<Batch> iterator() {
         return new DataIterator<>(dataset, trainer, sampler, config);
     }
 
-    private static class DataIterator<I, L> implements Iterator<Record> {
+    private static class DataIterator<I, L> implements Iterator<Batch> {
         private RandomAccessDataset<I, L> dataset;
         private Trainer<I, L, ?> trainer;
         private Iterator<List<Long>> sample;
@@ -77,7 +77,7 @@ public class DataIterable<I, L> implements Iterable<Record> {
         }
 
         @Override
-        public Record next() {
+        public Batch next() {
             List<Long> indices = sample.next();
             NDList[] data = new NDList[indices.size()];
             NDList[] labels = new NDList[indices.size()];
@@ -93,8 +93,8 @@ public class DataIterable<I, L> implements Iterable<Record> {
                 data[i] = record.getData();
                 labels[i] = record.getLabels();
             }
-            Record record =
-                    new Record(
+            Batch record =
+                    new Batch(
                             trainer.getManager(),
                             batchifier.batchify(data),
                             batchifier.batchify(labels));

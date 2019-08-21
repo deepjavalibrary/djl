@@ -43,12 +43,12 @@ public final class Cifar10 extends SimpleDataset {
 
     @Override
     public Pair<NDArray, NDArray> get(long index) {
-        return new Pair<>(getData().get(index), getLabels().get(index));
+        return new Pair<>(data.get(index), labels.get(index));
     }
 
     @Override
     public void loadData(Usage usage) throws IOException {
-        Map<String, Artifact.Item> map = getArtifact().getFiles();
+        Map<String, Artifact.Item> map = artifact.getFiles();
         Artifact.Item item;
         switch (usage) {
             case TRAIN:
@@ -62,24 +62,24 @@ public final class Cifar10 extends SimpleDataset {
                 throw new UnsupportedOperationException("Validation data not available.");
         }
         NDArray dataAndLabels = readData(item);
-        setData(dataAndLabels.get(":, 1:").reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1));
-        setLabels(dataAndLabels.get(":,0"));
+        data = dataAndLabels.get(":, 1:").reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1);
+        labels = dataAndLabels.get(":,0");
         // check if data and labels have the same size
-        if (getData().size(0) != getLabels().size(0)) {
+        if (data.size(0) != labels.size(0)) {
             throw new IOException(
                     String.format(
                             "the size of data %d didn't match with the size of labels %d",
-                            getData().size(0), getLabels().size(0)));
+                            data.size(0), labels.size(0)));
         }
-        size = getLabels().size();
+        size = labels.size();
     }
 
     public NDArray readData(Artifact.Item item) throws IOException {
-        try (InputStream is = getRepository().openStream(item, null)) {
+        try (InputStream is = repository.openStream(item, null)) {
             byte[] buf = Utils.toByteArray(is);
             int length = buf.length / DATA_AND_LABEL_SIZE;
             try (NDArray array =
-                    getManager().create(new Shape(length, DATA_AND_LABEL_SIZE), DataType.UINT8)) {
+                    manager.create(new Shape(length, DATA_AND_LABEL_SIZE), DataType.UINT8)) {
                 array.set(buf);
                 return array.asType(DataType.FLOAT32, true);
             }

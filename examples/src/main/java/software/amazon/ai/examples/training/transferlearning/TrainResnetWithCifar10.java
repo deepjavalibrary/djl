@@ -34,8 +34,8 @@ import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
@@ -88,7 +88,7 @@ public final class TrainResnetWithCifar10 {
                 LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
                 for (int epoch = 0; epoch < numEpoch; epoch++) {
-                    for (Record batch : trainer.iterateDataset(cifar10)) {
+                    for (Batch batch : trainer.iterateDataset(cifar10)) {
                         NDArray data = batch.getData().head().transpose(0, 3, 1, 2).div(255f);
                         NDArray label = batch.getLabels().head();
                         NDArray pred;

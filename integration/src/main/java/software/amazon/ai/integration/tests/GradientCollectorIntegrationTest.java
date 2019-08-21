@@ -35,7 +35,7 @@ import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.dataset.ArrayDataset;
-import software.amazon.ai.training.dataset.Record;
+import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Nag;
@@ -110,18 +110,18 @@ public class GradientCollectorIntegrationTest {
                         model.newTrainer(new ArrayDataset.DefaultTranslator(), optimizer)) {
                     for (int epoch = 0; epoch < epochs; epoch++) {
                         lossMetric.reset();
-                        for (Record record : trainer.iterateDataset(dataset)) {
+                        for (Batch batch : trainer.iterateDataset(dataset)) {
                             try (Gradient.Collector gradCol = Gradient.newCollector()) {
 
-                                NDArray x = record.getData().head();
-                                NDArray y = record.getLabels().head();
+                                NDArray x = batch.getData().head();
+                                NDArray y = batch.getLabels().head();
                                 NDArray yHat = block.forward(x);
                                 loss = Loss.l2Loss(y, yHat, 1, 0);
                                 gradCol.backward(loss);
                             }
                             trainer.step();
                             lossMetric.update(loss);
-                            record.close();
+                            batch.close();
                         }
                     }
                 }

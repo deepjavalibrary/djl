@@ -42,12 +42,12 @@ public final class Mnist extends SimpleDataset {
 
     @Override
     public Pair<NDArray, NDArray> get(long index) {
-        return new Pair<>(getData().get(index), getLabels().get(index));
+        return new Pair<>(data.get(index), labels.get(index));
     }
 
     @Override
     public void loadData(Usage usage) throws IOException {
-        Map<String, Artifact.Item> map = getArtifact().getFiles();
+        Map<String, Artifact.Item> map = artifact.getFiles();
         Artifact.Item imageItem;
         Artifact.Item labelItem;
         switch (usage) {
@@ -63,20 +63,19 @@ public final class Mnist extends SimpleDataset {
             default:
                 throw new UnsupportedOperationException("Validation data not available.");
         }
-        setLabels(readLabel(labelItem));
-        size = getLabels().size();
-        setData(readData(imageItem, getLabels().size()));
+        labels = readLabel(labelItem);
+        size = labels.size();
+        data = readData(imageItem, labels.size());
     }
 
     private NDArray readData(Artifact.Item item, long length) throws IOException {
-        try (InputStream is = getRepository().openStream(item, null)) {
+        try (InputStream is = repository.openStream(item, null)) {
             if (is.skip(16) != 16) {
                 throw new AssertionError("Failed skip data.");
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array =
-                    getManager().create(new Shape(length, 28, 28, 1), DataType.UINT8)) {
+            try (NDArray array = manager.create(new Shape(length, 28, 28, 1), DataType.UINT8)) {
                 array.set(buf);
                 return array.asType(DataType.FLOAT32, true);
             }
@@ -84,13 +83,13 @@ public final class Mnist extends SimpleDataset {
     }
 
     private NDArray readLabel(Artifact.Item item) throws IOException {
-        try (InputStream is = getRepository().openStream(item, null)) {
+        try (InputStream is = repository.openStream(item, null)) {
             if (is.skip(8) != 8) {
                 throw new AssertionError("Failed skip data.");
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = getManager().create(new Shape(buf.length), DataType.UINT8)) {
+            try (NDArray array = manager.create(new Shape(buf.length), DataType.UINT8)) {
                 array.set(buf);
                 return array.asType(DataType.FLOAT32, true);
             }

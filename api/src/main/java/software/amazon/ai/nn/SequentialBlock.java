@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import software.amazon.ai.BlockList;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -123,8 +124,8 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     @Override
-    public PairList<String, Block> getChildren() {
-        PairList<String, Block> children = new PairList<>(blocks.size());
+    public BlockList getChildren() {
+        BlockList children = new BlockList(blocks.size());
         for (int i = 0; i < blocks.size(); i++) {
             Block block = blocks.get(i);
             String name = String.format("%02d:%s", i, block.getClass().getSimpleName());

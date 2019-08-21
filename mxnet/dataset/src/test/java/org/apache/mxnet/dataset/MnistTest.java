@@ -21,8 +21,8 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.Record;
 
 public class MnistTest {
 
@@ -42,10 +42,10 @@ public class MnistTest {
             Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     model.newTrainer(new SimpleDataset.DefaultTranslator())) {
-                for (Record record : trainer.iterateDataset(mnist)) {
-                    Assert.assertEquals(record.getData().size(), 1);
-                    Assert.assertEquals(record.getLabels().size(), 1);
-                    record.close();
+                for (Batch batch : trainer.iterateDataset(mnist)) {
+                    Assert.assertEquals(batch.getData().size(), 1);
+                    Assert.assertEquals(batch.getLabels().size(), 1);
+                    batch.close();
                 }
             }
         }
@@ -65,10 +65,10 @@ public class MnistTest {
             Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     model.newTrainer(new SimpleDataset.DefaultTranslator())) {
-                for (Record record : trainer.iterateDataset(mnist)) {
-                    Assert.assertEquals(record.getData().size(), 1);
-                    Assert.assertEquals(record.getLabels().size(), 1);
-                    record.close();
+                for (Batch batch : trainer.iterateDataset(mnist)) {
+                    Assert.assertEquals(batch.getData().size(), 1);
+                    Assert.assertEquals(batch.getLabels().size(), 1);
+                    batch.close();
                 }
             }
         }

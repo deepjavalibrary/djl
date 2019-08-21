@@ -20,6 +20,7 @@ import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.DataIterable;
 import software.amazon.ai.training.dataset.MultithreadingDataIterable;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
@@ -29,13 +30,13 @@ import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
 public abstract class SimpleDataset extends RandomAccessDataset<NDArray, NDArray> {
-    private NDManager manager;
-    private Repository repository;
-    private Artifact artifact;
-    private NDArray data;
-    private NDArray labels;
-    private boolean prepared;
-    private Usage usage;
+    protected NDManager manager;
+    protected Repository repository;
+    protected Artifact artifact;
+    protected NDArray data;
+    protected NDArray labels;
+    protected boolean prepared;
+    protected Usage usage;
 
     public SimpleDataset(BaseBuilder<?> builder) {
         super(builder);
@@ -74,7 +75,7 @@ public abstract class SimpleDataset extends RandomAccessDataset<NDArray, NDArray
     }
 
     @Override
-    public Iterable<Record> getRecords(Trainer<NDArray, NDArray, ?> trainer) {
+    public Iterable<Batch> getData(Trainer<NDArray, NDArray, ?> trainer) {
         if (!prepared) {
             throw new IllegalStateException("please call prepare() before using the dataser");
         }
@@ -83,34 +84,6 @@ public abstract class SimpleDataset extends RandomAccessDataset<NDArray, NDArray
         } else {
             return new DataIterable<>(this, trainer, sampler, config);
         }
-    }
-
-    public NDManager getManager() {
-        return manager;
-    }
-
-    public Repository getRepository() {
-        return repository;
-    }
-
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    public NDArray getData() {
-        return data;
-    }
-
-    public void setData(NDArray data) {
-        this.data = data;
-    }
-
-    public NDArray getLabels() {
-        return labels;
-    }
-
-    public void setLabels(NDArray labels) {
-        this.labels = labels;
     }
 
     public static class DefaultTranslator implements TrainTranslator<NDArray, NDArray, NDArray> {

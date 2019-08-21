@@ -21,8 +21,8 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset.Usage;
-import software.amazon.ai.training.dataset.Record;
 
 public class Cifar10Test {
 
@@ -42,7 +42,7 @@ public class Cifar10Test {
             Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     model.newTrainer(new SimpleDataset.DefaultTranslator())) {
-                for (Record batch : trainer.iterateDataset(cifar10)) {
+                for (Batch batch : trainer.iterateDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);
                     batch.close();
@@ -65,7 +65,7 @@ public class Cifar10Test {
             Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     model.newTrainer(new SimpleDataset.DefaultTranslator())) {
-                for (Record batch : trainer.iterateDataset(cifar10)) {
+                for (Batch batch : trainer.iterateDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);
                     batch.close();

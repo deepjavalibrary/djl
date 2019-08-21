@@ -34,7 +34,7 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
     public abstract Pair<I, L> get(long index);
 
     @Override
-    public Iterable<Record> getRecords(Trainer<I, L, ?> trainer) {
+    public Iterable<Batch> getData(Trainer<I, L, ?> trainer) {
         return new DataIterable<>(this, trainer, sampler, config);
     }
 
