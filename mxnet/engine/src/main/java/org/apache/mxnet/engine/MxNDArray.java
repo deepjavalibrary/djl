@@ -215,7 +215,9 @@ public class MxNDArray extends NativeResource implements NDArray {
                 null);
     }
 
-    void attachGradient() {
+    /** {@inheritDoc} */
+    @Override
+    public void attachGradient() {
         attachGradient(GradReq.WRITE, null);
     }
 
@@ -233,8 +235,15 @@ public class MxNDArray extends NativeResource implements NDArray {
         JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
     }
 
-    NDArray getGradient() {
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getGradient() throws NullPointerException {
         Pointer pointer = JnaUtils.getGradient(getHandle());
+        if (pointer == null) {
+            throw new NullPointerException(
+                    "No gradient attached to this NDArray, please call array.attachGradient()"
+                            + "on your NDArray or block.setInitializer() on your Block");
+        }
         return manager.create(pointer);
     }
 

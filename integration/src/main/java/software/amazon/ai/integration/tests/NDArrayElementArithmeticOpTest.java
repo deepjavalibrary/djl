@@ -40,10 +40,10 @@ public class NDArrayElementArithmeticOpTest {
             NDArray lhs = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
             NDArray result;
             try (Gradient.Collector gradCol = Gradient.newCollector()) {
-                Gradient.NDArrayKey lhsKey = gradCol.collectFor(lhs);
+                lhs.attachGradient();
                 result = NDArrays.add(lhs, 2);
-                Gradient.Dict grads = gradCol.collect(result);
                 // check add scalar result
+                gradCol.backward(result);
 
                 Assertions.assertFalse(
                         NDArrays.equals(lhs, result),
@@ -57,7 +57,7 @@ public class NDArrayElementArithmeticOpTest {
                         manager.create(new float[] {1f, 1f, 1f, 1f}, new Shape(1, 4));
                 Assertions.assertEquals(
                         expectedGradient,
-                        grads.get(lhsKey).get(),
+                        lhs.getGradient(),
                         "AddScala backward: Incorrect gradient after backward");
             }
         }

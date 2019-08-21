@@ -71,11 +71,11 @@ public final class MnistUtils {
                 NDArray label = record.getLabels().head();
                 NDArray pred;
                 try (Gradient.Collector gradCol = Gradient.newCollector()) {
-                    Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);
                     pred = mlp.forward(new NDList(data)).head();
                     loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
-                    optimizer.step(gradCol.collect(loss).get(optKey));
+                    gradCol.backward(loss);
                 }
+                optimizer.step();
                 acc.update(label, pred);
                 lossMetric.update(loss);
             }

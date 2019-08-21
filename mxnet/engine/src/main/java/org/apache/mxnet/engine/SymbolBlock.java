@@ -43,6 +43,7 @@ public class SymbolBlock implements Block {
     private Symbol symbol;
     private MxNDManager manager;
     private List<Parameter> params;
+    private boolean paramGradientsAttached;
 
     SymbolBlock(Symbol symbol, List<Parameter> params, NDManager manager) {
         this.symbol = symbol;
@@ -129,12 +130,22 @@ public class SymbolBlock implements Block {
 
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
+        if (!paramGradientsAttached) {
+            initializeGradients();
+        }
         if (op == null) {
             // TODO: If the context change (CPU -> GPU), CachedOp will create a copy
             // This will lose the gradient tracking
             op = JnaUtils.createCachedOp(this, manager);
         }
         return op.forward(inputs);
+    }
+
+    public void initializeGradients() {
+        for (Parameter param : params) {
+            param.getArray().attachGradient();
+        }
+        paramGradientsAttached = true;
     }
 
     @Override

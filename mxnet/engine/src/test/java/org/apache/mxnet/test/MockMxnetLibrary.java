@@ -1312,8 +1312,11 @@ public class MockMxnetLibrary implements MxnetLibrary {
         }
 
         PointerArray pa =
-                new PointerArray(TestHelper.toPointer("softmax"), TestHelper.toPointer("_copyto"));
-        out_size.put(0, 2);
+                new PointerArray(
+                        TestHelper.toPointer("softmax"),
+                        TestHelper.toPointer("_copyto"),
+                        TestHelper.toPointer("_np_zeros_like"));
+        out_size.put(0, 3);
         out_array.setValue(pa);
         return 0;
     }
@@ -1325,8 +1328,11 @@ public class MockMxnetLibrary implements MxnetLibrary {
         }
 
         PointerArray pa =
-                new PointerArray(TestHelper.toPointer("softmax"), TestHelper.toPointer("_copyto"));
-        out_size.put(0, 2);
+                new PointerArray(
+                        TestHelper.toPointer("softmax"),
+                        TestHelper.toPointer("_copyto"),
+                        TestHelper.toPointer("_np_zeros_like"));
+        out_size.put(0, 3);
         out_array.setValue(pa);
         return 0;
     }

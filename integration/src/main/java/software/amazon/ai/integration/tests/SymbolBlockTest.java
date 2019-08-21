@@ -16,8 +16,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.mxnet.engine.SymbolBlock;
 import software.amazon.ai.Block;
@@ -146,12 +148,18 @@ public class SymbolBlockTest {
         NDArray gradMean;
         NDArray pred;
         try (Gradient.Collector gradCol = Gradient.newCollector()) {
-            Gradient.BlockKey blockKey = gradCol.collectFor(mlp);
             pred = mlp.forward(new NDList(data)).head();
             NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
-            List<NDArray> grads = gradCol.collect(loss).get(blockKey).get().values();
-            gradMean = NDArrays.stack(grads.stream().map(NDArray::mean).toArray(NDArray[]::new));
+            gradCol.backward(loss);
         }
+        List<NDArray> grads =
+                mlp.getParameters()
+                        .stream()
+                        .map(
+                                stringParameterPair ->
+                                        stringParameterPair.getValue().getArray().getGradient())
+                        .collect(Collectors.toCollection(ArrayList::new));
+        gradMean = NDArrays.stack(grads.stream().map(NDArray::mean).toArray(NDArray[]::new));
         return new Pair<>(pred.mean(), gradMean);
     }
 

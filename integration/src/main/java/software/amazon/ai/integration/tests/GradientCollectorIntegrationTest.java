@@ -63,14 +63,14 @@ public class GradientCollectorIntegrationTest {
                 Gradient.Collector gradCol = Gradient.newCollector()) {
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
-            gradCol.collectFor(lhs);
+            lhs.attachGradient();
             // autograd automatically set recording and training during initialization
             if (gradCol instanceof MxGradient.Collector) {
                 Assertions.assertTrue(MxGradient.isRecording());
                 Assertions.assertTrue(MxGradient.isTraining());
             }
             NDArray result = NDArrays.mmul(lhs, rhs);
-            gradCol.collect(result);
+            gradCol.backward(result);
         }
     }
 
@@ -113,14 +113,14 @@ public class GradientCollectorIntegrationTest {
                 lossMetric.reset();
                 for (Record record : dataset.getRecords()) {
                     try (Gradient.Collector gradCol = Gradient.newCollector()) {
-                        Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);
 
                         NDArray x = record.getData().head();
                         NDArray y = record.getLabels().head();
                         NDArray yHat = block.forward(x);
                         loss = Loss.l2Loss(y, yHat, 1, 0);
-                        optimizer.step(gradCol.collect(loss).get(optKey));
+                        gradCol.backward(loss);
                     }
+                    optimizer.step();
                     lossMetric.update(loss);
                 }
             }
@@ -170,11 +170,11 @@ public class GradientCollectorIntegrationTest {
             NDArray input = manager.ones(new Shape(100, 1, 28, 28));
             NDArray label = manager.ones(new Shape(100, 1));
             try (Gradient.Collector gradCol = Gradient.newCollector()) {
-                Gradient.OptimizerKey optKey = gradCol.collectFor(optimizer);
                 NDArray pred = resNet50.forward(new NDList(input)).head();
                 NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
-                optimizer.step(gradCol.collect(loss).get(optKey));
+                gradCol.backward(loss);
             }
+            optimizer.step();
             PairList<String, Parameter> parameters = optimizer.getParameters();
             NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
             NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(1.7576532f);

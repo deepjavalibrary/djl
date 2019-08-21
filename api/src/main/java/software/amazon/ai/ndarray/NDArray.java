@@ -149,6 +149,20 @@ public interface NDArray extends AutoCloseable {
     Matrix asMatrix();
 
     /**
+     * Attach a gradient {@code NDArray} to this {@code NDArray} and mark it so {@code backward} can
+     * compute gradient with respect to it.
+     */
+    void attachGradient();
+
+    /**
+     * Returns the gradient {@code NDArray} attached to this NDArray.
+     *
+     * @return the gradient {@code NDArray}
+     * @throws NullPointerException when gradient is not initialized
+     */
+    NDArray getGradient() throws NullPointerException;
+
+    /**
      * Returns the encoding format of the NDArray, or null.
      *
      * @return the encoded NDArray

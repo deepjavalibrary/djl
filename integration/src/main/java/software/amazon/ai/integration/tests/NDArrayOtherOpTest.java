@@ -326,9 +326,9 @@ public class NDArrayOtherOpTest {
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             NDArray result;
             try (Gradient.Collector gradCol = Gradient.newCollector()) {
-                Gradient.NDArrayKey lhsKey = gradCol.collectFor(lhs);
+                lhs.attachGradient();
                 result = NDArrays.mmul(lhs, rhs);
-                Gradient.Dict grads = gradCol.collect(result);
+                gradCol.backward(result);
                 NDArray expected = manager.create(new float[] {33, 14}, new Shape(2, 1));
                 Assertions.assertEquals(
                         expected,
@@ -339,7 +339,7 @@ public class NDArrayOtherOpTest {
                         manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
                 Assertions.assertEquals(
                         expectedGradient,
-                        grads.get(lhsKey).get(),
+                        lhs.getGradient(),
                         "Matrix multiplication: Incorrect gradient after backward");
             }
         }

@@ -107,6 +107,14 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public void attachGradient() {}
+
+    @Override
+    public NDArray getGradient() throws NullPointerException {
+        return null;
+    }
+
+    @Override
     public ByteBuffer toByteBuffer() {
         data.rewind();
         return data;

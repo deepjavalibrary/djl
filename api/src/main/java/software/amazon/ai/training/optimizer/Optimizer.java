@@ -13,7 +13,6 @@
 package software.amazon.ai.training.optimizer;
 
 import software.amazon.ai.Parameter;
-import software.amazon.ai.training.Gradient.OptimizerGrad;
 import software.amazon.ai.util.PairList;
 
 /**
@@ -24,7 +23,7 @@ public interface Optimizer {
 
     PairList<String, Parameter> getParameters();
 
-    void step(OptimizerGrad grads);
+    void step();
 
     @SuppressWarnings("rawtypes")
     abstract class BaseBuilder<B extends BaseBuilder> {

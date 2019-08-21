@@ -145,6 +145,16 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void attachGradient() {}
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getGradient() throws NullPointerException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer toByteBuffer() {
         return null;
     }

@@ -125,11 +125,11 @@ public class OptimizerTest {
         NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS));
         NDArray label = manager.arange(0, BATCH_SIZE);
         try (Gradient.Collector gradCol = Gradient.newCollector()) {
-            Gradient.OptimizerKey optimizerKey = gradCol.collectFor(optim);
             NDArray pred = block.forward(new NDList(data)).head();
             NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
-            optim.step(gradCol.collect(loss).get(optimizerKey));
+            gradCol.backward(loss);
         }
+        optim.step();
         return NDArrays.stack(
                 block.getParameters()
                         .stream()

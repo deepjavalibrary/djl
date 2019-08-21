@@ -37,6 +37,18 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public void attachGradient() {
+        array.attachGradient();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray getGradient() throws NullPointerException {
+        return array.getGradient();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray putRow(long row, NDArray toPut) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }

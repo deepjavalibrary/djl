@@ -15,7 +15,6 @@ package org.apache.mxnet.engine.optimizer;
 import java.util.Arrays;
 import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.training.Gradient.OptimizerGrad;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.util.PairList;
 
@@ -46,11 +45,10 @@ public abstract class MxOptimizer implements Optimizer {
     }
 
     @Override
-    public void step(OptimizerGrad grads) {
-        PairList<String, NDArray> paramGrads = grads.get();
+    public void step() {
         for (int i = 0; i < parameters.size(); i++) {
             NDArray paramArray = parameters.get(i).getValue().getArray();
-            NDArray grad = paramGrads.get(i).getValue();
+            NDArray grad = paramArray.getGradient();
             update(i, paramArray, grad);
         }
         numUpdate++;
