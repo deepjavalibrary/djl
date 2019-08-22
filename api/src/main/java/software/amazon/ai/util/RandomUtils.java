@@ -17,7 +17,7 @@ import java.util.Random;
 /** A class hold a static instance of {@link Random} object. */
 public final class RandomUtils {
 
-    private static final Random RANDOM = new Random();
+    public static final Random RANDOM = new Random();
 
     private RandomUtils() {}
 

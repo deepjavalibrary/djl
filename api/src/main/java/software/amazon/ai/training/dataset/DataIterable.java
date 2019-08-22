@@ -15,59 +15,52 @@ package software.amazon.ai.training.dataset;
 import java.util.Iterator;
 import java.util.List;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.training.Trainer;
 import software.amazon.ai.util.Pair;
 
 // TODO abstract a interface that could be inherited by this and Stream DataIterable
 // where the random reads is expensive
-public class DataIterable implements Iterable<Record> {
-    private RandomAccessDataset dataset;
+public class DataIterable<I, L> implements Iterable<Record> {
+    private RandomAccessDataset<I, L> dataset;
+    private Trainer<I, L, ?> trainer;
+    private Sampler sampler;
     private DataLoadingConfiguration config;
 
-    public DataIterable(RandomAccessDataset dataset, DataLoadingConfiguration config) {
+    public DataIterable(
+            RandomAccessDataset<I, L> dataset,
+            Trainer<I, L, ?> trainer,
+            Sampler sampler,
+            DataLoadingConfiguration config) {
         this.dataset = dataset;
+        this.trainer = trainer;
+        this.sampler = sampler;
         this.config = config;
     }
 
     @Override
     public Iterator<Record> iterator() {
-        return new DataIterator(dataset, config);
+        return new DataIterator<>(dataset, trainer, sampler, config);
     }
 
-    private static class DataIterator implements Iterator<Record> {
-        private RandomAccessDataset dataset;
-        private long batchSize;
-        private boolean shuffle;
-        private Sampler<Long> sampler;
-        private Sampler<List<Long>> batchSampler;
+    private static class DataIterator<I, L> implements Iterator<Record> {
+        private RandomAccessDataset<I, L> dataset;
+        private Trainer<I, L, ?> trainer;
+        private Iterator<List<Long>> sample;
         private int numWorkers;
         private Batchifier batchifier;
         private boolean pinMemory;
-        private boolean dropLast;
 
-        public DataIterator(RandomAccessDataset dataset, DataLoadingConfiguration config) {
+        public DataIterator(
+                RandomAccessDataset<I, L> dataset,
+                Trainer<I, L, ?> trainer,
+                Sampler sampler,
+                DataLoadingConfiguration config) {
             this.dataset = dataset;
-            this.batchSize = config.getBatchSize();
-            this.shuffle = config.getShuffle();
-            this.sampler = config.getSampler();
-            this.batchSampler = config.getBatchSampler();
+            this.trainer = trainer;
+            this.sample = sampler.sample(trainer, dataset);
             this.numWorkers = config.getNumWorkers();
             this.batchifier = config.getBatchifier();
             this.pinMemory = config.getPinMemory();
-            this.dropLast = config.getDropLast();
-
-            // parameter check
-            if (sampler != null && shuffle) {
-                throw new IllegalArgumentException(
-                        "sampler option is mutually exclusive with shuffle");
-            }
-
-            // parameter check
-            if (batchSampler != null) {
-                if (batchSize != 1 || shuffle || sampler != null || dropLast) {
-                    throw new IllegalArgumentException(
-                            "batchSampler option is mutually exclusive with batchSize, shuffle, sampler and dropLast");
-                }
-            }
 
             if (numWorkers > 0) {
                 throw new UnsupportedOperationException("Multi-threading is not support yet");
@@ -75,18 +68,6 @@ public class DataIterable implements Iterable<Record> {
 
             if (pinMemory) {
                 throw new UnsupportedOperationException("pin memory is not support yet");
-            }
-
-            if (sampler == null) {
-                if (shuffle) {
-                    sampler = new RandomSampler(dataset.size());
-                } else {
-                    sampler = new SequenceSampler(dataset.size());
-                }
-            }
-
-            if (batchSampler == null) {
-                batchSampler = new BatchSampler(sampler, batchSize, dropLast);
             }
 
             if (batchifier == null) {
@@ -97,18 +78,26 @@ public class DataIterable implements Iterable<Record> {
 
         @Override
         public boolean hasNext() {
-            return batchSampler.hasNext();
+            return sample.hasNext();
         }
 
         @Override
         public Record next() {
-            List<Long> indices = batchSampler.next();
+            List<Long> indices = sample.next();
             NDList[] data = new NDList[indices.size()];
             NDList[] labels = new NDList[indices.size()];
             for (int i = 0; i < indices.size(); i++) {
-                Pair<NDList, NDList> dataItem = dataset.get(indices.get(i));
-                data[i] = dataItem.getKey();
-                labels[i] = dataItem.getValue();
+                Pair<I, L> dataItem = dataset.get(indices.get(i));
+                Record record;
+                try {
+                    record =
+                            trainer.getTranslator()
+                                    .processInput(trainer.getPreprocessContext(), dataItem);
+                } catch (Exception e) {
+                    throw new IllegalStateException("Failed to get next data item", e);
+                }
+                data[i] = record.getData();
+                labels[i] = record.getLabels();
             }
             return new Record(batchifier.batchify(data), batchifier.batchify(labels));
         }

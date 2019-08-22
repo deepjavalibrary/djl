@@ -12,32 +12,76 @@
  */
 package software.amazon.ai.training;
 
+import java.io.IOException;
+import java.util.Optional;
+import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
-import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.training.dataset.Record;
+import software.amazon.ai.translate.TrainTranslator;
+import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.translate.TranslatorContext;
 
-public interface Trainer {
+public interface Trainer<I, L, O> extends AutoCloseable {
 
-    static Trainer newInstance(Model model) {
-        return newInstance(model, Context.defaultContext());
+    static <I, L, O> Trainer<I, L, O> newInstance(
+            Block block, TrainTranslator<I, L, O> translator) {
+        return newInstance(block, translator, Context.defaultContext());
     }
 
-    static Trainer newInstance(Model model, Context context) {
-        return Engine.getInstance().newTrainer(model, context);
+    static <I, L, O> Trainer<I, L, O> newInstance(
+            Block block, TrainTranslator<I, L, O> translator, Context context) {
+        return Engine.getInstance().newTrainer(block, translator, context);
     }
 
-    Estimator getEstimator();
+    static <I, L, O> Trainer<I, L, O> newInstance(
+            Model model, TrainTranslator<I, L, O> translator) {
+        return newInstance(model, translator, Context.defaultContext());
+    }
 
-    void setEstimator(Estimator estimator);
+    static <I, L, O> Trainer<I, L, O> newInstance(
+            Model model, TrainTranslator<I, L, O> translator, Context context) {
+        return Engine.getInstance().newTrainer(model, translator, context);
+    }
 
-    Optimizer getOptimizer();
+    TrainTranslator<I, L, O> getTranslator();
 
-    void setOptimizer(Optimizer optimizer);
+    TranslatorContext getPreprocessContext();
+
+    default Iterable<Record> trainDataset(Dataset<I, L> dataset) throws IOException {
+        return dataset.getRecords(this);
+    }
+
+    /**
+     * Predicts the method used for inference.
+     *
+     * @param input Input follows the inputObject
+     * @return The Output object defined by user
+     * @throws TranslateException if an error occurs during prediction
+     */
+    O predict(I input) throws TranslateException;
+
+    /**
+     * Attaches a Metrics param to use for benchmark.
+     *
+     * @param metrics the Metrics class
+     */
+    void setMetrics(Metrics metrics);
+
+    Optional<Integer> getSeed();
+
+    void setSeed(int seed);
 
     ModelSaver getModelSaver();
 
     void setModelSaver(ModelSaver modelSaver);
 
     void checkpoint();
+
+    /** {@inheritDoc} */
+    @Override
+    void close();
 }

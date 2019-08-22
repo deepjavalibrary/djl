@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.nn.MxNNIndex;
+import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
@@ -34,6 +35,7 @@ import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 
 public class MxEngine extends Engine {
@@ -183,8 +185,16 @@ public class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Trainer newTrainer(Model model, Context context) {
-        return null;
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            Block block, TrainTranslator<I, L, O> translator, Context context) {
+        return new MxTrainer<>(block, translator, context);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            Model model, TrainTranslator<I, L, O> translator, Context context) {
+        return new MxTrainer<>((MxModel) model, translator, context);
     }
 
     /** {@inheritDoc} */

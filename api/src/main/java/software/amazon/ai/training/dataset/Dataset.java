@@ -13,11 +13,12 @@
 package software.amazon.ai.training.dataset;
 
 import java.io.IOException;
+import software.amazon.ai.training.Trainer;
 
 /** An interface to represent Dataset. All the datasets should implement this interface. */
-public interface Dataset {
-    // TODO add tranlator
-    Iterable<Record> getRecords() throws IOException;
+public interface Dataset<I, L> {
+
+    Iterable<Record> getRecords(Trainer<I, L, ?> trainer) throws IOException;
 
     enum Usage {
         TRAIN,

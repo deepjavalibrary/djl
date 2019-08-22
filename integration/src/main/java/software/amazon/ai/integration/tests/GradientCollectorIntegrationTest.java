@@ -34,9 +34,12 @@ import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
+import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.dataset.ArrayDataset;
+import software.amazon.ai.training.dataset.BatchSampler;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
+import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.initializer.NormalInitializer;
@@ -76,7 +79,7 @@ public class GradientCollectorIntegrationTest {
     }
 
     @RunAsTest
-    public void testTrain() throws FailedTestException {
+    public void testTrain() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             int numOfData = 1000;
             int batchSize = 10;
@@ -108,23 +111,24 @@ public class GradientCollectorIntegrationTest {
                     new ArrayDataset(
                             data,
                             label,
-                            new DataLoadingConfiguration.Builder()
-                                    .setBatchSize(batchSize)
-                                    .setShuffle(true)
-                                    .build());
-            for (int epoch = 0; epoch < epochs; epoch++) {
-                lossMetric.reset();
-                for (Record record : dataset.getRecords()) {
-                    try (Gradient.Collector gradCol = Gradient.newCollector()) {
+                            new BatchSampler(new RandomSampler(), batchSize, true),
+                            new DataLoadingConfiguration.Builder().build());
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    Trainer.newInstance(block, new ArrayDataset.DefaultTranslator())) {
+                for (int epoch = 0; epoch < epochs; epoch++) {
+                    lossMetric.reset();
+                    for (Record record : trainer.trainDataset(dataset)) {
+                        try (Gradient.Collector gradCol = Gradient.newCollector()) {
 
-                        NDArray x = record.getData().head();
-                        NDArray y = record.getLabels().head();
-                        NDArray yHat = block.forward(x);
-                        loss = Loss.l2Loss(y, yHat, 1, 0);
-                        gradCol.backward(loss);
+                            NDArray x = record.getData().head();
+                            NDArray y = record.getLabels().head();
+                            NDArray yHat = block.forward(x);
+                            loss = Loss.l2Loss(y, yHat, 1, 0);
+                            gradCol.backward(loss);
+                        }
+                        controller.step();
+                        lossMetric.update(loss);
                     }
-                    controller.step();
-                    lossMetric.update(loss);
                 }
             }
             float lossValue = lossMetric.getMetric().getValue();

@@ -12,47 +12,66 @@
  */
 package org.apache.mxnet.engine;
 
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.training.ModelSaver;
+import software.amazon.ai.training.Trainer;
+import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.TranslateException;
-import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
-/**
- * {@code MxPredictor} is the MXNet implementation of {@link Predictor}.
- *
- * <p>MxPredictor contains all methods in the Predictor class and MXNet specific implementations.
- *
- * @param <I> Input Object
- * @param <O> Output Object
- */
-public class MxPredictor<I, O> implements Predictor<I, O> {
+public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
 
-    private static final Logger logger = LoggerFactory.getLogger(MxPredictor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MxTrainer.class);
 
-    MxModel model;
-    private Translator<I, O> translator;
-    Context context;
+    private MxModel model;
+    private TrainTranslator<I, L, O> translator;
+    private Context context;
     private Block block;
-    MxNDManager manager;
-    Metrics metrics;
+    private MxNDManager manager;
+    private Metrics metrics;
+    private Integer seed;
     private long timestamp;
 
-    MxPredictor(MxModel model, Translator<I, O> translator, Context context) {
+    private TranslatorContext currentContext;
+
+    MxTrainer(Block block, TrainTranslator<I, L, O> translator, Context context) {
+        this.manager = MxNDManager.getSystemManager().newSubManager(context);
+        this.model = new MxModel(null, block, manager.newSubManager());
+        this.translator = translator;
+        this.context = context;
+        this.block = model.getBlock();
+    }
+
+    MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Context context) {
         this.manager = MxNDManager.getSystemManager().newSubManager(context);
         this.model = model;
         this.translator = translator;
         this.context = context;
         this.block = model.getBlock();
+    }
+
+    @Override
+    public TrainTranslator<I, L, O> getTranslator() {
+        return translator;
+    }
+
+    @Override
+    public TranslatorContext getPreprocessContext() {
+        if (currentContext != null) {
+            currentContext.close();
+        }
+        currentContext = new TrainerContext();
+        return currentContext;
     }
 
     /** {@inheritDoc} */
@@ -61,13 +80,13 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     public O predict(I input) throws TranslateException {
         timestamp = System.nanoTime();
 
-        try (PredictorContext inputCtx = new PredictorContext();
-                PredictorContext outputCtx = new PredictorContext()) {
+        try (TrainerContext inputCtx = new TrainerContext();
+                TrainerContext outputCtx = new TrainerContext()) {
             NDList ndList = translator.processInput(inputCtx, input);
-            preprocessEnd();
+            predictPreprocessEnd();
 
-            NDList result = forward(ndList);
-            forwardEnd(result);
+            NDList result = block.forward(ndList);
+            predictForwardEnd(result);
 
             return translator.processOutput(outputCtx, result);
         } catch (RuntimeException e) {
@@ -75,30 +94,20 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         } catch (Exception e) {
             throw new TranslateException(e);
         } finally {
-            postProcessEnd();
+            predictPostProcessEnd();
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void setMetrics(Metrics metrics) {
-        this.metrics = metrics;
-    }
-
-    private NDList forward(NDList ndList) {
-        return block.forward(ndList);
-    }
-
-    private void preprocessEnd() {
+    private void predictPreprocessEnd() {
         if (metrics != null) {
             long tmp = System.nanoTime();
             long duration = tmp - timestamp;
             timestamp = tmp;
-            metrics.addMetric("Preprocess", duration, "nano");
+            metrics.addMetric("PredictPreprocess", duration, "nano");
         }
     }
 
-    private void forwardEnd(NDList list) {
+    private void predictForwardEnd(NDList list) {
         if (metrics != null) {
             // JnaUtils.waitAll();
             for (Pair<String, NDArray> pair : list) {
@@ -111,20 +120,40 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         }
     }
 
-    private void postProcessEnd() {
+    private void predictPostProcessEnd() {
         if (metrics != null) {
             long tmp = System.nanoTime();
             long duration = tmp - timestamp;
             timestamp = tmp;
-            metrics.addMetric("Postprocess", duration, "nano");
+            metrics.addMetric("PredictPostprocess", duration, "nano");
         }
     }
 
-    /** {@inheritDoc} */
     @Override
-    public void close() {
-        manager.close();
+    public void setMetrics(Metrics metrics) {
+        this.metrics = metrics;
     }
+
+    @Override
+    public Optional<Integer> getSeed() {
+        return Optional.ofNullable(seed);
+    }
+
+    @Override
+    public void setSeed(int seed) {
+        this.seed = seed;
+    }
+
+    @Override
+    public ModelSaver getModelSaver() {
+        return null;
+    }
+
+    @Override
+    public void setModelSaver(ModelSaver modelSaver) {}
+
+    @Override
+    public void checkpoint() {}
 
     /** {@inheritDoc} */
     @SuppressWarnings("deprecation")
@@ -139,11 +168,16 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
         super.finalize();
     }
 
-    private class PredictorContext implements TranslatorContext {
+    @Override
+    public void close() {
+        manager.close();
+    }
+
+    private class TrainerContext implements TranslatorContext {
 
         private NDManager ctxManager;
 
-        PredictorContext() {
+        TrainerContext() {
             ctxManager = manager.newSubManager();
         }
 
@@ -165,7 +199,6 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
             return ctxManager;
         }
 
-        /** {@inheritDoc} */
         @Override
         public Metrics getMetrics() {
             return metrics;

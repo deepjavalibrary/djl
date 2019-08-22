@@ -15,10 +15,15 @@ package org.apache.mxnet.dataset;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import software.amazon.ai.Block;
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.dataset.BatchSampler;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.Record;
 
 public class MnistTest {
@@ -32,11 +37,16 @@ public class MnistTest {
                             manager,
                             repository,
                             Dataset.Usage.TEST,
-                            new DataLoadingConfiguration.Builder().setBatchSize(32).build());
+                            new BatchSampler(new RandomSampler(), 32),
+                            new DataLoadingConfiguration.Builder().build());
             mnist.prepare();
-            for (Record record : mnist.getRecords()) {
-                Assert.assertEquals(record.getData().size(), 1);
-                Assert.assertEquals(record.getLabels().size(), 1);
+            try (Trainer<NDArray, NDArray, NDArray> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
+                for (Record record : trainer.trainDataset(mnist)) {
+                    Assert.assertEquals(record.getData().size(), 1);
+                    Assert.assertEquals(record.getLabels().size(), 1);
+                }
             }
         }
     }
@@ -48,11 +58,16 @@ public class MnistTest {
                     new Mnist(
                             manager,
                             Dataset.Usage.TEST,
-                            new DataLoadingConfiguration.Builder().setBatchSize(32).build());
+                            new BatchSampler(new RandomSampler(), 32),
+                            new DataLoadingConfiguration.Builder().build());
             mnist.prepare();
-            for (Record record : mnist.getRecords()) {
-                Assert.assertEquals(record.getData().size(), 1);
-                Assert.assertEquals(record.getLabels().size(), 1);
+            try (Trainer<NDArray, NDArray, NDArray> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
+                for (Record record : trainer.trainDataset(mnist)) {
+                    Assert.assertEquals(record.getData().size(), 1);
+                    Assert.assertEquals(record.getLabels().size(), 1);
+                }
             }
         }
     }

@@ -12,40 +12,39 @@
  */
 package software.amazon.ai.training.dataset;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
+import software.amazon.ai.training.Trainer;
 
 /** Sampler the data from [0, dataset.size) sequentially. */
-public class SequenceSampler implements Sampler<Long> {
+public class SequenceSampler implements Sampler.SubSampler {
 
-    private long size;
-    private long current;
-
-    public SequenceSampler() {
-        size = Long.MAX_VALUE;
-    }
-
-    public SequenceSampler(long size) {
-        this.size = size;
-    }
-
-    /** {@inheritDoc} */
     @Override
-    public boolean hasNext() {
-        return current < size;
+    public Iterator<Long> sample(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
+        return new Iterate(dataset);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Long next() {
-        if (!hasNext()) {
-            throw new NoSuchElementException();
+    static class Iterate implements Iterator<Long> {
+
+        private long size;
+        private long current;
+
+        Iterate(RandomAccessDataset<?, ?> dataset) {
+            size = dataset.size();
+            current = 0;
         }
-        return current++;
-    }
 
-    /** {@inheritDoc} */
-    @Override
-    public long size() {
-        return size;
+        @Override
+        public boolean hasNext() {
+            return current < size;
+        }
+
+        @Override
+        public Long next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return current++;
+        }
     }
 }

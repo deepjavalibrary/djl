@@ -15,6 +15,8 @@ package software.amazon.ai.training.dataset;
 import java.util.stream.Stream;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.translate.TrainTranslator;
+import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
 /**
@@ -34,26 +36,27 @@ import software.amazon.ai.util.Pair;
  *
  * @see Dataset
  */
-public final class ArrayDataset extends RandomAccessDataset {
+public final class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
 
     private final NDArray[] data;
     private final NDArray[] labels;
-    private long size;
 
-    public ArrayDataset(NDArray data, DataLoadingConfiguration config) {
-        this(new NDArray[] {data}, config);
+    public ArrayDataset(NDArray data, Sampler sampler, DataLoadingConfiguration config) {
+        this(new NDArray[] {data}, sampler, config);
     }
 
-    public ArrayDataset(NDArray[] data, DataLoadingConfiguration config) {
-        this(data, null, config);
+    public ArrayDataset(NDArray[] data, Sampler sampler, DataLoadingConfiguration config) {
+        this(data, null, sampler, config);
     }
 
-    public ArrayDataset(NDArray data, NDArray labels, DataLoadingConfiguration config) {
-        this(new NDArray[] {data}, new NDArray[] {labels}, config);
+    public ArrayDataset(
+            NDArray data, NDArray labels, Sampler sampler, DataLoadingConfiguration config) {
+        this(new NDArray[] {data}, new NDArray[] {labels}, sampler, config);
     }
 
-    public ArrayDataset(NDArray[] data, NDArray[] labels, DataLoadingConfiguration config) {
-        super(config);
+    public ArrayDataset(
+            NDArray[] data, NDArray[] labels, Sampler sampler, DataLoadingConfiguration config) {
+        super(sampler, config);
         if (data != null && data.length != 0) {
             size = data[0].size(0);
         } else if (labels != null && labels.length != 0) {
@@ -68,7 +71,6 @@ public final class ArrayDataset extends RandomAccessDataset {
         if (labels != null && Stream.of(labels).anyMatch(array -> array.size(0) != size)) {
             throw new IllegalArgumentException("All the NDArray must have the same length!");
         }
-        setSize(size);
         this.data = data;
         this.labels = labels;
     }
@@ -80,9 +82,30 @@ public final class ArrayDataset extends RandomAccessDataset {
         for (NDArray array : data) {
             datum.add(array.get(index));
         }
-        for (NDArray array : labels) {
-            label.add(array.get(index));
+        if (labels != null) {
+            for (NDArray array : labels) {
+                label.add(array.get(index));
+            }
         }
         return new Pair<>(datum, label);
+    }
+
+    public static class DefaultTranslator implements TrainTranslator<NDList, NDList, NDList> {
+
+        @Override
+        public NDList processOutput(TranslatorContext ctx, NDList list) throws Exception {
+            return list;
+        }
+
+        @Override
+        public NDList processInput(TranslatorContext ctx, NDList input) throws Exception {
+            return input;
+        }
+
+        @Override
+        public Record processInput(TranslatorContext ctx, NDList input, NDList label)
+                throws Exception {
+            return new Record(input, label);
+        }
     }
 }

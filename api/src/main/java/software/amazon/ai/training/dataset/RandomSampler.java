@@ -12,66 +12,56 @@
  */
 package software.amazon.ai.training.dataset;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.stream.LongStream;
+import software.amazon.ai.training.Trainer;
 import software.amazon.ai.util.RandomUtils;
 
-public class RandomSampler implements Sampler<Long> {
-
-    private long[] indices;
-    private long current;
-    private long size;
-
-    public RandomSampler(long size) {
-        this.size = size;
-        current = 0;
-        indices = LongStream.range(0, size).toArray();
-        // java array didn't support index greater than max integer
-        // so cast to int for now
-        for (int i = Math.toIntExact(size) - 1; i > 0; --i) {
-            swap(indices, i, RandomUtils.nextInt(i));
-        }
-    }
-
-    public RandomSampler(long size, int seed) {
-        this.size = size;
-        current = 0;
-        indices = LongStream.range(0, size).toArray();
-        Random rnd = new Random(seed);
-        // java array didn't support index greater than max integer
-        // so cast to int for now
-        for (int i = Math.toIntExact(size) - 1; i > 0; --i) {
-            swap(indices, i, rnd.nextInt(i));
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean hasNext() {
-        return current < indices.length;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Long next() {
-        if (!hasNext()) {
-            throw new NoSuchElementException();
-        }
-        // java array didn't support index greater than max integer
-        // so cast to int for now
-        return indices[Math.toIntExact(current++)];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long size() {
-        return size;
-    }
+public class RandomSampler implements Sampler.SubSampler {
 
     private static void swap(long[] arr, int i, int j) {
         long tmp = arr[i];
         arr[i] = arr[j];
         arr[j] = tmp;
+    }
+
+    @Override
+    public Iterator<Long> sample(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
+        return new Iterate(trainer, dataset);
+    }
+
+    static class Iterate implements Iterator<Long> {
+
+        private long[] indices;
+        private long current;
+
+        Iterate(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
+            long size = dataset.size();
+            current = 0;
+            indices = LongStream.range(0, size).toArray();
+            Random rnd = trainer.getSeed().map(Random::new).orElse(RandomUtils.RANDOM);
+            // java array didn't support index greater than max integer
+            // so cast to int for now
+            for (int i = Math.toIntExact(size) - 1; i > 0; --i) {
+                swap(indices, i, rnd.nextInt(i));
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return current < indices.length;
+        }
+
+        @Override
+        public Long next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            // java array didn't support index greater than max integer
+            // so cast to int for now
+            return indices[Math.toIntExact(current++)];
+        }
     }
 }

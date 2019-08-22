@@ -19,13 +19,20 @@ import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.training.dataset.BatchSampler;
+import software.amazon.ai.training.dataset.RandomSampler;
 
 public class ImageFolderTest {
 
     @Test
     public void testImageFolder() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            ImageFolder dataset = new ImageFolder(manager, "src/test/resources/imagefolder", null);
+            ImageFolder dataset =
+                    new ImageFolder(
+                            manager,
+                            "src/test/resources/imagefolder",
+                            new BatchSampler(new RandomSampler(), 32),
+                            null);
             NDArray cat = MxImages.read(manager, "src/test/resources/imagefolder/cat/cat2.jpeg");
             NDArray dog = MxImages.read(manager, "src/test/resources/imagefolder/dog/puppy1.jpg");
             Assertions.assertAlmostEquals(cat, dataset.get(0).getKey().head());

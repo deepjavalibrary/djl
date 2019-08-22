@@ -24,6 +24,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
+import software.amazon.ai.training.dataset.Sampler;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -31,7 +32,7 @@ import software.amazon.ai.util.PairList;
 // TODO put ImageFolder under mxnet for now it should be in Joule-api
 
 /** A dataset for loading image files stored in a folder structure. */
-public final class ImageFolder extends RandomAccessDataset {
+public final class ImageFolder extends RandomAccessDataset<NDList, NDList> {
     private static final String[] EXT = {".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"};
     private static final Logger logger = LoggerFactory.getLogger(ImageFolder.class);
 
@@ -40,13 +41,18 @@ public final class ImageFolder extends RandomAccessDataset {
     private List<String> synsets;
     private PairList<String, Integer> items;
 
-    public ImageFolder(NDManager manager, String root, DataLoadingConfiguration config) {
-        this(manager, root, MxImages.Flag.COLOR, config);
+    public ImageFolder(
+            NDManager manager, String root, Sampler sampler, DataLoadingConfiguration config) {
+        this(manager, root, MxImages.Flag.COLOR, sampler, config);
     }
 
     public ImageFolder(
-            NDManager manager, String root, MxImages.Flag flag, DataLoadingConfiguration config) {
-        super(config);
+            NDManager manager,
+            String root,
+            MxImages.Flag flag,
+            Sampler sampler,
+            DataLoadingConfiguration config) {
+        super(sampler, config);
         this.manager = manager;
         this.flag = flag;
         this.synsets = new ArrayList<>();

@@ -22,6 +22,7 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
@@ -31,6 +32,7 @@ import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 
 /**
@@ -188,10 +190,29 @@ public abstract class Engine {
      * Creates a new {@link Trainer} instance for this Engine.
      *
      * @param model the model created to train on
+     * @param translator the translator for preprocessing and postprocessing
      * @param context the context of training, can be CPU/GPU
+     * @param <I> Input data object for the Trainer
+     * @param <L> Label data object for the Trainer
+     * @param <O> Output Object for the Trainer
      * @return Trainer
      */
-    public abstract Trainer newTrainer(Model model, Context context);
+    public abstract <I, L, O> Trainer<I, L, O> newTrainer(
+            Model model, TrainTranslator<I, L, O> translator, Context context);
+
+    /**
+     * Creates a new {@link Trainer} instance for this Engine.
+     *
+     * @param block the block created to train on
+     * @param translator the translator for preprocessing and postprocessing
+     * @param context the context of training, can be CPU/GPU
+     * @param <I> Input data object for the Trainer
+     * @param <L> Label data object for the Trainer
+     * @param <O> Output Object for the Trainer
+     * @return Trainer
+     */
+    public abstract <I, L, O> Trainer<I, L, O> newTrainer(
+            Block block, TrainTranslator<I, L, O> translator, Context context);
 
     /**
      * Creates a new top-level {@link NDManager}.

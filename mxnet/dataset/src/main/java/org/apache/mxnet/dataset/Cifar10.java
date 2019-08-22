@@ -16,13 +16,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
+import software.amazon.ai.training.dataset.Sampler;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
 
@@ -36,16 +36,18 @@ public final class Cifar10 extends SimpleDataset {
     // 3072 = 32 * 32 * 3, i.e. one image size, +1 here is label
     private static final int DATA_AND_LABEL_SIZE = 32 * 32 * 3 + 1;
 
-    public Cifar10(NDManager manager, Usage usage, DataLoadingConfiguration config) {
-        super(manager, Datasets.REPOSITORY, usage, config);
+    public Cifar10(
+            NDManager manager, Usage usage, Sampler sampler, DataLoadingConfiguration config) {
+        super(manager, Datasets.REPOSITORY, usage, sampler, config);
     }
 
     public Cifar10(
             NDManager manager,
             Repository repository,
             Usage usage,
+            Sampler sampler,
             DataLoadingConfiguration config) {
-        super(manager, repository, usage, config);
+        super(manager, repository, usage, sampler, config);
     }
 
     public Cifar10(
@@ -53,8 +55,9 @@ public final class Cifar10 extends SimpleDataset {
             Repository repository,
             Artifact artifact,
             Usage usage,
+            Sampler sampler,
             DataLoadingConfiguration config) {
-        super(manager, repository, artifact, usage, config);
+        super(manager, repository, artifact, usage, sampler, config);
     }
 
     @Override
@@ -63,8 +66,8 @@ public final class Cifar10 extends SimpleDataset {
     }
 
     @Override
-    public Pair<NDList, NDList> get(long index) {
-        return new Pair<>(new NDList(getData().get(index)), new NDList(getLabels().get(index)));
+    public Pair<NDArray, NDArray> get(long index) {
+        return new Pair<>(getData().get(index), getLabels().get(index));
     }
 
     @Override
@@ -92,7 +95,7 @@ public final class Cifar10 extends SimpleDataset {
                             "the size of data %d didn't match with the size of labels %d",
                             getData().size(0), getLabels().size(0)));
         }
-        setSize(getLabels().size());
+        size = getLabels().size();
     }
 
     public NDArray readData(Artifact.Item item) throws IOException {

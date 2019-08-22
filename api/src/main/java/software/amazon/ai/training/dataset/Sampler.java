@@ -13,10 +13,16 @@
 package software.amazon.ai.training.dataset;
 
 import java.util.Iterator;
+import java.util.List;
+import software.amazon.ai.training.Trainer;
 
-/** An interface for all the indices sampler. */
-public interface Sampler<T> extends Iterator<T> {
+/** An interface for the indices sampler. */
+public interface Sampler {
 
-    // TODO have a good reason to have size
-    long size();
+    Iterator<List<Long>> sample(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset);
+
+    interface SubSampler {
+
+        Iterator<Long> sample(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset);
+    }
 }

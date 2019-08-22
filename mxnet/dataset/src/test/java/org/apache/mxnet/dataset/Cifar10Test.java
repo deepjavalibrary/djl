@@ -15,10 +15,15 @@ package org.apache.mxnet.dataset;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import software.amazon.ai.Block;
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.dataset.BatchSampler;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.Record;
 
 public class Cifar10Test {
@@ -32,11 +37,16 @@ public class Cifar10Test {
                             manager,
                             repository,
                             Dataset.Usage.TEST,
-                            new DataLoadingConfiguration.Builder().setBatchSize(32).build());
+                            new BatchSampler(new RandomSampler(), 32),
+                            new DataLoadingConfiguration.Builder().build());
             cifar10.prepare();
-            for (Record batch : cifar10.getRecords()) {
-                Assert.assertEquals(batch.getData().size(), 1);
-                Assert.assertEquals(batch.getLabels().size(), 1);
+            try (Trainer<NDArray, NDArray, NDArray> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
+                for (Record batch : trainer.trainDataset(cifar10)) {
+                    Assert.assertEquals(batch.getData().size(), 1);
+                    Assert.assertEquals(batch.getLabels().size(), 1);
+                }
             }
         }
     }
@@ -48,11 +58,16 @@ public class Cifar10Test {
                     new Cifar10(
                             manager,
                             Dataset.Usage.TEST,
-                            new DataLoadingConfiguration.Builder().setBatchSize(32).build());
+                            new BatchSampler(new RandomSampler(), 32),
+                            new DataLoadingConfiguration.Builder().build());
             cifar10.prepare();
-            for (Record batch : cifar10.getRecords()) {
-                Assert.assertEquals(batch.getData().size(), 1);
-                Assert.assertEquals(batch.getLabels().size(), 1);
+            try (Trainer<NDArray, NDArray, NDArray> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
+                for (Record batch : trainer.trainDataset(cifar10)) {
+                    Assert.assertEquals(batch.getData().size(), 1);
+                    Assert.assertEquals(batch.getLabels().size(), 1);
+                }
             }
         }
     }

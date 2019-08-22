@@ -10,18 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.dataset;
+package software.amazon.ai.translate;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.Record;
-
-public class ImageNet implements Dataset<BufferedImage, Long> {
-
-    @Override
-    public Iterable<Record> getRecords(Trainer<BufferedImage, Long, ?> trainer) throws IOException {
-        return null;
-    }
-}
+public interface TrainTranslator<I, L, O> extends Translator<I, O>, RecordProcessor<I, L> {}

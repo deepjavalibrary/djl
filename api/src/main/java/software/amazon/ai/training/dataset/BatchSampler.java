@@ -13,47 +13,65 @@
 package software.amazon.ai.training.dataset;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import software.amazon.ai.training.Trainer;
 
-/** Wraps another sampler to yield a mini-batch of indices. */
-public class BatchSampler implements Sampler<List<Long>> {
+/** Wraps another subSampler to yield a mini-batch of indices. */
+public class BatchSampler implements Sampler {
 
-    private Sampler<Long> sampler;
+    private Sampler.SubSampler subSampler;
     private long batchSize;
-    private long current;
-    private long size;
+    private boolean dropLast;
 
-    public BatchSampler(Sampler<Long> sampler, long batchSize, boolean dropLast) {
-        this.sampler = sampler;
+    public BatchSampler(Sampler.SubSampler subSampler, long batchSize) {
+        this(subSampler, batchSize, false);
+    }
+
+    public BatchSampler(Sampler.SubSampler subSampler, long batchSize, boolean dropLast) {
+        this.subSampler = subSampler;
         this.batchSize = batchSize;
-        this.current = 0;
-        if (dropLast) {
-            this.size = sampler.size() / batchSize;
-        } else {
-            this.size = (sampler.size() + batchSize - 1) / batchSize;
-        }
+        this.dropLast = dropLast;
     }
 
     @Override
-    public boolean hasNext() {
-        return current < size;
+    public Iterator<List<Long>> sample(
+            Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
+        return new Iterate(trainer, dataset);
     }
 
-    @Override
-    public List<Long> next() {
-        List<Long> batchIndices = new ArrayList<>();
-        while (sampler.hasNext()) {
-            batchIndices.add(sampler.next());
-            if (batchIndices.size() == batchSize) {
-                break;
+    class Iterate implements Iterator<List<Long>> {
+
+        private long size;
+        private long current;
+        private Iterator<Long> itemSampler;
+
+        Iterate(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
+            current = 0;
+            if (dropLast) {
+                this.size = dataset.size() / batchSize;
+            } else {
+                this.size = (dataset.size() + batchSize - 1) / batchSize;
             }
+            itemSampler = subSampler.sample(trainer, dataset);
         }
-        current++;
-        return batchIndices;
-    }
 
-    @Override
-    public long size() {
-        return this.size;
+        @Override
+        public boolean hasNext() {
+            return current < size;
+        }
+
+        @Override
+        public List<Long> next() {
+            List<Long> batchIndices = new ArrayList<>();
+            while (itemSampler.hasNext()) {
+                batchIndices.add(itemSampler.next());
+                if (batchIndices.size() == batchSize) {
+                    break;
+                }
+            }
+            current++;
+            return batchIndices;
+        }
     }
 }

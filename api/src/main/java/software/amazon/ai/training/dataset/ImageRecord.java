@@ -12,11 +12,14 @@
  */
 package software.amazon.ai.training.dataset;
 
-public class ImageRecord implements Dataset {
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import software.amazon.ai.training.Trainer;
 
-    /** {@inheritDoc} */
+public class ImageRecord implements Dataset<BufferedImage, Long> {
+
     @Override
-    public Iterable<Record> getRecords() {
+    public Iterable<Record> getRecords(Trainer<BufferedImage, Long, ?> trainer) throws IOException {
         return null;
     }
 }

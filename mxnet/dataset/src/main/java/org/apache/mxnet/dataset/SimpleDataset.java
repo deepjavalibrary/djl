@@ -19,13 +19,17 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.DataIterable;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.training.dataset.Record;
+import software.amazon.ai.training.dataset.Sampler;
+import software.amazon.ai.translate.TrainTranslator;
+import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
-public abstract class SimpleDataset extends RandomAccessDataset {
+public abstract class SimpleDataset extends RandomAccessDataset<NDArray, NDArray> {
     private NDManager manager;
     private Repository repository;
     private Artifact artifact;
@@ -34,16 +38,18 @@ public abstract class SimpleDataset extends RandomAccessDataset {
     private boolean prepared;
     private Usage usage;
 
-    public SimpleDataset(NDManager manager, Usage usage, DataLoadingConfiguration config) {
-        this(manager, Datasets.REPOSITORY, usage, config);
+    public SimpleDataset(
+            NDManager manager, Usage usage, Sampler sampler, DataLoadingConfiguration config) {
+        this(manager, Datasets.REPOSITORY, usage, sampler, config);
     }
 
     public SimpleDataset(
             NDManager manager,
             Repository repository,
             Usage usage,
+            Sampler sampler,
             DataLoadingConfiguration config) {
-        super(config);
+        super(sampler, config);
         this.repository = repository;
         this.manager = manager;
         this.usage = usage;
@@ -55,8 +61,9 @@ public abstract class SimpleDataset extends RandomAccessDataset {
             Repository repository,
             Artifact artifact,
             Usage usage,
+            Sampler sampler,
             DataLoadingConfiguration config) {
-        super(config);
+        super(sampler, config);
         this.repository = repository;
         this.manager = manager;
         this.artifact = artifact;
@@ -84,19 +91,19 @@ public abstract class SimpleDataset extends RandomAccessDataset {
     public abstract void loadData(Usage usage) throws IOException;
 
     @Override
-    public Pair<NDList, NDList> get(long index) {
+    public Pair<NDArray, NDArray> get(long index) {
         if (!prepared) {
             throw new IllegalStateException("please call prepare() before using the dataser");
         }
-        return new Pair<>(new NDList(data.get(index)), new NDList(labels.get(index)));
+        return new Pair<>(data.get(index), labels.get(index));
     }
 
     @Override
-    public Iterable<Record> getRecords() {
+    public Iterable<Record> getRecords(Trainer<NDArray, NDArray, ?> trainer) {
         if (!prepared) {
             throw new IllegalStateException("please call prepare() before using the dataser");
         }
-        return new DataIterable(this, getDataLoadingConfiguration());
+        return new DataIterable<>(this, trainer, sampler, config);
     }
 
     public NDManager getManager() {
@@ -125,5 +132,24 @@ public abstract class SimpleDataset extends RandomAccessDataset {
 
     public void setLabels(NDArray labels) {
         this.labels = labels;
+    }
+
+    public static class DefaultTranslator implements TrainTranslator<NDArray, NDArray, NDArray> {
+
+        @Override
+        public NDArray processOutput(TranslatorContext ctx, NDList list) throws Exception {
+            return list.get(0);
+        }
+
+        @Override
+        public NDList processInput(TranslatorContext ctx, NDArray input) throws Exception {
+            return new NDList(input);
+        }
+
+        @Override
+        public Record processInput(TranslatorContext ctx, NDArray input, NDArray label)
+                throws Exception {
+            return new Record(new NDList(input), new NDList(label));
+        }
     }
 }

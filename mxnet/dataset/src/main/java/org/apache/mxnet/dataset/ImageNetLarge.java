@@ -12,13 +12,16 @@
  */
 package org.apache.mxnet.dataset;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 
-public class ImageNetLarge implements Dataset {
+public class ImageNetLarge implements Dataset<BufferedImage, Long> {
 
     @Override
-    public Iterable<Record> getRecords() {
+    public Iterable<Record> getRecords(Trainer<BufferedImage, Long, ?> trainer) throws IOException {
         return null;
     }
 }

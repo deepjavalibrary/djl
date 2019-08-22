@@ -12,29 +12,34 @@
  */
 package software.amazon.ai.integration.tests;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import software.amazon.ai.Block;
+import software.amazon.ai.Context;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.BatchSampler;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.Record;
-import software.amazon.ai.training.dataset.Sampler;
 import software.amazon.ai.training.dataset.SequenceSampler;
 
 public class DatasetTest {
+
     public static void main(String[] args) {
-        // TODO remove this once NumpyMode is defualt
         String[] cmd = {"-c", DatasetTest.class.getName()};
         new IntegrationTest()
                 .runTests(
@@ -43,102 +48,181 @@ public class DatasetTest {
     }
 
     @RunAsTest
-    public void testSequenceSampler() throws FailedTestException {
+    public void testSequenceSampler() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            Sampler<Long> sequenceSampler = new SequenceSampler(manager.arange(100).size());
+            ArrayDataset dataset =
+                    new ArrayDataset(
+                            manager.arange(0, 100, 1, DataType.INT64, Context.defaultContext()),
+                            new BatchSampler(new SequenceSampler(), 1, false),
+                            new DataLoadingConfiguration.Builder().build());
             List<Long> original = new ArrayList<>();
-            sequenceSampler.forEachRemaining(original::add);
-            List<Long> expected = LongStream.range(0, 100).boxed().collect(Collectors.toList());
-            Assertions.assertTrue(original.equals(expected), "SequentialSampler test failed");
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
+                trainer.trainDataset(dataset)
+                        .iterator()
+                        .forEachRemaining(
+                                record -> original.add(record.getData().get(0).getLong()));
+                List<Long> expected = LongStream.range(0, 100).boxed().collect(Collectors.toList());
+                Assertions.assertTrue(original.equals(expected), "SequentialSampler test failed");
+            }
         }
     }
 
     @RunAsTest
-    public void testRandomSampler() throws FailedTestException {
+    public void testRandomSampler() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            Sampler<Long> randomSampler = new RandomSampler(manager.arange(10).size());
+            ArrayDataset dataset =
+                    new ArrayDataset(
+                            manager.arange(0, 10, 1, DataType.INT64, Context.defaultContext()),
+                            new BatchSampler(new RandomSampler(), 1, false),
+                            new DataLoadingConfiguration.Builder().build());
             List<Long> original = new ArrayList<>();
-            randomSampler.forEachRemaining(original::add);
-            Assertions.assertTrue(original.size() == 10, "SequentialSampler test failed");
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
+                trainer.trainDataset(dataset)
+                        .iterator()
+                        .forEachRemaining(
+                                record -> original.add(record.getData().get(0).getLong()));
+                Assertions.assertTrue(original.size() == 10, "SequentialSampler test failed");
+            }
         }
     }
 
     @RunAsTest
-    public void testBatchSampler() throws FailedTestException {
+    public void testBatchSampler() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray data = manager.arange(100);
-            Sampler<List<Long>> batchSampler =
-                    new BatchSampler(new SequenceSampler(data.size()), 27, false);
-            List<List<Long>> originalList = new ArrayList<>();
-            batchSampler.forEachRemaining(originalList::add);
-            Assertions.assertTrue(originalList.size() == 4, "size of BatchSampler is not correct");
-            List<Long> expected = LongStream.range(0, 27).boxed().collect(Collectors.toList());
-            Assertions.assertTrue(
-                    originalList.get(0).equals(expected), "data from BatchSampler is not correct");
-            Sampler<Long> randomSampler = new RandomSampler(data.size());
-            batchSampler = new BatchSampler(randomSampler, 33, true);
-            originalList = new ArrayList<>();
-            batchSampler.forEachRemaining(originalList::add);
-            Assertions.assertTrue(originalList.size() == 3, "size of BatchSampler is not correct");
-            // test case when dataset is smaller than batchSize
-            batchSampler = new BatchSampler(new SequenceSampler(data.size()), 101, true);
-            originalList = new ArrayList<>();
-            batchSampler.forEachRemaining(originalList::add);
-            Assertions.assertTrue(originalList.isEmpty());
-            batchSampler = new BatchSampler(new SequenceSampler(data.size()), 101, false);
-            originalList = new ArrayList<>();
-            batchSampler.forEachRemaining(originalList::add);
-            Assertions.assertTrue(
-                    originalList.size() == 1 && originalList.get(0).size() == 100,
-                    "dropLast test failed!");
+            NDArray data = manager.arange(0, 100, 1, DataType.INT64, Context.defaultContext());
+
+            ArrayDataset dataset =
+                    new ArrayDataset(
+                            data,
+                            new BatchSampler(new SequenceSampler(), 27, false),
+                            new DataLoadingConfiguration.Builder().build());
+            List<long[]> originalList = new ArrayList<>();
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
+                trainer.trainDataset(dataset)
+                        .iterator()
+                        .forEachRemaining(
+                                record -> originalList.add(record.getData().get(0).toLongArray()));
+                Assertions.assertTrue(
+                        originalList.size() == 4, "size of BatchSampler is not correct");
+                long[] expected = LongStream.range(0, 27).toArray();
+                Assertions.assertTrue(
+                        Arrays.equals(originalList.get(0), expected),
+                        "data from BatchSampler is not correct");
+            }
+
+            ArrayDataset dataset2 =
+                    new ArrayDataset(
+                            data,
+                            new BatchSampler(new RandomSampler(), 33, true),
+                            new DataLoadingConfiguration.Builder().build());
+            List<long[]> originalList2 = new ArrayList<>();
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
+                trainer.trainDataset(dataset2)
+                        .iterator()
+                        .forEachRemaining(
+                                record -> originalList2.add(record.getData().get(0).toLongArray()));
+                Assertions.assertTrue(
+                        originalList2.size() == 3, "size of BatchSampler is not correct");
+            }
+
+            // test case when dataset is smaller than batchSize, dropLast=true
+            ArrayDataset dataset3 =
+                    new ArrayDataset(
+                            data,
+                            new BatchSampler(new SequenceSampler(), 101, true),
+                            new DataLoadingConfiguration.Builder().build());
+            List<long[]> originalList3 = new ArrayList<>();
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
+                trainer.trainDataset(dataset3)
+                        .iterator()
+                        .forEachRemaining(
+                                record -> originalList3.add(record.getData().get(0).toLongArray()));
+                Assertions.assertTrue(
+                        originalList3.isEmpty(), "size of BatchSampler is not correct");
+            }
+
+            // test case when dataset is smaller than batchSize, dropLast=false
+            ArrayDataset dataset4 =
+                    new ArrayDataset(
+                            data,
+                            new BatchSampler(new SequenceSampler(), 101, false),
+                            new DataLoadingConfiguration.Builder().build());
+            List<long[]> originalList4 = new ArrayList<>();
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
+                trainer.trainDataset(dataset4)
+                        .iterator()
+                        .forEachRemaining(
+                                record -> originalList4.add(record.getData().get(0).toLongArray()));
+                Assertions.assertTrue(
+                        originalList4.size() == 1 && originalList4.get(0).length == 100,
+                        "size of BatchSampler is not correct");
+            }
         }
     }
 
     @RunAsTest
-    public void testArrayDataset() throws FailedTestException {
+    public void testArrayDataset() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray data = manager.arange(200).reshape(100, 2);
-            // TODO this should be (100) not (100, 1) due to NumpyShape off
-            NDArray label = manager.arange(100).reshape(100, 1);
+            NDArray label = manager.arange(100).reshape(100);
             ArrayDataset dataset =
                     new ArrayDataset(
                             data,
                             label,
-                            new DataLoadingConfiguration.Builder().setBatchSize(20).build());
+                            new BatchSampler(new SequenceSampler(), 20),
+                            new DataLoadingConfiguration.Builder().build());
             int index = 0;
-            for (Record record : dataset.getRecords()) {
-                Assertions.assertEquals(
-                        record.getData().get(0),
-                        manager.arange(2 * index, 2 * index + 40).reshape(20, 2));
-                Assertions.assertEquals(
-                        record.getLabels().get(0),
-                        manager.arange(index, index + 20).reshape(20, 1));
-                index += 20;
-            }
-            dataset =
-                    new ArrayDataset(
-                            data,
-                            label,
-                            new DataLoadingConfiguration.Builder().setBatchSize(15).build());
-            index = 0;
-            for (Record record : dataset.getRecords()) {
-                if (index != 90) {
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
+                for (Record record : trainer.trainDataset(dataset)) {
                     Assertions.assertEquals(
                             record.getData().get(0),
-                            manager.arange(2 * index, 2 * index + 30).reshape(15, 2));
+                            manager.arange(2 * index, 2 * index + 40).reshape(20, 2));
                     Assertions.assertEquals(
                             record.getLabels().get(0),
-                            manager.arange(index, index + 15).reshape(15, 1));
-                } else {
-                    // last batch
-                    Assertions.assertEquals(
-                            record.getData().get(0),
-                            manager.arange(2 * index, 2 * index + 20).reshape(10, 2));
-                    Assertions.assertEquals(
-                            record.getLabels().get(0),
-                            manager.arange(index, index + 10).reshape(10, 1));
+                            manager.arange(index, index + 20).reshape(20));
+                    index += 20;
                 }
-                index += 15;
+
+                dataset =
+                        new ArrayDataset(
+                                data,
+                                label,
+                                new BatchSampler(new SequenceSampler(), 15),
+                                new DataLoadingConfiguration.Builder().build());
+                index = 0;
+                for (Record record : trainer.trainDataset(dataset)) {
+                    if (index != 90) {
+                        Assertions.assertEquals(
+                                record.getData().get(0),
+                                manager.arange(2 * index, 2 * index + 30).reshape(15, 2));
+                        Assertions.assertEquals(
+                                record.getLabels().get(0),
+                                manager.arange(index, index + 15).reshape(15));
+                    } else {
+                        // last batch
+                        Assertions.assertEquals(
+                                record.getData().get(0),
+                                manager.arange(2 * index, 2 * index + 20).reshape(10, 2));
+                        Assertions.assertEquals(
+                                record.getLabels().get(0),
+                                manager.arange(index, index + 10).reshape(10));
+                    }
+                    index += 15;
+                }
             }
         }
     }

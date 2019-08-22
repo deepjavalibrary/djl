@@ -13,37 +13,32 @@
 package software.amazon.ai.training.dataset;
 
 import java.util.RandomAccess;
-import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.training.Trainer;
 import software.amazon.ai.util.Pair;
 
 /**
  * RandomAccessDataset represent the dataset that support random access reads. i.e. it could access
  * certain data item given the index
  */
-public abstract class RandomAccessDataset implements Dataset, RandomAccess {
-    private long size;
-    private DataLoadingConfiguration config;
+public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, RandomAccess {
 
-    public RandomAccessDataset(DataLoadingConfiguration config) {
+    protected long size;
+    protected Sampler sampler;
+    protected DataLoadingConfiguration config;
+
+    public RandomAccessDataset(Sampler sampler, DataLoadingConfiguration config) {
+        this.sampler = sampler;
         this.config = config;
     }
 
-    public abstract Pair<NDList, NDList> get(long index);
+    public abstract Pair<I, L> get(long index);
 
     @Override
-    public Iterable<Record> getRecords() {
-        return new DataIterable(this, config);
+    public Iterable<Record> getRecords(Trainer<I, L, ?> trainer) {
+        return new DataIterable<>(this, trainer, sampler, config);
     }
 
     public long size() {
         return size;
-    }
-
-    protected void setSize(long size) {
-        this.size = size;
-    }
-
-    protected DataLoadingConfiguration getDataLoadingConfiguration() {
-        return config;
     }
 }
