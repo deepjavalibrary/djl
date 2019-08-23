@@ -169,22 +169,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         return new MxMatrix(this);
     }
 
-    /** Computes the gradients of the NDArray w.r.t variables. */
-    public void backward() {
-        backward(null, false, true);
-    }
-
-    /**
-     * Computes the gradients of the NDArray w.r.t variables.
-     *
-     * @param retainGraph Whether to retain the computation graph for another backward pass on the
-     *     same graph. By default the computation history is cleared.
-     * @param isTraining Whether to compute gradient for training or inference.
-     */
-    public void backward(boolean retainGraph, boolean isTraining) {
-        backward(null, retainGraph, isTraining);
-    }
-
     /**
      * Computes the gradients of the NDArray w.r.t variables.
      *

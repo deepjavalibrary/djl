@@ -25,7 +25,9 @@ import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.Translator;
 
 public class MockEngine extends Engine {
@@ -83,6 +85,11 @@ public class MockEngine extends Engine {
 
     @Override
     public NNIndex getNNIndex() {
+        return null;
+    }
+
+    @Override
+    public ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU) {
         return null;
     }
 

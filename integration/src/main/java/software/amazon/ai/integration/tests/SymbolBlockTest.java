@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -158,7 +157,7 @@ public class SymbolBlockTest {
                         .map(
                                 stringParameterPair ->
                                         stringParameterPair.getValue().getArray().getGradient())
-                        .collect(Collectors.toCollection(ArrayList::new));
+                        .collect(Collectors.toList());
         gradMean = NDArrays.stack(grads.stream().map(NDArray::mean).toArray(NDArray[]::new));
         return new Pair<>(pred.mean(), gradMean);
     }

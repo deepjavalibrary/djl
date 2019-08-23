@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.engine;
 
+import com.sun.jna.Pointer;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.training.Gradient;
@@ -86,7 +87,39 @@ public interface MxGradient extends Gradient {
         /** {@inheritDoc} */
         @Override
         public void backward(NDArray array) {
-            ((MxNDArray) array).backward();
+            backward(array, null, false, true);
+        }
+
+        /**
+         * Computes the gradients of the NDArray w.r.t variables.
+         *
+         * @param array target/head array to run backward on.
+         * @param outGrad output gradient NDArray
+         * @param retainGraph Whether to retain the computation graph for another backward pass on
+         *     the same graph. By default the computation history is cleared.
+         * @param isTraining Whether to compute gradient for training or inference.
+         */
+        private void backward(
+                NDArray array, NDArray outGrad, boolean retainGraph, boolean isTraining) {
+            Pointer outGradHandle;
+            if (outGrad != null) {
+                MxNDArray outGradND = (MxNDArray) outGrad;
+                outGradHandle = outGradND.getHandle();
+            } else {
+                outGradHandle = null;
+            }
+
+            JnaUtils.autogradBackwardExecute(
+                    1,
+                    ((MxNDArray) array).getHandle(),
+                    outGradHandle,
+                    0,
+                    null,
+                    retainGraph ? 1 : 0,
+                    0,
+                    isTraining ? 1 : 0,
+                    null,
+                    null);
         }
     }
 }

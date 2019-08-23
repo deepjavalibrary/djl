@@ -12,10 +12,8 @@
  */
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.Parameter;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
-import software.amazon.ai.util.PairList;
 
 /** An SGD optimizer. Build with {@link Sgd.Builder}. */
 public interface Sgd extends Optimizer {
@@ -25,10 +23,6 @@ public interface Sgd extends Optimizer {
         private LrTracker lrTracker;
         private float momentum;
         private boolean lazyUpdate = true;
-
-        public Builder(PairList<String, Parameter> parameters) {
-            super(parameters);
-        }
 
         @Override
         Builder self() {

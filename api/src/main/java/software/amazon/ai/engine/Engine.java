@@ -28,7 +28,9 @@ import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.Translator;
 
 /**
@@ -171,6 +173,16 @@ public abstract class Engine {
      * @return The index of Neural Network operators to create a Block
      */
     public abstract NNIndex getNNIndex();
+
+    /**
+     * An internal helper to get the Engine specific implementation for parameter store.
+     *
+     * @param optimizer The optimizer that defines how to update parameters
+     * @param aggregateOnGPU whether to aggregate gradients on GPU for multi GPU training, if false,
+     *     gradients will be copied to CPU for aggregation
+     * @return {@link ParameterStore} object
+     */
+    public abstract ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU);
 
     /**
      * Creates a new {@link Trainer} instance for this Engine.

@@ -13,10 +13,8 @@
 
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.Parameter;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
-import software.amazon.ai.util.PairList;
 
 /** An NAG optimizer. Build with {@link Nag.Builder}. */
 public interface Nag extends Optimizer {
@@ -25,10 +23,6 @@ public interface Nag extends Optimizer {
 
         private LrTracker lrTracker;
         private float momentum;
-
-        public Builder(PairList<String, Parameter> parameters) {
-            super(parameters);
-        }
 
         public Builder setLrTracker(LrTracker lrTracker) {
             this.lrTracker = lrTracker;

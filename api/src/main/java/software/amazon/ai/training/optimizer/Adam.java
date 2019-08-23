@@ -12,9 +12,7 @@
  */
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.Parameter;
 import software.amazon.ai.engine.Engine;
-import software.amazon.ai.util.PairList;
 
 public interface Adam extends Optimizer {
 
@@ -25,10 +23,6 @@ public interface Adam extends Optimizer {
         private float beta2 = 0.999f;
         private float epsilon = 1e-8f;
         private boolean lazyUpdate = true;
-
-        public Builder(PairList<String, Parameter> parameters) {
-            super(parameters);
-        }
 
         @Override
         Builder self() {

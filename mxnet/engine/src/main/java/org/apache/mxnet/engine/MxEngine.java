@@ -31,7 +31,9 @@ import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.Translator;
 
 public class MxEngine extends Engine {
@@ -171,6 +173,12 @@ public class MxEngine extends Engine {
     @Override
     public Gradient.Collector newGradientCollector() {
         return new MxGradient.Collector();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU) {
+        return new MxParameterStore(optimizer, aggregateOnGPU);
     }
 
     /** {@inheritDoc} */

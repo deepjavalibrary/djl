@@ -12,13 +12,12 @@
  */
 package org.apache.mxnet.engine.optimizer;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
 import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.optimizer.Adam;
+import software.amazon.ai.util.PairList;
 
 public class MxAdam extends MxOptimizer implements Adam {
 
@@ -28,8 +27,8 @@ public class MxAdam extends MxOptimizer implements Adam {
     private float epsilon;
     private boolean lazyUpdate;
 
-    private List<NDArray> means;
-    private List<NDArray> variances;
+    private NDList means;
+    private NDList variances;
 
     public MxAdam(Adam.Builder builder) {
         super(builder);
@@ -41,15 +40,20 @@ public class MxAdam extends MxOptimizer implements Adam {
     }
 
     @Override
-    public void update(int index, NDArray weight, NDArray grad) {
+    public boolean initializeStates(PairList<String, Parameter> parameters) {
         if (means == null) {
-            means = new ArrayList<>(parameters.size());
-            variances = new ArrayList<>(parameters.size());
+            means = new NDList(parameters.size());
+            variances = new NDList(parameters.size());
             for (Parameter param : parameters.values()) {
                 means.add(param.getArray().zerosLike());
                 variances.add(param.getArray().zerosLike());
             }
         }
+        return true;
+    }
+
+    @Override
+    void update(int index, NDArray weight, NDArray grad) {
         double t = updateCount(index);
         double coef1 = 1.0 - Math.pow(beta1, t);
         double coef2 = 1.0 - Math.pow(beta2, t);

@@ -20,6 +20,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
+import software.amazon.ai.util.PairList;
 
 public class MxSgd extends MxOptimizer implements Sgd {
 
@@ -37,16 +38,21 @@ public class MxSgd extends MxOptimizer implements Sgd {
     }
 
     @Override
-    public void update(int index, NDArray weight, NDArray grad) {
+    boolean initializeStates(PairList<String, Parameter> parameters) {
+        if (momentum != 0f) {
+            momentumStates = new ArrayList<>(parameters.size());
+            for (Parameter param : parameters.values()) {
+                momentumStates.add(param.getArray().zerosLike());
+            }
+        }
+        return true;
+    }
+
+    @Override
+    void update(int index, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
         float learningRate = lrTracker.getNewLearningRate(updateCount(index));
         if (momentum != 0) {
-            if (momentumStates == null) {
-                momentumStates = new ArrayList<>(parameters.size());
-                for (Parameter param : parameters.values()) {
-                    momentumStates.add(param.getArray().zerosLike());
-                }
-            }
             MxOpParams params = new MxOpParams();
             params.addParam("wd", getWeightDecay(index));
             params.addParam("rescale_grad", rescaleGrad);

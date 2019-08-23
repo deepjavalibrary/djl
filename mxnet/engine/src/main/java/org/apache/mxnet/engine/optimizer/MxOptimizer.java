@@ -21,16 +21,14 @@ import software.amazon.ai.util.PairList;
 /** MXNet helper containing base implementations for optimizers. */
 public abstract class MxOptimizer implements Optimizer {
 
-    PairList<String, Parameter> parameters;
     float rescaleGrad;
     float clipGrad;
     private float weightDecays;
     int numUpdate;
-
+    private boolean statesInitialized;
     private int[] updateCounts;
 
     public MxOptimizer(BaseBuilder<?> builder) {
-        this.parameters = builder.getParameters();
         this.rescaleGrad = builder.getRescaleGrad();
         this.weightDecays = builder.getWeightDecays();
         this.clipGrad = builder.getClipGrad();
@@ -39,24 +37,23 @@ public abstract class MxOptimizer implements Optimizer {
         if (rescaleGrad == 0) {
             throw new IllegalArgumentException("The rescaleGrad should be set");
         }
-
-        updateCounts = new int[parameters.size()];
-        Arrays.fill(updateCounts, numUpdate);
     }
 
     @Override
-    public void step() {
+    public void updateAllParameters(PairList<String, Parameter> parameters) {
+        if (!statesInitialized) {
+            // ensure when create state is over ridden, statesCreated is updated
+            statesInitialized = initializeStates(parameters);
+        }
+        if (updateCounts == null) {
+            updateCounts = new int[parameters.size()];
+            Arrays.fill(updateCounts, numUpdate);
+        }
         for (int i = 0; i < parameters.size(); i++) {
             NDArray paramArray = parameters.get(i).getValue().getArray();
             NDArray grad = paramArray.getGradient();
             update(i, paramArray, grad);
         }
-        numUpdate++;
-    }
-
-    @Override
-    public PairList<String, Parameter> getParameters() {
-        return parameters;
     }
 
     float getWeightDecay(int index) {
@@ -69,5 +66,7 @@ public abstract class MxOptimizer implements Optimizer {
         return count;
     }
 
-    public abstract void update(int index, NDArray weight, NDArray grad);
+    abstract void update(int index, NDArray weight, NDArray grad);
+
+    abstract boolean initializeStates(PairList<String, Parameter> parameters);
 }

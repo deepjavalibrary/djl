@@ -23,6 +23,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
+import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
@@ -44,11 +45,13 @@ public final class MnistUtils {
         int batchSize = 100;
 
         Optimizer optimizer =
-                new Sgd.Builder(mlp.getParameters())
+                new Sgd.Builder()
                         .setRescaleGrad(1.0f / batchSize)
                         .setLrTracker(LrTracker.fixedLR(0.1f))
                         .optMomentum(0.9f)
                         .build();
+
+        TrainingController controller = new TrainingController(mlp.getParameters(), optimizer);
         Accuracy acc = new Accuracy();
         LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
@@ -75,7 +78,7 @@ public final class MnistUtils {
                     loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
                     gradCol.backward(loss);
                 }
-                optimizer.step();
+                controller.step();
                 acc.update(label, pred);
                 lossMetric.update(loss);
             }

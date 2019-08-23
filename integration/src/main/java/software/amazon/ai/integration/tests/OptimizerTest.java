@@ -27,6 +27,7 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
+import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Nag;
@@ -52,7 +53,7 @@ public class OptimizerTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             Block block = block(manager);
             Optimizer optim =
-                    new Sgd.Builder(block.getParameters())
+                    new Sgd.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
                             .setLrTracker(LrTracker.fixedLR(1E7f))
                             .build();
@@ -68,7 +69,7 @@ public class OptimizerTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             Block block = block(manager);
             Optimizer optim =
-                    new Sgd.Builder(block.getParameters())
+                    new Sgd.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
                             .setLrTracker(LrTracker.fixedLR(1E7f))
                             .optMomentum(1E2f)
@@ -85,7 +86,7 @@ public class OptimizerTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             Block block = block(manager);
             Optimizer optim =
-                    new Nag.Builder(block.getParameters())
+                    new Nag.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
                             .setLrTracker(LrTracker.fixedLR(1E7f))
                             .setMomentum(1E1f)
@@ -102,7 +103,7 @@ public class OptimizerTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             Block block = block(manager);
             Optimizer optim =
-                    new Adam.Builder(block.getParameters())
+                    new Adam.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
                             .optLearningRate(1E2f)
                             .build();
@@ -124,12 +125,13 @@ public class OptimizerTest {
     private NDArray runOptimizer(NDManager manager, Block block, Optimizer optim) {
         NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS));
         NDArray label = manager.arange(0, BATCH_SIZE);
+        TrainingController controller = new TrainingController(block.getParameters(), optim);
         try (Gradient.Collector gradCol = Gradient.newCollector()) {
             NDArray pred = block.forward(new NDList(data)).head();
             NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
             gradCol.backward(loss);
         }
-        optim.step();
+        controller.step();
         return NDArrays.stack(
                 block.getParameters()
                         .stream()

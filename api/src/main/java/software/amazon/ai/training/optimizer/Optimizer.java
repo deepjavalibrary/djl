@@ -21,22 +21,22 @@ import software.amazon.ai.util.PairList;
  */
 public interface Optimizer {
 
-    PairList<String, Parameter> getParameters();
-
-    void step();
+    /**
+     * Update a {@code PairList} of parameters one step at time. Assumes parameters are on the same
+     * context. This will be used when updating parameters locally, not on {@link
+     * software.amazon.ai.training.ParameterStore}.
+     *
+     * @param parameters a {@code PairList} of parameters from network to update
+     */
+    void updateAllParameters(PairList<String, Parameter> parameters);
 
     @SuppressWarnings("rawtypes")
     abstract class BaseBuilder<B extends BaseBuilder> {
 
-        private PairList<String, Parameter> parameters;
         private float rescaleGrad;
         private float weightDecays;
         private float clipGrad = -1;
         private int beginNumUpdate;
-
-        BaseBuilder(PairList<String, Parameter> parameters) {
-            this.parameters = parameters;
-        }
 
         public B setRescaleGrad(float rescaleGrad) {
             this.rescaleGrad = rescaleGrad;
@@ -56,10 +56,6 @@ public interface Optimizer {
         public B optBeginNumUpdate(int beginNumUpdate) {
             this.beginNumUpdate = beginNumUpdate;
             return self();
-        }
-
-        public PairList<String, Parameter> getParameters() {
-            return parameters;
         }
 
         public float getRescaleGrad() {

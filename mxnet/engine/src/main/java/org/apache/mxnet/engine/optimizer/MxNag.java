@@ -21,6 +21,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
+import software.amazon.ai.util.PairList;
 
 public class MxNag extends MxOptimizer implements Nag {
 
@@ -35,15 +36,21 @@ public class MxNag extends MxOptimizer implements Nag {
     }
 
     @Override
-    public void update(int index, NDArray weight, NDArray grad) {
+    boolean initializeStates(PairList<String, Parameter> parameters) {
+        if (momentum != 0f) {
+            momentumStates = new ArrayList<>(parameters.size());
+            for (Parameter param : parameters.values()) {
+                momentumStates.add(param.getArray().zerosLike());
+            }
+        }
+        return true;
+    }
+
+    @Override
+    void update(int index, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
         if (momentum != 0) {
-            if (momentumStates == null) {
-                momentumStates = new ArrayList<>(parameters.size());
-                for (Parameter param : parameters.values()) {
-                    momentumStates.add(param.getArray().zerosLike());
-                }
-            }
+
             MxOpParams params = new MxOpParams();
             params.addParam("lr", lrTracker.getNewLearningRate(updateCount(index)));
             params.addParam("wd", getWeightDecay(index));
