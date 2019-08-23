@@ -30,6 +30,7 @@ import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Utils;
 
 public class ImageNetTranslator extends ImageTranslator<List<Classification>> {
+
     private int topK = 5;
     private int imageWidth = 224;
     private int imageHeight = 224;

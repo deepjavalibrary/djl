@@ -12,7 +12,10 @@
  */
 package org.apache.mxnet.zoo;
 
-import org.apache.mxnet.zoo.cv.image_classification.ImageNetModel;
+import org.apache.mxnet.zoo.cv.image_classification.Resnet;
+import org.apache.mxnet.zoo.cv.image_classification.Resnext;
+import org.apache.mxnet.zoo.cv.image_classification.SeResnext;
+import org.apache.mxnet.zoo.cv.image_classification.Senet;
 import org.apache.mxnet.zoo.cv.objectdetection.SingleShotDetection;
 import software.amazon.ai.repository.Repository;
 
@@ -23,8 +26,8 @@ public interface ModelZoo {
     String GROUP_ID = "org.apache.mxnet";
 
     SingleShotDetection SSD = new SingleShotDetection(REPOSITORY);
-    ImageNetModel RESNET = new ImageNetModel(REPOSITORY, "resnet");
-    ImageNetModel RESNEXT = new ImageNetModel(REPOSITORY, "resnext");
-    ImageNetModel SENET = new ImageNetModel(REPOSITORY, "senet");
-    ImageNetModel SE_RESNEXT = new ImageNetModel(REPOSITORY, "se_resnext");
+    Resnet RESNET = new Resnet(REPOSITORY);
+    Resnext RESNEXT = new Resnext(REPOSITORY);
+    Senet SENET = new Senet(REPOSITORY);
+    SeResnext SE_RESNEXT = new SeResnext(REPOSITORY);
 }

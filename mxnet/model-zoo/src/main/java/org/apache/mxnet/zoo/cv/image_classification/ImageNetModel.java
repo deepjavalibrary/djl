@@ -28,14 +28,16 @@ import software.amazon.ai.repository.Metadata;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.repository.VersionRange;
 
-public class ImageNetModel {
+class ImageNetModel {
 
     private Repository repository;
     private Metadata metadata;
     private MRL mrl;
+    private String version;
 
-    public ImageNetModel(Repository repository, String artifactId) {
+    public ImageNetModel(Repository repository, String artifactId, String version) {
         this.repository = repository;
+        this.version = version;
         this.mrl = new MRL(MRL.Model.CV.IMAGE_CLASSIFICATION, ModelZoo.GROUP_ID, artifactId);
     }
 
@@ -74,6 +76,6 @@ public class ImageNetModel {
     }
 
     public List<Artifact> search(Map<String, String> criteria) {
-        return metadata.search(VersionRange.parse("0.0.1"), criteria);
+        return metadata.search(VersionRange.parse(version), criteria);
     }
 }

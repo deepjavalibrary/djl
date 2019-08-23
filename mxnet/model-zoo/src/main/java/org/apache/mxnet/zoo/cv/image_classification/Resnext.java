@@ -14,12 +14,12 @@ package org.apache.mxnet.zoo.cv.image_classification;
 
 import software.amazon.ai.repository.Repository;
 
-public class Resnet extends ImageNetModel {
+public class Resnext extends ImageNetModel {
 
-    private static final String ARTIFACT_ID = "resnet";
+    private static final String ARTIFACT_ID = "resnext";
     private static final String VERSION = "0.0.1";
 
-    public Resnet(Repository repository) {
+    public Resnext(Repository repository) {
         super(repository, ARTIFACT_ID, VERSION);
     }
 }
