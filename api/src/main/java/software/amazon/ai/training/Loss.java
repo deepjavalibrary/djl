@@ -14,6 +14,7 @@ package software.amazon.ai.training;
 
 import java.util.stream.IntStream;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDArrays;
 
 /** Loss functions or Cost Functions to evaluate model predictions against true labels. */
 public final class Loss {
@@ -66,6 +67,48 @@ public final class Loss {
 
     public static NDArray l1Loss(NDArray label, NDArray prediction) {
         return l1Loss(label, prediction, 1, 0);
+    }
+
+    /**
+     * The Sigmoid cross-entropy loss for binary classification.
+     *
+     * @param label true label
+     * @param prediction predicted label
+     * @param weight weight to apply on loss value, default 1
+     * @param batchAxis axis that represents mini-batch, default 0
+     * @param fromSigmoid Whether the input is from the output of sigmoid, default false
+     * @return sigmoid cross-entropy loss value
+     */
+    public static NDArray sigmoidBinaryCrossEntropyLoss(
+            NDArray label, NDArray prediction, float weight, int batchAxis, boolean fromSigmoid) {
+        label = label.reshape(prediction.getShape());
+        NDArray loss;
+        if (!fromSigmoid) {
+            // TODO: Add Position weight option
+            loss =
+                    Activation.relu(prediction)
+                            .sub(prediction.mul(label))
+                            .add(Activation.softrelu(prediction.abs().neg()));
+        } else {
+            double eps = 1e-12;
+            loss =
+                    prediction
+                            .add(eps)
+                            .log()
+                            .mul(label)
+                            .add(
+                                    NDArrays.sub(1., prediction)
+                                            .add(eps)
+                                            .mul(NDArrays.sub(1., label)));
+        }
+        if (weight != 1f) {
+            loss = loss.mul(weight);
+        }
+        return loss.mean(excludeBatchAxis(loss, batchAxis));
+    }
+
+    public static NDArray sigmoidBinaryCrossEntropyLoss(NDArray label, NDArray prediction) {
+        return sigmoidBinaryCrossEntropyLoss(label, prediction, 1, 0, false);
     }
 
     /**
@@ -134,7 +177,7 @@ public final class Loss {
     public static NDArray hingeLoss(
             NDArray label, NDArray prediction, int margin, float weight, int batchAxis) {
         label = label.reshape(prediction.getShape());
-        NDArray loss = label.mmul(prediction).subi(margin).getNDArrayInternal().relu();
+        NDArray loss = Activation.relu(NDArrays.sub(margin, label.mul(prediction)));
         if (weight != 1) {
             loss = loss.mul(weight);
         }
