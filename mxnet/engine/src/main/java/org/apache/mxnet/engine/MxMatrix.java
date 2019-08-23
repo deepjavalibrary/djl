@@ -43,7 +43,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getGradient() throws NullPointerException {
+    public NDArray getGradient() {
         return array.getGradient();
     }
 
@@ -372,7 +372,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public void setScalar(NDIndex index, Number value) throws IllegalArgumentException {
+    public void setScalar(NDIndex index, Number value) {
         array.setScalar(index, value);
     }
 

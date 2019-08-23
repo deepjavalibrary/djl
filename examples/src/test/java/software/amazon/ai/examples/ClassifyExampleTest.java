@@ -23,17 +23,9 @@ public class ClassifyExampleTest {
 
     @Test
     public void testClassifyExample() {
-        String[] args =
-                new String[] {
-                    "-n",
-                    MODEL_NAME,
-                    "-i",
-                    "src/test/resources/kitten.jpg",
-                    "-c",
-                    "1",
-                    "-l",
-                    "build/logs"
-                };
+        String[] args = {
+            "-n", MODEL_NAME, "-i", "src/test/resources/kitten.jpg", "-c", "1", "-l", "build/logs"
+        };
         Assert.assertTrue(new ClassifyExample().runExample(args));
         Classification result = (Classification) AbstractExample.getPredictResult();
         Assert.assertEquals(result.getClassName(), "n02123045 tabby, tabby cat");

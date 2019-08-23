@@ -32,8 +32,7 @@ import software.amazon.ai.util.PairList;
 
 /** A dataset for loading image files stored in a folder structure. */
 public final class ImageFolder extends RandomAccessDataset {
-    private static final String[] EXT =
-            new String[] {".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"};
+    private static final String[] EXT = {".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"};
     private static final Logger logger = LoggerFactory.getLogger(ImageFolder.class);
 
     private NDManager manager;

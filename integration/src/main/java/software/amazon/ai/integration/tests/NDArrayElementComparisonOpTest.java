@@ -26,7 +26,7 @@ import software.amazon.ai.ndarray.types.Shape;
 public class NDArrayElementComparisonOpTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", NDArrayElementComparisonOpTest.class.getName()};
+        String[] cmd = {"-c", NDArrayElementComparisonOpTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))

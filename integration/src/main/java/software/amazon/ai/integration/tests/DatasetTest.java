@@ -35,7 +35,7 @@ import software.amazon.ai.training.dataset.SequenceSampler;
 public class DatasetTest {
     public static void main(String[] args) {
         // TODO remove this once NumpyMode is defualt
-        String[] cmd = new String[] {"-c", DatasetTest.class.getName()};
+        String[] cmd = {"-c", DatasetTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))

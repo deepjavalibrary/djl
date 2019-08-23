@@ -79,7 +79,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
                 });
         try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager();
                 NDArray nd = manager.create(new Shape(3))) {
-            float[] input = new float[] {1.0f, 2.0f, 3.0f};
+            float[] input = {1.0f, 2.0f, 3.0f};
             nd.set(input);
             float[] fArr = fa[0];
             Assert.assertEquals(input, fArr);

@@ -115,7 +115,7 @@ public abstract class AbstractExample {
             long loaded = System.nanoTime();
             logger.info(
                     String.format(
-                            "Load library %s in %.3f ms.", version, (loaded - init) / 1000000f));
+                            "Load library %s in %.3f ms.", version, (loaded - init) / 1_000_000f));
 
             while (!duration.isNegative()) {
                 Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
@@ -125,8 +125,8 @@ public abstract class AbstractExample {
 
                 logger.info("Inference result: {}", lastResult);
 
-                float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1000000f;
-                float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000000f;
+                float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
+                float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1_000_000f;
 
                 logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
 

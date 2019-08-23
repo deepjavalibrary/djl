@@ -53,16 +53,15 @@ public class CachedOpTest extends PowerMockTestCase {
     @Test
     public void testForward() {
         try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager()) {
-            MxNDArray[] params =
-                    new MxNDArray[] {
-                        null,
-                        (MxNDArray) manager.create(new Shape(2)),
-                        (MxNDArray) manager.create(new Shape(3)),
-                        null,
-                        null,
-                        (MxNDArray) manager.create(new Shape(5)),
-                        (MxNDArray) manager.create(new Shape(6))
-                    };
+            MxNDArray[] params = {
+                null,
+                (MxNDArray) manager.create(new Shape(2)),
+                (MxNDArray) manager.create(new Shape(3)),
+                null,
+                null,
+                (MxNDArray) manager.create(new Shape(5)),
+                (MxNDArray) manager.create(new Shape(6))
+            };
             List<String> names = Arrays.asList("data0", "data1", "data2");
             List<Integer> locations = Arrays.asList(0, 3, 4);
             PairList<String, Integer> inputNames = new PairList<>(names, locations);

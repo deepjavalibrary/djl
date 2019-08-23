@@ -29,7 +29,7 @@ import software.amazon.ai.training.Gradient;
 public class NDArrayOtherOpTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", NDArrayOtherOpTest.class.getName()};
+        String[] cmd = {"-c", NDArrayOtherOpTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))

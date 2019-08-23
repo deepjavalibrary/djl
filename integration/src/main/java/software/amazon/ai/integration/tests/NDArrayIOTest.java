@@ -30,7 +30,7 @@ import software.amazon.ai.ndarray.NDManager;
 @SuppressWarnings("PMD.UseProperClassLoader")
 public class NDArrayIOTest {
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", NDArrayIOTest.class.getName()};
+        String[] cmd = {"-c", NDArrayIOTest.class.getName()};
         new IntegrationTest().runTests(cmd);
     }
 

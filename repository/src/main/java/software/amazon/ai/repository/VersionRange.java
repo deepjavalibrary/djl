@@ -97,7 +97,7 @@ public final class VersionRange {
         return new VersionRange(version, restrictions);
     }
 
-    private static Restriction parseRestriction(String spec) throws IllegalArgumentException {
+    private static Restriction parseRestriction(String spec) {
         boolean lowerBoundInclusive = spec.startsWith("[");
         boolean upperBoundInclusive = spec.endsWith("]");
 

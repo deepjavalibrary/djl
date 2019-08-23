@@ -27,8 +27,9 @@ import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 public class MxConv1D extends MxNNBlock implements Conv1D {
-    private static final LayoutType[] EXPECTED_LAYOUT =
-            new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.WIDTH};
+    private static final LayoutType[] EXPECTED_LAYOUT = {
+        LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.WIDTH
+    };
     private static final String LAYOUT_STRING = "NCW";
     private Shape kernel;
     private Shape stride;

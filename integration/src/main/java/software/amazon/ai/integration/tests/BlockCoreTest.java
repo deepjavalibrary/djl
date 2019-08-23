@@ -38,7 +38,7 @@ import software.amazon.ai.training.initializer.Initializer;
 public class BlockCoreTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", BlockCoreTest.class.getName()};
+        String[] cmd = {"-c", BlockCoreTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))

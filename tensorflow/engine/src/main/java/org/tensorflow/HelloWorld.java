@@ -93,7 +93,7 @@ public final class HelloWorld {
             byte[] data = ((DataBufferByte) img.getData().getDataBuffer()).getData();
             // ImageIO.read seems to produce BGR-encoded images, but the model expects RGB.
             bgr2rgb(data);
-            long[] shape = new long[] {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
+            long[] shape = {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
             NDArray array = ctx.getNDManager().create(data, new Shape(shape));
             NDList ndList = new NDList();
             ndList.add("image_tensor", array);

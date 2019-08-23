@@ -19,7 +19,7 @@ public class IntegrationTests {
 
     @Test
     public void runIntegrationTests() {
-        String[] args = new String[] {};
+        String[] args = {};
         Assert.assertTrue(new IntegrationTest().runTests(args));
     }
 }

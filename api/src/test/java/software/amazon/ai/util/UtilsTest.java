@@ -39,7 +39,7 @@ public class UtilsTest {
 
     @Test
     public void testContains() {
-        String[] words = new String[] {"Hello World", "2"};
+        String[] words = {"Hello World", "2"};
         Assert.assertTrue(Utils.contains(words, "2"));
         Assert.assertFalse(Utils.contains(words, "3"));
     }

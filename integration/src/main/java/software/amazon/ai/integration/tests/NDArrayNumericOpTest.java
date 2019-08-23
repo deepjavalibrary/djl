@@ -26,7 +26,7 @@ import software.amazon.ai.ndarray.types.Shape;
 public class NDArrayNumericOpTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", NDArrayNumericOpTest.class.getName()};
+        String[] cmd = {"-c", NDArrayNumericOpTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
@@ -54,7 +54,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testAbs() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
+            double[] testedData = {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::abs).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -65,7 +65,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testSquare() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
+            double[] testedData = {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(x -> Math.pow(x, 2.0)).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -76,8 +76,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testCbrt() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData =
-                    new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+            double[] testedData = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::cbrt).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -88,8 +87,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testFloor() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData =
-                    new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+            double[] testedData = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::floor).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -100,8 +98,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testCeil() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData =
-                    new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+            double[] testedData = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::ceil).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -112,8 +109,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testRound() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData =
-                    new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+            double[] testedData = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::round).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -124,10 +120,9 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testTrunc() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData =
-                    new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+            double[] testedData = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray testedND = manager.create(testedData);
-            double[] truncData = new double[] {1.0, 2.0, -3, -4, 5, -223};
+            double[] truncData = {1.0, 2.0, -3, -4, 5, -223};
             NDArray expectedND = manager.create(truncData);
             Assertions.assertAlmostEquals(testedND.trunc(), expectedND);
         }
@@ -136,8 +131,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testExp() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData =
-                    new double[] {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
+            double[] testedData = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::exp).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -148,7 +142,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testLog() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+            double[] testedData = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::log).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -159,7 +153,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testLog10() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+            double[] testedData = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::log10).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -170,7 +164,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testLog2() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+            double[] testedData = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray testedND = manager.create(testedData);
             testedData =
                     DoubleStream.of(testedData).map(x -> Math.log10(x) / Math.log10(2)).toArray();
@@ -182,7 +176,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testSin() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+            double[] testedData = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::sin).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -193,7 +187,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testCos() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+            double[] testedData = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::cos).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -204,7 +198,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testTan() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {0.0, Math.PI / 4.0, Math.PI / 2.0};
+            double[] testedData = {0.0, Math.PI / 4.0, Math.PI / 2.0};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::tan).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -215,7 +209,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testAsin() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, -1.0, -0.22, 0.4, 0.1234};
+            double[] testedData = {1.0, -1.0, -0.22, 0.4, 0.1234};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::asin).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -226,7 +220,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testAcos() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {-1.0, -0.707, 0.0, 0.707, 1.0};
+            double[] testedData = {-1.0, -0.707, 0.0, 0.707, 1.0};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::acos).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -237,7 +231,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testAtan() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {-1.0, 0.0, 1.0};
+            double[] testedData = {-1.0, 0.0, 1.0};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::atan).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -248,8 +242,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testToDegrees() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData =
-                    new double[] {0, Math.PI / 2, Math.PI, 3 * Math.PI / 2, 2 * Math.PI};
+            double[] testedData = {0, Math.PI / 2, Math.PI, 3 * Math.PI / 2, 2 * Math.PI};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::toDegrees).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -260,7 +253,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testToRadians() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {0.0, 90.0, 180.0, 270.0, 360.0};
+            double[] testedData = {0.0, 90.0, 180.0, 270.0, 360.0};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::toRadians).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -271,7 +264,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testSinh() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+            double[] testedData = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::sinh).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -282,7 +275,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testCosh() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+            double[] testedData = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::cosh).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -293,7 +286,7 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testTanh() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
+            double[] testedData = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray testedND = manager.create(testedData);
             testedData = DoubleStream.of(testedData).map(Math::tanh).toArray();
             NDArray expectedND = manager.create(testedData);
@@ -304,9 +297,9 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testAsinh() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {Math.E, 10.0};
+            double[] testedData = {Math.E, 10.0};
             NDArray testedND = manager.create(testedData);
-            double[] aSinhData = new double[] {1.72538256, 2.99822295};
+            double[] aSinhData = {1.72538256, 2.99822295};
             NDArray expectedND = manager.create(aSinhData);
             Assertions.assertAlmostEquals(testedND.asinh(), expectedND);
         }
@@ -315,9 +308,9 @@ public class NDArrayNumericOpTest {
     @RunAsTest
     public void testAtanh() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] testedData = new double[] {0.0, -0.5};
+            double[] testedData = {0.0, -0.5};
             NDArray testedND = manager.create(testedData);
-            double[] aTanhData = new double[] {0.0, -0.54930614};
+            double[] aTanhData = {0.0, -0.54930614};
             NDArray expectedND = manager.create(aTanhData);
             Assertions.assertAlmostEquals(testedND.atanh(), expectedND);
         }

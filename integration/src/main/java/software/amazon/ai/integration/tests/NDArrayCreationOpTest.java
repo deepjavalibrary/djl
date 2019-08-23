@@ -27,7 +27,7 @@ import software.amazon.ai.ndarray.types.SparseFormat;
 public class NDArrayCreationOpTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", NDArrayCreationOpTest.class.getName()};
+        String[] cmd = {"-c", NDArrayCreationOpTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
@@ -37,10 +37,10 @@ public class NDArrayCreationOpTest {
     @RunAsTest
     public void testCreateCSRMatrix() throws FailedTestException {
         try (NDManager factory = NDManager.newBaseManager()) {
-            float[] input = new float[] {7, 8, 9};
+            float[] input = {7, 8, 9};
             FloatBuffer buf = FloatBuffer.wrap(input);
-            long[] indptr = new long[] {0, 2, 2, 3};
-            long[] indices = new long[] {0, 2, 1};
+            long[] indptr = {0, 2, 2, 3};
+            long[] indices = {0, 2, 1};
             NDArray nd = factory.createCSR(buf, indptr, indices, new Shape(3, 4));
             float[] array = nd.toFloatArray();
             Assertions.assertTrue(input[0] == array[0]);
@@ -53,9 +53,9 @@ public class NDArrayCreationOpTest {
     @RunAsTest
     public void testCreateRowSparseMatrix() throws FailedTestException {
         try (NDManager factory = NDManager.newBaseManager()) {
-            float[] input = new float[] {1, 2, 3, 4, 5, 6};
+            float[] input = {1, 2, 3, 4, 5, 6};
             FloatBuffer buf = FloatBuffer.wrap(input);
-            long[] indices = new long[] {0, 1, 3};
+            long[] indices = {0, 1, 3};
             NDArray nd = factory.createRowSparse(buf, new Shape(3, 2), indices, new Shape(4, 2));
             float[] array = nd.toFloatArray();
             Assertions.assertTrue(input[0] == array[0]);

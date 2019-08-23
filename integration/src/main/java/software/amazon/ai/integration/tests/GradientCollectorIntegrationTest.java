@@ -50,7 +50,7 @@ import software.amazon.ai.zoo.cv.image_classification.ResNetV1;
 public class GradientCollectorIntegrationTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", GradientCollectorIntegrationTest.class.getName()};
+        String[] cmd = {"-c", GradientCollectorIntegrationTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))

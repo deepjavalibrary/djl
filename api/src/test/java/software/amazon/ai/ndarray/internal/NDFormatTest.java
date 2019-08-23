@@ -26,7 +26,7 @@ public class NDFormatTest {
     @Test
     public void testUint8Format() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            byte[] data = new byte[] {Byte.MAX_VALUE, Byte.MIN_VALUE, 1};
+            byte[] data = {Byte.MAX_VALUE, Byte.MIN_VALUE, 1};
             NDArray array = manager.create(new Shape(3), DataType.UINT8);
             array.set(data);
 
@@ -38,7 +38,7 @@ public class NDFormatTest {
     @Test
     public void testInt8Format() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            byte[] data = new byte[] {Byte.MAX_VALUE, Byte.MIN_VALUE, 1};
+            byte[] data = {Byte.MAX_VALUE, Byte.MIN_VALUE, 1};
             NDArray array = manager.create(data);
 
             String str = NDFormat.format(array);
@@ -49,7 +49,7 @@ public class NDFormatTest {
     @Test
     public void testIntFormat() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            int[] data = new int[] {Integer.MAX_VALUE, Integer.MIN_VALUE, 1};
+            int[] data = {Integer.MAX_VALUE, Integer.MIN_VALUE, 1};
             NDArray array = manager.create(data);
 
             String str = NDFormat.format(array);
@@ -70,7 +70,7 @@ public class NDFormatTest {
     @Test
     public void testLongFormat() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            long[] data = new long[] {Long.MAX_VALUE, Long.MIN_VALUE, 1};
+            long[] data = {Long.MAX_VALUE, Long.MIN_VALUE, 1};
             NDArray array = manager.create(data);
 
             String str = NDFormat.format(array);
@@ -86,8 +86,7 @@ public class NDFormatTest {
     @Test
     public void testFloat64Format() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            double[] data =
-                    new double[] {Double.NEGATIVE_INFINITY, Double.MAX_VALUE, Double.NaN, -1};
+            double[] data = {Double.NEGATIVE_INFINITY, Double.MAX_VALUE, Double.NaN, -1};
             NDArray array = manager.create(data);
 
             String str = NDFormat.format(array);

@@ -40,7 +40,7 @@ public class OptimizerTest {
     private static final int CHANNELS = 10;
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", OptimizerTest.class.getName()};
+        String[] cmd = {"-c", OptimizerTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))

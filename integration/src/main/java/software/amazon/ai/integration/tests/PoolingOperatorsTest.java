@@ -26,7 +26,7 @@ import software.amazon.ai.nn.pooling.Pool;
 public class PoolingOperatorsTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", PoolingOperatorsTest.class.getName()};
+        String[] cmd = {"-c", PoolingOperatorsTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))

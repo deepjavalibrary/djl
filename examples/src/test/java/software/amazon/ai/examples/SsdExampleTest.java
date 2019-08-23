@@ -23,17 +23,9 @@ public class SsdExampleTest {
 
     @Test
     public void testSsdExample() {
-        String[] args =
-                new String[] {
-                    "-n",
-                    MODEL_NAME,
-                    "-i",
-                    "src/test/resources/3dogs.jpg",
-                    "-c",
-                    "1",
-                    "-l",
-                    "build/logs"
-                };
+        String[] args = {
+            "-n", MODEL_NAME, "-i", "src/test/resources/3dogs.jpg", "-c", "1", "-l", "build/logs"
+        };
         Assert.assertTrue(new SsdExample().runExample(args));
         DetectedObject result = (DetectedObject) AbstractExample.getPredictResult();
         Assert.assertEquals(result.getClassName(), "dog");

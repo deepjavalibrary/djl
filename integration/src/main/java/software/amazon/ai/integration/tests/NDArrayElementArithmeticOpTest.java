@@ -27,7 +27,7 @@ import software.amazon.ai.training.Gradient;
 public class NDArrayElementArithmeticOpTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", NDArrayElementArithmeticOpTest.class.getName()};
+        String[] cmd = {"-c", NDArrayElementArithmeticOpTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
@@ -86,12 +86,11 @@ public class NDArrayElementArithmeticOpTest {
             NDArray solution = manager.create(new float[] {3f, 5f, 7f, 9f}, new Shape(1, 4));
             Assertions.assertEquals(solution, result, "Incorrect value in summed array");
 
-            NDArray[] toAddAll =
-                    new NDArray[] {
-                        manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
-                        manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2)),
-                        manager.create(new float[] {2, 2, 2, 2}, new Shape(2, 2))
-                    };
+            NDArray[] toAddAll = {
+                manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
+                manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2)),
+                manager.create(new float[] {2, 2, 2, 2}, new Shape(2, 2))
+            };
             NDArray addAll = NDArrays.add(toAddAll);
             Assertions.assertFalse(
                     addAll.equals(toAddAll[0]), "None in-place operator returned in-place result");
@@ -110,12 +109,11 @@ public class NDArrayElementArithmeticOpTest {
             NDArray solution = manager.create(new float[] {3f, 5f, 7f, 9f}, new Shape(1, 4));
             Assertions.assertEquals(solution, result, "Incorrect value in summed array");
 
-            NDArray[] toAddAll =
-                    new NDArray[] {
-                        manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
-                        manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2)),
-                        manager.create(new float[] {2, 2, 2, 2}, new Shape(2, 2))
-                    };
+            NDArray[] toAddAll = {
+                manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
+                manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2)),
+                manager.create(new float[] {2, 2, 2, 2}, new Shape(2, 2))
+            };
             NDArray addAll = NDArrays.addi(toAddAll);
             Assertions.assertTrue(addAll.equals(toAddAll[0]), "In-place summation failed");
             NDArray addAllResult = manager.create(new float[] {7, 7, 7, 7}, new Shape(2, 2));
@@ -247,12 +245,11 @@ public class NDArrayElementArithmeticOpTest {
                     inPlaceResult,
                     "Element wise multiplication: In-place operation failed");
 
-            NDArray[] toMulAll =
-                    new NDArray[] {
-                        manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
-                        manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2)),
-                        manager.create(new float[] {2, 2, 2, 2}, new Shape(2, 2))
-                    };
+            NDArray[] toMulAll = {
+                manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
+                manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2)),
+                manager.create(new float[] {2, 2, 2, 2}, new Shape(2, 2))
+            };
             NDArray mulAll = NDArrays.mul(toMulAll);
             NDArray mulAllInPlace = NDArrays.muli(toMulAll);
             Assertions.assertFalse(

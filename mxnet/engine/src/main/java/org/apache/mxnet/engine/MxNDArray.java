@@ -237,7 +237,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getGradient() throws NullPointerException {
+    public NDArray getGradient() {
         Pointer pointer = JnaUtils.getGradient(getHandle());
         if (pointer == null) {
             throw new NullPointerException(
@@ -354,7 +354,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void setScalar(NDIndex index, Number value) throws IllegalArgumentException {
+    public void setScalar(NDIndex index, Number value) {
         Optional<NDIndexFullSlice> hasFullSlice = index.getAsFullSlice(getShape());
         if (hasFullSlice.isPresent()) {
             if (hasFullSlice.get().getShape().size() != 1) {
@@ -1499,7 +1499,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return mxNDArrayEx;
     }
 
-    private long[] repeatsToMatchShape(Shape desiredShape) throws IllegalArgumentException {
+    private long[] repeatsToMatchShape(Shape desiredShape) {
         Shape curShape = getShape();
         int dimension = curShape.dimension();
         if (desiredShape.dimension() > dimension) {

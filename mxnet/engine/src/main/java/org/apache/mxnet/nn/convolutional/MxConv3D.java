@@ -27,14 +27,9 @@ import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 public class MxConv3D extends MxNNBlock implements Conv3D {
-    private static final LayoutType[] EXPECTED_LAYOUT =
-            new LayoutType[] {
-                LayoutType.BATCH,
-                LayoutType.CHANNEL,
-                LayoutType.DEPTH,
-                LayoutType.HEIGHT,
-                LayoutType.WIDTH
-            };
+    private static final LayoutType[] EXPECTED_LAYOUT = {
+        LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.DEPTH, LayoutType.HEIGHT, LayoutType.WIDTH
+    };
     private static final String LAYOUT_STRING = "NCDHW";
     private Shape kernel;
     private Shape stride;

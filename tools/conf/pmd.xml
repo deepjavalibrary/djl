@@ -363,6 +363,7 @@
         <exclude name="ShortVariable"/>
         <exclude name="UnnecessaryModifier"/>
         <exclude name="UselessParentheses"/>
+        <exclude name="UseUnderscoresInNumericLiterals"/>
         <exclude name="VariableNamingConventions"/>
     </rule>
 

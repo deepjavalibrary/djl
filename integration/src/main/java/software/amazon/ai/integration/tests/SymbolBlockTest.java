@@ -43,7 +43,7 @@ import software.amazon.ai.util.Pair;
 
 public class SymbolBlockTest {
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", SymbolBlockTest.class.getName()};
+        String[] cmd = {"-c", SymbolBlockTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))

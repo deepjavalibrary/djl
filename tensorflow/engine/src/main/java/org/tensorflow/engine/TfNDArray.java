@@ -149,7 +149,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getGradient() throws NullPointerException {
+    public NDArray getGradient() {
         return null;
     }
 
@@ -175,7 +175,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void setScalar(NDIndex index, Number value) throws IllegalArgumentException {}
+    public void setScalar(NDIndex index, Number value) {}
 
     /** {@inheritDoc} */
     @Override
@@ -724,7 +724,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int sections, int axis) throws IllegalArgumentException {
+    public NDList split(int sections, int axis) {
         if (axis < 0 || axis > getShape().dimension()) {
             throw new IllegalArgumentException("Invalid axis value");
         }

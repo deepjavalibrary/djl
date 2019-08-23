@@ -23,7 +23,7 @@ public interface Dropout extends Block {
     final class Builder {
 
         private float probability = 0.5f;
-        private int[] sharedAxes = new int[] {};
+        private int[] sharedAxes = {};
 
         public Builder setProbability(float probability) {
             this.probability = probability;

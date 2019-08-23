@@ -160,7 +160,7 @@ public interface NDArray extends AutoCloseable {
      * @return the gradient {@code NDArray}
      * @throws NullPointerException when gradient is not initialized
      */
-    NDArray getGradient() throws NullPointerException;
+    NDArray getGradient();
 
     /**
      * Returns the encoding format of the NDArray, or null.
@@ -408,7 +408,7 @@ public interface NDArray extends AutoCloseable {
      * @param value The value to replace with
      * @throws IllegalArgumentException Thrown if the index does not correspond to a single element
      */
-    void setScalar(NDIndex index, Number value) throws IllegalArgumentException;
+    void setScalar(NDIndex index, Number value);
 
     /**
      * Returns a partial {@code NDArray}.

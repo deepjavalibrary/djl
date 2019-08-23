@@ -110,7 +110,7 @@ public class MockNDArray implements NDArray {
     public void attachGradient() {}
 
     @Override
-    public NDArray getGradient() throws NullPointerException {
+    public NDArray getGradient() {
         return null;
     }
 

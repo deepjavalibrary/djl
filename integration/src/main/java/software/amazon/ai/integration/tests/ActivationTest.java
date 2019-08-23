@@ -27,7 +27,7 @@ import software.amazon.ai.training.initializer.Initializer;
 public class ActivationTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", ActivationTest.class.getName()};
+        String[] cmd = {"-c", ActivationTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))

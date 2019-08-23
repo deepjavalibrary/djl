@@ -28,8 +28,9 @@ import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.util.PairList;
 
 public class MxLSTM extends MxNNBlock implements LSTM {
-    private static final LayoutType[] EXPECTED_LAYOUT =
-            new LayoutType[] {LayoutType.TIME, LayoutType.BATCH, LayoutType.CHANNEL};
+    private static final LayoutType[] EXPECTED_LAYOUT = {
+        LayoutType.TIME, LayoutType.BATCH, LayoutType.CHANNEL
+    };
     private long stateSize;
     private float dropRate;
     private double lstmStateClipMin;

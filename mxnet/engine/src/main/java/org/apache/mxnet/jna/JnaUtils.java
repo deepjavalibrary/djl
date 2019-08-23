@@ -109,7 +109,7 @@ public final class JnaUtils {
 
     private static FunctionInfo getFunctionByName(
             String name, String functionName, Pointer handle) {
-        String[] nameRef = new String[] {name};
+        String[] nameRef = {name};
         String[] description = new String[1];
         IntBuffer numArgs = IntBuffer.allocate(1);
         PointerByReference argNameRef = new PointerByReference();
@@ -1589,10 +1589,8 @@ public final class JnaUtils {
 
         // Creating CachedOp
         // static_alloc and static_shape are enabled by default
-        String[] keys =
-                new String[] {"data_indices", "param_indices", "static_alloc", "static_shape"};
-        String[] values =
-                new String[] {inputs.values().toString(), Arrays.toString(paramIndices), "1", "1"};
+        String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
+        String[] values = {inputs.values().toString(), Arrays.toString(paramIndices), "1", "1"};
 
         Pointer symbolHandle = symbol.getHandle();
         PointerByReference ref = new PointerByReference();

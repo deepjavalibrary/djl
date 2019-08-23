@@ -27,7 +27,7 @@ import software.amazon.ai.ndarray.types.Shape;
 public class NDArrayShapesManipulationOpTest {
 
     public static void main(String[] args) {
-        String[] cmd = new String[] {"-c", NDArrayShapesManipulationOpTest.class.getName()};
+        String[] cmd = {"-c", NDArrayShapesManipulationOpTest.class.getName()};
         new IntegrationTest()
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
