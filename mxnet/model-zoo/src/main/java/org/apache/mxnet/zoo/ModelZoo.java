@@ -17,6 +17,7 @@ import org.apache.mxnet.zoo.cv.image_classification.Resnext;
 import org.apache.mxnet.zoo.cv.image_classification.SeResnext;
 import org.apache.mxnet.zoo.cv.image_classification.Senet;
 import org.apache.mxnet.zoo.cv.objectdetection.SingleShotDetection;
+import org.apache.mxnet.zoo.cv.pose_estimation.SimplePoseModel;
 import software.amazon.ai.repository.Repository;
 
 public interface ModelZoo {
@@ -30,4 +31,5 @@ public interface ModelZoo {
     Resnext RESNEXT = new Resnext(REPOSITORY);
     Senet SENET = new Senet(REPOSITORY);
     SeResnext SE_RESNEXT = new SeResnext(REPOSITORY);
+    SimplePoseModel SIMPLE_POSE = new SimplePoseModel(REPOSITORY);
 }
