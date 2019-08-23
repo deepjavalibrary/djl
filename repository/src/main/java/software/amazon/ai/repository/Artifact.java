@@ -172,7 +172,7 @@ public class Artifact {
         public String getType() {
             if (type == null) {
                 getExtension();
-                if ("tgz".equals(extension) || "tar".equals(extension)) {
+                if ("zip".equals(extension)) {
                     type = "dir";
                 } else {
                     type = "file";
@@ -196,9 +196,11 @@ public class Artifact {
                     } else {
                         name = uri;
                     }
-                    pos = name.lastIndexOf('.');
-                    if (pos > 0) {
-                        name = name.substring(0, pos);
+                    if (name.endsWith(".z") || name.endsWith(".gz") || name.endsWith(".zip")) {
+                        pos = name.lastIndexOf('.');
+                        if (pos > 0) {
+                            name = name.substring(0, pos);
+                        }
                     }
                 }
             }
@@ -211,11 +213,7 @@ public class Artifact {
 
         public String getExtension() {
             if (extension == null) {
-                if (uri.endsWith(".tar.gz") || uri.endsWith(".tgz") || uri.endsWith(".tar.z")) {
-                    extension = "tgz";
-                } else if (uri.endsWith(".tar")) {
-                    extension = "tar";
-                } else if (uri.endsWith(".zip")) {
+                if (uri.endsWith(".zip")) {
                     extension = "zip";
                 } else if (uri.endsWith(".gz") || uri.endsWith(".z")) {
                     extension = "gzip";

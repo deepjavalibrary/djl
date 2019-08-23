@@ -25,18 +25,15 @@
       "files": {
         "synset": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/synset.txt",
-          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
-          "name": "synset.txt"
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2"
         },
         "symbol": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/se_resnext/0.0.1/se_resnext101_32x4d-symbol.json",
-          "sha1Hash": "a2dd662c3b849e63977bfb83b7b317528726535c",
-          "name": "se_resnext101_32x4d-symbol.json"
+          "sha1Hash": "a2dd662c3b849e63977bfb83b7b317528726535c"
         },
         "parameters": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/image_classification/org/apache/mxnet/se_resnext/0.0.1/se_resnext101_32x4d-0000.params.gz",
-          "sha1Hash": "66678545f940331f7cbd1b11ceea89ec8bd1655c",
-          "name": "se_resnext101_32x4d-0000.params"
+          "sha1Hash": "66678545f940331f7cbd1b11ceea89ec8bd1655c"
         }
       }
     },

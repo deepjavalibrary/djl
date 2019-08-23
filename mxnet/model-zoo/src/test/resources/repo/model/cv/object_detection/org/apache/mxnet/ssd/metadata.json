@@ -35,9 +35,8 @@
           "name": "ssd_512_resnet50_v1_voc-symbol.json"
         },
         "parameters": {
-          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/object_detection/org/apache/mxnet/ssd/0.0.2/ssd_512_resnet50_v1_voc-0000.params.zip",
-          "sha1Hash": "9c8b225a552614e4284a0f647331bfdc6940eb4a",
-          "name": "ssd_512_resnet50_v1_voc-0000.params"
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/object_detection/org/apache/mxnet/ssd/0.0.2/ssd_512_resnet50_v1_voc-0000.params.gz",
+          "sha1Hash": "9c8b225a552614e4284a0f647331bfdc6940eb4a"
         }
       }
     },
@@ -58,14 +57,13 @@
           "name": "classes.txt"
         },
         "symbol": {
-          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/object_detection/org/apache/mxnet/ssd/0.0.2/ssd_512_vgg16_atrous_coco-symbol.json",
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/object_detection/org/apache/mxnet/ssd/0.0.2/ssd_512_vgg16_atrous-symbol.json",
           "sha1Hash": "ec2aca103ae9c43dc34da66e52ba491ee1bf9648",
           "name": "ssd_512_vgg16_atrous_coco-symbol.json"
         },
         "parameters": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/object_detection/org/apache/mxnet/ssd/0.0.2/ssd_512_vgg16_atrous_coco-0000.params.gz",
-          "sha1Hash": "491ed6ac57d252bee0721744176cdab93b6f8296",
-          "name": "ssd_512_vgg16_atrous_coco-0000.params"
+          "sha1Hash": "491ed6ac57d252bee0721744176cdab93b6f8296"
         }
       }
     }
