@@ -16,9 +16,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import org.apache.mxnet.dataset.Cifar10;
+import org.apache.mxnet.dataset.SimpleDataset;
+import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -32,6 +38,7 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.BatchSampler;
+import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.dataset.SequenceSampler;
@@ -228,6 +235,44 @@ public class DatasetTest {
                     }
                     index += 15;
                 }
+            }
+        }
+    }
+    // this is just to demonstrate how multithreading dataloader will look like
+    // @RunAsTest
+    public void testMultithreading() throws FailedTestException, IOException, InterruptedException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            ExecutorService executor =
+                    Executors.newFixedThreadPool(
+                            2,
+                            r ->
+                                    new Thread( // NOPMD
+                                            () -> {
+                                                // TODO current setNumpyMode flag is thread local
+                                                // so need to set it everytime we launch the thread
+                                                JnaUtils.setNumpyMode(true);
+                                                r.run();
+                                            }));
+            SimpleDataset cifar10 =
+                    new Cifar10.Builder()
+                            .setManager(manager)
+                            .optConfig(
+                                    new DataLoadingConfiguration.Builder()
+                                            .setExcutor(executor)
+                                            .build())
+                            .setSampling(100)
+                            .build();
+
+            cifar10.prepare();
+            try (Trainer<NDArray, NDArray, NDArray> trainer =
+                    Trainer.newInstance(
+                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
+                for (Record record : trainer.trainDataset(cifar10)) {
+                    record.close();
+                }
+                // user have to shutdown the executor
+                executor.shutdown();
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
             }
         }
     }

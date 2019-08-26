@@ -21,6 +21,7 @@ import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.DataIterable;
+import software.amazon.ai.training.dataset.MultithreadingDataIterable;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.translate.TrainTranslator;
@@ -77,7 +78,11 @@ public abstract class SimpleDataset extends RandomAccessDataset<NDArray, NDArray
         if (!prepared) {
             throw new IllegalStateException("please call prepare() before using the dataser");
         }
-        return new DataIterable<>(this, trainer, sampler, config);
+        if (config.getExecutor() != null) {
+            return new MultithreadingDataIterable<>(this, trainer, sampler, config);
+        } else {
+            return new DataIterable<>(this, trainer, sampler, config);
+        }
     }
 
     public NDManager getManager() {

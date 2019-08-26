@@ -12,26 +12,28 @@
  */
 package software.amazon.ai.training.dataset;
 
+import java.util.concurrent.ExecutorService;
+
 /**
  * DataLoadingConfiguration is used to build data loading configuration. It allows users to
  * customize loading order, automatic batching and optimize performance with multi-thread and memory
  * pining.
  */
 public final class DataLoadingConfiguration {
-    private int numWorkers;
+    private ExecutorService executor;
     private Batchifier batchifier;
     private boolean pinMemory;
     private boolean dropLast;
 
     private DataLoadingConfiguration(Builder builder) {
-        this.numWorkers = builder.numWorkers;
+        this.executor = builder.executor;
         this.batchifier = builder.batchifier;
         this.pinMemory = builder.pinMemory;
         this.dropLast = builder.dropLast;
     }
 
-    public int getNumWorkers() {
-        return numWorkers;
+    public ExecutorService getExecutor() {
+        return executor;
     }
 
     public Batchifier getBatchifier() {
@@ -47,19 +49,18 @@ public final class DataLoadingConfiguration {
     }
 
     public static final class Builder {
-        private int numWorkers;
+        private ExecutorService executor;
         private Batchifier batchifier;
         private boolean pinMemory;
         private boolean dropLast;
 
         public Builder() {
-            this.numWorkers = 0;
             this.pinMemory = false;
             this.dropLast = false;
         }
 
-        public Builder setNumWorkers(int workers) {
-            this.numWorkers = workers;
+        public Builder setExcutor(ExecutorService executor) {
+            this.executor = executor;
             return this;
         }
 

@@ -47,7 +47,6 @@ public class DataIterable<I, L> implements Iterable<Record> {
         private RandomAccessDataset<I, L> dataset;
         private Trainer<I, L, ?> trainer;
         private Iterator<List<Long>> sample;
-        private int numWorkers;
         private Batchifier batchifier;
         private boolean pinMemory;
 
@@ -59,13 +58,8 @@ public class DataIterable<I, L> implements Iterable<Record> {
             this.dataset = dataset;
             this.trainer = trainer;
             this.sample = sampler.sample(trainer, dataset);
-            this.numWorkers = config.getNumWorkers();
             this.batchifier = config.getBatchifier();
             this.pinMemory = config.getPinMemory();
-
-            if (numWorkers > 0) {
-                throw new UnsupportedOperationException("Multi-threading is not support yet");
-            }
 
             if (pinMemory) {
                 throw new UnsupportedOperationException("pin memory is not support yet");
