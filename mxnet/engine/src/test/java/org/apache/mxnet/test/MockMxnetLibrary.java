@@ -692,9 +692,28 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXNDArraySlice64(
+            Pointer handle, long slice_begin, long slice_end, PointerByReference out) {
+        if (functions.containsKey("MXNDArraySlice64")) {
+            return functions
+                    .get("MXNDArraySlice64")
+                    .apply(new Object[] {handle, slice_begin, slice_end, out});
+        }
+        return 0;
+    }
+
+    @Override
     public int MXNDArrayAt(Pointer handle, int idx, PointerByReference out) {
         if (functions.containsKey("MXNDArrayAt")) {
             return functions.get("MXNDArrayAt").apply(new Object[] {handle, idx, out});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXNDArrayAt64(Pointer handle, long idx, PointerByReference out) {
+        if (functions.containsKey("MXNDArrayAt64")) {
+            return functions.get("MXNDArrayAt64").apply(new Object[] {handle, idx, out});
         }
         return 0;
     }
@@ -929,14 +948,6 @@ public class MockMxnetLibrary implements MxnetLibrary {
     public int MXListFunctions(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("MXListFunctions")) {
             return functions.get("MXListFunctions").apply(new Object[] {out_size, out_array});
-        }
-        return 0;
-    }
-
-    @Override
-    public int MXListFunctions64(LongBuffer out_size, PointerByReference out_array) {
-        if (functions.containsKey("MXListFunctions64")) {
-            return functions.get("MXListFunctions64").apply(new Object[] {out_size, out_array});
         }
         return 0;
     }
@@ -1322,37 +1333,10 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
-    public int MXListAllOpNames64(LongBuffer out_size, PointerByReference out_array) {
-        if (functions.containsKey("MXListAllOpNames64")) {
-            return functions.get("MXListAllOpNames64").apply(new Object[] {out_size, out_array});
-        }
-
-        PointerArray pa =
-                new PointerArray(
-                        TestHelper.toPointer("softmax"),
-                        TestHelper.toPointer("_copyto"),
-                        TestHelper.toPointer("_np_zeros_like"));
-        out_size.put(0, 3);
-        out_array.setValue(pa);
-        return 0;
-    }
-
-    @Override
     public int MXSymbolListAtomicSymbolCreators(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("MXSymbolListAtomicSymbolCreators")) {
             return functions
                     .get("MXSymbolListAtomicSymbolCreators")
-                    .apply(new Object[] {out_size, out_array});
-        }
-        return 0;
-    }
-
-    @Override
-    public int MXSymbolListAtomicSymbolCreators64(
-            LongBuffer out_size, PointerByReference out_array) {
-        if (functions.containsKey("MXSymbolListAtomicSymbolCreators64")) {
-            return functions
-                    .get("MXSymbolListAtomicSymbolCreators64")
                     .apply(new Object[] {out_size, out_array});
         }
         return 0;
@@ -1569,33 +1553,11 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
-    public int MXSymbolListArguments64(
-            Pointer symbol, NativeSizeByReference out_size, PointerByReference out_str_array) {
-        if (functions.containsKey("MXSymbolListArguments64")) {
-            return functions
-                    .get("MXSymbolListArguments64")
-                    .apply(new Object[] {symbol, out_size, out_str_array});
-        }
-        return 0;
-    }
-
-    @Override
     public int MXSymbolListOutputs(
             Pointer symbol, IntBuffer out_size, PointerByReference out_str_array) {
         if (functions.containsKey("MXSymbolListOutputs")) {
             return functions
                     .get("MXSymbolListOutputs")
-                    .apply(new Object[] {symbol, out_size, out_str_array});
-        }
-        return 0;
-    }
-
-    @Override
-    public int MXSymbolListOutputs64(
-            Pointer symbol, NativeSizeByReference out_size, PointerByReference out_str_array) {
-        if (functions.containsKey("MXSymbolListOutputs64")) {
-            return functions
-                    .get("MXSymbolListOutputs64")
                     .apply(new Object[] {symbol, out_size, out_str_array});
         }
         return 0;
@@ -1641,17 +1603,6 @@ public class MockMxnetLibrary implements MxnetLibrary {
         if (functions.containsKey("MXSymbolListAuxiliaryStates")) {
             return functions
                     .get("MXSymbolListAuxiliaryStates")
-                    .apply(new Object[] {symbol, out_size, out_str_array});
-        }
-        return 0;
-    }
-
-    @Override
-    public int MXSymbolListAuxiliaryStates64(
-            Pointer symbol, NativeSizeByReference out_size, PointerByReference out_str_array) {
-        if (functions.containsKey("MXSymbolListAuxiliaryStates64")) {
-            return functions
-                    .get("MXSymbolListAuxiliaryStates64")
                     .apply(new Object[] {symbol, out_size, out_str_array});
         }
         return 0;
@@ -2084,8 +2035,11 @@ public class MockMxnetLibrary implements MxnetLibrary {
     public int MXQuantizeSymbol(
             Pointer sym_handle,
             PointerByReference ret_sym_handle,
-            int num_excluded_symbols,
-            String[] excluded_symbols,
+            int[] dev_type,
+            int num_excluded_sym_names,
+            String[] excluded_sym_names,
+            int num_excluded_op_names,
+            String[] excluded_op_names,
             int num_offline,
             String[] offline_params,
             String quantized_dtype,
@@ -2097,8 +2051,11 @@ public class MockMxnetLibrary implements MxnetLibrary {
                             new Object[] {
                                 sym_handle,
                                 ret_sym_handle,
-                                num_excluded_symbols,
-                                excluded_symbols,
+                                dev_type,
+                                num_excluded_sym_names,
+                                excluded_sym_names,
+                                num_excluded_op_names,
+                                excluded_op_names,
                                 num_offline,
                                 offline_params,
                                 quantized_dtype,
