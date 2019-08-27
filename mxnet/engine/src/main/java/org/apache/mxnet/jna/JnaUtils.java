@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
@@ -374,7 +375,6 @@ public final class JnaUtils {
                 ndList.add(manager.create(handle));
             }
         } else {
-            assert namesRef.getValue() != null;
             String[] names = namesRef.getValue().getStringArray(0, nameCount);
             for (int i = 0; i < ndArrayCount; i++) {
                 ndList.add(names[i], manager.create(handles[i]));
@@ -388,8 +388,8 @@ public final class JnaUtils {
         handlesSize.put(ndList.size());
         boolean namesProvided =
                 StreamSupport.stream(ndList.spliterator(), false)
-                        .map((Pair<String, NDArray> x) -> x.getKey())
-                        .allMatch((String x) -> x != null);
+                        .map(Pair::getKey)
+                        .allMatch(Objects::nonNull);
         Pointer[] handles =
                 StreamSupport.stream(ndList.spliterator(), false)
                         .map(
@@ -400,7 +400,7 @@ public final class JnaUtils {
                         .toArray(Pointer[]::new);
         String[] names =
                 StreamSupport.stream(ndList.spliterator(), false)
-                        .map((Pair<String, NDArray> x) -> x.getKey())
+                        .map(Pair::getKey)
                         .toArray(String[]::new);
         if (!namesProvided) {
             names = null;

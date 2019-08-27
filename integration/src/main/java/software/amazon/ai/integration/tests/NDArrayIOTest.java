@@ -27,8 +27,8 @@ import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 
-@SuppressWarnings("PMD.UseProperClassLoader")
 public class NDArrayIOTest {
+
     public static void main(String[] args) {
         String[] cmd = {"-c", NDArrayIOTest.class.getName()};
         new IntegrationTest().runTests(cmd);
@@ -39,17 +39,9 @@ public class NDArrayIOTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             ((MxEngine) Engine.getInstance()).setNumpyMode(false);
             Path arraysDictPath =
-                    Paths.get(
-                            this.getClass()
-                                    .getClassLoader()
-                                    .getResource("two_arrays_dict")
-                                    .toURI());
+                    Paths.get(NDArrayIOTest.class.getResource("/two_arrays_dict").toURI());
             Path arraysListPath =
-                    Paths.get(
-                            this.getClass()
-                                    .getClassLoader()
-                                    .getResource("two_arrays_list")
-                                    .toURI());
+                    Paths.get(NDArrayIOTest.class.getResource("/two_arrays_list").toURI());
             NDList arraysDict = manager.load(arraysDictPath);
             NDList arraysList = manager.load(arraysListPath);
             Assertions.assertTrue(arraysDict.size() == 2);
@@ -58,9 +50,10 @@ public class NDArrayIOTest {
             Assertions.assertTrue(arraysList.size() == 2);
             Assertions.assertTrue(arraysList.getWithTag(0).getKey() == null);
             Assertions.assertTrue(arraysList.getWithTag(1).getKey() == null);
-            ((MxEngine) Engine.getInstance()).setNumpyMode(true);
         } catch (URISyntaxException e) {
             throw new FailedTestException("URI parsing failed for test resources.", e);
+        } finally {
+            ((MxEngine) Engine.getInstance()).setNumpyMode(true);
         }
     }
 
@@ -73,10 +66,10 @@ public class NDArrayIOTest {
             NDList ndList = new NDList(size);
             IntStream.range(0, size)
                     .forEach(
-                            (int x) -> {
-                                ndList.add(
-                                        String.format("array %d", x), manager.arange(arangeStop));
-                            });
+                            (int x) ->
+                                    ndList.add(
+                                            String.format("array %d", x),
+                                            manager.arange(arangeStop)));
             manager.save(tmpfileNames.toPath(), ndList);
             NDList readNdList = manager.load(tmpfileNames.toPath());
             Assertions.assertEquals(ndList, readNdList);
@@ -93,11 +86,7 @@ public class NDArrayIOTest {
             int size = 10;
             int arangeStop = 25;
             NDList ndList = new NDList(size);
-            IntStream.range(0, size)
-                    .forEach(
-                            (int x) -> {
-                                ndList.add(manager.arange(arangeStop));
-                            });
+            IntStream.range(0, size).forEach((int x) -> ndList.add(manager.arange(arangeStop)));
             manager.save(tmpfileNames.toPath(), ndList);
             NDList readNdList = manager.load(tmpfileNames.toPath());
             Assertions.assertEquals(ndList, readNdList);
