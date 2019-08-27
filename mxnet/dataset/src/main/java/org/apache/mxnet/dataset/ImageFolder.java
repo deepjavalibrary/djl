@@ -17,14 +17,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.engine.MxImages;
+import org.apache.mxnet.engine.MxImages.Flag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
-import software.amazon.ai.training.dataset.Sampler;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -41,23 +40,13 @@ public final class ImageFolder extends RandomAccessDataset<NDList, NDList> {
     private List<String> synsets;
     private PairList<String, Integer> items;
 
-    public ImageFolder(
-            NDManager manager, String root, Sampler sampler, DataLoadingConfiguration config) {
-        this(manager, root, MxImages.Flag.COLOR, sampler, config);
-    }
-
-    public ImageFolder(
-            NDManager manager,
-            String root,
-            MxImages.Flag flag,
-            Sampler sampler,
-            DataLoadingConfiguration config) {
-        super(sampler, config);
-        this.manager = manager;
-        this.flag = flag;
+    public ImageFolder(Builder builder) {
+        super(builder);
+        this.manager = builder.getManager();
+        this.flag = builder.getFlag();
         this.synsets = new ArrayList<>();
         this.items = new PairList<>();
-        listImage(root);
+        listImage(builder.getRoot());
     }
 
     @Override
@@ -100,6 +89,49 @@ public final class ImageFolder extends RandomAccessDataset<NDList, NDList> {
                     logger.warn("ImageIO didn't support {} Ignoring... ", image.getName());
                 }
             }
+        }
+    }
+
+    public static class Builder extends RandomAccessDataset.BaseBuilder<Builder> {
+
+        private NDManager manager;
+        private MxImages.Flag flag = Flag.COLOR;
+        private String root;
+
+        public NDManager getManager() {
+            return manager;
+        }
+
+        public Builder setManager(NDManager manager) {
+            this.manager = manager;
+            return this;
+        }
+
+        public Flag getFlag() {
+            return flag;
+        }
+
+        public Builder optFlag(Flag flag) {
+            this.flag = flag;
+            return this;
+        }
+
+        public String getRoot() {
+            return root;
+        }
+
+        public Builder setRoot(String root) {
+            this.root = root;
+            return this;
+        }
+
+        @Override
+        public Builder self() {
+            return this;
+        }
+
+        public ImageFolder build() {
+            return new ImageFolder(this);
         }
     }
 }

@@ -20,10 +20,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.dataset.BatchSampler;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
-import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.RandomSampler;
+import software.amazon.ai.training.dataset.Dataset.Usage;
 import software.amazon.ai.training.dataset.Record;
 
 public class Cifar10Test {
@@ -32,13 +29,14 @@ public class Cifar10Test {
     public void testCifar10Local() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
-            SimpleDataset cifar10 =
-                    new Cifar10(
-                            manager,
-                            repository,
-                            Dataset.Usage.TEST,
-                            new BatchSampler(new RandomSampler(), 32),
-                            new DataLoadingConfiguration.Builder().build());
+            Cifar10 cifar10 =
+                    new Cifar10.Builder()
+                            .setManager(manager)
+                            .setUsage(Usage.TEST)
+                            .optRepository(repository)
+                            .setSampling(32)
+                            .build();
+
             cifar10.prepare();
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     Trainer.newInstance(
@@ -54,12 +52,13 @@ public class Cifar10Test {
     @Test
     public void testCifar10Remote() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            SimpleDataset cifar10 =
-                    new Cifar10(
-                            manager,
-                            Dataset.Usage.TEST,
-                            new BatchSampler(new RandomSampler(), 32),
-                            new DataLoadingConfiguration.Builder().build());
+            Cifar10 cifar10 =
+                    new Cifar10.Builder()
+                            .setManager(manager)
+                            .setUsage(Usage.TEST)
+                            .setSampling(32)
+                            .build();
+
             cifar10.prepare();
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     Trainer.newInstance(

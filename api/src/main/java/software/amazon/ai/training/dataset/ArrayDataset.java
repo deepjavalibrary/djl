@@ -41,22 +41,11 @@ public final class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
     private final NDArray[] data;
     private final NDArray[] labels;
 
-    public ArrayDataset(NDArray data, Sampler sampler, DataLoadingConfiguration config) {
-        this(new NDArray[] {data}, sampler, config);
-    }
+    public ArrayDataset(Builder builder) {
+        super(builder);
+        data = builder.getData();
+        labels = builder.getLabels();
 
-    public ArrayDataset(NDArray[] data, Sampler sampler, DataLoadingConfiguration config) {
-        this(data, null, sampler, config);
-    }
-
-    public ArrayDataset(
-            NDArray data, NDArray labels, Sampler sampler, DataLoadingConfiguration config) {
-        this(new NDArray[] {data}, new NDArray[] {labels}, sampler, config);
-    }
-
-    public ArrayDataset(
-            NDArray[] data, NDArray[] labels, Sampler sampler, DataLoadingConfiguration config) {
-        super(sampler, config);
         if (data != null && data.length != 0) {
             size = data[0].size(0);
         } else if (labels != null && labels.length != 0) {
@@ -71,8 +60,6 @@ public final class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
         if (labels != null && Stream.of(labels).anyMatch(array -> array.size(0) != size)) {
             throw new IllegalArgumentException("All the NDArray must have the same length!");
         }
-        this.data = data;
-        this.labels = labels;
     }
 
     @Override
@@ -106,6 +93,49 @@ public final class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
         public Record processInput(TranslatorContext ctx, NDList input, NDList label)
                 throws Exception {
             return new Record(input, label);
+        }
+    }
+
+    public static class Builder extends RandomAccessDataset.BaseBuilder<Builder> {
+
+        private NDArray[] data;
+        private NDArray[] labels;
+
+        public NDArray[] getData() {
+            return data;
+        }
+
+        public Builder setData(NDArray data) {
+            this.data = new NDArray[] {data};
+            return this;
+        }
+
+        public Builder setData(NDArray[] data) {
+            this.data = data;
+            return this;
+        }
+
+        public NDArray[] getLabels() {
+            return labels;
+        }
+
+        public Builder optLabels(NDArray labels) {
+            this.labels = new NDArray[] {labels};
+            return this;
+        }
+
+        public Builder optLabels(NDArray[] labels) {
+            this.labels = labels;
+            return this;
+        }
+
+        @Override
+        public Builder self() {
+            return this;
+        }
+
+        public ArrayDataset build() {
+            return new ArrayDataset(this);
         }
     }
 }

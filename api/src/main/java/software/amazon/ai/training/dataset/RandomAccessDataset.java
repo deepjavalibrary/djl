@@ -26,9 +26,9 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
     protected Sampler sampler;
     protected DataLoadingConfiguration config;
 
-    public RandomAccessDataset(Sampler sampler, DataLoadingConfiguration config) {
-        this.sampler = sampler;
-        this.config = config;
+    public RandomAccessDataset(BaseBuilder<?> builder) {
+        this.sampler = builder.getSampler();
+        this.config = builder.getConfig();
     }
 
     public abstract Pair<I, L> get(long index);
@@ -40,5 +40,53 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
 
     public long size() {
         return size;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public abstract static class BaseBuilder<B extends BaseBuilder> {
+
+        private Sampler sampler;
+        private DataLoadingConfiguration config;
+
+        public Sampler getSampler() {
+            if (sampler == null) {
+                throw new IllegalArgumentException("The sampler must be set");
+            }
+            return sampler;
+        }
+
+        public B setSampling(long batchSize) {
+            return setSampling(batchSize, true, false);
+        }
+
+        public B setSampling(long batchSize, boolean shuffle) {
+            return setSampling(batchSize, shuffle, false);
+        }
+
+        public B setSampling(long batchSize, boolean shuffle, boolean dropLast) {
+            Sampler.SubSampler subSampler = shuffle ? new RandomSampler() : new SequenceSampler();
+            sampler = new BatchSampler(subSampler, batchSize, dropLast);
+            return self();
+        }
+
+        public B setSampler(Sampler sampler) {
+            this.sampler = sampler;
+            return self();
+        }
+
+        public DataLoadingConfiguration getConfig() {
+            if (config != null) {
+                return config;
+            } else {
+                return new DataLoadingConfiguration.Builder().build();
+            }
+        }
+
+        public B optConfig(DataLoadingConfiguration config) {
+            this.config = config;
+            return self();
+        }
+
+        public abstract B self();
     }
 }

@@ -32,7 +32,6 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.BatchSampler;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.dataset.SequenceSampler;
@@ -51,10 +50,13 @@ public class DatasetTest {
     public void testSequenceSampler() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             ArrayDataset dataset =
-                    new ArrayDataset(
-                            manager.arange(0, 100, 1, DataType.INT64, Context.defaultContext()),
-                            new BatchSampler(new SequenceSampler(), 1, false),
-                            new DataLoadingConfiguration.Builder().build());
+                    new ArrayDataset.Builder()
+                            .setData(
+                                    manager.arange(
+                                            0, 100, 1, DataType.INT64, Context.defaultContext()))
+                            .setSampler(new BatchSampler(new SequenceSampler(), 1, false))
+                            .build();
+
             List<Long> original = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
                     Trainer.newInstance(
@@ -73,10 +75,12 @@ public class DatasetTest {
     public void testRandomSampler() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             ArrayDataset dataset =
-                    new ArrayDataset(
-                            manager.arange(0, 10, 1, DataType.INT64, Context.defaultContext()),
-                            new BatchSampler(new RandomSampler(), 1, false),
-                            new DataLoadingConfiguration.Builder().build());
+                    new ArrayDataset.Builder()
+                            .setData(
+                                    manager.arange(
+                                            0, 10, 1, DataType.INT64, Context.defaultContext()))
+                            .setSampler(new BatchSampler(new RandomSampler(), 1, false))
+                            .build();
             List<Long> original = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
                     Trainer.newInstance(
@@ -85,7 +89,7 @@ public class DatasetTest {
                         .iterator()
                         .forEachRemaining(
                                 record -> original.add(record.getData().get(0).getLong()));
-                Assertions.assertTrue(original.size() == 10, "SequentialSampler test failed");
+                Assertions.assertTrue(original.size() == 10, "RandomSampler test failed");
             }
         }
     }
@@ -96,10 +100,10 @@ public class DatasetTest {
             NDArray data = manager.arange(0, 100, 1, DataType.INT64, Context.defaultContext());
 
             ArrayDataset dataset =
-                    new ArrayDataset(
-                            data,
-                            new BatchSampler(new SequenceSampler(), 27, false),
-                            new DataLoadingConfiguration.Builder().build());
+                    new ArrayDataset.Builder()
+                            .setData(data)
+                            .setSampler(new BatchSampler(new SequenceSampler(), 27, false))
+                            .build();
             List<long[]> originalList = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
                     Trainer.newInstance(
@@ -117,10 +121,10 @@ public class DatasetTest {
             }
 
             ArrayDataset dataset2 =
-                    new ArrayDataset(
-                            data,
-                            new BatchSampler(new RandomSampler(), 33, true),
-                            new DataLoadingConfiguration.Builder().build());
+                    new ArrayDataset.Builder()
+                            .setData(data)
+                            .setSampler(new BatchSampler(new RandomSampler(), 33, true))
+                            .build();
             List<long[]> originalList2 = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
                     Trainer.newInstance(
@@ -135,10 +139,10 @@ public class DatasetTest {
 
             // test case when dataset is smaller than batchSize, dropLast=true
             ArrayDataset dataset3 =
-                    new ArrayDataset(
-                            data,
-                            new BatchSampler(new SequenceSampler(), 101, true),
-                            new DataLoadingConfiguration.Builder().build());
+                    new ArrayDataset.Builder()
+                            .setData(data)
+                            .setSampler(new BatchSampler(new SequenceSampler(), 101, true))
+                            .build();
             List<long[]> originalList3 = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
                     Trainer.newInstance(
@@ -153,10 +157,10 @@ public class DatasetTest {
 
             // test case when dataset is smaller than batchSize, dropLast=false
             ArrayDataset dataset4 =
-                    new ArrayDataset(
-                            data,
-                            new BatchSampler(new SequenceSampler(), 101, false),
-                            new DataLoadingConfiguration.Builder().build());
+                    new ArrayDataset.Builder()
+                            .setData(data)
+                            .setSampler(new BatchSampler(new SequenceSampler(), 101, false))
+                            .build();
             List<long[]> originalList4 = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
                     Trainer.newInstance(
@@ -178,11 +182,12 @@ public class DatasetTest {
             NDArray data = manager.arange(200).reshape(100, 2);
             NDArray label = manager.arange(100).reshape(100);
             ArrayDataset dataset =
-                    new ArrayDataset(
-                            data,
-                            label,
-                            new BatchSampler(new SequenceSampler(), 20),
-                            new DataLoadingConfiguration.Builder().build());
+                    new ArrayDataset.Builder()
+                            .setData(data)
+                            .optLabels(label)
+                            .setSampling(20, false)
+                            .build();
+
             int index = 0;
             try (Trainer<NDList, NDList, NDList> trainer =
                     Trainer.newInstance(
@@ -198,11 +203,11 @@ public class DatasetTest {
                 }
 
                 dataset =
-                        new ArrayDataset(
-                                data,
-                                label,
-                                new BatchSampler(new SequenceSampler(), 15),
-                                new DataLoadingConfiguration.Builder().build());
+                        new ArrayDataset.Builder()
+                                .setData(data)
+                                .optLabels(label)
+                                .setSampling(15, false)
+                                .build();
                 index = 0;
                 for (Record record : trainer.trainDataset(dataset)) {
                     if (index != 90) {

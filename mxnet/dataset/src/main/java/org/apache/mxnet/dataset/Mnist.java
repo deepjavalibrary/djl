@@ -16,13 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
-import software.amazon.ai.training.dataset.Sampler;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
 
@@ -35,27 +31,8 @@ public final class Mnist extends SimpleDataset {
 
     private static final String ARTIFACT_ID = "mnist";
 
-    public Mnist(NDManager manager, Usage usage, Sampler sampler, DataLoadingConfiguration config) {
-        super(manager, Datasets.REPOSITORY, usage, sampler, config);
-    }
-
-    public Mnist(
-            NDManager manager,
-            Repository repository,
-            Usage usage,
-            Sampler sampler,
-            DataLoadingConfiguration config) {
-        super(manager, repository, usage, sampler, config);
-    }
-
-    public Mnist(
-            NDManager manager,
-            Repository repository,
-            Artifact artifact,
-            Usage usage,
-            Sampler sampler,
-            DataLoadingConfiguration config) {
-        super(manager, repository, artifact, usage, sampler, config);
+    public Mnist(Builder builder) {
+        super(builder);
     }
 
     @Override
@@ -117,6 +94,18 @@ public final class Mnist extends SimpleDataset {
                 array.set(buf);
                 return array.asType(DataType.FLOAT32, true);
             }
+        }
+    }
+
+    public static class Builder extends SimpleDataset.BaseBuilder<Builder> {
+
+        @Override
+        public Builder self() {
+            return this;
+        }
+
+        public Mnist build() {
+            return new Mnist(this);
         }
     }
 }

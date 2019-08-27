@@ -25,10 +25,7 @@ import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
-import software.amazon.ai.training.dataset.BatchSampler;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
-import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.RandomSampler;
+import software.amazon.ai.training.dataset.Dataset.Usage;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
@@ -43,7 +40,6 @@ public final class MnistUtils {
     public static void trainMnist(
             Block mlp, NDManager manager, int numEpoch, float expectedLoss, float expectedAccuracy)
             throws FailedTestException, IOException {
-        // TODO remove numpy flag
 
         int batchSize = 100;
 
@@ -58,12 +54,13 @@ public final class MnistUtils {
         Accuracy acc = new Accuracy();
         LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
-        SimpleDataset mnist =
-                new Mnist(
-                        manager,
-                        Dataset.Usage.TRAIN,
-                        new BatchSampler(new RandomSampler(), batchSize, true),
-                        new DataLoadingConfiguration.Builder().build());
+        Mnist mnist =
+                new Mnist.Builder()
+                        .setManager(manager)
+                        .setUsage(Usage.TRAIN)
+                        .setSampling(batchSize, true, true)
+                        .build();
+
         mnist.prepare();
         try (Trainer<NDArray, NDArray, NDArray> trainer =
                 Trainer.newInstance(mlp, new SimpleDataset.DefaultTranslator())) {

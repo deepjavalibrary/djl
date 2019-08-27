@@ -37,9 +37,6 @@ import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.dataset.ArrayDataset;
-import software.amazon.ai.training.dataset.BatchSampler;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
-import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.initializer.NormalInitializer;
@@ -108,11 +105,11 @@ public class GradientCollectorIntegrationTest {
             LossMetric lossMetric = new LossMetric("l2loss");
 
             ArrayDataset dataset =
-                    new ArrayDataset(
-                            data,
-                            label,
-                            new BatchSampler(new RandomSampler(), batchSize, true),
-                            new DataLoadingConfiguration.Builder().build());
+                    new ArrayDataset.Builder()
+                            .setData(data)
+                            .optLabels(label)
+                            .setSampling(batchSize, true, true)
+                            .build();
             try (Trainer<NDList, NDList, NDList> trainer =
                     Trainer.newInstance(block, new ArrayDataset.DefaultTranslator())) {
                 for (int epoch = 0; epoch < epochs; epoch++) {

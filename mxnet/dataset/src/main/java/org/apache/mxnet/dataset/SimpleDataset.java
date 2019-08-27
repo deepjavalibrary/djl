@@ -21,10 +21,8 @@ import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.DataIterable;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.training.dataset.Record;
-import software.amazon.ai.training.dataset.Sampler;
 import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
@@ -38,36 +36,12 @@ public abstract class SimpleDataset extends RandomAccessDataset<NDArray, NDArray
     private boolean prepared;
     private Usage usage;
 
-    public SimpleDataset(
-            NDManager manager, Usage usage, Sampler sampler, DataLoadingConfiguration config) {
-        this(manager, Datasets.REPOSITORY, usage, sampler, config);
-    }
-
-    public SimpleDataset(
-            NDManager manager,
-            Repository repository,
-            Usage usage,
-            Sampler sampler,
-            DataLoadingConfiguration config) {
-        super(sampler, config);
-        this.repository = repository;
-        this.manager = manager;
-        this.usage = usage;
-        this.prepared = false;
-    }
-
-    public SimpleDataset(
-            NDManager manager,
-            Repository repository,
-            Artifact artifact,
-            Usage usage,
-            Sampler sampler,
-            DataLoadingConfiguration config) {
-        super(sampler, config);
-        this.repository = repository;
-        this.manager = manager;
-        this.artifact = artifact;
-        this.usage = usage;
+    public SimpleDataset(BaseBuilder<?> builder) {
+        super(builder);
+        this.repository = builder.getRepository();
+        this.manager = builder.getManager();
+        this.artifact = builder.getArtifact();
+        this.usage = builder.getUsage();
         this.prepared = false;
     }
 
@@ -150,6 +124,52 @@ public abstract class SimpleDataset extends RandomAccessDataset<NDArray, NDArray
         public Record processInput(TranslatorContext ctx, NDArray input, NDArray label)
                 throws Exception {
             return new Record(new NDList(input), new NDList(label));
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public abstract static class BaseBuilder<B extends BaseBuilder>
+            extends RandomAccessDataset.BaseBuilder<B> {
+
+        private NDManager manager;
+        private Usage usage;
+        private Repository repository = Datasets.REPOSITORY;
+        private Artifact artifact;
+
+        public NDManager getManager() {
+            return manager;
+        }
+
+        public B setManager(NDManager manager) {
+            this.manager = manager;
+            return self();
+        }
+
+        public Usage getUsage() {
+            return usage;
+        }
+
+        public B setUsage(Usage usage) {
+            this.usage = usage;
+            return self();
+        }
+
+        public Repository getRepository() {
+            return repository;
+        }
+
+        public B optRepository(Repository repository) {
+            this.repository = repository;
+            return self();
+        }
+
+        public Artifact getArtifact() {
+            return artifact;
+        }
+
+        public B optArtifact(Artifact artifact) {
+            this.artifact = artifact;
+            return self();
         }
     }
 }

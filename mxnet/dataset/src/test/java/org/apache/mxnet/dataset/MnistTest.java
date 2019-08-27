@@ -20,10 +20,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.dataset.BatchSampler;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.Record;
 
 public class MnistTest {
@@ -32,13 +29,14 @@ public class MnistTest {
     public void testMnistLocal() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
-            SimpleDataset mnist =
-                    new Mnist(
-                            manager,
-                            repository,
-                            Dataset.Usage.TEST,
-                            new BatchSampler(new RandomSampler(), 32),
-                            new DataLoadingConfiguration.Builder().build());
+            Mnist mnist =
+                    new Mnist.Builder()
+                            .setManager(manager)
+                            .setUsage(Dataset.Usage.TEST)
+                            .optRepository(repository)
+                            .setSampling(32)
+                            .build();
+
             mnist.prepare();
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     Trainer.newInstance(
@@ -54,12 +52,13 @@ public class MnistTest {
     @Test
     public void testMnistRemote() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            SimpleDataset mnist =
-                    new Mnist(
-                            manager,
-                            Dataset.Usage.TEST,
-                            new BatchSampler(new RandomSampler(), 32),
-                            new DataLoadingConfiguration.Builder().build());
+            Mnist mnist =
+                    new Mnist.Builder()
+                            .setManager(manager)
+                            .setUsage(Dataset.Usage.TEST)
+                            .setSampling(32)
+                            .build();
+
             mnist.prepare();
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     Trainer.newInstance(

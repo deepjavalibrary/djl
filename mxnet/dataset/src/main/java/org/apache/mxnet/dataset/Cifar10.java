@@ -16,13 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
-import software.amazon.ai.training.dataset.Sampler;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
 
@@ -36,28 +32,8 @@ public final class Cifar10 extends SimpleDataset {
     // 3072 = 32 * 32 * 3, i.e. one image size, +1 here is label
     private static final int DATA_AND_LABEL_SIZE = 32 * 32 * 3 + 1;
 
-    public Cifar10(
-            NDManager manager, Usage usage, Sampler sampler, DataLoadingConfiguration config) {
-        super(manager, Datasets.REPOSITORY, usage, sampler, config);
-    }
-
-    public Cifar10(
-            NDManager manager,
-            Repository repository,
-            Usage usage,
-            Sampler sampler,
-            DataLoadingConfiguration config) {
-        super(manager, repository, usage, sampler, config);
-    }
-
-    public Cifar10(
-            NDManager manager,
-            Repository repository,
-            Artifact artifact,
-            Usage usage,
-            Sampler sampler,
-            DataLoadingConfiguration config) {
-        super(manager, repository, artifact, usage, sampler, config);
+    public Cifar10(Builder builder) {
+        super(builder);
     }
 
     @Override
@@ -107,6 +83,18 @@ public final class Cifar10 extends SimpleDataset {
                 array.set(buf);
                 return array.asType(DataType.FLOAT32, true);
             }
+        }
+    }
+
+    public static class Builder extends SimpleDataset.BaseBuilder<Builder> {
+
+        @Override
+        public Builder self() {
+            return this;
+        }
+
+        public Cifar10 build() {
+            return new Cifar10(this);
         }
     }
 }
