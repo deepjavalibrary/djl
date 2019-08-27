@@ -1,0 +1,36 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "org.apache.mxnet",
+  "artifactId": "inception",
+  "type": "cv",
+  "name": "Action Recognition",
+  "description": "Inception Action Recognition",
+  "website": "http://www.mxnet.io",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "http://aws.amazon.com/apache2.0/"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "inceptionv3_ucf101",
+      "properties": {
+        "flavor": "v3",
+        "dataset": "ucf101"
+      },
+      "files": {
+        "symbol": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/action_recognition/org/apache/mxnet/inception/0.0.1/inceptionv3_ucf101-symbol.json",
+          "sha1Hash": "1612da87e162f26769785d93611292c567a1dc2c"
+        },
+        "parameters": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/action_recognition/org/apache/mxnet/inception/0.0.1/inceptionv3_ucf101-0000.params.gz",
+          "sha1Hash": "3f54c30fc86112bda6ad58e6c9bdc4a4b62db2b5"
+        }
+      }
+    }
+  ]
+}

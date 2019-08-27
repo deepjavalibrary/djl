@@ -80,6 +80,7 @@ public class MRL {
             Anchor SEMANTIC_SEGMENTATION = new Anchor("model/cv/semantic_segmentation");
             Anchor INSTANCE_SEGMENTATION = new Anchor("model/cv/instance_segmentation");
             Anchor POSE_ESTIMATION = new Anchor("model/cv/pose_estimation");
+            Anchor ACTION_RECOGNITION = new Anchor("model/cv/action_recognition");
         }
 
         interface NLP {
