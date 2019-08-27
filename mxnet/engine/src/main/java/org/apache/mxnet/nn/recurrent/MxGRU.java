@@ -63,20 +63,14 @@ public class MxGRU extends MxNNBlock implements GRU {
 
     private Parameter state = new Parameter("state", this, ParameterType.OTHER);
 
-    public MxGRU(
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs) {
+    public MxGRU(GRU.Builder builder) {
         this.opName = "RNN";
-        this.stateSize = stateSize;
-        this.dropRate = dropRate;
-        this.numStackedLayers = numStackedLayers;
-        this.useSequenceLength = useSequenceLength;
-        this.useBidirectional = useBidirectional;
-        this.stateOutputs = stateOutputs;
+        this.stateSize = builder.getStateSize();
+        this.dropRate = builder.getDropRate();
+        this.numStackedLayers = builder.getNumStackedLayers();
+        this.useSequenceLength = builder.isUseSequenceLength();
+        this.useBidirectional = builder.isUseBidirectional();
+        this.stateOutputs = builder.isStateOutputs();
         this.mode = "gru";
     }
 

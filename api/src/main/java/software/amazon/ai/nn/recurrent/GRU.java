@@ -25,15 +25,7 @@ public interface GRU extends RecurrentCell {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return Engine.getInstance()
-                    .getNNIndex()
-                    .gru(
-                            stateSize,
-                            dropRate,
-                            numStackedLayers,
-                            useSequenceLength,
-                            useBidirectional,
-                            stateOutputs);
+            return Engine.getInstance().getNNIndex().gru(this);
         }
     }
 }

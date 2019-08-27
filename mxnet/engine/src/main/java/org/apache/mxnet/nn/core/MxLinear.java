@@ -40,11 +40,11 @@ public class MxLinear extends MxNNBlock implements Linear {
     private Parameter weight;
     private Parameter bias;
 
-    public MxLinear(long outChannels, boolean bias) {
+    public MxLinear(Linear.Builder builder) {
         this.opName = "FullyConnected";
-        this.outChannels = outChannels;
+        this.outChannels = builder.getOutChannels();
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
-        if (bias) {
+        if (builder.isBias()) {
             this.bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);
         }
     }

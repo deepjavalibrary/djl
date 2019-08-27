@@ -49,22 +49,15 @@ public class MxConv1D extends MxNNBlock implements Conv1D {
     private Parameter weight;
     private Parameter bias;
 
-    public MxConv1D(
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            boolean includeBias) {
-        this.opName = "Convolution";
-        this.kernel = kernel;
-        this.stride = stride == null ? new Shape(1) : stride;
-        this.pad = pad == null ? new Shape(0) : pad;
-        this.dilate = dilate == null ? new Shape(1) : dilate;
-        this.numFilters = numFilters;
-        this.numGroups = numGroups;
-        this.includeBias = includeBias;
+    public MxConv1D(Conv1D.Builder builder) {
+        opName = "Convolution";
+        kernel = builder.getKernel();
+        stride = builder.getStride() == null ? new Shape(1) : builder.getStride();
+        pad = builder.getPad() == null ? new Shape(0) : builder.getPad();
+        dilate = builder.getDilate() == null ? new Shape(1) : builder.getDilate();
+        numFilters = builder.getNumFilters();
+        numGroups = builder.getNumGroups();
+        includeBias = builder.isIncludeBias();
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (includeBias) {
             bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);

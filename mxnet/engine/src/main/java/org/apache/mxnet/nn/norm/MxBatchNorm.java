@@ -40,11 +40,11 @@ public class MxBatchNorm extends MxNNBlock implements BatchNorm {
     private Parameter runningMean;
     private Parameter runningVar;
 
-    public MxBatchNorm(int axis, float epsilon, float momentum) {
+    public MxBatchNorm(BatchNorm.Builder builder) {
         this.opName = "BatchNorm";
-        this.axis = axis;
-        this.epsilon = epsilon;
-        this.momentum = momentum;
+        this.axis = builder.getAxis();
+        this.epsilon = builder.getEpsilon();
+        this.momentum = builder.getMomentum();
         runningMean = new Parameter("runningMean", this, ParameterType.OTHER, Initializer.ONES);
         runningVar = new Parameter("runningVar", this, ParameterType.OTHER, Initializer.ONES);
     }

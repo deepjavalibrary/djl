@@ -13,6 +13,7 @@
 package software.amazon.ai.nn.recurrent;
 
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.recurrent.RNN.Activation;
 
 public interface RecurrentCell extends Block {
 
@@ -27,6 +28,46 @@ public interface RecurrentCell extends Block {
         boolean useBidirectional;
         boolean stateOutputs;
         RNN.Activation activation;
+
+        public float getDropRate() {
+            return dropRate;
+        }
+
+        public long getStateSize() {
+            return stateSize;
+        }
+
+        public int getNumStackedLayers() {
+            return numStackedLayers;
+        }
+
+        public double getLstmStateClipMin() {
+            return lstmStateClipMin;
+        }
+
+        public double getLstmStateClipMax() {
+            return lstmStateClipMax;
+        }
+
+        public boolean isClipLstmState() {
+            return clipLstmState;
+        }
+
+        public boolean isUseSequenceLength() {
+            return useSequenceLength;
+        }
+
+        public boolean isUseBidirectional() {
+            return useBidirectional;
+        }
+
+        public boolean isStateOutputs() {
+            return stateOutputs;
+        }
+
+        public Activation getActivation() {
+            return activation;
+        }
 
         /**
          * Sets the drop rate of the dropout on the outputs of each RNN layer, except the last

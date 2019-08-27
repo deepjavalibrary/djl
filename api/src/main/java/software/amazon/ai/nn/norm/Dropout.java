@@ -25,6 +25,14 @@ public interface Dropout extends Block {
         private float probability = 0.5f;
         private int[] sharedAxes = {};
 
+        public float getProbability() {
+            return probability;
+        }
+
+        public int[] getSharedAxes() {
+            return sharedAxes;
+        }
+
         public Builder setProbability(float probability) {
             this.probability = probability;
             return this;
@@ -36,7 +44,7 @@ public interface Dropout extends Block {
         }
 
         public Dropout build() {
-            return Engine.getInstance().getNNIndex().dropout(probability, sharedAxes);
+            return Engine.getInstance().getNNIndex().dropout(this);
         }
     }
 }

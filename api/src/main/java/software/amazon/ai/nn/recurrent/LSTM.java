@@ -26,18 +26,7 @@ public interface LSTM extends RecurrentCell {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return Engine.getInstance()
-                    .getNNIndex()
-                    .lstm(
-                            stateSize,
-                            dropRate,
-                            numStackedLayers,
-                            lstmStateClipMin,
-                            lstmStateClipMax,
-                            useSequenceLength,
-                            useBidirectional,
-                            stateOutputs,
-                            clipLstmState);
+            return Engine.getInstance().getNNIndex().lstm(this);
         }
     }
 }

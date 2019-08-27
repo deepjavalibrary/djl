@@ -25,16 +25,7 @@ public interface RNN extends RecurrentCell {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return Engine.getInstance()
-                    .getNNIndex()
-                    .rnn(
-                            stateSize,
-                            dropRate,
-                            numStackedLayers,
-                            activation,
-                            useSequenceLength,
-                            useBidirectional,
-                            stateOutputs);
+            return Engine.getInstance().getNNIndex().rnn(this);
         }
     }
 

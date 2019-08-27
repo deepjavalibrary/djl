@@ -50,27 +50,20 @@ public class MxRNN extends MxNNBlock implements RNN {
     private Parameter h2hBias;
     private Parameter state;
 
-    public MxRNN(
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            Activation activation,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs) {
+    public MxRNN(RNN.Builder builder) {
         this.opName = "RNN";
-        this.stateSize = stateSize;
-        this.dropRate = dropRate;
-        this.numStackedLayers = numStackedLayers;
-        this.useSequenceLength = useSequenceLength;
-        this.useBidirectional = useBidirectional;
-        this.stateOutputs = stateOutputs;
+        this.stateSize = builder.getStateSize();
+        this.dropRate = builder.getDropRate();
+        this.numStackedLayers = builder.getNumStackedLayers();
+        this.useSequenceLength = builder.isUseSequenceLength();
+        this.useBidirectional = builder.isUseBidirectional();
+        this.stateOutputs = builder.isStateOutputs();
         i2hWeight = new Parameter("i2h_weight", this, ParameterType.WEIGHT);
         h2hWeight = new Parameter("h2h_weight", this, ParameterType.WEIGHT);
         i2hBias = new Parameter("i2h_bias", this, ParameterType.BIAS);
         h2hBias = new Parameter("h2h_bias", this, ParameterType.BIAS);
         state = new Parameter("state", this, ParameterType.OTHER);
-        mode = activation == Activation.RELU ? "rnn_relu" : "rnn_tanh";
+        mode = builder.getActivation() == Activation.RELU ? "rnn_relu" : "rnn_tanh";
     }
 
     /** {@inheritDoc} */

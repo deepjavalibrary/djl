@@ -13,11 +13,11 @@
 package software.amazon.ai.training;
 
 import java.util.function.Function;
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.LambdaBlock;
+import software.amazon.ai.nn.core.Prelu;
 
 public interface Activation extends Block {
 
@@ -130,7 +130,7 @@ public interface Activation extends Block {
     }
 
     static Activation preluBlock() {
-        return Engine.getInstance().getNNIndex().prelu();
+        return new Prelu.Builder().build();
     }
 
     NDArray forward(NDArray data);

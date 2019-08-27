@@ -12,9 +12,6 @@
  */
 package software.amazon.ai.nn;
 
-import java.util.Collection;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.convolutional.Conv3D;
@@ -37,71 +34,27 @@ public abstract class NNIndex {
     // Blocks
     ////////////////////////////////////////
 
-    public abstract Linear linear(long units, boolean bias);
+    public abstract Linear linear(Linear.Builder builder);
 
-    public abstract BatchNorm batchNorm2D(int axis, float epsilon, float momentum);
+    public abstract BatchNorm batchNorm2D(BatchNorm.Builder builder);
 
-    public abstract Dropout dropout(float probability, int[] sharedAxes);
+    public abstract Dropout dropout(Dropout.Builder builder);
 
-    public abstract <T> Embedding<T> embedding(
-            Collection<T> items, int embeddingSize, boolean useDefault, DataType dataType);
+    public abstract <T> Embedding<T> embedding(Embedding.Builder<T> builder);
 
-    public abstract Prelu prelu();
+    public abstract Prelu prelu(Prelu.Builder builder);
 
-    public abstract Conv1D conv1D(
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            boolean includeBias);
+    public abstract Conv1D conv1D(Conv1D.Builder builder);
 
-    public abstract Conv2D conv2D(
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            boolean includeBias);
+    public abstract Conv2D conv2D(Conv2D.Builder builder);
 
-    public abstract Conv3D conv3D(
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            boolean includeBias);
+    public abstract Conv3D conv3D(Conv3D.Builder builder);
 
-    public abstract RNN rnn(
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            RNN.Activation activation,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs);
+    public abstract RNN rnn(RNN.Builder builder);
 
-    public abstract LSTM lstm(
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            double lstmStateClipMin,
-            double lstmStateClipMax,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            boolean clipLstmState);
+    public abstract LSTM lstm(LSTM.Builder builder);
 
-    public abstract GRU gru(
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs);
+    public abstract GRU gru(GRU.Builder builder);
 
     ////////////////////////////////////////
     // Optimizers

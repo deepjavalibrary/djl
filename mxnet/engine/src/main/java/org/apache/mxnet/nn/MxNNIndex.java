@@ -12,7 +12,6 @@
  */
 package org.apache.mxnet.nn;
 
-import java.util.Collection;
 import org.apache.mxnet.engine.optimizer.MxAdam;
 import org.apache.mxnet.engine.optimizer.MxNag;
 import org.apache.mxnet.engine.optimizer.MxSgd;
@@ -27,8 +26,6 @@ import org.apache.mxnet.nn.norm.MxDropout;
 import org.apache.mxnet.nn.recurrent.MxGRU;
 import org.apache.mxnet.nn.recurrent.MxLSTM;
 import org.apache.mxnet.nn.recurrent.MxRNN;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.nn.convolutional.Conv2D;
@@ -54,134 +51,68 @@ public class MxNNIndex extends NNIndex {
 
     /** {@inheritDoc} */
     @Override
-    public Linear linear(long outChannels, boolean bias) {
-        return new MxLinear(outChannels, bias);
+    public Linear linear(Linear.Builder builder) {
+        return new MxLinear(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public BatchNorm batchNorm2D(int axis, float epsilon, float momentum) {
-        return new MxBatchNorm(axis, epsilon, momentum);
+    public BatchNorm batchNorm2D(BatchNorm.Builder builder) {
+        return new MxBatchNorm(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Dropout dropout(float probability, int[] sharedAxes) {
-        return new MxDropout(probability, sharedAxes);
+    public Dropout dropout(Dropout.Builder builder) {
+        return new MxDropout(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T> Embedding<T> embedding(
-            Collection<T> items, int embeddingSize, boolean useDefault, DataType dataType) {
-        return new MxEmbedding<>(items, embeddingSize, useDefault, dataType);
+    public <T> Embedding<T> embedding(Embedding.Builder<T> builder) {
+        return new MxEmbedding<>(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Prelu prelu() {
+    public Prelu prelu(Prelu.Builder builder) {
         return new MxPrelu();
     }
 
     /** {@inheritDoc} */
     @Override
-    public Conv1D conv1D(
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            boolean includeBias) {
-        return new MxConv1D(kernel, stride, pad, dilate, numFilters, numGroups, includeBias);
+    public Conv1D conv1D(Conv1D.Builder builder) {
+        return new MxConv1D(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Conv2D conv2D(
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            boolean includeBias) {
-        return new MxConv2D(kernel, stride, pad, dilate, numFilters, numGroups, includeBias);
+    public Conv2D conv2D(Conv2D.Builder builder) {
+        return new MxConv2D(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Conv3D conv3D(
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            boolean includeBias) {
-        return new MxConv3D(kernel, stride, pad, dilate, numFilters, numGroups, includeBias);
+    public Conv3D conv3D(Conv3D.Builder builder) {
+        return new MxConv3D(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public RNN rnn(
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            RNN.Activation activation,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs) {
-        return new MxRNN(
-                stateSize,
-                dropRate,
-                numStackedLayers,
-                activation,
-                useSequenceLength,
-                useBidirectional,
-                stateOutputs);
+    public RNN rnn(RNN.Builder builder) {
+        return new MxRNN(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public LSTM lstm(
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            double lstmStateClipMin,
-            double lstmStateClipMax,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            boolean clipLstmState) {
-        return new MxLSTM(
-                stateSize,
-                dropRate,
-                numStackedLayers,
-                lstmStateClipMin,
-                lstmStateClipMax,
-                useSequenceLength,
-                useBidirectional,
-                stateOutputs,
-                clipLstmState);
+    public LSTM lstm(LSTM.Builder builder) {
+        return new MxLSTM(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public GRU gru(
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs) {
-        return new MxGRU(
-                stateSize,
-                dropRate,
-                numStackedLayers,
-                useSequenceLength,
-                useBidirectional,
-                stateOutputs);
+    public GRU gru(GRU.Builder builder) {
+        return new MxGRU(builder);
     }
 
     ////////////////////////////////////////

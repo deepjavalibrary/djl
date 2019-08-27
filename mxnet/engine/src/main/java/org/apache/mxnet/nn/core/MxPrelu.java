@@ -34,8 +34,8 @@ public class MxPrelu extends MxNNBlock implements Prelu {
     private Parameter alpha;
 
     public MxPrelu() {
-        this.opName = "LeakyReLU";
-        this.alpha = new Parameter("alpha", this, ParameterType.OTHER);
+        opName = "LeakyReLU";
+        alpha = new Parameter("alpha", this, ParameterType.OTHER);
     }
 
     @Override

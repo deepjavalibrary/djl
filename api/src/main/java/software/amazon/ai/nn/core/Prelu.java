@@ -34,7 +34,7 @@ public interface Prelu extends Activation {
          *     been set
          */
         public Prelu build() {
-            return Engine.getInstance().getNNIndex().prelu();
+            return Engine.getInstance().getNNIndex().prelu(this);
         }
     }
 }

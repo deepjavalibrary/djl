@@ -33,10 +33,10 @@ public class MxDropout extends MxNNBlock implements Dropout {
     private float probability;
     private int[] sharedAxes;
 
-    public MxDropout(float probability, int[] sharedAxes) {
-        this.opName = "Dropout";
-        this.probability = probability;
-        this.sharedAxes = sharedAxes;
+    public MxDropout(Dropout.Builder builder) {
+        opName = "Dropout";
+        probability = builder.getProbability();
+        sharedAxes = builder.getSharedAxes();
     }
 
     @Override

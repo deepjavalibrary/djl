@@ -16,7 +16,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,20 +44,19 @@ public class MxEmbedding<T> extends MxNNBlock implements Embedding<T> {
 
     private Parameter embedding;
 
-    public MxEmbedding(
-            Collection<T> items, int embeddingSize, boolean useDefault, DataType dataType) {
-        this.opName = "Embedding";
-        this.embeddingSize = embeddingSize;
-        this.useDefault = useDefault;
-        this.dataType = dataType;
-        this.embedding = new Parameter("embedding", this, ParameterType.WEIGHT);
+    public MxEmbedding(Embedding.Builder<T> builder) {
+        opName = "Embedding";
+        embeddingSize = builder.getEmbeddingSize();
+        useDefault = builder.isUseDefault();
+        dataType = builder.getDataType();
+        embedding = new Parameter("embedding", this, ParameterType.WEIGHT);
 
-        embedder = new ConcurrentHashMap<>(items.size());
+        embedder = new ConcurrentHashMap<>(builder.getItems().size());
         numItems = 0;
         if (useDefault) {
             numItems++;
         }
-        for (T item : items) {
+        for (T item : builder.getItems()) {
             embedder.put(item, numItems++);
         }
     }

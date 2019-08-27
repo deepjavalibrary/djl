@@ -26,9 +26,7 @@ public interface Conv3D extends Convolution {
             if (kernel == null || numFilters == 0) {
                 throw new IllegalArgumentException("Kernel and numFilters must be set");
             }
-            return Engine.getInstance()
-                    .getNNIndex()
-                    .conv3D(kernel, stride, pad, dilate, numFilters, numGroups, includeBias);
+            return Engine.getInstance().getNNIndex().conv3D(this);
         }
     }
 }

@@ -26,6 +26,18 @@ public interface BatchNorm extends Block {
         private float epsilon = 1E-5f;
         private float momentum = .9f;
 
+        public int getAxis() {
+            return axis;
+        }
+
+        public float getEpsilon() {
+            return epsilon;
+        }
+
+        public float getMomentum() {
+            return momentum;
+        }
+
         public Builder setAxis(int val) {
             axis = val;
             return this;
@@ -42,7 +54,7 @@ public interface BatchNorm extends Block {
         }
 
         public BatchNorm build() {
-            return Engine.getInstance().getNNIndex().batchNorm2D(axis, epsilon, momentum);
+            return Engine.getInstance().getNNIndex().batchNorm2D(this);
         }
     }
 }

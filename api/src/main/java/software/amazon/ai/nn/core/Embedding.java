@@ -62,10 +62,26 @@ public interface Embedding<T> extends Block {
      */
     class Builder<T> {
 
-        Collection<T> items;
-        int embeddingSize;
-        boolean useDefault = true;
-        DataType dataType = DataType.FLOAT32;
+        private Collection<T> items;
+        private int embeddingSize;
+        private boolean useDefault = true;
+        private DataType dataType = DataType.FLOAT32;
+
+        public Collection<T> getItems() {
+            return items;
+        }
+
+        public int getEmbeddingSize() {
+            return embeddingSize;
+        }
+
+        public boolean isUseDefault() {
+            return useDefault;
+        }
+
+        public DataType getDataType() {
+            return dataType;
+        }
 
         /**
          * Sets the collection of items that should feature embeddings.
@@ -127,9 +143,7 @@ public interface Embedding<T> extends Block {
             if (embeddingSize == 0) {
                 throw new IllegalArgumentException("You must specify the embedding size");
             }
-            return Engine.getInstance()
-                    .getNNIndex()
-                    .embedding(items, embeddingSize, useDefault, dataType);
+            return Engine.getInstance().getNNIndex().embedding(this);
         }
     }
 }

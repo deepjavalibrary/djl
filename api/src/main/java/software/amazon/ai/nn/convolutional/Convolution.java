@@ -29,6 +29,34 @@ public interface Convolution extends Block {
         int numGroups = 1;
         boolean includeBias = true;
 
+        public Shape getKernel() {
+            return kernel;
+        }
+
+        public Shape getStride() {
+            return stride;
+        }
+
+        public Shape getPad() {
+            return pad;
+        }
+
+        public Shape getDilate() {
+            return dilate;
+        }
+
+        public int getNumFilters() {
+            return numFilters;
+        }
+
+        public int getNumGroups() {
+            return numGroups;
+        }
+
+        public boolean isIncludeBias() {
+            return includeBias;
+        }
+
         /**
          * Sets the shape of the kernel.
          *

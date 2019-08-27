@@ -26,9 +26,7 @@ public interface Conv1D extends Convolution {
             if (kernel == null || numFilters == 0) {
                 throw new IllegalArgumentException("Kernel and numFilters must be set");
             }
-            return Engine.getInstance()
-                    .getNNIndex()
-                    .conv1D(kernel, stride, pad, dilate, numFilters, numGroups, includeBias);
+            return Engine.getInstance().getNNIndex().conv1D(this);
         }
     }
 }

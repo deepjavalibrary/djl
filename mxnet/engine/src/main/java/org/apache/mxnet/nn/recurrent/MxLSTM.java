@@ -71,28 +71,19 @@ public class MxLSTM extends MxNNBlock implements LSTM {
     private Parameter state = new Parameter("state", this, ParameterType.OTHER);
     private Parameter stateCell = new Parameter("state_cell", this, ParameterType.OTHER);
 
-    public MxLSTM(
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            double lstmStateClipMin,
-            double lstmStateClipMax,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            boolean clipLstmState) {
+    public MxLSTM(LSTM.Builder builder) {
         this.opName = "RNN";
-        this.stateSize = stateSize;
-        this.dropRate = dropRate;
-        this.numStackedLayers = numStackedLayers;
-        this.useSequenceLength = useSequenceLength;
-        this.useBidirectional = useBidirectional;
-        this.stateOutputs = stateOutputs;
+        this.stateSize = builder.getStateSize();
+        this.dropRate = builder.getDropRate();
+        this.numStackedLayers = builder.getNumStackedLayers();
+        this.useSequenceLength = builder.isUseSequenceLength();
+        this.useBidirectional = builder.isUseBidirectional();
+        this.stateOutputs = builder.isStateOutputs();
         this.mode = "lstm";
-        this.clipLstmState = clipLstmState;
+        this.clipLstmState = builder.isClipLstmState();
         if (clipLstmState) {
-            this.lstmStateClipMin = lstmStateClipMin;
-            this.lstmStateClipMax = lstmStateClipMax;
+            this.lstmStateClipMin = builder.getLstmStateClipMin();
+            this.lstmStateClipMax = builder.getLstmStateClipMax();
         }
     }
 

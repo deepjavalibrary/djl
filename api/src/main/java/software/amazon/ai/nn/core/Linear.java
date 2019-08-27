@@ -40,6 +40,10 @@ public interface Linear extends Block {
         private long outChannels;
         private boolean bias = true;
 
+        public long getOutChannels() {
+            return outChannels;
+        }
+
         /**
          * Sets the <b>Required</b> number of output channels.
          *
@@ -49,6 +53,10 @@ public interface Linear extends Block {
         public Builder setOutChannels(long outChannels) {
             this.outChannels = outChannels;
             return this;
+        }
+
+        public boolean isBias() {
+            return bias;
         }
 
         /**
@@ -73,7 +81,7 @@ public interface Linear extends Block {
             if (outChannels == 0) {
                 throw new IllegalArgumentException("You must specify outChannels");
             }
-            return Engine.getInstance().getNNIndex().linear(outChannels, bias);
+            return Engine.getInstance().getNNIndex().linear(this);
         }
     }
 }
