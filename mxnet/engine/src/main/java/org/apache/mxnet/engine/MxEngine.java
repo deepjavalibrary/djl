@@ -180,7 +180,7 @@ public class MxEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU) {
-        return new MxParameterStore(optimizer, aggregateOnGPU);
+        return new MxParameterStore(aggregateOnGPU, optimizer);
     }
 
     /** {@inheritDoc} */

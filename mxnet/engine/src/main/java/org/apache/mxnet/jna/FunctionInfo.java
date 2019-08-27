@@ -14,7 +14,6 @@ package org.apache.mxnet.jna;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.engine.MxNDArray;
 import org.apache.mxnet.engine.MxNDManager;
@@ -37,23 +36,18 @@ public class FunctionInfo {
 
     public int invoke(
             NDManager manager, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
-        Pointer[] handles =
-                Arrays.stream(src).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
-        PointerArray srcHandles = new PointerArray(handles);
-        handles = Arrays.stream(dest).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
-        PointerByReference destRef = new PointerByReference(new PointerArray(handles));
+        PointerArray srcHandles = JnaUtils.toPointerArray(src);
+        PointerByReference destRef = new PointerByReference(JnaUtils.toPointerArray(dest));
         return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params).size();
     }
 
     public NDArray[] invoke(NDManager manager, NDArray[] src, PairList<String, ?> params) {
-        Pointer[] handles =
-                Arrays.stream(src).map(a -> ((MxNDArray) a).getHandle()).toArray(Pointer[]::new);
-        PointerArray srcHandles = new PointerArray(handles);
+        PointerArray srcHandles = JnaUtils.toPointerArray(src);
         return invoke((MxNDManager) manager, srcHandles, params);
     }
 
     public NDArray[] invoke(NDManager manager, NDArray src, PairList<String, ?> params) {
-        PointerArray handles = new PointerArray(((MxNDArray) src).getHandle());
+        PointerArray handles = JnaUtils.toPointerArray(new NDArray[] {src});
         return invoke((MxNDManager) manager, handles, params);
     }
 

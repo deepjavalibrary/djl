@@ -2768,7 +2768,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
-    public int MXKVStoreInit(Pointer handle, int num, int[] keys, PointerByReference vals) {
+    public int MXKVStoreInit(Pointer handle, int num, int[] keys, PointerArray vals) {
         if (functions.containsKey("MXKVStoreInit")) {
             return functions.get("MXKVStoreInit").apply(new Object[] {handle, num, keys, vals});
         }
@@ -2776,7 +2776,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
-    public int MXKVStoreInitEx(Pointer handle, int num, String[] keys, PointerByReference vals) {
+    public int MXKVStoreInitEx(Pointer handle, int num, String[] keys, PointerArray vals) {
         if (functions.containsKey("MXKVStoreInitEx")) {
             return functions.get("MXKVStoreInitEx").apply(new Object[] {handle, num, keys, vals});
         }
@@ -2784,8 +2784,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
-    public int MXKVStorePush(
-            Pointer handle, int num, int[] keys, PointerByReference vals, int priority) {
+    public int MXKVStorePush(Pointer handle, int num, int[] keys, PointerArray vals, int priority) {
         if (functions.containsKey("MXKVStorePush")) {
             return functions
                     .get("MXKVStorePush")
@@ -2796,7 +2795,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXKVStorePushEx(
-            Pointer handle, int num, String[] keys, PointerByReference vals, int priority) {
+            Pointer handle, int num, String[] keys, PointerArray vals, int priority) {
         if (functions.containsKey("MXKVStorePushEx")) {
             return functions
                     .get("MXKVStorePushEx")
@@ -2838,8 +2837,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
-    public int MXKVStorePull(
-            Pointer handle, int num, int[] keys, PointerByReference vals, int priority) {
+    public int MXKVStorePull(Pointer handle, int num, int[] keys, PointerArray vals, int priority) {
         if (functions.containsKey("MXKVStorePull")) {
             return functions
                     .get("MXKVStorePull")
@@ -2850,7 +2848,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     @Override
     public int MXKVStorePullEx(
-            Pointer handle, int num, String[] keys, PointerByReference vals, int priority) {
+            Pointer handle, int num, String[] keys, PointerArray vals, int priority) {
         if (functions.containsKey("MXKVStorePullEx")) {
             return functions
                     .get("MXKVStorePullEx")

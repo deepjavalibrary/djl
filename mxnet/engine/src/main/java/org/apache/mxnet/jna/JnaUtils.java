@@ -384,20 +384,12 @@ public final class JnaUtils {
     }
 
     public static void saveNdArray(Path path, NDList ndList) {
-        IntBuffer handlesSize = IntBuffer.allocate(1);
-        handlesSize.put(ndList.size());
+
         boolean namesProvided =
                 StreamSupport.stream(ndList.spliterator(), false)
                         .map(Pair::getKey)
                         .allMatch(Objects::nonNull);
-        Pointer[] handles =
-                StreamSupport.stream(ndList.spliterator(), false)
-                        .map(
-                                (Pair<String, NDArray> x) -> {
-                                    MxNDArray ary = (MxNDArray) x.getValue();
-                                    return ary.getHandle();
-                                })
-                        .toArray(Pointer[]::new);
+
         String[] names =
                 StreamSupport.stream(ndList.spliterator(), false)
                         .map(Pair::getKey)
@@ -405,9 +397,7 @@ public final class JnaUtils {
         if (!namesProvided) {
             names = null;
         }
-        checkCall(
-                LIB.MXNDArraySave(
-                        path.toString(), ndList.size(), new PointerArray(handles), names));
+        checkCall(LIB.MXNDArraySave(path.toString(), ndList.size(), toPointerArray(ndList), names));
     }
 
     /* Need tests
@@ -648,6 +638,104 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
+    public static Pointer parameterStoreCreate(String type) {
+        PointerByReference ref = new PointerByReference();
+        checkCall(LIB.MXKVStoreCreate(type, ref));
+        return ref.getValue();
+    }
+
+    public static void parameterStoreClose(Pointer handle) {
+        checkCall(LIB.MXKVStoreFree(handle));
+    }
+
+    public static void parameterStoreInit(Pointer handle, int num, int[] keys, NDList vals) {
+        checkCall((LIB.MXKVStoreInit(handle, num, keys, toPointerArray(vals))));
+    }
+
+    public static void parameterStoreInit(Pointer handle, int num, String[] keys, NDList vals) {
+        checkCall(LIB.MXKVStoreInitEx(handle, num, keys, toPointerArray(vals)));
+    }
+
+    public static void parameterStorePush(
+            Pointer handle, int num, int[] keys, NDList vals, int priority) {
+        checkCall(LIB.MXKVStorePush(handle, num, keys, toPointerArray(vals), priority));
+    }
+
+    public static void parameterStorePush(
+            Pointer handle, int num, String[] keys, NDList vals, int priority) {
+        checkCall(LIB.MXKVStorePushEx(handle, num, keys, toPointerArray(vals), priority));
+    }
+
+    public static void parameterStorePull(
+            Pointer handle, int num, int[] keys, NDList vals, int priority) {
+        checkCall(LIB.MXKVStorePull(handle, num, keys, toPointerArray(vals), priority));
+    }
+
+    public static void parameterStorePull(
+            Pointer handle, int num, String[] keys, NDList vals, int priority) {
+        checkCall(LIB.MXKVStorePullEx(handle, num, keys, toPointerArray(vals), priority));
+    }
+
+    public static void parameterStoreSetUpdater(
+            Pointer handle,
+            MxnetLibrary.MXKVStoreUpdater updater,
+            MxnetLibrary.MXKVStoreStrUpdater stringUpdater,
+            Pointer updaterHandle) {
+        checkCall(LIB.MXKVStoreSetUpdaterEx(handle, updater, stringUpdater, updaterHandle));
+    }
+
+    public static void parameterStoreSetUpdater(
+            Pointer handle, MxnetLibrary.MXKVStoreUpdater updater, Pointer updaterHandle) {
+        checkCall(LIB.MXKVStoreSetUpdater(handle, updater, updaterHandle));
+    }
+
+    /*
+    int MXInitPSEnv(int num_vars, String keys[], String vals[]);
+
+    int MXKVStoreSetGradientCompression(Pointer handle, int num_params, String keys[],
+                                        String vals[]);
+
+    int MXKVStorePullWithSparse(Pointer handle, int num, int keys[], PointerByReference vals,
+                                int priority, byte ignore_sparse);
+
+    int MXKVStorePullWithSparseEx(Pointer handle, int num, String keys[], PointerByReference vals,
+                                  int priority, byte ignore_sparse);
+
+
+    int MXKVStorePullRowSparse(Pointer handle, int num, int keys[], PointerByReference vals,
+                               PointerByReference row_ids, int priority);
+
+    int MXKVStorePullRowSparseEx(Pointer handle, int num, String keys[], PointerByReference vals,
+                                 PointerByReference row_ids, int priority);
+
+    int MXKVStoreGetType(Pointer handle, String type[]);
+
+
+    int MXKVStoreGetRank(Pointer handle, IntBuffer ret);
+
+    int MXKVStoreGetGroupSize(Pointer handle, IntBuffer ret);
+
+    int MXKVStoreIsWorkerNode(IntBuffer ret);
+
+    int MXKVStoreIsServerNode(IntBuffer ret);
+
+    int MXKVStoreIsSchedulerNode(IntBuffer ret);
+
+
+    int MXKVStoreBarrier(Pointer handle);
+
+
+    int MXKVStoreSetBarrierBeforeExit(Pointer handle, int barrier_before_exit);
+
+
+    int MXKVStoreRunServer(Pointer handle, MxnetLibrary.MXKVStoreServerController controller,
+                           Pointer controller_handle);
+
+
+    int MXKVStoreSendCommmandToServers(Pointer handle, int cmd_id, String cmd_body);
+
+    int MXKVStoreGetNumDeadNode(Pointer handle, int node_id, IntBuffer number, int timeout_sec);
+     */
     /*
     int MXImperativeInvokeEx(Pointer creator, int num_inputs, PointerByReference inputs,
                              IntBuffer num_outputs, PointerByReference outputs, int num_params,
@@ -1386,82 +1474,7 @@ public final class JnaUtils {
      */
 
     /*
-    int MXInitPSEnv(int num_vars, String keys[], String vals[]);
 
-
-    int MXKVStoreCreate(String type, PointerByReference out);
-
-
-    int MXKVStoreSetGradientCompression(Pointer handle, int num_params, String keys[],
-                                        String vals[]);
-
-
-    int MXKVStoreFree(Pointer handle);
-
-
-    int MXKVStoreInit(Pointer handle, int num, int keys[], PointerByReference vals);
-
-
-    int MXKVStoreInitEx(Pointer handle, int num, String keys[], PointerByReference vals);
-
-    int MXKVStorePush(Pointer handle, int num, int keys[], PointerByReference vals, int priority);
-
-    int MXKVStorePushEx(Pointer handle, int num, String keys[], PointerByReference vals,
-                        int priority);
-
-    int MXKVStorePullWithSparse(Pointer handle, int num, int keys[], PointerByReference vals,
-                                int priority, byte ignore_sparse);
-
-    int MXKVStorePullWithSparseEx(Pointer handle, int num, String keys[], PointerByReference vals,
-                                  int priority, byte ignore_sparse);
-
-
-    int MXKVStorePull(Pointer handle, int num, int keys[], PointerByReference vals, int priority);
-
-    int MXKVStorePullEx(Pointer handle, int num, String keys[], PointerByReference vals,
-                        int priority);
-
-    int MXKVStorePullRowSparse(Pointer handle, int num, int keys[], PointerByReference vals,
-                               PointerByReference row_ids, int priority);
-
-    int MXKVStorePullRowSparseEx(Pointer handle, int num, String keys[], PointerByReference vals,
-                                 PointerByReference row_ids, int priority);
-
-
-    int MXKVStoreSetUpdater(Pointer handle, MxnetLibrary.MXKVStoreUpdater updater,
-                            Pointer updater_handle);
-
-
-    int MXKVStoreSetUpdaterEx(Pointer handle, MxnetLibrary.MXKVStoreUpdater updater,
-                              MxnetLibrary.MXKVStoreStrUpdater str_updater, Pointer updater_handle);
-
-    int MXKVStoreGetType(Pointer handle, String type[]);
-
-
-    int MXKVStoreGetRank(Pointer handle, IntBuffer ret);
-
-    int MXKVStoreGetGroupSize(Pointer handle, IntBuffer ret);
-
-    int MXKVStoreIsWorkerNode(IntBuffer ret);
-
-    int MXKVStoreIsServerNode(IntBuffer ret);
-
-    int MXKVStoreIsSchedulerNode(IntBuffer ret);
-
-
-    int MXKVStoreBarrier(Pointer handle);
-
-
-    int MXKVStoreSetBarrierBeforeExit(Pointer handle, int barrier_before_exit);
-
-
-    int MXKVStoreRunServer(Pointer handle, MxnetLibrary.MXKVStoreServerController controller,
-                           Pointer controller_handle);
-
-
-    int MXKVStoreSendCommmandToServers(Pointer handle, int cmd_id, String cmd_body);
-
-    int MXKVStoreGetNumDeadNode(Pointer handle, int node_id, IntBuffer number, int timeout_sec);
 
 
     int MXRecordIOWriterCreate(String uri, PointerByReference out);
@@ -1634,6 +1647,22 @@ public final class JnaUtils {
         if (ret != 0) {
             throw new EngineException("MXNet engine call failed: " + getLastError());
         }
+    }
+
+    static PointerArray toPointerArray(NDList vals) {
+        Pointer[] valPointers = new Pointer[vals.size()];
+        for (int i = 0; i < vals.size(); i++) {
+            valPointers[i] = ((MxNDArray) vals.get(i)).getHandle();
+        }
+        return new PointerArray(valPointers);
+    }
+
+    static PointerArray toPointerArray(NDArray[] vals) {
+        Pointer[] valPointers = new Pointer[vals.length];
+        for (int i = 0; i < vals.length; i++) {
+            valPointers[i] = ((MxNDArray) vals[i]).getHandle();
+        }
+        return new PointerArray(valPointers);
     }
 
     private static String getLastError() {

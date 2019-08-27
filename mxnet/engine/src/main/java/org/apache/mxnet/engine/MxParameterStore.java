@@ -13,41 +13,66 @@
 
 package org.apache.mxnet.engine;
 
+import com.sun.jna.Pointer;
+import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.optimizer.Optimizer;
 
-public class MxParameterStore implements ParameterStore {
+public class MxParameterStore extends NativeResource implements ParameterStore {
 
-    public MxParameterStore(Optimizer optimizer, boolean aggregateOnGPU) {
-        // TODO: call KVStore JnaUtils
-        createdKVStore(aggregateOnGPU);
+    public MxParameterStore(boolean aggregateOnGPU, Optimizer optimizer) {
+        super(createdKVStore(aggregateOnGPU));
         setOptimizer(optimizer);
     }
 
     /** {@inheritDoc} */
     @Override
     public void init(int key, NDArray value) {
-        // TODO: call KVStore JnaUtils
+        // TODO: handle list
+        int[] keys = {key};
+        NDList vals = new NDList(value);
+        JnaUtils.parameterStoreInit(getHandle(), 1, keys, vals);
     }
 
     /** {@inheritDoc} */
     @Override
     public void push(int key, NDArray value) {
-        // TODO: call KVStore JnaUtils
+        // TODO: handle list
+        int[] keys = {key};
+        NDList vals = new NDList(value);
+        JnaUtils.parameterStorePush(getHandle(), 1, keys, vals, 0);
     }
 
     /** {@inheritDoc} */
     @Override
     public void pull(int key, NDArray value) {
-        // TODO: call KVStore JnaUtils
+        // TODO: handle list
+        int[] keys = {key};
+        NDList vals = new NDList(value);
+        JnaUtils.parameterStorePull(getHandle(), 1, keys, vals, 0);
     }
 
-    private void createdKVStore(boolean aggregateOnGPU) { // NOPMD
-        // TODO: call KVStore create
+    private static Pointer createdKVStore(boolean aggregateOnGPU) {
+        Pointer handle;
+        if (aggregateOnGPU) {
+            handle = JnaUtils.parameterStoreCreate("device");
+        } else {
+            handle = JnaUtils.parameterStoreCreate("local");
+        }
+        return handle;
     }
 
     private void setOptimizer(Optimizer optimizer) { // NOPMD
         // TODO: call KVStore JnaUtils
+    }
+
+    @Override
+    public void close() {
+        Pointer pointer = handle.getAndSet(null);
+        if (pointer != null) {
+            JnaUtils.parameterStoreClose(pointer);
+        }
     }
 }

@@ -1,0 +1,65 @@
+/*
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
+package software.amazon.ai.integration.tests;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
+import org.apache.mxnet.engine.MxParameterStore;
+import software.amazon.ai.integration.IntegrationTest;
+import software.amazon.ai.integration.exceptions.FailedTestException;
+import software.amazon.ai.integration.util.Assertions;
+import software.amazon.ai.integration.util.RunAsTest;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.training.ParameterStore;
+import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.training.optimizer.Sgd;
+import software.amazon.ai.training.optimizer.learningrate.LrTracker;
+
+public class ParameterStoreTest {
+
+    public static void main(String[] args) {
+        String[] cmd = {"-c", ParameterStoreTest.class.getName()};
+        new IntegrationTest()
+                .runTests(
+                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
+                                .toArray(String[]::new));
+    }
+
+    @RunAsTest
+    public void testParameterStore() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray weight = manager.create(new float[] {1.f, 1.f}, new Shape(1, 2));
+            NDArray grad = manager.create(new float[] {2.f, 2.f}, new Shape(1, 2));
+
+            Optimizer optimizer =
+                    new Sgd.Builder()
+                            .setRescaleGrad(1.0f / 32)
+                            .setLrTracker(LrTracker.fixedLR(.03f))
+                            .build();
+            try (ParameterStore ps = new MxParameterStore(false, optimizer)) {
+                ps.init(0, weight);
+                ps.push(0, grad);
+                ps.pull(0, weight);
+                Assertions.assertEquals(
+                        weight,
+                        grad,
+                        String.format(
+                                "Parameter Store updated wrong result: actual %s, expected %s",
+                                weight.toString(), grad.toString()));
+            }
+        }
+    }
+}

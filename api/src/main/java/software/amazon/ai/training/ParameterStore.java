@@ -15,11 +15,14 @@ package software.amazon.ai.training;
 
 import software.amazon.ai.ndarray.NDArray;
 
-public interface ParameterStore {
+public interface ParameterStore extends AutoCloseable {
 
     void init(int key, NDArray value);
 
     void push(int key, NDArray value);
 
     void pull(int key, NDArray value);
+
+    @Override
+    void close();
 }
