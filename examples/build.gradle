@@ -17,7 +17,8 @@ dependencies {
     compile "com.google.code.gson:gson:2.8.5"
     compile "software.amazon.ai:joule-api:0.2.0-SNAPSHOT"
     compile "org.apache.mxnet:mxnet-model-zoo:0.2.0-SNAPSHOT"
-
+    compile "org.apache.mxnet:mxnet:dataset:0.2.0-SNAPSHOY"
+    
     runtime "org.apache.mxnet:mxnet-joule:0.2.0-SNAPSHOT"
     runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:osx-x86_64"
 

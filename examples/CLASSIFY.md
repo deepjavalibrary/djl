@@ -37,7 +37,7 @@ You can run the example using either Intellij or via command line.
 
 ```
 cd examples
-./gradlew -Dmain=software.amazon.ai.examples.ClassifyExample run --args="-n squeezenet_v1.1 -i ./src/test/resources/kitten.jpg"
+./gradlew -Dmain=software.amazon.ai.examples.inference.ClassifyExample run --args="-n squeezenet_v1.1 -i ./src/test/resources/kitten.jpg"
 ```
 ```text
 [INFO] Inference result: class: "tabby, tabby cat", probability: 0.7371954321861267

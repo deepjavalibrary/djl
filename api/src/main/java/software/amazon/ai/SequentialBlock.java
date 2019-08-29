@@ -53,6 +53,15 @@ public class SequentialBlock implements Block {
         this.isInitialized = false;
     }
 
+    public void removeLastBlock() {
+        blocks.remove(blocks.size() - 1);
+    }
+
+    public void replaceLastBlock(Block block) {
+        removeLastBlock();
+        blocks.add(block);
+    }
+
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
         NDList current = inputs;

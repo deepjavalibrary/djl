@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.examples;
+package software.amazon.ai.examples.inference;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,8 +22,8 @@ import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
 import software.amazon.ai.Context;
-import software.amazon.ai.examples.util.AbstractExample;
-import software.amazon.ai.examples.util.Arguments;
+import software.amazon.ai.examples.inference.util.AbstractExample;
+import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.Classification;

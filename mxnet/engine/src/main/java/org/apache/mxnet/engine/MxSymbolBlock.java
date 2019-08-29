@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Block;
 import software.amazon.ai.Parameter;
+import software.amazon.ai.SymbolBlock;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -35,7 +36,7 @@ import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 // TODO: Need to add Memory management for all params
-public class SymbolBlock implements Block {
+public class MxSymbolBlock implements SymbolBlock {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
@@ -45,7 +46,7 @@ public class SymbolBlock implements Block {
     private List<Parameter> params;
     private boolean paramGradientsAttached;
 
-    SymbolBlock(Symbol symbol, List<Parameter> params, NDManager manager) {
+    MxSymbolBlock(Symbol symbol, List<Parameter> params, NDManager manager) {
         this.symbol = symbol;
         this.params = params;
         this.manager = (MxNDManager) manager;
@@ -63,7 +64,7 @@ public class SymbolBlock implements Block {
     /**
      * Extract the middle layer of SymbolBlock.
      *
-     * @param name the layer name. Can be found in {@link SymbolBlock#getLayerNames()}
+     * @param name the layer name. Can be found in {@link MxSymbolBlock#getLayerNames()}
      * @return sliced SymbolBlock
      */
     public SymbolBlock getLayer(String name) {
@@ -73,7 +74,7 @@ public class SymbolBlock implements Block {
                 params.stream()
                         .filter(ele -> set.contains(ele.getName()))
                         .collect(Collectors.toList());
-        return new SymbolBlock(sliced, slicedParams, manager);
+        return new MxSymbolBlock(sliced, slicedParams, manager);
     }
 
     /**
@@ -125,7 +126,7 @@ public class SymbolBlock implements Block {
                                     return new Parameter(ele.getName(), casted);
                                 })
                         .collect(Collectors.toList());
-        return new SymbolBlock(symbol, newParams, manager);
+        return new MxSymbolBlock(symbol, newParams, manager);
     }
 
     @Override
@@ -164,6 +165,12 @@ public class SymbolBlock implements Block {
     @Override
     public List<Parameter> getDirectParameters() {
         return params;
+    }
+
+    @Override
+    public SymbolBlock removeLastBlock() {
+        List<String> layerNames = getLayerNames();
+        return getLayer(layerNames.get(layerNames.size() - 2));
     }
 
     @Override

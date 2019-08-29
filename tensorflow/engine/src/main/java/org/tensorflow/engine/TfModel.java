@@ -30,6 +30,7 @@ import org.tensorflow.framework.TensorInfo;
 import org.tensorflow.framework.TensorShapeProto;
 import software.amazon.ai.Block;
 import software.amazon.ai.Model;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -149,6 +150,11 @@ public class TfModel implements Model {
 
     @Override
     public Block getBlock() {
+        return null;
+    }
+
+    @Override
+    public NDManager getManager() {
         return null;
     }
 

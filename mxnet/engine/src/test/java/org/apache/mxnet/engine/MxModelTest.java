@@ -63,7 +63,7 @@ public class MxModelTest extends PowerMockTestCase {
         try (MxModel model = MxModel.loadModel(prefix, epoch)) {
             Assert.assertEquals(
                     model.getBlock().getDirectParameters().get(0).getName(), "A-0122.params");
-            Symbol sym = ((SymbolBlock) model.getBlock()).getSymbol();
+            Symbol sym = ((MxSymbolBlock) model.getBlock()).getSymbol();
             Assert.assertNotNull(sym);
         }
     }

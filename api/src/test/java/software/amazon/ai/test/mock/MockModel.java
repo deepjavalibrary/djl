@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import software.amazon.ai.Block;
 import software.amazon.ai.Model;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 
@@ -82,6 +83,11 @@ public class MockModel implements Model {
 
     @Override
     public Block getBlock() {
+        return null;
+    }
+
+    @Override
+    public NDManager getManager() {
         return null;
     }
 

@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package software.amazon.ai.examples;
+package software.amazon.ai.examples.inference;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -22,10 +22,10 @@ import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.examples.util.AbstractExample;
-import software.amazon.ai.examples.util.Arguments;
-import software.amazon.ai.examples.util.BertDataParser;
-import software.amazon.ai.examples.util.LogUtils;
+import software.amazon.ai.examples.inference.util.AbstractExample;
+import software.amazon.ai.examples.inference.util.Arguments;
+import software.amazon.ai.examples.inference.util.BertDataParser;
+import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;

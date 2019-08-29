@@ -184,7 +184,7 @@ The model, input image, output directory can all be provided as input. The avail
 You can navigate to the source folder, and simply type the following command to run the inference:
  
  ```
- ./gradlew -Dmain=software.amazon.ai.examples.SsdExample run --args="-p build/ -n resnet50_ssd_model -i {PATH_TO_IMAGE} -l {OUTPUT_DIR}" 
+ ./gradlew -Dmain=software.amazon.ai.examples.inference.SsdExample run --args="-p build/ -n resnet50_ssd_model -i {PATH_TO_IMAGE} -l {OUTPUT_DIR}" 
  ```
  
  When you run inference on the image of the dog and the cat, this is the output generated. 

@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Function;
 import software.amazon.ai.engine.Engine;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.translate.Translator;
@@ -178,9 +179,16 @@ public interface Model extends AutoCloseable {
     /**
      * Get the block from the Model.
      *
-     * @return {@link Block} from
+     * @return {@link Block}
      */
     Block getBlock();
+
+    /**
+     * Get the NDArray Manager from the model.
+     *
+     * @return {@link NDManager}
+     */
+    NDManager getManager();
 
     /**
      * Casts the model to support a different precision level.

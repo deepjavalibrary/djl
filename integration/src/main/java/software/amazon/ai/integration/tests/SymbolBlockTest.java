@@ -20,10 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.mxnet.engine.SymbolBlock;
 import software.amazon.ai.Block;
 import software.amazon.ai.Model;
 import software.amazon.ai.SequentialBlock;
+import software.amazon.ai.SymbolBlock;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -116,9 +116,8 @@ public class SymbolBlockTest {
             Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
             Model mnistmlp = Model.loadModel(modelPathPrefix);
             SymbolBlock mlp = (SymbolBlock) mnistmlp.getBlock();
-            SymbolBlock mlpPartial = mlp.getLayer("hybridsequential0_dense1_relu_fwd_output");
             SequentialBlock newMlp = new SequentialBlock();
-            newMlp.add(mlpPartial);
+            newMlp.add(mlp.removeLastBlock());
             newMlp.add(
                     new Linear.Builder()
                             .setOutChannels(10)

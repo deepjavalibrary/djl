@@ -14,7 +14,8 @@ package software.amazon.ai.examples;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import software.amazon.ai.examples.util.AbstractExample;
+import software.amazon.ai.examples.inference.SsdExample;
+import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.modality.cv.DetectedObject;
 
 public class SsdExampleTest {

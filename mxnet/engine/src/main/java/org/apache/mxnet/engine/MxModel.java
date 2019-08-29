@@ -32,6 +32,7 @@ import software.amazon.ai.Model;
 import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.util.Pair;
@@ -93,7 +94,7 @@ public class MxModel implements Model {
                                 })
                         .collect(Collectors.toList());
         // TODO: Check if Symbol has all names that params file have
-        return new MxModel(modelDir, new SymbolBlock(symbol, parameters, subManager), subManager);
+        return new MxModel(modelDir, new MxSymbolBlock(symbol, parameters, subManager), subManager);
     }
 
     /** {@inheritDoc} */
@@ -188,9 +189,16 @@ public class MxModel implements Model {
         return url.openStream();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Block getBlock() {
         return block;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDManager getManager() {
+        return manager;
     }
 
     /** {@inheritDoc} */
