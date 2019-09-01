@@ -53,7 +53,7 @@ public class MxPredictorTest extends PowerMockTestCase {
     public void testPredict() throws Exception {
         String prefix = "A";
         int epoch = 122;
-        MxModel model = MxModel.loadModel(prefix, epoch);
+        MxModel model = MxModel.load(prefix, epoch);
         DummyTranslator translator = new DummyTranslator();
         Predictor<Integer, NDList> predictor = new MxPredictor<>(model, translator, Context.gpu());
         predictor.setMetrics(new Metrics());

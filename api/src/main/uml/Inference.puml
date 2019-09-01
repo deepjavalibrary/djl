@@ -24,9 +24,9 @@ interface Model {
     +InputStream getArtifactAsStream(String name)
     +void save(File modelPath, String modelName)
 	.. static Manager methods ..
-    +Model loadModel(Path modelPath)
-    +Model loadModel(Path modelPath, String modelName)
-    +Model loadModel(Path modelPath, String modelName, Map options)
+    +Model load(Path modelPath)
+    +Model load(Path modelPath, String modelName)
+    +Model load(Path modelPath, String modelName, Map options)
 }
 
 interface Translator<I, O> {

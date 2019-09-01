@@ -73,7 +73,7 @@ public class TfModel implements Model {
         return descs;
     }
 
-    public static TfModel loadModel(String modelDir, String... tags)
+    public static TfModel load(String modelDir, String... tags)
             throws InvalidProtocolBufferException {
         if (tags == null || tags.length == 0) {
             tags = new String[] {"serve"};
@@ -81,7 +81,7 @@ public class TfModel implements Model {
         return new TfModel(Paths.get(modelDir), SavedModelBundle.load(modelDir, tags));
     }
 
-    public static TfModel loadModel(
+    public static TfModel load(
             String modelDir, byte[] configProto, byte[] runOptions, String... tags)
             throws InvalidProtocolBufferException {
         SavedModelBundle bundle =

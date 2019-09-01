@@ -55,7 +55,7 @@ public final class HelloWorld {
             System.out.println("OnesLike:");
             System.out.println(Arrays.toString(a.onesLike().toFloatArray()));
 
-            TfModel model = TfModel.loadModel("ModelPath/TF-resnet_ssd");
+            TfModel model = TfModel.load("ModelPath/TF-resnet_ssd");
             System.out.println(model.describeInput()[0].getShape());
             System.out.println(model.describeInput()[0].getName());
 

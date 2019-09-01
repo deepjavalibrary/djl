@@ -61,7 +61,7 @@ class ImageNetModel {
         Path dir = repository.getCacheDirectory();
         String relativePath = artifact.getResourceUri().getPath();
         Path modelPath = dir.resolve(relativePath);
-        Model model = Model.loadModel(modelPath, artifact.getName());
+        Model model = Model.load(modelPath, artifact.getName());
         return new ZooModel<>(model, new ImageNetTranslator());
     }
 

@@ -57,10 +57,10 @@ public class MxModelTest extends PowerMockTestCase {
     }
 
     @Test
-    public void testLoadModel() throws IOException {
+    public void testLoadModel() {
         String prefix = "A";
         int epoch = 122;
-        try (MxModel model = MxModel.loadModel(prefix, epoch)) {
+        try (MxModel model = MxModel.load(prefix, epoch)) {
             Assert.assertEquals(
                     model.getBlock().getDirectParameters().get(0).getName(), "A-0122.params");
             Symbol sym = ((MxSymbolBlock) model.getBlock()).getSymbol();
@@ -69,10 +69,10 @@ public class MxModelTest extends PowerMockTestCase {
     }
 
     @Test
-    public void testDescribeInput() throws IOException {
+    public void testDescribeInput() {
         String prefix = "A";
         int epoch = 122;
-        try (MxModel model = MxModel.loadModel(prefix, epoch)) {
+        try (MxModel model = MxModel.load(prefix, epoch)) {
             DataDesc[] descs = model.describeInput();
             Assert.assertEquals(descs.length, 3);
             Assert.assertEquals(descs[0].getName(), "a");
@@ -80,10 +80,10 @@ public class MxModelTest extends PowerMockTestCase {
     }
 
     @Test
-    public void testCast() throws IOException {
+    public void testCast() {
         String prefix = "A";
         int epoch = 122;
-        MxModel model = MxModel.loadModel(prefix, epoch);
+        MxModel model = MxModel.load(prefix, epoch);
         MxModel casted = (MxModel) model.cast(DataType.FLOAT32);
         Assert.assertEquals(
                 casted.getBlock().getDirectParameters(), model.getBlock().getDirectParameters());
@@ -104,7 +104,7 @@ public class MxModelTest extends PowerMockTestCase {
         Files.createDirectories(Paths.get(dir));
         Files.createFile(Paths.get(dir + prefix + "-0001.params"));
         Files.createFile(Paths.get(dir + prefix + "-symbol.json"));
-        MxModel model = MxModel.loadModel(dir + prefix, epoch);
+        MxModel model = MxModel.load(dir + prefix, epoch);
         Assert.assertEquals(model.getArtifactNames().length, 0);
 
         // Test: Add new file

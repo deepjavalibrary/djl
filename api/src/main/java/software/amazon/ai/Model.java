@@ -41,7 +41,7 @@ import software.amazon.ai.translate.Translator;
  * {@link software.amazon.ai.inference.Predictor#predict(Object)} to get the inference result.
  *
  * <pre>
- * Model model = <b>Model.loadModel</b>(modelDir, modelName);
+ * Model model = <b>Model.load</b>(modelDir, modelName);
  *
  * // User must implement Translator interface, read Translator for detail.
  * Translator translator = new MyTranslator();
@@ -51,7 +51,7 @@ import software.amazon.ai.translate.Translator;
  * }
  * </pre>
  *
- * @see software.amazon.ai.Model#loadModel(Path, String)
+ * @see software.amazon.ai.Model#load(Path, String)
  * @see software.amazon.ai.inference.Predictor
  * @see Translator
  */
@@ -64,8 +64,8 @@ public interface Model extends AutoCloseable {
      * @return {@code Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model loadModel(Path modelPath) throws IOException {
-        return loadModel(modelPath, modelPath.toFile().getName(), null, null);
+    static Model load(Path modelPath) throws IOException {
+        return load(modelPath, modelPath.toFile().getName(), null, null);
     }
 
     /**
@@ -76,8 +76,8 @@ public interface Model extends AutoCloseable {
      * @return {@code Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model loadModel(Path modelPath, String modelName) throws IOException {
-        return loadModel(modelPath, modelName, null, null);
+    static Model load(Path modelPath, String modelName) throws IOException {
+        return load(modelPath, modelName, null, null);
     }
 
     /**
@@ -89,9 +89,9 @@ public interface Model extends AutoCloseable {
      * @return {@code Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model loadModel(Path modelPath, String modelName, Map<String, String> options)
+    static Model load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException {
-        return Engine.getInstance().loadModel(modelPath, modelName, null, options);
+        return load(modelPath, modelName, null, options);
     }
 
     /**
@@ -105,7 +105,7 @@ public interface Model extends AutoCloseable {
      * @return {@link Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model loadModel(
+    static Model load(
             Path modelPath, String modelName, Context context, Map<String, String> options)
             throws IOException {
         return Engine.getInstance().loadModel(modelPath, modelName, context, options);

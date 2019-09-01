@@ -26,7 +26,7 @@ import software.amazon.ai.translate.Translator;
  * following is example code that uses {@code Predictor}:
  *
  * <pre>
- * Model model = Model.loadModel(modelDir, modelName);
+ * Model model = Model.load(modelDir, modelName);
  *
  * // User must implement Translator interface, read Translator for detail.
  * Translator translator = new MyTranslator();

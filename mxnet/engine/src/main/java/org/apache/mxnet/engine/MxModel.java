@@ -58,15 +58,15 @@ public class MxModel implements Model {
         this.manager = manager;
     }
 
-    static MxModel loadModel(String prefix, int epoch) {
-        return loadModel(MxNDManager.getSystemManager(), prefix, epoch, null);
+    static MxModel load(String prefix, int epoch) {
+        return load(MxNDManager.getSystemManager(), prefix, epoch, null);
     }
 
-    static MxModel loadModel(String prefix, int epoch, Context context) {
-        return loadModel(MxNDManager.getSystemManager(), prefix, epoch, context);
+    static MxModel load(String prefix, int epoch, Context context) {
+        return load(MxNDManager.getSystemManager(), prefix, epoch, context);
     }
 
-    static MxModel loadModel(
+    static MxModel load(
             MxNDManager manager, final String prefix, final int epoch, final Context context) {
         MxNDManager subManager = manager.newSubManager();
         Symbol symbol = Symbol.load(subManager, prefix + "-symbol.json");

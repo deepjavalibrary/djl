@@ -54,7 +54,7 @@ public final class BertQaInferenceExample extends AbstractExample {
         Path modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
 
-        Model model = Model.loadModel(modelDir, modelName);
+        Model model = Model.load(modelDir, modelName);
 
         QAInput input = new QAInput(arguments);
         BertDataParser parser = model.getArtifact("vocab.json", BertDataParser::parse);

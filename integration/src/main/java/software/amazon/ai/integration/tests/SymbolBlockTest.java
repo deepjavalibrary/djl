@@ -52,7 +52,7 @@ public class SymbolBlockTest {
     @RunAsTest
     public void testInference() throws FailedTestException, IOException {
         Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-        Model mnistmlp = Model.loadModel(modelPathPrefix);
+        Model mnistmlp = Model.load(modelPathPrefix);
         Block block = mnistmlp.getBlock();
         Shape shape;
         try (NDManager manager = NDManager.newBaseManager().newSubManager()) {
@@ -67,7 +67,7 @@ public class SymbolBlockTest {
     public void trainWithNewParam() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-            Model mnistmlp = Model.loadModel(modelPathPrefix);
+            Model mnistmlp = Model.load(modelPathPrefix);
             Block mlp = mnistmlp.getBlock();
             mlp.setInitializer(manager, Initializer.ONES, true);
             Pair<NDArray, NDArray> result = train(manager, mlp);
@@ -91,7 +91,7 @@ public class SymbolBlockTest {
     public void trainWithExistParam() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-            Model mnistmlp = Model.loadModel(modelPathPrefix);
+            Model mnistmlp = Model.load(modelPathPrefix);
             Block mlp = mnistmlp.getBlock();
             Pair<NDArray, NDArray> result = train(manager, mlp);
             Assertions.assertAlmostEquals(manager.create(0.29814255237579346), result.getKey());
@@ -114,7 +114,7 @@ public class SymbolBlockTest {
     public void trainWithCustomLayer() throws FailedTestException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-            Model mnistmlp = Model.loadModel(modelPathPrefix);
+            Model mnistmlp = Model.load(modelPathPrefix);
             SymbolBlock mlp = (SymbolBlock) mnistmlp.getBlock();
             SequentialBlock newMlp = new SequentialBlock();
             newMlp.add(mlp.removeLastBlock());

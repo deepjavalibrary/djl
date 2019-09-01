@@ -142,7 +142,7 @@ Loading a model requires the path to the directory where the model is stored, an
 name of the symbol or param files that were downloaded. In this case, it is `resnet50_ssd_model`. As we will see later, 
 we will pass these values through command-line arguments.  
 ~~~
-Model model = Model.loadModel(modelDir, modelName);
+Model model = Model.load(modelDir, modelName);
 ~~~
 
 ### Step 3 Create Predictor

@@ -153,7 +153,7 @@ public class MxEngine extends Engine {
             epoch = Integer.parseInt(epochOption);
         }
 
-        Model result = MxModel.loadModel(modelPrefix, epoch, context);
+        Model result = MxModel.load(modelPrefix, epoch, context);
         ((MxEngine) Engine.getInstance()).setNumpyMode(true);
         return result;
     }

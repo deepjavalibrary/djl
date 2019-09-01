@@ -19,7 +19,7 @@ The following is an example of how to write inference code:
 
 ```java
     // Assume user has a pre-trained already, they just need load it
-    Model model = Model.loadModel(modelDir, modelName);
+    Model model = Model.load(modelDir, modelName);
 
     // User must implement Translator interface, read Translator document for detail.
     Translator translator = new MyTranslator();
