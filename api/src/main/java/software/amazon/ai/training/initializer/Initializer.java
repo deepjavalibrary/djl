@@ -12,11 +12,11 @@
  */
 package software.amazon.ai.training.initializer;
 
-import software.amazon.ai.Block;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Block;
 
 /**
  * An interface representing an initialization method.

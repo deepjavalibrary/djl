@@ -15,10 +15,10 @@ package software.amazon.ai.training;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import software.amazon.ai.Parameter;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
+import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.util.PairList;
 

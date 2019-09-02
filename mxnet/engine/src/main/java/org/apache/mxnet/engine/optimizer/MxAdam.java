@@ -13,9 +13,9 @@
 package org.apache.mxnet.engine.optimizer;
 
 import org.apache.mxnet.engine.MxOpParams;
-import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.util.PairList;
 

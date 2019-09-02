@@ -22,6 +22,7 @@ import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.translate.Translator;
 
 /**

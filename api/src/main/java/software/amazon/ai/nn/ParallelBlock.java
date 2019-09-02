@@ -10,32 +10,43 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai;
+package software.amazon.ai.nn;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
-public class LambdaBlock implements Block {
+/** ParallelBlock can be used to represent branches in the computational graph. */
+public class ParallelBlock implements Block {
+    private List<Block> blocks;
+    private Function<List<NDList>, NDList> function;
+    private boolean isInitialized;
 
-    Function<NDList, NDList> lambda;
-
-    public LambdaBlock(Function<NDList, NDList> lambda) {
-        this.lambda = lambda;
+    public ParallelBlock(List<Block> blocks, Function<List<NDList>, NDList> function) {
+        this.blocks = blocks;
+        this.function = function;
     }
 
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
-        return lambda.apply(inputs);
+        return function.apply(
+                blocks.stream()
+                        .map(
+                                block -> {
+                                    block.ensureInitialized(inputs);
+                                    return block.forward(inputs, params);
+                                })
+                        .collect(Collectors.toList()));
     }
 
     @Override
     public boolean isInitialized() {
-        return true;
+        return isInitialized;
     }
 
     @Override
@@ -49,7 +60,9 @@ public class LambdaBlock implements Block {
     }
 
     @Override
-    public void beforeInitialize(NDList inputs) {}
+    public void beforeInitialize(NDList inputs) {
+        isInitialized = true;
+    }
 
     @Override
     public DataDesc[] describeInput() {
@@ -58,7 +71,18 @@ public class LambdaBlock implements Block {
 
     @Override
     public Shape getParameterShape(String name, NDList inputs) {
-        throw new IllegalArgumentException("LambdaBlocks have no parameters");
+        throw new IllegalArgumentException("ParallelBlock have no parameters");
+    }
+
+    @Override
+    public PairList<String, Block> getChildren() {
+        PairList<String, Block> children = new PairList<>(blocks.size());
+        for (int i = 0; i < blocks.size(); i++) {
+            Block block = blocks.get(i);
+            String name = String.format("%02d:%s", i, block.getClass().getSimpleName());
+            children.add(name, block);
+        }
+        return children;
     }
 
     @Override

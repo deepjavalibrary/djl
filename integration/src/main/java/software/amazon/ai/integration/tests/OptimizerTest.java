@@ -14,7 +14,6 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
-import software.amazon.ai.Block;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -24,6 +23,7 @@ import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;

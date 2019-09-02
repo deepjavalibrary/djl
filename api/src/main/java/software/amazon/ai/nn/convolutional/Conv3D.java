@@ -12,8 +12,8 @@
  */
 package software.amazon.ai.nn.convolutional;
 
-import software.amazon.ai.Block;
 import software.amazon.ai.engine.Engine;
+import software.amazon.ai.nn.Block;
 
 public interface Conv3D extends Convolution {
 

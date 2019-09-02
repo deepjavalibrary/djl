@@ -12,12 +12,12 @@
  */
 package org.apache.mxnet.nn;
 
-import software.amazon.ai.Block;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.util.PairList;
 
 public abstract class MxNNBlock implements Block {

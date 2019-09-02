@@ -14,11 +14,11 @@ package software.amazon.ai.training;
 
 import java.io.IOException;
 import java.util.Optional;
-import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.translate.TrainTranslator;

@@ -13,11 +13,11 @@
 package software.amazon.ai.nn.core;
 
 import java.util.Collection;
-import software.amazon.ai.Block;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.nn.Block;
 
 /**
  * An Embedding block map a collection of items to 1-Dimensional representative {@link NDArray}s.

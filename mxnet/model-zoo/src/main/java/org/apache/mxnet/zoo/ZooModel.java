@@ -16,13 +16,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.function.Function;
-import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.translate.Translator;
 
 public class ZooModel<I, O> implements Model {

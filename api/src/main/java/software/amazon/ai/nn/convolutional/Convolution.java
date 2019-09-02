@@ -12,9 +12,9 @@
  */
 package software.amazon.ai.nn.convolutional;
 
-import software.amazon.ai.Block;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Block;
 
 public interface Convolution extends Block {
     NDArray forward(NDArray data);

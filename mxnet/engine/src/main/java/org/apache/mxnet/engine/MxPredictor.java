@@ -14,7 +14,6 @@ package org.apache.mxnet.engine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
@@ -22,6 +21,7 @@ import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;

@@ -23,15 +23,15 @@ import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Block;
-import software.amazon.ai.Parameter;
-import software.amazon.ai.SymbolBlock;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 

@@ -16,11 +16,11 @@ import java.util.Collections;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
-import software.amazon.ai.Parameter;
-import software.amazon.ai.ParameterType;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.util.PairList;
 

@@ -13,11 +13,11 @@
 package software.amazon.ai.training;
 
 import java.util.function.Function;
-import software.amazon.ai.Block;
-import software.amazon.ai.LambdaBlock;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.LambdaBlock;
 
 public interface Activation extends Block {
 

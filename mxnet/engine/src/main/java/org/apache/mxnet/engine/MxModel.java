@@ -26,15 +26,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.mxnet.jna.JnaUtils;
-import software.amazon.ai.Block;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.util.Pair;
 
 /**

@@ -30,10 +30,7 @@ import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Sgd;
 
-/**
- * An internal mapping to Engine specific implementations of Neural Network {@link
- * software.amazon.ai.Block}s.
- */
+/** An internal mapping to Engine specific implementations of Neural Network {@link Block}s. */
 public abstract class NNIndex {
 
     ////////////////////////////////////////

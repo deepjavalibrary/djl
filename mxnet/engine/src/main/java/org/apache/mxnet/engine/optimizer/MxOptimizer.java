@@ -13,8 +13,8 @@
 package org.apache.mxnet.engine.optimizer;
 
 import java.util.Arrays;
-import software.amazon.ai.Parameter;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.util.PairList;
 

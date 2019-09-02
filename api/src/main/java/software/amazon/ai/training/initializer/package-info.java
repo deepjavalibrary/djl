@@ -12,8 +12,8 @@
  */
 
 /**
- * Contains classes for initializing a {@link software.amazon.ai.Block}'s {@link
- * software.amazon.ai.Parameter}s.
+ * Contains classes for initializing a {@link software.amazon.ai.nn.Block}'s {@link
+ * software.amazon.ai.nn.Parameter}s.
  *
  * <p>It contains a main interface {@link software.amazon.ai.training.initializer.Initializer} and
  * various initializers that extend it.

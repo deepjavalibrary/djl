@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.Parameter;
+import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.util.PairList;
 
 /**

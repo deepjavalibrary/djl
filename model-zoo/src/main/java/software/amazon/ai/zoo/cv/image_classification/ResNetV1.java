@@ -13,12 +13,12 @@
 package software.amazon.ai.zoo.cv.image_classification;
 
 import java.util.Arrays;
-import software.amazon.ai.Block;
-import software.amazon.ai.LambdaBlock;
-import software.amazon.ai.ParallelBlock;
-import software.amazon.ai.SequentialBlock;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.LambdaBlock;
+import software.amazon.ai.nn.ParallelBlock;
+import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.norm.BatchNorm;

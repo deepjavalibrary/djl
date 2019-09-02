@@ -12,9 +12,9 @@
  */
 package software.amazon.ai.nn.norm;
 
-import software.amazon.ai.Block;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.nn.Block;
 
 public interface Dropout extends Block {
 
