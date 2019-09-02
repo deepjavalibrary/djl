@@ -27,10 +27,12 @@ import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 public class MxConv3D extends MxNNBlock implements Conv3D {
+
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.DEPTH, LayoutType.HEIGHT, LayoutType.WIDTH
     };
     private static final String LAYOUT_STRING = "NCDHW";
+
     private Shape kernel;
     private Shape stride;
     private Shape pad;
@@ -43,13 +45,13 @@ public class MxConv3D extends MxNNBlock implements Conv3D {
     private Parameter bias;
 
     public MxConv3D(
-            final Shape kernel,
-            final Shape stride,
-            final Shape pad,
-            final Shape dilate,
-            final int numFilters,
-            final int numGroups,
-            final boolean includeBias) {
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            Shape dilate,
+            int numFilters,
+            int numGroups,
+            boolean includeBias) {
         this.opName = "Convolution";
         this.kernel = kernel;
         this.stride = stride == null ? new Shape(1, 1, 1) : stride;
@@ -65,7 +67,7 @@ public class MxConv3D extends MxNNBlock implements Conv3D {
     }
 
     @Override
-    public Shape getOutputShape(final Shape... inputs) {
+    public Shape getOutputShape(Shape... inputs) {
         long[] shape = new long[5];
         shape[0] = inputs[0].get(0);
         shape[1] = numFilters;
@@ -92,7 +94,7 @@ public class MxConv3D extends MxNNBlock implements Conv3D {
     }
 
     @Override
-    public void beforeInitialize(final NDList inputs) {
+    public void beforeInitialize(NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
         if (!isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
@@ -101,7 +103,7 @@ public class MxConv3D extends MxNNBlock implements Conv3D {
     }
 
     @Override
-    public Shape getParameterShape(final String name, final NDList inputs) {
+    public Shape getParameterShape(String name, NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
         switch (name) {
@@ -116,7 +118,7 @@ public class MxConv3D extends MxNNBlock implements Conv3D {
     }
 
     @Override
-    public NDArray forward(final NDArray data) {
+    public NDArray forward(NDArray data) {
         return forward(new NDList(data)).get(0);
     }
 

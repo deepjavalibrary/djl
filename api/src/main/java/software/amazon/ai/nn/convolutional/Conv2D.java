@@ -16,8 +16,10 @@ import software.amazon.ai.engine.Engine;
 import software.amazon.ai.nn.Block;
 
 public interface Conv2D extends Convolution {
+
     /** The Builder to construct a {@link Conv2D} type of {@link Block}. */
-    class Builder extends Convolution.Builder<Conv2D> {
+    final class Builder extends Convolution.Builder<Conv2D> {
+
         /** {@inheritDoc} */
         @Override
         public Conv2D build() {

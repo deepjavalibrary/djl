@@ -65,11 +65,9 @@ public final class TrainResnetWithCifar10 {
         Block modifiedBlock = ((SymbolBlock) model.getBlock()).removeLastBlock();
         SequentialBlock newBlock = new SequentialBlock();
         newBlock.add(modifiedBlock);
-        newBlock.add(
-                new Linear.Builder()
-                        .setOutChannels(10)
-                        .build()
-                        .setInitializer(model.getManager(), Initializer.ONES, true));
+        Linear linear = new Linear.Builder().setOutChannels(10).build();
+        linear.setInitializer(model.getManager(), Initializer.ONES, true);
+        newBlock.add(linear);
         return newBlock;
     }
 

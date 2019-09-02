@@ -48,13 +48,10 @@ public class MxPrelu extends MxNNBlock implements Prelu {
 
     @Override
     public Shape getParameterShape(String name, NDList inputs) {
-        switch (name) {
-            case "alpha":
-                // TODO: This should return Shape()
-                return new Shape(1);
-            default:
-                throw new IllegalArgumentException("Invalid parameter name");
+        if ("alpha".equals(name)) { // TODO: This should return Shape()
+            return new Shape(1);
         }
+        throw new IllegalArgumentException("Invalid parameter name");
     }
 
     @Override

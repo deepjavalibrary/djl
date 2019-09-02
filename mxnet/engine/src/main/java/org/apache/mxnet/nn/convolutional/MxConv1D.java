@@ -27,10 +27,12 @@ import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 public class MxConv1D extends MxNNBlock implements Conv1D {
+
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.WIDTH
     };
     private static final String LAYOUT_STRING = "NCW";
+
     private Shape kernel;
     private Shape stride;
     private Shape pad;
@@ -43,13 +45,13 @@ public class MxConv1D extends MxNNBlock implements Conv1D {
     private Parameter bias;
 
     public MxConv1D(
-            final Shape kernel,
-            final Shape stride,
-            final Shape pad,
-            final Shape dilate,
-            final int numFilters,
-            final int numGroups,
-            final boolean includeBias) {
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            Shape dilate,
+            int numFilters,
+            int numGroups,
+            boolean includeBias) {
         this.opName = "Convolution";
         this.kernel = kernel;
         this.stride = stride == null ? new Shape(1) : stride;

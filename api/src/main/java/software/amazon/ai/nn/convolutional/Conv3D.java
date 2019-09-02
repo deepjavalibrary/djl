@@ -18,7 +18,8 @@ import software.amazon.ai.nn.Block;
 public interface Conv3D extends Convolution {
 
     /** The Builder to construct a {@link Conv3D} type of {@link Block}. */
-    class Builder extends Convolution.Builder<Conv3D> {
+    final class Builder extends Convolution.Builder<Conv3D> {
+
         /** {@inheritDoc} */
         @Override
         public Conv3D build() {

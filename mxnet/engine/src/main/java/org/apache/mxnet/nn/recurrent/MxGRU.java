@@ -28,9 +28,11 @@ import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.util.PairList;
 
 public class MxGRU extends MxNNBlock implements GRU {
+
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.TIME, LayoutType.BATCH, LayoutType.CHANNEL
     };
+
     private long stateSize;
     private float dropRate;
     private int numStackedLayers;

@@ -13,6 +13,7 @@
 package org.apache.mxnet.nn.core;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
@@ -55,7 +56,7 @@ public class MxLinear extends MxNNBlock implements Linear {
         if (bias != null) {
             return Arrays.asList(weight, bias);
         }
-        return Arrays.asList(weight);
+        return Collections.singletonList(weight);
     }
 
     /** {@inheritDoc} */

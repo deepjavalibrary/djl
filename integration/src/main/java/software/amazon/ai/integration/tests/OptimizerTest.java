@@ -116,10 +116,9 @@ public class OptimizerTest {
     }
 
     private Block block(NDManager manager) {
-        return new Linear.Builder()
-                .setOutChannels(CHANNELS)
-                .build()
-                .setInitializer(manager, Initializer.ONES, true);
+        Linear linear = new Linear.Builder().setOutChannels(CHANNELS).build();
+        linear.setInitializer(manager, Initializer.ONES, true);
+        return linear;
     }
 
     private NDArray runOptimizer(NDManager manager, Block block, Optimizer optim) {

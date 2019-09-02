@@ -17,6 +17,7 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 
 public interface Convolution extends Block {
+
     NDArray forward(NDArray data);
 
     abstract class Builder<C extends Convolution> {

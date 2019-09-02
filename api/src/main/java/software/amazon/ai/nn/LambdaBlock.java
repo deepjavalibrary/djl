@@ -20,22 +20,18 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
-public class LambdaBlock implements Block {
+public class LambdaBlock extends AbstractBlock {
 
     Function<NDList, NDList> lambda;
 
     public LambdaBlock(Function<NDList, NDList> lambda) {
         this.lambda = lambda;
+        initialized = true;
     }
 
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
         return lambda.apply(inputs);
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return true;
     }
 
     @Override

@@ -26,6 +26,7 @@ import software.amazon.ai.nn.recurrent.RNN;
 import software.amazon.ai.util.PairList;
 
 public class MxRNN extends MxNNBlock implements RNN {
+
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.TIME, LayoutType.BATCH, LayoutType.CHANNEL
     };

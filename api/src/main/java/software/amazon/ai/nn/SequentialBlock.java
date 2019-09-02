@@ -24,10 +24,9 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
-public class SequentialBlock implements Block {
+public class SequentialBlock extends AbstractBlock {
 
-    boolean isInitialized;
-    List<Block> blocks;
+    private List<Block> blocks;
 
     public SequentialBlock(Block... blocks) {
         this.blocks = new ArrayList<>(Arrays.asList(blocks));
@@ -35,22 +34,22 @@ public class SequentialBlock implements Block {
 
     public void addAll(Block... blocks) {
         this.blocks.addAll(Arrays.asList(blocks));
-        this.isInitialized = false;
+        initialized = false;
     }
 
     public void addAll(Collection<Block> blocks) {
         this.blocks.addAll(blocks);
-        this.isInitialized = false;
+        initialized = false;
     }
 
     public void add(Block block) {
         blocks.add(block);
-        this.isInitialized = false;
+        initialized = false;
     }
 
     public void add(Function<NDList, NDList> f) {
         blocks.add(new LambdaBlock(f));
-        this.isInitialized = false;
+        initialized = false;
     }
 
     public void removeLastBlock() {
@@ -77,11 +76,6 @@ public class SequentialBlock implements Block {
     }
 
     @Override
-    public boolean isInitialized() {
-        return isInitialized;
-    }
-
-    @Override
     public Shape getOutputShape(Shape... inputs) {
         if (blocks.isEmpty()) {
             throw new IllegalArgumentException("The sequential block is empty");
@@ -100,7 +94,7 @@ public class SequentialBlock implements Block {
 
     @Override
     public void beforeInitialize(NDList inputs) {
-        isInitialized = true;
+        initialized = true;
     }
 
     @Override

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.apache.mxnet.jna.LibUtils;
 import org.apache.mxnet.jna.MxnetLibrary;
+import org.apache.mxnet.nn.MxSymbolBlock;
 import org.apache.mxnet.test.MockMxnetLibrary;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;

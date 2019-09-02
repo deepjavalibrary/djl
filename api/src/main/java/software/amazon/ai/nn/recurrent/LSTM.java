@@ -18,7 +18,8 @@ import software.amazon.ai.nn.Block;
 public interface LSTM extends RecurrentCell {
 
     /** The Builder to construct a {@link LSTM} type of {@link Block}. */
-    class Builder extends RecurrentCell.Builder<LSTM> {
+    final class Builder extends RecurrentCell.Builder<LSTM> {
+
         /** {@inheritDoc} */
         @Override
         public LSTM build() {

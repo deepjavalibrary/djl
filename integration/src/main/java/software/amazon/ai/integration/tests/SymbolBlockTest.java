@@ -118,11 +118,9 @@ public class SymbolBlockTest {
             SymbolBlock mlp = (SymbolBlock) mnistmlp.getBlock();
             SequentialBlock newMlp = new SequentialBlock();
             newMlp.add(mlp.removeLastBlock());
-            newMlp.add(
-                    new Linear.Builder()
-                            .setOutChannels(10)
-                            .build()
-                            .setInitializer(manager, Initializer.ONES, true));
+            Linear linear = new Linear.Builder().setOutChannels(10).build();
+            linear.setInitializer(manager, Initializer.ONES, true);
+            newMlp.add(linear);
             Pair<NDArray, NDArray> result = train(manager, mlp);
             Assertions.assertAlmostEquals(manager.create(0.29814255237579346), result.getKey());
             Assertions.assertAlmostEquals(

@@ -15,6 +15,7 @@ package software.amazon.ai.nn.recurrent;
 import software.amazon.ai.nn.Block;
 
 public interface RecurrentCell extends Block {
+
     abstract class Builder<R extends RecurrentCell> {
         float dropRate;
         long stateSize = -1;

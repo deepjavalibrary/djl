@@ -13,81 +13,42 @@
 package software.amazon.ai.nn;
 
 import java.util.List;
-import java.util.Optional;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.initializer.Initializer;
-import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
 /** An interface defining neural-network layers. */
 public interface Block {
+
     Block IDENTITY_BLOCK = new LambdaBlock(x -> x);
 
     NDList forward(NDList inputs, PairList<String, Object> params);
 
-    default NDList forward(NDList inputs) {
-        return forward(inputs, new PairList<>());
-    }
+    NDList forward(NDList inputs);
 
-    default void backward() {}
-
-    boolean isInitialized();
+    void backward();
 
     Shape getOutputShape(Shape... inputs);
 
     List<Parameter> getDirectParameters();
 
-    default Block setInitializer(NDManager manager, Initializer initializer) {
-        return setInitializer(manager, initializer, false);
-    }
+    void setInitializer(NDManager manager, Initializer initializer);
 
-    default Block setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
-        for (Parameter parameter : getDirectParameters()) {
-            parameter.setInitializer(manager, initializer, overwrite);
-        }
-        for (Block child : getChildren().values()) {
-            child.setInitializer(manager, initializer, overwrite);
-        }
-        return this;
-    }
+    void setInitializer(NDManager manager, Initializer initializer, boolean overwrite);
 
-    default Block setInitializer(NDManager manager, Initializer initializer, String paramName) {
-        return setInitializer(manager, initializer, paramName, false);
-    }
+    void setInitializer(NDManager manager, Initializer initializer, String paramName);
 
-    default Block setInitializer(
-            NDManager manager, Initializer initializer, String paramName, boolean overwrite) {
-        Optional<Parameter> parameter =
-                getDirectParameters()
-                        .stream()
-                        .filter(pair -> pair.getName().equals(paramName))
-                        .findFirst();
-        if (parameter.isPresent()) {
-            parameter.get().setInitializer(manager, initializer, overwrite);
-        } else {
-            throw new IllegalArgumentException("Could not find parameter " + paramName);
-        }
-        return this;
-    }
+    void setInitializer(
+            NDManager manager, Initializer initializer, String paramName, boolean overwrite);
 
-    default void ensureInitialized(NDList inputs) {
-        if (!isInitialized()) {
-            beforeInitialize(inputs);
-            for (Parameter parameter : getDirectParameters()) {
-                parameter.initialize(inputs);
-            }
-        }
-    }
+    // TODO: remove this API
+    void ensureInitialized(NDList inputs);
 
-    void beforeInitialize(NDList inputs);
-
-    default Block cast(DataType dataType) {
-        throw new UnsupportedOperationException("Unimplemented method cast");
-    }
+    Block cast(DataType dataType);
 
     DataDesc[] describeInput();
 
@@ -95,26 +56,9 @@ public interface Block {
 
     byte[] getEncoded();
 
-    default PairList<String, Block> getChildren() {
-        return new PairList<>();
-    }
+    PairList<String, Block> getChildren();
 
-    default PairList<String, Parameter> getParameters() {
-        PairList<String, Parameter> parameters = new PairList<>();
-        List<Parameter> directParams = this.getDirectParameters();
-        directParams.forEach(param -> parameters.add(param.getName(), param));
-        PairList<String, Parameter> childrenParameters = getChildrenParameters();
-        childrenParameters.forEach(pair -> parameters.add(pair));
-        return parameters;
-    }
+    PairList<String, Parameter> getParameters();
 
-    default PairList<String, Parameter> getChildrenParameters() {
-        PairList<String, Parameter> parameters = new PairList<>();
-        for (Pair<String, Block> childPair : getChildren()) {
-            for (Pair<String, Parameter> paramPair : childPair.getValue().getParameters()) {
-                parameters.add(childPair.getKey() + "_" + paramPair.getKey(), paramPair.getValue());
-            }
-        }
-        return parameters;
-    }
+    PairList<String, Parameter> getChildrenParameters();
 }

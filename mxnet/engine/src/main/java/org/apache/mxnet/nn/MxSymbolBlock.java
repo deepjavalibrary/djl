@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package org.apache.mxnet.engine;
+package org.apache.mxnet.nn;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,6 +20,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.apache.mxnet.engine.CachedOp;
+import org.apache.mxnet.engine.MxModel;
+import org.apache.mxnet.engine.MxNDManager;
+import org.apache.mxnet.engine.Symbol;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,14 +33,14 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 // TODO: Need to add Memory management for all params
-public class MxSymbolBlock implements SymbolBlock {
+public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
@@ -46,10 +50,11 @@ public class MxSymbolBlock implements SymbolBlock {
     private List<Parameter> params;
     private boolean paramGradientsAttached;
 
-    MxSymbolBlock(Symbol symbol, List<Parameter> params, NDManager manager) {
+    public MxSymbolBlock(Symbol symbol, List<Parameter> params, NDManager manager) {
         this.symbol = symbol;
         this.params = params;
         this.manager = (MxNDManager) manager;
+        initialized = true;
     }
 
     /**
@@ -151,11 +156,6 @@ public class MxSymbolBlock implements SymbolBlock {
     public void backward() {}
 
     @Override
-    public boolean isInitialized() {
-        return true;
-    }
-
-    @Override
     public Shape getOutputShape(Shape... inputs) {
         return null;
     }
@@ -172,16 +172,15 @@ public class MxSymbolBlock implements SymbolBlock {
     }
 
     @Override
-    public Block setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
+    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
         for (Parameter param : params) {
             param.setInitializer(manager, initializer, overwrite);
             param.reinitialize();
         }
-        return this;
     }
 
     @Override
-    public Block setInitializer(NDManager manager, Initializer initializer, String paramName) {
+    public void setInitializer(NDManager manager, Initializer initializer, String paramName) {
         Optional<Parameter> parameter =
                 params.stream().filter(pair -> pair.getName().equals(paramName)).findFirst();
         if (parameter.isPresent()) {
@@ -191,7 +190,6 @@ public class MxSymbolBlock implements SymbolBlock {
         } else {
             throw new IllegalArgumentException("Could not find parameter " + paramName);
         }
-        return this;
     }
 
     @Override

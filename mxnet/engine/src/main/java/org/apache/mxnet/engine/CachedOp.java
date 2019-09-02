@@ -15,6 +15,7 @@ package org.apache.mxnet.engine;
 import com.sun.jna.Pointer;
 import java.util.Map;
 import org.apache.mxnet.jna.JnaUtils;
+import org.apache.mxnet.nn.MxSymbolBlock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.ndarray.NDArray;

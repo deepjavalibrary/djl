@@ -73,12 +73,10 @@ public class MxEmbedding<T> extends MxNNBlock implements Embedding<T> {
 
     @Override
     public Shape getParameterShape(String name, NDList inputs) {
-        switch (name) {
-            case "embedding":
-                return new Shape(numItems, embeddingSize);
-            default:
-                throw new IllegalArgumentException("Invalid parameter name");
+        if ("embedding".equals(name)) {
+            return new Shape(numItems, embeddingSize);
         }
+        throw new IllegalArgumentException("Invalid parameter name");
     }
 
     @Override

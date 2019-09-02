@@ -17,13 +17,12 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.util.PairList;
 
-public abstract class MxNNBlock implements Block {
+public abstract class MxNNBlock extends AbstractBlock {
 
     protected String opName;
-    private boolean initialized;
     protected Shape inputShape;
     protected Shape inChannels;
 
@@ -42,19 +41,13 @@ public abstract class MxNNBlock implements Block {
     /** {@inheritDoc} */
     @Override
     public void ensureInitialized(NDList inputs) {
-        Block.super.ensureInitialized(inputs);
+        super.ensureInitialized(inputs);
         initialized = true;
     }
 
     @Override
     public DataDesc[] describeInput() {
         return new DataDesc[] {new DataDesc(inputShape)};
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isInitialized() {
-        return initialized;
     }
 
     /** {@inheritDoc} */

@@ -22,10 +22,10 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
 /** ParallelBlock can be used to represent branches in the computational graph. */
-public class ParallelBlock implements Block {
+public class ParallelBlock extends AbstractBlock {
+
     private List<Block> blocks;
     private Function<List<NDList>, NDList> function;
-    private boolean isInitialized;
 
     public ParallelBlock(List<Block> blocks, Function<List<NDList>, NDList> function) {
         this.blocks = blocks;
@@ -45,11 +45,6 @@ public class ParallelBlock implements Block {
     }
 
     @Override
-    public boolean isInitialized() {
-        return isInitialized;
-    }
-
-    @Override
     public Shape getOutputShape(Shape... inputs) {
         return null;
     }
@@ -61,7 +56,7 @@ public class ParallelBlock implements Block {
 
     @Override
     public void beforeInitialize(NDList inputs) {
-        isInitialized = true;
+        initialized = true;
     }
 
     @Override

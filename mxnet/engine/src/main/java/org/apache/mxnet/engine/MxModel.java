@@ -26,6 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.mxnet.jna.JnaUtils;
+import org.apache.mxnet.nn.MxSymbolBlock;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDArray;
