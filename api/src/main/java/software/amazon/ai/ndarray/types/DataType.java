@@ -71,6 +71,7 @@ public enum DataType {
     public boolean isFloating() {
         return format == Format.FLOATING;
     }
+
     /**
      * Checks whether it is an integer data type.
      *
@@ -94,6 +95,25 @@ public enum DataType {
         } else {
             throw new IllegalArgumentException(
                     "Unsupported buffer type: " + data.getClass().getSimpleName());
+        }
+    }
+
+    public Buffer asDataType(ByteBuffer data) {
+        switch (this) {
+            case FLOAT32:
+                return data.asFloatBuffer();
+            case FLOAT64:
+                return data.asDoubleBuffer();
+            case INT32:
+                return data.asIntBuffer();
+            case INT64:
+                return data.asLongBuffer();
+            case UINT8:
+            case INT8:
+            case FLOAT16:
+            case UNKNOWN:
+            default:
+                return data;
         }
     }
 

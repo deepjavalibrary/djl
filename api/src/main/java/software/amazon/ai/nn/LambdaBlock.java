@@ -12,6 +12,9 @@
  */
 package software.amazon.ai.nn;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -22,7 +25,9 @@ import software.amazon.ai.util.PairList;
 
 public class LambdaBlock extends AbstractBlock {
 
-    Function<NDList, NDList> lambda;
+    private static final byte VERSION = 1;
+
+    private Function<NDList, NDList> lambda;
 
     public LambdaBlock(Function<NDList, NDList> lambda) {
         this.lambda = lambda;
@@ -58,7 +63,15 @@ public class LambdaBlock extends AbstractBlock {
     }
 
     @Override
-    public byte[] getEncoded() {
-        return new byte[0];
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
     }
 }

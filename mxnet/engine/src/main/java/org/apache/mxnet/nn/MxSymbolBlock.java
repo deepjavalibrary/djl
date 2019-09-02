@@ -13,6 +13,9 @@
 
 package org.apache.mxnet.nn;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +46,8 @@ import software.amazon.ai.util.PairList;
 public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
+
+    private static final byte VERSION = 1;
 
     private CachedOp op;
     private Symbol symbol;
@@ -206,7 +211,21 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     @Override
-    public byte[] getEncoded() {
-        return new byte[0];
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        for (Parameter parameter : params) {
+            parameter.save(os);
+        }
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        for (Parameter parameter : params) {
+            parameter.load(is);
+        }
     }
 }

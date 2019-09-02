@@ -45,6 +45,7 @@ import software.amazon.ai.training.GradReq;
 import software.amazon.ai.util.Utils;
 
 public class MxNDArray extends NativeResource implements NDArray {
+
     private Context context;
     private SparseFormat sparseFormat;
     private DataType dataType;

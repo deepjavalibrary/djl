@@ -12,6 +12,9 @@
  */
 package org.apache.mxnet.nn.recurrent;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
@@ -30,6 +33,8 @@ public class MxRNN extends MxNNBlock implements RNN {
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.TIME, LayoutType.BATCH, LayoutType.CHANNEL
     };
+
+    private static final byte VERSION = 1;
 
     private long stateSize;
     private float dropRate;
@@ -160,5 +165,28 @@ public class MxRNN extends MxNNBlock implements RNN {
         result.addParam("mode", mode);
         result.addAll(params);
         return result;
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        i2hWeight.save(os);
+        h2hWeight.save(os);
+        i2hBias.save(os);
+        h2hBias.save(os);
+        state.save(os);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        i2hWeight.load(is);
+        h2hWeight.load(is);
+        i2hBias.load(is);
+        h2hBias.load(is);
+        state.load(is);
     }
 }

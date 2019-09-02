@@ -12,6 +12,9 @@
  */
 package org.apache.mxnet.nn.norm;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
@@ -24,6 +27,8 @@ import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.util.PairList;
 
 public class MxDropout extends MxNNBlock implements Dropout {
+
+    private static final byte VERSION = 1;
 
     private float probability;
     private int[] sharedAxes;
@@ -72,5 +77,18 @@ public class MxDropout extends MxNNBlock implements Dropout {
         result.addTupleParam("axes", sharedAxes);
         result.addAll(params);
         return result;
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
     }
 }

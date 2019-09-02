@@ -12,6 +12,9 @@
  */
 package software.amazon.ai.nn;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.List;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -54,11 +57,13 @@ public interface Block {
 
     Shape getParameterShape(String name, NDList inputs);
 
-    byte[] getEncoded();
-
     PairList<String, Block> getChildren();
 
     PairList<String, Parameter> getParameters();
 
     PairList<String, Parameter> getChildrenParameters();
+
+    void saveParameters(DataOutputStream os) throws IOException;
+
+    void loadParameters(DataInputStream is) throws IOException;
 }

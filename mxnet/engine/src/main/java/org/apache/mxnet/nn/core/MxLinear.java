@@ -12,6 +12,9 @@
  */
 package org.apache.mxnet.nn.core;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +32,8 @@ import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
 public class MxLinear extends MxNNBlock implements Linear {
+
+    private static final byte VERSION = 1;
 
     private long outChannels;
 
@@ -128,5 +133,26 @@ public class MxLinear extends MxNNBlock implements Linear {
         result.addParam("no_bias", bias == null);
         result.addAll(params);
         return result;
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        weight.save(os);
+        if (bias != null) {
+            bias.save(os);
+        }
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        weight.load(is);
+        if (bias != null) {
+            bias.load(is);
+        }
     }
 }

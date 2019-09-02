@@ -54,12 +54,6 @@ public abstract class MxNNBlock extends AbstractBlock {
     @Override
     public void backward() {}
 
-    /** {@inheritDoc} */
-    @Override
-    public byte[] getEncoded() {
-        return new byte[0];
-    }
-
     protected boolean isLayoutSupported(LayoutType[] expectedLayout, LayoutType[] actualLayout) {
         if (actualLayout.length != expectedLayout.length) {
             return false;

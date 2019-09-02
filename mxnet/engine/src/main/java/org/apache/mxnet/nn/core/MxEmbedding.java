@@ -12,6 +12,9 @@
  */
 package org.apache.mxnet.nn.core;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +34,8 @@ import software.amazon.ai.nn.core.Embedding;
 import software.amazon.ai.util.PairList;
 
 public class MxEmbedding<T> extends MxNNBlock implements Embedding<T> {
+
+    private static final byte VERSION = 1;
 
     private int embeddingSize;
     private boolean useDefault;
@@ -108,6 +113,21 @@ public class MxEmbedding<T> extends MxNNBlock implements Embedding<T> {
             result = new NDList(result.get(0).reshape(embeddingSize));
         }
         return result;
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        embedding.save(os);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        embedding.load(is);
     }
 
     @Override

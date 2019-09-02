@@ -135,7 +135,7 @@ public interface Activation extends Block {
 
     NDArray forward(NDArray data);
 
-    class ActivationLambdaBlock extends LambdaBlock implements Activation {
+    final class ActivationLambdaBlock extends LambdaBlock implements Activation {
 
         public ActivationLambdaBlock(Function<NDList, NDList> lambda) {
             super(lambda);

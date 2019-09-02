@@ -12,6 +12,9 @@
  */
 package org.apache.mxnet.nn.norm;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
@@ -26,6 +29,8 @@ import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 public class MxBatchNorm extends MxNNBlock implements BatchNorm {
+
+    private static final byte VERSION = 1;
 
     private int axis;
     private float epsilon;
@@ -101,5 +106,22 @@ public class MxBatchNorm extends MxNNBlock implements BatchNorm {
         result.addParam("axis", axis);
         result.addAll(params);
         return result;
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        runningMean.save(os);
+        runningVar.save(os);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        runningMean.load(is);
+        runningVar.load(is);
     }
 }

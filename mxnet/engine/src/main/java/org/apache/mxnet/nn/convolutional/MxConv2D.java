@@ -12,6 +12,9 @@
  */
 package org.apache.mxnet.nn.convolutional;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
@@ -31,7 +34,9 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.HEIGHT, LayoutType.WIDTH
     };
+
     private static final String LAYOUT = "NCHW";
+    private static final byte VERSION = 1;
 
     private Shape kernel;
     private Shape stride;
@@ -146,5 +151,26 @@ public class MxConv2D extends MxNNBlock implements Conv2D {
         result.add("no_bias", !includeBias);
         result.addAll(params);
         return result;
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        weight.save(os);
+        if (bias != null) {
+            bias.save(os);
+        }
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        weight.load(is);
+        if (bias != null) {
+            bias.load(is);
+        }
     }
 }

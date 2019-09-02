@@ -12,8 +12,6 @@
  */
 package software.amazon.ai.ndarray;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -161,25 +159,6 @@ public interface NDArray extends AutoCloseable {
      * @throws NullPointerException when gradient is not initialized
      */
     NDArray getGradient();
-
-    /**
-     * Returns the encoding format of the NDArray, or null.
-     *
-     * @return the encoded NDArray
-     */
-    default byte[] getEncoded() {
-        return toByteArray();
-    }
-
-    /**
-     * Encodes NDArray to an {@link OutputStream}.
-     *
-     * @param os OutputStream
-     * @throws IOException for writing problems
-     */
-    default void encode(OutputStream os) throws IOException {
-        os.write(getEncoded());
-    }
 
     /**
      * Returns the size along a specified dimension.

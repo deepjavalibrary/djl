@@ -12,6 +12,9 @@
  */
 package org.apache.mxnet.nn.core;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
@@ -25,6 +28,8 @@ import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.util.PairList;
 
 public class MxPrelu extends MxNNBlock implements Prelu {
+
+    private static final byte VERSION = 1;
 
     private Parameter alpha;
 
@@ -70,5 +75,20 @@ public class MxPrelu extends MxNNBlock implements Prelu {
         result.addParam("act_type", "prelu");
         result.addAll(params);
         return result;
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        alpha.save(os);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        alpha.load(is);
     }
 }
