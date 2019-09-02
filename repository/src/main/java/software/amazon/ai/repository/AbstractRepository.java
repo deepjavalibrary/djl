@@ -19,6 +19,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
@@ -130,22 +133,35 @@ public abstract class AbstractRepository implements Repository {
             return;
         }
 
-        try (InputStream is = fileUri.toURL().openStream()) {
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA1");
+        } catch (NoSuchAlgorithmException e) {
+            throw new AssertionError("SHA1 algorithm not found.", e);
+        }
+
+        try (InputStream is = fileUri.toURL().openStream();
+                DigestInputStream dis = new DigestInputStream(is, md)) {
             Path file = tmp.resolve(fileName);
             if ("zip".equals(extension)) {
-                try (ZipInputStream zis = new ZipInputStream(is)) {
+                try (ZipInputStream zis = new ZipInputStream(dis)) {
                     zis.getNextEntry();
                     Files.copy(zis, file);
                 }
             } else if ("gzip".equals(extension)) {
-                try (GZIPInputStream zis = new GZIPInputStream(is)) {
+                try (GZIPInputStream zis = new GZIPInputStream(dis)) {
                     Files.copy(zis, file);
                 }
             } else if (extension.isEmpty()) {
-                Files.copy(is, file);
+                Files.copy(dis, file);
             } else {
                 throw new IOException("File type is not supported: " + extension);
             }
+        }
+
+        String sha1 = Hex.toHexString(md.digest());
+        if (!sha1.equalsIgnoreCase(item.getSha1Hash())) {
+            throw new IOException("Checksum error: " + item.getName() + ", sha1: " + sha1);
         }
     }
 }

@@ -2,7 +2,6 @@ plugins {
     id 'maven-publish'
 }
 
-group 'software.amazon.ai.repository'
 version '0.2.0-SNAPSHOT'
 
 dependencies {
