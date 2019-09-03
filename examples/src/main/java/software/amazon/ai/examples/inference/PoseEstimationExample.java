@@ -46,8 +46,8 @@ public class PoseEstimationExample extends AbstractExample {
     protected List<List<Joint>> predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
         /* Section SSD */
-        List<DetectedObject> ssdResult = null;
-        List<List<Joint>> poseResult = null;
+        List<DetectedObject> ssdResult;
+        List<List<Joint>> poseResult;
         Path imageFile = arguments.getImageFile();
         BufferedImage img = Images.loadImageFromFile(imageFile);
         int imageWidth = img.getWidth();
@@ -79,12 +79,12 @@ public class PoseEstimationExample extends AbstractExample {
                         .filter(obj -> obj.getClassName().equals("person"))
                         .map(obj -> obj.getBoundingBox().getBounds())
                         .map(
-                                rec ->
+                                rect ->
                                         img.getSubimage(
-                                                (int) (rec.getX() * imageWidth),
-                                                (int) (rec.getY() * imageHeight),
-                                                (int) (rec.getWidth() * imageWidth),
-                                                (int) (rec.getHeight() * imageHeight)))
+                                                (int) (rect.getX() * imageWidth),
+                                                (int) (rect.getY() * imageHeight),
+                                                (int) (rect.getWidth() * imageWidth),
+                                                (int) (rect.getHeight() * imageHeight)))
                         .collect(Collectors.toList());
 
         /* Pose recognition */

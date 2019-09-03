@@ -95,7 +95,7 @@ public class ImageFolder extends RandomAccessDataset<String, Integer> {
 
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private MxImages.Flag flag = Flag.COLOR;
+        private Flag flag = Flag.COLOR;
         private String root;
 
         @Override
