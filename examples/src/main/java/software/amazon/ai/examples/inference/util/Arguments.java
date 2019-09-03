@@ -19,14 +19,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 
 /** A class represents parsed command line arguments. */
 public class Arguments {
 
     private String modelDir;
-    private String modelUrl;
     private String modelName;
     private String imageFile;
     private String logDir;
@@ -35,7 +33,6 @@ public class Arguments {
 
     public Arguments(CommandLine cmd) {
         modelDir = cmd.getOptionValue("model-dir");
-        modelUrl = cmd.getOptionValue("model-url");
         modelName = cmd.getOptionValue("model-name");
         logDir = cmd.getOptionValue("log-dir");
         imageFile = cmd.getOptionValue("image");
@@ -49,22 +46,13 @@ public class Arguments {
 
     public static Options getOptions() {
         Options options = new Options();
-        OptionGroup group = new OptionGroup();
-        group.addOption(
-                        Option.builder("u")
-                                .longOpt("model-url")
-                                .hasArg()
-                                .argName("MODEL-URL")
-                                .desc("URL to download model archive.")
-                                .build())
-                .addOption(
-                        Option.builder("p")
-                                .longOpt("model-dir")
-                                .hasArg()
-                                .argName("MODEL-DIR")
-                                .desc("Path to the model directory.")
-                                .build());
-        options.addOptionGroup(group);
+        options.addOption(
+                Option.builder("u")
+                        .longOpt("model-url")
+                        .hasArg()
+                        .argName("MODEL-URL")
+                        .desc("URL to download model archive.")
+                        .build());
         options.addOption(
                 Option.builder("n")
                         .longOpt("model-name")
@@ -106,17 +94,7 @@ public class Arguments {
 
     public Path getModelDir() throws IOException {
         if (modelDir == null) {
-            ModelInfo modelInfo;
-            if (modelUrl == null) {
-                modelInfo = ModelInfo.getModel(modelName);
-                if (modelInfo == null) {
-                    throw new IOException("Please specify --model-dir or --model-url");
-                }
-            } else {
-                modelInfo = new ModelInfo(modelName, modelUrl);
-            }
-            modelInfo.download();
-            return modelInfo.getDownloadDir();
+            throw new IOException("Please specify --model-dir");
         }
 
         Path path = Paths.get(modelDir);
