@@ -13,10 +13,14 @@
 package software.amazon.ai.examples.training;
 
 import java.io.IOException;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.dataset.Mnist;
 import org.apache.mxnet.dataset.SimpleDataset;
 import org.slf4j.Logger;
 import software.amazon.ai.examples.inference.util.LogUtils;
+import software.amazon.ai.examples.training.util.Arguments;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
@@ -40,12 +44,18 @@ import software.amazon.ai.translate.TranslateException;
 public final class TrainMnist {
 
     private static Logger logger = LogUtils.getLogger(TrainMnist.class);
+    private static float accuracy;
+    private static float lossValue;
 
     private TrainMnist() {}
 
-    public static void main(String[] args) throws IOException, TranslateException {
+    public static void main(String[] args) throws IOException, TranslateException, ParseException {
+        Options options = Arguments.getOptions();
+        DefaultParser parser = new DefaultParser();
+        org.apache.commons.cli.CommandLine cmd = parser.parse(options, args, null, false);
+        Arguments arguments = new Arguments(cmd);
         // load the model
-        trainMnist();
+        trainMnist(arguments);
     }
 
     public static Block constructBlock(NDManager manager) {
@@ -59,11 +69,11 @@ public final class TrainMnist {
         return mlp;
     }
 
-    public static void trainMnist() throws IOException, TranslateException {
+    public static void trainMnist(Arguments arguments) throws IOException, TranslateException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Block mlp = constructBlock(manager);
-            int batchSize = 100;
-            int numEpoch = 10;
+            int batchSize = arguments.getBatchSize();
+            int numEpoch = arguments.getEpoch();
             Optimizer optimizer =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / batchSize)
@@ -106,12 +116,20 @@ public final class TrainMnist {
                         acc.update(label, pred);
                         lossMetric.update(loss);
                     }
-                    float lossValue = lossMetric.getMetric().getValue();
-                    float accuracy = acc.getMetric().getValue();
+                    lossValue = lossMetric.getMetric().getValue();
+                    accuracy = acc.getMetric().getValue();
                     logger.info("Loss: " + lossValue + " accuracy: " + accuracy);
                     logger.info("Epoch " + epoch + " finish");
                 }
             }
         }
+    }
+
+    public static float getAccuracy() {
+        return accuracy;
+    }
+
+    public static float getLossValue() {
+        return lossValue;
     }
 }

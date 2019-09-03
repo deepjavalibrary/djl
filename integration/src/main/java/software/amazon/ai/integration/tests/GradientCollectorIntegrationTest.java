@@ -19,7 +19,6 @@ import org.apache.mxnet.engine.MxGradient;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.MnistUtils;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
@@ -29,9 +28,7 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
-import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Linear;
-import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
@@ -39,7 +36,6 @@ import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.initializer.Initializer;
-import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -136,22 +132,6 @@ public class GradientCollectorIntegrationTest {
                             "Loss did not improve, loss value: %f, expected "
                                     + "max loss value: %f",
                             lossValue, expectedLoss));
-        }
-    }
-
-    @RunAsTest
-    public void testTrainMnist() throws IOException, FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            SequentialBlock mlp = new SequentialBlock();
-            mlp.add(new Linear.Builder().setOutChannels(128).build());
-            mlp.add(Activation.reluBlock());
-            mlp.add(new Linear.Builder().setOutChannels(64).build());
-            mlp.add(Activation.reluBlock());
-            mlp.add(new Linear.Builder().setOutChannels(10).build());
-            mlp.setInitializer(manager, new NormalInitializer(0.01));
-
-            int numEpoch = 3;
-            MnistUtils.trainMnist(mlp, manager, numEpoch, 0.3f, 0.9f);
         }
     }
 
