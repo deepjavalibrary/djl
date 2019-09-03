@@ -31,12 +31,12 @@
         },
         "symbol": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/object_detection/org/apache/mxnet/ssd/0.0.2/ssd_512_resnet50_v1-symbol.json",
-          "sha1Hash": "0518131d1361dddaa2d2471595fa758bae15b754",
+          "sha1Hash": "ca1e3c3c7575097418b64a745bde5b3984f4ca4b",
           "name": "ssd_512_resnet50_v1_voc-symbol.json"
         },
         "parameters": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/object_detection/org/apache/mxnet/ssd/0.0.2/ssd_512_resnet50_v1_voc-0000.params.gz",
-          "sha1Hash": "9c8b225a552614e4284a0f647331bfdc6940eb4a"
+          "sha1Hash": "d830eb4d786776577eaf0b0198125a932f055262"
         }
       }
     },
