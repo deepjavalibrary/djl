@@ -11,16 +11,18 @@ repositories {
     }
 }
 
+def classifier = getClassifier()
+
 dependencies {
     compile "commons-cli:commons-cli:1.4"
     compile "org.slf4j:slf4j-simple:1.7.26"
     compile "com.google.code.gson:gson:2.8.5"
     compile "software.amazon.ai:joule-api:0.2.0-SNAPSHOT"
     compile "org.apache.mxnet:mxnet-model-zoo:0.2.0-SNAPSHOT"
-    compile "org.apache.mxnet:mxnet:dataset:0.2.0-SNAPSHOY"
-    
+    compile "org.apache.mxnet:mxnet-dataset:0.2.0-SNAPSHOT"
+
     runtime "org.apache.mxnet:mxnet-joule:0.2.0-SNAPSHOT"
-    runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:osx-x86_64"
+    runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
 
     testImplementation 'org.testng:testng:6.14.3'
 }
@@ -31,4 +33,19 @@ test {
 
 application {
     mainClassName = System.getProperty("main", "software.amazon.ai.examples.ClassifyExample")
+}
+
+def getClassifier() {
+    String osName = System.getProperty("os.name")
+    String osPrefix;
+    if (osName.startsWith("Win")) {
+        osPrefix = "win"
+    } else if (osName.startsWith("Mac")) {
+        osPrefix = "osx"
+    } else if (osName.startsWith("Linux")) {
+        osPrefix = "linux"
+    } else {
+        throw new GradleException("Unsupported os: " + osName)
+    }
+    return osPrefix + "-x86_64"
 }
