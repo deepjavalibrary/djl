@@ -83,14 +83,13 @@ public class MxModel implements Model {
                 StreamSupport.stream(paramNDlist.spliterator(), false)
                         .map(
                                 (Pair<String, NDArray> x) -> {
-                                    if (context == Context.gpu()) {
-                                        return new Parameter(
-                                                paramName.apply(x.getKey()),
-                                                x.getValue().asInContext(Context.gpu(), true));
-                                    } else {
-                                        return new Parameter(
-                                                paramName.apply(x.getKey()), x.getValue());
+                                    Context ctx = context;
+                                    if (ctx == null) {
+                                        ctx = manager.getContext();
                                     }
+                                    return new Parameter(
+                                            paramName.apply(x.getKey()),
+                                            x.getValue().asInContext(ctx, true));
                                 })
                         .collect(Collectors.toList());
         // TODO: Check if Symbol has all names that params file have

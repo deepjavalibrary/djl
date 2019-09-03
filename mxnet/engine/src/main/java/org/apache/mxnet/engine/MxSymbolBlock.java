@@ -135,8 +135,6 @@ public class MxSymbolBlock implements SymbolBlock {
             initializeGradients();
         }
         if (op == null) {
-            // TODO: If the context change (CPU -> GPU), CachedOp will create a copy
-            // This will lose the gradient tracking
             op = JnaUtils.createCachedOp(this, manager);
         }
         return op.forward(inputs);

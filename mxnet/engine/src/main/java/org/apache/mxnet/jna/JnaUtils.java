@@ -1589,11 +1589,7 @@ public final class JnaUtils {
             MxNDArray array = paramMap.get(paramName);
             if (array != null) {
                 paramIndices[paramLoc] = i;
-                // TODO: Change the DataType to non-determined
-                // parameter NDArray in MxModel is always loaded in CPU context,
-                // we have to copy to desired context to execution.
-                // TODO: use array.dup(ctx) instead
-                inputNDArray[i] = array.asInContext(manager.getContext(), false);
+                inputNDArray[i] = array;
                 paramLoc++;
             } else {
                 inputs.add(paramName, i);
