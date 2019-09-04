@@ -22,9 +22,9 @@ import software.amazon.ai.translate.TranslateException;
 public class TrainMnistTest {
     @Test
     public void testTrainMnist() throws TranslateException, ParseException, IOException {
-        String[] args = {"-e", "1", "-b", "100"};
+        String[] args = {"-e", "2"};
         TrainMnist.main(args);
-        Assert.assertTrue(TrainMnist.getAccuracy() > 0.8f);
-        Assert.assertTrue(TrainMnist.getLossValue() < 0.6f);
+        Assert.assertTrue(TrainMnist.getAccuracy() > 0.9f);
+        Assert.assertTrue(TrainMnist.getLossValue() < 0.2f);
     }
 }

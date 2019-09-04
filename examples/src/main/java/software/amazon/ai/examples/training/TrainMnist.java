@@ -77,7 +77,7 @@ public final class TrainMnist {
             Optimizer optimizer =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / batchSize)
-                            .setLrTracker(LrTracker.fixedLR(0.1f))
+                            .setLrTracker(LrTracker.fixedLR(0.01f))
                             .optMomentum(0.9f)
                             .build();
             TrainingController controller = new TrainingController(mlp.getParameters(), optimizer);
