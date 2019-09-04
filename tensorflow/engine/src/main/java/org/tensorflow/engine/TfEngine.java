@@ -19,7 +19,6 @@ import org.tensorflow.TensorFlow;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
-import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.NNIndex;
@@ -28,7 +27,6 @@ import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.Translator;
 
 public class TfEngine extends Engine {
 
@@ -68,13 +66,6 @@ public class TfEngine extends Engine {
     @Override
     public Model loadModel(
             Path modelPath, String modelName, Context context, Map<String, String> options) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <I, O> Predictor<I, O> newPredictor(
-            Model model, Translator<I, O> translator, Context context) {
         return null;
     }
 

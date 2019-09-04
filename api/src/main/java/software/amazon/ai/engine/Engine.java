@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.NNIndex;
@@ -33,7 +32,6 @@ import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.Translator;
 
 /**
  * The {@code Engine} interface shadows differences between each deep learning framework.
@@ -147,19 +145,6 @@ public abstract class Engine {
     public abstract Model loadModel(
             Path modelPath, String modelName, Context context, Map<String, String> options)
             throws IOException;
-
-    /**
-     * Creates new {@link Predictor} instance for this Engine.
-     *
-     * @param model the model used for inference
-     * @param translator preprocessing and postprocessing helper class
-     * @param context context to work on inference
-     * @param <I> Input Object for the Predictor
-     * @param <O> Output Object for the Predictor
-     * @return Predictor
-     */
-    public abstract <I, O> Predictor<I, O> newPredictor(
-            Model model, Translator<I, O> translator, Context context);
 
     /**
      * Creates a new {@link Gradient.Collector} instance for this Engine.

@@ -89,15 +89,9 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return MxEngine.getInstance().newPredictor(this, translator, manager.getContext());
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
         context = Context.defaultIfNull(context, manager.getContext());
-        return MxEngine.getInstance().newPredictor(this, translator, context);
+        return new MxPredictor<>(this, translator, context);
     }
 
     /** {@inheritDoc} */

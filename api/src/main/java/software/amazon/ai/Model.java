@@ -121,7 +121,9 @@ public interface Model extends AutoCloseable {
      * @param <O> Output object come from postprocessing
      * @return instance of {@code Predictor}
      */
-    <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator);
+    default <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
+        return newPredictor(translator, null);
+    }
 
     /**
      * Creates a new Predictor based on the model.

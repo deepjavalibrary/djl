@@ -27,7 +27,6 @@ import org.apache.mxnet.nn.MxNNIndex;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
-import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.NNIndex;
@@ -36,7 +35,6 @@ import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.Translator;
 
 public class MxEngine extends Engine {
 
@@ -162,13 +160,6 @@ public class MxEngine extends Engine {
     @Override
     public NNIndex getNNIndex() {
         return NN_INDEX;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <I, O> Predictor<I, O> newPredictor(
-            Model model, Translator<I, O> translator, Context context) {
-        return new MxPredictor<>((MxModel) model, translator, context);
     }
 
     /** {@inheritDoc} */

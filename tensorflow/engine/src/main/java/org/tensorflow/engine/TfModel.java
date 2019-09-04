@@ -110,14 +110,8 @@ public class TfModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return TfEngine.getInstance().newPredictor(this, translator, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
-        return TfEngine.getInstance().newPredictor(this, translator, context);
+        return new TfPredictor<>(this, translator);
     }
 
     /** {@inheritDoc} */

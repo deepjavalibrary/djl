@@ -45,12 +45,6 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <P, Q> Predictor<P, Q> newPredictor(Translator<P, Q> translator) {
-        return newPredictor(translator, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public <P, Q> Predictor<P, Q> newPredictor(Translator<P, Q> translator, Context context) {
         return model.newPredictor(translator, context);
     }

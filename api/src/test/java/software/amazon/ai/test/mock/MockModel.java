@@ -32,13 +32,8 @@ public class MockModel implements Model {
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return MockEngine.getInstance().newPredictor(this, translator, null);
-    }
-
-    @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
-        return MockEngine.getInstance().newPredictor(this, translator, context);
+        return new MockPredictor<>(this, translator, context);
     }
 
     @Override
