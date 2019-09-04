@@ -134,4 +134,18 @@ public class Context {
     public static Context defaultContext() {
         return Engine.getInstance().defaultContext();
     }
+
+    public static Context defaultIfNull(Context context) {
+        if (context != null) {
+            return context;
+        }
+        return Engine.getInstance().defaultContext();
+    }
+
+    public static Context defaultIfNull(Context context, Context def) {
+        if (context != null) {
+            return context;
+        }
+        return defaultIfNull(def);
+    }
 }

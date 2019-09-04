@@ -50,7 +50,7 @@ public class MxNDManager implements NDManager {
 
     private MxNDManager(NDManager parent, Context context) {
         this.parent = parent;
-        this.context = context;
+        this.context = Context.defaultIfNull(context);
         resources = new ConcurrentHashMap<>();
     }
 
@@ -77,13 +77,10 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray create(Shape shape, DataType dataType, Context context) {
-        if (context == null) {
-            context = this.context;
-        }
-
-        Pointer handle = JnaUtils.createNdArray(context, shape, dataType, shape.dimension(), false);
-        MxNDArray array = new MxNDArray(this, handle, context, shape, dataType);
+    public MxNDArray create(Shape shape, DataType dataType, Context ctx) {
+        ctx = Context.defaultIfNull(ctx, context);
+        Pointer handle = JnaUtils.createNdArray(ctx, shape, dataType, shape.dimension(), false);
+        MxNDArray array = new MxNDArray(this, handle, ctx, shape, dataType);
         attach(array);
         return array;
     }
@@ -91,24 +88,26 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public MxSparseNDArray createCSR(
-            Buffer data, long[] indptr, long[] indices, Shape shape, Context context) {
+            Buffer data, long[] indptr, long[] indices, Shape shape, Context ctx) {
+        ctx = Context.defaultIfNull(ctx, context);
+
         SparseFormat fmt = SparseFormat.CSR;
         DataType dataType = DataType.fromBuffer(data);
-        MxNDArray indptrNd = create(new Shape(indptr.length), DataType.INT64, context);
+        MxNDArray indptrNd = create(new Shape(indptr.length), DataType.INT64, ctx);
         indptrNd.set(indptr);
-        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64, context);
+        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64, ctx);
         indicesNd.set(indices);
         Pointer handle =
                 JnaUtils.createSparseNdArray(
                         fmt,
-                        context,
+                        ctx,
                         shape,
                         dataType,
                         new DataType[] {indptrNd.getDataType(), indicesNd.getDataType()},
                         new Shape[] {indptrNd.getShape(), indicesNd.getShape()},
                         false);
         MxSparseNDArray sparse = create(handle, fmt);
-        MxNDArray dataNd = create(new Shape(data.remaining()), dataType, context);
+        MxNDArray dataNd = create(new Shape(data.remaining()), dataType, ctx);
         dataNd.set(data);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, indptrNd, 0);
@@ -119,22 +118,24 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public MxSparseNDArray createRowSparse(
-            Buffer data, Shape dataShape, long[] indices, Shape shape, Context context) {
+            Buffer data, Shape dataShape, long[] indices, Shape shape, Context ctx) {
+        ctx = Context.defaultIfNull(ctx, context);
+
         SparseFormat fmt = SparseFormat.ROW_SPARSE;
         DataType dataType = DataType.fromBuffer(data);
-        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64, context);
+        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64, ctx);
         indicesNd.set(indices);
         Pointer handle =
                 JnaUtils.createSparseNdArray(
                         fmt,
-                        context,
+                        ctx,
                         shape,
                         dataType,
                         new DataType[] {indicesNd.getDataType()},
                         new Shape[] {indicesNd.getShape()},
                         false);
         MxSparseNDArray sparse = create(handle, fmt);
-        MxNDArray dataNd = create(dataShape, dataType, context);
+        MxNDArray dataNd = create(dataShape, dataType, ctx);
         dataNd.set(data);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, indicesNd, 0);
@@ -155,43 +156,43 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(Shape shape, DataType dataType, Context context) {
-        return fill("_zeros", context, shape, dataType);
+    public NDArray zeros(Shape shape, DataType dataType, Context ctx) {
+        return fill("_zeros", ctx, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ones(Shape shape, DataType dataType, Context context) {
-        return fill("_ones", context, shape, dataType);
+    public NDArray ones(Shape shape, DataType dataType, Context ctx) {
+        return fill("_ones", ctx, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(int start, int stop, int step, DataType dataType, Context context) {
+    public NDArray arange(int start, int stop, int step, DataType dataType, Context ctx) {
         MxOpParams params = new MxOpParams();
         params.addParam("start", start);
         params.addParam("stop", stop);
         params.addParam("step", step);
         params.setDataType(dataType);
-        params.setContext(context);
+        params.setContext(Context.defaultIfNull(ctx, context));
         return invoke("_npi_arange", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eye(int rows, int cols, int k, DataType dataType, Context context) {
+    public NDArray eye(int rows, int cols, int k, DataType dataType, Context ctx) {
         MxOpParams params = new MxOpParams();
         params.addParam("N", rows);
         params.addParam("M", cols);
         params.addParam("k", k);
         params.setDataType(dataType);
-        params.setContext(context);
+        params.setContext(Context.defaultIfNull(ctx, context));
         return invoke("_npi_eye", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(double start, double stop, int num, boolean endpoint, Context context) {
+    public NDArray linspace(double start, double stop, int num, boolean endpoint, Context ctx) {
         if (num < 0) {
             throw new IllegalArgumentException("Num argument must be non-negative");
         }
@@ -201,19 +202,19 @@ public class MxNDManager implements NDManager {
         params.addParam("num", num);
         params.addParam("endpoint", endpoint);
         params.setDataType(DataType.FLOAT32);
-        params.setContext(context);
+        params.setContext(Context.defaultIfNull(ctx, context));
         return invoke("_npi_linspace", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, DataType dataType, Context context) {
+            double low, double high, Shape shape, DataType dataType, Context ctx) {
         MxOpParams params = new MxOpParams();
         params.addParam("low", low);
         params.addParam("high", high);
         params.addParam("shape", shape);
-        params.setContext(context);
+        params.setContext(Context.defaultIfNull(ctx, context));
         params.setDataType(dataType);
         return invoke("_npi_random_uniform", EMPTY, params).head();
     }
@@ -221,12 +222,12 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, DataType dataType, Context context) {
+            double loc, double scale, Shape shape, DataType dataType, Context ctx) {
         MxOpParams params = new MxOpParams();
         params.addParam("loc", loc);
         params.addParam("scale", scale);
         params.addParam("shape", shape);
-        params.setContext(context);
+        params.setContext(Context.defaultIfNull(ctx, context));
         params.setDataType(dataType);
         return invoke("_npi_random_normal", EMPTY, params).head();
     }
@@ -269,8 +270,8 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDManager newSubManager(Context context) {
-        MxNDManager manager = new MxNDManager(this, context);
+    public MxNDManager newSubManager(Context ctx) {
+        MxNDManager manager = new MxNDManager(this, ctx);
         attach(manager);
         return manager;
     }
@@ -339,13 +340,13 @@ public class MxNDManager implements NDManager {
         return !closed.get();
     }
 
-    private NDArray fill(String opName, Context context, Shape shape, DataType dataType) {
+    private NDArray fill(String opName, Context ctx, Shape shape, DataType dataType) {
         MxOpParams params = new MxOpParams();
         if (shape == null) {
             throw new IllegalArgumentException("Shape is required for " + opName.substring(1));
         }
         params.addParam("shape", shape);
-        params.setContext(context == null ? this.context : context);
+        params.setContext(Context.defaultIfNull(ctx, context));
         params.setDataType(dataType);
         return invoke(opName, params);
     }

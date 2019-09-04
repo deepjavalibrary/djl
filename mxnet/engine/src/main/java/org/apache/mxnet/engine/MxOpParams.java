@@ -32,9 +32,7 @@ public class MxOpParams extends PairList<String, Object> {
     }
 
     public void setContext(Context context) {
-        if (context != null) {
-            setParam("ctx", context.toString());
-        }
+        setParam("ctx", context.toString());
     }
 
     public void setDataType(DataType dataType) {
