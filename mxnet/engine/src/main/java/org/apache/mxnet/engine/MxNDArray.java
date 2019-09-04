@@ -16,7 +16,6 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -239,10 +238,9 @@ public class MxNDArray extends NativeResource implements NDArray {
         DataType dType = getDataType();
         long product = sh.size();
         long len = dType.getNumOfBytes() * product;
-        ByteBuffer bb = ByteBuffer.allocateDirect(Math.toIntExact(len));
+        ByteBuffer bb = manager.allocateDirect(Math.toIntExact(len));
         Pointer pointer = Native.getDirectBufferPointer(bb);
         JnaUtils.syncCopyToCPU(getHandle(), pointer, Math.toIntExact(product));
-        bb.order(ByteOrder.nativeOrder());
         return bb;
     }
 
@@ -259,8 +257,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
 
         int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = ByteBuffer.allocateDirect(size * numOfBytes);
-        buf.order(ByteOrder.nativeOrder()); // MXNet use native byte order
+        ByteBuffer buf = manager.allocateDirect(size * numOfBytes);
 
         switch (inputType) {
             case FLOAT32:

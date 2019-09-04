@@ -13,6 +13,7 @@
 package software.amazon.ai.test.mock;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDArray;
@@ -23,6 +24,11 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
 public class MockNDManager implements NDManager {
+
+    @Override
+    public ByteBuffer allocateDirect(int capacity) {
+        return ByteBuffer.allocateDirect(capacity);
+    }
 
     @Override
     public NDArray create(Shape shape, DataType dataType, Context context) {

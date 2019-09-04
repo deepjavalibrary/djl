@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.translate.Translator;
@@ -42,9 +43,11 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
         Shape shape = new Shape(1, 3, h, w);
         DataDesc dataDesc = new DataDesc(shape);
 
-        FloatBuffer buffer = Images.toFloatBuffer(input);
+        NDManager manager = ctx.getNDManager();
 
-        NDArray array = ctx.getNDManager().create(dataDesc);
+        FloatBuffer buffer = Images.toFloatBuffer(manager, input);
+
+        NDArray array = manager.create(dataDesc);
         array.set(buffer);
 
         return new NDList(normalize(array));

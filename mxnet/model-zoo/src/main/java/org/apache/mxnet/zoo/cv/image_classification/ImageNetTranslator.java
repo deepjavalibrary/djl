@@ -24,6 +24,7 @@ import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Images;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.translate.TranslatorContext;
@@ -40,8 +41,10 @@ public class ImageNetTranslator extends ImageTranslator<List<Classification>> {
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
         BufferedImage image = Images.centerCrop(input);
         image = Images.resizeImage(image, imageWidth, imageHeight);
-        FloatBuffer buffer = Images.toFloatBuffer(image);
-        NDArray array = ctx.getNDManager().create(buffer, dataDesc);
+
+        NDManager manager = ctx.getNDManager();
+        FloatBuffer buffer = Images.toFloatBuffer(manager, image);
+        NDArray array = manager.create(buffer, dataDesc);
         array.divi(255);
 
         return new NDList(array);

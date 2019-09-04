@@ -72,6 +72,11 @@ public class TfNDManager implements NDManager, AutoCloseable {
     }
 
     @Override
+    public ByteBuffer allocateDirect(int capacity) {
+        return ByteBuffer.allocateDirect(capacity);
+    }
+
+    @Override
     public NDArray create(float[] data, Shape shape) {
         return new TfNDArray(this, Tensors.create(data));
     }

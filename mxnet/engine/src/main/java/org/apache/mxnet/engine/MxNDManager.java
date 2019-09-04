@@ -14,6 +14,8 @@ package org.apache.mxnet.engine;
 
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,6 +56,11 @@ public class MxNDManager implements NDManager {
 
     static MxNDManager getSystemManager() {
         return SYSTEM_MANAGER;
+    }
+
+    @Override
+    public ByteBuffer allocateDirect(int capacity) {
+        return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
     public MxNDArray create(Pointer handle) {

@@ -19,11 +19,11 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.util.List;
 import javax.imageio.ImageIO;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.util.RandomUtils;
 
 /** {@code Images} is an image processing utility that can load, reshape and convert images. */
@@ -165,10 +165,11 @@ public final class Images {
     /**
      * Converts image to a float buffer.
      *
+     * @param manager {@link NDManager} to allocate direct buffer
      * @param image the buffered image to be converted
      * @return {@link FloatBuffer}
      */
-    public static FloatBuffer toFloatBuffer(BufferedImage image) {
+    public static FloatBuffer toFloatBuffer(NDManager manager, BufferedImage image) {
         // Get height and width of the image
         int width = image.getWidth();
         int height = image.getHeight();
@@ -177,10 +178,7 @@ public final class Images {
         int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
 
         // 3 times height and width for R,G,B channels
-        ByteBuffer bb = ByteBuffer.allocateDirect(4 * 3 * height * width);
-
-        // FIXME: make engine agnostic, current implementation is MXNet specific.
-        bb.order(ByteOrder.nativeOrder());
+        ByteBuffer bb = manager.allocateDirect(4 * 3 * height * width);
         FloatBuffer buf = bb.asFloatBuffer();
         for (int row = 0; row < height; ++row) {
             for (int col = 0; col < width; ++col) {

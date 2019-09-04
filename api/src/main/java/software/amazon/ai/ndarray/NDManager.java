@@ -116,6 +116,14 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Allocates a new engine specific direct byte buffer.
+     *
+     * @param capacity The new buffer's capacity, in bytes
+     * @return The new byte buffer
+     */
+    ByteBuffer allocateDirect(int capacity);
+
+    /**
      * Creates an uninitialized instance of {@link DataType#FLOAT32} {@link NDArray} with specified
      * {@link Shape}.
      *

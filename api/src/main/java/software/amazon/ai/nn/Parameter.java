@@ -208,7 +208,7 @@ public class Parameter implements AutoCloseable {
 
         // Data
         length = dis.readInt();
-        ByteBuffer data = ByteBuffer.allocateDirect(length);
+        ByteBuffer data = manager.allocateDirect(length);
 
         if (length > 0) {
             byte[] buf = new byte[BUFFER_SIZE];
