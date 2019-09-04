@@ -29,6 +29,7 @@ import software.amazon.ai.modality.cv.DetectedObject;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.test.mock.EchoTranslator;
 import software.amazon.ai.test.mock.MockImageTranslator;
+import software.amazon.ai.test.mock.MockModel;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;
@@ -52,8 +53,7 @@ public class InferenceTest {
         MockImageTranslator translator = new MockImageTranslator("cat");
 
         Metrics metrics = new Metrics();
-        try (Predictor<BufferedImage, List<DetectedObject>> ssd =
-                Predictor.newInstance(model, translator)) {
+        try (Predictor<BufferedImage, List<DetectedObject>> ssd = model.newPredictor(translator)) {
             ssd.setMetrics(metrics);
             List<DetectedObject> result = ssd.predict(image);
             DetectedObject detectedObject = result.get(0);
@@ -89,8 +89,7 @@ public class InferenceTest {
                 };
         Metrics metrics = new Metrics();
 
-        try (Predictor<String, Classification> classifier =
-                Predictor.newInstance(model, translator)) {
+        try (Predictor<String, Classification> classifier = model.newPredictor(translator)) {
             classifier.setMetrics(metrics);
             Classification result = classifier.predict(data);
             Assert.assertEquals(result.getClassName(), "cat");
@@ -102,7 +101,8 @@ public class InferenceTest {
     public void testTranslatException() throws TranslateException {
         EchoTranslator<String> translator = new EchoTranslator<>();
         translator.setInputException(new TranslateException("Some exception"));
-        Predictor<String, String> predictor = Predictor.newInstance(null, translator);
+        Model model = new MockModel();
+        Predictor<String, String> predictor = model.newPredictor(translator);
         String result = predictor.predict("input");
         Assert.assertEquals(result, "input");
     }

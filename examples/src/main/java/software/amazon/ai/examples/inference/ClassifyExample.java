@@ -49,7 +49,7 @@ public final class ClassifyExample extends AbstractExample {
         ZooModel<BufferedImage, List<Classification>> model = ModelZoo.RESNET.loadModel(criteria);
 
         // Following context is not required, default context will be used by Predictor without
-        // passing context to Predictor.newInstance(model, translator)
+        // passing context to model.newPredictor(translator)
         // Change to a specific context if needed.
         Context context = Context.defaultContext();
 

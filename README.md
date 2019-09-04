@@ -34,7 +34,7 @@ The following is an example of how to write inference code:
     // Next user need create a Predictor, and use Predictor.predict()
     // to get prediction.
     try (Predictor<BufferedImage, List<DetectedObject>> predictor =
-            Predictor.newInstance(model, translator, context)) {
+            model.newPredictor(translator, context)) {
         List<DetectedObject> result = predictor.predict(img);
     }
 ```

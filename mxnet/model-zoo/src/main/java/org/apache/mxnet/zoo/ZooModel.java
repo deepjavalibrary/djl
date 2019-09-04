@@ -36,11 +36,23 @@ public class ZooModel<I, O> implements Model {
     }
 
     public Predictor<I, O> newPredictor() {
-        return newPredictor(Context.defaultContext());
+        return newPredictor(translator, null);
     }
 
     public Predictor<I, O> newPredictor(Context context) {
-        return Predictor.newInstance(model, translator, context);
+        return newPredictor(translator, context);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <P, Q> Predictor<P, Q> newPredictor(Translator<P, Q> translator) {
+        return newPredictor(translator, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <P, Q> Predictor<P, Q> newPredictor(Translator<P, Q> translator, Context context) {
+        return model.newPredictor(translator, context);
     }
 
     public Translator<I, O> getTranslator() {
@@ -51,51 +63,61 @@ public class ZooModel<I, O> implements Model {
         return model.cast(DataType.UINT8);
     }
 
+    /** {@inheritDoc} */
     @Override
     public DataDesc[] describeInput() {
         return model.describeInput();
     }
 
+    /** {@inheritDoc} */
     @Override
     public DataDesc[] describeOutput() {
         return model.describeOutput();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String[] getArtifactNames() {
         return model.getArtifactNames();
     }
 
+    /** {@inheritDoc} */
     @Override
     public <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException {
         return model.getArtifact(name, function);
     }
 
+    /** {@inheritDoc} */
     @Override
     public URL getArtifact(String name) throws IOException {
         return model.getArtifact(name);
     }
 
+    /** {@inheritDoc} */
     @Override
     public InputStream getArtifactAsStream(String name) throws IOException {
         return model.getArtifactAsStream(name);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Block getBlock() {
         return model.getBlock();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager getManager() {
         return model.getManager();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Model cast(DataType dataType) {
         return model.cast(dataType);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         model.close();

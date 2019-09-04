@@ -12,9 +12,7 @@
  */
 package software.amazon.ai.inference;
 
-import software.amazon.ai.Context;
 import software.amazon.ai.Model;
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.Translator;
@@ -31,7 +29,7 @@ import software.amazon.ai.translate.Translator;
  * // User must implement Translator interface, read Translator for detail.
  * Translator translator = new MyTranslator();
  *
- * try (Predictor&lt;String, String&gt; predictor = <b>Predictor.newInstance</b>(model, translator)) {
+ * try (Predictor&lt;String, String&gt; predictor = <b>model.newPredictor</b>(translator)) {
  *   String result = predictor.<b>predict</b>("What's up");
  * }
  * </pre>
@@ -42,34 +40,6 @@ import software.amazon.ai.translate.Translator;
  * @see Translator
  */
 public interface Predictor<I, O> extends AutoCloseable {
-
-    /**
-     * Creates a new Predictor based on the model given.
-     *
-     * @param model The model used for inference
-     * @param translator The Object used for preprocessing and post processing
-     * @param <I> Input object for preprocessing
-     * @param <O> Output object come from postprocessing
-     * @return instance of {@code Predictor}
-     */
-    static <I, O> Predictor<I, O> newInstance(Model model, Translator<I, O> translator) {
-        return newInstance(model, translator, Context.defaultContext());
-    }
-
-    /**
-     * Creates a new Predictor based on the model given.
-     *
-     * @param model the model used for inference
-     * @param translator The Object used for preprocessing and post processing
-     * @param context context used for the inference
-     * @param <I> Input object for preprocessing
-     * @param <O> Output object come from postprocessing
-     * @return new instance of {@code Predictor}
-     */
-    static <I, O> Predictor<I, O> newInstance(
-            Model model, Translator<I, O> translator, Context context) {
-        return Engine.getInstance().newPredictor(model, translator, context);
-    }
 
     /**
      * Predicts the method used for inference.

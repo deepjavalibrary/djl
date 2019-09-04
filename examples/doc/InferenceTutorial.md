@@ -151,7 +151,7 @@ Once the model is loaded, we have everything we need to create a Predictor that 
 implemented a Translator, and loaded a model. We can create a Predictor using these objects. 
 
 ~~~
-Predictor<BufferedImage, List<DetectedObject>> ssd = Predictor.newInstance(model, translator, context)
+Predictor<BufferedImage, List<DetectedObject>> ssd = model.newPredictor(translator, context)
 ~~~
 
 The Predictor class extends AutoCloseable. Therefore, it is good to use it within a try-with-resources block. 

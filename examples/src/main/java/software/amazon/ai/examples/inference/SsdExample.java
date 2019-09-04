@@ -54,7 +54,7 @@ public final class SsdExample extends AbstractExample {
         ZooModel<BufferedImage, List<DetectedObject>> model = ModelZoo.SSD.loadModel(criteria);
 
         // Following context is not not required, default context will be used by Predictor without
-        // passing context to Predictor.newInstance(model, translator)
+        // passing context to model.newPredictor(translator)
         // Change to a specific context if needed.
         Context context = Context.defaultContext();
 

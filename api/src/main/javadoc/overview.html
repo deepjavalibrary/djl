@@ -43,8 +43,7 @@
     // Next user need create a <b>Predictor</b>, and use <a
     href="software/amazon/ai/inference/Predictor.html#predict-I-"><b>Predictor.predict()</b></a>
     // to get prediction.
-    try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor =
-            <b>Predictor.newInstance</b>(model, translator, context)) {
+    try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor = <b>model.newPredictor</b>(translator, context)) {
         List&lt;DetectedObject&gt; result = predictor.<b>predict</b>(img);
     }
 </pre>

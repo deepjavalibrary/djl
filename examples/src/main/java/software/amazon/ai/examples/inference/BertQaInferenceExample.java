@@ -65,12 +65,11 @@ public final class BertQaInferenceExample extends AbstractExample {
         BertTranslator translator = new BertTranslator(parser);
 
         // Following context is not not required, default context will be used by Predictor without
-        // passing context to Predictor.newInstance(model, translator)
+        // passing context to model.newPredictor(translator)
         // Change to a specific context if needed.
         Context context = Context.defaultContext();
 
-        try (Predictor<QAInput, String> predictor =
-                Predictor.newInstance(model, translator, context)) {
+        try (Predictor<QAInput, String> predictor = model.newPredictor(translator, context)) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {

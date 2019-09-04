@@ -28,12 +28,15 @@ import org.tensorflow.framework.MetaGraphDef;
 import org.tensorflow.framework.SignatureDef;
 import org.tensorflow.framework.TensorInfo;
 import org.tensorflow.framework.TensorShapeProto;
+import software.amazon.ai.Context;
 import software.amazon.ai.Model;
+import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.translate.Translator;
 
 public class TfModel implements Model {
 
@@ -103,6 +106,18 @@ public class TfModel implements Model {
 
     private byte[] getMetaGraphDef() {
         return bundle.metaGraphDef();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
+        return TfEngine.getInstance().newPredictor(this, translator, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
+        return TfEngine.getInstance().newPredictor(this, translator, context);
     }
 
     /** {@inheritDoc} */

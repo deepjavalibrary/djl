@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.nn.MxSymbolBlock;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
+import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -36,6 +36,7 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.translate.Translator;
 import software.amazon.ai.util.Pair;
 
 /**
@@ -60,41 +61,43 @@ public class MxModel implements Model {
     }
 
     static MxModel load(String prefix, int epoch) {
-        return load(MxNDManager.getSystemManager(), prefix, epoch, null);
+        return load(prefix, epoch, null);
     }
 
     static MxModel load(String prefix, int epoch, Context context) {
-        return load(MxNDManager.getSystemManager(), prefix, epoch, context);
-    }
-
-    static MxModel load(
-            MxNDManager manager, final String prefix, final int epoch, final Context context) {
-        MxNDManager subManager = manager.newSubManager();
+        context = Context.defaultIfNull(context);
+        MxNDManager subManager = MxNDManager.getSystemManager().newSubManager(context);
         Symbol symbol = Symbol.load(subManager, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
         Path modelDir = Paths.get(paramFile).toAbsolutePath().getParent();
         NDList paramNDlist = JnaUtils.loadNdArray(subManager, Paths.get(paramFile));
-        if (!StreamSupport.stream(paramNDlist.spliterator(), false)
-                .allMatch(x -> x.getKey() != null)) {
-            throw new IllegalArgumentException("Array names must be present in parameter file");
+
+        List<Parameter> parameters = new ArrayList<>();
+        for (Pair<String, NDArray> pair : paramNDlist) {
+            String key = pair.getKey();
+            if (key == null) {
+                throw new IllegalArgumentException("Array names must be present in parameter file");
+            }
+            String paramName = key.split(":", 2)[1];
+            NDArray array = pair.getValue().asInContext(context, true);
+            parameters.add(new Parameter(paramName, array));
         }
 
-        Function<String, String> paramName = x -> x.split(":", 2)[1];
-        List<Parameter> parameters =
-                StreamSupport.stream(paramNDlist.spliterator(), false)
-                        .map(
-                                (Pair<String, NDArray> x) -> {
-                                    Context ctx = context;
-                                    if (ctx == null) {
-                                        ctx = manager.getContext();
-                                    }
-                                    return new Parameter(
-                                            paramName.apply(x.getKey()),
-                                            x.getValue().asInContext(ctx, true));
-                                })
-                        .collect(Collectors.toList());
         // TODO: Check if Symbol has all names that params file have
         return new MxModel(modelDir, new MxSymbolBlock(symbol, parameters, subManager), subManager);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
+        return MxEngine.getInstance().newPredictor(this, translator, manager.getContext());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
+        context = Context.defaultIfNull(context, manager.getContext());
+        return MxEngine.getInstance().newPredictor(this, translator, context);
     }
 
     /** {@inheritDoc} */

@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Function;
 import software.amazon.ai.engine.Engine;
+import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -47,7 +48,7 @@ import software.amazon.ai.translate.Translator;
  * // User must implement Translator interface, read Translator for detail.
  * Translator translator = new MyTranslator();
  *
- * try (Predictor&lt;String, String&gt; predictor = <b>Predictor.newInstance</b>(model, translator)) {
+ * try (Predictor&lt;String, String&gt; predictor = <b>model.newPredictor</b>(translator)) {
  *   String result = predictor.<b>predict</b>("What's up");
  * }
  * </pre>
@@ -111,6 +112,27 @@ public interface Model extends AutoCloseable {
             throws IOException {
         return Engine.getInstance().loadModel(modelPath, modelName, context, options);
     }
+
+    /**
+     * Creates a new Predictor based on the model.
+     *
+     * @param translator The Object used for preprocessing and post processing
+     * @param <I> Input object for preprocessing
+     * @param <O> Output object come from postprocessing
+     * @return instance of {@code Predictor}
+     */
+    <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator);
+
+    /**
+     * Creates a new Predictor based on the model.
+     *
+     * @param translator The Object used for preprocessing and post processing
+     * @param context context used for the inference
+     * @param <I> Input object for preprocessing
+     * @param <O> Output object come from postprocessing
+     * @return instance of {@code Predictor}
+     */
+    <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context);
 
     /**
      * Returns the input descriptor of the model.

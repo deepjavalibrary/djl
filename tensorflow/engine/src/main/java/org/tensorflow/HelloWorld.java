@@ -62,7 +62,7 @@ public final class HelloWorld {
             String filename = "ModelPath/TF-resnet_ssd/mfc.jpg";
             BufferedImage img = ImageIO.read(new File(filename));
             GenericTranslator translator = new GenericTranslator();
-            Predictor<BufferedImage, NDList> predictor = Predictor.newInstance(model, translator);
+            Predictor<BufferedImage, NDList> predictor = model.newPredictor(translator);
             NDList list = predictor.predict(img);
 
             for (Pair<String, NDArray> pair : list) {
