@@ -30,5 +30,5 @@ dependencies {
 }
 
 application {
-    mainClassName = System.getProperty("main", "software.amazon.ai.examples.ClassifyExample")
+    mainClassName = System.getProperty("main", "software.amazon.ai.examples.inference.ClassifyExample")
 }
