@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
 // TODO abstract a interface that could be inherited by this and Stream DataIterable
@@ -86,20 +87,25 @@ public class DataIterable<I, L> implements Iterable<Record> {
             List<Long> indices = sample.next();
             NDList[] data = new NDList[indices.size()];
             NDList[] labels = new NDList[indices.size()];
+            TranslatorContext ctx = trainer.getPreprocessContext();
             for (int i = 0; i < indices.size(); i++) {
                 Pair<I, L> dataItem = dataset.get(indices.get(i));
                 Record record;
                 try {
-                    record =
-                            trainer.getTranslator()
-                                    .processInput(trainer.getPreprocessContext(), dataItem);
+                    record = trainer.getTranslator().processInput(ctx, dataItem);
                 } catch (Exception e) {
                     throw new IllegalStateException("Failed to get next data item", e);
                 }
                 data[i] = record.getData();
                 labels[i] = record.getLabels();
             }
-            return new Record(batchifier.batchify(data), batchifier.batchify(labels));
+            Record record =
+                    new Record(
+                            trainer.getManager(),
+                            batchifier.batchify(data),
+                            batchifier.batchify(labels));
+            ctx.close();
+            return record;
         }
     }
 }

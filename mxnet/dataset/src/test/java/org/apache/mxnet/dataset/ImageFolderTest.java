@@ -13,31 +13,45 @@
 package org.apache.mxnet.dataset;
 
 import java.io.IOException;
+import java.util.Iterator;
 import org.apache.mxnet.engine.MxImages;
 import org.testng.annotations.Test;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.nn.Block;
+import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.dataset.Record;
 
 public class ImageFolderTest {
 
     @Test
     public void testImageFolder() throws FailedTestException, IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            ImageFolder dataset =
-                    new ImageFolder.Builder()
-                            .setManager(manager)
-                            .setRoot("src/test/resources/imagefolder")
-                            .setSampling(32)
-                            .build();
+        ImageFolder dataset =
+                new ImageFolder.Builder()
+                        .setRoot("src/test/resources/imagefolder")
+                        .setSampling(1, false, false)
+                        .build();
+        try (Trainer<String, Integer, NDList> trainer =
+                        Trainer.newInstance(Block.IDENTITY_BLOCK, dataset.defaultTranslator());
+                NDManager manager = NDManager.newBaseManager()) {
 
             NDArray cat = MxImages.read(manager, "src/test/resources/imagefolder/cat/cat2.jpeg");
             NDArray dog = MxImages.read(manager, "src/test/resources/imagefolder/dog/puppy1.jpg");
-            Assertions.assertAlmostEquals(cat, dataset.get(0).getKey().head());
-            Assertions.assertEquals(manager.create(0), dataset.get(0).getValue().head());
-            Assertions.assertAlmostEquals(dog, dataset.get(1).getKey().head());
-            Assertions.assertEquals(manager.create(1), dataset.get(1).getValue().head());
+
+            Iterator<Record> ds = trainer.trainDataset(dataset).iterator();
+
+            Record catRecord = ds.next();
+            Assertions.assertAlmostEquals(cat, catRecord.getData().head());
+            Assertions.assertEquals(manager.create(new int[] {0}), catRecord.getLabels().head());
+            catRecord.close();
+
+            Record dogRecord = ds.next();
+            Assertions.assertAlmostEquals(dog, dogRecord.getData().head());
+            Assertions.assertEquals(manager.create(new int[] {1}), dogRecord.getLabels().head());
+            dogRecord.close();
         }
     }
 }

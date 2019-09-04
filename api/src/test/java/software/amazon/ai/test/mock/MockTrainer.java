@@ -14,6 +14,7 @@ package software.amazon.ai.test.mock;
 
 import java.util.Optional;
 import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.ModelSaver;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.translate.TrainTranslator;
@@ -39,6 +40,11 @@ public class MockTrainer<I, L, O> implements Trainer<I, L, O> {
 
     @Override
     public void setMetrics(Metrics metrics) {}
+
+    @Override
+    public NDManager getManager() {
+        return null;
+    }
 
     @Override
     public Optional<Integer> getSeed() {

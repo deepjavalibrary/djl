@@ -121,6 +121,7 @@ public class GradientCollectorIntegrationTest {
                         }
                         controller.step();
                         lossMetric.update(loss);
+                        record.close();
                     }
                 }
             }

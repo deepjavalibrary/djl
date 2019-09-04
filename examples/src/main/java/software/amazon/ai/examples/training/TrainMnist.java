@@ -115,6 +115,7 @@ public final class TrainMnist {
                         controller.step();
                         acc.update(label, pred);
                         lossMetric.update(loss);
+                        record.close();
                     }
                     lossValue = lossMetric.getMetric().getValue();
                     accuracy = acc.getMetric().getValue();

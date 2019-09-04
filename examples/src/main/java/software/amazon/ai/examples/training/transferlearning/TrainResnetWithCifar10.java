@@ -111,6 +111,7 @@ public final class TrainResnetWithCifar10 {
                         controller.step();
                         acc.update(label, pred);
                         lossMetric.update(loss);
+                        batch.close();
                         float lossValue = lossMetric.getMetric().getValue();
                         float accuracy = acc.getMetric().getValue();
                         logger.info(

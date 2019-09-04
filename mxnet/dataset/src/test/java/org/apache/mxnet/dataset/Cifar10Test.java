@@ -44,6 +44,7 @@ public class Cifar10Test {
                 for (Record batch : trainer.trainDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);
+                    batch.close();
                 }
             }
         }
@@ -66,6 +67,7 @@ public class Cifar10Test {
                 for (Record batch : trainer.trainDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);
+                    batch.close();
                 }
             }
         }

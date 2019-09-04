@@ -42,8 +42,6 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     private Integer seed;
     private long timestamp;
 
-    private TranslatorContext currentContext;
-
     MxTrainer(Block block, TrainTranslator<I, L, O> translator, Context context) {
         this.manager = MxNDManager.getSystemManager().newSubManager(context);
         this.model = new MxModel(null, block, manager.newSubManager());
@@ -67,11 +65,7 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
 
     @Override
     public TranslatorContext getPreprocessContext() {
-        if (currentContext != null) {
-            currentContext.close();
-        }
-        currentContext = new TrainerContext();
-        return currentContext;
+        return new TrainerContext();
     }
 
     /** {@inheritDoc} */
@@ -132,6 +126,11 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     @Override
     public void setMetrics(Metrics metrics) {
         this.metrics = metrics;
+    }
+
+    @Override
+    public NDManager getManager() {
+        return manager;
     }
 
     @Override

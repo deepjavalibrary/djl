@@ -44,6 +44,7 @@ public class MnistTest {
                 for (Record record : trainer.trainDataset(mnist)) {
                     Assert.assertEquals(record.getData().size(), 1);
                     Assert.assertEquals(record.getLabels().size(), 1);
+                    record.close();
                 }
             }
         }
@@ -66,6 +67,7 @@ public class MnistTest {
                 for (Record record : trainer.trainDataset(mnist)) {
                     Assert.assertEquals(record.getData().size(), 1);
                     Assert.assertEquals(record.getLabels().size(), 1);
+                    record.close();
                 }
             }
         }

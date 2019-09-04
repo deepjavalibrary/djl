@@ -18,6 +18,7 @@ import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
@@ -70,6 +71,8 @@ public interface Trainer<I, L, O> extends AutoCloseable {
      * @param metrics the Metrics class
      */
     void setMetrics(Metrics metrics);
+
+    NDManager getManager();
 
     Optional<Integer> getSeed();
 
