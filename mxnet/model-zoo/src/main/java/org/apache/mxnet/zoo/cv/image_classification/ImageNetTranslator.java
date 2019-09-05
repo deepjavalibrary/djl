@@ -35,7 +35,7 @@ public class ImageNetTranslator extends ImageTranslator<List<Classification>> {
     private int topK = 5;
     private int imageWidth = 224;
     private int imageHeight = 224;
-    private DataDesc dataDesc = new DataDesc(new Shape(1, 3, imageWidth, imageHeight), "data");
+    private DataDesc dataDesc = new DataDesc(new Shape(1, 3, imageHeight, imageWidth), "data");
 
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {

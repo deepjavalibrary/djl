@@ -191,6 +191,19 @@ public interface NDArrayEx {
 
     NDArray maxPool(Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention);
 
+    /**
+     * Normalize a NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard deviation.
+     *
+     * <p>Given mean `(m1, ..., mn)` and std `(s\ :sub:`1`\ , ..., s\ :sub:`n`)` for `n` channels,
+     * this transform normalizes each channel of the input tensor with: output[i] = (input[i] - m\
+     * :sub:`i`\ ) / s\ :sub:`i`
+     *
+     * @param mean mean value for each channel
+     * @param std standard deviation for each channel
+     * @return the result of normalization
+     */
+    NDArray normalize(float[] mean, float[] std);
+
     NDArray globalMaxPool(Shape stride, Shape pad, PoolingConvention poolingConvention);
 
     NDArray sumPool(Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention);

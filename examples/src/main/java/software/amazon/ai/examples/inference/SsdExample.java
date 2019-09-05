@@ -43,13 +43,12 @@ public final class SsdExample extends AbstractExample {
     public DetectedObject predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
         List<DetectedObject> predictResult = null;
-        String modelName = arguments.getModelName();
         Path imageFile = arguments.getImageFile();
         BufferedImage img = Images.loadImageFromFile(imageFile);
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("size", "512");
-        criteria.put("backbone", modelName);
+        criteria.put("backbone", "resnet50_v1");
         criteria.put("dataset", "voc");
         ZooModel<BufferedImage, List<DetectedObject>> model = ModelZoo.SSD.loadModel(criteria);
 

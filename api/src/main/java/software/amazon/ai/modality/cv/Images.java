@@ -23,6 +23,7 @@ import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.util.List;
 import javax.imageio.ImageIO;
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.util.RandomUtils;
 
@@ -158,6 +159,29 @@ public final class Images {
         g.dispose();
     }
 
+    /**
+     * Draws all joints of a body on an image.
+     *
+     * @param image the input image
+     * @param joints the joints of the body
+     */
+    public static void drawJoints(BufferedImage image, List<Joint> joints) {
+        Graphics2D g = (Graphics2D) image.getGraphics();
+        int stroke = 2;
+        g.setStroke(new BasicStroke(stroke));
+
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+
+        for (Joint joint : joints) {
+            g.setPaint(randomColor().darker());
+            int x = (int) (joint.getX() * imageWidth);
+            int y = (int) (joint.getY() * imageHeight);
+            g.fillOval(x, y, 10, 10);
+        }
+        g.dispose();
+    }
+
     private static Color randomColor() {
         return new Color(RandomUtils.nextInt(255));
     }
@@ -193,6 +217,22 @@ public final class Images {
             }
         }
         return buf;
+    }
+
+    /**
+     * Normalize a NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard deviation.
+     *
+     * <p>Given mean `(m1, ..., mn)` and std `(s\ :sub:`1`\ , ..., s\ :sub:`n`)` for `n` channels,
+     * this transform normalizes each channel of the input tensor with: output[i] = (input[i] - m\
+     * :sub:`i`\ ) / s\ :sub:`i`
+     *
+     * @param input the input image NDArray
+     * @param mean mean value for each channel
+     * @param std standard deviation for each channel
+     * @return the result of normalization
+     */
+    public static NDArray normalize(NDArray input, float[] mean, float[] std) {
+        return input.getNDArrayInternal().normalize(mean, std);
     }
 
     private static void drawText(Graphics2D g, String text, int x, int y, int stroke, int padding) {

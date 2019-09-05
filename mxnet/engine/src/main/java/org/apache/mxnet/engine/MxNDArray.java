@@ -298,6 +298,13 @@ public class MxNDArray extends NativeResource implements NDArray {
             prepareValue.add(value);
             prepareValue.add(prepareValue.peek().asInContext(getContext(), false));
             // prepareValue.add(prepareValue.peek().asType(getDataType(), false));
+            // Deal with the case target: (1, 10, 1), original (10)
+            // try to find (10, 1) and reshape (10) to that
+            Shape targetShape = fullSlice.getShape();
+            while (targetShape.size() > value.size()) {
+                targetShape = targetShape.slice(1);
+            }
+            prepareValue.add(prepareValue.peek().reshape(targetShape));
             prepareValue.add(prepareValue.peek().broadcast(fullSlice.getShape()));
 
             manager.invoke(

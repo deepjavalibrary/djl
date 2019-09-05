@@ -233,6 +233,14 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     @Override
+    public NDArray normalize(float[] mean, float[] std) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("mean", mean);
+        params.addTupleParam("std", std);
+        return manager.invoke("normalize", array, params);
+    }
+
+    @Override
     public NDArray globalMaxPool(Shape stride, Shape pad, PoolingConvention poolingConvention) {
         MxOpParams params = new MxOpParams();
         params.addParam("stride", stride);

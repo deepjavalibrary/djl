@@ -56,7 +56,6 @@ public class Arguments {
         options.addOption(
                 Option.builder("n")
                         .longOpt("model-name")
-                        .required()
                         .hasArg()
                         .argName("MODEL-NAME")
                         .desc("Model name.")

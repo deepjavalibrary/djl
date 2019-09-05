@@ -1,0 +1,127 @@
+/*
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+package software.amazon.ai.examples.inference;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
+import org.apache.mxnet.zoo.ModelNotFoundException;
+import org.apache.mxnet.zoo.ModelZoo;
+import org.apache.mxnet.zoo.ZooModel;
+import software.amazon.ai.Context;
+import software.amazon.ai.examples.inference.util.AbstractExample;
+import software.amazon.ai.examples.inference.util.Arguments;
+import software.amazon.ai.inference.Predictor;
+import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.Images;
+import software.amazon.ai.modality.cv.Joint;
+import software.amazon.ai.translate.TranslateException;
+
+public class PoseEstimationExample extends AbstractExample {
+
+    public static void main(String[] args) {
+        new PoseEstimationExample().runExample(args);
+    }
+
+    @Override
+    protected List<List<Joint>> predict(Arguments arguments, Metrics metrics, int iteration)
+            throws IOException, ModelNotFoundException, TranslateException {
+        /* Section SSD */
+        List<DetectedObject> ssdResult = null;
+        List<List<Joint>> poseResult = null;
+        Path imageFile = arguments.getImageFile();
+        BufferedImage img = Images.loadImageFromFile(imageFile);
+        int imageWidth = img.getWidth();
+        int imageHeight = img.getHeight();
+
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        criteria.put("size", "512");
+        criteria.put("backbone", "resnet50_v1");
+        criteria.put("dataset", "voc");
+        ZooModel<BufferedImage, List<DetectedObject>> ssd = ModelZoo.SSD.loadModel(criteria);
+
+        criteria = new ConcurrentHashMap<>();
+        criteria.put("flavor", "v1b");
+        criteria.put("backbone", "resnet18");
+        criteria.put("dataset", "imagenet");
+
+        ZooModel<BufferedImage, List<Joint>> pose = ModelZoo.SIMPLE_POSE.loadModel(criteria);
+
+        Context context = Context.defaultContext();
+
+        try (Predictor<BufferedImage, List<DetectedObject>> ssdPredictor =
+                ssd.newPredictor(context)) {
+            ssdResult = ssdPredictor.predict(img);
+        }
+        // Get the cropped image
+        List<BufferedImage> filtered =
+                ssdResult
+                        .stream()
+                        .filter(obj -> obj.getClassName().equals("person"))
+                        .map(obj -> obj.getBoundingBox().getBounds())
+                        .map(
+                                rec ->
+                                        img.getSubimage(
+                                                (int) (rec.getX() * imageWidth),
+                                                (int) (rec.getY() * imageHeight),
+                                                (int) (rec.getWidth() * imageWidth),
+                                                (int) (rec.getHeight() * imageHeight)))
+                        .collect(Collectors.toList());
+
+        /* Pose recognition */
+        try (Predictor<BufferedImage, List<Joint>> posePredictor = pose.newPredictor(context)) {
+            posePredictor.setMetrics(metrics); // Let predictor collect metrics
+            poseResult = new ArrayList<>();
+            for (BufferedImage segmentedImg : filtered) {
+                poseResult.add(posePredictor.predict(segmentedImg));
+            }
+            collectMemoryInfo(metrics);
+        }
+
+        drawJoints(
+                filtered.get(0),
+                poseResult
+                        .get(0)
+                        .stream()
+                        .filter(ele -> ele.getConfidence() > 0.2f)
+                        .collect(Collectors.toList()),
+                arguments.getLogDir());
+        ssd.close();
+        pose.close();
+        return poseResult;
+    }
+
+    private void drawJoints(BufferedImage img, List<Joint> joints, String logDir)
+            throws IOException {
+        if (logDir == null) {
+            return;
+        }
+
+        Path dir = Paths.get(logDir);
+        Files.createDirectories(dir);
+
+        Images.drawJoints(img, joints);
+
+        Path out = Paths.get(logDir, "joint.png");
+        ImageIO.write(img, "png", out.toFile());
+    }
+}

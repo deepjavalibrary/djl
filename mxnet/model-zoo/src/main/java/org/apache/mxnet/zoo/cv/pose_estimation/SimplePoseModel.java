@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.zoo.cv.pose_estimation;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -20,7 +21,7 @@ import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
 import software.amazon.ai.Model;
-import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.modality.cv.Joint;
 import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Metadata;
@@ -49,7 +50,7 @@ public class SimplePoseModel {
         }
     }
 
-    public ZooModel<NDList, NDList> loadModel(Map<String, String> criteria)
+    public ZooModel<BufferedImage, List<Joint>> loadModel(Map<String, String> criteria)
             throws IOException, ModelNotFoundException {
         locateMetadata();
         Artifact artifact = match(criteria);
