@@ -17,12 +17,12 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.dataset.Mnist;
-import org.apache.mxnet.dataset.SimpleDataset;
 import org.slf4j.Logger;
 import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.examples.training.util.Arguments;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.SequentialBlock;
@@ -31,6 +31,7 @@ import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
+import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.initializer.NormalInitializer;
@@ -91,8 +92,8 @@ public final class TrainMnist {
                             .setSampling(batchSize, true, true)
                             .build();
             mnist.prepare();
-            try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    model.newTrainer(new SimpleDataset.DefaultTranslator(), optimizer)) {
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    model.newTrainer(new ArrayDataset.DefaultTranslator(), optimizer)) {
                 int numEpoch = arguments.getEpoch();
 
                 TrainingController controller =
@@ -109,7 +110,7 @@ public final class TrainMnist {
                         NDArray pred;
                         NDArray loss;
                         try (GradientCollector gradCol = GradientCollector.newInstance()) {
-                            pred = trainer.predict(data);
+                            pred = trainer.predict(new NDList(data)).get(0);
                             loss =
                                     Loss.softmaxCrossEntropyLoss(
                                             label, pred, 1.f, 0, -1, true, false);

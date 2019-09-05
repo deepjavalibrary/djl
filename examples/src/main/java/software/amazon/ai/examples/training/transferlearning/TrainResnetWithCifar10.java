@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.dataset.Cifar10;
-import org.apache.mxnet.dataset.SimpleDataset;
 import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
@@ -27,6 +26,7 @@ import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.SequentialBlock;
@@ -35,6 +35,7 @@ import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.initializer.Initializer;
@@ -88,8 +89,8 @@ public final class TrainResnetWithCifar10 {
                         .setSampling(batchSize)
                         .build();
         cifar10.prepare();
-        try (Trainer<NDArray, NDArray, NDArray> trainer =
-                model.newTrainer(new SimpleDataset.DefaultTranslator(), optimizer)) {
+        try (Trainer<NDList, NDList, NDList> trainer =
+                model.newTrainer(new ArrayDataset.DefaultTranslator(), optimizer)) {
             Accuracy acc = new Accuracy();
             LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
@@ -100,7 +101,7 @@ public final class TrainResnetWithCifar10 {
                     NDArray pred;
                     NDArray loss;
                     try (GradientCollector gradCol = GradientCollector.newInstance()) {
-                        pred = trainer.predict(data);
+                        pred = trainer.predict(new NDList(data)).get(0);
                         loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
                         gradCol.backward(loss);
                     }

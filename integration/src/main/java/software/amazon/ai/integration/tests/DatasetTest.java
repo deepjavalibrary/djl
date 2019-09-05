@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import org.apache.mxnet.dataset.Cifar10;
-import org.apache.mxnet.dataset.SimpleDataset;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
@@ -272,7 +271,7 @@ public class DatasetTest {
                                                 JnaUtils.setNumpyMode(true);
                                                 r.run();
                                             }));
-            SimpleDataset cifar10 =
+            Cifar10 cifar10 =
                     new Cifar10.Builder()
                             .setManager(manager)
                             .optConfig(
@@ -283,8 +282,8 @@ public class DatasetTest {
                             .build();
 
             cifar10.prepare();
-            try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    model.newTrainer(new SimpleDataset.DefaultTranslator())) {
+            try (Trainer<NDList, NDList, NDList> trainer =
+                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     batch.close();
                 }

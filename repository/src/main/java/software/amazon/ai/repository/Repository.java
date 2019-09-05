@@ -53,6 +53,8 @@ public interface Repository {
 
     InputStream openStream(Artifact.Item item, String path) throws IOException;
 
+    String[] listDirectory(Artifact.Item item, String path) throws IOException;
+
     void prepare(Artifact artifact) throws IOException;
 
     Path getCacheDirectory() throws IOException;

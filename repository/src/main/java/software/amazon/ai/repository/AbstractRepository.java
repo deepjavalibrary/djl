@@ -31,6 +31,15 @@ public abstract class AbstractRepository implements Repository {
 
     @Override
     public InputStream openStream(Artifact.Item item, String path) throws IOException {
+        return Files.newInputStream(Paths.get(resolvePath(item, path)));
+    }
+
+    @Override
+    public String[] listDirectory(Artifact.Item item, String path) throws IOException {
+        return Paths.get(resolvePath(item, path)).toFile().list();
+    }
+
+    private URI resolvePath(Artifact.Item item, String path) throws IOException {
         Artifact artifact = item.getArtifact();
         URI artifactUri = artifact.getResourceUri();
 
@@ -47,14 +56,12 @@ public abstract class AbstractRepository implements Repository {
                 } else {
                     cachedFile = resourceDir;
                 }
-                cachedFile = cachedFile.resolve(path);
+                return cachedFile.resolve(path).toUri();
             } else {
-                cachedFile = resourceDir.resolve(fileName);
+                return resourceDir.resolve(fileName).toUri();
             }
-            return Files.newInputStream(cachedFile);
         }
-        URI itemUri = getBaseUri().resolve(artifactUri.resolve(item.getUri()));
-        return itemUri.toURL().openStream();
+        return getBaseUri().resolve(artifactUri.resolve(item.getUri()));
     }
 
     @Override

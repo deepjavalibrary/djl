@@ -32,7 +32,7 @@ import software.amazon.ai.util.PairList;
 // TODO put ImageFolder under mxnet for now it should be in Joule-api
 
 /** A dataset for loading image files stored in a folder structure. */
-public final class ImageFolder extends RandomAccessDataset<String, Integer> {
+public class ImageFolder extends RandomAccessDataset<String, Integer> {
     private static final String[] EXT = {".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"};
     private static final Logger logger = LoggerFactory.getLogger(ImageFolder.class);
 
@@ -40,7 +40,7 @@ public final class ImageFolder extends RandomAccessDataset<String, Integer> {
     private List<String> synsets;
     private PairList<String, Integer> items;
 
-    public ImageFolder(Builder builder) {
+    public ImageFolder(BaseBuilder<?> builder) {
         super(builder);
         this.flag = builder.getFlag();
         this.synsets = new ArrayList<>();
@@ -93,7 +93,9 @@ public final class ImageFolder extends RandomAccessDataset<String, Integer> {
         return new DefaultTranslator();
     }
 
-    public static class Builder extends RandomAccessDataset.BaseBuilder<Builder> {
+    @SuppressWarnings("rawtypes")
+    public abstract static class BaseBuilder<B extends BaseBuilder>
+            extends RandomAccessDataset.BaseBuilder<B> {
 
         private MxImages.Flag flag = Flag.COLOR;
         private String root;
@@ -102,19 +104,22 @@ public final class ImageFolder extends RandomAccessDataset<String, Integer> {
             return flag;
         }
 
-        public Builder optFlag(Flag flag) {
+        public B optFlag(Flag flag) {
             this.flag = flag;
-            return this;
+            return self();
         }
 
         public String getRoot() {
             return root;
         }
 
-        public Builder setRoot(String root) {
+        public B setRoot(String root) {
             this.root = root;
-            return this;
+            return self();
         }
+    }
+
+    public static class Builder extends BaseBuilder<Builder> {
 
         @Override
         public Builder self() {

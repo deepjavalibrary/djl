@@ -16,38 +16,78 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.util.Pair;
+import software.amazon.ai.repository.MRL;
+import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.dataset.ArrayDataset;
+import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.util.Utils;
 
 /**
  * CIFAR10 image classification dataset from https://www.cs.toronto.edu/~kriz/cifar.html Each sample
  * is an image (in 3D NDArray) with shape (32, 32, 3).
  */
-public final class Cifar10 extends SimpleDataset {
+public final class Cifar10 extends ArrayDataset implements ZooDataset<NDList, NDList> {
 
     private static final String ARTIFACT_ID = "cifar10";
     // 3072 = 32 * 32 * 3, i.e. one image size, +1 here is label
     private static final int DATA_AND_LABEL_SIZE = 32 * 32 * 3 + 1;
 
+    private NDManager manager;
+    private Repository repository;
+    private Artifact artifact;
+    private Usage usage;
+    private boolean prepared;
+
     public Cifar10(Builder builder) {
         super(builder);
+        this.manager = builder.manager;
+        this.repository = builder.repository;
+        this.artifact = builder.artifact;
+        this.usage = builder.usage;
     }
 
     @Override
-    public String getArtifactID() {
-        return ARTIFACT_ID;
+    public MRL getMrl() {
+        return new MRL(MRL.Dataset.CV, Datasets.GROUP_ID, ARTIFACT_ID);
     }
 
     @Override
-    public Pair<NDArray, NDArray> get(long index) {
-        return new Pair<>(data.get(index), labels.get(index));
+    public Repository getRepository() {
+        return repository;
     }
 
     @Override
-    public void loadData(Usage usage) throws IOException {
+    public Artifact getArtifact() {
+        return artifact;
+    }
+
+    @Override
+    public Usage getUsage() {
+        return usage;
+    }
+
+    @Override
+    public boolean isPrepared() {
+        return prepared;
+    }
+
+    @Override
+    public void setPrepared(boolean prepared) {
+        this.prepared = prepared;
+    }
+
+    @Override
+    public void useDefaultArtifact() throws IOException {
+        artifact = repository.resolve(getMrl(), "1.0", null);
+    }
+
+    @Override
+    public void prepareData(Usage usage) throws IOException {
         Map<String, Artifact.Item> map = artifact.getFiles();
         Artifact.Item item;
         switch (usage) {
@@ -62,16 +102,19 @@ public final class Cifar10 extends SimpleDataset {
                 throw new UnsupportedOperationException("Validation data not available.");
         }
         NDArray dataAndLabels = readData(item);
-        data = dataAndLabels.get(":, 1:").reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1);
-        labels = dataAndLabels.get(":,0");
+        data =
+                new NDArray[] {
+                    dataAndLabels.get(":, 1:").reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1)
+                };
+        labels = new NDArray[] {dataAndLabels.get(":,0")};
         // check if data and labels have the same size
-        if (data.size(0) != labels.size(0)) {
+        if (data[0].size(0) != labels[0].size(0)) {
             throw new IOException(
                     String.format(
                             "the size of data %d didn't match with the size of labels %d",
-                            data.size(0), labels.size(0)));
+                            data[0].size(0), labels[0].size(0)));
         }
-        size = labels.size();
+        size = labels[0].size();
     }
 
     public NDArray readData(Artifact.Item item) throws IOException {
@@ -86,7 +129,32 @@ public final class Cifar10 extends SimpleDataset {
         }
     }
 
-    public static class Builder extends SimpleDataset.BaseBuilder<Builder> {
+    public static class Builder extends RandomAccessDataset.BaseBuilder<Builder> {
+
+        private NDManager manager;
+        private Repository repository = Datasets.REPOSITORY;
+        private Artifact artifact;
+        private Usage usage;
+
+        public Builder setManager(NDManager manager) {
+            this.manager = manager;
+            return this;
+        }
+
+        public Builder optRepository(Repository repository) {
+            this.repository = repository;
+            return this;
+        }
+
+        public Builder optArtifact(Artifact artifact) {
+            this.artifact = artifact;
+            return this;
+        }
+
+        public Builder setUsage(Usage usage) {
+            this.usage = usage;
+            return this;
+        }
 
         @Override
         public Builder self() {

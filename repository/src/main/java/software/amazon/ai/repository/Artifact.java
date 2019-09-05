@@ -110,7 +110,12 @@ public class Artifact {
     }
 
     public Map<String, Item> getFiles() {
-        files.forEach((k, v) -> v.setArtifact(this));
+        for (Map.Entry<String, Item> file : files.entrySet()) {
+            file.getValue().setArtifact(this);
+            if (file.getValue().name == null && "dir".equals(file.getValue().getType())) {
+                file.getValue().name = file.getKey();
+            }
+        }
         return files;
     }
 

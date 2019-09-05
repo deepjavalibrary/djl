@@ -16,10 +16,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.util.Pair;
+import software.amazon.ai.repository.MRL;
+import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.dataset.ArrayDataset;
+import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.util.Utils;
 
 /**
@@ -27,26 +32,61 @@ import software.amazon.ai.util.Utils;
  *
  * <p>Each sample is an image (in 3D NDArray) with shape (28, 28, 1).
  */
-public final class Mnist extends SimpleDataset {
+public final class Mnist extends ArrayDataset implements ZooDataset<NDList, NDList> {
 
     private static final String ARTIFACT_ID = "mnist";
 
+    private NDManager manager;
+    private Repository repository;
+    private Artifact artifact;
+    private Usage usage;
+    private boolean prepared;
+
     public Mnist(Builder builder) {
         super(builder);
+        this.manager = builder.manager;
+        this.repository = builder.repository;
+        this.artifact = builder.artifact;
+        this.usage = builder.usage;
     }
 
     @Override
-    public String getArtifactID() {
-        return ARTIFACT_ID;
+    public MRL getMrl() {
+        return new MRL(MRL.Dataset.CV, Datasets.GROUP_ID, ARTIFACT_ID);
     }
 
     @Override
-    public Pair<NDArray, NDArray> get(long index) {
-        return new Pair<>(data.get(index), labels.get(index));
+    public Repository getRepository() {
+        return repository;
     }
 
     @Override
-    public void loadData(Usage usage) throws IOException {
+    public Artifact getArtifact() {
+        return artifact;
+    }
+
+    @Override
+    public Usage getUsage() {
+        return usage;
+    }
+
+    @Override
+    public boolean isPrepared() {
+        return prepared;
+    }
+
+    @Override
+    public void setPrepared(boolean prepared) {
+        this.prepared = prepared;
+    }
+
+    @Override
+    public void useDefaultArtifact() throws IOException {
+        artifact = repository.resolve(getMrl(), "1.0", null);
+    }
+
+    @Override
+    public void prepareData(Usage usage) throws IOException {
         Map<String, Artifact.Item> map = artifact.getFiles();
         Artifact.Item imageItem;
         Artifact.Item labelItem;
@@ -63,9 +103,9 @@ public final class Mnist extends SimpleDataset {
             default:
                 throw new UnsupportedOperationException("Validation data not available.");
         }
-        labels = readLabel(labelItem);
-        size = labels.size();
-        data = readData(imageItem, labels.size());
+        labels = new NDArray[] {readLabel(labelItem)};
+        size = labels[0].size();
+        data = new NDArray[] {readData(imageItem, size)};
     }
 
     private NDArray readData(Artifact.Item item, long length) throws IOException {
@@ -96,7 +136,32 @@ public final class Mnist extends SimpleDataset {
         }
     }
 
-    public static class Builder extends SimpleDataset.BaseBuilder<Builder> {
+    public static class Builder extends RandomAccessDataset.BaseBuilder<Builder> {
+
+        private NDManager manager;
+        private Repository repository = Datasets.REPOSITORY;
+        private Artifact artifact;
+        private Usage usage;
+
+        public Builder setManager(NDManager manager) {
+            this.manager = manager;
+            return this;
+        }
+
+        public Builder optRepository(Repository repository) {
+            this.repository = repository;
+            return this;
+        }
+
+        public Builder optArtifact(Artifact artifact) {
+            this.artifact = artifact;
+            return this;
+        }
+
+        public Builder setUsage(Usage usage) {
+            this.usage = usage;
+            return this;
+        }
 
         @Override
         public Builder self() {

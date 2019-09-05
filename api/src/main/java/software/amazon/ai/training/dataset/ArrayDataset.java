@@ -36,29 +36,31 @@ import software.amazon.ai.util.Pair;
  *
  * @see Dataset
  */
-public final class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
+public class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
 
-    private final NDArray[] data;
-    private final NDArray[] labels;
+    protected NDArray[] data;
+    protected NDArray[] labels;
 
-    public ArrayDataset(Builder builder) {
+    public ArrayDataset(RandomAccessDataset.BaseBuilder<?> builder) {
         super(builder);
-        data = builder.getData();
-        labels = builder.getLabels();
+        if (builder instanceof BaseBuilder<?>) {
+            BaseBuilder<?> builder2 = (BaseBuilder<?>) builder;
+            data = builder2.getData();
+            labels = builder2.getLabels();
 
-        if (data != null && data.length != 0) {
-            size = data[0].size(0);
-        } else if (labels != null && labels.length != 0) {
-            size = labels[0].size(0);
-        } else {
-            throw new IllegalArgumentException("Either data or labels must have NDArray");
-        }
-        // check data and labels have the same size
-        if (data != null && Stream.of(data).anyMatch(array -> array.size(0) != size)) {
-            throw new IllegalArgumentException("All the NDArray must have the same length!");
-        }
-        if (labels != null && Stream.of(labels).anyMatch(array -> array.size(0) != size)) {
-            throw new IllegalArgumentException("All the NDArray must have the same length!");
+            if (data != null && data.length != 0) {
+                size = data[0].size(0);
+            } else if (labels != null && labels.length != 0) {
+                size = labels[0].size(0);
+            }
+
+            // check data and labels have the same size
+            if (data != null && Stream.of(data).anyMatch(array -> array.size(0) != size)) {
+                throw new IllegalArgumentException("All the NDArray must have the same length!");
+            }
+            if (labels != null && Stream.of(labels).anyMatch(array -> array.size(0) != size)) {
+                throw new IllegalArgumentException("All the NDArray must have the same length!");
+            }
         }
     }
 
@@ -96,7 +98,9 @@ public final class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
         }
     }
 
-    public static class Builder extends RandomAccessDataset.BaseBuilder<Builder> {
+    @SuppressWarnings("rawtypes")
+    public abstract static class BaseBuilder<B extends BaseBuilder>
+            extends RandomAccessDataset.BaseBuilder<B> {
 
         private NDArray[] data;
         private NDArray[] labels;
@@ -105,29 +109,32 @@ public final class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
             return data;
         }
 
-        public Builder setData(NDArray data) {
+        public B setData(NDArray data) {
             this.data = new NDArray[] {data};
-            return this;
+            return self();
         }
 
-        public Builder setData(NDArray[] data) {
+        public B setData(NDArray[] data) {
             this.data = data;
-            return this;
+            return self();
         }
 
         public NDArray[] getLabels() {
             return labels;
         }
 
-        public Builder optLabels(NDArray labels) {
+        public B optLabels(NDArray labels) {
             this.labels = new NDArray[] {labels};
-            return this;
+            return self();
         }
 
-        public Builder optLabels(NDArray[] labels) {
+        public B optLabels(NDArray[] labels) {
             this.labels = labels;
-            return this;
+            return self();
         }
+    }
+
+    public static class Builder extends BaseBuilder<Builder> {
 
         @Override
         public Builder self() {
