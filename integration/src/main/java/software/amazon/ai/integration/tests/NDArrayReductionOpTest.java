@@ -121,8 +121,8 @@ public class NDArrayReductionOpTest {
             Assertions.assertEquals(meanKeepExpected, meanKeep, "Incorrect mean keep");
         }
     }
-
-    @RunAsTest
+    // TODO disable for now
+    // @RunAsTest
     public void testTrace() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.arange(8).reshape(new Shape(2, 2, 2)).trace();

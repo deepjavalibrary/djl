@@ -157,13 +157,13 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Context ctx) {
-        return fill("_zeros", ctx, shape, dataType);
+        return fill("_npi_zeros", ctx, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray ones(Shape shape, DataType dataType, Context ctx) {
-        return fill("_ones", ctx, shape, dataType);
+        return fill("_npi_ones", ctx, shape, dataType);
     }
 
     /** {@inheritDoc} */

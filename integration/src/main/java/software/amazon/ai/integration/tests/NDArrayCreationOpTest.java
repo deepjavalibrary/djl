@@ -90,8 +90,8 @@ public class NDArrayCreationOpTest {
             Assertions.assertEquals(testedND, expectedND);
         }
     }
-
-    @RunAsTest
+    // TODO disable for now
+    // @RunAsTest
     public void testEye() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.eye(2);

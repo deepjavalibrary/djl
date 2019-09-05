@@ -770,20 +770,20 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neg() {
-        return manager.invoke("negative", this, null);
+        return manager.invoke("_npi_negative", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray negi() {
-        manager.invoke("negative", new NDList(this), new NDList(this), null);
+        manager.invoke("_npi_negative", new NDList(this), new NDList(this), null);
         return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray abs() {
-        return manager.invoke("_np_absolute", this, null);
+        return manager.invoke("_npi_absolute", this, null);
     }
 
     /** {@inheritDoc} */
@@ -795,19 +795,19 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray cbrt() {
-        return manager.invoke("_np_cbrt", this, null);
+        return manager.invoke("_npi_cbrt", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray floor() {
-        return manager.invoke("_np_floor", this, null);
+        return manager.invoke("_npi_floor", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray ceil() {
-        return manager.invoke("_np_ceil", this, null);
+        return manager.invoke("_npi_ceil", this, null);
     }
 
     /** {@inheritDoc} */
@@ -819,7 +819,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray trunc() {
-        return manager.invoke("_np_trunc", this, null);
+        return manager.invoke("_npi_trunc", this, null);
     }
 
     /** {@inheritDoc} */
@@ -861,7 +861,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray tan() {
-        return manager.invoke("_np_tan", this, null);
+        return manager.invoke("_npi_tan", this, null);
     }
 
     /** {@inheritDoc} */
@@ -873,7 +873,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray acos() {
-        return manager.invoke("_np_arccos", this, null);
+        return manager.invoke("_npi_arccos", this, null);
     }
 
     /** {@inheritDoc} */
@@ -897,25 +897,25 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
-        return manager.invoke("_np_tanh", this, null);
+        return manager.invoke("_npi_tanh", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray asinh() {
-        return manager.invoke("_np_arcsinh", this, null);
+        return manager.invoke("_npi_arcsinh", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray acosh() {
-        return manager.invoke("_np_arccosh", this, null);
+        return manager.invoke("_npi_arccosh", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray atanh() {
-        return manager.invoke("_np_arctanh", this, null);
+        return manager.invoke("_npi_arctanh", this, null);
     }
 
     /** {@inheritDoc} */
@@ -957,7 +957,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray min() {
         MxOpParams params = new MxOpParams();
-        return manager.invoke("min", this, params);
+        return manager.invoke("_np_min", this, params);
     }
 
     /** {@inheritDoc} */
@@ -966,7 +966,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
         params.addParam("keepdims", keepDims);
-        return manager.invoke("min", this, params);
+        return manager.invoke("_np_min", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1152,7 +1152,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logicalNot() {
-        return manager.invoke("_np_logical_not", this, null);
+        return manager.invoke("_npi_logical_not", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1163,7 +1163,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         // be careful that MXNet numpy argsort op didn't officially support this param
         params.addParam("is_ascend", ascending);
         params.setDataType(DataType.INT32);
-        return manager.invoke("_npi_argsort", this, params);
+        return manager.invoke("argsort", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1203,7 +1203,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axes[0]);
         params.addParam("temperature", temperature);
-        return manager.invoke("softmax", this, params);
+        return manager.invoke("_npx_softmax", this, params);
     }
 
     /** {@inheritDoc} */
