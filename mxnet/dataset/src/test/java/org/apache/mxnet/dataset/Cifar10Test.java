@@ -15,6 +15,7 @@ package org.apache.mxnet.dataset;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
@@ -38,10 +39,10 @@ public class Cifar10Test {
                             .build();
 
             cifar10.prepare();
+            Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
-                for (Record batch : trainer.trainDataset(cifar10)) {
+                    model.newTrainer(new SimpleDataset.DefaultTranslator())) {
+                for (Record batch : trainer.iterateDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);
                     batch.close();
@@ -61,10 +62,10 @@ public class Cifar10Test {
                             .build();
 
             cifar10.prepare();
+            Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
-                for (Record batch : trainer.trainDataset(cifar10)) {
+                    model.newTrainer(new SimpleDataset.DefaultTranslator())) {
+                for (Record batch : trainer.iterateDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);
                     batch.close();

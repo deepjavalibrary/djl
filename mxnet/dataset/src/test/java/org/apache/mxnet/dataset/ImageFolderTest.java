@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import org.apache.mxnet.engine.MxImages;
 import org.testng.annotations.Test;
+import software.amazon.ai.Model;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
@@ -34,14 +35,15 @@ public class ImageFolderTest {
                         .setRoot("src/test/resources/imagefolder")
                         .setSampling(1, false, false)
                         .build();
+        Model model = Model.newInstance(Block.IDENTITY_BLOCK);
         try (Trainer<String, Integer, NDList> trainer =
-                        Trainer.newInstance(Block.IDENTITY_BLOCK, dataset.defaultTranslator());
+                        model.newTrainer(dataset.defaultTranslator());
                 NDManager manager = NDManager.newBaseManager()) {
 
             NDArray cat = MxImages.read(manager, "src/test/resources/imagefolder/cat/cat2.jpeg");
             NDArray dog = MxImages.read(manager, "src/test/resources/imagefolder/dog/puppy1.jpg");
 
-            Iterator<Record> ds = trainer.trainDataset(dataset).iterator();
+            Iterator<Record> ds = trainer.iterateDataset(dataset).iterator();
 
             Record catRecord = ds.next();
             Assertions.assertAlmostEquals(cat, catRecord.getData().head());

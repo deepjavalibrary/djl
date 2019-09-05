@@ -20,9 +20,10 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
-public class TrainingController {
+public class TrainingController implements AutoCloseable {
     private PairList<String, Parameter> parameters;
     private Optimizer optimizer;
     private ParameterStore parameterStore;
@@ -99,5 +100,13 @@ public class TrainingController {
 
     public PairList<String, Parameter> getParameters() {
         return parameters;
+    }
+
+    @Override
+    public void close() {
+        parameterStore.close();
+        for (Pair<String, Parameter> pair : parameters) {
+            pair.getValue().close();
+        }
     }
 }

@@ -36,6 +36,10 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 
 public class TfModel implements Model {
@@ -107,6 +111,32 @@ public class TfModel implements Model {
     private byte[] getMetaGraphDef() {
         return bundle.metaGraphDef();
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Context context) {
+        return null;
+    }
+
+    @Override
+    public void setInitializer(Initializer initializer) {}
+
+    @Override
+    public void setInitializer(Initializer initializer, boolean overwrite) {}
 
     /** {@inheritDoc} */
     @Override

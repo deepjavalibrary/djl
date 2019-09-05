@@ -24,13 +24,16 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Gradient.Collector;
 import software.amazon.ai.training.ParameterStore;
-import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.translate.TrainTranslator;
 
 public class TfEngine extends Engine {
 
     TfEngine() {}
+
+    @Override
+    public Model newModel(Block block) {
+        return null;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -83,19 +86,6 @@ public class TfEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            Model model, TrainTranslator<I, L, O> translator, Context context) {
-        return null;
-    }
-
-    @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            Block block, TrainTranslator<I, L, O> translator, Context context) {
         return null;
     }
 

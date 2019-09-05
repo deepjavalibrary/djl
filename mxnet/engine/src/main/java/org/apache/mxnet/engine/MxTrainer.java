@@ -24,6 +24,8 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.ModelSaver;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingController;
+import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.TranslatorContext;
@@ -41,21 +43,33 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     private Metrics metrics;
     private Integer seed;
     private long timestamp;
+    private TrainingController trainingController;
 
-    MxTrainer(Block block, TrainTranslator<I, L, O> translator, Context context) {
-        this.manager = MxNDManager.getSystemManager().newSubManager(context);
-        this.model = new MxModel(null, block, manager.newSubManager());
+    MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Context context) {
+        this.model = model;
+        this.manager = (MxNDManager) model.getManager().newSubManager();
         this.translator = translator;
         this.context = context;
         this.block = model.getBlock();
     }
 
-    MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Context context) {
-        this.manager = MxNDManager.getSystemManager().newSubManager(context);
-        this.model = model;
-        this.translator = translator;
-        this.context = context;
-        this.block = model.getBlock();
+    MxTrainer(
+            MxModel model,
+            TrainTranslator<I, L, O> translator,
+            Optimizer optimizer,
+            Context context) {
+        this(model, translator, context);
+        trainingController = new TrainingController(block.getParameters(), optimizer);
+    }
+
+    @Override
+    public void step() {
+        if (trainingController == null) {
+            throw new IllegalStateException(
+                    "No optimizer is set for trainer, please initialize"
+                            + "your trainer with an Optimizer.");
+        }
+        trainingController.step();
     }
 
     @Override
@@ -81,7 +95,6 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
 
             NDList result = block.forward(ndList);
             predictForwardEnd(result);
-
             return translator.processOutput(outputCtx, result);
         } catch (RuntimeException e) {
             throw e;
@@ -170,6 +183,9 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     @Override
     public void close() {
         manager.close();
+        if (trainingController != null) {
+            trainingController.close();
+        }
     }
 
     private class TrainerContext implements TranslatorContext {

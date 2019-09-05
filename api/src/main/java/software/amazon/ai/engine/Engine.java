@@ -29,9 +29,7 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.ParameterStore;
-import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.translate.TrainTranslator;
 
 /**
  * The {@code Engine} interface shadows differences between each deep learning framework.
@@ -130,6 +128,14 @@ public abstract class Engine {
     public abstract String getVersion();
 
     /**
+     * Construct a new model from Block.
+     *
+     * @param block Block that defines the network architecture
+     * @return a new Model instance using the network defined in block
+     */
+    public abstract Model newModel(Block block);
+
+    /**
      * Loads the model from the specified location.
      *
      * <p>The model format is deep learning framework specific, each framework may have its own
@@ -170,34 +176,6 @@ public abstract class Engine {
      * @return {@link ParameterStore} object
      */
     public abstract ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU);
-
-    /**
-     * Creates a new {@link Trainer} instance for this Engine.
-     *
-     * @param model the model created to train on
-     * @param translator the translator for preprocessing and postprocessing
-     * @param context the context of training, can be CPU/GPU
-     * @param <I> Input data object for the Trainer
-     * @param <L> Label data object for the Trainer
-     * @param <O> Output Object for the Trainer
-     * @return Trainer
-     */
-    public abstract <I, L, O> Trainer<I, L, O> newTrainer(
-            Model model, TrainTranslator<I, L, O> translator, Context context);
-
-    /**
-     * Creates a new {@link Trainer} instance for this Engine.
-     *
-     * @param block the block created to train on
-     * @param translator the translator for preprocessing and postprocessing
-     * @param context the context of training, can be CPU/GPU
-     * @param <I> Input data object for the Trainer
-     * @param <L> Label data object for the Trainer
-     * @param <O> Output Object for the Trainer
-     * @return Trainer
-     */
-    public abstract <I, L, O> Trainer<I, L, O> newTrainer(
-            Block block, TrainTranslator<I, L, O> translator, Context context);
 
     /**
      * Creates a new top-level {@link NDManager}.

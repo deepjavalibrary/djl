@@ -15,6 +15,7 @@ package org.apache.mxnet.dataset;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
@@ -38,10 +39,10 @@ public class MnistTest {
                             .build();
 
             mnist.prepare();
+            Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
-                for (Record record : trainer.trainDataset(mnist)) {
+                    model.newTrainer(new SimpleDataset.DefaultTranslator())) {
+                for (Record record : trainer.iterateDataset(mnist)) {
                     Assert.assertEquals(record.getData().size(), 1);
                     Assert.assertEquals(record.getLabels().size(), 1);
                     record.close();
@@ -61,10 +62,10 @@ public class MnistTest {
                             .build();
 
             mnist.prepare();
+            Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
-                for (Record record : trainer.trainDataset(mnist)) {
+                    model.newTrainer(new SimpleDataset.DefaultTranslator())) {
+                for (Record record : trainer.iterateDataset(mnist)) {
                     Assert.assertEquals(record.getData().size(), 1);
                     Assert.assertEquals(record.getLabels().size(), 1);
                     record.close();

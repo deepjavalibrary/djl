@@ -26,6 +26,7 @@ import org.apache.mxnet.dataset.Cifar10;
 import org.apache.mxnet.dataset.SimpleDataset;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.Context;
+import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -65,10 +66,10 @@ public class DatasetTest {
                             .build();
 
             List<Long> original = new ArrayList<>();
+            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDList, NDList, NDList> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
-                trainer.trainDataset(dataset)
+                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
                                 record -> original.add(record.getData().get(0).getLong()));
@@ -89,10 +90,10 @@ public class DatasetTest {
                             .setSampler(new BatchSampler(new RandomSampler(), 1, false))
                             .build();
             List<Long> original = new ArrayList<>();
+            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDList, NDList, NDList> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
-                trainer.trainDataset(dataset)
+                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
                                 record -> original.add(record.getData().get(0).getLong()));
@@ -112,10 +113,10 @@ public class DatasetTest {
                             .setSampler(new BatchSampler(new SequenceSampler(), 27, false))
                             .build();
             List<long[]> originalList = new ArrayList<>();
+            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDList, NDList, NDList> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
-                trainer.trainDataset(dataset)
+                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
                                 record -> originalList.add(record.getData().get(0).toLongArray()));
@@ -134,9 +135,8 @@ public class DatasetTest {
                             .build();
             List<long[]> originalList2 = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
-                trainer.trainDataset(dataset2)
+                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                trainer.iterateDataset(dataset2)
                         .iterator()
                         .forEachRemaining(
                                 record -> originalList2.add(record.getData().get(0).toLongArray()));
@@ -152,9 +152,8 @@ public class DatasetTest {
                             .build();
             List<long[]> originalList3 = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
-                trainer.trainDataset(dataset3)
+                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                trainer.iterateDataset(dataset3)
                         .iterator()
                         .forEachRemaining(
                                 record -> originalList3.add(record.getData().get(0).toLongArray()));
@@ -170,9 +169,8 @@ public class DatasetTest {
                             .build();
             List<long[]> originalList4 = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
-                trainer.trainDataset(dataset4)
+                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                trainer.iterateDataset(dataset4)
                         .iterator()
                         .forEachRemaining(
                                 record -> originalList4.add(record.getData().get(0).toLongArray()));
@@ -196,10 +194,10 @@ public class DatasetTest {
                             .build();
 
             int index = 0;
+            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDList, NDList, NDList> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new ArrayDataset.DefaultTranslator())) {
-                for (Record record : trainer.trainDataset(dataset)) {
+                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                for (Record record : trainer.iterateDataset(dataset)) {
                     Assertions.assertEquals(
                             record.getData().get(0),
                             manager.arange(2 * index, 2 * index + 40).reshape(20, 2));
@@ -216,7 +214,7 @@ public class DatasetTest {
                                 .setSampling(15, false)
                                 .build();
                 index = 0;
-                for (Record record : trainer.trainDataset(dataset)) {
+                for (Record record : trainer.iterateDataset(dataset)) {
                     if (index != 90) {
                         Assertions.assertEquals(
                                 record.getData().get(0),
@@ -264,10 +262,10 @@ public class DatasetTest {
                             .build();
 
             cifar10.prepare();
+            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    Trainer.newInstance(
-                            Block.IDENTITY_BLOCK, new SimpleDataset.DefaultTranslator())) {
-                for (Record record : trainer.trainDataset(cifar10)) {
+                    testModel.newTrainer(new SimpleDataset.DefaultTranslator())) {
+                for (Record record : trainer.iterateDataset(cifar10)) {
                     record.close();
                 }
                 // user have to shutdown the executor

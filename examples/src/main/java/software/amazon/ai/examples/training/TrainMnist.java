@@ -19,10 +19,10 @@ import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.dataset.Mnist;
 import org.apache.mxnet.dataset.SimpleDataset;
 import org.slf4j.Logger;
+import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.examples.training.util.Arguments;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Linear;
@@ -59,53 +59,52 @@ public final class TrainMnist {
         trainMnist(arguments);
     }
 
-    public static Block constructBlock(NDManager manager) {
+    public static Block constructBlock() {
         SequentialBlock mlp = new SequentialBlock();
         mlp.add(new Linear.Builder().setOutChannels(128).build());
         mlp.add(Activation.reluBlock());
         mlp.add(new Linear.Builder().setOutChannels(64).build());
         mlp.add(Activation.reluBlock());
         mlp.add(new Linear.Builder().setOutChannels(10).build());
-        mlp.setInitializer(manager, new NormalInitializer(0.01));
         return mlp;
     }
 
     public static void trainMnist(Arguments arguments) throws IOException, TranslateException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block mlp = constructBlock(manager);
-            int batchSize = arguments.getBatchSize();
-            int numEpoch = arguments.getEpoch();
+        int batchSize = arguments.getBatchSize();
+        Block mlp = constructBlock();
+        try (Model model = Model.newInstance(mlp)) {
+            model.setInitializer(new NormalInitializer(0.01));
             Optimizer optimizer =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / batchSize)
                             .setLrTracker(LrTracker.fixedLR(0.01f))
                             .optMomentum(0.9f)
                             .build();
-            TrainingController controller = new TrainingController(mlp.getParameters(), optimizer);
-            Accuracy acc = new Accuracy();
-            LossMetric lossMetric = new LossMetric("softmaxCELoss");
-
             Mnist mnist =
                     new Mnist.Builder()
-                            .setManager(manager)
+                            .setManager(model.getManager())
                             .setUsage(Dataset.Usage.TRAIN)
                             .setSampling(batchSize, true, true)
                             .build();
-
             mnist.prepare();
-
             try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    Trainer.newInstance(mlp, new SimpleDataset.DefaultTranslator())) {
+                    model.newTrainer(new SimpleDataset.DefaultTranslator(), optimizer)) {
+                int numEpoch = arguments.getEpoch();
+
+                TrainingController controller =
+                        new TrainingController(mlp.getParameters(), optimizer);
+                Accuracy acc = new Accuracy();
+                LossMetric lossMetric = new LossMetric("softmaxCELoss");
                 for (int epoch = 0; epoch < numEpoch; epoch++) {
                     // reset loss and accuracy
                     acc.reset();
                     lossMetric.reset();
-                    NDArray loss;
-                    for (Record record : trainer.trainDataset(mnist)) {
+                    for (Record record : trainer.iterateDataset(mnist)) {
                         NDArray data =
                                 record.getData().head().reshape(batchSize, 28 * 28).div(255f);
                         NDArray label = record.getLabels().head();
                         NDArray pred;
+                        NDArray loss;
                         try (Gradient.Collector gradCol = Gradient.newCollector()) {
                             pred = trainer.predict(data);
                             loss =

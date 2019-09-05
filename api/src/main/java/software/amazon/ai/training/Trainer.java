@@ -14,12 +14,8 @@ package software.amazon.ai.training;
 
 import java.io.IOException;
 import java.util.Optional;
-import software.amazon.ai.Context;
-import software.amazon.ai.Model;
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.translate.TrainTranslator;
@@ -28,31 +24,11 @@ import software.amazon.ai.translate.TranslatorContext;
 
 public interface Trainer<I, L, O> extends AutoCloseable {
 
-    static <I, L, O> Trainer<I, L, O> newInstance(
-            Block block, TrainTranslator<I, L, O> translator) {
-        return newInstance(block, translator, Context.defaultContext());
-    }
-
-    static <I, L, O> Trainer<I, L, O> newInstance(
-            Block block, TrainTranslator<I, L, O> translator, Context context) {
-        return Engine.getInstance().newTrainer(block, translator, context);
-    }
-
-    static <I, L, O> Trainer<I, L, O> newInstance(
-            Model model, TrainTranslator<I, L, O> translator) {
-        return newInstance(model, translator, Context.defaultContext());
-    }
-
-    static <I, L, O> Trainer<I, L, O> newInstance(
-            Model model, TrainTranslator<I, L, O> translator, Context context) {
-        return Engine.getInstance().newTrainer(model, translator, context);
-    }
-
     TrainTranslator<I, L, O> getTranslator();
 
     TranslatorContext getPreprocessContext();
 
-    default Iterable<Record> trainDataset(Dataset<I, L> dataset) throws IOException {
+    default Iterable<Record> iterateDataset(Dataset<I, L> dataset) throws IOException {
         return dataset.getRecords(this);
     }
 
@@ -64,6 +40,8 @@ public interface Trainer<I, L, O> extends AutoCloseable {
      * @throws TranslateException if an error occurs during prediction
      */
     O predict(I input) throws TranslateException;
+
+    void step();
 
     /**
      * Attaches a Metrics param to use for benchmark.

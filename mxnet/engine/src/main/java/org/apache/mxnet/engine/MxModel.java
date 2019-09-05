@@ -36,6 +36,10 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.util.Pair;
 
@@ -53,6 +57,10 @@ public class MxModel implements Model {
     private DataDesc[] inputData;
     private MxNDManager manager;
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
+
+    MxModel(Block block) {
+        this(null, block, (MxNDManager) MxEngine.getInstance().newBaseManager());
+    }
 
     MxModel(Path modelDir, Block block, MxNDManager manager) {
         this.modelDir = modelDir;
@@ -89,9 +97,42 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator) {
+        return new MxTrainer<I, L, O>(this, trainTranslator, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer) {
+        return newTrainer(trainTranslator, optimizer, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Context context) {
+        context = Context.defaultIfNull(context, manager.getContext());
+        return new MxTrainer<I, L, O>(this, trainTranslator, optimizer, context);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
         context = Context.defaultIfNull(context, manager.getContext());
         return new MxPredictor<>(this, translator, context);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setInitializer(Initializer initializer) {
+        setInitializer(initializer, false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setInitializer(Initializer initializer, boolean overwrite) {
+        block.setInitializer(manager, initializer, overwrite);
     }
 
     /** {@inheritDoc} */

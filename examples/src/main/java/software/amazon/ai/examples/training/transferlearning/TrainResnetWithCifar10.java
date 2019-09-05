@@ -27,7 +27,6 @@ import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
@@ -35,7 +34,6 @@ import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.dataset.Record;
 import software.amazon.ai.training.initializer.Initializer;
@@ -72,31 +70,25 @@ public final class TrainResnetWithCifar10 {
     }
 
     public static void trainCifar10(Model model) throws IOException, TranslateException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block reconstructedBlock = reconstructBlock(model);
-            int batchSize = 50;
-            int numEpoch = 2;
+        Block reconstructedBlock = reconstructBlock(model);
+        int batchSize = 50;
+        int numEpoch = 2;
+        try (Model reconstructedModel = Model.newInstance(reconstructedBlock)) {
+            Optimizer optimizer = new Adam.Builder().setRescaleGrad(1.0f / batchSize).build();
             Cifar10 cifar10 =
                     new Cifar10.Builder()
-                            .setManager(manager)
+                            .setManager(reconstructedModel.getManager())
                             .setUsage(Dataset.Usage.TRAIN)
                             .setSampling(batchSize)
                             .build();
-
             cifar10.prepare();
-
-            Optimizer optimizer = new Adam.Builder().setRescaleGrad(1.0f / batchSize).build();
-
-            TrainingController controller =
-                    new TrainingController(reconstructedBlock.getParameters(), optimizer);
-            Accuracy acc = new Accuracy();
-            LossMetric lossMetric = new LossMetric("softmaxCELoss");
-
             try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    Trainer.newInstance(
-                            reconstructedBlock, new SimpleDataset.DefaultTranslator())) {
+                    model.newTrainer(new SimpleDataset.DefaultTranslator(), optimizer)) {
+                Accuracy acc = new Accuracy();
+                LossMetric lossMetric = new LossMetric("softmaxCELoss");
+
                 for (int epoch = 0; epoch < numEpoch; epoch++) {
-                    for (Record batch : trainer.trainDataset(cifar10)) {
+                    for (Record batch : trainer.iterateDataset(cifar10)) {
                         NDArray data = batch.getData().head().transpose(0, 3, 1, 2).div(255f);
                         NDArray label = batch.getLabels().head();
                         NDArray pred;
@@ -108,7 +100,7 @@ public final class TrainResnetWithCifar10 {
                                             label, pred, 1.f, 0, -1, true, false);
                             gradCol.backward(loss);
                         }
-                        controller.step();
+                        trainer.step();
                         acc.update(label, pred);
                         lossMetric.update(loss);
                         batch.close();

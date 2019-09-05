@@ -34,6 +34,9 @@ public class MockTrainer<I, L, O> implements Trainer<I, L, O> {
     }
 
     @Override
+    public void step() {}
+
+    @Override
     public O predict(I input) throws TranslateException {
         return null;
     }

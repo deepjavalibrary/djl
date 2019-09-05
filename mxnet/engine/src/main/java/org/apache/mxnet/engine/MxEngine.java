@@ -32,9 +32,7 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.Gradient;
 import software.amazon.ai.training.ParameterStore;
-import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.translate.TrainTranslator;
 
 public class MxEngine extends Engine {
 
@@ -85,6 +83,12 @@ public class MxEngine extends Engine {
         int patch = version % 100;
 
         return major + "." + minor + '.' + patch;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Model newModel(Block block) {
+        return new MxModel(block);
     }
 
     /**
@@ -172,20 +176,6 @@ public class MxEngine extends Engine {
     @Override
     public ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU) {
         return new MxParameterStore(aggregateOnGPU, optimizer);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            Block block, TrainTranslator<I, L, O> translator, Context context) {
-        return new MxTrainer<>(block, translator, context);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            Model model, TrainTranslator<I, L, O> translator, Context context) {
-        return new MxTrainer<>((MxModel) model, translator, context);
     }
 
     /** {@inheritDoc} */

@@ -25,6 +25,10 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 
 public class MockModel implements Model {
@@ -32,9 +36,32 @@ public class MockModel implements Model {
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
     @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator) {
+        return null;
+    }
+
+    @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer) {
+        return null;
+    }
+
+    @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Context context) {
+        return null;
+    }
+
+    @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
         return new MockPredictor<>(this, translator, context);
     }
+
+    @Override
+    public void setInitializer(Initializer initializer) {}
+
+    @Override
+    public void setInitializer(Initializer initializer, boolean overwrite) {}
 
     @Override
     public DataDesc[] describeInput() {
