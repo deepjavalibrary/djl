@@ -47,7 +47,7 @@ import software.amazon.ai.translate.TranslateException;
 
 public final class TrainResnetWithCifar10 {
 
-    private static Logger logger = LogUtils.getLogger(TrainResnetWithCifar10.class);
+    private static final Logger logger = LogUtils.getLogger(TrainResnetWithCifar10.class);
 
     private TrainResnetWithCifar10() {}
 

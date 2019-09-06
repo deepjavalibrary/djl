@@ -43,7 +43,8 @@ import software.amazon.ai.translate.TranslateException;
 
 public final class TrainMnist {
 
-    private static Logger logger = LogUtils.getLogger(TrainMnist.class);
+    private static final Logger logger = LogUtils.getLogger(TrainMnist.class);
+
     private static float accuracy;
     private static float lossValue;
 

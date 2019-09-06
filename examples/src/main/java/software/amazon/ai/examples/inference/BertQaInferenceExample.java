@@ -39,7 +39,7 @@ import software.amazon.ai.util.Utils;
 
 public final class BertQaInferenceExample extends AbstractExample {
 
-    private static Logger logger = LogUtils.getLogger(BertQaInferenceExample.class);
+    private static final Logger logger = LogUtils.getLogger(BertQaInferenceExample.class);
 
     public static void main(String[] args) {
         new BertQaInferenceExample().runExample(args);
