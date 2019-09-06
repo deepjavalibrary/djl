@@ -19,7 +19,9 @@ import org.slf4j.impl.SimpleLogger;
 public final class LogUtils {
 
     static {
-        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
+        if (System.getProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY) == null) {
+            System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
+        }
         System.setProperty(SimpleLogger.SHOW_DATE_TIME_KEY, "false");
         System.setProperty(SimpleLogger.SHOW_THREAD_NAME_KEY, "false");
         System.setProperty(SimpleLogger.SHOW_LOG_NAME_KEY, "false");

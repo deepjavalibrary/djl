@@ -46,16 +46,38 @@ public class LibUtils {
     private LibUtils() {}
 
     public static MxnetLibrary loadLibrary() {
-        String libName = LibUtils.findLibraryInClasspath();
+        String libName = LibUtils.findOverrideLibrary();
         if (libName == null) {
-            libName = LibUtils.findLibraryFromSystem();
+            libName = LibUtils.findLibraryInClasspath();
             if (libName == null) {
-                libName = LIB_NAME;
+                libName = searchPythonPath("python3 -m site");
+                if (libName == null) {
+                    libName = searchPythonPath("python -m site");
+                    if (libName == null) {
+                        libName = LIB_NAME;
+                    }
+                }
             }
         }
         logger.debug("Loading mxnet library from: {}", libName);
 
         return Native.load(libName, MxnetLibrary.class);
+    }
+
+    private static String findOverrideLibrary() {
+        String libPath = System.getenv("MXNET_LIBRARY_PATH");
+        if (libPath != null) {
+            String libName = findLibraryInPath(libPath);
+            if (libName != null) {
+                return libName;
+            }
+        }
+
+        libPath = System.getProperty("java.library.path");
+        if (libPath != null) {
+            return findLibraryInPath(libPath);
+        }
+        return null;
     }
 
     private static synchronized String findLibraryInClasspath() {
@@ -100,32 +122,32 @@ public class LibUtils {
         }
     }
 
-    private static String findLibraryFromSystem() {
-        String libPath = System.getProperty("java.library.path");
-        if (libPath != null) {
-            String[] paths = libPath.split(File.pathSeparator);
-            List<String> mappedLibNames;
-            if (Platform.isMac()) {
-                mappedLibNames = Arrays.asList("libmxnet.dylib", "libmxnet.jnilib", "libmxnet.so");
-            } else {
-                mappedLibNames = Collections.singletonList(System.mapLibraryName(LIB_NAME));
-            }
+    private static String findLibraryInPath(String libPath) {
+        String[] paths = libPath.split(File.pathSeparator);
+        List<String> mappedLibNames;
+        if (Platform.isMac()) {
+            mappedLibNames = Arrays.asList("libmxnet.dylib", "libmxnet.jnilib", "libmxnet.so");
+        } else {
+            mappedLibNames = Collections.singletonList(System.mapLibraryName(LIB_NAME));
+        }
 
-            for (String path : paths) {
-                for (String name : mappedLibNames) {
-                    File file = new File(path, name);
-                    if (file.exists()) {
-                        return file.getAbsolutePath();
-                    }
+        for (String path : paths) {
+            File p = new File(path);
+            for (String name : mappedLibNames) {
+                if (!p.exists()) {
+                    continue;
+                }
+                if (p.getName().equals(name) && p.isFile()) {
+                    return p.getAbsolutePath();
+                }
+
+                File file = new File(path, name);
+                if (file.exists() && file.isFile()) {
+                    return file.getAbsolutePath();
                 }
             }
         }
-
-        String libName = searchPythonPath("python3 -m site");
-        if (libName != null) {
-            return libName;
-        }
-        return searchPythonPath("python -m site");
+        return null;
     }
 
     private static String searchPythonPath(String cmd) {
