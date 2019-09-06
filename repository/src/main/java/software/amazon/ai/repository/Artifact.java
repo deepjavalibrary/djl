@@ -106,7 +106,7 @@ public class Artifact {
                 uri = uri.resolve(values + '/');
             }
         }
-        return uri.resolve(version);
+        return uri.resolve(version + '/');
     }
 
     public Map<String, Item> getFiles() {

@@ -18,7 +18,7 @@ import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.dataset.Dataset;
 
-public interface ZooDataset extends Dataset {
+public interface ZooDataset extends Dataset, PreparedDataset {
 
     MRL getMrl();
 
@@ -36,6 +36,7 @@ public interface ZooDataset extends Dataset {
 
     void prepareData(Usage usage) throws IOException;
 
+    @Override
     default void prepare() throws IOException {
         if (!isPrepared()) {
             if (getArtifact() == null) {

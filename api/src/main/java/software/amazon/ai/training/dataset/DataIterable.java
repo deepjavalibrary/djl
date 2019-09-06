@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.training.dataset;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -121,7 +122,12 @@ public class DataIterable implements Iterable<Batch> {
             if (executor == null) {
                 // single thread data loading with blocking fetch
                 List<Long> indices = sample.next();
-                return fetch(indices);
+                try {
+                    return fetch(indices);
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                    throw new IllegalStateException("Data loading failed", e);
+                }
             } else {
                 // multithreading data loading with async fetch
                 preFetch();
@@ -130,12 +136,12 @@ public class DataIterable implements Iterable<Batch> {
                     return future.get();
                 } catch (InterruptedException | ExecutionException e) {
                     logger.error(e.getMessage());
+                    throw new IllegalStateException("Data loading failed", e);
                 }
-                throw new IllegalStateException("Data loading failed");
             }
         }
 
-        private Batch fetch(List<Long> indices) {
+        private Batch fetch(List<Long> indices) throws IOException {
             NDList[] data = new NDList[indices.size()];
             NDList[] labels = new NDList[indices.size()];
             for (int i = 0; i < indices.size(); i++) {
@@ -180,7 +186,7 @@ public class DataIterable implements Iterable<Batch> {
             }
 
             @Override
-            public Batch call() {
+            public Batch call() throws IOException {
                 return fetch(indices);
             }
         }

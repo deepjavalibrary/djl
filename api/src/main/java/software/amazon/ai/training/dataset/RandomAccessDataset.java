@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.training.dataset;
 
+import java.io.IOException;
 import java.util.RandomAccess;
 import java.util.concurrent.ExecutorService;
 import software.amazon.ai.Device;
@@ -42,7 +43,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         this.device = builder.getDevice();
     }
 
-    public abstract Record get(long index);
+    public abstract Record get(long index) throws IOException;
 
     @Override
     public Iterable<Batch> getData() {

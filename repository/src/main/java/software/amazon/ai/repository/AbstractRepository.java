@@ -25,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
+import software.amazon.ai.repository.Artifact.Item;
 import software.amazon.ai.util.Utils;
 
 public abstract class AbstractRepository implements Repository {
@@ -39,12 +40,18 @@ public abstract class AbstractRepository implements Repository {
         return Paths.get(resolvePath(item, path)).toFile().list();
     }
 
+    @Override
+    public Path getFile(Item item, String path) throws IOException {
+        return Paths.get(resolvePath(item, path)).toAbsolutePath();
+    }
+
     private URI resolvePath(Artifact.Item item, String path) throws IOException {
         Artifact artifact = item.getArtifact();
         URI artifactUri = artifact.getResourceUri();
 
-        URI fileUri = URI.create(item.getUri());
-        if (fileUri.isAbsolute()) {
+        String itemUri = item.getUri();
+        // Resolve cached item
+        if (itemUri != null && URI.create(itemUri).isAbsolute()) {
             Path cacheDir = getCacheDirectory();
             Path resourceDir = cacheDir.resolve(artifactUri.getPath());
             String type = item.getType();
@@ -61,7 +68,10 @@ public abstract class AbstractRepository implements Repository {
                 return resourceDir.resolve(fileName).toUri();
             }
         }
-        return getBaseUri().resolve(artifactUri.resolve(item.getUri()));
+
+        // Resolve metadata item
+        String uriSuffix = itemUri != null ? itemUri : item.getName();
+        return getBaseUri().resolve(artifactUri.resolve(uriSuffix));
     }
 
     @Override

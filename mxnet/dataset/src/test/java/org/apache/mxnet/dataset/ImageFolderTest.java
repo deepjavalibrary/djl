@@ -43,6 +43,7 @@ public class ImageFolderTest {
                             .setRoot("src/test/resources/imagefolder")
                             .setSampling(1, false, false)
                             .build();
+            dataset.prepare();
 
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
