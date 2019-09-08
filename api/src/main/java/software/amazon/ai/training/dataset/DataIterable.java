@@ -14,6 +14,7 @@ package software.amazon.ai.training.dataset;
 
 import java.util.Iterator;
 import java.util.List;
+import software.amazon.ai.Context;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.translate.TranslatorContext;
@@ -48,7 +49,7 @@ public class DataIterable<I, L> implements Iterable<Batch> {
         private Trainer<I, L, ?> trainer;
         private Iterator<List<Long>> sample;
         private Batchifier batchifier;
-        private boolean pinMemory;
+        private Context pinDeviceContext;
 
         public DataIterator(
                 RandomAccessDataset<I, L> dataset,
@@ -59,11 +60,7 @@ public class DataIterable<I, L> implements Iterable<Batch> {
             this.trainer = trainer;
             this.sample = sampler.sample(trainer, dataset);
             this.batchifier = config.getBatchifier();
-            this.pinMemory = config.getPinMemory();
-
-            if (pinMemory) {
-                throw new UnsupportedOperationException("pin memory is not support yet");
-            }
+            this.pinDeviceContext = config.getPinDeviceContext();
 
             if (batchifier == null) {
                 // default batchifier is StackBatchifier
@@ -93,13 +90,16 @@ public class DataIterable<I, L> implements Iterable<Batch> {
                 data[i] = record.getData();
                 labels[i] = record.getLabels();
             }
-            Batch record =
-                    new Batch(
-                            trainer.getManager(),
-                            batchifier.batchify(data),
-                            batchifier.batchify(labels));
+            NDList batchData = batchifier.batchify(data);
+            NDList batchLabels = batchifier.batchify(labels);
+            // pin the device to specific context
+            if (pinDeviceContext != null) {
+                batchData = batchData.asInContext(pinDeviceContext, false);
+                batchLabels = batchLabels.asInContext(pinDeviceContext, false);
+            }
+            Batch batch = new Batch(trainer.getManager(), batchData, batchLabels);
             ctx.close();
-            return record;
+            return batch;
         }
     }
 }

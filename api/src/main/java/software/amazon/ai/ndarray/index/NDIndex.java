@@ -48,7 +48,10 @@ public class NDIndex {
     private List<NDIndexElement> indices;
 
     /** Creates an empty {@link NDIndex} to append values to. */
-    public NDIndex() {}
+    public NDIndex() {
+        rank = 0;
+        indices = new ArrayList<>();
+    }
 
     /**
      * Creates a {@link NDIndex} given the index values.
@@ -89,8 +92,7 @@ public class NDIndex {
      *     Indexing</a>
      */
     public NDIndex(String indices) {
-        rank = 0;
-        this.indices = new ArrayList<>();
+        this();
         addIndices(indices);
     }
 
@@ -101,8 +103,7 @@ public class NDIndex {
      *     tarting from the end
      */
     public NDIndex(long... indices) {
-        rank = 0;
-        this.indices = new ArrayList<>(indices.length);
+        this();
         addIndices(indices);
     }
 

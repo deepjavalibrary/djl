@@ -13,6 +13,7 @@
 package software.amazon.ai.ndarray;
 
 import java.util.Iterator;
+import software.amazon.ai.Context;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -179,6 +180,44 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      */
     public void addAll(PairList<String, NDArray> other) {
         list.addAll(other);
+    }
+
+    /**
+     * Converts all the {@code NDArray} in {@code NDList} to a different {@link Context}.
+     *
+     * @param ctx {@link Context} to be set
+     * @param copy set {@code true} if you want to return a copy of the Existing {@code NDList}.
+     * @return the result {@code NDList} with the new {@link Context}
+     */
+    public NDList asInContext(Context ctx, boolean copy) {
+        return asInContext(new Context[] {ctx}, copy);
+    }
+
+    /**
+     * Converts all the {@code NDArray} in {@code NDList} to a different {@link Context}.
+     *
+     * @param contexts array of {@link Context} to be set following the contexts order
+     * @param copy set {@code true} if you want to return a copy of the Existing {@code NDList}.
+     * @return the result {@code NDList} with the new {@link Context}
+     */
+    public NDList asInContext(Context[] contexts, boolean copy) {
+        int length = (contexts.length == 1) ? list.size() : Math.min(list.size(), contexts.length);
+        if (!copy) {
+            PairList<String, NDArray> newPairList = new PairList<>(length);
+            for (int i = 0; i < length; i++) {
+                Context context = (contexts.length == 1) ? contexts[0] : contexts[i];
+                newPairList.add(
+                        list.get(i).getKey(), list.get(i).getValue().asInContext(context, false));
+            }
+            list = newPairList;
+            return this;
+        }
+        NDList newNDList = new NDList(length);
+        for (int i = 0; i < length; i++) {
+            Context context = (contexts.length == 1) ? contexts[0] : contexts[i];
+            newNDList.add(list.get(i).getKey(), list.get(i).getValue().asInContext(context, true));
+        }
+        return newNDList;
     }
 
     public void attach(NDManager manager) {
