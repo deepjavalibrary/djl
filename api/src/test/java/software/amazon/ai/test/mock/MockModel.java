@@ -25,6 +25,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -34,6 +35,19 @@ import software.amazon.ai.translate.Translator;
 public class MockModel implements Model {
 
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
+
+    @Override
+    public BlockFactory getBlockFactory() {
+        return null;
+    }
+
+    @Override
+    public Block getBlock() {
+        return null;
+    }
+
+    @Override
+    public void setBlock(Block block) {}
 
     @Override
     public <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator) {
@@ -117,18 +131,13 @@ public class MockModel implements Model {
     }
 
     @Override
-    public Block getBlock() {
+    public NDManager getNDManager() {
         return null;
     }
 
     @Override
-    public NDManager getManager() {
-        return null;
-    }
-
-    @Override
-    public Model cast(DataType dataType) {
-        return null;
+    public void cast(DataType dataType) {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @Override

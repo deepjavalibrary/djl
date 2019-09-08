@@ -28,6 +28,7 @@ import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.nn.core.Linear;
@@ -57,60 +58,61 @@ public final class TrainResnetWithCifar10 {
         criteria.put("flavor", "v1d");
         ZooModel<BufferedImage, List<Classification>> model = ModelZoo.RESNET.loadModel(criteria);
         trainCifar10(model);
+        model.close();
     }
 
-    public static Block reconstructBlock(Model model) {
+    public static void reconstructBlock(Model model) {
+        BlockFactory factory = model.getBlockFactory();
         Block modifiedBlock = ((SymbolBlock) model.getBlock()).removeLastBlock();
-        SequentialBlock newBlock = new SequentialBlock();
+        SequentialBlock newBlock = factory.createSequential();
         newBlock.add(modifiedBlock);
         Linear linear = new Linear.Builder().setOutChannels(10).build();
-        linear.setInitializer(model.getManager(), Initializer.ONES, true);
+        linear.setInitializer(Initializer.ONES, true);
         newBlock.add(linear);
-        return newBlock;
+        model.setBlock(newBlock);
     }
 
     public static void trainCifar10(Model model) throws IOException, TranslateException {
-        Block reconstructedBlock = reconstructBlock(model);
+        reconstructBlock(model);
+
+        BlockFactory factory = model.getBlockFactory();
+
         int batchSize = 50;
         int numEpoch = 2;
-        try (Model reconstructedModel = Model.newInstance(reconstructedBlock)) {
-            Optimizer optimizer = new Adam.Builder().setRescaleGrad(1.0f / batchSize).build();
-            Cifar10 cifar10 =
-                    new Cifar10.Builder()
-                            .setManager(reconstructedModel.getManager())
-                            .setUsage(Dataset.Usage.TRAIN)
-                            .setSampling(batchSize)
-                            .build();
-            cifar10.prepare();
-            try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    model.newTrainer(new SimpleDataset.DefaultTranslator(), optimizer)) {
-                Accuracy acc = new Accuracy();
-                LossMetric lossMetric = new LossMetric("softmaxCELoss");
+        Optimizer optimizer =
+                new Adam.Builder().setFactory(factory).setRescaleGrad(1.0f / batchSize).build();
+        Cifar10 cifar10 =
+                new Cifar10.Builder()
+                        .setManager(model.getNDManager())
+                        .setUsage(Dataset.Usage.TRAIN)
+                        .setSampling(batchSize)
+                        .build();
+        cifar10.prepare();
+        try (Trainer<NDArray, NDArray, NDArray> trainer =
+                model.newTrainer(new SimpleDataset.DefaultTranslator(), optimizer)) {
+            Accuracy acc = new Accuracy();
+            LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
-                for (int epoch = 0; epoch < numEpoch; epoch++) {
-                    for (Batch batch : trainer.iterateDataset(cifar10)) {
-                        NDArray data = batch.getData().head().transpose(0, 3, 1, 2).div(255f);
-                        NDArray label = batch.getLabels().head();
-                        NDArray pred;
-                        NDArray loss;
-                        try (GradientCollector gradCol = GradientCollector.newInstance()) {
-                            pred = trainer.predict(data);
-                            loss =
-                                    Loss.softmaxCrossEntropyLoss(
-                                            label, pred, 1.f, 0, -1, true, false);
-                            gradCol.backward(loss);
-                        }
-                        trainer.step();
-                        acc.update(label, pred);
-                        lossMetric.update(loss);
-                        batch.close();
-                        float lossValue = lossMetric.getMetric().getValue();
-                        float accuracy = acc.getMetric().getValue();
-                        logger.info(
-                                "The loss value is " + lossValue + " and accuracy: " + accuracy);
+            for (int epoch = 0; epoch < numEpoch; epoch++) {
+                for (Batch batch : trainer.iterateDataset(cifar10)) {
+                    NDArray data = batch.getData().head().transpose(0, 3, 1, 2).div(255f);
+                    NDArray label = batch.getLabels().head();
+                    NDArray pred;
+                    NDArray loss;
+                    try (GradientCollector gradCol = GradientCollector.newInstance()) {
+                        pred = trainer.predict(data);
+                        loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
+                        gradCol.backward(loss);
                     }
-                    logger.info("Epoch " + epoch + " finish");
+                    trainer.step();
+                    acc.update(label, pred);
+                    lossMetric.update(loss);
+                    batch.close();
+                    float lossValue = lossMetric.getMetric().getValue();
+                    float accuracy = acc.getMetric().getValue();
+                    logger.info("The loss value is " + lossValue + " and accuracy: " + accuracy);
                 }
+                logger.info("Epoch " + epoch + " finish");
             }
         }
     }

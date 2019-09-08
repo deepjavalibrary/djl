@@ -37,6 +37,7 @@ import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.util.Utils;
 
 // CHECKSTYLE:ON:AvoidStaticImport
@@ -62,6 +63,7 @@ public class MxModelTest extends PowerMockTestCase {
         String prefix = "A";
         int epoch = 122;
         try (MxModel model = MxModel.load(prefix, epoch)) {
+            BlockFactory factory = model.getBlockFactory();
             Assert.assertEquals(
                     model.getBlock().getDirectParameters().get(0).getName(), "A-0122.params");
             Symbol sym = ((MxSymbolBlock) model.getBlock()).getSymbol();
@@ -80,20 +82,13 @@ public class MxModelTest extends PowerMockTestCase {
         }
     }
 
-    @Test
+    @Test(expectedExceptions = UnsupportedOperationException.class)
     public void testCast() {
         String prefix = "A";
         int epoch = 122;
-        MxModel model = MxModel.load(prefix, epoch);
-        MxModel casted = (MxModel) model.cast(DataType.FLOAT32);
-        Assert.assertEquals(
-                casted.getBlock().getDirectParameters(), model.getBlock().getDirectParameters());
-
-        casted = (MxModel) model.cast(DataType.FLOAT64);
-        Assert.assertEquals(
-                casted.getBlock().getDirectParameters().get(0).getArray().getDataType(),
-                DataType.FLOAT64);
-        model.close();
+        try (MxModel model = MxModel.load(prefix, epoch)) {
+            model.cast(DataType.INT8);
+        }
     }
 
     @Test

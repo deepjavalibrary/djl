@@ -27,7 +27,7 @@ import software.amazon.ai.util.PairList;
 /** An interface defining neural-network layers. */
 public interface Block {
 
-    Block IDENTITY_BLOCK = new LambdaBlock(x -> x);
+    NDManager getNDManager();
 
     NDList forward(NDList inputs, PairList<String, Object> params);
 
@@ -39,19 +39,18 @@ public interface Block {
 
     List<Parameter> getDirectParameters();
 
-    void setInitializer(NDManager manager, Initializer initializer);
+    void setInitializer(Initializer initializer);
 
-    void setInitializer(NDManager manager, Initializer initializer, boolean overwrite);
+    void setInitializer(Initializer initializer, boolean overwrite);
 
-    void setInitializer(NDManager manager, Initializer initializer, String paramName);
+    void setInitializer(Initializer initializer, String paramName);
 
-    void setInitializer(
-            NDManager manager, Initializer initializer, String paramName, boolean overwrite);
+    void setInitializer(Initializer initializer, String paramName, boolean overwrite);
 
     // TODO: remove this API
     void ensureInitialized(NDList inputs);
 
-    Block cast(DataType dataType);
+    void cast(DataType dataType);
 
     DataDesc[] describeInput();
 

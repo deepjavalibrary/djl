@@ -16,6 +16,7 @@ package software.amazon.ai.integration.tests;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxParameterStore;
+import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -23,6 +24,7 @@ import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
@@ -40,12 +42,15 @@ public class ParameterStoreTest {
 
     @RunAsTest
     public void testParameterStore() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray weight = manager.create(new float[] {1.f, 1.f}, new Shape(1, 2));
             NDArray grad = manager.create(new float[] {2.f, 2.f}, new Shape(1, 2));
 
             Optimizer optimizer =
                     new Sgd.Builder()
+                            .setFactory(factory)
                             .setRescaleGrad(1.0f / 32)
                             .setLrTracker(LrTracker.fixedLR(.03f))
                             .build();

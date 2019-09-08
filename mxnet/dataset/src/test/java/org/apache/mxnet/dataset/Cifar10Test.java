@@ -17,8 +17,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.Batch;
@@ -28,18 +27,20 @@ public class Cifar10Test {
 
     @Test
     public void testCifar10Local() throws IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
+
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
             Cifar10 cifar10 =
                     new Cifar10.Builder()
-                            .setManager(manager)
+                            .setManager(model.getNDManager())
                             .setUsage(Usage.TEST)
                             .optRepository(repository)
                             .setSampling(32)
                             .build();
 
             cifar10.prepare();
-            Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     model.newTrainer(new SimpleDataset.DefaultTranslator())) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
@@ -53,16 +54,18 @@ public class Cifar10Test {
 
     @Test
     public void testCifar10Remote() throws IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
+
             Cifar10 cifar10 =
                     new Cifar10.Builder()
-                            .setManager(manager)
+                            .setManager(model.getNDManager())
                             .setUsage(Usage.TEST)
                             .setSampling(32)
                             .build();
 
             cifar10.prepare();
-            Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     model.newTrainer(new SimpleDataset.DefaultTranslator())) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {

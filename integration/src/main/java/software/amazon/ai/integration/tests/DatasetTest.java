@@ -35,7 +35,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
@@ -56,7 +56,12 @@ public class DatasetTest {
 
     @RunAsTest
     public void testSequenceSampler() throws FailedTestException, IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
+
+            NDManager manager = model.getNDManager();
+
             ArrayDataset dataset =
                     new ArrayDataset.Builder()
                             .setData(
@@ -66,9 +71,8 @@ public class DatasetTest {
                             .build();
 
             List<Long> original = new ArrayList<>();
-            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDList, NDList, NDList> trainer =
-                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
@@ -81,7 +85,12 @@ public class DatasetTest {
 
     @RunAsTest
     public void testRandomSampler() throws FailedTestException, IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
+
+            NDManager manager = model.getNDManager();
+
             ArrayDataset dataset =
                     new ArrayDataset.Builder()
                             .setData(
@@ -90,9 +99,8 @@ public class DatasetTest {
                             .setSampler(new BatchSampler(new RandomSampler(), 1, false))
                             .build();
             List<Long> original = new ArrayList<>();
-            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDList, NDList, NDList> trainer =
-                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
@@ -104,7 +112,12 @@ public class DatasetTest {
 
     @RunAsTest
     public void testBatchSampler() throws FailedTestException, IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
+
+            NDManager manager = model.getNDManager();
+
             NDArray data = manager.arange(0, 100, 1, DataType.INT64, Context.defaultContext());
 
             ArrayDataset dataset =
@@ -113,9 +126,8 @@ public class DatasetTest {
                             .setSampler(new BatchSampler(new SequenceSampler(), 27, false))
                             .build();
             List<long[]> originalList = new ArrayList<>();
-            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDList, NDList, NDList> trainer =
-                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
@@ -135,7 +147,7 @@ public class DatasetTest {
                             .build();
             List<long[]> originalList2 = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
-                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
                 trainer.iterateDataset(dataset2)
                         .iterator()
                         .forEachRemaining(
@@ -152,7 +164,7 @@ public class DatasetTest {
                             .build();
             List<long[]> originalList3 = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
-                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
                 trainer.iterateDataset(dataset3)
                         .iterator()
                         .forEachRemaining(
@@ -169,7 +181,7 @@ public class DatasetTest {
                             .build();
             List<long[]> originalList4 = new ArrayList<>();
             try (Trainer<NDList, NDList, NDList> trainer =
-                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
                 trainer.iterateDataset(dataset4)
                         .iterator()
                         .forEachRemaining(
@@ -183,7 +195,12 @@ public class DatasetTest {
 
     @RunAsTest
     public void testArrayDataset() throws FailedTestException, IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
+
+            NDManager manager = model.getNDManager();
+
             NDArray data = manager.arange(200).reshape(100, 2);
             NDArray label = manager.arange(100).reshape(100);
             ArrayDataset dataset =
@@ -194,9 +211,8 @@ public class DatasetTest {
                             .build();
 
             int index = 0;
-            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDList, NDList, NDList> trainer =
-                    testModel.newTrainer(new ArrayDataset.DefaultTranslator())) {
+                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
                 for (Batch batch : trainer.iterateDataset(dataset)) {
                     Assertions.assertEquals(
                             batch.getData().get(0),
@@ -238,8 +254,13 @@ public class DatasetTest {
     }
     // this is just to demonstrate how multithreading dataloader will look like
     // @RunAsTest
-    public void testMultithreading() throws FailedTestException, IOException, InterruptedException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+    public void testMultithreading() throws IOException, InterruptedException {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
+
+            NDManager manager = model.getNDManager();
+
             ExecutorService executor =
                     Executors.newFixedThreadPool(
                             2,
@@ -262,9 +283,8 @@ public class DatasetTest {
                             .build();
 
             cifar10.prepare();
-            Model testModel = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
-                    testModel.newTrainer(new SimpleDataset.DefaultTranslator())) {
+                    model.newTrainer(new SimpleDataset.DefaultTranslator())) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     batch.close();
                 }

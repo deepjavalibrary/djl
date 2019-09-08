@@ -24,9 +24,9 @@ import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.examples.training.util.Arguments;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Linear;
-import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
@@ -59,30 +59,34 @@ public final class TrainMnist {
         trainMnist(arguments);
     }
 
-    public static Block constructBlock() {
-        SequentialBlock mlp = new SequentialBlock();
-        mlp.add(new Linear.Builder().setOutChannels(128).build());
-        mlp.add(Activation.reluBlock());
-        mlp.add(new Linear.Builder().setOutChannels(64).build());
-        mlp.add(Activation.reluBlock());
-        mlp.add(new Linear.Builder().setOutChannels(10).build());
+    public static Block constructBlock(BlockFactory factory) {
+        SequentialBlock mlp = factory.createSequential();
+        mlp.add(new Linear.Builder().setFactory(factory).setOutChannels(128).build());
+        mlp.add(factory.activation().reluBlock());
+        mlp.add(new Linear.Builder().setFactory(factory).setOutChannels(64).build());
+        mlp.add(factory.activation().reluBlock());
+        mlp.add(new Linear.Builder().setFactory(factory).setOutChannels(10).build());
         return mlp;
     }
 
     public static void trainMnist(Arguments arguments) throws IOException, TranslateException {
         int batchSize = arguments.getBatchSize();
-        Block mlp = constructBlock();
-        try (Model model = Model.newInstance(mlp)) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            Block mlp = constructBlock(factory);
+            model.setBlock(mlp);
+
             model.setInitializer(new NormalInitializer(0.01));
             Optimizer optimizer =
                     new Sgd.Builder()
+                            .setFactory(factory)
                             .setRescaleGrad(1.0f / batchSize)
                             .setLrTracker(LrTracker.fixedLR(0.01f))
                             .optMomentum(0.9f)
                             .build();
             Mnist mnist =
                     new Mnist.Builder()
-                            .setManager(model.getManager())
+                            .setManager(model.getNDManager())
                             .setUsage(Dataset.Usage.TRAIN)
                             .setSampling(batchSize, true, true)
                             .build();

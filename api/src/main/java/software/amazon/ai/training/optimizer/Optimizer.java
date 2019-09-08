@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.training.optimizer;
 
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.util.PairList;
 
@@ -33,10 +34,16 @@ public interface Optimizer {
     @SuppressWarnings("rawtypes")
     abstract class BaseBuilder<B extends BaseBuilder> {
 
+        protected BlockFactory factory;
         private float rescaleGrad;
         private float weightDecays;
         private float clipGrad = -1;
         private int beginNumUpdate;
+
+        public B setFactory(BlockFactory factory) {
+            this.factory = factory;
+            return self();
+        }
 
         public B setRescaleGrad(float rescaleGrad) {
             this.rescaleGrad = rescaleGrad;

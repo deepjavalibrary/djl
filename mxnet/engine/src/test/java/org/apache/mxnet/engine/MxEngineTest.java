@@ -35,6 +35,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.Context;
+import software.amazon.ai.Model;
+import software.amazon.ai.engine.Engine;
+import software.amazon.ai.nn.BlockFactory;
 
 // CHECKSTYLE:ON:AvoidStaticImport
 
@@ -58,7 +61,7 @@ public class MxEngineTest extends PowerMockTestCase {
 
     @Test
     public void testGetGpuMemory() {
-        MxEngine engine = new MxEngine();
+        Engine engine = Engine.getEngine(MxEngine.ENGINE_NAME);
         MemoryUsage usage = engine.getGpuMemory(Context.gpu(0));
         Assert.assertEquals(usage.getUsed(), 100);
         Assert.assertEquals(usage.getMax(), 1000);
@@ -66,19 +69,19 @@ public class MxEngineTest extends PowerMockTestCase {
 
     @Test
     public void testDefaultContext() {
-        MxEngine engine = new MxEngine();
+        Engine engine = Engine.getEngine(MxEngine.ENGINE_NAME);
         Assert.assertEquals(engine.defaultContext(), Context.gpu());
     }
 
     @Test
     public void testGetVersion() {
-        MxEngine engine = new MxEngine();
+        Engine engine = Engine.getEngine(MxEngine.ENGINE_NAME);
         Assert.assertEquals(engine.getVersion(), "1.5.0");
     }
 
     @Test
     public void testLoadModel() throws IOException {
-        MxEngine engine = new MxEngine();
+        Engine engine = Engine.getEngine(MxEngine.ENGINE_NAME);
         Path modelDir = Paths.get("build/tmp/");
         String modelName = "A";
         Path path122 = modelDir.resolve(modelName + "-0122.params");
@@ -106,10 +109,11 @@ public class MxEngineTest extends PowerMockTestCase {
     }
 
     private String loadModel(
-            MxEngine engine, Path location, String modelName, Map<String, String> options)
+            Engine engine, Path location, String modelName, Map<String, String> options)
             throws IOException {
-        try (MxModel model = (MxModel) engine.loadModel(location, modelName, null, options)) {
+        try (Model model = engine.loadModel(location, modelName, null, options)) {
             // In JNA.MXNDArrayLoad function, file name is stored as the first param name in Model
+            BlockFactory factory = model.getBlockFactory();
             String paramPath = model.getBlock().getDirectParameters().get(0).getName();
             return Paths.get(paramPath).toFile().getName();
         }

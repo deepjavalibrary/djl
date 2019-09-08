@@ -12,20 +12,20 @@
  */
 package software.amazon.ai.nn.recurrent;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.nn.Block;
 
 public interface RNN extends RecurrentCell {
 
     /** The Builder to construct a {@link RNN} type of {@link Block}. */
     final class Builder extends RecurrentCell.Builder<RNN> {
+
         /** {@inheritDoc} */
         @Override
         public RNN build() {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return Engine.getInstance().getNNIndex().rnn(this);
+            return factory.createRnn(this);
         }
     }
 

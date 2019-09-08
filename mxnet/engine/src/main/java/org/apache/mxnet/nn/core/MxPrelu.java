@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
-import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
@@ -33,9 +33,10 @@ public class MxPrelu extends MxNNBlock implements Prelu {
 
     private Parameter alpha;
 
-    public MxPrelu() {
-        opName = "LeakyReLU";
-        alpha = new Parameter("alpha", this, ParameterType.OTHER);
+    public MxPrelu(NDManager manager) {
+        super(manager);
+        this.opName = "LeakyReLU";
+        this.alpha = new Parameter("alpha", this, ParameterType.OTHER);
     }
 
     @Override
@@ -57,11 +58,6 @@ public class MxPrelu extends MxNNBlock implements Prelu {
             return new Shape(1);
         }
         throw new IllegalArgumentException("Invalid parameter name");
-    }
-
-    @Override
-    public NDArray forward(NDArray data) {
-        return forward(new NDList(data)).get(0);
     }
 
     @Override

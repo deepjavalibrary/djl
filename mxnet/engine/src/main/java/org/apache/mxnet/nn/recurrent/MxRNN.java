@@ -21,6 +21,7 @@ import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Parameter;
@@ -50,14 +51,15 @@ public class MxRNN extends MxNNBlock implements RNN {
     private Parameter h2hBias;
     private Parameter state;
 
-    public MxRNN(RNN.Builder builder) {
-        this.opName = "RNN";
-        this.stateSize = builder.getStateSize();
-        this.dropRate = builder.getDropRate();
-        this.numStackedLayers = builder.getNumStackedLayers();
-        this.useSequenceLength = builder.isUseSequenceLength();
-        this.useBidirectional = builder.isUseBidirectional();
-        this.stateOutputs = builder.isStateOutputs();
+    public MxRNN(NDManager manager, RNN.Builder builder) {
+        super(manager);
+        opName = "RNN";
+        stateSize = builder.getStateSize();
+        dropRate = builder.getDropRate();
+        numStackedLayers = builder.getNumStackedLayers();
+        useSequenceLength = builder.isUseSequenceLength();
+        useBidirectional = builder.isUseBidirectional();
+        stateOutputs = builder.isStateOutputs();
         i2hWeight = new Parameter("i2h_weight", this, ParameterType.WEIGHT);
         h2hWeight = new Parameter("h2h_weight", this, ParameterType.WEIGHT);
         i2hBias = new Parameter("i2h_bias", this, ParameterType.BIAS);

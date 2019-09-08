@@ -24,6 +24,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -64,13 +65,12 @@ import software.amazon.ai.translate.Translator;
 public interface Model extends AutoCloseable {
 
     /**
-     * Build the model from {@link Block} definition.
+     * Create an empty model instance.
      *
-     * @param block Block that defines the network architecture
-     * @return a new Model instance using the network defined in block
+     * @return a new Model instance
      */
-    static Model newInstance(Block block) {
-        return Engine.getInstance().newModel(block);
+    static Model newInstance() {
+        return Engine.getInstance().newModel(Context.defaultContext());
     }
 
     /**
@@ -126,6 +126,29 @@ public interface Model extends AutoCloseable {
             throws IOException {
         return Engine.getInstance().loadModel(modelPath, modelName, context, options);
     }
+
+    /**
+     * Get the factory from the Model.
+     *
+     * @return {@link BlockFactory}
+     */
+    BlockFactory getBlockFactory();
+
+    /**
+     * Get the block from the Model.
+     *
+     * @return {@link Block}
+     */
+    Block getBlock();
+
+    void setBlock(Block block);
+
+    /**
+     * Get the NDArray Manager from the model.
+     *
+     * @return {@link NDManager}
+     */
+    NDManager getNDManager();
 
     /**
      * Creates a new {@link Trainer} instance for a Model.
@@ -258,28 +281,13 @@ public interface Model extends AutoCloseable {
     InputStream getArtifactAsStream(String name) throws IOException;
 
     /**
-     * Get the block from the Model.
-     *
-     * @return {@link Block}
-     */
-    Block getBlock();
-
-    /**
-     * Get the NDArray Manager from the model.
-     *
-     * @return {@link NDManager}
-     */
-    NDManager getManager();
-
-    /**
      * Casts the model to support a different precision level.
      *
      * <p>For example, you can cast the precision from Float to Int
      *
      * @param dataType the target dataType you would like to cast to
-     * @return A model with the down casting parameters
      */
-    Model cast(DataType dataType);
+    void cast(DataType dataType);
 
     /** {@inheritDoc} */
     @Override

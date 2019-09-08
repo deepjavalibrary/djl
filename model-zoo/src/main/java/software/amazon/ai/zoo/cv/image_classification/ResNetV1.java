@@ -16,14 +16,12 @@ import java.util.Arrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.LambdaBlock;
-import software.amazon.ai.nn.ParallelBlock;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.nn.pooling.Pool;
-import software.amazon.ai.training.Activation;
 
 /**
  * Generic implementation of ResNet adapted from
@@ -40,15 +38,17 @@ public final class ResNetV1 {
     private ResNetV1() {}
 
     public static Block residualUnit(
+            BlockFactory factory,
             int numFilters,
             final Shape stride,
             final boolean dimMatch,
             boolean bottleneck,
             float batchNormMomentum) {
-        SequentialBlock resUnit = new SequentialBlock();
+        SequentialBlock resUnit = factory.createSequential();
         if (bottleneck) {
             resUnit.add(
                     new Conv2D.Builder()
+                            .setFactory(factory)
                             .setKernel(new Shape(1, 1))
                             .setNumFilters(numFilters / 4)
                             .setStride(stride)
@@ -57,12 +57,14 @@ public final class ResNetV1 {
                             .build());
             resUnit.add(
                     new BatchNorm.Builder()
+                            .setFactory(factory)
                             .setEpsilon(2E-5f)
                             .setMomentum(batchNormMomentum)
                             .build());
-            resUnit.add(Activation.reluBlock());
+            resUnit.add(factory.activation().reluBlock());
             resUnit.add(
                     new Conv2D.Builder()
+                            .setFactory(factory)
                             .setKernel(new Shape(3, 3))
                             .setNumFilters(numFilters / 4)
                             .setStride(new Shape(1, 1))
@@ -71,12 +73,14 @@ public final class ResNetV1 {
                             .build());
             resUnit.add(
                     new BatchNorm.Builder()
+                            .setFactory(factory)
                             .setEpsilon(2E-5f)
                             .setMomentum(batchNormMomentum)
                             .build());
-            resUnit.add(Activation.reluBlock());
+            resUnit.add(factory.activation().reluBlock());
             resUnit.add(
                     new Conv2D.Builder()
+                            .setFactory(factory)
                             .setKernel(new Shape(1, 1))
                             .setNumFilters(numFilters)
                             .setStride(new Shape(1, 1))
@@ -85,6 +89,7 @@ public final class ResNetV1 {
                             .build());
             resUnit.add(
                     new BatchNorm.Builder()
+                            .setFactory(factory)
                             .setEpsilon(2E-5f)
                             .setMomentum(batchNormMomentum)
                             .build());
@@ -92,6 +97,7 @@ public final class ResNetV1 {
         } else {
             resUnit.add(
                     new Conv2D.Builder()
+                            .setFactory(factory)
                             .setKernel(new Shape(3, 3))
                             .setNumFilters(numFilters)
                             .setStride(stride)
@@ -100,12 +106,14 @@ public final class ResNetV1 {
                             .build());
             resUnit.add(
                     new BatchNorm.Builder()
+                            .setFactory(factory)
                             .setEpsilon(2E-5f)
                             .setMomentum(batchNormMomentum)
                             .build());
-            resUnit.add(Activation.reluBlock());
+            resUnit.add(factory.activation().reluBlock());
             resUnit.add(
                     new Conv2D.Builder()
+                            .setFactory(factory)
                             .setKernel(new Shape(3, 3))
                             .setNumFilters(numFilters)
                             .setStride(new Shape(1, 1))
@@ -114,16 +122,18 @@ public final class ResNetV1 {
                             .build());
             resUnit.add(
                     new BatchNorm.Builder()
+                            .setFactory(factory)
                             .setEpsilon(2E-5f)
                             .setMomentum(batchNormMomentum)
                             .build());
         }
-        SequentialBlock shortcut = new SequentialBlock();
+        SequentialBlock shortcut = factory.createSequential();
         if (dimMatch) {
-            shortcut.add(Block.IDENTITY_BLOCK);
+            shortcut.add(factory.createIdentityBlock());
         } else {
             shortcut.add(
                     new Conv2D.Builder()
+                            .setFactory(factory)
                             .setKernel(new Shape(1, 1))
                             .setNumFilters(numFilters)
                             .setStride(stride)
@@ -132,11 +142,12 @@ public final class ResNetV1 {
                             .build());
             shortcut.add(
                     new BatchNorm.Builder()
+                            .setFactory(factory)
                             .setEpsilon(2E-5f)
                             .setMomentum(batchNormMomentum)
                             .build());
         }
-        return new ParallelBlock(
+        return factory.createParallel(
                 Arrays.asList(resUnit, shortcut),
                 list -> {
                     NDList unit = list.get(0);
@@ -148,10 +159,12 @@ public final class ResNetV1 {
     public static Block resnet(Builder builder) {
         int numStages = builder.units.length;
         long height = builder.imageShape.get(1);
-        SequentialBlock resNet = new SequentialBlock();
+        BlockFactory factory = builder.factory;
+        SequentialBlock resNet = factory.createSequential();
         if (height <= 32) {
             resNet.add(
                     new Conv2D.Builder()
+                            .setFactory(factory)
                             .setKernel(new Shape(3, 3))
                             .setNumFilters(builder.filters[0])
                             .setStride(new Shape(1, 1))
@@ -160,12 +173,14 @@ public final class ResNetV1 {
                             .build());
             resNet.add(
                     new BatchNorm.Builder()
+                            .setFactory(factory)
                             .setEpsilon(2E-5f)
                             .setMomentum(builder.batchNormMomentum)
                             .build());
         } else {
             resNet.add(
                     new Conv2D.Builder()
+                            .setFactory(factory)
                             .setKernel(new Shape(7, 7))
                             .setNumFilters(builder.filters[0])
                             .setStride(new Shape(2, 2))
@@ -174,12 +189,13 @@ public final class ResNetV1 {
                             .build());
             resNet.add(
                     new BatchNorm.Builder()
+                            .setFactory(factory)
                             .setEpsilon(2E-5f)
                             .setMomentum(builder.batchNormMomentum)
                             .build());
-            resNet.add(Activation.reluBlock());
+            resNet.add(factory.activation().reluBlock());
             resNet.add(
-                    new LambdaBlock(
+                    factory.createLambda(
                             arrays ->
                                     new NDList(
                                             Pool.maxPool(
@@ -192,6 +208,7 @@ public final class ResNetV1 {
         for (int i = 0; i < numStages; i++) {
             resNet.add(
                     residualUnit(
+                            factory,
                             builder.filters[i + 1],
                             resStride,
                             false,
@@ -200,6 +217,7 @@ public final class ResNetV1 {
             for (int j = 0; j < builder.units[i] - 1; j++) {
                 resNet.add(
                         residualUnit(
+                                factory,
                                 builder.filters[i + 1],
                                 new Shape(1, 1),
                                 true,
@@ -211,31 +229,39 @@ public final class ResNetV1 {
             }
         }
         resNet.add(
-                new LambdaBlock(
+                factory.createLambda(
                         arrays ->
                                 new NDList(
                                         Pool.globalAvgPool(
                                                 arrays.head(), new Shape(1, 1), new Shape(0, 0)))));
         resNet.add(
-                new LambdaBlock(
+                factory.createLambda(
                         arrays -> {
                             long batch = arrays.head().getShape().get(0);
                             return new NDList(arrays.head().reshape(batch, -1));
                         }));
-        resNet.add(new Linear.Builder().setOutChannels(builder.outSize).build());
-        resNet.add(new LambdaBlock(arrays -> new NDList(arrays.head().softmax(0))));
+        resNet.add(
+                new Linear.Builder().setFactory(factory).setOutChannels(builder.outSize).build());
+        resNet.add(factory.createLambda(arrays -> new NDList(arrays.head().softmax(0))));
         return resNet;
     }
 
-    public static class Builder {
-        private int numLayers;
-        private int numStages;
-        private long outSize;
-        private float batchNormMomentum = 0.9f;
-        private Shape imageShape;
-        private boolean bottleneck;
-        private int[] units;
-        private int[] filters;
+    public static final class Builder {
+
+        BlockFactory factory;
+        int numLayers;
+        int numStages;
+        long outSize;
+        float batchNormMomentum = 0.9f;
+        Shape imageShape;
+        boolean bottleneck;
+        int[] units;
+        int[] filters;
+
+        public Builder setFactory(BlockFactory factory) {
+            this.factory = factory;
+            return this;
+        }
 
         /**
          * Sets the <b>Required</b> number of layers in the network.
@@ -288,7 +314,7 @@ public final class ResNetV1 {
             long height = imageShape.get(1);
             if (height <= 28) {
                 numStages = 3;
-                int perUnit = 1;
+                int perUnit;
                 if ((numLayers - 2) % 9 == 0 && numLayers >= 164) {
                     perUnit = (numLayers - 2) / 9;
                     filters = new int[] {16, 64, 128, 256};

@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 
 /** An SGD optimizer. Build with {@link Sgd.Builder}. */
@@ -60,7 +59,7 @@ public interface Sgd extends Optimizer {
             if (lrTracker == null) {
                 throw new IllegalArgumentException("No lrTracker set");
             }
-            return Engine.getInstance().getNNIndex().sgd(this);
+            return factory.createSgd(this);
         }
     }
 }

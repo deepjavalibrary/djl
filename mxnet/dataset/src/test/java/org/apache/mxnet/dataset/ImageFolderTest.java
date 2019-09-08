@@ -22,9 +22,10 @@ import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.Batch;
+import software.amazon.ai.translate.TrainTranslator;
 
 public class ImageFolderTest {
 
@@ -35,25 +36,31 @@ public class ImageFolderTest {
                         .setRoot("src/test/resources/imagefolder")
                         .setSampling(1, false, false)
                         .build();
-        Model model = Model.newInstance(Block.IDENTITY_BLOCK);
-        try (Trainer<String, Integer, NDList> trainer =
-                        model.newTrainer(dataset.defaultTranslator());
-                NDManager manager = NDManager.newBaseManager()) {
 
-            NDArray cat = MxImages.read(manager, "src/test/resources/imagefolder/cat/cat2.jpeg");
-            NDArray dog = MxImages.read(manager, "src/test/resources/imagefolder/dog/puppy1.jpg");
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
 
-            Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
+            TrainTranslator<String, Integer, NDList> translator = dataset.defaultTranslator();
+            try (Trainer<String, Integer, NDList> trainer = model.newTrainer(translator)) {
+                NDManager manager = trainer.getManager();
+                NDArray cat =
+                        MxImages.read(manager, "src/test/resources/imagefolder/cat/cat2.jpeg");
+                NDArray dog =
+                        MxImages.read(manager, "src/test/resources/imagefolder/dog/puppy1.jpg");
 
-            Batch catBatch = ds.next();
-            Assertions.assertAlmostEquals(cat, catBatch.getData().head());
-            Assertions.assertEquals(manager.create(new int[] {0}), catBatch.getLabels().head());
-            catBatch.close();
+                Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
 
-            Batch dogBatch = ds.next();
-            Assertions.assertAlmostEquals(dog, dogBatch.getData().head());
-            Assertions.assertEquals(manager.create(new int[] {1}), dogBatch.getLabels().head());
-            dogBatch.close();
+                Batch catBatch = ds.next();
+                Assertions.assertAlmostEquals(cat, catBatch.getData().head());
+                Assertions.assertEquals(manager.create(new int[] {0}), catBatch.getLabels().head());
+                catBatch.close();
+
+                Batch dogBatch = ds.next();
+                Assertions.assertAlmostEquals(dog, dogBatch.getData().head());
+                Assertions.assertEquals(manager.create(new int[] {1}), dogBatch.getLabels().head());
+                dogBatch.close();
+            }
         }
     }
 }

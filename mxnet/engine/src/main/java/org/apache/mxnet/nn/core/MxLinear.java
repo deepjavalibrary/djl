@@ -22,6 +22,7 @@ import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Parameter;
@@ -40,12 +41,13 @@ public class MxLinear extends MxNNBlock implements Linear {
     private Parameter weight;
     private Parameter bias;
 
-    public MxLinear(Linear.Builder builder) {
-        this.opName = "FullyConnected";
-        this.outChannels = builder.getOutChannels();
+    public MxLinear(NDManager manager, Linear.Builder builder) {
+        super(manager);
+        opName = "FullyConnected";
+        outChannels = builder.getOutChannels();
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (builder.isBias()) {
-            this.bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);
+            bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);
         }
     }
 

@@ -12,6 +12,9 @@
  */
 package software.amazon.ai.nn;
 
+import java.util.List;
+import java.util.function.Function;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.convolutional.Conv3D;
@@ -23,46 +26,49 @@ import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.nn.recurrent.RNN;
+import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Sgd;
 
-/** An internal mapping to Engine specific implementations of Neural Network {@link Block}s. */
-public abstract class NNIndex {
+/** An internal to create Neural Network {@link Block}s. */
+public interface BlockFactory {
 
-    ////////////////////////////////////////
-    // Blocks
-    ////////////////////////////////////////
+    Activation activation();
 
-    public abstract Linear linear(Linear.Builder builder);
+    Block createIdentityBlock();
 
-    public abstract BatchNorm batchNorm2D(BatchNorm.Builder builder);
+    SequentialBlock createSequential();
 
-    public abstract Dropout dropout(Dropout.Builder builder);
+    ParallelBlock createParallel(List<Block> blocks, Function<List<NDList>, NDList> function);
 
-    public abstract <T> Embedding<T> embedding(Embedding.Builder<T> builder);
+    LambdaBlock createLambda(Function<NDList, NDList> lambda);
 
-    public abstract Prelu prelu(Prelu.Builder builder);
+    Linear createLinear(Linear.Builder builder);
 
-    public abstract Conv1D conv1D(Conv1D.Builder builder);
+    BatchNorm createBatchNorm2D(BatchNorm.Builder builder);
 
-    public abstract Conv2D conv2D(Conv2D.Builder builder);
+    Dropout createDropout(Dropout.Builder builder);
 
-    public abstract Conv3D conv3D(Conv3D.Builder builder);
+    <T> Embedding<T> createEmbedding(Embedding.Builder<T> builder);
 
-    public abstract RNN rnn(RNN.Builder builder);
+    Prelu createPrelu();
 
-    public abstract LSTM lstm(LSTM.Builder builder);
+    Conv1D createConv1D(Conv1D.Builder builder);
 
-    public abstract GRU gru(GRU.Builder builder);
+    Conv2D createConv2D(Conv2D.Builder builder);
 
-    ////////////////////////////////////////
-    // Optimizers
-    ////////////////////////////////////////
+    Conv3D createConv3D(Conv3D.Builder builder);
 
-    public abstract Sgd sgd(Sgd.Builder builder);
+    RNN createRnn(RNN.Builder builder);
 
-    public abstract Nag nag(Nag.Builder builder);
+    LSTM createLstm(LSTM.Builder builder);
 
-    public abstract Adam adam(Adam.Builder builder);
+    GRU createGru(GRU.Builder builder);
+
+    Sgd createSgd(Sgd.Builder builder);
+
+    Nag createNag(Nag.Builder builder);
+
+    Adam createAdam(Adam.Builder builder);
 }

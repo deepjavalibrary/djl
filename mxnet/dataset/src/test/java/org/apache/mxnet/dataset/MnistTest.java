@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.Batch;
@@ -28,7 +28,11 @@ public class MnistTest {
 
     @Test
     public void testMnistLocal() throws IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
+
+            NDManager manager = model.getNDManager();
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
             Mnist mnist =
                     new Mnist.Builder()
@@ -39,7 +43,6 @@ public class MnistTest {
                             .build();
 
             mnist.prepare();
-            Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     model.newTrainer(new SimpleDataset.DefaultTranslator())) {
                 for (Batch batch : trainer.iterateDataset(mnist)) {
@@ -53,7 +56,11 @@ public class MnistTest {
 
     @Test
     public void testMnistRemote() throws IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            model.setBlock(factory.createIdentityBlock());
+
+            NDManager manager = model.getNDManager();
             Mnist mnist =
                     new Mnist.Builder()
                             .setManager(manager)
@@ -62,7 +69,6 @@ public class MnistTest {
                             .build();
 
             mnist.prepare();
-            Model model = Model.newInstance(Block.IDENTITY_BLOCK);
             try (Trainer<NDArray, NDArray, NDArray> trainer =
                     model.newTrainer(new SimpleDataset.DefaultTranslator())) {
                 for (Batch batch : trainer.iterateDataset(mnist)) {

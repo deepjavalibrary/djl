@@ -16,6 +16,7 @@ package org.apache.mxnet.nn;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +31,6 @@ import org.apache.mxnet.engine.Symbol;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -51,14 +51,17 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     private CachedOp op;
     private Symbol symbol;
-    private MxNDManager manager;
     private List<Parameter> params;
     private boolean paramGradientsAttached;
 
-    public MxSymbolBlock(Symbol symbol, List<Parameter> params, NDManager manager) {
+    public MxSymbolBlock(NDManager manager, Symbol symbol) {
+        this(manager, symbol, new ArrayList<>());
+    }
+
+    public MxSymbolBlock(NDManager manager, Symbol symbol, List<Parameter> params) {
+        super(manager);
         this.symbol = symbol;
         this.params = params;
-        this.manager = (MxNDManager) manager;
         initialized = true;
     }
 
@@ -84,7 +87,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
                 params.stream()
                         .filter(ele -> set.contains(ele.getName()))
                         .collect(Collectors.toList());
-        return new MxSymbolBlock(sliced, slicedParams, manager);
+        return new MxSymbolBlock(manager, sliced, slicedParams);
     }
 
     /**
@@ -119,24 +122,14 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     @Override
-    public SymbolBlock cast(DataType dataType) {
+    public void cast(DataType dataType) {
         if (params.get(0).getArray().getDataType() == dataType) {
             logger.debug("You are casting the model to its original type!");
-            return this;
+            return;
         }
 
-        // TODO: This implementation is unsafe, new SymbolBlock shares the same
-        // symbol and optimizerStates with original one. Close either one
-        // will cause anther SymbolBlock instance invalidated.
-        List<Parameter> newParams =
-                params.stream()
-                        .map(
-                                ele -> {
-                                    NDArray casted = ele.getArray().asType(dataType, true);
-                                    return new Parameter(ele.getName(), casted);
-                                })
-                        .collect(Collectors.toList());
-        return new MxSymbolBlock(symbol, newParams, manager);
+        // TODO: Not all parameters can be casted.
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @Override
@@ -145,7 +138,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
             initializeGradients();
         }
         if (op == null) {
-            op = JnaUtils.createCachedOp(this, manager);
+            op = JnaUtils.createCachedOp(this, (MxNDManager) manager);
         }
         return op.forward(inputs);
     }
@@ -177,20 +170,20 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
+    public void setInitializer(Initializer initializer, boolean overwrite) {
         for (Parameter param : params) {
-            param.setInitializer(manager, initializer, overwrite);
+            param.setInitializer(initializer, overwrite);
             param.reinitialize();
         }
     }
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer, String paramName) {
+    public void setInitializer(Initializer initializer, String paramName) {
         Optional<Parameter> parameter =
                 params.stream().filter(pair -> pair.getName().equals(paramName)).findFirst();
         if (parameter.isPresent()) {
             Parameter param = parameter.get();
-            param.setInitializer(manager, initializer);
+            param.setInitializer(initializer);
             param.reinitialize();
         } else {
             throw new IllegalArgumentException("Could not find parameter " + paramName);

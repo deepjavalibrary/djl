@@ -23,20 +23,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.nn.MxNNIndex;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.optimizer.Optimizer;
 
 public class MxEngine extends Engine {
 
-    public static final NNIndex NN_INDEX = new MxNNIndex();
+    public static final String ENGINE_NAME = "MXNet";
 
     MxEngine() {
         // Workaround MXNet engine lazy initialization issue
@@ -48,7 +45,7 @@ public class MxEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getEngineName() {
-        return "MXNet";
+        return ENGINE_NAME;
     }
 
     /** {@inheritDoc} */
@@ -87,8 +84,8 @@ public class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(Block block) {
-        return new MxModel(block);
+    public Model newModel(Context context) {
+        return new MxModel(context);
     }
 
     /**
@@ -158,12 +155,6 @@ public class MxEngine extends Engine {
         Model result = MxModel.load(modelPrefix, epoch, context);
         ((MxEngine) Engine.getInstance()).setNumpyMode(true);
         return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NNIndex getNNIndex() {
-        return NN_INDEX;
     }
 
     /** {@inheritDoc} */

@@ -14,6 +14,7 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
+import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -21,6 +22,8 @@ import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.initializer.Initializer;
 
@@ -36,119 +39,167 @@ public class ActivationTest {
 
     @RunAsTest
     public void testRelu() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {-1, 0, 2});
             NDArray expected = manager.create(new float[] {0, 0, 2});
             Assertions.assertEquals(expected, Activation.relu(original));
-            Assertions.assertEquals(new NDList(expected), Activation.relu(new NDList(original)));
-            Assertions.assertEquals(expected, Activation.reluBlock().forward(original));
+            NDList expectedList = new NDList(expected);
+            NDList ndList = new NDList(original);
+            Assertions.assertEquals(expectedList, Activation.relu(ndList));
+            Assertions.assertEquals(expectedList, factory.activation().reluBlock().forward(ndList));
         }
     }
 
     @RunAsTest
     public void testSigmoid() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {0});
             NDArray expected = manager.create(new float[] {0.5f});
             Assertions.assertAlmostEquals(expected, Activation.sigmoid(original));
+
+            NDList expectedList = new NDList(expected);
+            NDList ndList = new NDList(original);
+            Assertions.assertAlmostEquals(expectedList, Activation.sigmoid(ndList));
             Assertions.assertAlmostEquals(
-                    new NDList(expected), Activation.sigmoid(new NDList(original)));
-            Assertions.assertAlmostEquals(expected, Activation.sigmoidBlock().forward(original));
+                    expectedList, factory.activation().sigmoidBlock().forward(ndList));
         }
     }
 
     @RunAsTest
     public void testTanh() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {0});
             NDArray expected = manager.create(new float[] {0});
             Assertions.assertEquals(expected, Activation.tanh(original));
-            Assertions.assertEquals(new NDList(expected), Activation.tanh(new NDList(original)));
-            Assertions.assertEquals(expected, Activation.tanhBlock().forward(original));
+            NDList expectedList = new NDList(expected);
+            NDList ndList = new NDList(original);
+            Assertions.assertEquals(expectedList, Activation.tanh(ndList));
+            Assertions.assertEquals(expectedList, factory.activation().tanhBlock().forward(ndList));
         }
     }
 
     @RunAsTest
     public void testSoftrelu() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {0, 0, 2});
             NDArray expected = manager.create(new float[] {.6931f, .6931f, 2.1269f});
+            Activation activation = factory.activation();
             Assertions.assertAlmostEquals(expected, Activation.softrelu(original));
-            Assertions.assertAlmostEquals(
-                    new NDList(expected), Activation.softrelu(new NDList(original)));
-            Assertions.assertAlmostEquals(expected, Activation.softreluBlock().forward(original));
+
+            NDList expectedList = new NDList(expected);
+            NDList ndList = new NDList(original);
+            Assertions.assertAlmostEquals(expectedList, Activation.softrelu(ndList));
+            Assertions.assertAlmostEquals(expectedList, activation.softreluBlock().forward(ndList));
         }
     }
 
     @RunAsTest
     public void testLeakyrelu() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {-1, 0, 2});
             NDArray expected = manager.create(new float[] {-1, 0, 2});
             float alpha = 1.0f;
             Assertions.assertEquals(expected, Activation.leakyRelu(original, alpha));
-            Assertions.assertEquals(
-                    new NDList(expected), Activation.leakyRelu(new NDList(original), alpha));
-            Assertions.assertEquals(expected, Activation.leakyReluBlock(alpha).forward(original));
+
+            NDList expectedList = new NDList(expected);
+            NDList ndList = new NDList(original);
+            Activation activation = factory.activation();
+            Assertions.assertAlmostEquals(expectedList, Activation.leakyRelu(ndList, alpha));
+            Assertions.assertAlmostEquals(
+                    expectedList, activation.leakyReluBlock(alpha).forward(ndList));
         }
     }
 
     @RunAsTest
     public void testElu() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {0, 2});
             NDArray expected = manager.create(new float[] {0, 2});
             float alpha = 1.0f;
             Assertions.assertEquals(expected, Activation.elu(original, alpha));
-            Assertions.assertEquals(
-                    new NDList(expected), Activation.elu(new NDList(original), alpha));
-            Assertions.assertEquals(expected, Activation.eluBlock(alpha).forward(original));
+
+            NDList expectedList = new NDList(expected);
+            NDList ndList = new NDList(original);
+            Activation activation = factory.activation();
+            Assertions.assertEquals(expectedList, Activation.elu(ndList, alpha));
+            Assertions.assertEquals(expectedList, activation.eluBlock(alpha).forward(ndList));
         }
     }
 
     @RunAsTest
     public void testSelu() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {0});
             NDArray expected = manager.create(new float[] {0});
             Assertions.assertEquals(expected, Activation.selu(original));
-            Assertions.assertEquals(new NDList(expected), Activation.selu(new NDList(original)));
-            Assertions.assertEquals(expected, Activation.seluBlock().forward(original));
+
+            NDList expectedList = new NDList(expected);
+            NDList ndList = new NDList(original);
+            Activation activation = factory.activation();
+            Assertions.assertEquals(expectedList, Activation.selu(ndList));
+            Assertions.assertEquals(expectedList, activation.seluBlock().forward(ndList));
         }
     }
 
     @RunAsTest
     public void testGelu() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {0});
             NDArray expected = manager.create(new float[] {0});
             Assertions.assertEquals(expected, Activation.gelu(original));
-            Assertions.assertEquals(new NDList(expected), Activation.gelu(new NDList(original)));
-            Assertions.assertEquals(expected, Activation.geluBlock().forward(original));
+
+            NDList expectedList = new NDList(expected);
+            NDList ndList = new NDList(original);
+            Activation activation = factory.activation();
+            Assertions.assertEquals(expectedList, Activation.gelu(ndList));
+            Assertions.assertEquals(expectedList, activation.geluBlock().forward(ndList));
         }
     }
 
     @RunAsTest
     public void testSwish() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {0});
             NDArray expected = manager.create(new float[] {0});
             float beta = 1.0f;
             Assertions.assertEquals(expected, Activation.swish(original, beta));
-            Assertions.assertEquals(
-                    new NDList(expected), Activation.swish(new NDList(original), beta));
-            Assertions.assertEquals(expected, Activation.swishBlock(beta).forward(original));
+
+            NDList expectedList = new NDList(expected);
+            NDList ndList = new NDList(original);
+            Activation activation = factory.activation();
+            Assertions.assertEquals(expectedList, Activation.swish(ndList, beta));
+            Assertions.assertEquals(expectedList, activation.swishBlock(beta).forward(ndList));
         }
     }
 
     @RunAsTest
     public void testPrelu() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
             NDArray original = manager.create(new float[] {-1, 0, 2});
-            NDArray expected = manager.create(new float[] {-1, 0, 2});
-            Activation block = Activation.preluBlock();
-            block.setInitializer(manager, Initializer.ONES);
-            Assertions.assertEquals(expected, block.forward(original));
+            NDList expected = new NDList(manager.create(new float[] {-1, 0, 2}));
+            Block block = factory.activation().preluBlock();
+            block.setInitializer(Initializer.ONES);
+            Assertions.assertEquals(expected, block.forward(new NDList(original)));
         }
     }
 }

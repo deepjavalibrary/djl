@@ -22,8 +22,6 @@ import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -36,7 +34,7 @@ public class MockEngine extends Engine {
     private String version;
 
     @Override
-    public Model newModel(Block block) {
+    public Model newModel(Context context) {
         return new MockModel();
     }
 
@@ -77,11 +75,6 @@ public class MockEngine extends Engine {
 
     @Override
     public GradientCollector newGradientCollector() {
-        return null;
-    }
-
-    @Override
-    public NNIndex getNNIndex() {
         return null;
     }
 

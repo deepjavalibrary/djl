@@ -12,9 +12,9 @@
  */
 package software.amazon.ai.nn.core;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 
 /**
  * A Linear block applies a linear transformation \(Y = XW^T + b\).
@@ -37,11 +37,17 @@ public interface Linear extends Block {
     /** The Builder to construct a {@link Linear} type of {@link Block}. */
     class Builder {
 
+        private BlockFactory factory;
         private long outChannels;
         private boolean bias = true;
 
         public long getOutChannels() {
             return outChannels;
+        }
+
+        public Builder setFactory(BlockFactory factory) {
+            this.factory = factory;
+            return this;
         }
 
         /**
@@ -81,7 +87,7 @@ public interface Linear extends Block {
             if (outChannels == 0) {
                 throw new IllegalArgumentException("You must specify outChannels");
             }
-            return Engine.getInstance().getNNIndex().linear(this);
+            return factory.createLinear(this);
         }
     }
 }

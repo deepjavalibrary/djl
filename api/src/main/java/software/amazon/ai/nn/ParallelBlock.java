@@ -21,6 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import software.amazon.ai.BlockList;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
@@ -33,7 +34,9 @@ public class ParallelBlock extends AbstractBlock {
     private List<Block> blocks;
     private Function<List<NDList>, NDList> function;
 
-    public ParallelBlock(List<Block> blocks, Function<List<NDList>, NDList> function) {
+    public ParallelBlock(
+            NDManager manager, List<Block> blocks, Function<List<NDList>, NDList> function) {
+        super(manager);
         this.blocks = blocks;
         this.function = function;
     }

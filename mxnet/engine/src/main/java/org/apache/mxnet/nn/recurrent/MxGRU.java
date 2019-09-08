@@ -23,6 +23,7 @@ import org.apache.mxnet.nn.MxNNBlock;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Parameter;
@@ -63,15 +64,16 @@ public class MxGRU extends MxNNBlock implements GRU {
 
     private Parameter state = new Parameter("state", this, ParameterType.OTHER);
 
-    public MxGRU(GRU.Builder builder) {
-        this.opName = "RNN";
-        this.stateSize = builder.getStateSize();
-        this.dropRate = builder.getDropRate();
-        this.numStackedLayers = builder.getNumStackedLayers();
-        this.useSequenceLength = builder.isUseSequenceLength();
-        this.useBidirectional = builder.isUseBidirectional();
-        this.stateOutputs = builder.isStateOutputs();
-        this.mode = "gru";
+    public MxGRU(NDManager manager, GRU.Builder builder) {
+        super(manager);
+        opName = "RNN";
+        stateSize = builder.getStateSize();
+        dropRate = builder.getDropRate();
+        numStackedLayers = builder.getNumStackedLayers();
+        useSequenceLength = builder.isUseSequenceLength();
+        useBidirectional = builder.isUseBidirectional();
+        stateOutputs = builder.isStateOutputs();
+        mode = "gru";
     }
 
     @Override

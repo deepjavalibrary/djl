@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
@@ -29,7 +30,8 @@ public class LambdaBlock extends AbstractBlock {
 
     private Function<NDList, NDList> lambda;
 
-    public LambdaBlock(Function<NDList, NDList> lambda) {
+    public LambdaBlock(NDManager manager, Function<NDList, NDList> lambda) {
+        super(manager);
         this.lambda = lambda;
         initialized = true;
     }

@@ -12,9 +12,9 @@
  */
 package software.amazon.ai.nn.norm;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 
 public interface BatchNorm extends Block {
 
@@ -22,6 +22,7 @@ public interface BatchNorm extends Block {
 
     final class Builder {
 
+        private BlockFactory factory;
         private int axis = 1;
         private float epsilon = 1E-5f;
         private float momentum = .9f;
@@ -36,6 +37,11 @@ public interface BatchNorm extends Block {
 
         public float getMomentum() {
             return momentum;
+        }
+
+        public Builder setFactory(BlockFactory factory) {
+            this.factory = factory;
+            return this;
         }
 
         public Builder setAxis(int val) {
@@ -54,7 +60,7 @@ public interface BatchNorm extends Block {
         }
 
         public BatchNorm build() {
-            return Engine.getInstance().getNNIndex().batchNorm2D(this);
+            return factory.createBatchNorm2D(this);
         }
     }
 }

@@ -21,6 +21,7 @@ import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
@@ -40,11 +41,12 @@ public class MxBatchNorm extends MxNNBlock implements BatchNorm {
     private Parameter runningMean;
     private Parameter runningVar;
 
-    public MxBatchNorm(BatchNorm.Builder builder) {
-        this.opName = "BatchNorm";
-        this.axis = builder.getAxis();
-        this.epsilon = builder.getEpsilon();
-        this.momentum = builder.getMomentum();
+    public MxBatchNorm(NDManager manager, BatchNorm.Builder builder) {
+        super(manager);
+        opName = "BatchNorm";
+        axis = builder.getAxis();
+        epsilon = builder.getEpsilon();
+        momentum = builder.getMomentum();
         runningMean = new Parameter("runningMean", this, ParameterType.OTHER, Initializer.ONES);
         runningVar = new Parameter("runningVar", this, ParameterType.OTHER, Initializer.ONES);
     }

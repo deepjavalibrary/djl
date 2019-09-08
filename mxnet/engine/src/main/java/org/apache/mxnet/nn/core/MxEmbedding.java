@@ -44,13 +44,13 @@ public class MxEmbedding<T> extends MxNNBlock implements Embedding<T> {
 
     private Parameter embedding;
 
-    public MxEmbedding(Embedding.Builder<T> builder) {
+    public MxEmbedding(NDManager manager, Embedding.Builder<T> builder) {
+        super(manager);
         opName = "Embedding";
         embeddingSize = builder.getEmbeddingSize();
         useDefault = builder.isUseDefault();
         dataType = builder.getDataType();
         embedding = new Parameter("embedding", this, ParameterType.WEIGHT);
-
         embedder = new ConcurrentHashMap<>(builder.getItems().size());
         numItems = 0;
         if (useDefault) {

@@ -13,11 +13,11 @@
 package software.amazon.ai.nn.core;
 
 import java.util.Collection;
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 
 /**
  * An Embedding block map a collection of items to 1-Dimensional representative {@link NDArray}s.
@@ -62,6 +62,7 @@ public interface Embedding<T> extends Block {
      */
     class Builder<T> {
 
+        private BlockFactory factory;
         private Collection<T> items;
         private int embeddingSize;
         private boolean useDefault = true;
@@ -81,6 +82,11 @@ public interface Embedding<T> extends Block {
 
         public DataType getDataType() {
             return dataType;
+        }
+
+        public Builder<T> setFactory(BlockFactory factory) {
+            this.factory = factory;
+            return this;
         }
 
         /**
@@ -143,7 +149,7 @@ public interface Embedding<T> extends Block {
             if (embeddingSize == 0) {
                 throw new IllegalArgumentException("You must specify the embedding size");
             }
-            return Engine.getInstance().getNNIndex().embedding(this);
+            return factory.createEmbedding(this);
         }
     }
 }

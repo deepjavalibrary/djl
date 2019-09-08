@@ -34,9 +34,12 @@ public class Parameter implements AutoCloseable {
     private String name;
     private Block block;
     private ParameterType type;
-    private NDManager manager;
     private Initializer initializer;
     private NDArray array;
+
+    public Parameter(String name, Block block, ParameterType type) {
+        this(name, block, type, null);
+    }
 
     public Parameter(String name, Block block, ParameterType type, Initializer initializer) {
         this.name = name;
@@ -45,14 +48,9 @@ public class Parameter implements AutoCloseable {
         this.initializer = initializer;
     }
 
-    public Parameter(String name, Block block, ParameterType type) {
+    public Parameter(String name, Block block, NDArray array) {
         this.name = name;
         this.block = block;
-        this.type = type;
-    }
-
-    public Parameter(String name, NDArray array) {
-        this.name = name;
         this.array = array;
     }
 
@@ -75,13 +73,12 @@ public class Parameter implements AutoCloseable {
         return array != null;
     }
 
-    public Parameter setInitializer(NDManager manager, Initializer initializer) {
-        setInitializer(manager, initializer, false);
+    public Parameter setInitializer(Initializer initializer) {
+        setInitializer(initializer, false);
         return this;
     }
 
-    public Parameter setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
-        this.manager = manager;
+    public Parameter setInitializer(Initializer initializer, boolean overwrite) {
         if (overwrite || this.initializer == null) {
             this.initializer = initializer;
         }
@@ -93,6 +90,7 @@ public class Parameter implements AutoCloseable {
             throw new IllegalStateException("This parameter is not initialized");
         }
         Objects.requireNonNull(initializer, "No initializer has been set");
+        NDManager manager = block.getNDManager();
         array = initializer.initialize(manager, array.getShape(), array.getDataType());
         array.attachGradient();
     }
@@ -107,7 +105,7 @@ public class Parameter implements AutoCloseable {
         }
 
         Objects.requireNonNull(initializer, "No initializer has been set");
-        Objects.requireNonNull(manager, "No initializer has been set");
+        NDManager manager = block.getNDManager();
 
         array =
                 initializer.initialize(
@@ -179,6 +177,8 @@ public class Parameter implements AutoCloseable {
         } else if (magic != 'P') {
             throw new IllegalArgumentException("Invalid input data.");
         }
+
+        NDManager manager = block.getNDManager();
 
         // Version
         byte version = dis.readByte();

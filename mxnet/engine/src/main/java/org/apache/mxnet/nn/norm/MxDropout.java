@@ -21,6 +21,7 @@ import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.norm.Dropout;
@@ -33,7 +34,8 @@ public class MxDropout extends MxNNBlock implements Dropout {
     private float probability;
     private int[] sharedAxes;
 
-    public MxDropout(Dropout.Builder builder) {
+    public MxDropout(NDManager manager, Dropout.Builder builder) {
+        super(manager);
         opName = "Dropout";
         probability = builder.getProbability();
         sharedAxes = builder.getSharedAxes();

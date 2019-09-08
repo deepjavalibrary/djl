@@ -21,6 +21,7 @@ import org.apache.mxnet.engine.MxOpParams;
 import org.apache.mxnet.nn.MxNNBlock;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Parameter;
@@ -49,12 +50,13 @@ public class MxConv3D extends MxNNBlock implements Conv3D {
     private Parameter weight;
     private Parameter bias;
 
-    public MxConv3D(Conv3D.Builder builder) {
-        this.opName = "Convolution";
+    public MxConv3D(NDManager manager, Conv3D.Builder builder) {
+        super(manager);
+        opName = "Convolution";
         kernel = builder.getKernel();
-        this.stride = builder.getStride() == null ? new Shape(1, 1, 1) : builder.getStride();
-        this.pad = builder.getPad() == null ? new Shape(0, 0, 0) : builder.getPad();
-        this.dilate = builder.getDilate() == null ? new Shape(1, 1, 1) : builder.getDilate();
+        stride = builder.getStride() == null ? new Shape(1, 1, 1) : builder.getStride();
+        pad = builder.getPad() == null ? new Shape(0, 0, 0) : builder.getPad();
+        dilate = builder.getDilate() == null ? new Shape(1, 1, 1) : builder.getDilate();
         numFilters = builder.getNumFilters();
         numGroups = builder.getNumGroups();
         includeBias = builder.isIncludeBias();

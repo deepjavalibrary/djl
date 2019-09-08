@@ -14,6 +14,7 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
+import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -24,6 +25,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
@@ -50,10 +52,14 @@ public class OptimizerTest {
 
     @RunAsTest
     public void testSgd() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block block = block(manager);
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
+
+            Block block = block(factory);
             Optimizer optim =
                     new Sgd.Builder()
+                            .setFactory(factory)
                             .setRescaleGrad(1.0f / BATCH_SIZE)
                             .setLrTracker(LrTracker.fixedLR(1E7f))
                             .build();
@@ -66,10 +72,14 @@ public class OptimizerTest {
 
     @RunAsTest
     public void testSgdWithMomentum() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block block = block(manager);
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
+
+            Block block = block(factory);
             Optimizer optim =
                     new Sgd.Builder()
+                            .setFactory(factory)
                             .setRescaleGrad(1.0f / BATCH_SIZE)
                             .setLrTracker(LrTracker.fixedLR(1E7f))
                             .optMomentum(1E2f)
@@ -83,10 +93,14 @@ public class OptimizerTest {
 
     @RunAsTest
     public void testNag() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block block = block(manager);
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
+
+            Block block = block(factory);
             Optimizer optim =
                     new Nag.Builder()
+                            .setFactory(factory)
                             .setRescaleGrad(1.0f / BATCH_SIZE)
                             .setLrTracker(LrTracker.fixedLR(1E7f))
                             .setMomentum(1E1f)
@@ -100,10 +114,13 @@ public class OptimizerTest {
 
     @RunAsTest
     public void testAdam() throws FailedTestException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block block = block(manager);
+        try (Model model = Model.newInstance()) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
+            Block block = block(factory);
             Optimizer optim =
                     new Adam.Builder()
+                            .setFactory(factory)
                             .setRescaleGrad(1.0f / BATCH_SIZE)
                             .optLearningRate(1E2f)
                             .build();
@@ -115,9 +132,9 @@ public class OptimizerTest {
         }
     }
 
-    private Block block(NDManager manager) {
-        Linear linear = new Linear.Builder().setOutChannels(CHANNELS).build();
-        linear.setInitializer(manager, Initializer.ONES, true);
+    private Block block(BlockFactory factory) {
+        Linear linear = new Linear.Builder().setFactory(factory).setOutChannels(CHANNELS).build();
+        linear.setInitializer(Initializer.ONES, true);
         return linear;
     }
 

@@ -23,6 +23,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -37,6 +38,22 @@ public class ZooModel<I, O> implements Model {
     public ZooModel(Model model, Translator<I, O> translator) {
         this.model = model;
         this.translator = translator;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BlockFactory getBlockFactory() {
+        return model.getBlockFactory();
+    }
+
+    @Override
+    public Block getBlock() {
+        return model.getBlock();
+    }
+
+    @Override
+    public void setBlock(Block block) {
+        model.setBlock(block);
     }
 
     /** {@inheritDoc} */
@@ -68,7 +85,7 @@ public class ZooModel<I, O> implements Model {
     /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer, boolean overwrite) {
-        model.getBlock().setInitializer(model.getManager(), initializer, overwrite);
+        model.setInitializer(initializer, overwrite);
     }
 
     public Predictor<I, O> newPredictor() {
@@ -89,8 +106,8 @@ public class ZooModel<I, O> implements Model {
         return translator;
     }
 
-    public Model quantize() {
-        return model.cast(DataType.UINT8);
+    public void quantize() {
+        model.cast(DataType.UINT8);
     }
 
     /** {@inheritDoc} */
@@ -131,20 +148,14 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public Block getBlock() {
-        return model.getBlock();
+    public NDManager getNDManager() {
+        return model.getNDManager();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDManager getManager() {
-        return model.getManager();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Model cast(DataType dataType) {
-        return model.cast(dataType);
+    public void cast(DataType dataType) {
+        model.cast(dataType);
     }
 
     /** {@inheritDoc} */

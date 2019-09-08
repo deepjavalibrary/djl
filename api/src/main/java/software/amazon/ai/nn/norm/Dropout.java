@@ -12,9 +12,9 @@
  */
 package software.amazon.ai.nn.norm;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 
 public interface Dropout extends Block {
 
@@ -22,6 +22,7 @@ public interface Dropout extends Block {
 
     final class Builder {
 
+        private BlockFactory factory;
         private float probability = 0.5f;
         private int[] sharedAxes = {};
 
@@ -31,6 +32,11 @@ public interface Dropout extends Block {
 
         public int[] getSharedAxes() {
             return sharedAxes;
+        }
+
+        public Builder setFactory(BlockFactory factory) {
+            this.factory = factory;
+            return this;
         }
 
         public Builder setProbability(float probability) {
@@ -44,7 +50,7 @@ public interface Dropout extends Block {
         }
 
         public Dropout build() {
-            return Engine.getInstance().getNNIndex().dropout(this);
+            return factory.createDropout(this);
         }
     }
 }

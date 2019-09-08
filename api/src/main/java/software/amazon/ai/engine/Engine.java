@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.NNIndex;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -128,12 +126,12 @@ public abstract class Engine {
     public abstract String getVersion();
 
     /**
-     * Construct a new model from Block.
+     * Construct a new model.
      *
-     * @param block Block that defines the network architecture
+     * @param context the context that model to be loaded
      * @return a new Model instance using the network defined in block
      */
-    public abstract Model newModel(Block block);
+    public abstract Model newModel(Context context);
 
     /**
      * Loads the model from the specified location.
@@ -158,14 +156,6 @@ public abstract class Engine {
      * @return Returns the GradientCollector
      */
     public abstract GradientCollector newGradientCollector();
-
-    /**
-     * An internal helper to get the Engine specific implementations for the blocks in {@link
-     * software.amazon.ai.nn}.
-     *
-     * @return The index of Neural Network operators to create a Block
-     */
-    public abstract NNIndex getNNIndex();
 
     /**
      * An internal helper to get the Engine specific implementation for parameter store.

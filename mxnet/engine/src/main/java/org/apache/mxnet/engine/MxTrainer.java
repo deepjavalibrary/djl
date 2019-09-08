@@ -47,7 +47,7 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
 
     MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Context context) {
         this.model = model;
-        this.manager = (MxNDManager) model.getManager().newSubManager();
+        this.manager = (MxNDManager) model.getNDManager().newSubManager();
         this.translator = translator;
         this.context = context;
         this.block = model.getBlock();

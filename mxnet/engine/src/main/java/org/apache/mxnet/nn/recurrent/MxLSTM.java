@@ -23,6 +23,7 @@ import org.apache.mxnet.nn.MxNNBlock;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Parameter;
@@ -71,19 +72,20 @@ public class MxLSTM extends MxNNBlock implements LSTM {
     private Parameter state = new Parameter("state", this, ParameterType.OTHER);
     private Parameter stateCell = new Parameter("state_cell", this, ParameterType.OTHER);
 
-    public MxLSTM(LSTM.Builder builder) {
-        this.opName = "RNN";
-        this.stateSize = builder.getStateSize();
-        this.dropRate = builder.getDropRate();
-        this.numStackedLayers = builder.getNumStackedLayers();
-        this.useSequenceLength = builder.isUseSequenceLength();
-        this.useBidirectional = builder.isUseBidirectional();
-        this.stateOutputs = builder.isStateOutputs();
-        this.mode = "lstm";
-        this.clipLstmState = builder.isClipLstmState();
+    public MxLSTM(NDManager manager, LSTM.Builder builder) {
+        super(manager);
+        opName = "RNN";
+        stateSize = builder.getStateSize();
+        dropRate = builder.getDropRate();
+        numStackedLayers = builder.getNumStackedLayers();
+        useSequenceLength = builder.isUseSequenceLength();
+        useBidirectional = builder.isUseBidirectional();
+        stateOutputs = builder.isStateOutputs();
+        mode = "lstm";
+        clipLstmState = builder.isClipLstmState();
         if (clipLstmState) {
-            this.lstmStateClipMin = builder.getLstmStateClipMin();
-            this.lstmStateClipMax = builder.getLstmStateClipMax();
+            lstmStateClipMin = builder.getLstmStateClipMin();
+            lstmStateClipMax = builder.getLstmStateClipMax();
         }
     }
 

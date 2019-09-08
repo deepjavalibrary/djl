@@ -21,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Function;
-import org.tensorflow.Graph;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Session;
 import org.tensorflow.framework.MetaGraphDef;
@@ -36,6 +35,7 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -100,7 +100,7 @@ public class TfModel implements Model {
         return new TfModel(Paths.get(modelDir), bundle);
     }
 
-    public Graph getGraph() {
+    public org.tensorflow.Graph getTensorflowGraph() {
         return bundle.graph();
     }
 
@@ -111,6 +111,19 @@ public class TfModel implements Model {
     private byte[] getMetaGraphDef() {
         return bundle.metaGraphDef();
     }
+
+    @Override
+    public BlockFactory getBlockFactory() {
+        return null;
+    }
+
+    @Override
+    public Block getBlock() {
+        return null;
+    }
+
+    @Override
+    public void setBlock(Block block) {}
 
     /** {@inheritDoc} */
     @Override
@@ -188,19 +201,14 @@ public class TfModel implements Model {
     }
 
     @Override
-    public Block getBlock() {
-        return null;
-    }
-
-    @Override
-    public NDManager getManager() {
+    public NDManager getNDManager() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Model cast(DataType dataType) {
-        return null;
+    public void cast(DataType dataType) {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @Override

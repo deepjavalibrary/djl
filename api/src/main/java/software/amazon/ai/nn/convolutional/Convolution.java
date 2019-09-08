@@ -15,19 +15,22 @@ package software.amazon.ai.nn.convolutional;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 
 public interface Convolution extends Block {
 
     NDArray forward(NDArray data);
 
     abstract class Builder<C extends Convolution> {
-        Shape kernel;
-        Shape stride;
-        Shape pad;
-        Shape dilate;
-        int numFilters;
-        int numGroups = 1;
-        boolean includeBias = true;
+
+        protected BlockFactory factory;
+        protected Shape kernel;
+        protected Shape stride;
+        protected Shape pad;
+        protected Shape dilate;
+        protected int numFilters;
+        protected int numGroups = 1;
+        protected boolean includeBias = true;
 
         public Shape getKernel() {
             return kernel;
@@ -55,6 +58,11 @@ public interface Convolution extends Block {
 
         public boolean isIncludeBias() {
             return includeBias;
+        }
+
+        public Builder<C> setFactory(BlockFactory factory) {
+            this.factory = factory;
+            return this;
         }
 
         /**

@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.nn.recurrent;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.nn.Block;
 
 public interface LSTM extends RecurrentCell {
@@ -26,7 +25,7 @@ public interface LSTM extends RecurrentCell {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return Engine.getInstance().getNNIndex().lstm(this);
+            return factory.createLstm(this);
         }
     }
 }

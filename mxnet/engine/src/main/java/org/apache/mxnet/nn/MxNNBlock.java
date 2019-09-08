@@ -26,6 +26,10 @@ public abstract class MxNNBlock extends AbstractBlock {
     protected Shape inputShape;
     protected Shape inChannels;
 
+    public MxNNBlock(NDManager manager) {
+        super(manager);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {

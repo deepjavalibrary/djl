@@ -12,8 +12,6 @@
  */
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.engine.Engine;
-
 public interface Adam extends Optimizer {
 
     class Builder extends BaseBuilder<Builder> {
@@ -75,7 +73,7 @@ public interface Adam extends Optimizer {
         }
 
         public Adam build() {
-            return Engine.getInstance().getNNIndex().adam(this);
+            return factory.createAdam(this);
         }
     }
 }

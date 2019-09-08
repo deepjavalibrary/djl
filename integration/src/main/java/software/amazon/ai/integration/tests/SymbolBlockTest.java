@@ -32,6 +32,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.nn.core.Linear;
@@ -41,6 +42,7 @@ import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.Pair;
 
 public class SymbolBlockTest {
+
     public static void main(String[] args) {
         String[] cmd = {"-c", SymbolBlockTest.class.getName()};
         new IntegrationTest()
@@ -52,24 +54,23 @@ public class SymbolBlockTest {
     @RunAsTest
     public void testInference() throws FailedTestException, IOException {
         Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-        Model mnistmlp = Model.load(modelPathPrefix);
-        Block block = mnistmlp.getBlock();
-        Shape shape;
-        try (NDManager manager = NDManager.newBaseManager().newSubManager()) {
+        try (Model model = Model.load(modelPathPrefix)) {
+            NDManager manager = model.getNDManager();
+
+            Block block = model.getBlock();
             NDArray arr = manager.ones(new Shape(1, 28, 28));
-            shape = block.forward(new NDList(arr)).head().getShape();
+            Shape shape = block.forward(new NDList(arr)).head().getShape();
+            Assertions.assertTrue(shape.equals(new Shape(1, 10)));
         }
-        mnistmlp.close();
-        Assertions.assertTrue(shape.equals(new Shape(1, 10)));
     }
 
     @RunAsTest
     public void trainWithNewParam() throws FailedTestException, IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-            Model mnistmlp = Model.load(modelPathPrefix);
-            Block mlp = mnistmlp.getBlock();
-            mlp.setInitializer(manager, Initializer.ONES, true);
+        Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
+        try (Model model = Model.load(modelPathPrefix)) {
+            NDManager manager = model.getNDManager();
+            Block mlp = model.getBlock();
+            mlp.setInitializer(Initializer.ONES, true);
             Pair<NDArray, NDArray> result = train(manager, mlp);
             Assertions.assertAlmostEquals(manager.create(6430785.5), result.getKey());
             Assertions.assertAlmostEquals(
@@ -83,16 +84,15 @@ public class SymbolBlockTest {
                                 -2.30967991e-08f
                             }),
                     result.getValue());
-            mnistmlp.close();
         }
     }
 
     @RunAsTest
     public void trainWithExistParam() throws FailedTestException, IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-            Model mnistmlp = Model.load(modelPathPrefix);
-            Block mlp = mnistmlp.getBlock();
+        Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
+        try (Model model = Model.load(modelPathPrefix)) {
+            NDManager manager = model.getNDManager();
+            Block mlp = model.getBlock();
             Pair<NDArray, NDArray> result = train(manager, mlp);
             Assertions.assertAlmostEquals(manager.create(0.29814255237579346), result.getKey());
             Assertions.assertAlmostEquals(
@@ -106,21 +106,22 @@ public class SymbolBlockTest {
                                 -1.19209291e-08f
                             }),
                     result.getValue());
-            mnistmlp.close();
         }
     }
 
     @RunAsTest
     public void trainWithCustomLayer() throws FailedTestException, IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-            Model mnistmlp = Model.load(modelPathPrefix);
-            SymbolBlock mlp = (SymbolBlock) mnistmlp.getBlock();
-            SequentialBlock newMlp = new SequentialBlock();
+        Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
+        try (Model model = Model.load(modelPathPrefix)) {
+            BlockFactory factory = model.getBlockFactory();
+            NDManager manager = model.getNDManager();
+            SymbolBlock mlp = (SymbolBlock) model.getBlock();
+            SequentialBlock newMlp = factory.createSequential();
             newMlp.add(mlp.removeLastBlock());
-            Linear linear = new Linear.Builder().setOutChannels(10).build();
-            linear.setInitializer(manager, Initializer.ONES, true);
+            Linear linear = new Linear.Builder().setFactory(factory).setOutChannels(10).build();
+            linear.setInitializer(Initializer.ONES, true);
             newMlp.add(linear);
+
             Pair<NDArray, NDArray> result = train(manager, mlp);
             Assertions.assertAlmostEquals(manager.create(0.29814255237579346), result.getKey());
             Assertions.assertAlmostEquals(
@@ -134,7 +135,6 @@ public class SymbolBlockTest {
                                 -1.19209291e-08f
                             }),
                     result.getValue());
-            mnistmlp.close();
         }
     }
 

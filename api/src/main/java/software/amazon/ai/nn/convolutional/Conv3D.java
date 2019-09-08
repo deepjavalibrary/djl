@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.nn.convolutional;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.nn.Block;
 
 public interface Conv3D extends Convolution {
@@ -26,7 +25,7 @@ public interface Conv3D extends Convolution {
             if (kernel == null || numFilters == 0) {
                 throw new IllegalArgumentException("Kernel and numFilters must be set");
             }
-            return Engine.getInstance().getNNIndex().conv3D(this);
+            return factory.createConv3D(this);
         }
     }
 }

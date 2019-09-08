@@ -12,29 +12,13 @@
  */
 package software.amazon.ai.nn.core;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.training.Activation;
 
-public interface Prelu extends Activation {
+public interface Prelu extends Block {
 
-    /** {@inheritDoc} */
-    @Override
-    NDArray forward(NDArray data);
-
-    /** The Builder to construct a {@link Prelu} type of {@link Block}. */
-    class Builder {
-
-        /**
-         * Returns the constructed {@code Prelu}.
-         *
-         * @return Returns the constructed {@code Prelu}
-         * @throws IllegalArgumentException Thrown if all required parameters (outChannels) have not
-         *     been set
-         */
-        public Prelu build() {
-            return Engine.getInstance().getNNIndex().prelu(this);
-        }
+    default NDArray forward(NDArray data) {
+        return forward(new NDList(data)).get(0);
     }
 }

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.function.Function;
 import software.amazon.ai.BlockList;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -34,8 +35,9 @@ public class SequentialBlock extends AbstractBlock {
 
     private List<Block> blocks;
 
-    public SequentialBlock(Block... blocks) {
-        this.blocks = new ArrayList<>(Arrays.asList(blocks));
+    public SequentialBlock(NDManager manager) {
+        super(manager);
+        this.blocks = new ArrayList<>();
     }
 
     public void addAll(Block... blocks) {
@@ -54,7 +56,7 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     public void add(Function<NDList, NDList> f) {
-        blocks.add(new LambdaBlock(f));
+        blocks.add(new LambdaBlock(manager, f));
         initialized = false;
     }
 
@@ -104,10 +106,8 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     @Override
-    public Block cast(DataType dataType) {
-        SequentialBlock newBlock = new SequentialBlock();
-        blocks.forEach(ele -> newBlock.add(ele.cast(dataType)));
-        return newBlock;
+    public void cast(DataType dataType) {
+        blocks.forEach(ele -> ele.cast(dataType));
     }
 
     @Override

@@ -13,21 +13,24 @@
 package software.amazon.ai.nn.recurrent;
 
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.recurrent.RNN.Activation;
 
 public interface RecurrentCell extends Block {
 
     abstract class Builder<R extends RecurrentCell> {
-        float dropRate;
-        long stateSize = -1;
-        int numStackedLayers = -1;
-        double lstmStateClipMin;
-        double lstmStateClipMax;
-        boolean clipLstmState;
-        boolean useSequenceLength;
-        boolean useBidirectional;
-        boolean stateOutputs;
-        RNN.Activation activation;
+
+        protected BlockFactory factory;
+        protected float dropRate;
+        protected long stateSize = -1;
+        protected int numStackedLayers = -1;
+        protected double lstmStateClipMin;
+        protected double lstmStateClipMax;
+        protected boolean clipLstmState;
+        protected boolean useSequenceLength;
+        protected boolean useBidirectional;
+        protected boolean stateOutputs;
+        protected RNN.Activation activation;
 
         public float getDropRate() {
             return dropRate;
@@ -67,6 +70,11 @@ public interface RecurrentCell extends Block {
 
         public Activation getActivation() {
             return activation;
+        }
+
+        public Builder<R> setFactory(BlockFactory factory) {
+            this.factory = factory;
+            return this;
         }
 
         /**

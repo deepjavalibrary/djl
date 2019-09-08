@@ -13,7 +13,6 @@
 
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 
 /** An NAG optimizer. Build with {@link Nag.Builder}. */
@@ -54,7 +53,7 @@ public interface Nag extends Optimizer {
             if (momentum == 0) {
                 throw new IllegalArgumentException("The momentum should be set");
             }
-            return Engine.getInstance().getNNIndex().nag(this);
+            return factory.createNag(this);
         }
     }
 }

@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
+import org.apache.mxnet.nn.MxBlockFactory;
 import org.apache.mxnet.nn.MxSymbolBlock;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
@@ -35,6 +36,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
@@ -53,19 +55,23 @@ import software.amazon.ai.util.Pair;
 public class MxModel implements Model {
 
     private Path modelDir;
+    private MxNDManager manager;
+    private BlockFactory factory;
     private Block block;
     private DataDesc[] inputData;
-    private MxNDManager manager;
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
-    MxModel(Block block) {
-        this(null, block, (MxNDManager) MxEngine.getInstance().newBaseManager());
+    MxModel(Context context) {
+        context = Context.defaultIfNull(context);
+        manager = MxNDManager.getSystemManager().newSubManager(context);
+        factory = new MxBlockFactory(manager);
     }
 
     MxModel(Path modelDir, Block block, MxNDManager manager) {
         this.modelDir = modelDir;
         this.block = block;
         this.manager = manager;
+        factory = new MxBlockFactory(manager);
     }
 
     static MxModel load(String prefix, int epoch) {
@@ -74,13 +80,15 @@ public class MxModel implements Model {
 
     static MxModel load(String prefix, int epoch, Context context) {
         context = Context.defaultIfNull(context);
-        MxNDManager subManager = MxNDManager.getSystemManager().newSubManager(context);
-        Symbol symbol = Symbol.load(subManager, prefix + "-symbol.json");
+        MxNDManager manager = MxNDManager.getSystemManager().newSubManager(context);
+        Symbol symbol = Symbol.load(manager, prefix + "-symbol.json");
         String paramFile = String.format("%s-%04d.params", prefix, epoch);
         Path modelDir = Paths.get(paramFile).toAbsolutePath().getParent();
-        NDList paramNDlist = JnaUtils.loadNdArray(subManager, Paths.get(paramFile));
+        NDList paramNDlist = JnaUtils.loadNdArray(manager, Paths.get(paramFile));
 
-        List<Parameter> parameters = new ArrayList<>();
+        MxSymbolBlock block = new MxSymbolBlock(manager, symbol);
+
+        List<Parameter> parameters = block.getDirectParameters();
         for (Pair<String, NDArray> pair : paramNDlist) {
             String key = pair.getKey();
             if (key == null) {
@@ -88,17 +96,33 @@ public class MxModel implements Model {
             }
             String paramName = key.split(":", 2)[1];
             NDArray array = pair.getValue().asInContext(context, true);
-            parameters.add(new Parameter(paramName, array));
+            parameters.add(new Parameter(paramName, block, array));
         }
 
         // TODO: Check if Symbol has all names that params file have
-        return new MxModel(modelDir, new MxSymbolBlock(symbol, parameters, subManager), subManager);
+        return new MxModel(modelDir, block, manager);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BlockFactory getBlockFactory() {
+        return factory;
+    }
+
+    @Override
+    public Block getBlock() {
+        return block;
+    }
+
+    @Override
+    public void setBlock(Block block) {
+        this.block = block;
     }
 
     /** {@inheritDoc} */
     @Override
     public <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator) {
-        return new MxTrainer<I, L, O>(this, trainTranslator, null);
+        return new MxTrainer<>(this, trainTranslator, null);
     }
 
     /** {@inheritDoc} */
@@ -113,7 +137,7 @@ public class MxModel implements Model {
     public <I, L, O> Trainer<I, L, O> newTrainer(
             TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Context context) {
         context = Context.defaultIfNull(context, manager.getContext());
-        return new MxTrainer<I, L, O>(this, trainTranslator, optimizer, context);
+        return new MxTrainer<>(this, trainTranslator, optimizer, context);
     }
 
     /** {@inheritDoc} */
@@ -132,14 +156,13 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer, boolean overwrite) {
-        block.setInitializer(manager, initializer, overwrite);
+        block.setInitializer(initializer, overwrite);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Model cast(DataType dataType) {
-        Block newBlock = block.cast(dataType);
-        return new MxModel(modelDir, newBlock, manager);
+    public void cast(DataType dataType) {
+        block.cast(dataType);
     }
 
     /** {@inheritDoc} */
@@ -229,13 +252,7 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public Block getBlock() {
-        return block;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager getManager() {
+    public NDManager getNDManager() {
         return manager;
     }
 

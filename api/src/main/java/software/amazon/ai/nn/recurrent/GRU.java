@@ -12,20 +12,20 @@
  */
 package software.amazon.ai.nn.recurrent;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.nn.Block;
 
 public interface GRU extends RecurrentCell {
 
     /** The Builder to construct a {@link GRU} type of {@link Block}. */
     final class Builder extends RecurrentCell.Builder<GRU> {
+
         /** {@inheritDoc} */
         @Override
         public GRU build() {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return Engine.getInstance().getNNIndex().gru(this);
+            return factory.createGru(this);
         }
     }
 }
