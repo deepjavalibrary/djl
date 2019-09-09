@@ -35,7 +35,7 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.nn.core.Linear;
-import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.Pair;
@@ -143,7 +143,7 @@ public class SymbolBlockTest {
         NDArray label = manager.arange(0, 10);
         NDArray gradMean;
         NDArray pred;
-        try (Gradient.Collector gradCol = Gradient.newCollector()) {
+        try (GradientCollector gradCol = GradientCollector.newInstance()) {
             pred = mlp.forward(new NDList(data)).head();
             NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
             gradCol.backward(loss);

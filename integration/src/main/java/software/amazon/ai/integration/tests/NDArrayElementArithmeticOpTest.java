@@ -22,7 +22,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.GradientCollector;
 
 public class NDArrayElementArithmeticOpTest {
 
@@ -39,7 +39,7 @@ public class NDArrayElementArithmeticOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray lhs = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
             NDArray result;
-            try (Gradient.Collector gradCol = Gradient.newCollector()) {
+            try (GradientCollector gradCol = GradientCollector.newInstance()) {
                 lhs.attachGradient();
                 result = NDArrays.add(lhs, 2);
                 // check add scalar result

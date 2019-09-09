@@ -15,7 +15,7 @@ package software.amazon.ai.integration.tests;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Stream;
-import org.apache.mxnet.engine.MxGradient;
+import org.apache.mxnet.engine.MxGradientCollector;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -30,7 +30,7 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.core.Linear;
-import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
@@ -58,14 +58,14 @@ public class GradientCollectorIntegrationTest {
     @RunAsTest
     public void testAutograd() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager();
-                Gradient.Collector gradCol = Gradient.newCollector()) {
+                GradientCollector gradCol = GradientCollector.newInstance()) {
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             lhs.attachGradient();
             // autograd automatically set recording and training during initialization
-            if (gradCol instanceof MxGradient.Collector) {
-                Assertions.assertTrue(MxGradient.isRecording());
-                Assertions.assertTrue(MxGradient.isTraining());
+            if (gradCol instanceof MxGradientCollector) {
+                Assertions.assertTrue(MxGradientCollector.isRecording());
+                Assertions.assertTrue(MxGradientCollector.isTraining());
             }
             NDArray result = NDArrays.mmul(lhs, rhs);
             gradCol.backward(result);
@@ -111,7 +111,7 @@ public class GradientCollectorIntegrationTest {
                     for (int epoch = 0; epoch < epochs; epoch++) {
                         lossMetric.reset();
                         for (Batch batch : trainer.iterateDataset(dataset)) {
-                            try (Gradient.Collector gradCol = Gradient.newCollector()) {
+                            try (GradientCollector gradCol = GradientCollector.newInstance()) {
 
                                 NDArray x = batch.getData().head();
                                 NDArray y = batch.getLabels().head();
@@ -158,7 +158,7 @@ public class GradientCollectorIntegrationTest {
                 NDArray label = manager.ones(new Shape(100, 1));
                 TrainingController controller =
                         new TrainingController(resNet50.getParameters(), optimizer);
-                try (Gradient.Collector gradCol = Gradient.newCollector()) {
+                try (GradientCollector gradCol = GradientCollector.newInstance()) {
                     NDArray pred = resNet50.forward(new NDList(input)).head();
                     NDArray loss =
                             Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);

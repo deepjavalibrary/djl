@@ -17,7 +17,7 @@ import software.amazon.ai.util.PairList;
 
 /**
  * An optimizer updates a set of parameters based on gradients collected with a {@link
- * software.amazon.ai.training.Gradient.Collector}.
+ * software.amazon.ai.training.GradientCollector}.
  */
 public interface Optimizer {
 

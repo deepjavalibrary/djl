@@ -25,7 +25,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.core.Linear;
-import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.initializer.Initializer;
@@ -125,7 +125,7 @@ public class OptimizerTest {
         NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS));
         NDArray label = manager.arange(0, BATCH_SIZE);
         TrainingController controller = new TrainingController(block.getParameters(), optim);
-        try (Gradient.Collector gradCol = Gradient.newCollector()) {
+        try (GradientCollector gradCol = GradientCollector.newInstance()) {
             NDArray pred = block.forward(new NDList(data)).head();
             NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
             gradCol.backward(loss);

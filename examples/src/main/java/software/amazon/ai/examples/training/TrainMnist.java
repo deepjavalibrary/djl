@@ -27,7 +27,7 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Activation;
-import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
@@ -104,7 +104,7 @@ public final class TrainMnist {
                         NDArray label = batch.getLabels().head();
                         NDArray pred;
                         NDArray loss;
-                        try (Gradient.Collector gradCol = Gradient.newCollector()) {
+                        try (GradientCollector gradCol = GradientCollector.newInstance()) {
                             pred = trainer.predict(data);
                             loss =
                                     Loss.softmaxCrossEntropyLoss(

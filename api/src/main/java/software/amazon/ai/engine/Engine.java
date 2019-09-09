@@ -27,7 +27,7 @@ import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.NNIndex;
-import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.optimizer.Optimizer;
 
@@ -153,11 +153,11 @@ public abstract class Engine {
             throws IOException;
 
     /**
-     * Creates a new {@link Gradient.Collector} instance for this Engine.
+     * Creates a new {@link GradientCollector} instance for this Engine.
      *
-     * @return Returns the Gradient Collector
+     * @return Returns the GradientCollector
      */
-    public abstract Gradient.Collector newGradientCollector();
+    public abstract GradientCollector newGradientCollector();
 
     /**
      * An internal helper to get the Engine specific implementations for the blocks in {@link

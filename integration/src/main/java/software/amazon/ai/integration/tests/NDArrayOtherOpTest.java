@@ -24,7 +24,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.training.Gradient;
+import software.amazon.ai.training.GradientCollector;
 
 public class NDArrayOtherOpTest {
 
@@ -325,7 +325,7 @@ public class NDArrayOtherOpTest {
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             NDArray result;
-            try (Gradient.Collector gradCol = Gradient.newCollector()) {
+            try (GradientCollector gradCol = GradientCollector.newInstance()) {
                 lhs.attachGradient();
                 result = NDArrays.mmul(lhs, rhs);
                 gradCol.backward(result);
