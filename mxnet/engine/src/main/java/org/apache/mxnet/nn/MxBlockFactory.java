@@ -65,27 +65,38 @@ public class MxBlockFactory implements BlockFactory {
         return manager;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Activation activation() {
         return new MxActivation(manager);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Block createIdentityBlock() {
         return new LambdaBlock(manager, x -> x);
     }
 
+    /** {@inheritDoc} */
     @Override
     public SequentialBlock createSequential() {
         return new SequentialBlock(manager);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public ParallelBlock createParallel(
-            List<Block> blocks, Function<List<NDList>, NDList> function) {
-        return new ParallelBlock(manager, blocks, function);
+    public ParallelBlock createParallel(Function<List<NDList>, NDList> function) {
+        return new ParallelBlock(manager, function);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public ParallelBlock createParallel(
+            Function<List<NDList>, NDList> function, List<Block> blocks) {
+        return new ParallelBlock(manager, function, blocks);
+    }
+
+    /** {@inheritDoc} */
     @Override
     public LambdaBlock createLambda(Function<NDList, NDList> lambda) {
         return new LambdaBlock(manager, lambda);

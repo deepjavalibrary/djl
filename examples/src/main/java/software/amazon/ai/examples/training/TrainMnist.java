@@ -25,7 +25,6 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.BlockFactory;
-import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
@@ -61,13 +60,12 @@ public final class TrainMnist {
     }
 
     public static Block constructBlock(BlockFactory factory) {
-        SequentialBlock mlp = factory.createSequential();
-        mlp.add(new Linear.Builder().setFactory(factory).setOutChannels(128).build());
-        mlp.add(factory.activation().reluBlock());
-        mlp.add(new Linear.Builder().setFactory(factory).setOutChannels(64).build());
-        mlp.add(factory.activation().reluBlock());
-        mlp.add(new Linear.Builder().setFactory(factory).setOutChannels(10).build());
-        return mlp;
+        return factory.createSequential()
+                .add(new Linear.Builder().setFactory(factory).setOutChannels(128).build())
+                .add(factory.activation().reluBlock())
+                .add(new Linear.Builder().setFactory(factory).setOutChannels(64).build())
+                .add(factory.activation().reluBlock())
+                .add(new Linear.Builder().setFactory(factory).setOutChannels(10).build());
     }
 
     public static void trainMnist(Arguments arguments) throws IOException, TranslateException {

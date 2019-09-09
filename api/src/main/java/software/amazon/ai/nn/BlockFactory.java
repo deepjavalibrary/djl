@@ -40,7 +40,9 @@ public interface BlockFactory {
 
     SequentialBlock createSequential();
 
-    ParallelBlock createParallel(List<Block> blocks, Function<List<NDList>, NDList> function);
+    ParallelBlock createParallel(Function<List<NDList>, NDList> function);
+
+    ParallelBlock createParallel(Function<List<NDList>, NDList> function, List<Block> blocks);
 
     LambdaBlock createLambda(Function<NDList, NDList> lambda);
 

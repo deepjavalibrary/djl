@@ -47,113 +47,113 @@ public final class ResNetV1 {
         SequentialBlock resUnit = factory.createSequential();
         if (bottleneck) {
             resUnit.add(
-                    new Conv2D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(1, 1))
-                            .setNumFilters(numFilters / 4)
-                            .setStride(stride)
-                            .setPad(new Shape(0, 0))
-                            .setBias(false)
-                            .build());
-            resUnit.add(
-                    new BatchNorm.Builder()
-                            .setFactory(factory)
-                            .setEpsilon(2E-5f)
-                            .setMomentum(batchNormMomentum)
-                            .build());
-            resUnit.add(factory.activation().reluBlock());
-            resUnit.add(
-                    new Conv2D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(3, 3))
-                            .setNumFilters(numFilters / 4)
-                            .setStride(new Shape(1, 1))
-                            .setPad(new Shape(1, 1))
-                            .setBias(false)
-                            .build());
-            resUnit.add(
-                    new BatchNorm.Builder()
-                            .setFactory(factory)
-                            .setEpsilon(2E-5f)
-                            .setMomentum(batchNormMomentum)
-                            .build());
-            resUnit.add(factory.activation().reluBlock());
-            resUnit.add(
-                    new Conv2D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(1, 1))
-                            .setNumFilters(numFilters)
-                            .setStride(new Shape(1, 1))
-                            .setPad(new Shape(0, 0))
-                            .setBias(false)
-                            .build());
-            resUnit.add(
-                    new BatchNorm.Builder()
-                            .setFactory(factory)
-                            .setEpsilon(2E-5f)
-                            .setMomentum(batchNormMomentum)
-                            .build());
+                            new Conv2D.Builder()
+                                    .setFactory(factory)
+                                    .setKernel(new Shape(1, 1))
+                                    .setNumFilters(numFilters / 4)
+                                    .setStride(stride)
+                                    .setPad(new Shape(0, 0))
+                                    .setBias(false)
+                                    .build())
+                    .add(
+                            new BatchNorm.Builder()
+                                    .setFactory(factory)
+                                    .setEpsilon(2E-5f)
+                                    .setMomentum(batchNormMomentum)
+                                    .build())
+                    .add(factory.activation().reluBlock())
+                    .add(
+                            new Conv2D.Builder()
+                                    .setFactory(factory)
+                                    .setKernel(new Shape(3, 3))
+                                    .setNumFilters(numFilters / 4)
+                                    .setStride(new Shape(1, 1))
+                                    .setPad(new Shape(1, 1))
+                                    .setBias(false)
+                                    .build())
+                    .add(
+                            new BatchNorm.Builder()
+                                    .setFactory(factory)
+                                    .setEpsilon(2E-5f)
+                                    .setMomentum(batchNormMomentum)
+                                    .build())
+                    .add(factory.activation().reluBlock())
+                    .add(
+                            new Conv2D.Builder()
+                                    .setFactory(factory)
+                                    .setKernel(new Shape(1, 1))
+                                    .setNumFilters(numFilters)
+                                    .setStride(new Shape(1, 1))
+                                    .setPad(new Shape(0, 0))
+                                    .setBias(false)
+                                    .build())
+                    .add(
+                            new BatchNorm.Builder()
+                                    .setFactory(factory)
+                                    .setEpsilon(2E-5f)
+                                    .setMomentum(batchNormMomentum)
+                                    .build());
 
         } else {
             resUnit.add(
-                    new Conv2D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(3, 3))
-                            .setNumFilters(numFilters)
-                            .setStride(stride)
-                            .setPad(new Shape(1, 1))
-                            .setBias(false)
-                            .build());
-            resUnit.add(
-                    new BatchNorm.Builder()
-                            .setFactory(factory)
-                            .setEpsilon(2E-5f)
-                            .setMomentum(batchNormMomentum)
-                            .build());
-            resUnit.add(factory.activation().reluBlock());
-            resUnit.add(
-                    new Conv2D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(3, 3))
-                            .setNumFilters(numFilters)
-                            .setStride(new Shape(1, 1))
-                            .setPad(new Shape(1, 1))
-                            .setBias(false)
-                            .build());
-            resUnit.add(
-                    new BatchNorm.Builder()
-                            .setFactory(factory)
-                            .setEpsilon(2E-5f)
-                            .setMomentum(batchNormMomentum)
-                            .build());
+                            new Conv2D.Builder()
+                                    .setFactory(factory)
+                                    .setKernel(new Shape(3, 3))
+                                    .setNumFilters(numFilters)
+                                    .setStride(stride)
+                                    .setPad(new Shape(1, 1))
+                                    .setBias(false)
+                                    .build())
+                    .add(
+                            new BatchNorm.Builder()
+                                    .setFactory(factory)
+                                    .setEpsilon(2E-5f)
+                                    .setMomentum(batchNormMomentum)
+                                    .build())
+                    .add(factory.activation().reluBlock())
+                    .add(
+                            new Conv2D.Builder()
+                                    .setFactory(factory)
+                                    .setKernel(new Shape(3, 3))
+                                    .setNumFilters(numFilters)
+                                    .setStride(new Shape(1, 1))
+                                    .setPad(new Shape(1, 1))
+                                    .setBias(false)
+                                    .build())
+                    .add(
+                            new BatchNorm.Builder()
+                                    .setFactory(factory)
+                                    .setEpsilon(2E-5f)
+                                    .setMomentum(batchNormMomentum)
+                                    .build());
         }
         SequentialBlock shortcut = factory.createSequential();
         if (dimMatch) {
             shortcut.add(factory.createIdentityBlock());
         } else {
             shortcut.add(
-                    new Conv2D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(1, 1))
-                            .setNumFilters(numFilters)
-                            .setStride(stride)
-                            .setPad(new Shape(0, 0))
-                            .setBias(false)
-                            .build());
-            shortcut.add(
-                    new BatchNorm.Builder()
-                            .setFactory(factory)
-                            .setEpsilon(2E-5f)
-                            .setMomentum(batchNormMomentum)
-                            .build());
+                            new Conv2D.Builder()
+                                    .setFactory(factory)
+                                    .setKernel(new Shape(1, 1))
+                                    .setNumFilters(numFilters)
+                                    .setStride(stride)
+                                    .setPad(new Shape(0, 0))
+                                    .setBias(false)
+                                    .build())
+                    .add(
+                            new BatchNorm.Builder()
+                                    .setFactory(factory)
+                                    .setEpsilon(2E-5f)
+                                    .setMomentum(batchNormMomentum)
+                                    .build());
         }
         return factory.createParallel(
-                Arrays.asList(resUnit, shortcut),
                 list -> {
                     NDList unit = list.get(0);
                     NDList parallel = list.get(1);
                     return new NDList(unit.head().add(parallel.head()));
-                });
+                },
+                Arrays.asList(resUnit, shortcut));
     }
 
     public static Block resnet(Builder builder) {
@@ -163,46 +163,46 @@ public final class ResNetV1 {
         SequentialBlock resNet = factory.createSequential();
         if (height <= 32) {
             resNet.add(
-                    new Conv2D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(3, 3))
-                            .setNumFilters(builder.filters[0])
-                            .setStride(new Shape(1, 1))
-                            .setPad(new Shape(1, 1))
-                            .setBias(false)
-                            .build());
-            resNet.add(
-                    new BatchNorm.Builder()
-                            .setFactory(factory)
-                            .setEpsilon(2E-5f)
-                            .setMomentum(builder.batchNormMomentum)
-                            .build());
+                            new Conv2D.Builder()
+                                    .setFactory(factory)
+                                    .setKernel(new Shape(3, 3))
+                                    .setNumFilters(builder.filters[0])
+                                    .setStride(new Shape(1, 1))
+                                    .setPad(new Shape(1, 1))
+                                    .setBias(false)
+                                    .build())
+                    .add(
+                            new BatchNorm.Builder()
+                                    .setFactory(factory)
+                                    .setEpsilon(2E-5f)
+                                    .setMomentum(builder.batchNormMomentum)
+                                    .build());
         } else {
             resNet.add(
-                    new Conv2D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(7, 7))
-                            .setNumFilters(builder.filters[0])
-                            .setStride(new Shape(2, 2))
-                            .setPad(new Shape(3, 3))
-                            .setBias(false)
-                            .build());
-            resNet.add(
-                    new BatchNorm.Builder()
-                            .setFactory(factory)
-                            .setEpsilon(2E-5f)
-                            .setMomentum(builder.batchNormMomentum)
-                            .build());
-            resNet.add(factory.activation().reluBlock());
-            resNet.add(
-                    factory.createLambda(
-                            arrays ->
-                                    new NDList(
-                                            Pool.maxPool(
-                                                    arrays.head(),
-                                                    new Shape(3, 3),
-                                                    new Shape(2, 2),
-                                                    new Shape(1, 1)))));
+                            new Conv2D.Builder()
+                                    .setFactory(factory)
+                                    .setKernel(new Shape(7, 7))
+                                    .setNumFilters(builder.filters[0])
+                                    .setStride(new Shape(2, 2))
+                                    .setPad(new Shape(3, 3))
+                                    .setBias(false)
+                                    .build())
+                    .add(
+                            new BatchNorm.Builder()
+                                    .setFactory(factory)
+                                    .setEpsilon(2E-5f)
+                                    .setMomentum(builder.batchNormMomentum)
+                                    .build())
+                    .add(factory.activation().reluBlock())
+                    .add(
+                            factory.createLambda(
+                                    arrays ->
+                                            new NDList(
+                                                    Pool.maxPool(
+                                                            arrays.head(),
+                                                            new Shape(3, 3),
+                                                            new Shape(2, 2),
+                                                            new Shape(1, 1)))));
         }
         Shape resStride = new Shape(1, 1);
         for (int i = 0; i < numStages; i++) {
@@ -228,22 +228,26 @@ public final class ResNetV1 {
                 resStride = new Shape(2, 2);
             }
         }
-        resNet.add(
-                factory.createLambda(
-                        arrays ->
-                                new NDList(
-                                        Pool.globalAvgPool(
-                                                arrays.head(), new Shape(1, 1), new Shape(0, 0)))));
-        resNet.add(
-                factory.createLambda(
-                        arrays -> {
-                            long batch = arrays.head().getShape().get(0);
-                            return new NDList(arrays.head().reshape(batch, -1));
-                        }));
-        resNet.add(
-                new Linear.Builder().setFactory(factory).setOutChannels(builder.outSize).build());
-        resNet.add(factory.createLambda(arrays -> new NDList(arrays.head().softmax(0))));
-        return resNet;
+        return resNet.add(
+                        factory.createLambda(
+                                arrays ->
+                                        new NDList(
+                                                Pool.globalAvgPool(
+                                                        arrays.head(),
+                                                        new Shape(1, 1),
+                                                        new Shape(0, 0)))))
+                .add(
+                        factory.createLambda(
+                                arrays -> {
+                                    long batch = arrays.head().getShape().get(0);
+                                    return new NDList(arrays.head().reshape(batch, -1));
+                                }))
+                .add(
+                        new Linear.Builder()
+                                .setFactory(factory)
+                                .setOutChannels(builder.outSize)
+                                .build())
+                .add(factory.createLambda(arrays -> new NDList(arrays.head().softmax(0))));
     }
 
     public static final class Builder {

@@ -15,6 +15,9 @@ package software.amazon.ai.nn;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -34,11 +37,41 @@ public class ParallelBlock extends AbstractBlock {
     private List<Block> blocks;
     private Function<List<NDList>, NDList> function;
 
-    public ParallelBlock(
-            NDManager manager, List<Block> blocks, Function<List<NDList>, NDList> function) {
+    public ParallelBlock(NDManager manager, Function<List<NDList>, NDList> function) {
         super(manager);
-        this.blocks = blocks;
         this.function = function;
+        blocks = new ArrayList<>();
+    }
+
+    public ParallelBlock(
+            NDManager manager, Function<List<NDList>, NDList> function, List<Block> blocks) {
+        super(manager);
+        this.function = function;
+        this.blocks = blocks;
+    }
+
+    public ParallelBlock addAll(Block... blocks) {
+        this.blocks.addAll(Arrays.asList(blocks));
+        initialized = false;
+        return this;
+    }
+
+    public ParallelBlock addAll(Collection<Block> blocks) {
+        this.blocks.addAll(blocks);
+        initialized = false;
+        return this;
+    }
+
+    public ParallelBlock add(Block block) {
+        blocks.add(block);
+        initialized = false;
+        return this;
+    }
+
+    public ParallelBlock add(Function<NDList, NDList> f) {
+        blocks.add(new LambdaBlock(manager, f));
+        initialized = false;
+        return this;
     }
 
     @Override
