@@ -23,13 +23,11 @@ public final class DataLoadingConfiguration {
     private ExecutorService executor;
     private Batchifier batchifier;
     private boolean pinMemory;
-    private boolean dropLast;
 
     private DataLoadingConfiguration(Builder builder) {
         this.executor = builder.executor;
         this.batchifier = builder.batchifier;
         this.pinMemory = builder.pinMemory;
-        this.dropLast = builder.dropLast;
     }
 
     public ExecutorService getExecutor() {
@@ -44,19 +42,13 @@ public final class DataLoadingConfiguration {
         return pinMemory;
     }
 
-    public boolean getDropLast() {
-        return dropLast;
-    }
-
     public static final class Builder {
         private ExecutorService executor;
         private Batchifier batchifier;
         private boolean pinMemory;
-        private boolean dropLast;
 
         public Builder() {
             this.pinMemory = false;
-            this.dropLast = false;
         }
 
         public Builder setExcutor(ExecutorService executor) {
@@ -71,11 +63,6 @@ public final class DataLoadingConfiguration {
 
         public Builder setPinMemory(boolean pinMemory) {
             this.pinMemory = pinMemory;
-            return this;
-        }
-
-        public Builder setDropLast(boolean dropLast) {
-            this.dropLast = dropLast;
             return this;
         }
 
