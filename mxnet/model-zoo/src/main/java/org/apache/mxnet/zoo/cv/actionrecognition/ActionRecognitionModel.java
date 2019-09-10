@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.zoo.cv.image_segmentation;
+package org.apache.mxnet.zoo.cv.actionrecognition;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,22 +27,21 @@ import software.amazon.ai.repository.Metadata;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.repository.VersionRange;
 
-public class InstanceSegmentationModel {
-
-    private static final String ARTIFACT_ID = "mask_rcnn";
-    private static final MRL MASK_RCNN =
-            new MRL(MRL.Model.CV.INSTANCE_SEGMENTATION, ModelZoo.GROUP_ID, ARTIFACT_ID);
+public class ActionRecognitionModel {
+    private static final String ARTIFACT_ID = "inception";
+    private static final MRL INCEPTION =
+            new MRL(MRL.Model.CV.ACTION_RECOGNITION, ModelZoo.GROUP_ID, ARTIFACT_ID);
 
     private Repository repository;
     private Metadata metadata;
 
-    public InstanceSegmentationModel(Repository repository) {
+    public ActionRecognitionModel(Repository repository) {
         this.repository = repository;
     }
 
     private void locateMetadata() throws IOException, ModelNotFoundException {
         if (metadata == null) {
-            metadata = repository.locate(MASK_RCNN);
+            metadata = repository.locate(INCEPTION);
             if (metadata == null) {
                 throw new ModelNotFoundException("Simple Pose Models not found.");
             }
@@ -61,7 +60,7 @@ public class InstanceSegmentationModel {
         String relativePath = artifact.getResourceUri().getPath();
         Path modelPath = dir.resolve(relativePath);
         Model model = Model.load(modelPath, artifact.getName());
-        return new ZooModel<>(model, new InstanceSegementationTranslator());
+        return new ZooModel<>(model, new ActionRecognitionTranslator());
     }
 
     public Artifact match(Map<String, String> criteria) {

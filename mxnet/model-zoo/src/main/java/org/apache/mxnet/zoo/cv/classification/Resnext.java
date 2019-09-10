@@ -10,20 +10,16 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.zoo.cv.action_recognition;
+package org.apache.mxnet.zoo.cv.classification;
 
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.translate.Translator;
-import software.amazon.ai.translate.TranslatorContext;
+import software.amazon.ai.repository.Repository;
 
-public class ActionRecognitionTranslator implements Translator<NDList, NDList> {
-    @Override
-    public NDList processOutput(TranslatorContext ctx, NDList list) throws Exception {
-        return null;
-    }
+public class Resnext extends ImageNetModel {
 
-    @Override
-    public NDList processInput(TranslatorContext ctx, NDList input) throws Exception {
-        return null;
+    private static final String ARTIFACT_ID = "resnext";
+    private static final String VERSION = "0.0.1";
+
+    public Resnext(Repository repository) {
+        super(repository, ARTIFACT_ID, VERSION);
     }
 }

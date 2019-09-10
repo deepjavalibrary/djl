@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package org.apache.mxnet.zoo.cv.image_classification;
+package org.apache.mxnet.zoo.cv.classification;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

@@ -44,7 +44,7 @@ import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.learningrate.LrTracker;
 import software.amazon.ai.util.PairList;
-import software.amazon.ai.zoo.cv.image_classification.ResNetV1;
+import software.amazon.ai.zoo.cv.classification.ResNetV1;
 
 public class GradientCollectorIntegrationTest {
 

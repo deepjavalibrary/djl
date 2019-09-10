@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.zoo.cv.image_segmentation;
+package org.apache.mxnet.zoo.cv.segmentation;
 
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.translate.Translator;

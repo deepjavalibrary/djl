@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.zoo.cv.image_classification;
+package software.amazon.ai.zoo.cv.classification;
 
 import java.util.Arrays;
 import software.amazon.ai.ndarray.NDList;

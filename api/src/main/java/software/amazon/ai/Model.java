@@ -175,7 +175,7 @@ public interface Model extends AutoCloseable {
             TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer);
 
     /**
-     * * Creates a new {@link Trainer} instance for a Model.
+     * Creates a new {@link Trainer} instance for a Model.
      *
      * @param trainTranslator the translator for pre-processing and post-processing
      * @param optimizer optimizer used to train this model

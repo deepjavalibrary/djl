@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package org.apache.mxnet.zoo.cv.pose_estimation;
+package org.apache.mxnet.zoo.cv.poseestimation;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;

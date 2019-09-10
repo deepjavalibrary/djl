@@ -12,14 +12,14 @@
  */
 package org.apache.mxnet.zoo;
 
-import org.apache.mxnet.zoo.cv.action_recognition.ActionRecognitionModel;
-import org.apache.mxnet.zoo.cv.image_classification.Resnet;
-import org.apache.mxnet.zoo.cv.image_classification.Resnext;
-import org.apache.mxnet.zoo.cv.image_classification.SeResnext;
-import org.apache.mxnet.zoo.cv.image_classification.Senet;
-import org.apache.mxnet.zoo.cv.image_segmentation.InstanceSegmentationModel;
+import org.apache.mxnet.zoo.cv.actionrecognition.ActionRecognitionModel;
+import org.apache.mxnet.zoo.cv.classification.Resnet;
+import org.apache.mxnet.zoo.cv.classification.Resnext;
+import org.apache.mxnet.zoo.cv.classification.SeResnext;
+import org.apache.mxnet.zoo.cv.classification.Senet;
 import org.apache.mxnet.zoo.cv.objectdetection.SingleShotDetection;
-import org.apache.mxnet.zoo.cv.pose_estimation.SimplePoseModel;
+import org.apache.mxnet.zoo.cv.poseestimation.SimplePoseModel;
+import org.apache.mxnet.zoo.cv.segmentation.InstanceSegmentationModel;
 import software.amazon.ai.repository.Repository;
 
 public interface ModelZoo {
