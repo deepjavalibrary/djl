@@ -16,6 +16,7 @@ import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.nn.Parameter;
 
 public final class Assertions {
 
@@ -72,6 +73,13 @@ public final class Assertions {
             throws FailedTestException {
         if (expected != actual) {
             throw new FailedTestException(errorMessage);
+        }
+    }
+
+    public static void assertEquals(Parameter expected, Parameter actual)
+            throws FailedTestException {
+        if (!expected.equals(actual)) {
+            throw new FailedTestException("Two Parameters are different!");
         }
     }
 

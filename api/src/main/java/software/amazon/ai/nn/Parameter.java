@@ -230,4 +230,23 @@ public class Parameter implements AutoCloseable {
     public void close() {
         array.close();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Parameter parameter = (Parameter) o;
+        return Objects.equals(name, parameter.name)
+                && type == parameter.type
+                && Objects.equals(array, parameter.array);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, array);
+    }
 }
