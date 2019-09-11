@@ -21,7 +21,7 @@ public interface LSTM extends RecurrentCell {
 
         /** {@inheritDoc} */
         @Override
-        public Builder self() {
+        protected Builder self() {
             return this;
         }
 

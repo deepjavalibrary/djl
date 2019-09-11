@@ -87,6 +87,6 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
             return self();
         }
 
-        public abstract T self();
+        protected abstract T self();
     }
 }

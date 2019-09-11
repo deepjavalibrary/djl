@@ -33,6 +33,7 @@ import software.amazon.ai.util.PairList;
 
 /** A dataset for loading image files stored in a folder structure. */
 public class ImageFolder extends RandomAccessDataset<String, Integer> {
+
     private static final String[] EXT = {".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"};
     private static final Logger logger = LoggerFactory.getLogger(ImageFolder.class);
 
@@ -40,7 +41,7 @@ public class ImageFolder extends RandomAccessDataset<String, Integer> {
     private List<String> synsets;
     private PairList<String, Integer> items;
 
-    public ImageFolder(BaseBuilder<?> builder) {
+    public ImageFolder(Builder builder) {
         super(builder);
         this.flag = builder.getFlag();
         this.synsets = new ArrayList<>();
@@ -92,18 +93,21 @@ public class ImageFolder extends RandomAccessDataset<String, Integer> {
         return new DefaultTranslator();
     }
 
-    @SuppressWarnings("rawtypes")
-    public abstract static class BaseBuilder<B extends BaseBuilder>
-            extends RandomAccessDataset.BaseBuilder<B> {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private MxImages.Flag flag = Flag.COLOR;
         private String root;
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
 
         public Flag getFlag() {
             return flag;
         }
 
-        public B optFlag(Flag flag) {
+        public Builder optFlag(Flag flag) {
             this.flag = flag;
             return self();
         }
@@ -112,17 +116,9 @@ public class ImageFolder extends RandomAccessDataset<String, Integer> {
             return root;
         }
 
-        public B setRoot(String root) {
+        public Builder setRoot(String root) {
             this.root = root;
             return self();
-        }
-    }
-
-    public static class Builder extends BaseBuilder<Builder> {
-
-        @Override
-        public Builder self() {
-            return this;
         }
 
         public ImageFolder build() {
@@ -133,18 +129,17 @@ public class ImageFolder extends RandomAccessDataset<String, Integer> {
     private class DefaultTranslator implements TrainTranslator<String, Integer, NDList> {
 
         @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) throws Exception {
+        public NDList processOutput(TranslatorContext ctx, NDList list) {
             return null;
         }
 
         @Override
-        public NDList processInput(TranslatorContext ctx, String input) throws Exception {
+        public NDList processInput(TranslatorContext ctx, String input) {
             return new NDList(MxImages.read(ctx.getNDManager(), input, flag));
         }
 
         @Override
-        public Record processInput(TranslatorContext ctx, String input, Integer label)
-                throws Exception {
+        public Record processInput(TranslatorContext ctx, String input, Integer label) {
             NDList i = new NDList(MxImages.read(ctx.getNDManager(), input, flag));
             NDList l = new NDList(ctx.getNDManager().create(label));
             return new Record(i, l);

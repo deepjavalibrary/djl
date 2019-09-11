@@ -21,7 +21,7 @@ public interface Conv2D extends Convolution {
 
         /** {@inheritDoc} */
         @Override
-        public Builder self() {
+        protected Builder self() {
             return this;
         }
 

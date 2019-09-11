@@ -26,6 +26,7 @@ import software.amazon.ai.util.Pair;
  * <p>The following is an example of how to use ArrayDataset:
  *
  * <pre>
+ *     ArrayDataset.Builder builder = new Arrayset.Builder()
  *     ArrayDataset dataset = new ArrayDataset(
  *                      new NDArray[]{data1, data2},
  *                      new NDArray[]{label1, label2, label3},
@@ -41,10 +42,10 @@ public class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
     protected NDArray[] data;
     protected NDArray[] labels;
 
-    public ArrayDataset(RandomAccessDataset.BaseBuilder<?> builder) {
+    public ArrayDataset(BaseBuilder<?> builder) {
         super(builder);
-        if (builder instanceof BaseBuilder<?>) {
-            BaseBuilder<?> builder2 = (BaseBuilder<?>) builder;
+        if (builder instanceof Builder) {
+            Builder builder2 = (Builder) builder;
             data = builder2.getData();
             labels = builder2.getLabels();
 
@@ -79,7 +80,7 @@ public class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
         return new Pair<>(datum, label);
     }
 
-    public static class DefaultTranslator implements TrainTranslator<NDList, NDList, NDList> {
+    public static final class DefaultTranslator implements TrainTranslator<NDList, NDList, NDList> {
 
         @Override
         public NDList processOutput(TranslatorContext ctx, NDList list) {
@@ -98,22 +99,26 @@ public class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
     }
 
     @SuppressWarnings("rawtypes")
-    public abstract static class BaseBuilder<B extends BaseBuilder>
-            extends RandomAccessDataset.BaseBuilder<B> {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private NDArray[] data;
         private NDArray[] labels;
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
 
         public NDArray[] getData() {
             return data;
         }
 
-        public B setData(NDArray data) {
+        public Builder setData(NDArray data) {
             this.data = new NDArray[] {data};
             return self();
         }
 
-        public B setData(NDArray[] data) {
+        public Builder setData(NDArray[] data) {
             this.data = data;
             return self();
         }
@@ -122,22 +127,14 @@ public class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
             return labels;
         }
 
-        public B optLabels(NDArray labels) {
+        public Builder optLabels(NDArray labels) {
             this.labels = new NDArray[] {labels};
             return self();
         }
 
-        public B optLabels(NDArray[] labels) {
+        public Builder optLabels(NDArray[] labels) {
             this.labels = labels;
             return self();
-        }
-    }
-
-    public static class Builder extends BaseBuilder<Builder> {
-
-        @Override
-        public Builder self() {
-            return this;
         }
 
         public ArrayDataset build() {

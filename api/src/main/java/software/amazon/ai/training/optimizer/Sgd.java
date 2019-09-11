@@ -24,7 +24,7 @@ public interface Sgd extends Optimizer {
         private boolean lazyUpdate = true;
 
         @Override
-        Builder self() {
+        protected Builder self() {
             return this;
         }
 

@@ -171,6 +171,6 @@ public interface RecurrentCell extends Block {
             return self();
         }
 
-        public abstract T self();
+        protected abstract T self();
     }
 }

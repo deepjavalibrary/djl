@@ -42,7 +42,7 @@ public interface Nag extends Optimizer {
         }
 
         @Override
-        public Builder self() {
+        protected Builder self() {
             return this;
         }
 

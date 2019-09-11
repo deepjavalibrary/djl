@@ -24,7 +24,6 @@ import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.dataset.ArrayDataset;
-import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.util.Utils;
 
 /**
@@ -136,12 +135,17 @@ public final class Mnist extends ArrayDataset implements ZooDataset<NDList, NDLi
         }
     }
 
-    public static class Builder extends RandomAccessDataset.BaseBuilder<Builder> {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private NDManager manager;
         private Repository repository = Datasets.REPOSITORY;
         private Artifact artifact;
         private Usage usage;
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
 
         public Builder setManager(NDManager manager) {
             this.manager = manager;
@@ -160,11 +164,6 @@ public final class Mnist extends ArrayDataset implements ZooDataset<NDList, NDLi
 
         public Builder setUsage(Usage usage) {
             this.usage = usage;
-            return this;
-        }
-
-        @Override
-        public Builder self() {
             return this;
         }
 

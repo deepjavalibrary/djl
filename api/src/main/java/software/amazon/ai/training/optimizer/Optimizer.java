@@ -81,6 +81,6 @@ public interface Optimizer {
             return beginNumUpdate;
         }
 
-        abstract T self();
+        protected abstract T self();
     }
 }
