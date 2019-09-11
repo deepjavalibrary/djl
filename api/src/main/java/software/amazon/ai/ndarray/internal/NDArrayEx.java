@@ -13,6 +13,7 @@
 package software.amazon.ai.ndarray.internal;
 
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.pooling.PoolingConvention;
 import software.amazon.ai.training.Activation;
@@ -224,6 +225,41 @@ public interface NDArrayEx {
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue);
 
     NDArray globalLpPool(Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue);
+
+    ////////////////////////////////////////
+    // Optimizer
+    ////////////////////////////////////////
+
+    void adamUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float beta1,
+            float beta2,
+            float epsilon,
+            boolean lazyUpdate);
+
+    void nagUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float momentum);
+
+    void sgdUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float momentum,
+            boolean lazyUpdate);
 
     ////////////////////////////////////////
     // Miscellaneous

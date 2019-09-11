@@ -12,15 +12,31 @@
  */
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.nn.BlockFactory;
+import java.util.Arrays;
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.util.PairList;
 
-/**
- * An optimizer updates a set of parameters based on gradients collected with a {@link
- * software.amazon.ai.training.GradientCollector}.
- */
-public interface Optimizer {
+/** MXNet helper containing base implementations for optimizers. */
+public abstract class Optimizer {
+
+    protected float rescaleGrad;
+    protected float clipGrad;
+    private float weightDecays;
+    private int numUpdate;
+    private boolean statesInitialized;
+    private int[] updateCounts;
+
+    public Optimizer(BaseBuilder<?> builder) {
+        this.rescaleGrad = builder.getRescaleGrad();
+        this.weightDecays = builder.getWeightDecays();
+        this.clipGrad = builder.getClipGrad();
+        this.numUpdate = builder.getBeginNumUpdate();
+
+        if (rescaleGrad == 0) {
+            throw new IllegalArgumentException("The rescaleGrad should be set");
+        }
+    }
 
     /**
      * Update a {@code PairList} of parameters one step at time. Assumes parameters are on the same
@@ -29,21 +45,43 @@ public interface Optimizer {
      *
      * @param parameters a {@code PairList} of parameters from network to update
      */
-    void updateAllParameters(PairList<String, Parameter> parameters);
+    public void updateAllParameters(PairList<String, Parameter> parameters) {
+        if (!statesInitialized) {
+            // ensure when create state is over ridden, statesCreated is updated
+            statesInitialized = initializeStates(parameters);
+        }
+        if (updateCounts == null) {
+            updateCounts = new int[parameters.size()];
+            Arrays.fill(updateCounts, numUpdate);
+        }
+        for (int i = 0; i < parameters.size(); i++) {
+            NDArray paramArray = parameters.get(i).getValue().getArray();
+            NDArray grad = paramArray.getGradient();
+            update(i, paramArray, grad);
+        }
+    }
+
+    protected float getWeightDecay(int index) {
+        return weightDecays;
+    }
+
+    protected int updateCount(int index) {
+        int count = ++updateCounts[index];
+        numUpdate = Math.max(numUpdate, count);
+        return count;
+    }
+
+    protected abstract void update(int index, NDArray weight, NDArray grad);
+
+    protected abstract boolean initializeStates(PairList<String, Parameter> parameters);
 
     @SuppressWarnings("rawtypes")
-    abstract class BaseBuilder<T extends BaseBuilder> {
+    public abstract static class BaseBuilder<T extends BaseBuilder> {
 
-        protected BlockFactory factory;
         private float rescaleGrad;
         private float weightDecays;
         private float clipGrad = -1;
         private int beginNumUpdate;
-
-        public T setFactory(BlockFactory factory) {
-            this.factory = factory;
-            return self();
-        }
 
         public T setRescaleGrad(float rescaleGrad) {
             this.rescaleGrad = rescaleGrad;

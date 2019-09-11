@@ -15,9 +15,6 @@ package org.apache.mxnet.nn;
 import java.util.List;
 import java.util.function.Function;
 import org.apache.mxnet.engine.MxNDManager;
-import org.apache.mxnet.engine.optimizer.MxAdam;
-import org.apache.mxnet.engine.optimizer.MxNag;
-import org.apache.mxnet.engine.optimizer.MxSgd;
 import org.apache.mxnet.nn.convolutional.MxConv1D;
 import org.apache.mxnet.nn.convolutional.MxConv2D;
 import org.apache.mxnet.nn.convolutional.MxConv3D;
@@ -47,10 +44,6 @@ import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.nn.recurrent.RNN;
 import software.amazon.ai.training.Activation;
-import software.amazon.ai.training.optimizer.Adam;
-import software.amazon.ai.training.optimizer.Adam.Builder;
-import software.amazon.ai.training.optimizer.Nag;
-import software.amazon.ai.training.optimizer.Sgd;
 
 @SuppressWarnings("PMD.CouplingBetweenObjects")
 public class MxBlockFactory implements BlockFactory {
@@ -166,27 +159,5 @@ public class MxBlockFactory implements BlockFactory {
     @Override
     public GRU createGru(GRU.Builder builder) {
         return new MxGRU(manager, builder);
-    }
-
-    ////////////////////////////////////////
-    // Optimizers
-    ////////////////////////////////////////
-
-    /** {@inheritDoc} */
-    @Override
-    public Sgd createSgd(Sgd.Builder builder) {
-        return new MxSgd(builder);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Nag createNag(Nag.Builder builder) {
-        return new MxNag(builder);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Adam createAdam(Builder builder) {
-        return new MxAdam(builder);
     }
 }

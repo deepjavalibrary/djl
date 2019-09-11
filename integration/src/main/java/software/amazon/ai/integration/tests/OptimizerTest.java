@@ -35,7 +35,7 @@ import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
-import software.amazon.ai.training.optimizer.learningrate.LrTracker;
+import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
 
 public class OptimizerTest {
 
@@ -59,9 +59,8 @@ public class OptimizerTest {
             Block block = block(factory);
             Optimizer optim =
                     new Sgd.Builder()
-                            .setFactory(factory)
                             .setRescaleGrad(1.0f / BATCH_SIZE)
-                            .setLrTracker(LrTracker.fixedLR(1E7f))
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(1E7f))
                             .build();
             NDArray result = runOptimizer(manager, block, optim);
             NDArray result2 = runOptimizer(manager, block, optim);
@@ -79,9 +78,8 @@ public class OptimizerTest {
             Block block = block(factory);
             Optimizer optim =
                     new Sgd.Builder()
-                            .setFactory(factory)
                             .setRescaleGrad(1.0f / BATCH_SIZE)
-                            .setLrTracker(LrTracker.fixedLR(1E7f))
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(1E7f))
                             .optMomentum(1E2f)
                             .build();
             NDArray result = runOptimizer(manager, block, optim);
@@ -100,9 +98,8 @@ public class OptimizerTest {
             Block block = block(factory);
             Optimizer optim =
                     new Nag.Builder()
-                            .setFactory(factory)
                             .setRescaleGrad(1.0f / BATCH_SIZE)
-                            .setLrTracker(LrTracker.fixedLR(1E7f))
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(1E7f))
                             .setMomentum(1E1f)
                             .build();
             NDArray result = runOptimizer(manager, block, optim);
@@ -120,7 +117,6 @@ public class OptimizerTest {
             Block block = block(factory);
             Optimizer optim =
                     new Adam.Builder()
-                            .setFactory(factory)
                             .setRescaleGrad(1.0f / BATCH_SIZE)
                             .optLearningRate(1E2f)
                             .build();

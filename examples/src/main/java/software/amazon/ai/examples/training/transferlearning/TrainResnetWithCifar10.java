@@ -76,12 +76,9 @@ public final class TrainResnetWithCifar10 {
     public static void trainCifar10(Model model) throws IOException, TranslateException {
         reconstructBlock(model);
 
-        BlockFactory factory = model.getBlockFactory();
-
         int batchSize = 50;
         int numEpoch = 2;
-        Optimizer optimizer =
-                new Adam.Builder().setFactory(factory).setRescaleGrad(1.0f / batchSize).build();
+        Optimizer optimizer = new Adam.Builder().setRescaleGrad(1.0f / batchSize).build();
         Cifar10 cifar10 =
                 new Cifar10.Builder()
                         .setManager(model.getNDManager())

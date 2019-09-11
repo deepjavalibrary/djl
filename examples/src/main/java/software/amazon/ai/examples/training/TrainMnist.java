@@ -38,7 +38,7 @@ import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
-import software.amazon.ai.training.optimizer.learningrate.LrTracker;
+import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
 import software.amazon.ai.translate.TranslateException;
 
 public final class TrainMnist {
@@ -78,9 +78,8 @@ public final class TrainMnist {
             model.setInitializer(new NormalInitializer(0.01));
             Optimizer optimizer =
                     new Sgd.Builder()
-                            .setFactory(factory)
                             .setRescaleGrad(1.0f / batchSize)
-                            .setLrTracker(LrTracker.fixedLR(0.01f))
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(0.01f))
                             .optMomentum(0.9f)
                             .build();
             Mnist mnist =

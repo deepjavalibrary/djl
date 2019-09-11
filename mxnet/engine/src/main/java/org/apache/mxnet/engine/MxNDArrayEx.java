@@ -353,6 +353,87 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     ////////////////////////////////////////
+    // Optimizer
+    ////////////////////////////////////////
+
+    /** {@inheritDoc} */
+    @Override
+    public void adamUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float beta1,
+            float beta2,
+            float epsilon,
+            boolean lazyUpdate) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("lr", learningRate);
+        params.addParam("wd", weightDecay);
+        params.addParam("rescale_grad", rescaleGrad);
+        params.addParam("clip_gradient", clipGrad);
+
+        params.addParam("beta1", beta1);
+        params.addParam("beta2", beta2);
+        params.addParam("epsilon", epsilon);
+        params.addParam("lazy_update", lazyUpdate);
+
+        manager.invoke("adam_update", inputs, weights, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void nagUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float momentum) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("lr", learningRate);
+        params.addParam("wd", weightDecay);
+        params.addParam("rescale_grad", rescaleGrad);
+        params.addParam("clip_gradient", clipGrad);
+
+        if (momentum != 0) {
+            params.addParam("momentum", momentum);
+            manager.invoke("nag_mom_update", inputs, weights, params);
+        } else {
+            manager.invoke("sgd_update", inputs, weights, params);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void sgdUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float momentum,
+            boolean lazyUpdate) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("lr", learningRate);
+        params.addParam("wd", weightDecay);
+        params.addParam("rescale_grad", rescaleGrad);
+        params.addParam("clip_gradient", clipGrad);
+        params.addParam("lazy_update", lazyUpdate);
+
+        if (momentum != 0) {
+            params.addParam("momentum", momentum);
+            manager.invoke("sgd_mom_update", inputs, weights, params);
+        } else {
+            manager.invoke("sgd_update", inputs, weights, params);
+        }
+    }
+
+    ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////
 

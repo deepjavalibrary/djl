@@ -15,7 +15,7 @@ package software.amazon.ai.training.optimizer.learningrate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FactorTracker extends LrTracker {
+public class FactorTracker extends LearningRateTracker {
 
     private static final Logger logger = LoggerFactory.getLogger(FactorTracker.class);
 

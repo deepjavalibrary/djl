@@ -12,9 +12,72 @@
  */
 package software.amazon.ai.training.optimizer;
 
-public interface Adam extends Optimizer {
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.util.PairList;
 
-    class Builder extends BaseBuilder<Builder> {
+public class Adam extends Optimizer {
+
+    private float learningRate;
+    private float beta1;
+    private float beta2;
+    private float epsilon;
+    private boolean lazyUpdate;
+
+    private NDList means;
+    private NDList variances;
+
+    protected Adam(Builder builder) {
+        super(builder);
+        learningRate = builder.getLearningRate();
+        beta1 = builder.getBeta1();
+        beta2 = builder.getBeta2();
+        epsilon = builder.getEpsilon();
+        lazyUpdate = builder.isLazyUpdate();
+    }
+
+    @Override
+    protected boolean initializeStates(PairList<String, Parameter> parameters) {
+        if (means == null) {
+            means = new NDList(parameters.size());
+            variances = new NDList(parameters.size());
+            for (Parameter param : parameters.values()) {
+                means.add(param.getArray().zerosLike());
+                variances.add(param.getArray().zerosLike());
+            }
+        }
+        return true;
+    }
+
+    @Override
+    protected void update(int index, NDArray weight, NDArray grad) {
+        double t = updateCount(index);
+        double coef1 = 1.0 - Math.pow(beta1, t);
+        double coef2 = 1.0 - Math.pow(beta2, t);
+        float newLearningRate = (float) (learningRate * Math.sqrt(coef2) / coef1);
+
+        float weightDecay = getWeightDecay(index);
+        NDList inputs = new NDList(weight, grad, means.get(index), variances.get(index));
+        NDList weights = new NDList(weight);
+
+        NDArrayEx ex = weight.getNDArrayInternal();
+
+        ex.adamUpdate(
+                inputs,
+                weights,
+                newLearningRate,
+                weightDecay,
+                rescaleGrad,
+                clipGrad,
+                beta1,
+                beta2,
+                epsilon,
+                lazyUpdate);
+    }
+
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private float learningRate = 0.001f;
         private float beta1 = 0.9f;
@@ -73,7 +136,7 @@ public interface Adam extends Optimizer {
         }
 
         public Adam build() {
-            return factory.createAdam(this);
+            return new Adam(this);
         }
     }
 }

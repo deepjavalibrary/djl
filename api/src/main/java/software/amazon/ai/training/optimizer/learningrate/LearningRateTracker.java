@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.training.optimizer.learningrate;
 
-public abstract class LrTracker {
+public abstract class LearningRateTracker {
 
     // TODO: Add abstraction on Joule level
     float baseLr;
@@ -32,7 +32,7 @@ public abstract class LrTracker {
      *     each step in equal increments 'constant' mode keeps lr at warmup_begin_lr for
      *     warmup_steps
      */
-    LrTracker(float baseLR, int warmupSteps, float warmupBeginLr, WarmupMode warmupMode) {
+    LearningRateTracker(float baseLR, int warmupSteps, float warmupBeginLr, WarmupMode warmupMode) {
         this.baseLr = baseLR;
         this.warmupSteps = warmupSteps;
         this.warmupBeginLr = warmupBeginLr;
@@ -49,7 +49,7 @@ public abstract class LrTracker {
 
     public abstract float getNewLearningRate(int numUpdate);
 
-    public static LrTracker fixedLR(float lr) {
-        return new FixedLr(lr);
+    public static LearningRateTracker fixedLR(float lr) {
+        return new FixedLearningRate(lr);
     }
 }

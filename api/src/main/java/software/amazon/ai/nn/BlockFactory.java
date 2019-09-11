@@ -27,9 +27,6 @@ import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.nn.recurrent.RNN;
 import software.amazon.ai.training.Activation;
-import software.amazon.ai.training.optimizer.Adam;
-import software.amazon.ai.training.optimizer.Nag;
-import software.amazon.ai.training.optimizer.Sgd;
 
 /** An internal to create Neural Network {@link Block}s. */
 public interface BlockFactory {
@@ -67,10 +64,4 @@ public interface BlockFactory {
     LSTM createLstm(LSTM.Builder builder);
 
     GRU createGru(GRU.Builder builder);
-
-    Sgd createSgd(Sgd.Builder builder);
-
-    Nag createNag(Nag.Builder builder);
-
-    Adam createAdam(Adam.Builder builder);
 }

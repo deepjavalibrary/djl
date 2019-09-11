@@ -12,14 +12,69 @@
  */
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.training.optimizer.learningrate.LrTracker;
+import java.util.ArrayList;
+import java.util.List;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
+import software.amazon.ai.util.PairList;
 
 /** An SGD optimizer. Build with {@link Sgd.Builder}. */
-public interface Sgd extends Optimizer {
+public class Sgd extends Optimizer {
 
-    class Builder extends BaseBuilder<Builder> {
+    private LearningRateTracker learningRateTracker;
+    private float momentum;
+    private boolean lazyUpdate;
+    private List<NDArray> momentumStates;
 
-        private LrTracker lrTracker;
+    protected Sgd(Builder builder) {
+        super(builder);
+        learningRateTracker = builder.getLearningRateTracker();
+        momentum = builder.getMomentum();
+        lazyUpdate = builder.isLazyUpdate();
+    }
+
+    @Override
+    protected boolean initializeStates(PairList<String, Parameter> parameters) {
+        if (momentum != 0f) {
+            momentumStates = new ArrayList<>(parameters.size());
+            for (Parameter param : parameters.values()) {
+                momentumStates.add(param.getArray().zerosLike());
+            }
+        }
+        return true;
+    }
+
+    @Override
+    protected void update(int index, NDArray weight, NDArray grad) {
+        // TODO: Support Mixed precision Sparse
+        float weightDecay = getWeightDecay(index);
+        float learningRate = learningRateTracker.getNewLearningRate(updateCount(index));
+        NDList inputs;
+        if (momentum != 0f) {
+            inputs = new NDList(weight, grad, momentumStates.get(index));
+        } else {
+            inputs = new NDList(weight, grad);
+        }
+        NDList weights = new NDList(weight);
+
+        NDArrayEx ex = weight.getNDArrayInternal();
+        ex.sgdUpdate(
+                inputs,
+                weights,
+                learningRate,
+                weightDecay,
+                rescaleGrad,
+                clipGrad,
+                momentum,
+                lazyUpdate);
+    }
+
+    public static final class Builder extends BaseBuilder<Builder> {
+
+        private LearningRateTracker learningRateTracker;
         private float momentum;
         private boolean lazyUpdate = true;
 
@@ -28,8 +83,8 @@ public interface Sgd extends Optimizer {
             return this;
         }
 
-        public Builder setLrTracker(LrTracker lrTracker) {
-            this.lrTracker = lrTracker;
+        public Builder setLearningRateTracker(LearningRateTracker learningRateTracker) {
+            this.learningRateTracker = learningRateTracker;
             return this;
         }
 
@@ -43,8 +98,8 @@ public interface Sgd extends Optimizer {
             return this;
         }
 
-        public LrTracker getLrTracker() {
-            return lrTracker;
+        public LearningRateTracker getLearningRateTracker() {
+            return learningRateTracker;
         }
 
         public float getMomentum() {
@@ -56,10 +111,10 @@ public interface Sgd extends Optimizer {
         }
 
         public Sgd build() {
-            if (lrTracker == null) {
+            if (learningRateTracker == null) {
                 throw new IllegalArgumentException("No lrTracker set");
             }
-            return factory.createSgd(this);
+            return new Sgd(this);
         }
     }
 }

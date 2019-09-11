@@ -42,7 +42,7 @@ import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
-import software.amazon.ai.training.optimizer.learningrate.LrTracker;
+import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
 import software.amazon.ai.util.PairList;
 import software.amazon.ai.zoo.cv.classification.ResNetV1;
 
@@ -99,9 +99,8 @@ public class GradientCollectorIntegrationTest {
 
             Optimizer optimizer =
                     new Sgd.Builder()
-                            .setFactory(factory)
                             .setRescaleGrad(1.0f / batchSize)
-                            .setLrTracker(LrTracker.fixedLR(.03f))
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(.03f))
                             .build();
             NDArray loss;
             LossMetric lossMetric = new LossMetric("l2loss");
@@ -160,9 +159,8 @@ public class GradientCollectorIntegrationTest {
             model.setInitializer(Initializer.ONES);
             Optimizer optimizer =
                     new Nag.Builder()
-                            .setFactory(factory)
                             .setRescaleGrad(1.0f / 100)
-                            .setLrTracker(LrTracker.fixedLR(0.1f))
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
                             .setMomentum(0.9f)
                             .build();
             NDArray input = manager.ones(new Shape(100, 1, 28, 28));

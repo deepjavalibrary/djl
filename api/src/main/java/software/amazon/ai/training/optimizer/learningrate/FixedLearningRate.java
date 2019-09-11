@@ -12,9 +12,9 @@
  */
 package software.amazon.ai.training.optimizer.learningrate;
 
-class FixedLr extends LrTracker {
+class FixedLearningRate extends LearningRateTracker {
 
-    public FixedLr(float baseLr) {
+    public FixedLearningRate(float baseLr) {
         super(baseLr, 0, baseLr, WarmupMode.CONSTANT);
     }
 

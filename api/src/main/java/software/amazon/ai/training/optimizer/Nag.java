@@ -13,18 +13,64 @@
 
 package software.amazon.ai.training.optimizer;
 
-import software.amazon.ai.training.optimizer.learningrate.LrTracker;
+import java.util.ArrayList;
+import java.util.List;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
+import software.amazon.ai.util.PairList;
 
 /** An NAG optimizer. Build with {@link Nag.Builder}. */
-public interface Nag extends Optimizer {
+public class Nag extends Optimizer {
 
-    class Builder extends BaseBuilder<Builder> {
+    private LearningRateTracker learningRateTracker;
+    private float momentum;
+    private List<NDArray> momentumStates;
 
-        private LrTracker lrTracker;
+    protected Nag(Builder builder) {
+        super(builder);
+        learningRateTracker = builder.getLearningRateTracker();
+        momentum = builder.getMomentum();
+    }
+
+    @Override
+    protected boolean initializeStates(PairList<String, Parameter> parameters) {
+        if (momentum != 0f) {
+            momentumStates = new ArrayList<>(parameters.size());
+            for (Parameter param : parameters.values()) {
+                momentumStates.add(param.getArray().zerosLike());
+            }
+        }
+        return true;
+    }
+
+    @Override
+    protected void update(int index, NDArray weight, NDArray grad) {
+        // TODO: Support Mixed precision Sparse
+        float newLearningRate = learningRateTracker.getNewLearningRate(updateCount(index));
+        float weightDecay = getWeightDecay(index);
+        NDList inputs;
+        if (momentum != 0f) {
+            inputs = new NDList(weight, grad, momentumStates.get(index));
+        } else {
+            inputs = new NDList(weight, grad);
+        }
+        NDList weights = new NDList(weight);
+
+        NDArrayEx ex = weight.getNDArrayInternal();
+        ex.nagUpdate(
+                inputs, weights, newLearningRate, weightDecay, rescaleGrad, clipGrad, momentum);
+    }
+
+    public static final class Builder extends BaseBuilder<Builder> {
+
+        private LearningRateTracker learningRateTracker;
         private float momentum;
 
-        public Builder setLrTracker(LrTracker lrTracker) {
-            this.lrTracker = lrTracker;
+        public Builder setLearningRateTracker(LearningRateTracker learningRateTracker) {
+            this.learningRateTracker = learningRateTracker;
             return this;
         }
 
@@ -33,8 +79,8 @@ public interface Nag extends Optimizer {
             return this;
         }
 
-        public LrTracker getLrTracker() {
-            return lrTracker;
+        public LearningRateTracker getLearningRateTracker() {
+            return learningRateTracker;
         }
 
         public float getMomentum() {
@@ -47,13 +93,13 @@ public interface Nag extends Optimizer {
         }
 
         public Nag build() {
-            if (lrTracker == null) {
+            if (learningRateTracker == null) {
                 throw new IllegalArgumentException("No lrTracker set");
             }
             if (momentum == 0) {
                 throw new IllegalArgumentException("The momentum should be set");
             }
-            return factory.createNag(this);
+            return new Nag(this);
         }
     }
 }
