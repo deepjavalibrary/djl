@@ -14,7 +14,7 @@ package org.apache.mxnet.zoo.cv.classification;
 
 import software.amazon.ai.repository.Repository;
 
-public class SeResnext extends ImageNetModel {
+public class SeResnext extends ImageNetBaseModelLoader {
 
     private static final String ARTIFACT_ID = "se_resnext";
     private static final String VERSION = "0.0.1";

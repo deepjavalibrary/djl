@@ -14,7 +14,7 @@ package org.apache.mxnet.zoo.cv.classification;
 
 import software.amazon.ai.repository.Repository;
 
-public class Senet extends ImageNetModel {
+public class Senet extends ImageNetBaseModelLoader {
 
     private static final String ARTIFACT_ID = "senet";
     private static final String VERSION = "0.0.1";

@@ -12,14 +12,14 @@
  */
 package org.apache.mxnet.zoo;
 
-import org.apache.mxnet.zoo.cv.actionrecognition.ActionRecognitionModel;
+import org.apache.mxnet.zoo.cv.actionrecognition.ActionRecognitionModelLoader;
 import org.apache.mxnet.zoo.cv.classification.Resnet;
 import org.apache.mxnet.zoo.cv.classification.Resnext;
 import org.apache.mxnet.zoo.cv.classification.SeResnext;
 import org.apache.mxnet.zoo.cv.classification.Senet;
-import org.apache.mxnet.zoo.cv.objectdetection.SingleShotDetection;
-import org.apache.mxnet.zoo.cv.poseestimation.SimplePoseModel;
-import org.apache.mxnet.zoo.cv.segmentation.InstanceSegmentationModel;
+import org.apache.mxnet.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
+import org.apache.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
+import org.apache.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
 import software.amazon.ai.repository.Repository;
 
 public interface ModelZoo {
@@ -28,12 +28,12 @@ public interface ModelZoo {
     Repository REPOSITORY = Repository.newInstance("MxNet", MXNET_REPO_URL);
     String GROUP_ID = "org.apache.mxnet";
 
-    SingleShotDetection SSD = new SingleShotDetection(REPOSITORY);
+    SingleShotDetectionModelLoader SSD = new SingleShotDetectionModelLoader(REPOSITORY);
     Resnet RESNET = new Resnet(REPOSITORY);
     Resnext RESNEXT = new Resnext(REPOSITORY);
     Senet SENET = new Senet(REPOSITORY);
     SeResnext SE_RESNEXT = new SeResnext(REPOSITORY);
-    SimplePoseModel SIMPLE_POSE = new SimplePoseModel(REPOSITORY);
-    InstanceSegmentationModel MASK_RCNN = new InstanceSegmentationModel(REPOSITORY);
-    ActionRecognitionModel ACTION_RECOGNITION = new ActionRecognitionModel(REPOSITORY);
+    SimplePoseModelLoader SIMPLE_POSE = new SimplePoseModelLoader(REPOSITORY);
+    InstanceSegmentationModelLoader MASK_RCNN = new InstanceSegmentationModelLoader(REPOSITORY);
+    ActionRecognitionModelLoader ACTION_RECOGNITION = new ActionRecognitionModelLoader(REPOSITORY);
 }

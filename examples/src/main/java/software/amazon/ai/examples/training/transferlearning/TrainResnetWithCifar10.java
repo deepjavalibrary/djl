@@ -19,9 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.dataset.Cifar10;
 import org.apache.mxnet.dataset.transform.cv.ToTensor;
-import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
-import org.apache.mxnet.zoo.ZooModel;
 import org.slf4j.Logger;
 import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.LogUtils;
@@ -45,6 +43,8 @@ import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.Pipeline;
+import software.amazon.ai.zoo.ModelNotFoundException;
+import software.amazon.ai.zoo.ZooModel;
 
 public final class TrainResnetWithCifar10 {
 

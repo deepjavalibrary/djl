@@ -14,7 +14,7 @@ package org.apache.mxnet.zoo.cv.classification;
 
 import software.amazon.ai.repository.Repository;
 
-public class Resnet extends ImageNetModel {
+public class Resnet extends ImageNetBaseModelLoader {
 
     private static final String ARTIFACT_ID = "resnet";
     private static final String VERSION = "0.0.1";

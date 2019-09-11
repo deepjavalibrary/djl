@@ -24,9 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
-import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
-import org.apache.mxnet.zoo.ZooModel;
 import org.slf4j.Logger;
 import software.amazon.ai.Device;
 import software.amazon.ai.examples.inference.util.AbstractExample;
@@ -38,6 +36,8 @@ import software.amazon.ai.modality.cv.DetectedObject;
 import software.amazon.ai.modality.cv.Images;
 import software.amazon.ai.modality.cv.Joint;
 import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.zoo.ModelNotFoundException;
+import software.amazon.ai.zoo.ZooModel;
 
 public class PoseEstimationExample extends AbstractExample {
 

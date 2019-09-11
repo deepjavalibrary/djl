@@ -18,9 +18,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
-import org.apache.mxnet.zoo.ZooModel;
 import software.amazon.ai.Device;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
@@ -29,6 +27,8 @@ import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.modality.cv.Images;
 import software.amazon.ai.translate.TranslateException;
+import software.amazon.ai.zoo.ModelNotFoundException;
+import software.amazon.ai.zoo.ZooModel;
 
 public final class ClassifyExample extends AbstractExample {
 
