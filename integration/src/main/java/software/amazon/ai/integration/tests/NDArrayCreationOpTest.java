@@ -14,13 +14,16 @@ package software.amazon.ai.integration.tests;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
 
@@ -32,6 +35,23 @@ public class NDArrayCreationOpTest {
                 .runTests(
                         Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
                                 .toArray(String[]::new));
+    }
+
+    @RunAsTest
+    public void testCreation() throws FailedTestException {
+        // TODO add more test cases to make it robust
+        try (NDManager manager = NDManager.newBaseManager()) {
+            double[] data = IntStream.range(0, 100).mapToDouble(i -> i).toArray();
+            NDArray original = manager.create(data);
+            NDArray expected = manager.arange(0, 100, 1, DataType.FLOAT64, original.getContext());
+            // test 1d
+            Assertions.assertEquals(original, expected);
+            // test 2d
+            double[][] data2D = {data, data};
+            original = manager.create(data2D);
+            NDArray expected2d = NDArrays.stack(new NDArray[] {expected, expected});
+            Assertions.assertEquals(original, expected2d);
+        }
     }
 
     @RunAsTest

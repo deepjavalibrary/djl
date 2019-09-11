@@ -251,13 +251,13 @@ public class DatasetTest {
             }
         }
     }
+
     // this is just to demonstrate how multithreading dataloader will look like
     // @RunAsTest
     public void testMultithreading() throws IOException, InterruptedException {
         try (Model model = Model.newInstance()) {
             BlockFactory factory = model.getBlockFactory();
             model.setBlock(factory.createIdentityBlock());
-
             NDManager manager = model.getNDManager();
 
             ExecutorService executor =

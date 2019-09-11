@@ -245,6 +245,7 @@ public interface NDManager extends AutoCloseable {
         for (float[] d : data) {
             buffer.put(d);
         }
+        buffer.rewind();
         return create(buffer, new Shape(data.length, data[0].length));
     }
 
@@ -259,6 +260,7 @@ public interface NDManager extends AutoCloseable {
         for (int[] d : data) {
             buffer.put(d);
         }
+        buffer.rewind();
         return create(buffer, new Shape(data.length, data[0].length));
     }
 
@@ -273,6 +275,7 @@ public interface NDManager extends AutoCloseable {
         for (double[] d : data) {
             buffer.put(d);
         }
+        buffer.rewind();
         return create(buffer, new Shape(data.length, data[0].length));
     }
 
@@ -287,6 +290,7 @@ public interface NDManager extends AutoCloseable {
         for (long[] d : data) {
             buffer.put(d);
         }
+        buffer.rewind();
         return create(buffer, new Shape(data.length, data[0].length));
     }
 
@@ -301,6 +305,7 @@ public interface NDManager extends AutoCloseable {
         for (byte[] d : data) {
             buffer.put(d);
         }
+        buffer.rewind();
         return create(buffer, new Shape(data.length, data[0].length));
     }
 
