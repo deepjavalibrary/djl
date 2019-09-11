@@ -13,7 +13,8 @@
 package org.tensorflow.engine;
 
 public interface TFInput {
-    public String setOutputName();
 
-    public <I> I getInput();
+    String setOutputName();
+
+    <I> I getInput();
 }

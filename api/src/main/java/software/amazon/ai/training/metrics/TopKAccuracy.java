@@ -41,7 +41,7 @@ public class TopKAccuracy extends Accuracy {
     }
 
     public TopKAccuracy(int topK) {
-        this(String.format("Top_%d_Accuracy", topK), topK);
+        this("Top_" + topK + "_Accuracy", topK);
     }
 
     /** {@inheritDoc} */
@@ -65,8 +65,7 @@ public class TopKAccuracy extends Accuracy {
                             j -> {
                                 // get from last index as argsort is ascending
                                 NDArray jPrediction =
-                                        topKPrediction.get(
-                                                String.format(":, %d", numClasses - j - 1));
+                                        topKPrediction.get(":, " + (numClasses - j - 1));
                                 addCorrectInstances(
                                         jPrediction.flatten().eq(labels.flatten()).sum().getInt());
                             });

@@ -41,7 +41,7 @@ public interface ZooDataset<I, L> extends Dataset<I, L> {
             if (getArtifact() == null) {
                 useDefaultArtifact();
                 if (getArtifact() == null) {
-                    throw new IOException(String.format("%s dataset not found.", getMrl()));
+                    throw new IOException(getMrl() + " dataset not found.");
                 }
             }
             getRepository().prepare(getArtifact());

@@ -101,7 +101,7 @@ public final class HelloWorld {
         }
 
         @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) throws TranslateException {
+        public NDList processOutput(TranslatorContext ctx, NDList list) {
             return list;
         }
     }

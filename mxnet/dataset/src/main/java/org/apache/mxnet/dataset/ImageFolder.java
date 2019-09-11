@@ -61,8 +61,7 @@ public class ImageFolder extends RandomAccessDataset<String, Integer> {
     private void listImage(String root) {
         File[] dir = new File(root).listFiles();
         if (dir == null || dir.length == 0) {
-            throw new IllegalArgumentException(
-                    String.format("%s not found or didn't have any file in it", root));
+            throw new IllegalArgumentException(root + " not found or didn't have any file in it");
         }
         Arrays.sort(dir);
         for (File file : dir) {

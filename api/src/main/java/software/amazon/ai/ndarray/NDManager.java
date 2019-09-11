@@ -488,7 +488,7 @@ public interface NDManager extends AutoCloseable {
      * @param path path to load from
      * @return list of NDArray. Tags might be present or be null.
      */
-    public NDList load(Path path);
+    NDList load(Path path);
 
     /**
      * Save NDArray to file.
@@ -496,7 +496,7 @@ public interface NDManager extends AutoCloseable {
      * @param path path save to
      * @param ndList list of NDArray to save
      */
-    public void save(Path path, NDList ndList);
+    void save(Path path, NDList ndList);
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.

@@ -110,9 +110,10 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset<NDList, ND
         // check if data and labels have the same size
         if (data[0].size(0) != labels[0].size(0)) {
             throw new IOException(
-                    String.format(
-                            "the size of data %d didn't match with the size of labels %d",
-                            data[0].size(0), labels[0].size(0)));
+                    "the size of data "
+                            + data[0].size(0)
+                            + " didn't match with the size of labels "
+                            + labels[0].size(0));
         }
         size = labels[0].size();
     }

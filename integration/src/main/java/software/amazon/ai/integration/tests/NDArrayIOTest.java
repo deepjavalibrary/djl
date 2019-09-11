@@ -65,11 +65,7 @@ public class NDArrayIOTest {
             int arangeStop = 25;
             NDList ndList = new NDList(size);
             IntStream.range(0, size)
-                    .forEach(
-                            (int x) ->
-                                    ndList.add(
-                                            String.format("array %d", x),
-                                            manager.arange(arangeStop)));
+                    .forEach((int x) -> ndList.add("array " + x, manager.arange(arangeStop)));
             manager.save(tmpfileNames.toPath(), ndList);
             NDList readNdList = manager.load(tmpfileNames.toPath());
             Assertions.assertEquals(ndList, readNdList);

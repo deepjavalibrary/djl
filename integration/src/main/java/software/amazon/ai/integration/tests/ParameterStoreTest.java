@@ -61,9 +61,10 @@ public class ParameterStoreTest {
                 Assertions.assertEquals(
                         weight,
                         grad,
-                        String.format(
-                                "Parameter Store updated wrong result: actual %s, expected %s",
-                                weight.toString(), grad.toString()));
+                        "Parameter Store updated wrong result: actual "
+                                + weight
+                                + ", expected "
+                                + grad);
             }
         }
     }

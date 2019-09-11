@@ -13,13 +13,12 @@
 package software.amazon.ai.training.dataset;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import software.amazon.ai.training.Trainer;
 
 public class ImageRecord implements Dataset<BufferedImage, Long> {
 
     @Override
-    public Iterable<Batch> getData(Trainer<BufferedImage, Long, ?> trainer) throws IOException {
+    public Iterable<Batch> getData(Trainer<BufferedImage, Long, ?> trainer) {
         return null;
     }
 }

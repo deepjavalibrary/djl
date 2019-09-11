@@ -394,7 +394,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         Shape destShape = ndArray.getShape();
         if (!Arrays.equals(inShape.getShape(), destShape.getShape())) {
             throw new IllegalArgumentException(
-                    String.format("shape are diff. Required: %s, Actual %s", destShape, inShape));
+                    "shape are diff. Required: " + destShape + ", Actual " + inShape);
         }
         NDList src = new NDList(this);
         NDList dest = new NDList(ndArray);
@@ -1123,10 +1123,13 @@ public class MxNDArray extends NativeResource implements NDArray {
         for (int i = 1; i < arrays.length; i++) {
             if (arrays[i].getShape().dimension() != dimension) {
                 throw new IllegalArgumentException(
-                        "all the input arrays must have same number of dimensions, "
-                                + String.format(
-                                        "but the array at index 0 has %d dimension(s) and the array at index %d has %d dimension(s)",
-                                        dimension, i, arrays[i].getShape().dimension()));
+                        "all the input arrays must have same number of dimensions, but the array at index 0 has "
+                                + dimension
+                                + " dimension(s) and the array at index "
+                                + i
+                                + " has "
+                                + arrays[i].getShape().dimension()
+                                + " dimension(s)");
             }
         }
         MxOpParams params = new MxOpParams();

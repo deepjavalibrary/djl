@@ -50,10 +50,14 @@ public class FactorTracker extends LrTracker {
             if (baseLr < stopFactorLr) {
                 baseLr = stopFactorLr;
                 logger.debug(
-                        "Update[%d]: now learning rate arrived at %.5e, will not change in the future",
-                        numUpdate, baseLr);
+                        "Update[{}]: now learning rate arrived at {}, will not change in the future",
+                        numUpdate,
+                        String.format("%.5e", baseLr));
             } else {
-                logger.debug("Update[%d]: Change learning rate to %.5e", numUpdate, baseLr);
+                logger.debug(
+                        "Update[{}]: Change learning rate to {}",
+                        numUpdate,
+                        String.format("%.5e", baseLr));
             }
         }
         return baseLr;

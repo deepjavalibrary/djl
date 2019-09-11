@@ -49,7 +49,7 @@ public abstract class LrTracker {
 
     public abstract float getNewLearningRate(int numUpdate);
 
-    public static final LrTracker fixedLR(float lr) {
+    public static LrTracker fixedLR(float lr) {
         return new FixedLr(lr);
     }
 }

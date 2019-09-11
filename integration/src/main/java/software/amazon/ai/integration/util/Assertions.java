@@ -108,9 +108,7 @@ public final class Assertions {
             double a = expectedDoubleArray[i].doubleValue();
             double b = actualDoubleArray[i].doubleValue();
             if (Math.abs(a - b) > (atol + rtol * Math.abs(b))) {
-                throw new FailedTestException(
-                        String.format(
-                                "expect = %s, actual = %s", String.valueOf(a), String.valueOf(b)));
+                throw new FailedTestException("expect = " + a + ", actual =" + b);
             }
         }
     }

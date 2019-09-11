@@ -78,16 +78,20 @@ abstract class TrainingMetrics {
     protected void checkLabelShapes(NDArray labels, NDArray predictions, boolean checkDimOnly) {
         if (labels.getShape().get(0) != predictions.getShape().get(0)) {
             throw new IllegalArgumentException(
-                    String.format(
-                            "The size of labels(%d) does not match that of predictions(%d)",
-                            labels.size(), predictions.size()));
+                    "The size of labels("
+                            + labels.size()
+                            + ") does not match that of predictions("
+                            + predictions.size()
+                            + ")");
         }
         if (!checkDimOnly) {
             if (labels.getShape() != predictions.getShape()) {
                 throw new IllegalArgumentException(
-                        String.format(
-                                "The shape of labels(%d) does not match that of predictions(%d)",
-                                labels.getShape(), predictions.getShape()));
+                        "The shape of labels("
+                                + labels.getShape()
+                                + ") does not match that of predictions("
+                                + predictions.getShape()
+                                + ")");
             }
         }
     }

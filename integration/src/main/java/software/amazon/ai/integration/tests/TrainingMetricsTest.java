@@ -50,9 +50,7 @@ public class TrainingMetricsTest {
             Assertions.assertEquals(
                     expectedAccuracy,
                     accuracy,
-                    String.format(
-                            "Wrong accuracy, expected: %f, actual: %f",
-                            expectedAccuracy, accuracy));
+                    "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);
         }
     }
 
@@ -73,9 +71,7 @@ public class TrainingMetricsTest {
             Assertions.assertEquals(
                     expectedAccuracy,
                     accuracy,
-                    String.format(
-                            "Wrong accuracy, expected: %f, actual: %f",
-                            expectedAccuracy, accuracy));
+                    "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);
         }
     }
 }

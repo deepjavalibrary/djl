@@ -82,18 +82,17 @@ public class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
     public static class DefaultTranslator implements TrainTranslator<NDList, NDList, NDList> {
 
         @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) throws Exception {
+        public NDList processOutput(TranslatorContext ctx, NDList list) {
             return list;
         }
 
         @Override
-        public NDList processInput(TranslatorContext ctx, NDList input) throws Exception {
+        public NDList processInput(TranslatorContext ctx, NDList input) {
             return input;
         }
 
         @Override
-        public Record processInput(TranslatorContext ctx, NDList input, NDList label)
-                throws Exception {
+        public Record processInput(TranslatorContext ctx, NDList input, NDList label) {
             return new Record(input, label);
         }
     }

@@ -13,7 +13,6 @@
 package org.apache.mxnet.dataset;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
@@ -21,7 +20,7 @@ import software.amazon.ai.training.dataset.Dataset;
 public class ImageNetLarge implements Dataset<BufferedImage, Long> {
 
     @Override
-    public Iterable<Batch> getData(Trainer<BufferedImage, Long, ?> trainer) throws IOException {
+    public Iterable<Batch> getData(Trainer<BufferedImage, Long, ?> trainer) {
         return null;
     }
 }

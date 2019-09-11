@@ -235,11 +235,7 @@ public class Shape {
      * @return Returns a new filtered Shape
      */
     public Shape map(Function<Pair<Long, LayoutType>, Pair<Long, LayoutType>> mapper) {
-        return new Shape(
-                new PairList<>(
-                        this.stream()
-                                .map(pair -> mapper.apply(pair))
-                                .collect(Collectors.toList())));
+        return new Shape(new PairList<>(stream().map(mapper).collect(Collectors.toList())));
     }
 
     /**
@@ -397,7 +393,7 @@ public class Shape {
      * @return whether a layout has been set
      */
     public boolean isLayoutKnown() {
-        return !Arrays.asList(layout).stream().allMatch(l -> l == LayoutType.UNKNOWN);
+        return !Arrays.stream(layout).allMatch(l -> l == LayoutType.UNKNOWN);
     }
 
     public LayoutType[] getLayout() {

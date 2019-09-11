@@ -17,13 +17,14 @@ import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;
 
 public class ActionRecognitionTranslator implements Translator<NDList, NDList> {
+
     @Override
-    public NDList processOutput(TranslatorContext ctx, NDList list) throws Exception {
+    public NDList processOutput(TranslatorContext ctx, NDList list) {
         return null;
     }
 
     @Override
-    public NDList processInput(TranslatorContext ctx, NDList input) throws Exception {
+    public NDList processInput(TranslatorContext ctx, NDList input) {
         return null;
     }
 }
