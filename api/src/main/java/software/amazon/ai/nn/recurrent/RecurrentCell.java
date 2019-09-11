@@ -18,7 +18,8 @@ import software.amazon.ai.nn.recurrent.RNN.Activation;
 
 public interface RecurrentCell extends Block {
 
-    abstract class Builder<R extends RecurrentCell> {
+    @SuppressWarnings("rawtypes")
+    abstract class BaseBuilder<T extends BaseBuilder> {
 
         protected BlockFactory factory;
         protected float dropRate;
@@ -72,9 +73,9 @@ public interface RecurrentCell extends Block {
             return activation;
         }
 
-        public Builder<R> setFactory(BlockFactory factory) {
+        public T setFactory(BlockFactory factory) {
             this.factory = factory;
-            return this;
+            return self();
         }
 
         /**
@@ -84,9 +85,9 @@ public interface RecurrentCell extends Block {
          * @param dropRate drop rate of the dropout
          * @return Returns this Builder
          */
-        public Builder<R> setDropRate(float dropRate) {
+        public T setDropRate(float dropRate) {
             this.dropRate = dropRate;
-            return this;
+            return self();
         }
 
         /**
@@ -96,11 +97,11 @@ public interface RecurrentCell extends Block {
          * @param lstmStateClipMax Maximum clip value of LSTM states
          * @return Returns this Builder
          */
-        public Builder<R> setLstmStateClipMin(float lstmStateClipMin, float lstmStateClipMax) {
+        public T setLstmStateClipMin(float lstmStateClipMin, float lstmStateClipMax) {
             this.lstmStateClipMin = lstmStateClipMin;
             this.lstmStateClipMax = lstmStateClipMax;
             this.clipLstmState = true;
-            return this;
+            return self();
         }
 
         /**
@@ -109,9 +110,9 @@ public interface RecurrentCell extends Block {
          * @param stateSize Number of convolution filter(channel)
          * @return Returns this Builder
          */
-        public Builder<R> setStateSize(int stateSize) {
+        public T setStateSize(int stateSize) {
             this.stateSize = stateSize;
-            return this;
+            return self();
         }
 
         /**
@@ -120,9 +121,9 @@ public interface RecurrentCell extends Block {
          * @param numStackedLayers Number of convolution filter(channel)
          * @return Returns this Builder
          */
-        public Builder<R> setNumStackedLayers(int numStackedLayers) {
+        public T setNumStackedLayers(int numStackedLayers) {
             this.numStackedLayers = numStackedLayers;
-            return this;
+            return self();
         }
 
         /**
@@ -131,9 +132,9 @@ public interface RecurrentCell extends Block {
          * @param activation Projection size.
          * @return Returns this Builder
          */
-        public Builder<R> setActivation(RNN.Activation activation) {
+        public T setActivation(RNN.Activation activation) {
             this.activation = activation;
-            return this;
+            return self();
         }
 
         /**
@@ -143,9 +144,9 @@ public interface RecurrentCell extends Block {
          * @param useSequenceLength Whether to use sequence length
          * @return Returns this Builder
          */
-        public Builder<R> setSequenceLength(boolean useSequenceLength) {
+        public T setSequenceLength(boolean useSequenceLength) {
             this.useSequenceLength = useSequenceLength;
-            return this;
+            return self();
         }
 
         /**
@@ -154,9 +155,9 @@ public interface RecurrentCell extends Block {
          * @param useBidirectional Whether to use bidirectional recurrent layers
          * @return Returns this Builder
          */
-        public Builder<R> setBirectional(boolean useBidirectional) {
+        public T setBirectional(boolean useBidirectional) {
             this.useBidirectional = useBidirectional;
-            return this;
+            return self();
         }
 
         /**
@@ -165,18 +166,11 @@ public interface RecurrentCell extends Block {
          * @param stateOutputs Whether to have the states as symbol output
          * @return Returns this Builder
          */
-        public Builder<R> setStateOutput(boolean stateOutputs) {
+        public T setStateOutput(boolean stateOutputs) {
             this.stateOutputs = stateOutputs;
-            return this;
+            return self();
         }
 
-        /**
-         * Returns the constructed {@code RecurrentCell}.
-         *
-         * @return Returns the constructed {@code RecurrentCell}
-         * @throws IllegalArgumentException Thrown if all required parameters (outChannels) have not
-         *     been set
-         */
-        public abstract R build();
+        public abstract T self();
     }
 }

@@ -21,7 +21,8 @@ public interface Convolution extends Block {
 
     NDArray forward(NDArray data);
 
-    abstract class Builder<C extends Convolution> {
+    @SuppressWarnings("rawtypes")
+    abstract class BaseBuilder<T extends BaseBuilder> {
 
         protected BlockFactory factory;
         protected Shape kernel;
@@ -60,9 +61,9 @@ public interface Convolution extends Block {
             return includeBias;
         }
 
-        public Builder<C> setFactory(BlockFactory factory) {
+        public T setFactory(BlockFactory factory) {
             this.factory = factory;
-            return this;
+            return self();
         }
 
         /**
@@ -71,9 +72,9 @@ public interface Convolution extends Block {
          * @param kernel Shape of the kernel
          * @return Returns this Builder
          */
-        public Builder<C> setKernel(Shape kernel) {
+        public T setKernel(Shape kernel) {
             this.kernel = kernel;
-            return this;
+            return self();
         }
 
         /**
@@ -82,9 +83,9 @@ public interface Convolution extends Block {
          * @param stride Shape of the stride
          * @return Returns this Builder
          */
-        public Builder<C> setStride(Shape stride) {
+        public T setStride(Shape stride) {
             this.stride = stride;
-            return this;
+            return self();
         }
 
         /**
@@ -93,9 +94,9 @@ public interface Convolution extends Block {
          * @param pad Padding along each dimension
          * @return Returns this Builder
          */
-        public Builder<C> setPad(Shape pad) {
+        public T setPad(Shape pad) {
             this.pad = pad;
-            return this;
+            return self();
         }
 
         /**
@@ -104,9 +105,9 @@ public interface Convolution extends Block {
          * @param dilate Padding along each dimension
          * @return Returns this Builder
          */
-        public Builder<C> setDilate(Shape dilate) {
+        public T setDilate(Shape dilate) {
             this.dilate = dilate;
-            return this;
+            return self();
         }
 
         /**
@@ -115,9 +116,9 @@ public interface Convolution extends Block {
          * @param numFilters Number of convolution filter(channel)
          * @return Returns this Builder
          */
-        public Builder<C> setNumFilters(int numFilters) {
+        public T setNumFilters(int numFilters) {
             this.numFilters = numFilters;
-            return this;
+            return self();
         }
 
         /**
@@ -126,9 +127,9 @@ public interface Convolution extends Block {
          * @param numGroups Number of group partitions
          * @return Returns this Builder
          */
-        public Builder<C> setNumGroups(int numGroups) {
+        public T setNumGroups(int numGroups) {
             this.numGroups = numGroups;
-            return this;
+            return self();
         }
 
         /**
@@ -138,18 +139,11 @@ public interface Convolution extends Block {
          * @param includeBias Whether to use a bias vector parameter
          * @return Returns this Builder
          */
-        public Builder<C> setBias(boolean includeBias) {
+        public T setBias(boolean includeBias) {
             this.includeBias = includeBias;
-            return this;
+            return self();
         }
 
-        /**
-         * Returns the constructed {@code Convolution}.
-         *
-         * @return Returns the constructed {@code Convolution}
-         * @throws IllegalArgumentException Thrown if all required parameters (outChannels) have not
-         *     been set
-         */
-        public abstract C build();
+        public abstract T self();
     }
 }

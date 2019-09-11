@@ -43,7 +43,7 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
     }
 
     @SuppressWarnings("rawtypes")
-    public abstract static class BaseBuilder<B extends BaseBuilder> {
+    public abstract static class BaseBuilder<T extends BaseBuilder> {
 
         private Sampler sampler;
         private DataLoadingConfiguration config;
@@ -55,21 +55,21 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
             return sampler;
         }
 
-        public B setSampling(long batchSize) {
+        public T setSampling(long batchSize) {
             return setSampling(batchSize, true, false);
         }
 
-        public B setSampling(long batchSize, boolean shuffle) {
+        public T setSampling(long batchSize, boolean shuffle) {
             return setSampling(batchSize, shuffle, false);
         }
 
-        public B setSampling(long batchSize, boolean shuffle, boolean dropLast) {
+        public T setSampling(long batchSize, boolean shuffle, boolean dropLast) {
             Sampler.SubSampler subSampler = shuffle ? new RandomSampler() : new SequenceSampler();
             sampler = new BatchSampler(subSampler, batchSize, dropLast);
             return self();
         }
 
-        public B setSampler(Sampler sampler) {
+        public T setSampler(Sampler sampler) {
             this.sampler = sampler;
             return self();
         }
@@ -82,11 +82,11 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
             }
         }
 
-        public B optConfig(DataLoadingConfiguration config) {
+        public T optConfig(DataLoadingConfiguration config) {
             this.config = config;
             return self();
         }
 
-        public abstract B self();
+        public abstract T self();
     }
 }

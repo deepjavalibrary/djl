@@ -32,7 +32,7 @@ public interface Optimizer {
     void updateAllParameters(PairList<String, Parameter> parameters);
 
     @SuppressWarnings("rawtypes")
-    abstract class BaseBuilder<B extends BaseBuilder> {
+    abstract class BaseBuilder<T extends BaseBuilder> {
 
         protected BlockFactory factory;
         private float rescaleGrad;
@@ -40,27 +40,27 @@ public interface Optimizer {
         private float clipGrad = -1;
         private int beginNumUpdate;
 
-        public B setFactory(BlockFactory factory) {
+        public T setFactory(BlockFactory factory) {
             this.factory = factory;
             return self();
         }
 
-        public B setRescaleGrad(float rescaleGrad) {
+        public T setRescaleGrad(float rescaleGrad) {
             this.rescaleGrad = rescaleGrad;
             return self();
         }
 
-        public B optWeightDecays(float weightDecays) {
+        public T optWeightDecays(float weightDecays) {
             this.weightDecays = weightDecays;
             return self();
         }
 
-        public B optClipGrad(float clipGrad) {
+        public T optClipGrad(float clipGrad) {
             this.clipGrad = clipGrad;
             return self();
         }
 
-        public B optBeginNumUpdate(int beginNumUpdate) {
+        public T optBeginNumUpdate(int beginNumUpdate) {
             this.beginNumUpdate = beginNumUpdate;
             return self();
         }
@@ -81,6 +81,6 @@ public interface Optimizer {
             return beginNumUpdate;
         }
 
-        abstract B self();
+        abstract T self();
     }
 }

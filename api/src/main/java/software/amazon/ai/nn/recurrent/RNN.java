@@ -17,10 +17,14 @@ import software.amazon.ai.nn.Block;
 public interface RNN extends RecurrentCell {
 
     /** The Builder to construct a {@link RNN} type of {@link Block}. */
-    final class Builder extends RecurrentCell.Builder<RNN> {
+    final class Builder extends BaseBuilder<Builder> {
 
         /** {@inheritDoc} */
         @Override
+        public Builder self() {
+            return this;
+        }
+
         public RNN build() {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");

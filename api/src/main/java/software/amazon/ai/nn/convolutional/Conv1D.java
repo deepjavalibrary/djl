@@ -17,10 +17,14 @@ import software.amazon.ai.nn.Block;
 public interface Conv1D extends Convolution {
 
     /** The Builder to construct a {@link Conv1D} type of {@link Block}. */
-    final class Builder extends Convolution.Builder<Conv1D> {
+    final class Builder extends BaseBuilder<Builder> {
 
         /** {@inheritDoc} */
         @Override
+        public Builder self() {
+            return this;
+        }
+
         public Conv1D build() {
             if (kernel == null || numFilters == 0) {
                 throw new IllegalArgumentException("Kernel and numFilters must be set");
