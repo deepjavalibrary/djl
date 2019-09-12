@@ -1,0 +1,9 @@
+@startuml
+(*) --> [An Engine is associated with the Model] "Create Model"
+--> "Build neural network"
+--> [model.setBlock()] "Set neural network"
+--> [model.load() on specified device)] "Load pre-trained parameters"
+--> [model.newPredictor] "Create predictor"
+--> [predictor.predict()] "Inference"
+--> [model.close()] (*)
+@enduml
