@@ -426,12 +426,8 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = array.pow(2);
             NDArray inPlaceResult = array.powi(2);
             NDArray solution = manager.create(new float[] {36, 0, 1, 25, 4}, new Shape(1, 5));
-            Assertions.assertEquals(
-                    solution, result, "Scalar power: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    solution,
-                    inPlaceResult,
-                    "Scalar in-place power: Incorrect value in result ndarray");
+            Assertions.assertAlmostEquals(solution, result);
+            Assertions.assertAlmostEquals(solution, inPlaceResult);
             Assertions.assertInPlace(
                     array, inPlaceResult, "Scalar power: In-place operation failed");
         }
