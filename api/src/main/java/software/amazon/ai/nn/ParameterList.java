@@ -10,11 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai;
+package software.amazon.ai.nn;
 
 import java.util.List;
 import java.util.Map;
-import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 

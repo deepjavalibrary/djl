@@ -14,8 +14,6 @@ package software.amazon.ai.nn;
 
 import java.util.List;
 import java.util.Optional;
-import software.amazon.ai.BlockList;
-import software.amazon.ai.ParameterList;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
