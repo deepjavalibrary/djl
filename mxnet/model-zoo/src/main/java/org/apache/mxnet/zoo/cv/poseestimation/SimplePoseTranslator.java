@@ -74,7 +74,7 @@ public class SimplePoseTranslator implements Translator<BufferedImage, List<Join
         return joints;
     }
 
-    protected NDArray normalize(NDArray array) {
+    private NDArray normalize(NDArray array) {
         float[] mean = {0.485f, 0.456f, 0.406f};
         float[] std = {0.229f, 0.224f, 0.225f};
         return Images.normalize(array, mean, std);

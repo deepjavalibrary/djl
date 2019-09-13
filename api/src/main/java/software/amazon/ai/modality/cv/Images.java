@@ -145,15 +145,12 @@ public final class Images {
 
         for (DetectedObject result : detections) {
             String className = result.getClassName();
-            Rectangle rect = result.getBoundingBox().getBounds();
+            BoundingBox box = result.getBoundingBox();
             g.setPaint(randomColor().darker());
-
-            int x = (int) (rect.getX() * imageWidth);
-            int y = (int) (rect.getY() * imageHeight);
-            int w = (int) (rect.getWidth() * imageWidth);
-            int h = (int) (rect.getHeight() * imageHeight);
-
-            g.drawRect(x, y, w, h);
+            box.draw(g, imageWidth, imageHeight);
+            Point p = box.getPoint();
+            int x = (int) (p.getX() * imageWidth);
+            int y = (int) (p.getY() * imageHeight);
             drawText(g, className, x, y, stroke, 4);
         }
         g.dispose();

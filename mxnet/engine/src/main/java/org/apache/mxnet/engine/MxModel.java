@@ -114,7 +114,9 @@ public class MxModel implements Model {
             Path symbolFile = Paths.get(modelPrefix + "-symbol.json");
             if (Files.notExists(symbolFile)) {
                 throw new FileNotFoundException(
-                        "Failed to load symbol file, please set block manually.");
+                        "Failed to load "
+                                + modelPrefix
+                                + " symbol file, please set block manually.");
             }
             Symbol symbol = Symbol.load(manager, modelPrefix + "-symbol.json");
             block = new MxSymbolBlock(manager, symbol);

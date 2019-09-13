@@ -12,6 +12,8 @@
  */
 package software.amazon.ai.modality.cv;
 
+import java.awt.Graphics2D;
+
 /** An interface representing a bounding box for the detected object. */
 public interface BoundingBox {
 
@@ -30,4 +32,20 @@ public interface BoundingBox {
      *     {@code BoundingBox}.
      */
     PathIterator getPath();
+
+    /**
+     * Returns the top left point of the bounding box.
+     *
+     * @return {@link Point} of top left corner
+     */
+    Point getPoint();
+
+    /**
+     * Draw the bounding box using the {@link Graphics2D}.
+     *
+     * @param g Graphics2D object of the image
+     * @param imageWidth the width of the image
+     * @param imageHeight the height of the image
+     */
+    void draw(Graphics2D g, int imageWidth, int imageHeight);
 }

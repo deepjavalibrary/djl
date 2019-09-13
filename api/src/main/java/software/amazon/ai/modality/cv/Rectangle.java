@@ -12,6 +12,8 @@
  */
 package software.amazon.ai.modality.cv;
 
+import java.awt.Graphics2D;
+
 /**
  * A {@code Rectangle} specifies an area in a coordinate space that is enclosed by the {@code
  * Rectangle} object's upper-left point {@link Point} in the coordinate space, its width, and its
@@ -94,8 +96,18 @@ public class Rectangle implements BoundingBox {
         };
     }
 
+    @Override
     public Point getPoint() {
         return point;
+    }
+
+    @Override
+    public void draw(Graphics2D g, int imageWidth, int imageHeight) {
+        int x = (int) (getX() * imageWidth);
+        int y = (int) (getY() * imageHeight);
+        int w = (int) (getWidth() * imageWidth);
+        int h = (int) (getHeight() * imageHeight);
+        g.drawRect(x, y, w, h);
     }
 
     public double getX() {

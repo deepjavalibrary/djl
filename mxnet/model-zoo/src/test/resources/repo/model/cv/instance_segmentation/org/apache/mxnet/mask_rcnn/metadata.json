@@ -16,13 +16,18 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": " mask_rcnn_resnet18_v1b_coco",
+      "name": "mask_rcnn_resnet18_v1b_coco",
       "properties": {
         "backbone": "resnet18",
         "flavor": "v1b",
         "dataset": "coco"
       },
       "files": {
+        "classes": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/instance_segmentation/org/apache/mxnet/mask_rcnn/classes.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "name": "classes.txt"
+        },
         "symbol": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/instance_segmentation/org/apache/mxnet/mask_rcnn/0.0.1/mask_rcnn_resnet18_v1b_coco-symbol.json",
           "sha1Hash": "09496b76957d1ad8690276464722d2b3894d6474"
@@ -36,13 +41,18 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": " mask_rcnn_resnet101_v1d_coco",
+      "name": "mask_rcnn_resnet101_v1d_coco",
       "properties": {
         "backbone": "resnet101",
         "flavor": "v1d",
         "dataset": "coco"
       },
       "files": {
+        "classes": {
+          "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/instance_segmentation/org/apache/mxnet/mask_rcnn/classes.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "name": "classes.txt"
+        },
         "symbol": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/model/cv/instance_segmentation/org/apache/mxnet/mask_rcnn/0.0.1/mask_rcnn_resnet101_v1d_coco-symbol.json",
           "sha1Hash": "bcc65fb684313937026e600c1888de80618a54cb"
