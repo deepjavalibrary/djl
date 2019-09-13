@@ -13,6 +13,7 @@
 
 package software.amazon.ai.training.initializer;
 
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
@@ -39,8 +40,9 @@ public class NormalInitializer implements Initializer {
         this.sigma = sigma;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
-        return manager.randomNormal(0.0, sigma, shape, dataType, manager.getDevice());
+    public NDArray initialize(NDManager manager, Shape shape, DataType dataType, Device device) {
+        return manager.randomNormal(0.0, sigma, shape, dataType, device);
     }
 }

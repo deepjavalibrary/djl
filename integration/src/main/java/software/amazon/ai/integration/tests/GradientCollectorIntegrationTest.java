@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxGradientCollector;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -161,10 +162,10 @@ public class GradientCollectorIntegrationTest {
                             .build();
             NDArray input = manager.ones(new Shape(100, 1, 28, 28));
             NDArray label = manager.ones(new Shape(100, 1));
-
             PairList<String, Parameter> parameters = resNet50.getParameters();
-
-            TrainingController controller = new TrainingController(parameters, optimizer);
+            TrainingController controller =
+                    new TrainingController(
+                            parameters, optimizer, new Device[] {manager.getDevice()});
             try (GradientCollector gradCol = GradientCollector.newInstance()) {
                 NDArray pred = resNet50.forward(new NDList(input)).head();
                 NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);

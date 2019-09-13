@@ -145,6 +145,18 @@ public class TfModel implements Model {
     }
 
     @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device[] devices) {
+        return null;
+    }
+
+    @Override
+    public void setInitializer(Initializer initializer, Device[] devices) {}
+
+    @Override
+    public void setInitializer(Initializer initializer, boolean overwrite, Device[] devices) {}
+
+    @Override
     public void setInitializer(Initializer initializer) {}
 
     @Override

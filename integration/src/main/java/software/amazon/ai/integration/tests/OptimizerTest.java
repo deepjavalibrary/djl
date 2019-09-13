@@ -14,6 +14,7 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -145,7 +146,9 @@ public class OptimizerTest {
     private NDArray runOptimizer(NDManager manager, Block block, Optimizer optim) {
         NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS)).mul(2);
         NDArray label = data.mul(2);
-        try (TrainingController controller = new TrainingController(block.getParameters(), optim)) {
+        try (TrainingController controller =
+                new TrainingController(
+                        block.getParameters(), optim, new Device[] {manager.getDevice()})) {
             try (GradientCollector gradCol = GradientCollector.newInstance()) {
                 NDArray pred = block.forward(new NDList(data)).head();
                 NDArray loss = Loss.l2Loss(label, pred);

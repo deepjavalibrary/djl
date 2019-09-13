@@ -22,6 +22,7 @@ import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
 import org.slf4j.Logger;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.modality.Classification;
@@ -66,7 +67,11 @@ public final class TrainResnetWithCifar10 {
         SequentialBlock newBlock = new SequentialBlock();
         newBlock.add(modifiedBlock);
         Linear linear = new Linear.Builder().setOutChannels(10).build();
-        linear.setInitializer(model.getNDManager(), Initializer.ONES, true);
+        linear.setInitializer(
+                model.getNDManager(),
+                Initializer.ONES,
+                true,
+                new Device[] {model.getNDManager().getDevice()});
         newBlock.add(linear);
         model.setBlock(newBlock);
     }

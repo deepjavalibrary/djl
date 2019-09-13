@@ -12,7 +12,8 @@
  */
 package software.amazon.ai.training.optimizer;
 
-import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.util.PairList;
@@ -25,7 +26,7 @@ public abstract class Optimizer {
     private float weightDecays;
     private int numUpdate;
     private boolean statesInitialized;
-    private int[] updateCounts;
+    private Map<Integer, Integer> updateCounts = new ConcurrentHashMap<>();
 
     public Optimizer(BaseBuilder<?> builder) {
         this.rescaleGrad = builder.getRescaleGrad();
@@ -50,10 +51,6 @@ public abstract class Optimizer {
             // ensure when create state is over ridden, statesCreated is updated
             statesInitialized = initializeStates(parameters);
         }
-        if (updateCounts == null) {
-            updateCounts = new int[parameters.size()];
-            Arrays.fill(updateCounts, numUpdate);
-        }
         for (int i = 0; i < parameters.size(); i++) {
             NDArray paramArray = parameters.get(i).getValue().getArray();
             NDArray grad = paramArray.getGradient();
@@ -66,12 +63,13 @@ public abstract class Optimizer {
     }
 
     protected int updateCount(int index) {
-        int count = ++updateCounts[index];
+        int count = updateCounts.compute(index, (key, val) -> (val == null) ? numUpdate : val + 1);
         numUpdate = Math.max(numUpdate, count);
         return count;
     }
 
-    protected abstract void update(int index, NDArray weight, NDArray grad);
+    // TODO: make this protected after integrate with PS store
+    public abstract void update(int index, NDArray weight, NDArray grad);
 
     protected abstract boolean initializeStates(PairList<String, Parameter> parameters);
 

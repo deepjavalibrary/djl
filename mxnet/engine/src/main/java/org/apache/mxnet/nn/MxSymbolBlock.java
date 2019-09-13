@@ -31,6 +31,7 @@ import org.apache.mxnet.engine.Symbol;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -171,10 +172,16 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
+    public void setInitializer(NDManager manager, Initializer initializer, Device[] devices) {
+        setInitializer(manager, initializer, false, devices);
+    }
+
+    @Override
+    public void setInitializer(
+            NDManager manager, Initializer initializer, boolean overwrite, Device[] devices) {
         for (Parameter param : params) {
-            param.setInitializer(manager, initializer, overwrite);
-            param.reinitialize();
+            param.setInitializer(manager, initializer, overwrite, devices);
+            param.reinitialize(devices);
         }
     }
 

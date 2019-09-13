@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.training.initializer;
 
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
@@ -25,8 +26,8 @@ import software.amazon.ai.nn.Block;
  */
 public interface Initializer {
 
-    Initializer ZEROS = (m, s, t) -> m.zeros(s, t, m.getDevice());
-    Initializer ONES = (m, s, t) -> m.ones(s, t, m.getDevice());
+    Initializer ZEROS = (m, s, t, d) -> m.zeros(s, t, d);
+    Initializer ONES = (m, s, t, d) -> m.ones(s, t, d);
 
     /**
      * Initializes a single {@link NDArray}.
@@ -36,5 +37,18 @@ public interface Initializer {
      * @param dataType the {@link DataType} for the new NDArray
      * @return Returns the NDArray initialized with the manager and shape
      */
-    NDArray initialize(NDManager manager, Shape shape, DataType dataType);
+    default NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
+        return initialize(manager, shape, dataType, manager.getDevice());
+    }
+
+    /**
+     * Initializes a single {@link NDArray}.
+     *
+     * @param manager the {@link NDManager} to create the new NDArray in
+     * @param shape the {@link Shape} for the new NDArray
+     * @param dataType the {@link DataType} for the new NDArray
+     * @param device specific {@link Device} to initialize the data
+     * @return Returns the NDArray initialized with the manager and shape
+     */
+    NDArray initialize(NDManager manager, Shape shape, DataType dataType, Device device);
 }

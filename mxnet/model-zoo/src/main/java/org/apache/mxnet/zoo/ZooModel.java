@@ -71,7 +71,13 @@ public class ZooModel<I, O> implements Model {
     @Override
     public <I, L, O> Trainer<I, L, O> newTrainer(
             TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer) {
-        return newTrainer(trainTranslator, optimizer, null);
+        return model.newTrainer(trainTranslator, optimizer, model.getNDManager().getDevice());
+    }
+
+    @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device[] devices) {
+        return model.newTrainer(trainTranslator, optimizer, devices);
     }
 
     /** {@inheritDoc} */
@@ -85,6 +91,16 @@ public class ZooModel<I, O> implements Model {
     @Override
     public void setInitializer(Initializer initializer) {
         setInitializer(initializer, false);
+    }
+
+    @Override
+    public void setInitializer(Initializer initializer, Device[] devices) {
+        setInitializer(initializer, false, devices);
+    }
+
+    @Override
+    public void setInitializer(Initializer initializer, boolean overwrite, Device[] devices) {
+        model.setInitializer(initializer, overwrite, devices);
     }
 
     /** {@inheritDoc} */

@@ -38,7 +38,7 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
 
     private MxModel model;
     private TrainTranslator<I, L, O> translator;
-    private Device device;
+    private Device[] devices;
     private Block block;
     private MxNDManager manager;
     private Metrics metrics;
@@ -47,11 +47,7 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     private TrainingController trainingController;
 
     MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Device device) {
-        this.model = model;
-        this.manager = (MxNDManager) model.getNDManager().newSubManager();
-        this.translator = translator;
-        this.device = device;
-        this.block = model.getBlock();
+        this(model, translator, new Device[] {device});
     }
 
     MxTrainer(
@@ -60,7 +56,25 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
             Optimizer optimizer,
             Device device) {
         this(model, translator, device);
-        trainingController = new TrainingController(block.getParameters(), optimizer);
+        trainingController =
+                new TrainingController(block.getParameters(), optimizer, new Device[] {device});
+    }
+
+    MxTrainer(
+            MxModel model,
+            TrainTranslator<I, L, O> translator,
+            Optimizer optimizer,
+            Device[] devices) {
+        this(model, translator, devices);
+        trainingController = new TrainingController(block.getParameters(), optimizer, devices);
+    }
+
+    MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Device[] devices) {
+        this.model = model;
+        this.manager = (MxNDManager) model.getNDManager().newSubManager();
+        this.translator = translator;
+        this.devices = devices;
+        this.block = model.getBlock();
     }
 
     @Override
@@ -81,6 +95,11 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     @Override
     public TranslatorContext getPreprocessContext() {
         return new TrainerContext();
+    }
+
+    @Override
+    public NDList forward(NDList intput) {
+        return block.forward(intput);
     }
 
     /** {@inheritDoc} */
@@ -206,7 +225,7 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
         /** {@inheritDoc} */
         @Override
         public Device getDevice() {
-            return device;
+            return devices[0];
         }
 
         /** {@inheritDoc} */

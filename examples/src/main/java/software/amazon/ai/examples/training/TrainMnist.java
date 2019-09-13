@@ -16,8 +16,10 @@ import java.io.IOException;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.mxnet.dataset.DatasetUtils;
 import org.apache.mxnet.dataset.Mnist;
 import org.slf4j.Logger;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.examples.training.util.Arguments;
@@ -30,7 +32,6 @@ import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
@@ -72,16 +73,23 @@ public final class TrainMnist {
     public static void trainMnist(Arguments arguments) throws IOException, TranslateException {
         int batchSize = arguments.getBatchSize();
         Block mlp = constructBlock();
-
+        int numGpus = arguments.getNumGpus();
         try (Model model = Model.newInstance()) {
             model.setBlock(mlp);
-
-            model.setInitializer(new NormalInitializer(0.01));
+            Device[] devices;
+            if (numGpus > 0) {
+                devices = new Device[numGpus];
+                for (int i = 0; i < numGpus; i++) {
+                    devices[i] = Device.gpu(i);
+                }
+            } else {
+                devices = new Device[] {model.getNDManager().getDevice()};
+            }
+            model.setInitializer(new NormalInitializer(0.01), devices);
             Optimizer optimizer =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / batchSize)
-                            .setLearningRateTracker(LearningRateTracker.fixedLR(0.01f))
-                            .optMomentum(0.9f)
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
                             .build();
             Mnist mnist =
                     new Mnist.Builder()
@@ -91,11 +99,9 @@ public final class TrainMnist {
                             .build();
             mnist.prepare();
             try (Trainer<NDList, NDList, NDList> trainer =
-                    model.newTrainer(new ArrayDataset.DefaultTranslator(), optimizer)) {
+                    model.newTrainer(new ArrayDataset.DefaultTranslator(), optimizer, devices)) {
                 int numEpoch = arguments.getEpoch();
 
-                TrainingController controller =
-                        new TrainingController(mlp.getParameters(), optimizer);
                 Accuracy acc = new Accuracy();
                 LossMetric lossMetric = new LossMetric("softmaxCELoss");
                 for (int epoch = 0; epoch < numEpoch; epoch++) {
@@ -105,18 +111,30 @@ public final class TrainMnist {
                     for (Batch batch : trainer.iterateDataset(mnist)) {
                         NDArray data = batch.getData().head().reshape(batchSize, 28 * 28).div(255f);
                         NDArray label = batch.getLabels().head();
-                        NDArray pred;
-                        NDArray loss;
+                        NDList dataSplit = DatasetUtils.splitAndLoad(data, devices, false);
+                        NDList labelSplit = DatasetUtils.splitAndLoad(label, devices, false);
+                        NDArray[] pred = new NDArray[devices.length];
+                        NDArray[] loss = new NDArray[devices.length];
                         try (GradientCollector gradCol = GradientCollector.newInstance()) {
-                            pred = mlp.forward(new NDList(data)).get(0);
-                            loss =
-                                    Loss.softmaxCrossEntropyLoss(
-                                            label, pred, 1.f, 0, -1, true, false);
-                            gradCol.backward(loss);
+                            for (int i = 0; i < dataSplit.size(); i++) {
+                                pred[i] = trainer.forward(new NDList(dataSplit.get(i))).get(0);
+                                loss[i] =
+                                        Loss.softmaxCrossEntropyLoss(
+                                                labelSplit.get(i),
+                                                pred[i],
+                                                1.f,
+                                                0,
+                                                -1,
+                                                true,
+                                                false);
+                                gradCol.backward(loss[i]);
+                            }
                         }
-                        controller.step();
-                        acc.update(label, pred);
-                        lossMetric.update(loss);
+                        trainer.step();
+                        for (int i = 0; i < dataSplit.size(); i++) {
+                            acc.update(labelSplit.get(i), pred[i]);
+                            lossMetric.update(loss[i]);
+                        }
                         batch.close();
                     }
                     lossValue = lossMetric.getMetric().getValue();

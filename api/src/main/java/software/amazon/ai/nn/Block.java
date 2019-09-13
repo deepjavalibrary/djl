@@ -16,6 +16,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -38,11 +39,16 @@ public interface Block {
 
     List<Parameter> getDirectParameters();
 
+    void setInitializer(NDManager manager, Initializer initializer, String paramName);
+
     void setInitializer(NDManager manager, Initializer initializer);
 
     void setInitializer(NDManager manager, Initializer initializer, boolean overwrite);
 
-    void setInitializer(NDManager manager, Initializer initializer, String paramName);
+    void setInitializer(NDManager manager, Initializer initializer, Device[] devices);
+
+    void setInitializer(
+            NDManager manager, Initializer initializer, boolean overwrite, Device[] devices);
 
     void setInitializer(
             NDManager manager, Initializer initializer, String paramName, boolean overwrite);

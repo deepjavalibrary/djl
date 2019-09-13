@@ -183,6 +183,20 @@ public interface Model extends AutoCloseable {
             TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device);
 
     /**
+     * Creates a new {@link Trainer} instance for a Model.
+     *
+     * @param trainTranslator the translator for pre-processing and post-processing
+     * @param optimizer optimizer used to train this model
+     * @param devices array of {@link Device} to run parallel, for multi-GPU training
+     * @param <I> Input data object for the Trainer
+     * @param <L> Label data object for the Trainer
+     * @param <O> Output Object for the Trainer
+     * @return Trainer
+     */
+    <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device[] devices);
+
+    /**
      * Creates a new Predictor based on the model.
      *
      * @param translator The Object used for preprocessing and post processing
@@ -208,6 +222,10 @@ public interface Model extends AutoCloseable {
     void setInitializer(Initializer initializer);
 
     void setInitializer(Initializer initializer, boolean overwrite);
+
+    void setInitializer(Initializer initializer, Device[] devices);
+
+    void setInitializer(Initializer initializer, boolean overwrite, Device[] devices);
 
     /**
      * Returns the input descriptor of the model.

@@ -14,6 +14,7 @@ package software.amazon.ai.nn;
 
 import java.util.List;
 import java.util.Optional;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -41,16 +42,27 @@ public abstract class AbstractBlock implements Block {
 
     @Override
     public void setInitializer(NDManager manager, Initializer initializer) {
-        setInitializer(manager, initializer, false);
+        setInitializer(manager, initializer, false, new Device[] {manager.getDevice()});
     }
 
     @Override
     public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
+        setInitializer(manager, initializer, overwrite, new Device[] {manager.getDevice()});
+    }
+
+    @Override
+    public void setInitializer(NDManager manager, Initializer initializer, Device[] devices) {
+        setInitializer(manager, initializer, false, devices);
+    }
+
+    @Override
+    public void setInitializer(
+            NDManager manager, Initializer initializer, boolean overwrite, Device[] devices) {
         for (Parameter parameter : getDirectParameters()) {
-            parameter.setInitializer(manager, initializer, overwrite);
+            parameter.setInitializer(manager, initializer, overwrite, devices);
         }
         for (Block child : getChildren().values()) {
-            child.setInitializer(manager, initializer, overwrite);
+            child.setInitializer(manager, initializer, overwrite, devices);
         }
     }
 
@@ -68,7 +80,10 @@ public abstract class AbstractBlock implements Block {
                         .filter(pair -> pair.getName().equals(paramName))
                         .findFirst();
         if (parameter.isPresent()) {
-            parameter.get().setInitializer(manager, initializer, overwrite);
+            parameter
+                    .get()
+                    .setInitializer(
+                            manager, initializer, overwrite, new Device[] {manager.getDevice()});
         } else {
             throw new IllegalArgumentException("Could not find parameter " + paramName);
         }

@@ -19,6 +19,7 @@ import org.apache.commons.cli.Options;
 public class Arguments {
     private int epoch;
     private int batchSize;
+    private int numGpus;
 
     public Arguments(CommandLine cmd) {
         if (cmd.hasOption("epoch")) {
@@ -30,6 +31,11 @@ public class Arguments {
             batchSize = Integer.parseInt(cmd.getOptionValue("batch-size"));
         } else {
             batchSize = 32;
+        }
+        if (cmd.hasOption("num-gpus")) {
+            numGpus = Integer.parseInt(cmd.getOptionValue("num-gpus"));
+        } else {
+            numGpus = 0;
         }
     }
 
@@ -49,6 +55,13 @@ public class Arguments {
                         .argName("BATCH-SIZE")
                         .desc("The batch size of the training data.")
                         .build());
+        options.addOption(
+                Option.builder("g")
+                        .longOpt("num-gpus")
+                        .hasArg()
+                        .argName("NUMGPUS")
+                        .desc("Number of GPUs used for training")
+                        .build());
         return options;
     }
 
@@ -58,5 +71,9 @@ public class Arguments {
 
     public int getEpoch() {
         return epoch;
+    }
+
+    public int getNumGpus() {
+        return numGpus;
     }
 }

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
@@ -157,10 +158,11 @@ public class Linear extends AbstractBlock {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
         }
+        Device device = inputs.get(0).getDevice();
         NDList additional =
                 bias != null
-                        ? new NDList(weight.getArray(), bias.getArray())
-                        : new NDList(weight.getArray());
+                        ? new NDList(weight.getArray(device), bias.getArray(device))
+                        : new NDList(weight.getArray(device));
         NDList result = new NDList();
         result.addAll(inputs);
         result.addAll(additional);

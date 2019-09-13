@@ -13,6 +13,7 @@
 
 package software.amazon.ai.training.initializer;
 
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
@@ -36,8 +37,9 @@ public class UniformInitializer implements Initializer {
         this.scale = scale;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
-        return manager.randomUniform(-scale, scale, shape);
+    public NDArray initialize(NDManager manager, Shape shape, DataType dataType, Device device) {
+        return manager.randomUniform(-scale, scale, shape, dataType, device);
     }
 }

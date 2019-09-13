@@ -46,8 +46,9 @@ public class Nag extends Optimizer {
         return true;
     }
 
+    // TODO: make this protected after integrate with PS store
     @Override
-    protected void update(int index, NDArray weight, NDArray grad) {
+    public void update(int index, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
         float newLearningRate = learningRateTracker.getNewLearningRate(updateCount(index));
         float weightDecay = getWeightDecay(index);

@@ -79,6 +79,12 @@ public class MockModel implements Model {
     }
 
     @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device[] devices) {
+        return null;
+    }
+
+    @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
         return new MockPredictor<>(this, translator, device);
     }
@@ -88,6 +94,12 @@ public class MockModel implements Model {
 
     @Override
     public void setInitializer(Initializer initializer, boolean overwrite) {}
+
+    @Override
+    public void setInitializer(Initializer initializer, Device[] devices) {}
+
+    @Override
+    public void setInitializer(Initializer initializer, boolean overwrite, Device[] devices) {}
 
     @Override
     public DataDesc[] describeInput() {

@@ -15,6 +15,7 @@ package software.amazon.ai.training;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import software.amazon.ai.Device;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
@@ -29,18 +30,22 @@ public class TrainingController implements AutoCloseable {
     private ParameterStore parameterStore;
     private boolean gradientsChecked;
     private boolean updateOnParameterStore;
+    private Device[] devices;
 
-    public TrainingController(PairList<String, Parameter> parameters, Optimizer optimizer) {
-        this(parameters, optimizer, false, false);
+    public TrainingController(
+            PairList<String, Parameter> parameters, Optimizer optimizer, Device[] devices) {
+        this(parameters, optimizer, devices, devices.length > 1, devices.length > 1);
     }
 
     public TrainingController(
             PairList<String, Parameter> parameters,
             Optimizer optimizer,
+            Device[] devices,
             boolean updateOnParameterStore,
             boolean aggregateOnGPU) {
         this.parameters = parameters;
         this.optimizer = optimizer;
+        this.devices = devices;
         this.updateOnParameterStore = updateOnParameterStore;
         parameterStore = Engine.getInstance().newParameterStore(optimizer, aggregateOnGPU);
     }
@@ -51,8 +56,9 @@ public class TrainingController implements AutoCloseable {
             checkGradients();
         }
         if (updateOnParameterStore) {
-            reduceGradientsOnParameterStore();
-            updateOnParameterStore();
+            //            reduceGradientsOnParameterStore();
+            //            updateOnParameterStore();
+            fakeReduceOnParameterStore();
         } else {
             optimizer.updateAllParameters(parameters);
         }
@@ -80,6 +86,31 @@ public class TrainingController implements AutoCloseable {
                             + "your target NDArray (usually loss), before calling step() ");
         }
         gradientsChecked = true;
+    }
+
+    // TODO: remove this method, and make optimizer update methods protected
+    void fakeReduceOnParameterStore() {
+        int numDevices = devices.length;
+        for (int i = 0; i < parameters.size(); i++) {
+            NDArray[] grads = new NDArray[numDevices];
+            NDArray[] paramArrays = new NDArray[numDevices];
+            for (int j = 0; j < numDevices; j++) {
+                paramArrays[j] = parameters.get(i).getValue().getArray(devices[j]);
+                grads[j] = paramArrays[j].getGradient().asInDevice(Device.cpu(0), true);
+            }
+            NDArray stackedGrads = NDArrays.stack(grads);
+            NDArray mean = stackedGrads.mean(new int[] {0});
+            for (int j = 0; j < numDevices; j++) {
+                NDArray meanGPU = mean.asInDevice(devices[j], true);
+                optimizer.update(i, paramArrays[j], meanGPU);
+                meanGPU.close();
+            }
+            mean.close();
+            stackedGrads.close();
+            for (int j = 0; j < numDevices; j++) {
+                grads[j].close();
+            }
+        }
     }
 
     void reduceGradientsOnParameterStore() {

@@ -1589,6 +1589,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     public void close() {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
+            // TODO: remove after fixing multi-thread data loading issue
+            // JnaUtils.waitToRead(pointer);
             JnaUtils.freeNdArray(pointer);
             detach();
             manager = null;

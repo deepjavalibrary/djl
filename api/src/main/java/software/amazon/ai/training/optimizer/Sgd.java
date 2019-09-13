@@ -47,8 +47,9 @@ public class Sgd extends Optimizer {
         return true;
     }
 
+    // TODO: make this protected after integrate with PS store
     @Override
-    protected void update(int index, NDArray weight, NDArray grad) {
+    public void update(int index, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
         float weightDecay = getWeightDecay(index);
         float learningRate = learningRateTracker.getNewLearningRate(updateCount(index));

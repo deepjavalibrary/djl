@@ -169,14 +169,14 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator) {
-        return new MxTrainer<>(this, trainTranslator, null);
+        return new MxTrainer<>(this, trainTranslator, manager.getDevice());
     }
 
     /** {@inheritDoc} */
     @Override
     public <I, L, O> Trainer<I, L, O> newTrainer(
             TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer) {
-        return newTrainer(trainTranslator, optimizer, null);
+        return newTrainer(trainTranslator, optimizer, manager.getDevice());
     }
 
     /** {@inheritDoc} */
@@ -189,6 +189,13 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public <I, L, O> Trainer<I, L, O> newTrainer(
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device[] devices) {
+        return new MxTrainer<>(this, trainTranslator, optimizer, devices);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
         device = Device.defaultIfNull(device, manager.getDevice());
         return new MxPredictor<>(this, translator, device);
@@ -197,13 +204,25 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer) {
-        setInitializer(initializer, false);
+        setInitializer(initializer, false, new Device[] {manager.getDevice()});
     }
 
     /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer, boolean overwrite) {
-        block.setInitializer(manager, initializer, overwrite);
+        setInitializer(initializer, overwrite, new Device[] {manager.getDevice()});
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setInitializer(Initializer initializer, Device[] devices) {
+        setInitializer(initializer, false, devices);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setInitializer(Initializer initializer, boolean overwrite, Device[] devices) {
+        block.setInitializer(manager, initializer, overwrite, devices);
     }
 
     /** {@inheritDoc} */

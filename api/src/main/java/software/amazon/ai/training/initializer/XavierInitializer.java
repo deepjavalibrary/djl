@@ -13,6 +13,7 @@
 
 package software.amazon.ai.training.initializer;
 
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
@@ -74,7 +75,7 @@ public class XavierInitializer implements Initializer {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
+    public NDArray initialize(NDManager manager, Shape shape, DataType dataType, Device device) {
 
         double hwScale;
         long dimension = shape.dimension();
@@ -111,9 +112,9 @@ public class XavierInitializer implements Initializer {
 
         switch (randomType) {
             case UNIFORM:
-                return manager.randomUniform(-scale, scale, shape, dataType, manager.getDevice());
+                return manager.randomUniform(-scale, scale, shape, dataType, device);
             case GAUSSIAN:
-                return manager.randomNormal(0, scale, shape, dataType, manager.getDevice());
+                return manager.randomNormal(0, scale, shape, dataType, device);
             default:
                 throw new IllegalArgumentException("Invalid randomType");
         }

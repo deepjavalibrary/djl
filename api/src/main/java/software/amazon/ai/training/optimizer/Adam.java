@@ -51,8 +51,9 @@ public class Adam extends Optimizer {
         return true;
     }
 
+    // TODO: make this protected after integrate with PS store
     @Override
-    protected void update(int index, NDArray weight, NDArray grad) {
+    public void update(int index, NDArray weight, NDArray grad) {
         double t = updateCount(index);
         double coef1 = 1.0 - Math.pow(beta1, t);
         double coef2 = 1.0 - Math.pow(beta2, t);

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
@@ -33,6 +34,8 @@ public interface Trainer<I, L, O> extends AutoCloseable {
     default Iterable<Batch> iterateDataset(Dataset<I, L> dataset) throws IOException {
         return dataset.getData(this);
     }
+
+    NDList forward(NDList intput);
 
     /**
      * Predicts the method used for inference.
