@@ -49,16 +49,6 @@ public class TfModel implements Model {
     private DataDesc[] inputDesc;
     private DataDesc[] outputDesc;
 
-    TfModel(Path modelDir, SavedModelBundle bundle) throws InvalidProtocolBufferException {
-        this.modelDir = modelDir;
-        this.bundle = bundle;
-        SignatureDef sig =
-                MetaGraphDef.parseFrom(this.bundle.metaGraphDef())
-                        .getSignatureDefOrThrow("serving_default");
-        inputDesc = constructDataDescFromModel(sig.getInputsMap());
-        outputDesc = constructDataDescFromModel(sig.getOutputsMap());
-    }
-
     private DataDesc[] constructDataDescFromModel(Map<String, TensorInfo> info) {
         DataDesc[] descs = new DataDesc[info.size()];
         int dataDescIter = 0;
@@ -80,24 +70,36 @@ public class TfModel implements Model {
         return descs;
     }
 
-    public static TfModel load(String modelDir, String... tags)
-            throws InvalidProtocolBufferException {
+    public void load(Path modelDir, String... tags) throws InvalidProtocolBufferException {
         if (tags == null || tags.length == 0) {
             tags = new String[] {"serve"};
         }
-        return new TfModel(Paths.get(modelDir), SavedModelBundle.load(modelDir, tags));
+        bundle = SavedModelBundle.load(modelDir.toString(), tags);
+        SignatureDef sig =
+                MetaGraphDef.parseFrom(bundle.metaGraphDef())
+                        .getSignatureDefOrThrow("serving_default");
+        inputDesc = constructDataDescFromModel(sig.getInputsMap());
+        outputDesc = constructDataDescFromModel(sig.getOutputsMap());
     }
 
-    public static TfModel load(
-            String modelDir, byte[] configProto, byte[] runOptions, String... tags)
-            throws InvalidProtocolBufferException {
-        SavedModelBundle bundle =
+    @Override
+    public void load(Path modelPath, String modelName, Context context, Map<String, String> options)
+            throws IOException {
+        try {
+            load(modelPath);
+        } catch (InvalidProtocolBufferException e) {
+            throw new IOException(e);
+        }
+    }
+
+    public void load(String modelDir, byte[] configProto, byte[] runOptions, String... tags) {
+        this.modelDir = Paths.get(modelDir);
+        bundle =
                 SavedModelBundle.loader(modelDir)
                         .withConfigProto(configProto)
                         .withRunOptions(runOptions)
                         .withTags(tags)
                         .load();
-        return new TfModel(Paths.get(modelDir), bundle);
     }
 
     public org.tensorflow.Graph getTensorflowGraph() {

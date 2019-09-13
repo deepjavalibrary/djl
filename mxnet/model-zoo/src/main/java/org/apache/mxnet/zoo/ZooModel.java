@@ -15,6 +15,8 @@ package org.apache.mxnet.zoo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.function.Function;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
@@ -44,6 +46,12 @@ public class ZooModel<I, O> implements Model {
     @Override
     public BlockFactory getBlockFactory() {
         return model.getBlockFactory();
+    }
+
+    @Override
+    public void load(
+            Path modelPath, String modelName, Context context, Map<String, String> options) {
+        throw new IllegalArgumentException("ZooModel should not be re-loaded.");
     }
 
     @Override

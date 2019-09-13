@@ -49,12 +49,14 @@ public class MxEngineTest extends PowerMockTestCase {
         mockStatic(LibUtils.class);
         MxnetLibrary library = new MockMxnetLibrary();
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
+        Files.deleteIfExists(Paths.get("build/tmp/A-symbol.json"));
         Files.deleteIfExists(Paths.get("build/tmp/A-0122.params"));
         Files.deleteIfExists(Paths.get("build/tmp/A-0001.params"));
     }
 
     @AfterClass
     public void postProcessing() throws IOException {
+        Files.deleteIfExists(Paths.get("build/tmp/A-symbol.json"));
         Files.deleteIfExists(Paths.get("build/tmp/A-0122.params"));
         Files.deleteIfExists(Paths.get("build/tmp/A-0001.params"));
     }
@@ -81,37 +83,38 @@ public class MxEngineTest extends PowerMockTestCase {
 
     @Test
     public void testLoadModel() throws IOException {
-        Engine engine = Engine.getEngine(MxEngine.ENGINE_NAME);
         Path modelDir = Paths.get("build/tmp/");
         String modelName = "A";
+        Files.createFile(modelDir.resolve(modelName + "-symbol.json"));
+
         Path path122 = modelDir.resolve(modelName + "-0122.params");
         Files.createFile(path122);
-        String result = loadModel(engine, modelDir, modelName, null);
+        String result = loadModel(modelDir, modelName, null);
         Files.delete(path122);
         Assert.assertEquals(result, "A-0122.params");
 
         Path path1 = modelDir.resolve(modelName + "-0001.params");
         Files.createFile(path1);
-        result = loadModel(engine, modelDir, modelName, null);
+        result = loadModel(modelDir, modelName, null);
         Files.delete(path1);
         Assert.assertEquals(result, "A-0001.params");
 
         Map<String, String> options = new ConcurrentHashMap<>();
         options.put("epoch", String.valueOf(122));
-        result = loadModel(engine, modelDir, modelName, options);
+        result = loadModel(modelDir, modelName, options);
         Assert.assertEquals(result, "A-0122.params");
 
         Files.createFile(path122);
         Files.createFile(path1);
 
-        result = loadModel(engine, modelDir, modelName, options);
+        result = loadModel(modelDir, modelName, options);
         Assert.assertEquals(result, "A-0122.params");
     }
 
-    private String loadModel(
-            Engine engine, Path location, String modelName, Map<String, String> options)
+    private String loadModel(Path location, String modelName, Map<String, String> options)
             throws IOException {
-        try (Model model = engine.loadModel(location, modelName, null, options)) {
+        try (Model model = Model.newInstance()) {
+            model.load(location, modelName, null, options);
             // In JNA.MXNDArrayLoad function, file name is stored as the first param name in Model
             BlockFactory factory = model.getBlockFactory();
             String paramPath = model.getBlock().getDirectParameters().get(0).getName();

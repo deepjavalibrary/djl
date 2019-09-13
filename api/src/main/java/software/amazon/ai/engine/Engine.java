@@ -12,9 +12,7 @@
  */
 package software.amazon.ai.engine;
 
-import java.io.IOException;
 import java.lang.management.MemoryUsage;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -132,23 +130,6 @@ public abstract class Engine {
      * @return a new Model instance using the network defined in block
      */
     public abstract Model newModel(Context context);
-
-    /**
-     * Loads the model from the specified location.
-     *
-     * <p>The model format is deep learning framework specific, each framework may have its own
-     * loading options. You should check each framework's document for available loading options.
-     *
-     * @param modelPath Directory of the model
-     * @param modelName Name/Prefix of the model
-     * @param context the context that model to be loaded
-     * @param options load model options, check document for specific engine
-     * @return {@link Model} contains the model information
-     * @throws IOException Exception for file loading
-     */
-    public abstract Model loadModel(
-            Path modelPath, String modelName, Context context, Map<String, String> options)
-            throws IOException;
 
     /**
      * Creates a new {@link GradientCollector} instance for this Engine.

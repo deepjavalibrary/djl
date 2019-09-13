@@ -18,6 +18,7 @@ import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
 import org.tensorflow.engine.TfModel;
@@ -55,7 +56,8 @@ public final class HelloWorld {
             System.out.println("OnesLike:");
             System.out.println(Arrays.toString(a.onesLike().toFloatArray()));
 
-            TfModel model = TfModel.load("ModelPath/TF-resnet_ssd");
+            TfModel model = new TfModel();
+            model.load(Paths.get("ModelPath/TF-resnet_ssd"));
             System.out.println(model.describeInput()[0].getShape());
             System.out.println(model.describeInput()[0].getName());
 

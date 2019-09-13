@@ -49,7 +49,8 @@ public class InferenceTest {
         Path modelDir = Paths.get("build/model");
         String modelName = "mockModel";
 
-        Model model = Model.load(modelDir, modelName);
+        Model model = Model.newInstance();
+        model.load(modelDir, modelName);
         MockImageTranslator translator = new MockImageTranslator("cat");
 
         Metrics metrics = new Metrics();
@@ -71,7 +72,8 @@ public class InferenceTest {
     @Test
     public void testClassifier() throws IOException, TranslateException {
         Path modelDir = Paths.get("build/model");
-        Model model = Model.load(modelDir);
+        Model model = Model.newInstance();
+        model.load(modelDir);
 
         final String data = "cat";
         Translator<String, Classification> translator =
@@ -112,6 +114,8 @@ public class InferenceTest {
         Path modelDir = Paths.get("build/non-exist-model");
         String modelName = "mockModel";
 
-        Model.load(modelDir, modelName);
+        try (Model model = Model.newInstance()) {
+            model.load(modelDir, modelName);
+        }
     }
 }

@@ -61,7 +61,8 @@ public class SimplePoseModel {
         Path dir = repository.getCacheDirectory();
         String relativePath = artifact.getResourceUri().getPath();
         Path modelPath = dir.resolve(relativePath);
-        Model model = Model.load(modelPath, artifact.getName());
+        Model model = Model.newInstance();
+        model.load(modelPath, artifact.getName());
         return new ZooModel<>(model, new SimplePoseTranslator());
     }
 

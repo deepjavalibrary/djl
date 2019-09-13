@@ -77,11 +77,10 @@ public interface Model extends AutoCloseable {
      * Loads the model from the {@code modelPath}.
      *
      * @param modelPath the directory or file path of the model location
-     * @return {@code Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model load(Path modelPath) throws IOException {
-        return load(modelPath, modelPath.toFile().getName(), null, null);
+    default void load(Path modelPath) throws IOException {
+        load(modelPath, modelPath.toFile().getName(), null, null);
     }
 
     /**
@@ -89,11 +88,10 @@ public interface Model extends AutoCloseable {
      *
      * @param modelPath the directory or file path of the model location
      * @param modelName model file name or assigned name
-     * @return {@code Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model load(Path modelPath, String modelName) throws IOException {
-        return load(modelPath, modelName, null, null);
+    default void load(Path modelPath, String modelName) throws IOException {
+        load(modelPath, modelName, null, null);
     }
 
     /**
@@ -102,12 +100,11 @@ public interface Model extends AutoCloseable {
      * @param modelPath the directory or file path of the model location
      * @param modelName model file name or assigned name
      * @param options engine specific load model options, see document for each engine
-     * @return {@code Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model load(Path modelPath, String modelName, Map<String, String> options)
+    default void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException {
-        return load(modelPath, modelName, null, options);
+        load(modelPath, modelName, null, options);
     }
 
     /**
@@ -118,14 +115,10 @@ public interface Model extends AutoCloseable {
      * @param modelName model file name or assigned name
      * @param context the context that model to be loaded
      * @param options engine specific load model options, see document for each engine
-     * @return {@link Model} object
      * @throws IOException IO exception happened in loading
      */
-    static Model load(
-            Path modelPath, String modelName, Context context, Map<String, String> options)
-            throws IOException {
-        return Engine.getInstance().loadModel(modelPath, modelName, context, options);
-    }
+    void load(Path modelPath, String modelName, Context context, Map<String, String> options)
+            throws IOException;
 
     /**
      * Get the factory from the Model.

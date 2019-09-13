@@ -54,7 +54,8 @@ public class SymbolBlockTest {
     @RunAsTest
     public void testInference() throws FailedTestException, IOException {
         Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-        try (Model model = Model.load(modelPathPrefix)) {
+        try (Model model = Model.newInstance()) {
+            model.load(modelPathPrefix);
             NDManager manager = model.getNDManager();
 
             Block block = model.getBlock();
@@ -67,7 +68,8 @@ public class SymbolBlockTest {
     @RunAsTest
     public void trainWithNewParam() throws FailedTestException, IOException {
         Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-        try (Model model = Model.load(modelPathPrefix)) {
+        try (Model model = Model.newInstance()) {
+            model.load(modelPathPrefix);
             NDManager manager = model.getNDManager();
             Block mlp = model.getBlock();
             mlp.setInitializer(Initializer.ONES, true);
@@ -90,7 +92,8 @@ public class SymbolBlockTest {
     @RunAsTest
     public void trainWithExistParam() throws FailedTestException, IOException {
         Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-        try (Model model = Model.load(modelPathPrefix)) {
+        try (Model model = Model.newInstance()) {
+            model.load(modelPathPrefix);
             NDManager manager = model.getNDManager();
             Block mlp = model.getBlock();
             Pair<NDArray, NDArray> result = train(manager, mlp);
@@ -112,7 +115,8 @@ public class SymbolBlockTest {
     @RunAsTest
     public void trainWithCustomLayer() throws FailedTestException, IOException {
         Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
-        try (Model model = Model.load(modelPathPrefix)) {
+        try (Model model = Model.newInstance()) {
+            model.load(modelPathPrefix);
             BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             SymbolBlock mlp = (SymbolBlock) model.getBlock();

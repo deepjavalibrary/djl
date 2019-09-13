@@ -13,8 +13,6 @@
 package org.tensorflow.engine;
 
 import java.lang.management.MemoryUsage;
-import java.nio.file.Path;
-import java.util.Map;
 import org.tensorflow.TensorFlow;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
@@ -61,13 +59,6 @@ public class TfEngine extends Engine {
     @Override
     public String getVersion() {
         return TensorFlow.version();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Model loadModel(
-            Path modelPath, String modelName, Context context, Map<String, String> options) {
-        return null;
     }
 
     @Override

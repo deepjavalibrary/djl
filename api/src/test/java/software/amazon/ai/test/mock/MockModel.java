@@ -12,9 +12,12 @@
  */
 package software.amazon.ai.test.mock;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -39,6 +42,14 @@ public class MockModel implements Model {
     @Override
     public BlockFactory getBlockFactory() {
         return null;
+    }
+
+    @Override
+    public void load(Path modelPath, String modelName, Context context, Map<String, String> options)
+            throws IOException {
+        if (Files.notExists(modelPath)) {
+            throw new FileNotFoundException("File not found: " + modelPath);
+        }
     }
 
     @Override

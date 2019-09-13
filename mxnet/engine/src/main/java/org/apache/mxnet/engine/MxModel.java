@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.engine;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -21,14 +22,18 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.nn.MxBlockFactory;
 import org.apache.mxnet.nn.MxSymbolBlock;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
+import software.amazon.ai.engine.Engine;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -67,40 +72,55 @@ public class MxModel implements Model {
         factory = new MxBlockFactory(manager);
     }
 
-    MxModel(Path modelDir, Block block, MxNDManager manager) {
-        this.modelDir = modelDir;
-        this.block = block;
-        this.manager = manager;
-        factory = new MxBlockFactory(manager);
-    }
+    /**
+     * Load the MXNet model from specified location.
+     *
+     * <p>MXNet engine looks for modelName.json and modelName-xxxx.params files in specified
+     * directory. By default, MXNet engine will pick up latest epoch of parameter file. However,
+     * user can explicitly an epoch to be loaded:
+     *
+     * <pre>
+     * Map&lt;String, String&gt; options = new HashMap&lt;&gt;()
+     * <b>options.put("epoch", "3");</b>
+     * model.load(modelPath, "squeezenet", options);
+     * </pre>
+     *
+     * @param modelPath Directory of the model
+     * @param modelName Name/Prefix of the model
+     * @param context the context that model to be loaded
+     * @param options load model options, check document for specific engine
+     * @throws IOException Exception for file loading
+     */
+    @Override
+    public void load(Path modelPath, String modelName, Context context, Map<String, String> options)
+            throws IOException {
+        MxEngine engine = ((MxEngine) Engine.getEngine(MxEngine.ENGINE_NAME));
+        engine.setNumpyMode(false);
 
-    static MxModel load(String prefix, int epoch) {
-        return load(prefix, epoch, null);
-    }
-
-    static MxModel load(String prefix, int epoch, Context context) {
-        context = Context.defaultIfNull(context);
-        MxNDManager manager = MxNDManager.getSystemManager().newSubManager(context);
-        Symbol symbol = Symbol.load(manager, prefix + "-symbol.json");
-        String paramFile = String.format("%s-%04d.params", prefix, epoch);
-        Path modelDir = Paths.get(paramFile).toAbsolutePath().getParent();
-        NDList paramNDlist = JnaUtils.loadNdArray(manager, Paths.get(paramFile));
-
-        MxSymbolBlock block = new MxSymbolBlock(manager, symbol);
-
-        List<Parameter> parameters = block.getDirectParameters();
-        for (Pair<String, NDArray> pair : paramNDlist) {
-            String key = pair.getKey();
-            if (key == null) {
-                throw new IllegalArgumentException("Array names must be present in parameter file");
+        if (Files.isDirectory(modelPath)) {
+            modelDir = modelPath.toAbsolutePath();
+        } else {
+            modelDir = modelPath.toAbsolutePath().getParent();
+            if (modelDir == null) {
+                throw new AssertionError("Invalid path: " + modelPath.toString());
             }
-            String paramName = key.split(":", 2)[1];
-            NDArray array = pair.getValue().asInContext(context, true);
-            parameters.add(new Parameter(paramName, block, array));
+        }
+        String modelPrefix = modelDir.resolve(modelName).toString();
+        if (block == null) {
+            Path symbolFile = Paths.get(modelPrefix + "-symbol.json");
+            if (Files.notExists(symbolFile)) {
+                throw new FileNotFoundException(
+                        "Failed to load symbol file, please set block manually.");
+            }
+            Symbol symbol = Symbol.load(manager, modelPrefix + "-symbol.json");
+            block = new MxSymbolBlock(manager, symbol);
         }
 
+        loadParameters(modelPrefix, modelName, context, options);
+
         // TODO: Check if Symbol has all names that params file have
-        return new MxModel(modelDir, block, manager);
+
+        engine.setNumpyMode(true);
     }
 
     /** {@inheritDoc} */
@@ -260,5 +280,52 @@ public class MxModel implements Model {
     @Override
     public void close() {
         manager.close();
+    }
+
+    private void loadParameters(
+            String modelPrefix, String modelName, Context context, Map<String, String> options)
+            throws IOException {
+        context = Context.defaultIfNull(context);
+        String epochOption = null;
+        if (options != null) {
+            epochOption = options.get("epoch");
+        }
+        int epoch;
+        if (epochOption == null) {
+            final Pattern pattern = Pattern.compile(Pattern.quote(modelName) + "-(\\d{4}).params");
+            List<Integer> checkpoints =
+                    Files.walk(modelDir, 1)
+                            .map(
+                                    p -> {
+                                        Matcher m = pattern.matcher(p.toFile().getName());
+                                        if (m.matches()) {
+                                            return Integer.parseInt(m.group(1));
+                                        }
+                                        return null;
+                                    })
+                            .filter(Objects::nonNull)
+                            .sorted()
+                            .collect(Collectors.toList());
+            if (checkpoints.isEmpty()) {
+                throw new IOException("Parameter files not found: " + modelPrefix + "-0001.params");
+            }
+            epoch = checkpoints.get(checkpoints.size() - 1);
+        } else {
+            epoch = Integer.parseInt(epochOption);
+        }
+
+        String paramFile = String.format("%s-%04d.params", modelPrefix, epoch);
+        NDList paramNDlist = JnaUtils.loadNdArray(manager, Paths.get(paramFile));
+
+        List<Parameter> parameters = block.getDirectParameters();
+        for (Pair<String, NDArray> pair : paramNDlist) {
+            String key = pair.getKey();
+            if (key == null) {
+                throw new IllegalArgumentException("Array names must be present in parameter file");
+            }
+            String paramName = key.split(":", 2)[1];
+            NDArray array = pair.getValue().asInContext(context, true);
+            parameters.add(new Parameter(paramName, block, array));
+        }
     }
 }

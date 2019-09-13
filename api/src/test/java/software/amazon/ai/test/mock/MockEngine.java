@@ -12,12 +12,7 @@
  */
 package software.amazon.ai.test.mock;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.management.MemoryUsage;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
 import software.amazon.ai.Context;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
@@ -61,16 +56,6 @@ public class MockEngine extends Engine {
     @Override
     public String getVersion() {
         return version;
-    }
-
-    @Override
-    public Model loadModel(
-            Path modelPath, String modelName, Context context, Map<String, String> options)
-            throws IOException {
-        if (Files.notExists(modelPath)) {
-            throw new FileNotFoundException("File not found: " + modelPath);
-        }
-        return new MockModel();
     }
 
     @Override
