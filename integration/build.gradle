@@ -56,6 +56,13 @@ jacocoTestReport {
     sourceDirectories = files()
     classDirectories = files()
 
+    javaProjects().findAll { p ->
+        ![":mxnet:jnarator", ":tensorflow:engine"].contains(p.getPath())
+    }.each { p ->
+        additionalSourceDirs files((Set<File>) p.sourceSets.main.allJava.srcDirs)
+        additionalClassDirs((FileCollection) p.sourceSets.main.output)
+    }
+
     reports {
         xml.enabled true
         csv.enabled false
@@ -64,15 +71,6 @@ jacocoTestReport {
     // Work-around to allow us to build list of executionData files in doFirst
     onlyIf = {
         true
-    }
-
-    doFirst {
-        javaProjects().findAll { p ->
-            ![":mxnet:jnarator", ":tensorflow:engine"].contains(p.getPath())
-        }.each { p ->
-            additionalSourceDirs files((Set<File>) p.sourceSets.main.allJava.srcDirs)
-            additionalClassDirs((FileCollection) p.sourceSets.main.output)
-        }
     }
 }
 
