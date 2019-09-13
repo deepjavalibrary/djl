@@ -66,9 +66,9 @@ public class OptimizerTest {
             NDArray result2 = runOptimizer(manager, block, optim);
             // TODO: fix atol and rtol too large on GPU build
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.9963f, 1.0231f}), result, 0.5, 0.5);
+                    manager.create(new float[] {0.9963f, 1.0231f}), result, 4.2, 4.2);
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {1.0222f, 1.0625f}), result2, 0.5, 0.5);
+                    manager.create(new float[] {1.0222f, 1.0625f}), result2, 4.2, 4.2);
         }
     }
 
@@ -89,9 +89,9 @@ public class OptimizerTest {
             NDArray result2 = runOptimizer(manager, block, optim);
             // TODO: fix atol and rtol too large on GPU build
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.9963f, 1.0231f}), result, 0.5, 0.5);
+                    manager.create(new float[] {0.9963f, 1.0231f}), result, 4.2, 4.2);
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.6516f, 3.3688f}), result2, 0.5, 0.5);
+                    manager.create(new float[] {0.6516f, 3.3688f}), result2, 4.2, 4.2);
         }
     }
 
@@ -112,9 +112,9 @@ public class OptimizerTest {
             NDArray result2 = runOptimizer(manager, block, optim);
             // TODO: fix atol and rtol too large on GPU build
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.959f, 1.2541f}), result, 0.5, 0.5);
+                    manager.create(new float[] {0.959f, 1.2541f}), result, 4.2, 4.2);
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {-0.61f, 5f}), result2, 0.5, 0.5);
+                    manager.create(new float[] {-0.61f, 5f}), result2, 4.2, 4.2);
         }
     }
 
@@ -133,9 +133,9 @@ public class OptimizerTest {
             NDArray result2 = runOptimizer(manager, block, optim);
             // TODO: fix atol and rtol too large on GPU build
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.8849f, 1.7222f}), result, 0.5, 0.5);
+                    manager.create(new float[] {0.8849f, 1.7222f}), result, 4.2, 4.2);
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {60.4156f, 61.2529f}), result2, 0.5, 0.5);
+                    manager.create(new float[] {60.4156f, 61.2529f}), result2, 4.2, 4.2);
         }
     }
 

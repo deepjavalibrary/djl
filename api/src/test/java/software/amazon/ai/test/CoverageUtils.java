@@ -118,7 +118,7 @@ public final class CoverageUtils {
 
                 try {
                     classList.add(Class.forName(className));
-                } catch (ExceptionInInitializerError ignore) {
+                } catch (ExceptionInInitializerError | NoClassDefFoundError ignore) {
                     // ignore
                 }
             }
