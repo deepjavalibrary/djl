@@ -12,10 +12,10 @@
  */
 package org.apache.mxnet.nn;
 
-import org.apache.mxnet.nn.core.MxPrelu;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.LambdaBlock;
+import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.training.Activation;
 
 public class MxActivation implements Activation {
@@ -73,6 +73,6 @@ public class MxActivation implements Activation {
 
     @Override
     public Block preluBlock() {
-        return new MxPrelu(manager);
+        return new Prelu(manager);
     }
 }

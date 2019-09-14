@@ -275,7 +275,16 @@ public interface NDArrayEx {
             int numGroups,
             String layout,
             boolean noBias,
-            PairList<String, Object> params);
+            PairList<String, Object> additional);
+
+    NDList fullyConnected(
+            NDList inputs,
+            long outChannels,
+            boolean flatten,
+            boolean noBias,
+            PairList<String, Object> additional);
+
+    NDList prelu(NDList inputs, PairList<String, Object> additional);
 
     ////////////////////////////////////////
     // Miscellaneous

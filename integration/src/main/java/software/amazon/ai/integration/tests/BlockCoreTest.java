@@ -59,7 +59,7 @@ public class BlockCoreTest {
             Linear linearWithBias =
                     new Linear.Builder().setFactory(factory).setOutChannels(outSize).build();
             linearWithBias.setInitializer(Initializer.ONES, true);
-            NDArray outBias = linearWithBias.forward(input);
+            NDArray outBias = linearWithBias.forward(new NDList(input)).head();
             NDArray expectedBias =
                     input.mmul(manager.ones(new Shape(outSize, 2)).transpose())
                             .add(manager.ones(new Shape(2, outSize)));
@@ -72,7 +72,7 @@ public class BlockCoreTest {
                             .setBias(false)
                             .build();
             linearWithoutBias.setInitializer(Initializer.ONES, true);
-            NDArray outNoBias = linearWithoutBias.forward(input);
+            NDArray outNoBias = linearWithoutBias.forward(new NDList(input)).head();
             NDArray expectedNoBias = input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
             Assertions.assertEquals(expectedNoBias, outNoBias);
         }
@@ -94,7 +94,7 @@ public class BlockCoreTest {
             Linear linearWithBias =
                     new Linear.Builder().setFactory(factory).setOutChannels(outSize).build();
             linearWithBias.setInitializer(Initializer.ONES, true);
-            NDArray outBias = linearWithBias.forward(input);
+            NDArray outBias = linearWithBias.forward(new NDList(input)).head();
             NDArray expectedBias =
                     input.mmul(manager.ones(new Shape(outSize, 2)).transpose())
                             .add(manager.ones(new Shape(2, outSize)));
@@ -107,7 +107,7 @@ public class BlockCoreTest {
                             .setBias(false)
                             .build();
             linearWithoutBias.setInitializer(Initializer.ONES, true);
-            NDArray outNoBias = linearWithoutBias.forward(input);
+            NDArray outNoBias = linearWithoutBias.forward(new NDList(input)).head();
             NDArray expectedNoBias = input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
             Assertions.assertEquals(expectedNoBias, outNoBias);
         }

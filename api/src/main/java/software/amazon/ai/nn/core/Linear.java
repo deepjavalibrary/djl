@@ -12,9 +12,26 @@
  */
 package software.amazon.ai.nn.core;
 
-import software.amazon.ai.ndarray.NDArray;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.LayoutType;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.BlockFactory;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
+import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.util.Pair;
+import software.amazon.ai.util.PairList;
 
 /**
  * A Linear block applies a linear transformation \(Y = XW^T + b\).
@@ -30,12 +47,130 @@ import software.amazon.ai.nn.BlockFactory;
  *
  * <p>The Linear block should be constructed using {@link Linear.Builder}.
  */
-public interface Linear extends Block {
+public class Linear extends AbstractBlock {
 
-    NDArray forward(NDArray data);
+    private static final byte VERSION = 1;
+
+    private long outChannels;
+
+    private Shape inputShape;
+    private Shape inChannels;
+
+    private Parameter weight;
+    private Parameter bias;
+
+    Linear(NDManager manager, Builder builder) {
+        super(manager);
+        outChannels = builder.getOutChannels();
+        weight = new Parameter("weight", this, ParameterType.WEIGHT);
+        if (builder.isBias()) {
+            bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);
+        }
+    }
+
+    @Override
+    public NDList forward(NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(inputs);
+        NDArrayEx ex = inputs.head().getNDArrayInternal();
+        return ex.fullyConnected(inputs, outChannels, false, bias == null, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape getOutputShape(Shape... inputs) {
+        return new Shape(inputs[0].get(0), outChannels);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Parameter> getDirectParameters() {
+        if (bias != null) {
+            return Arrays.asList(weight, bias);
+        }
+        return Collections.singletonList(weight);
+    }
+
+    @Override
+    public DataDesc[] describeInput() {
+        return new DataDesc[] {new DataDesc(inputShape)};
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void beforeInitialize(NDList inputs) {
+        Shape input = inputs.head().getShape();
+        if (input.isLayoutKnown()) {
+            inChannels = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
+            inputShape =
+                    input.map(
+                            pair ->
+                                    new Pair<>(
+                                            pair.getValue().equals(LayoutType.BATCH)
+                                                    ? Long.valueOf(-1)
+                                                    : pair.getKey(),
+                                            pair.getValue()));
+        } else if (input.dimension() > 1) {
+            inChannels = input.slice(1);
+            inputShape =
+                    new Shape(new long[] {-1}, new LayoutType[] {LayoutType.BATCH})
+                            .addAll(input.slice(1));
+        } else {
+            inChannels = input.slice(0);
+            inputShape = input;
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape getParameterShape(String name, NDList inputs) {
+        switch (name) {
+            case "weight":
+                return new Shape(outChannels).addAll(inChannels);
+            case "bias":
+                return new Shape(outChannels);
+            default:
+                throw new IllegalArgumentException("Invalid parameter name");
+        }
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        weight.save(os);
+        if (bias != null) {
+            bias.save(os);
+        }
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        weight.load(is);
+        if (bias != null) {
+            bias.load(is);
+        }
+    }
+
+    private NDList opInputs(NDList inputs) {
+        ensureInitialized(inputs);
+        if (inputs.size() != 1) {
+            throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
+        }
+        NDList additional =
+                bias != null
+                        ? new NDList(weight.getArray(), bias.getArray())
+                        : new NDList(weight.getArray());
+        NDList result = new NDList();
+        result.addAll(inputs);
+        result.addAll(additional);
+        return result;
+    }
 
     /** The Builder to construct a {@link Linear} type of {@link Block}. */
-    class Builder {
+    public static final class Builder {
 
         private BlockFactory factory;
         private long outChannels;
@@ -87,7 +222,7 @@ public interface Linear extends Block {
             if (outChannels == 0) {
                 throw new IllegalArgumentException("You must specify outChannels");
             }
-            return factory.createLinear(this);
+            return new Linear(factory.getNDManager(), this);
         }
     }
 }

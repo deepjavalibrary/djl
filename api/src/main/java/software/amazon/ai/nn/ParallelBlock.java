@@ -24,7 +24,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
@@ -98,11 +97,6 @@ public class ParallelBlock extends AbstractBlock {
     @Override
     public void beforeInitialize(NDList inputs) {
         initialized = true;
-    }
-
-    @Override
-    public DataDesc[] describeInput() {
-        return new DataDesc[0];
     }
 
     @Override

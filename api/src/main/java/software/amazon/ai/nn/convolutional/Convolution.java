@@ -21,7 +21,6 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
-import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.BlockFactory;
@@ -64,11 +63,6 @@ public abstract class Convolution extends AbstractBlock {
             parameters.add(bias);
         }
         return parameters;
-    }
-
-    @Override
-    public DataDesc[] describeInput() {
-        return new DataDesc[0];
     }
 
     @Override

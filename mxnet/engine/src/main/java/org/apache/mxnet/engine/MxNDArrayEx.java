@@ -463,6 +463,33 @@ class MxNDArrayEx implements NDArrayEx {
         return manager.invoke("Convolution", inputs, params);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public NDList fullyConnected(
+            NDList inputs,
+            long outChannels,
+            boolean flatten,
+            boolean noBias,
+            PairList<String, Object> additional) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("num_hidden", outChannels);
+        params.addParam("flatten", false);
+        params.addParam("no_bias", noBias);
+        params.addAll(additional);
+
+        return manager.invoke("FullyConnected", inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList prelu(NDList inputs, PairList<String, Object> additional) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("act_type", "prelu");
+        params.addAll(additional);
+
+        return manager.invoke("LeakyReLU", inputs, params);
+    }
+
     ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////

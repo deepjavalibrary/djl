@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.function.Function;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
@@ -49,14 +48,6 @@ public class LambdaBlock extends AbstractBlock {
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.emptyList();
-    }
-
-    @Override
-    public void beforeInitialize(NDList inputs) {}
-
-    @Override
-    public DataDesc[] describeInput() {
-        return new DataDesc[0];
     }
 
     @Override

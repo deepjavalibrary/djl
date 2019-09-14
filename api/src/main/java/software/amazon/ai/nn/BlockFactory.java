@@ -17,8 +17,6 @@ import java.util.function.Function;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.core.Embedding;
-import software.amazon.ai.nn.core.Linear;
-import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.nn.recurrent.GRU;
@@ -43,15 +41,11 @@ public interface BlockFactory {
 
     LambdaBlock createLambda(Function<NDList, NDList> lambda);
 
-    Linear createLinear(Linear.Builder builder);
-
     BatchNorm createBatchNorm2D(BatchNorm.Builder builder);
 
     Dropout createDropout(Dropout.Builder builder);
 
     <T> Embedding<T> createEmbedding(Embedding.Builder<T> builder);
-
-    Prelu createPrelu();
 
     RNN createRnn(RNN.Builder builder);
 

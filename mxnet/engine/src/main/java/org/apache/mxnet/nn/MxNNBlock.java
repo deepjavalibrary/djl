@@ -14,16 +14,12 @@ package org.apache.mxnet.nn;
 
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataDesc;
-import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.util.PairList;
 
 public abstract class MxNNBlock extends AbstractBlock {
 
     protected String opName;
-    protected Shape inputShape;
-    protected Shape inChannels;
 
     public MxNNBlock(NDManager manager) {
         super(manager);
@@ -40,9 +36,4 @@ public abstract class MxNNBlock extends AbstractBlock {
     protected abstract NDList opInputs(NDList inputs);
 
     protected abstract PairList<String, Object> opParams(PairList<String, Object> params);
-
-    @Override
-    public DataDesc[] describeInput() {
-        return new DataDesc[] {new DataDesc(inputShape)};
-    }
 }

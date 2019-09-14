@@ -12,13 +12,71 @@
  */
 package software.amazon.ai.nn.core;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.AbstractBlock;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
+import software.amazon.ai.util.PairList;
 
-public interface Prelu extends Block {
+public class Prelu extends AbstractBlock {
 
-    default NDArray forward(NDArray data) {
-        return forward(new NDList(data)).get(0);
+    private static final byte VERSION = 1;
+
+    private Parameter alpha;
+
+    public Prelu(NDManager manager) {
+        super(manager);
+        this.alpha = new Parameter("alpha", this, ParameterType.OTHER);
+    }
+
+    @Override
+    public NDList forward(NDList inputs, PairList<String, Object> params) {
+        ensureInitialized(inputs);
+        NDArray head = inputs.head();
+        inputs = new NDList(head, alpha.getArray());
+        NDArrayEx ex = head.getNDArrayInternal();
+        return ex.prelu(inputs, params);
+    }
+
+    @Override
+    public Shape getOutputShape(Shape... inputs) {
+        return inputs[0];
+    }
+
+    @Override
+    public List<Parameter> getDirectParameters() {
+        return Collections.singletonList(alpha);
+    }
+
+    @Override
+    public Shape getParameterShape(String name, NDList inputs) {
+        if ("alpha".equals(name)) { // TODO: This should return Shape()
+            return new Shape(1);
+        }
+        throw new IllegalArgumentException("Invalid parameter name");
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        alpha.save(os);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        alpha.load(is);
     }
 }

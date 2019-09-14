@@ -141,8 +141,7 @@ public class BlockEncodeDecodeTest {
     @RunAsTest
     public void testPrelu() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            Prelu blk = factory.createPrelu();
+            Prelu blk = new Prelu(model.getNDManager());
             blk.setInitializer(new NormalInitializer());
             NDArray input = model.getNDManager().ones(new Shape(3, 2, 2));
             testBlock(blk, input);

@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.function.Function;
 import org.apache.mxnet.engine.MxNDManager;
 import org.apache.mxnet.nn.core.MxEmbedding;
-import org.apache.mxnet.nn.core.MxLinear;
-import org.apache.mxnet.nn.core.MxPrelu;
 import org.apache.mxnet.nn.norm.MxBatchNorm;
 import org.apache.mxnet.nn.norm.MxDropout;
 import org.apache.mxnet.nn.recurrent.MxGRU;
@@ -30,8 +28,6 @@ import software.amazon.ai.nn.LambdaBlock;
 import software.amazon.ai.nn.ParallelBlock;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Embedding;
-import software.amazon.ai.nn.core.Linear;
-import software.amazon.ai.nn.core.Prelu;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.nn.recurrent.GRU;
@@ -93,12 +89,6 @@ public class MxBlockFactory implements BlockFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Linear createLinear(Linear.Builder builder) {
-        return new MxLinear(manager, builder);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public BatchNorm createBatchNorm2D(BatchNorm.Builder builder) {
         return new MxBatchNorm(manager, builder);
     }
@@ -113,12 +103,6 @@ public class MxBlockFactory implements BlockFactory {
     @Override
     public <T> Embedding<T> createEmbedding(Embedding.Builder<T> builder) {
         return new MxEmbedding<>(manager, builder);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Prelu createPrelu() {
-        return new MxPrelu(manager);
     }
 
     /** {@inheritDoc} */

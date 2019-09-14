@@ -120,7 +120,7 @@ public class GradientCollectorIntegrationTest {
 
                             NDArray x = batch.getData().head();
                             NDArray y = batch.getLabels().head();
-                            NDArray yHat = block.forward(x);
+                            NDArray yHat = block.forward(new NDList(x)).head();
                             loss = Loss.l2Loss(y, yHat, 1, 0);
                             gradCol.backward(loss);
                         }

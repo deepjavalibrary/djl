@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.Pair;
@@ -38,6 +39,11 @@ public abstract class AbstractBlock implements Block {
     @Override
     public NDList forward(NDList inputs) {
         return forward(inputs, new PairList<>());
+    }
+
+    @Override
+    public DataDesc[] describeInput() {
+        return new DataDesc[0];
     }
 
     @Override
@@ -103,7 +109,7 @@ public abstract class AbstractBlock implements Block {
         return parameters;
     }
 
-    protected abstract void beforeInitialize(NDList inputs);
+    protected void beforeInitialize(NDList inputs) {}
 
     @Override
     public void ensureInitialized(NDList inputs) {
