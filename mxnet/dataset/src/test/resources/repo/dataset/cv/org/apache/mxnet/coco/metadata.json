@@ -28,7 +28,7 @@
           "uri": "https://joule.s3.amazonaws.com/mlrepo/dataset/cv/org/apache/mxnet/coco/val2017.zip",
           "sha1Hash": "5643a1b4c5344fd9bdc9b0f7665e575edeff444a"
         },
-        "annotations_trainval2017": {
+        "annotations": {
           "uri": "https://joule.s3.amazonaws.com/mlrepo/dataset/cv/org/apache/mxnet/coco/annotations_trainval2017.zip",
           "sha1Hash": "08bb4fb5394aa37ce8362f21689cbcb42f14b1e8"
         }
