@@ -20,7 +20,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
@@ -65,12 +65,12 @@ public final class BertQaInferenceExample extends AbstractExample {
 
         BertTranslator translator = new BertTranslator(parser);
 
-        // Following context is not not required, default context will be used by Predictor without
-        // passing context to model.newPredictor(translator)
-        // Change to a specific context if needed.
-        Context context = Context.defaultContext();
+        // Following device is not not required, default device will be used by Predictor without
+        // passing device to model.newPredictor(translator)
+        // Change to a specific device if needed.
+        Device device = Device.defaultDevice();
 
-        try (Predictor<QAInput, String> predictor = model.newPredictor(translator, context)) {
+        try (Predictor<QAInput, String> predictor = model.newPredictor(translator, device)) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {

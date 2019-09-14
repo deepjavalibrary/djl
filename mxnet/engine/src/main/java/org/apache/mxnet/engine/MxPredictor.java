@@ -14,7 +14,7 @@ package org.apache.mxnet.engine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
@@ -41,17 +41,17 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
     MxModel model;
     private Translator<I, O> translator;
-    Context context;
+    Device device;
     private Block block;
     MxNDManager manager;
     Metrics metrics;
     private long timestamp;
 
-    MxPredictor(MxModel model, Translator<I, O> translator, Context context) {
-        this.manager = MxNDManager.getSystemManager().newSubManager(context);
+    MxPredictor(MxModel model, Translator<I, O> translator, Device device) {
+        this.manager = MxNDManager.getSystemManager().newSubManager(device);
         this.model = model;
         this.translator = translator;
-        this.context = context;
+        this.device = device;
         this.block = model.getBlock();
     }
 
@@ -155,8 +155,8 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
 
         /** {@inheritDoc} */
         @Override
-        public Context getContext() {
-            return context;
+        public Device getDevice() {
+            return device;
         }
 
         /** {@inheritDoc} */

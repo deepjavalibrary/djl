@@ -13,7 +13,7 @@
 package software.amazon.ai.training.dataset;
 
 import java.util.concurrent.ExecutorService;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 
 /**
  * DataLoadingConfiguration is used to build data loading configuration. It allows users to
@@ -23,12 +23,12 @@ import software.amazon.ai.Context;
 public final class DataLoadingConfiguration {
     private ExecutorService executor;
     private Batchifier batchifier;
-    private Context pinDeviceContext;
+    private Device pinDevice;
 
     private DataLoadingConfiguration(Builder builder) {
         this.executor = builder.executor;
         this.batchifier = builder.batchifier;
-        this.pinDeviceContext = builder.pinDeviceContext;
+        this.pinDevice = builder.pinDevice;
     }
 
     public ExecutorService getExecutor() {
@@ -39,15 +39,15 @@ public final class DataLoadingConfiguration {
         return batchifier;
     }
 
-    public Context getPinDeviceContext() {
-        return pinDeviceContext;
+    public Device getPinDevice() {
+        return pinDevice;
     }
 
     public static final class Builder {
         private ExecutorService executor;
         private Batchifier batchifier;
 
-        private Context pinDeviceContext;
+        private Device pinDevice;
 
         public Builder setExcutor(ExecutorService executor) {
             this.executor = executor;
@@ -59,8 +59,8 @@ public final class DataLoadingConfiguration {
             return this;
         }
 
-        public Builder setPinDeviceContext(Context ctx) {
-            this.pinDeviceContext = ctx;
+        public Builder setPinDevice(Device ctx) {
+            this.pinDevice = ctx;
             return this;
         }
 

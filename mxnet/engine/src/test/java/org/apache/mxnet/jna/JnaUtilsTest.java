@@ -24,7 +24,7 @@ import org.testng.IObjectFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 
 // CHECKSTYLE:ON:AvoidStaticImport
 
@@ -65,13 +65,13 @@ public class JnaUtilsTest extends PowerMockTestCase {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testGetGpuMemoryIllegalArgument() {
-        JnaUtils.getGpuMemory(Context.cpu());
+        JnaUtils.getGpuMemory(Device.cpu());
     }
 
     @Test
     public void testGetGpuMemory() {
         if (JnaUtils.getGpuCount() > 0) {
-            JnaUtils.getGpuMemory(Context.gpu(0));
+            JnaUtils.getGpuMemory(Device.gpu(0));
         }
     }
 

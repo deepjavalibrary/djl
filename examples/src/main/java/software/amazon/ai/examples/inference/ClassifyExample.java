@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
@@ -48,13 +48,13 @@ public final class ClassifyExample extends AbstractExample {
         criteria.put("flavor", "v1");
         ZooModel<BufferedImage, List<Classification>> model = ModelZoo.RESNET.loadModel(criteria);
 
-        // Following context is not required, default context will be used by Predictor without
-        // passing context to model.newPredictor(translator)
-        // Change to a specific context if needed.
-        Context context = Context.defaultContext();
+        // Following device is not required, default device will be used by Predictor without
+        // passing device to model.newPredictor(translator)
+        // Change to a specific device if needed.
+        Device device = Device.defaultDevice();
 
         try (Predictor<BufferedImage, List<Classification>> predictor =
-                model.newPredictor(context)) {
+                model.newPredictor(device)) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {

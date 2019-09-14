@@ -14,7 +14,7 @@ package org.apache.mxnet.engine;
 
 import java.lang.management.MemoryUsage;
 import org.apache.mxnet.jna.JnaUtils;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDManager;
@@ -47,19 +47,19 @@ public class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public MemoryUsage getGpuMemory(Context context) {
-        long[] mem = JnaUtils.getGpuMemory(context);
+    public MemoryUsage getGpuMemory(Device device) {
+        long[] mem = JnaUtils.getGpuMemory(device);
         long committed = mem[1] - mem[0];
         return new MemoryUsage(-1, committed, committed, mem[1]);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Context defaultContext() {
+    public Device defaultDevice() {
         if (getGpuCount() > 0) {
-            return Context.gpu();
+            return Device.gpu();
         }
-        return Context.cpu();
+        return Device.cpu();
     }
 
     /** {@inheritDoc} */
@@ -75,8 +75,8 @@ public class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(Context context) {
-        return new MxModel(context);
+    public Model newModel(Device device) {
+        return new MxModel(device);
     }
 
     /** {@inheritDoc} */
@@ -99,7 +99,7 @@ public class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager newBaseManager(Context context) {
+    public NDManager newBaseManager(Device device) {
         return MxNDManager.getSystemManager().newSubManager();
     }
 

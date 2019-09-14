@@ -19,7 +19,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.function.Predicate;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -34,7 +34,7 @@ import software.amazon.ai.ndarray.types.SparseFormat;
 
 public class MockNDArray implements NDArray {
 
-    private Context context;
+    private Device device;
     private SparseFormat sparseFormat;
     private DataType dataType;
     private Shape shape;
@@ -45,12 +45,12 @@ public class MockNDArray implements NDArray {
 
     public MockNDArray(
             NDManager manager,
-            Context context,
+            Device device,
             Shape shape,
             DataType dataType,
             SparseFormat sparseFormat) {
         this.manager = manager;
-        this.context = context;
+        this.device = device;
         this.shape = shape;
         this.dataType = dataType;
         this.sparseFormat = sparseFormat;
@@ -67,8 +67,8 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public Context getContext() {
-        return context;
+    public Device getDevice() {
+        return device;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray asInContext(Context ctx, boolean copy) {
+    public NDArray asInDevice(Device ctx, boolean copy) {
         return this;
     }
 
@@ -170,7 +170,7 @@ public class MockNDArray implements NDArray {
         int start = idx * size;
         data.position(start);
         Buffer buf = data.slice().limit(size);
-        MockNDArray array = new MockNDArray(manager, context, subShape, dataType, sparseFormat);
+        MockNDArray array = new MockNDArray(manager, device, subShape, dataType, sparseFormat);
         array.set(buf);
         return array;
     }

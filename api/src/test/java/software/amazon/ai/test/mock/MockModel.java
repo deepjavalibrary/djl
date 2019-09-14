@@ -21,7 +21,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
@@ -45,7 +45,7 @@ public class MockModel implements Model {
     }
 
     @Override
-    public void load(Path modelPath, String modelName, Context context, Map<String, String> options)
+    public void load(Path modelPath, String modelName, Device device, Map<String, String> options)
             throws IOException {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException("File not found: " + modelPath);
@@ -73,13 +73,13 @@ public class MockModel implements Model {
 
     @Override
     public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Context context) {
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device) {
         return null;
     }
 
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
-        return new MockPredictor<>(this, translator, context);
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
+        return new MockPredictor<>(this, translator, device);
     }
 
     @Override

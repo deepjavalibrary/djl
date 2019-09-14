@@ -70,7 +70,7 @@ public interface Model extends AutoCloseable {
      * @return a new Model instance
      */
     static Model newInstance() {
-        return Engine.getInstance().newModel(Context.defaultContext());
+        return Engine.getInstance().newModel(Device.defaultDevice());
     }
 
     /**
@@ -108,16 +108,16 @@ public interface Model extends AutoCloseable {
     }
 
     /**
-     * Loads the model on specified {@code context} from the {@code modelPath} with the name and
+     * Loads the model on specified {@code device} from the {@code modelPath} with the name and
      * options provided.
      *
      * @param modelPath the directory or file path of the model location
      * @param modelName model file name or assigned name
-     * @param context the context that model to be loaded
+     * @param device the device that model to be loaded
      * @param options engine specific load model options, see document for each engine
      * @throws IOException IO exception happened in loading
      */
-    void load(Path modelPath, String modelName, Context context, Map<String, String> options)
+    void load(Path modelPath, String modelName, Device device, Map<String, String> options)
             throws IOException;
 
     /**
@@ -172,14 +172,14 @@ public interface Model extends AutoCloseable {
      *
      * @param trainTranslator the translator for pre-processing and post-processing
      * @param optimizer optimizer used to train this model
-     * @param context context used for training the model, can be CPU/GPU
+     * @param device device used for training the model, can be CPU/GPU
      * @param <I> Input data object for the Trainer
      * @param <L> Label data object for the Trainer
      * @param <O> Output Object for the Trainer
      * @return Trainer
      */
     <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Context context);
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device);
 
     /**
      * Creates a new Predictor based on the model.
@@ -197,12 +197,12 @@ public interface Model extends AutoCloseable {
      * Creates a new Predictor based on the model.
      *
      * @param translator The Object used for preprocessing and post processing
-     * @param context context used for the inference
+     * @param device device used for the inference
      * @param <I> Input object for preprocessing
      * @param <O> Output object come from postprocessing
      * @return instance of {@code Predictor}
      */
-    <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context);
+    <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device);
 
     void setInitializer(Initializer initializer);
 

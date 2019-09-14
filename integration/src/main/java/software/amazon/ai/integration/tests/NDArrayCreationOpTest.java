@@ -43,7 +43,7 @@ public class NDArrayCreationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = IntStream.range(0, 100).mapToDouble(i -> i).toArray();
             NDArray original = manager.create(data);
-            NDArray expected = manager.arange(0, 100, 1, DataType.FLOAT64, original.getContext());
+            NDArray expected = manager.arange(0, 100, 1, DataType.FLOAT64, original.getDevice());
             // test 1d
             Assertions.assertEquals(original, expected);
             // test 2d

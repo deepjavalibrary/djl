@@ -82,7 +82,7 @@ public class CachedOp extends NativeResource {
             String inputName = pair.getKey();
             // if inputName not provided, value will follow the default order
             int position = indexOf(inputName, index++);
-            // TODO: should we check context of input data?
+            // TODO: should we check device of input data?
             inputNDArray[position] = (MxNDArray) pair.getValue();
         }
         // check the input, set as Shape(1) by default

@@ -34,7 +34,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.nn.BlockFactory;
@@ -64,15 +64,15 @@ public class MxEngineTest extends PowerMockTestCase {
     @Test
     public void testGetGpuMemory() {
         Engine engine = Engine.getEngine(MxEngine.ENGINE_NAME);
-        MemoryUsage usage = engine.getGpuMemory(Context.gpu(0));
+        MemoryUsage usage = engine.getGpuMemory(Device.gpu(0));
         Assert.assertEquals(usage.getUsed(), 100);
         Assert.assertEquals(usage.getMax(), 1000);
     }
 
     @Test
-    public void testDefaultContext() {
+    public void testDefaultDevice() {
         Engine engine = Engine.getEngine(MxEngine.ENGINE_NAME);
-        Assert.assertEquals(engine.defaultContext(), Context.gpu());
+        Assert.assertEquals(engine.defaultDevice(), Device.gpu());
     }
 
     @Test

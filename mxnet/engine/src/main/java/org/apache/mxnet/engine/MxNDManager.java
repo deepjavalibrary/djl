@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.mxnet.jna.JnaUtils;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -44,13 +44,13 @@ public class MxNDManager implements NDManager {
     private static final NDList EMPTY = new NDList(0);
 
     private NDManager parent;
-    private Context context;
+    private Device device;
     private Map<AutoCloseable, AutoCloseable> resources;
     private AtomicBoolean closed = new AtomicBoolean(false);
 
-    private MxNDManager(NDManager parent, Context context) {
+    private MxNDManager(NDManager parent, Device device) {
         this.parent = parent;
-        this.context = Context.defaultIfNull(context);
+        this.device = Device.defaultIfNull(device);
         resources = new ConcurrentHashMap<>();
     }
 
@@ -77,8 +77,8 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray create(Shape shape, DataType dataType, Context ctx) {
-        ctx = Context.defaultIfNull(ctx, context);
+    public MxNDArray create(Shape shape, DataType dataType, Device ctx) {
+        ctx = Device.defaultIfNull(ctx, device);
         Pointer handle = JnaUtils.createNdArray(ctx, shape, dataType, shape.dimension(), false);
         MxNDArray array = new MxNDArray(this, handle, ctx, shape, dataType);
         attach(array);
@@ -88,8 +88,8 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public MxSparseNDArray createCSR(
-            Buffer data, long[] indptr, long[] indices, Shape shape, Context ctx) {
-        ctx = Context.defaultIfNull(ctx, context);
+            Buffer data, long[] indptr, long[] indices, Shape shape, Device ctx) {
+        ctx = Device.defaultIfNull(ctx, device);
 
         SparseFormat fmt = SparseFormat.CSR;
         DataType dataType = DataType.fromBuffer(data);
@@ -118,8 +118,8 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public MxSparseNDArray createRowSparse(
-            Buffer data, Shape dataShape, long[] indices, Shape shape, Context ctx) {
-        ctx = Context.defaultIfNull(ctx, context);
+            Buffer data, Shape dataShape, long[] indices, Shape shape, Device ctx) {
+        ctx = Device.defaultIfNull(ctx, device);
 
         SparseFormat fmt = SparseFormat.ROW_SPARSE;
         DataType dataType = DataType.fromBuffer(data);
@@ -156,43 +156,43 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(Shape shape, DataType dataType, Context ctx) {
+    public NDArray zeros(Shape shape, DataType dataType, Device ctx) {
         return fill("_npi_zeros", ctx, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ones(Shape shape, DataType dataType, Context ctx) {
+    public NDArray ones(Shape shape, DataType dataType, Device ctx) {
         return fill("_npi_ones", ctx, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(int start, int stop, int step, DataType dataType, Context ctx) {
+    public NDArray arange(int start, int stop, int step, DataType dataType, Device ctx) {
         MxOpParams params = new MxOpParams();
         params.addParam("start", start);
         params.addParam("stop", stop);
         params.addParam("step", step);
         params.setDataType(dataType);
-        params.setContext(Context.defaultIfNull(ctx, context));
+        params.setDevice(Device.defaultIfNull(ctx, device));
         return invoke("_npi_arange", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eye(int rows, int cols, int k, DataType dataType, Context ctx) {
+    public NDArray eye(int rows, int cols, int k, DataType dataType, Device ctx) {
         MxOpParams params = new MxOpParams();
         params.addParam("N", rows);
         params.addParam("M", cols);
         params.addParam("k", k);
         params.setDataType(dataType);
-        params.setContext(Context.defaultIfNull(ctx, context));
+        params.setDevice(Device.defaultIfNull(ctx, device));
         return invoke("_npi_eye", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(double start, double stop, int num, boolean endpoint, Context ctx) {
+    public NDArray linspace(double start, double stop, int num, boolean endpoint, Device ctx) {
         if (num < 0) {
             throw new IllegalArgumentException("Num argument must be non-negative");
         }
@@ -202,19 +202,19 @@ public class MxNDManager implements NDManager {
         params.addParam("num", num);
         params.addParam("endpoint", endpoint);
         params.setDataType(DataType.FLOAT32);
-        params.setContext(Context.defaultIfNull(ctx, context));
+        params.setDevice(Device.defaultIfNull(ctx, device));
         return invoke("_npi_linspace", EMPTY, params).head();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, DataType dataType, Context ctx) {
+            double low, double high, Shape shape, DataType dataType, Device ctx) {
         MxOpParams params = new MxOpParams();
         params.addParam("low", low);
         params.addParam("high", high);
         params.addParam("shape", shape);
-        params.setContext(Context.defaultIfNull(ctx, context));
+        params.setDevice(Device.defaultIfNull(ctx, device));
         params.setDataType(dataType);
         return invoke("_npi_random_uniform", EMPTY, params).head();
     }
@@ -222,12 +222,12 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, DataType dataType, Context ctx) {
+            double loc, double scale, Shape shape, DataType dataType, Device ctx) {
         MxOpParams params = new MxOpParams();
         params.addParam("loc", loc);
         params.addParam("scale", scale);
         params.addParam("shape", shape);
-        params.setContext(Context.defaultIfNull(ctx, context));
+        params.setDevice(Device.defaultIfNull(ctx, device));
         params.setDataType(dataType);
         return invoke("_npi_random_normal", EMPTY, params).head();
     }
@@ -265,12 +265,12 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public MxNDManager newSubManager() {
-        return newSubManager(context);
+        return newSubManager(device);
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDManager newSubManager(Context ctx) {
+    public MxNDManager newSubManager(Device ctx) {
         MxNDManager manager = new MxNDManager(this, ctx);
         attach(manager);
         return manager;
@@ -278,8 +278,8 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public Context getContext() {
-        return context;
+    public Device getDevice() {
+        return device;
     }
 
     /** {@inheritDoc} */
@@ -340,13 +340,13 @@ public class MxNDManager implements NDManager {
         return !closed.get();
     }
 
-    private NDArray fill(String opName, Context ctx, Shape shape, DataType dataType) {
+    private NDArray fill(String opName, Device ctx, Shape shape, DataType dataType) {
         MxOpParams params = new MxOpParams();
         if (shape == null) {
             throw new IllegalArgumentException("Shape is required for " + opName.substring(1));
         }
         params.addParam("shape", shape);
-        params.setContext(Context.defaultIfNull(ctx, context));
+        params.setDevice(Device.defaultIfNull(ctx, device));
         params.setDataType(dataType);
         return invoke(opName, params);
     }
@@ -354,7 +354,7 @@ public class MxNDManager implements NDManager {
     private static final class SystemManager extends MxNDManager {
 
         SystemManager() {
-            super(null, Context.defaultContext());
+            super(null, Device.defaultDevice());
         }
 
         /** {@inheritDoc} */

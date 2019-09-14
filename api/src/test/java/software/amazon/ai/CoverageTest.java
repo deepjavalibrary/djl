@@ -20,6 +20,6 @@ public class CoverageTest {
 
     @Test
     public void test() throws IOException, ClassNotFoundException {
-        CoverageUtils.testGetterSetters(Context.class);
+        CoverageUtils.testGetterSetters(Device.class);
     }
 }

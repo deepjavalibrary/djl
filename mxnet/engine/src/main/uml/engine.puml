@@ -7,12 +7,12 @@ class MxModel {
 
 class Engine {
     +Model loadModel(File modelPath, String modelName, int epoch)
-    +Predictor newPredictor(Model, Translator, Context)
-    +Trainer newTrainer(Model model, Context context)
+    +Predictor newPredictor(Model, Translator, Device)
+    +Trainer newTrainer(Model model, Device device)
     + getInstance()
 	.. more ..
     +int getGpuCount()
-    +Context defaultContext()
+    +Device defaultDevice()
     +getVersion()
 }
 

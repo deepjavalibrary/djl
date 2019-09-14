@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.nn.MxBlockFactory;
 import org.apache.mxnet.nn.MxSymbolBlock;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.inference.Predictor;
@@ -66,9 +66,9 @@ public class MxModel implements Model {
     private DataDesc[] inputData;
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
-    MxModel(Context context) {
-        context = Context.defaultIfNull(context);
-        manager = MxNDManager.getSystemManager().newSubManager(context);
+    MxModel(Device device) {
+        device = Device.defaultIfNull(device);
+        manager = MxNDManager.getSystemManager().newSubManager(device);
         factory = new MxBlockFactory(manager);
     }
 
@@ -87,12 +87,12 @@ public class MxModel implements Model {
      *
      * @param modelPath Directory of the model
      * @param modelName Name/Prefix of the model
-     * @param context the context that model to be loaded
+     * @param device the device that model to be loaded
      * @param options load model options, check document for specific engine
      * @throws IOException Exception for file loading
      */
     @Override
-    public void load(Path modelPath, String modelName, Context context, Map<String, String> options)
+    public void load(Path modelPath, String modelName, Device device, Map<String, String> options)
             throws IOException {
         MxEngine engine = ((MxEngine) Engine.getEngine(MxEngine.ENGINE_NAME));
         engine.setNumpyMode(false);
@@ -116,7 +116,7 @@ public class MxModel implements Model {
             block = new MxSymbolBlock(manager, symbol);
         }
 
-        loadParameters(modelPrefix, modelName, context, options);
+        loadParameters(modelPrefix, modelName, device, options);
 
         // TODO: Check if Symbol has all names that params file have
 
@@ -155,16 +155,16 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Context context) {
-        context = Context.defaultIfNull(context, manager.getContext());
-        return new MxTrainer<>(this, trainTranslator, optimizer, context);
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device) {
+        device = Device.defaultIfNull(device, manager.getDevice());
+        return new MxTrainer<>(this, trainTranslator, optimizer, device);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
-        context = Context.defaultIfNull(context, manager.getContext());
-        return new MxPredictor<>(this, translator, context);
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
+        device = Device.defaultIfNull(device, manager.getDevice());
+        return new MxPredictor<>(this, translator, device);
     }
 
     /** {@inheritDoc} */
@@ -283,9 +283,9 @@ public class MxModel implements Model {
     }
 
     private void loadParameters(
-            String modelPrefix, String modelName, Context context, Map<String, String> options)
+            String modelPrefix, String modelName, Device device, Map<String, String> options)
             throws IOException {
-        context = Context.defaultIfNull(context);
+        device = Device.defaultIfNull(device);
         String epochOption = null;
         if (options != null) {
             epochOption = options.get("epoch");
@@ -324,7 +324,7 @@ public class MxModel implements Model {
                 throw new IllegalArgumentException("Array names must be present in parameter file");
             }
             String paramName = key.split(":", 2)[1];
-            NDArray array = pair.getValue().asInContext(context, true);
+            NDArray array = pair.getValue().asInDevice(device, true);
             parameters.add(new Parameter(paramName, block, array));
         }
     }

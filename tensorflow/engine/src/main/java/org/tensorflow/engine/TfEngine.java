@@ -14,7 +14,7 @@ package org.tensorflow.engine;
 
 import java.lang.management.MemoryUsage;
 import org.tensorflow.TensorFlow;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDManager;
@@ -27,7 +27,7 @@ public class TfEngine extends Engine {
     TfEngine() {}
 
     @Override
-    public Model newModel(Context context) {
+    public Model newModel(Device device) {
         return null;
     }
 
@@ -45,14 +45,14 @@ public class TfEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public MemoryUsage getGpuMemory(Context context) {
+    public MemoryUsage getGpuMemory(Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Context defaultContext() {
-        return Context.cpu();
+    public Device defaultDevice() {
+        return Device.cpu();
     }
 
     /** {@inheritDoc} */
@@ -78,7 +78,7 @@ public class TfEngine extends Engine {
     }
 
     @Override
-    public NDManager newBaseManager(Context context) {
-        return TfNDManager.newBaseManager(context);
+    public NDManager newBaseManager(Device device) {
+        return TfNDManager.newBaseManager(device);
     }
 }

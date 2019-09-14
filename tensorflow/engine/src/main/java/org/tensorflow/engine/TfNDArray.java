@@ -21,7 +21,7 @@ import org.tensorflow.Operation;
 import org.tensorflow.Output;
 import org.tensorflow.Tensor;
 import org.tensorflow.types.UInt8;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -79,8 +79,8 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Context getContext() {
-        return manager.getContext();
+    public Device getDevice() {
+        return manager.getDevice();
     }
 
     /** {@inheritDoc} */
@@ -127,7 +127,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asInContext(Context ctx, boolean copy) {
+    public NDArray asInDevice(Device ctx, boolean copy) {
         return null;
     }
 

@@ -64,7 +64,7 @@ public class MxGradientCollector implements GradientCollector {
     }
 
     /**
-     * Set status to training/predicting. This affects ctx.is_train in operator running context. For
+     * Set status to training/predicting. This affects ctx.is_train in operator running device. For
      * example, Dropout will drop inputs randomly when isTraining=True while simply passing through
      * if isTraining=False.
      *

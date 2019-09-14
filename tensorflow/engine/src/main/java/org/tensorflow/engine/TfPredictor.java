@@ -15,7 +15,7 @@ package org.tensorflow.engine;
 import java.util.List;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
@@ -102,7 +102,7 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
 
         /** {@inheritDoc} */
         @Override
-        public Context getContext() {
+        public Device getDevice() {
             return null;
         }
 

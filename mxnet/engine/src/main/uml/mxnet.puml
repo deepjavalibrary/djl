@@ -19,7 +19,7 @@ class MxNDManager {
     -MxNDManager parent;
     +MxNDArray create(Pointer);
     MxNDManager newSubManager()
-    MxNDManager newSubManager(Context context)
+    MxNDManager newSubManager(Device device)
     void attach(AutoCloseable resource)
     void detach(AutoCloseable resource)
     +void close()

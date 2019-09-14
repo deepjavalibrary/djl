@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.mxnet.jna.JnaUtils;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -45,17 +45,16 @@ import software.amazon.ai.util.Utils;
 
 public class MxNDArray extends NativeResource implements NDArray {
 
-    private Context context;
+    private Device device;
     private SparseFormat sparseFormat;
     private DataType dataType;
     private Shape shape;
     private MxNDManager manager;
     private MxNDArrayEx mxNDArrayEx;
 
-    MxNDArray(
-            MxNDManager manager, Pointer handle, Context context, Shape shape, DataType dataType) {
+    MxNDArray(MxNDManager manager, Pointer handle, Device device, Shape shape, DataType dataType) {
         this(manager, handle);
-        this.context = context;
+        this.device = device;
         // shape check
         if (Arrays.stream(shape.getShape()).anyMatch(s -> s < 0)) {
             throw new IllegalArgumentException("The shape must be >= 0");
@@ -92,11 +91,11 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Context getContext() {
-        if (context == null) {
-            context = JnaUtils.getContext(getHandle());
+    public Device getDevice() {
+        if (device == null) {
+            device = JnaUtils.getDevice(getHandle());
         }
-        return context;
+        return device;
     }
 
     /** {@inheritDoc} */
@@ -140,8 +139,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray asInContext(Context ctx, boolean copy) {
-        if (ctx.equals(getContext()) && !copy) {
+    public MxNDArray asInDevice(Device ctx, boolean copy) {
+        if (ctx.equals(getDevice()) && !copy) {
             return this;
         }
         MxNDArray nd = manager.create(getShape(), getDataType(), ctx);
@@ -155,7 +154,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (dtype.equals(getDataType()) && !copy) {
             return this;
         }
-        MxNDArray nd = manager.create(getShape(), dtype, getContext());
+        MxNDArray nd = manager.create(getShape(), dtype, getDevice());
         copyTo(nd);
         return nd;
     }
@@ -211,7 +210,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (sparseFormat == null || sparseFormat == SparseFormat.UNDEFINED) {
             grad = (MxNDArray) zerosLike();
         } else {
-            grad = (MxNDArray) manager.zeros(getShape(), getDataType(), getContext());
+            grad = (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice());
         }
         int gradReqValue = gradReq.getValue();
         IntBuffer gradReqBuffer = IntBuffer.allocate(1);
@@ -296,7 +295,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
             Stack<NDArray> prepareValue = new Stack<>();
             prepareValue.add(value);
-            prepareValue.add(prepareValue.peek().asInContext(getContext(), false));
+            prepareValue.add(prepareValue.peek().asInDevice(getDevice(), false));
             // prepareValue.add(prepareValue.peek().asType(getDataType(), false));
             // Deal with the case target: (1, 10, 1), original (10)
             // try to find (10, 1) and reshape (10) to that

@@ -24,15 +24,15 @@ The following is an example of how to write inference code:
     // User must implement Translator interface, read Translator document for detail.
     Translator translator = new MyTranslator();
 
-    // User can specify GPU/CPU Context to run inference session.
-    // This context is optional, Predictor can pick up default Context if not specified.
-    // See Context.defaultContext()
-    Context context = Context.defaultContext();
+    // User can specify GPU/CPU Device to run inference session.
+    // This device is optional, Predictor can pick up default Device if not specified.
+    // See Device.defaultDevice()
+    Device device = Device.defaultDevice();
 
     // Next user need create a Predictor, and use Predictor.predict()
     // to get prediction.
     try (Predictor<BufferedImage, List<DetectedObject>> predictor =
-            model.newPredictor(translator, context)) {
+            model.newPredictor(translator, device)) {
         List<DetectedObject> result = predictor.predict(img);
     }
 ```

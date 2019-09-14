@@ -13,7 +13,7 @@
 package software.amazon.ai.test.mock;
 
 import java.lang.management.MemoryUsage;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDManager;
@@ -25,11 +25,11 @@ public class MockEngine extends Engine {
 
     private int gpuCount;
     private MemoryUsage gpuMemory;
-    private Context context = Context.cpu();
+    private Device device = Device.cpu();
     private String version;
 
     @Override
-    public Model newModel(Context context) {
+    public Model newModel(Device device) {
         return new MockModel();
     }
 
@@ -44,13 +44,13 @@ public class MockEngine extends Engine {
     }
 
     @Override
-    public MemoryUsage getGpuMemory(Context context) {
+    public MemoryUsage getGpuMemory(Device device) {
         return gpuMemory;
     }
 
     @Override
-    public Context defaultContext() {
-        return context;
+    public Device defaultDevice() {
+        return device;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class MockEngine extends Engine {
     }
 
     @Override
-    public NDManager newBaseManager(Context context) {
+    public NDManager newBaseManager(Device device) {
         return new MockNDManager();
     }
 
@@ -86,8 +86,8 @@ public class MockEngine extends Engine {
         this.gpuMemory = gpuMemory;
     }
 
-    public void setContext(Context context) {
-        this.context = context;
+    public void setDevice(Device device) {
+        this.device = device;
     }
 
     public void setVersion(String version) {

@@ -15,7 +15,7 @@ package org.apache.mxnet.engine;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.function.Predicate;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.Matrix;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -301,8 +301,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public Context getContext() {
-        return array.getContext();
+    public Device getDevice() {
+        return array.getDevice();
     }
 
     /** {@inheritDoc} */
@@ -330,8 +330,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asInContext(Context ctx, boolean copy) {
-        return array.asInContext(ctx, copy);
+    public NDArray asInDevice(Device ctx, boolean copy) {
+        return array.asInDevice(ctx, copy);
     }
 
     /** {@inheritDoc} */

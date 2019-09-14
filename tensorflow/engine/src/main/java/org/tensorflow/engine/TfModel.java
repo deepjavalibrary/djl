@@ -27,7 +27,7 @@ import org.tensorflow.framework.MetaGraphDef;
 import org.tensorflow.framework.SignatureDef;
 import org.tensorflow.framework.TensorInfo;
 import org.tensorflow.framework.TensorShapeProto;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
@@ -83,7 +83,7 @@ public class TfModel implements Model {
     }
 
     @Override
-    public void load(Path modelPath, String modelName, Context context, Map<String, String> options)
+    public void load(Path modelPath, String modelName, Device device, Map<String, String> options)
             throws IOException {
         try {
             load(modelPath);
@@ -143,7 +143,7 @@ public class TfModel implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Context context) {
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device) {
         return null;
     }
 
@@ -155,7 +155,7 @@ public class TfModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Context context) {
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
         return new TfPredictor<>(this, translator);
     }
 

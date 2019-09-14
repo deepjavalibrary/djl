@@ -25,8 +25,8 @@ import software.amazon.ai.nn.Block;
  */
 public interface Initializer {
 
-    Initializer ZEROS = (m, s, t) -> m.zeros(s, t, m.getContext());
-    Initializer ONES = (m, s, t) -> m.ones(s, t, m.getContext());
+    Initializer ZEROS = (m, s, t) -> m.zeros(s, t, m.getDevice());
+    Initializer ONES = (m, s, t) -> m.ones(s, t, m.getDevice());
 
     /**
      * Initializes a single {@link NDArray}.

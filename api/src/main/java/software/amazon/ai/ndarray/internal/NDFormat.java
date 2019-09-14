@@ -49,7 +49,7 @@ public abstract class NDFormat {
         sb.append("ND: ")
                 .append(array.getShape())
                 .append(' ')
-                .append(array.getContext())
+                .append(array.getDevice())
                 .append(' ')
                 .append(array.getDataType())
                 .append(LF);

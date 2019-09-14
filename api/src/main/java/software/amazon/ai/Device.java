@@ -16,45 +16,44 @@ import java.util.Objects;
 import software.amazon.ai.engine.Engine;
 
 /**
- * The {@code Context} class provides the specified assignment for CPU/GPU processing on the
- * NDArray.
+ * The {@code Device} class provides the specified assignment for CPU/GPU processing on the NDArray.
  *
  * <p>Users can use this to specify whether to load/compute the NDArray on CPU/GPU with deviceType
  * and deviceId provided
  */
-public class Context {
+public class Device {
 
-    private static final Context CPU = new Context("cpu", 0);
-    private static final Context GPU = new Context("gpu", 0);
+    private static final Device CPU = new Device("cpu", 0);
+    private static final Device GPU = new Device("gpu", 0);
 
     private String deviceType;
     private int deviceId;
 
     /**
-     * Creates {@code Context} with basic information.
+     * Creates {@code Device} with basic information.
      *
      * @param deviceType device type user would like to use, typically CPU or GPU
      * @param deviceId deviceId on the hardware. For example, if you have multiple GPUs, you can
      *     choose which GPU to process the NDArray
      */
-    public Context(String deviceType, int deviceId) {
+    public Device(String deviceType, int deviceId) {
         this.deviceType = deviceType;
         this.deviceId = deviceId;
     }
 
     /**
-     * Returns device type of the Context.
+     * Returns device type of the Device.
      *
-     * @return device type of the Context
+     * @return device type of the Devicejk
      */
     public String getDeviceType() {
         return deviceType;
     }
 
     /**
-     * Returns {@code deviceId} of the Context.
+     * Returns {@code deviceId} of the Device.
      *
-     * @return {@code deviceId} of the Context
+     * @return {@code deviceId} of the Device
      */
     public int getDeviceId() {
         return deviceId;
@@ -75,8 +74,8 @@ public class Context {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Context context = (Context) o;
-        return deviceId == context.deviceId && Objects.equals(deviceType, context.deviceType);
+        Device device = (Device) o;
+        return deviceId == device.deviceId && Objects.equals(deviceType, device.deviceType);
     }
 
     /** {@inheritDoc} */
@@ -86,41 +85,41 @@ public class Context {
     }
 
     /**
-     * Returns default CPU Context.
+     * Returns default CPU Device.
      *
-     * @return default CPU Context
+     * @return default CPU Device
      */
-    public static Context cpu() {
+    public static Device cpu() {
         return CPU;
     }
 
     /**
-     * Returns a new instance of CPU Context with specified {@code deviceId}.
+     * Returns a new instance of CPU Device with specified {@code deviceId}.
      *
      * @param deviceId CPU device ID
-     * @return a new instance of CPU Context with specified {@code deviceId}
+     * @return a new instance of CPU Device with specified {@code deviceId}
      */
-    public static Context cpu(int deviceId) {
-        return new Context("cpu", deviceId);
+    public static Device cpu(int deviceId) {
+        return new Device("cpu", deviceId);
     }
 
     /**
-     * Returns default GPU Context.
+     * Returns default GPU Device.
      *
-     * @return default GPU Context
+     * @return default GPU Device
      */
-    public static Context gpu() {
+    public static Device gpu() {
         return GPU;
     }
 
     /**
-     * Returns a new instance of GPU Context with specified {@code deviceId}.
+     * Returns a new instance of GPU Device with specified {@code deviceId}.
      *
      * @param deviceId GPU device ID
-     * @return a new instance of GPU Context with specified {@code deviceId}
+     * @return a new instance of GPU Device with specified {@code deviceId}
      */
-    public static Context gpu(int deviceId) {
-        return new Context("gpu", deviceId);
+    public static Device gpu(int deviceId) {
+        return new Device("gpu", deviceId);
     }
 
     /**
@@ -129,22 +128,22 @@ public class Context {
      * <p>default type is defined by whether the Deep Learning framework is recognizing GPUs
      * available on your machine. If there is no GPU available, CPU will be used.
      *
-     * @return {@link Context}
+     * @return {@link Device}
      */
-    public static Context defaultContext() {
-        return Engine.getInstance().defaultContext();
+    public static Device defaultDevice() {
+        return Engine.getInstance().defaultDevice();
     }
 
-    public static Context defaultIfNull(Context context) {
-        if (context != null) {
-            return context;
+    public static Device defaultIfNull(Device device) {
+        if (device != null) {
+            return device;
         }
-        return Engine.getInstance().defaultContext();
+        return Engine.getInstance().defaultDevice();
     }
 
-    public static Context defaultIfNull(Context context, Context def) {
-        if (context != null) {
-            return context;
+    public static Device defaultIfNull(Device device, Device def) {
+        if (device != null) {
+            return device;
         }
         return defaultIfNull(def);
     }

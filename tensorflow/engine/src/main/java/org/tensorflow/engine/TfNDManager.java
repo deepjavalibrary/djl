@@ -21,7 +21,7 @@ import org.tensorflow.Graph;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
 import org.tensorflow.Tensors;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -35,14 +35,14 @@ public class TfNDManager implements NDManager, AutoCloseable {
     private static int nameAssignment = 1;
 
     private NDManager parent;
-    private Context context;
+    private Device device;
     Graph graph;
     Session session;
     private Map<AutoCloseable, AutoCloseable> resources;
 
-    private TfNDManager(NDManager parent, Context context, Graph graph) {
+    private TfNDManager(NDManager parent, Device device, Graph graph) {
         this.parent = parent;
-        this.context = context;
+        this.device = device;
         this.graph = graph;
         resources = new ConcurrentHashMap<>();
     }
@@ -51,8 +51,8 @@ public class TfNDManager implements NDManager, AutoCloseable {
         return SYSTEM_MANAGER.newSubManager();
     }
 
-    public static TfNDManager newBaseManager(Context context) {
-        return SYSTEM_MANAGER.newSubManager(context);
+    public static TfNDManager newBaseManager(Device device) {
+        return SYSTEM_MANAGER.newSubManager(device);
     }
 
     Graph getGraph() {
@@ -82,7 +82,7 @@ public class TfNDManager implements NDManager, AutoCloseable {
     }
 
     @Override
-    public NDArray create(Shape shape, DataType dataType, Context context) {
+    public NDArray create(Shape shape, DataType dataType, Device device) {
         return null;
     }
 
@@ -101,13 +101,13 @@ public class TfNDManager implements NDManager, AutoCloseable {
 
     @Override
     public NDArray createCSR(
-            Buffer data, long[] indptr, long[] indices, Shape shape, Context context) {
+            Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
         return null;
     }
 
     @Override
     public NDArray createRowSparse(
-            Buffer data, Shape dataShape, long[] indices, Shape shape, Context context) {
+            Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
         return null;
     }
 
@@ -132,44 +132,44 @@ public class TfNDManager implements NDManager, AutoCloseable {
     public void save(Path path, NDList ndList) {}
 
     @Override
-    public NDArray zeros(Shape shape, DataType dataType, Context context) {
+    public NDArray zeros(Shape shape, DataType dataType, Device device) {
         return null;
     }
 
     @Override
-    public NDArray ones(Shape shape, DataType dataType, Context context) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray arange(int start, int stop, int step, DataType dataType, Context context) {
+    public NDArray ones(Shape shape, DataType dataType, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eye(int rows, int cols, int k, DataType dataType, Context context) {
+    public NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(double start, double stop, int num, boolean endpoint, Context context) {
+    public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray linspace(double start, double stop, int num, boolean endpoint, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, DataType dataType, Context context) {
+            double low, double high, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, DataType dataType, Context context) {
+            double loc, double scale, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
@@ -193,20 +193,20 @@ public class TfNDManager implements NDManager, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public Context getContext() {
-        return context;
+    public Device getDevice() {
+        return device;
     }
 
     /** {@inheritDoc} */
     @Override
     public TfNDManager newSubManager() {
-        return newSubManager(context);
+        return newSubManager(device);
     }
 
     /** {@inheritDoc} */
     @Override
-    public TfNDManager newSubManager(Context context) {
-        TfNDManager manager = new TfNDManager(this, context, graph);
+    public TfNDManager newSubManager(Device device) {
+        TfNDManager manager = new TfNDManager(this, device, graph);
         resources.put(manager, manager);
         return manager;
     }
@@ -240,7 +240,7 @@ public class TfNDManager implements NDManager, AutoCloseable {
     private static final class SystemManager extends TfNDManager {
 
         SystemManager() {
-            super(null, Context.defaultContext(), new Graph());
+            super(null, Device.defaultDevice(), new Graph());
             session = new Session(graph);
         }
 

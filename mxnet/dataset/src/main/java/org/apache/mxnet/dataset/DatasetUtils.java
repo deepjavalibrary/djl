@@ -13,7 +13,7 @@
 package org.apache.mxnet.dataset;
 
 import java.util.stream.IntStream;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 
@@ -61,38 +61,38 @@ public final class DatasetUtils {
         return slices;
     }
     /**
-     * Splits an {@code NDArray} into `contexts.length` slices along first axis and loads each slice
-     * to one context in `contexts`.
+     * Splits an {@code NDArray} into `devices.length` slices along first axis and loads each slice
+     * to one device in `devices`.
      *
      * @param data a batch of {@code NDArray}.
-     * @param contexts list of {@code Context}.
+     * @param devices list of {@code Device}.
      * @param evenSplit whether to force all slices to have the same number of elements.
-     * @return list of {@code NDArray}, each of whom corresponds to a context in `contexts`.
+     * @return list of {@code NDArray}, each of whom corresponds to a device in `devices`.
      */
-    public static NDList splitAndLoad(NDArray data, Context[] contexts, boolean evenSplit) {
-        return splitAndLoad(data, contexts, 0, evenSplit);
+    public static NDList splitAndLoad(NDArray data, Device[] devices, boolean evenSplit) {
+        return splitAndLoad(data, devices, 0, evenSplit);
     }
 
     /**
-     * Splits an {@code NDArray} into `contexts.length` slices along `batchAxis` and loads each
-     * slice to one context in `contexts`.
+     * Splits an {@code NDArray} into `devices.length` slices along `batchAxis` and loads each slice
+     * to one device in `devices`.
      *
      * @param data a batch of {@code NDArray}.
-     * @param contexts list of {@code Context}.
+     * @param devices list of {@code Device}.
      * @param batchAxis the axis along which to slice.
      * @param evenSplit whether to force all slices to have the same number of elements.
-     * @return list of {@code NDArray}, each of whom corresponds to a context in `contexts`.
+     * @return list of {@code NDArray}, each of whom corresponds to a device in `devices`.
      */
     public static NDList splitAndLoad(
-            NDArray data, Context[] contexts, int batchAxis, boolean evenSplit) {
+            NDArray data, Device[] devices, int batchAxis, boolean evenSplit) {
         // null check
-        if (contexts == null) {
-            throw new IllegalArgumentException("please specify valid contexts");
+        if (devices == null) {
+            throw new IllegalArgumentException("please specify valid devices");
         }
-        if (contexts.length == 1) {
-            return new NDList(data.asInContext(contexts[0], false));
+        if (devices.length == 1) {
+            return new NDList(data.asInDevice(devices[0], false));
         }
-        NDList splices = splitData(data, contexts.length, batchAxis, evenSplit);
-        return splices.asInContext(contexts, false);
+        NDList splices = splitData(data, devices.length, batchAxis, evenSplit);
+        return splices.asInContext(devices, false);
     }
 }

@@ -111,9 +111,9 @@ public class XavierInitializer implements Initializer {
 
         switch (randomType) {
             case UNIFORM:
-                return manager.randomUniform(-scale, scale, shape, dataType, manager.getContext());
+                return manager.randomUniform(-scale, scale, shape, dataType, manager.getDevice());
             case GAUSSIAN:
-                return manager.randomNormal(0, scale, shape, dataType, manager.getContext());
+                return manager.randomNormal(0, scale, shape, dataType, manager.getDevice());
             default:
                 throw new IllegalArgumentException("Invalid randomType");
         }

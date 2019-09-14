@@ -15,7 +15,7 @@ package software.amazon.ai.test.mock;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -31,19 +31,19 @@ public class MockNDManager implements NDManager {
     }
 
     @Override
-    public NDArray create(Shape shape, DataType dataType, Context context) {
-        return new MockNDArray(this, context, shape, dataType, null);
+    public NDArray create(Shape shape, DataType dataType, Device device) {
+        return new MockNDArray(this, device, shape, dataType, null);
     }
 
     @Override
     public NDArray createCSR(
-            Buffer data, long[] indptr, long[] indices, Shape shape, Context context) {
+            Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
         return null;
     }
 
     @Override
     public NDArray createRowSparse(
-            Buffer data, Shape dataShape, long[] indices, Shape shape, Context context) {
+            Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
         return null;
     }
 
@@ -56,39 +56,39 @@ public class MockNDManager implements NDManager {
     public void save(Path path, NDList ndList) {}
 
     @Override
-    public NDArray zeros(Shape shape, DataType dataType, Context context) {
+    public NDArray zeros(Shape shape, DataType dataType, Device device) {
         return null;
     }
 
     @Override
-    public NDArray ones(Shape shape, DataType dataType, Context context) {
+    public NDArray ones(Shape shape, DataType dataType, Device device) {
         return null;
     }
 
     @Override
-    public NDArray arange(int start, int stop, int step, DataType dataType, Context context) {
+    public NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
         return null;
     }
 
     @Override
-    public NDArray eye(int rows, int cols, int k, DataType dataType, Context context) {
+    public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
         return null;
     }
 
     @Override
-    public NDArray linspace(double start, double stop, int num, boolean endPoint, Context context) {
+    public NDArray linspace(double start, double stop, int num, boolean endPoint, Device device) {
         return null;
     }
 
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, DataType dataType, Context context) {
+            double low, double high, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, DataType dataType, Context context) {
+            double loc, double scale, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
@@ -108,8 +108,8 @@ public class MockNDManager implements NDManager {
     }
 
     @Override
-    public Context getContext() {
-        return Context.defaultContext();
+    public Device getDevice() {
+        return Device.defaultDevice();
     }
 
     @Override
@@ -118,7 +118,7 @@ public class MockNDManager implements NDManager {
     }
 
     @Override
-    public NDManager newSubManager(Context context) {
+    public NDManager newSubManager(Device device) {
         return this;
     }
 

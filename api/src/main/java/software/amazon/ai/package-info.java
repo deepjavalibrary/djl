@@ -15,6 +15,6 @@
  * Contains top level common classes shared for both inference and training.
  *
  * @see software.amazon.ai.Model
- * @see software.amazon.ai.Context
+ * @see software.amazon.ai.Device
  */
 package software.amazon.ai;

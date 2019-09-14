@@ -14,7 +14,7 @@ package org.apache.mxnet.dataset;
 
 import org.junit.Assert;
 import org.junit.Test;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
@@ -73,19 +73,19 @@ public class DatasetUtilsTest {
     public void testSplitAndLoad() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray data = manager.randomUniform(0, 1, new Shape(6, 5, 5, 3));
-            Context[] contexts = new Context[] {Context.cpu(0), Context.cpu(1), Context.cpu(2)};
-            NDList list = DatasetUtils.splitAndLoad(data, contexts, true);
+            Device[] devices = new Device[] {Device.cpu(0), Device.cpu(1), Device.cpu(2)};
+            NDList list = DatasetUtils.splitAndLoad(data, devices, true);
             int step = 2;
             for (int i = 0; i < list.size(); i++) {
                 Assertions.assertEquals(
                         data.get(String.format("%d:%d", i * step, (i + 1) * step)), list.get(i));
-                Assert.assertEquals(list.get(i).getContext(), contexts[i]);
+                Assert.assertEquals(list.get(i).getDevice(), devices[i]);
             }
             // uneven data case
             data = manager.randomUniform(0, 1, new Shape(7, 5, 5, 3));
-            list = DatasetUtils.splitAndLoad(data, contexts, false);
+            list = DatasetUtils.splitAndLoad(data, devices, false);
             for (int i = 0; i < list.size(); i++) {
-                Assert.assertEquals(list.get(i).getContext(), contexts[i]);
+                Assert.assertEquals(list.get(i).getDevice(), devices[i]);
                 if (i == list.size() - 1) {
                     Assertions.assertEquals(
                             data.get(String.format("%d:%d", i * step, data.size(0))), list.get(i));
@@ -96,19 +96,19 @@ public class DatasetUtilsTest {
             }
             // numOfSlice is greater than size
             data = manager.randomUniform(0, 1, new Shape(2, 5, 5, 3));
-            list = DatasetUtils.splitAndLoad(data, contexts, 0, false);
+            list = DatasetUtils.splitAndLoad(data, devices, 0, false);
             step = 1;
             for (int i = 0; i < list.size(); i++) {
-                Assert.assertEquals(list.get(i).getContext(), contexts[i]);
+                Assert.assertEquals(list.get(i).getDevice(), devices[i]);
                 Assertions.assertEquals(
                         data.get(String.format("%d:%d", i * step, (i + 1) * step)), list.get(i));
             }
             // splitAxis is not 0
             data = manager.randomUniform(0, 1, new Shape(3, 5, 5, 3));
-            list = DatasetUtils.splitAndLoad(data, contexts, 2, false);
+            list = DatasetUtils.splitAndLoad(data, devices, 2, false);
             step = 1;
             for (int i = 0; i < list.size(); i++) {
-                Assert.assertEquals(list.get(i).getContext(), contexts[i]);
+                Assert.assertEquals(list.get(i).getDevice(), devices[i]);
                 if (i == list.size() - 1) {
                     Assertions.assertEquals(
                             data.get(String.format(":,:,%d:%d,:", i * step, data.size(2))),

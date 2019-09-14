@@ -21,7 +21,7 @@ import java.nio.LongBuffer;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -56,14 +56,14 @@ public interface NDArray extends AutoCloseable {
     DataType getDataType();
 
     /**
-     * Returns the {@link Context} of the {@code NDArray}.
+     * Returns the {@link Device} of the {@code NDArray}.
      *
-     * <p>{@link Context} class contains the information where this NDArray stored in memory, like
+     * <p>{@link Device} class contains the information where this NDArray stored in memory, like
      * CPU/GPU.
      *
-     * @return {@link Context}
+     * @return {@link Device}
      */
-    Context getContext();
+    Device getDevice();
 
     /**
      * Returns the {@link Shape} of the {@code NDArray}.
@@ -77,7 +77,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the {@link DataDesc} of the {@code NDArray}.
      *
-     * <p>{@link DataDesc} contains all information about NDArray, including {@link Context}, {@link
+     * <p>{@link DataDesc} contains all information about NDArray, including {@link Device}, {@link
      * DataType}, {@link Shape}, and {@link software.amazon.ai.ndarray.types.SparseFormat}.
      *
      * @return {@link DataDesc}
@@ -121,13 +121,13 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Converts the NDArray to a different {@link Context}.
+     * Converts the NDArray to a different {@link Device}.
      *
-     * @param ctx {@link Context} to be set
+     * @param ctx {@link Device} to be set
      * @param copy set {@code true} if you want to return a copy of the Existing {@code NDArray}.
-     * @return the result {@code NDArray} with the new {@link Context}
+     * @return the result {@code NDArray} with the new {@link Device}
      */
-    NDArray asInContext(Context ctx, boolean copy);
+    NDArray asInDevice(Device ctx, boolean copy);
 
     /**
      * Converts the NDArray to a different {@link DataType}.

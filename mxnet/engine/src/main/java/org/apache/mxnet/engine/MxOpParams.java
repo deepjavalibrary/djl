@@ -12,7 +12,7 @@
  */
 package org.apache.mxnet.engine;
 
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
@@ -31,8 +31,8 @@ public class MxOpParams extends PairList<String, Object> {
         }
     }
 
-    public void setContext(Context context) {
-        setParam("ctx", context.toString());
+    public void setDevice(Device device) {
+        setParam("ctx", device.toString());
     }
 
     public void setDataType(DataType dataType) {

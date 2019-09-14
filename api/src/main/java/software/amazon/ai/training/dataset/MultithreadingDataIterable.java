@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.translate.TranslatorContext;
@@ -57,7 +57,7 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Batch> {
         private Trainer<I, L, ?> trainer;
         private Iterator<List<Long>> sample;
         private Batchifier batchifier;
-        private Context pinDeviceContext;
+        private Device pinDevice;
         private ExecutorService executor;
         private Queue<Future<Batch>> queue;
 
@@ -70,7 +70,7 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Batch> {
             this.trainer = trainer;
             this.sample = sampler.sample(trainer, dataset);
             this.batchifier = config.getBatchifier();
-            this.pinDeviceContext = config.getPinDeviceContext();
+            this.pinDevice = config.getPinDevice();
             this.executor = config.getExecutor();
             this.queue = new LinkedList<>();
 
@@ -140,9 +140,9 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Batch> {
                 NDList batchData = batchifier.batchify(data);
                 NDList batchLabels = batchifier.batchify(labels);
                 // pin the device to specific context
-                if (pinDeviceContext != null) {
-                    batchData = batchData.asInContext(pinDeviceContext, false);
-                    batchLabels = batchLabels.asInContext(pinDeviceContext, false);
+                if (pinDevice != null) {
+                    batchData = batchData.asInContext(pinDevice, false);
+                    batchLabels = batchLabels.asInContext(pinDevice, false);
                 }
                 Batch batch = new Batch(trainer.getManager(), batchData, batchLabels);
                 ctx.close();

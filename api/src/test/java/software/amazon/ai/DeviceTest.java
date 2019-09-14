@@ -16,16 +16,16 @@ package software.amazon.ai;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ContextTest {
+public class DeviceTest {
 
     @Test
-    public void testContext() {
-        Assert.assertEquals(Context.cpu(), new Context("cpu", 0));
-        Assert.assertEquals(Context.cpu(1), new Context("cpu", 1));
-        Assert.assertEquals(Context.gpu(), new Context("gpu", 0));
-        Assert.assertEquals(Context.gpu(3), new Context("gpu", 3));
-        // Assert.assertTrue(Context.cpu().equals(new Context("cpu", 0)));
-        Assert.assertNotEquals(Context.cpu(), Context.gpu());
-        Assert.assertNotEquals(new Context("cpu", 1), Context.cpu());
+    public void testDevice() {
+        Assert.assertEquals(Device.cpu(), new Device("cpu", 0));
+        Assert.assertEquals(Device.cpu(1), new Device("cpu", 1));
+        Assert.assertEquals(Device.gpu(), new Device("gpu", 0));
+        Assert.assertEquals(Device.gpu(3), new Device("gpu", 3));
+        // Assert.assertTrue(Device.cpu().equals(new Device("cpu", 0)));
+        Assert.assertNotEquals(Device.cpu(), Device.gpu());
+        Assert.assertNotEquals(new Device("cpu", 1), Device.cpu());
     }
 }

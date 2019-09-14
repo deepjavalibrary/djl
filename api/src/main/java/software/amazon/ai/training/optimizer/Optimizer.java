@@ -40,7 +40,7 @@ public abstract class Optimizer {
 
     /**
      * Update a {@code PairList} of parameters one step at time. Assumes parameters are on the same
-     * context. This will be used when updating parameters locally, not on {@link
+     * device. This will be used when updating parameters locally, not on {@link
      * software.amazon.ai.training.ParameterStore}.
      *
      * @param parameters a {@code PairList} of parameters from network to update

@@ -33,17 +33,17 @@
     href="software/amazon/ai/Translator.html"><b>Translator</b></a> for detail.
     Translator translator = new <b>MyTranslator</b>();
 
-    // User can specify GPU/CPU <a href="software/amazon/ai/Context.html"><b>Context</b></a> to run inference session.
-    // This context is optional, <a
-    href="software/amazon/ai/inference/Predictor.html"><b>Predictor</b></a> can pick up default Context if not specified.
+    // User can specify GPU/CPU <a href="software/amazon/ai/Device.html"><b>Device</b></a> to run inference session.
+    // This device is optional, <a
+    href="software/amazon/ai/inference/Predictor.html"><b>Predictor</b></a> can pick up default Device if not specified.
     // See <a
-    href="software/amazon/ai/Context.html#defaultContext--"><b>Context.defaultContext()</b></a>
-    Context context = Context.defaultContext();
+    href="software/amazon/ai/Device.html#defaultDevice--"><b>Device.defaultDevice()</b></a>
+    Device device = Device.defaultDevice();
 
     // Next user need create a <b>Predictor</b>, and use <a
     href="software/amazon/ai/inference/Predictor.html#predict-I-"><b>Predictor.predict()</b></a>
     // to get prediction.
-    try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor = <b>model.newPredictor</b>(translator, context)) {
+    try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor = <b>model.newPredictor</b>(translator, device)) {
         List&lt;DetectedObject&gt; result = predictor.<b>predict</b>(img);
     }
 </pre>

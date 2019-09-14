@@ -1,12 +1,12 @@
 @startuml
-class Context {
+class Device {
 	-String deviceType
 	-int deviceId
 }
 
 class DataDesc {
 	-String name
-	-Context context
+	-Device device
 	-Shape shape
 	-DataType dataType
 	-SparseFormat sparseFormat
@@ -42,13 +42,13 @@ interface Predictor<I, O> {
 
 interface TranslatorContext {
     +Model getModel()
-    +Context getContext()
+    +Device getDevice()
     +NDManager getNDManager()
     +void close()
 }
 
 interface NDManager {
-    +NDArray create(Context context, ...);
+    +NDArray create(Device device, ...);
     +NDArray create(DataDesc dataDesc);
 }
 
@@ -64,7 +64,7 @@ interface NDArray {
 
 Model -right-> DataDesc
 Model o-down- Predictor : aggregation
-Predictor -right-o Context : aggregation
+Predictor -right-o Device : aggregation
 Predictor -right-> Translator : uses
 Translator -right-> NDArray : uses
 Translator --> TranslatorContext : uses

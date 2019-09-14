@@ -41,6 +41,6 @@ public class NormalInitializer implements Initializer {
 
     @Override
     public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
-        return manager.randomNormal(0.0, sigma, shape, dataType, manager.getContext());
+        return manager.randomNormal(0.0, sigma, shape, dataType, manager.getDevice());
     }
 }

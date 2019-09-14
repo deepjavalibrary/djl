@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.test.mock;
 
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
@@ -26,13 +26,13 @@ public class MockPredictor<I, O> implements Predictor<I, O> {
 
     Model model;
     private Translator<I, O> translator;
-    Context context;
+    Device device;
     Metrics metrics;
 
-    public MockPredictor(Model model, Translator<I, O> translator, Context context) {
+    public MockPredictor(Model model, Translator<I, O> translator, Device device) {
         this.model = model;
         this.translator = translator;
-        this.context = context;
+        this.device = device;
     }
 
     @Override
@@ -78,8 +78,8 @@ public class MockPredictor<I, O> implements Predictor<I, O> {
 
         /** {@inheritDoc} */
         @Override
-        public Context getContext() {
-            return context;
+        public Device getDevice() {
+            return device;
         }
 
         /** {@inheritDoc} */

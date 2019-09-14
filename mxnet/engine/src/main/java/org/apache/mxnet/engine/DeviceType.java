@@ -12,7 +12,7 @@
  */
 package org.apache.mxnet.engine;
 
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 
 public final class DeviceType {
 
@@ -20,26 +20,26 @@ public final class DeviceType {
 
     private DeviceType() {}
 
-    public static int toDeviceType(Context context) {
-        String deviceType = context.getDeviceType();
+    public static int toDeviceType(Device device) {
+        String deviceType = device.getDeviceType();
 
-        if (Context.cpu().getDeviceType().equals(deviceType)) {
+        if (Device.cpu().getDeviceType().equals(deviceType)) {
             return 1;
-        } else if (Context.gpu().getDeviceType().equals(deviceType)) {
+        } else if (Device.gpu().getDeviceType().equals(deviceType)) {
             return 2;
         } else if (CPU_PINNED.equals(deviceType)) {
             return 3;
         } else {
-            throw new IllegalArgumentException("Unsupported context: " + context.toString());
+            throw new IllegalArgumentException("Unsupported device: " + device.toString());
         }
     }
 
     public static String fromDeviceType(int deviceType) {
         switch (deviceType) {
             case 1:
-                return Context.cpu().getDeviceType();
+                return Device.cpu().getDeviceType();
             case 2:
-                return Context.gpu().getDeviceType();
+                return Device.gpu().getDeviceType();
             case 3:
                 return "cpu_pinned";
             default:

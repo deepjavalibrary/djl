@@ -91,7 +91,7 @@ public class GradientCollectorIntegrationTest {
             // add noise
             label.add(
                     manager.randomNormal(
-                            0, 0.01, label.getShape(), DataType.FLOAT32, manager.getContext()));
+                            0, 0.01, label.getShape(), DataType.FLOAT32, manager.getDevice()));
             Linear block = new Linear.Builder().setFactory(factory).setOutChannels(1).build();
             model.setBlock(block);
 

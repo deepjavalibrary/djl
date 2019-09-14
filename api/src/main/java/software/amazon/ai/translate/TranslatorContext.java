@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.translate;
 
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDManager;
@@ -33,11 +33,11 @@ public interface TranslatorContext extends AutoCloseable {
     Model getModel();
 
     /**
-     * Returns the context information.
+     * Returns the device information.
      *
-     * @return {@link Context}
+     * @return {@link Device}
      */
-    Context getContext();
+    Device getDevice();
 
     /**
      * Returns the {@link NDManager} to create {@link software.amazon.ai.ndarray.NDArray}.

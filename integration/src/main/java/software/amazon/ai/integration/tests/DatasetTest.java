@@ -24,7 +24,7 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import org.apache.mxnet.dataset.Cifar10;
 import org.apache.mxnet.jna.JnaUtils;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -65,7 +65,7 @@ public class DatasetTest {
                     new ArrayDataset.Builder()
                             .setData(
                                     manager.arange(
-                                            0, 100, 1, DataType.INT64, Context.defaultContext()))
+                                            0, 100, 1, DataType.INT64, Device.defaultDevice()))
                             .setSampler(new BatchSampler(new SequenceSampler(), 1, false))
                             .build();
 
@@ -94,7 +94,7 @@ public class DatasetTest {
                     new ArrayDataset.Builder()
                             .setData(
                                     manager.arange(
-                                            0, 10, 1, DataType.INT64, Context.defaultContext()))
+                                            0, 10, 1, DataType.INT64, Device.defaultDevice()))
                             .setSampler(new BatchSampler(new RandomSampler(), 1, false))
                             .build();
             List<Long> original = new ArrayList<>();
@@ -117,7 +117,7 @@ public class DatasetTest {
 
             NDManager manager = model.getNDManager();
 
-            NDArray data = manager.arange(0, 100, 1, DataType.INT64, Context.defaultContext());
+            NDArray data = manager.arange(0, 100, 1, DataType.INT64, Device.defaultDevice());
 
             ArrayDataset dataset =
                     new ArrayDataset.Builder()

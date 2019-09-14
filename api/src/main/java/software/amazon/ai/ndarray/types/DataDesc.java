@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.ndarray.types;
 
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 
 /**
  * A data descriptor class that encapsulates information of a {@link
@@ -22,7 +22,7 @@ import software.amazon.ai.Context;
  *
  * <ul>
  *   <li>Optional name of the NDArray
- *   <li>{@link software.amazon.ai.Context}
+ *   <li>{@link Device}
  *   <li>{@link software.amazon.ai.ndarray.types.Shape}
  *   <li>{@link software.amazon.ai.ndarray.types.DataType}
  *   <li>{@link software.amazon.ai.ndarray.types.SparseFormat}
@@ -66,7 +66,7 @@ public class DataDesc {
 
     /**
      * Constructs and initializes a {@code DataDesc} with specified {@link Shape}, {@link DataType},
-     * name, {@link Context} and {@link SparseFormat}.
+     * name, {@link Device} and {@link SparseFormat}.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}

@@ -15,7 +15,7 @@ package org.apache.mxnet.engine;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
@@ -37,7 +37,7 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
 
     private MxModel model;
     private TrainTranslator<I, L, O> translator;
-    private Context context;
+    private Device device;
     private Block block;
     private MxNDManager manager;
     private Metrics metrics;
@@ -45,11 +45,11 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     private long timestamp;
     private TrainingController trainingController;
 
-    MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Context context) {
+    MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Device device) {
         this.model = model;
         this.manager = (MxNDManager) model.getNDManager().newSubManager();
         this.translator = translator;
-        this.context = context;
+        this.device = device;
         this.block = model.getBlock();
     }
 
@@ -57,8 +57,8 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
             MxModel model,
             TrainTranslator<I, L, O> translator,
             Optimizer optimizer,
-            Context context) {
-        this(model, translator, context);
+            Device device) {
+        this(model, translator, device);
         trainingController = new TrainingController(block.getParameters(), optimizer);
     }
 
@@ -204,8 +204,8 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
 
         /** {@inheritDoc} */
         @Override
-        public Context getContext() {
-            return context;
+        public Device getDevice() {
+            return device;
         }
 
         /** {@inheritDoc} */

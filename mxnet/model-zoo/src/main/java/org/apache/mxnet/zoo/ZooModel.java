@@ -18,7 +18,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Function;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
@@ -49,8 +49,7 @@ public class ZooModel<I, O> implements Model {
     }
 
     @Override
-    public void load(
-            Path modelPath, String modelName, Context context, Map<String, String> options) {
+    public void load(Path modelPath, String modelName, Device device, Map<String, String> options) {
         throw new IllegalArgumentException("ZooModel should not be re-loaded.");
     }
 
@@ -80,8 +79,8 @@ public class ZooModel<I, O> implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Context context) {
-        return model.newTrainer(trainTranslator, optimizer, context);
+            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device) {
+        return model.newTrainer(trainTranslator, optimizer, device);
     }
 
     /** {@inheritDoc} */
@@ -100,14 +99,14 @@ public class ZooModel<I, O> implements Model {
         return newPredictor(translator, null);
     }
 
-    public Predictor<I, O> newPredictor(Context context) {
-        return newPredictor(translator, context);
+    public Predictor<I, O> newPredictor(Device device) {
+        return newPredictor(translator, device);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <P, Q> Predictor<P, Q> newPredictor(Translator<P, Q> translator, Context context) {
-        return model.newPredictor(translator, context);
+    public <P, Q> Predictor<P, Q> newPredictor(Translator<P, Q> translator, Device device) {
+        return model.newPredictor(translator, device);
     }
 
     public Translator<I, O> getTranslator() {

@@ -24,7 +24,7 @@ import javax.imageio.ImageIO;
 import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
@@ -52,13 +52,13 @@ public final class SsdExample extends AbstractExample {
         criteria.put("dataset", "voc");
         ZooModel<BufferedImage, List<DetectedObject>> model = ModelZoo.SSD.loadModel(criteria);
 
-        // Following context is not not required, default context will be used by Predictor without
-        // passing context to model.newPredictor(translator)
-        // Change to a specific context if needed.
-        Context context = Context.defaultContext();
+        // Following device is not not required, default device will be used by Predictor without
+        // passing device to model.newPredictor(translator)
+        // Change to a specific device if needed.
+        Device device = Device.defaultDevice();
 
         try (Predictor<BufferedImage, List<DetectedObject>> predictor =
-                model.newPredictor(context)) {
+                model.newPredictor(device)) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {

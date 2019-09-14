@@ -84,7 +84,7 @@ public class TrainingController implements AutoCloseable {
 
     void reduceGradientsOnParameterStore() {
         for (int i = 0; i < parameters.size(); i++) {
-            // TODO: handle gradient from multiple contexts
+            // TODO: handle gradient from multiple devices
             NDArray gradient = parameters.get(i).getValue().getArray().getGradient();
             parameterStore.push(i, gradient);
         }
@@ -92,7 +92,7 @@ public class TrainingController implements AutoCloseable {
 
     void updateOnParameterStore() {
         for (int i = 0; i < parameters.size(); i++) {
-            // TODO: handle update from multiple contexts
+            // TODO: handle update from multiple devices
             NDArray paramArray = parameters.get(i).getValue().getArray();
             parameterStore.pull(i, paramArray);
         }

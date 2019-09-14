@@ -30,7 +30,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -61,7 +61,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
         try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager();
                 MxNDArray nd = new MxNDArray(manager, new PointerArray())) {
             Assert.assertEquals(nd.getShape(), new Shape(1, 2, 3));
-            Assert.assertEquals(nd.getContext(), Context.gpu(1));
+            Assert.assertEquals(nd.getDevice(), Device.gpu(1));
             Assert.assertEquals(nd.getDataType(), DataType.FLOAT32);
             Assert.assertEquals(nd.getSparseFormat(), SparseFormat.CSR);
         }

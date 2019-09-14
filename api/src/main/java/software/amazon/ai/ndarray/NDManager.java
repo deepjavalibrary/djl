@@ -19,7 +19,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.file.Path;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
@@ -97,7 +97,7 @@ public interface NDManager extends AutoCloseable {
     /**
      * Creates a new top-level {@code NDManager}.
      *
-     * <p>{@code NDManager} will inherit default {@link Context}.
+     * <p>{@code NDManager} will inherit default {@link Device}.
      *
      * @return Returns a new top-level {@code NDManager}
      */
@@ -106,13 +106,13 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates a new top-level {@code NDManager} with specified {@link Context}.
+     * Creates a new top-level {@code NDManager} with specified {@link Device}.
      *
-     * @param context default {@link Context}
+     * @param device default {@link Device}
      * @return Returns a new top-level {@code NDManager}
      */
-    static NDManager newBaseManager(Context context) {
-        return Engine.getInstance().newBaseManager(context);
+    static NDManager newBaseManager(Device device) {
+        return Engine.getInstance().newBaseManager(device);
     }
 
     /**
@@ -131,7 +131,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray create(Shape shape) {
-        return create(shape, DataType.FLOAT32, getContext());
+        return create(shape, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -320,7 +320,7 @@ public interface NDManager extends AutoCloseable {
      */
     default NDArray create(Buffer data, Shape shape) {
         DataType dataType = DataType.fromBuffer(data);
-        NDArray array = create(shape, dataType, getContext());
+        NDArray array = create(shape, dataType, getDevice());
         array.set(data);
         return array;
     }
@@ -334,7 +334,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray create(Shape shape, DataType dataType) {
-        return create(shape, dataType, getContext());
+        return create(shape, dataType, getDevice());
     }
 
     /**
@@ -344,7 +344,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray create(DataDesc dataDesc) {
-        return create(dataDesc.getShape(), dataDesc.getDataType(), getContext());
+        return create(dataDesc.getShape(), dataDesc.getDataType(), getDevice());
     }
 
     /**
@@ -422,14 +422,14 @@ public interface NDManager extends AutoCloseable {
 
     /**
      * Creates an uninitialized instance of {@link NDArray} with specified {@link Shape}, {@link
-     * DataType} and {@link Context}.
+     * DataType} and {@link Device}.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray create(Shape shape, DataType dataType, Context context);
+    NDArray create(Shape shape, DataType dataType, Device device);
 
     /**
      * Create a Compressed Sparse Row Storage (CSR) Format Matrix.
@@ -438,10 +438,10 @@ public interface NDManager extends AutoCloseable {
      * @param indptr The indptr array is what will help identify the rows where the data appears
      * @param indices The indices array stores the column index for each non-zero element in data
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape, Context context);
+    NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape, Device device);
 
     /**
      * Create a Compressed Sparse Row Storage (CSR) Format Matrix.
@@ -453,7 +453,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
-        return createCSR(data, indptr, indices, shape, getContext());
+        return createCSR(data, indptr, indices, shape, getDevice());
     }
 
     /**
@@ -463,11 +463,11 @@ public interface NDManager extends AutoCloseable {
      * @param dataShape the {@link Shape} of the data {@link software.amazon.ai.ndarray.NDArray}
      * @param indices the indices to store the data
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
     NDArray createRowSparse(
-            Buffer data, Shape dataShape, long[] indices, Shape shape, Context context);
+            Buffer data, Shape dataShape, long[] indices, Shape shape, Device device);
 
     /**
      * RowSparseNDArray stores the matrix in row sparse format.
@@ -479,7 +479,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
-        return createRowSparse(data, dataShape, indices, shape, getContext());
+        return createRowSparse(data, dataShape, indices, shape, getDevice());
     }
 
     /**
@@ -503,10 +503,10 @@ public interface NDManager extends AutoCloseable {
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
-     * @see #zeros(Shape, DataType, Context)
+     * @see #zeros(Shape, DataType, Device)
      */
     default NDArray zeros(Shape shape) {
-        return zeros(shape, DataType.FLOAT32, getContext());
+        return zeros(shape, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -516,19 +516,19 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray zeros(DataDesc dataDesc) {
-        return zeros(dataDesc.getShape(), dataDesc.getDataType(), getContext());
+        return zeros(dataDesc.getShape(), dataDesc.getDataType(), getDevice());
     }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link Context}, * {@link Shape}, and
+     * Creates an instance of {@link NDArray} with specified {@link Device}, * {@link Shape}, and
      * {@link DataType} filled with zeros.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray zeros(Shape shape, DataType dataType, Context context);
+    NDArray zeros(Shape shape, DataType dataType, Device device);
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with ones.
@@ -537,7 +537,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray ones(Shape shape) {
-        return ones(shape, DataType.FLOAT32, getContext());
+        return ones(shape, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -547,22 +547,22 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray ones(DataDesc dataDesc) {
-        return ones(dataDesc.getShape(), dataDesc.getDataType(), getContext());
+        return ones(dataDesc.getShape(), dataDesc.getDataType(), getDevice());
     }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link Context}, {@link Shape}, and
+     * Creates an instance of {@link NDArray} with specified {@link Device}, {@link Shape}, and
      * {@link DataType} filled with ones.
      *
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray ones(Shape shape, DataType dataType, Context context);
+    NDArray ones(Shape shape, DataType dataType, Device device);
 
     /**
-     * Returns evenly spaced values starting from 0 in current context.
+     * Returns evenly spaced values starting from 0 on current device.
      *
      * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
      * interval including `start` but excluding `stop`). For integer arguments the function is
@@ -573,11 +573,11 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray arange(int stop) {
-        return arange(0, stop, 1, DataType.FLOAT32, getContext());
+        return arange(0, stop, 1, DataType.FLOAT32, getDevice());
     }
 
     /**
-     * Returns evenly spaced values within a given interval in current context with step 1.
+     * Returns evenly spaced values within a given interval on current device with step 1.
      *
      * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
      * interval including `start` but excluding `stop`). For integer arguments the function is
@@ -589,11 +589,11 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray arange(int start, int stop) {
-        return arange(start, stop, 1, DataType.FLOAT32, getContext());
+        return arange(start, stop, 1, DataType.FLOAT32, getDevice());
     }
 
     /**
-     * Returns evenly spaced values within a given interval in current context.
+     * Returns evenly spaced values within a given interval on current device.
      *
      * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
      * interval including `start` but excluding `stop`). For integer arguments the function is
@@ -606,7 +606,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray arange(int start, int stop, int step) {
-        return arange(start, stop, step, DataType.FLOAT32, getContext());
+        return arange(start, stop, step, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -621,24 +621,24 @@ public interface NDManager extends AutoCloseable {
      * @param stop end of interval, exclusive
      * @param step spacing between values
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray arange(int start, int stop, int step, DataType dataType, Context context);
+    NDArray arange(int start, int stop, int step, DataType dataType, Device device);
 
     /**
-     * Return a 2-D array with ones on the diagonal and zeros elsewhere in current context.
+     * Return a 2-D array with ones on the diagonal and zeros elsewhere on current device.
      *
      * @param rows number of rows and cols in the output
      * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
      *     whose values are equal to one.
      */
     default NDArray eye(int rows) {
-        return eye(rows, rows, 0, DataType.FLOAT32, getContext());
+        return eye(rows, rows, 0, DataType.FLOAT32, getDevice());
     }
 
     /**
-     * Return a 2-D array with ones on the diagonal and zeros elsewhere in current context.
+     * Return a 2-D array with ones on the diagonal and zeros elsewhere on current device.
      *
      * @param rows number of rows and cols in the output
      * @param k index of the diagonal: 0 (the default) refers to the main diagonal, a positive value
@@ -647,11 +647,11 @@ public interface NDManager extends AutoCloseable {
      *     whose values are equal to one.
      */
     default NDArray eye(int rows, int k) {
-        return eye(rows, rows, k, DataType.FLOAT32, getContext());
+        return eye(rows, rows, k, DataType.FLOAT32, getDevice());
     }
 
     /**
-     * Return a 2-D array with ones on the diagonal and zeros elsewhere in current context.
+     * Return a 2-D array with ones on the diagonal and zeros elsewhere on current device.
      *
      * @param rows number of rows in the output
      * @param cols number of columns in the output
@@ -661,7 +661,7 @@ public interface NDManager extends AutoCloseable {
      *     whose values are equal to one.
      */
     default NDArray eye(int rows, int cols, int k) {
-        return eye(rows, cols, k, DataType.FLOAT32, getContext());
+        return eye(rows, cols, k, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -672,14 +672,14 @@ public interface NDManager extends AutoCloseable {
      * @param k index of the diagonal: 0 (the default) refers to the main diagonal, a positive value
      *     refers to an upper diagonal, and a negative value to a lower diagonal.
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
      *     whose values are equal to one.
      */
-    NDArray eye(int rows, int cols, int k, DataType dataType, Context context);
+    NDArray eye(int rows, int cols, int k, DataType dataType, Device device);
 
     /**
-     * Return evenly spaced numbers over a specified interval in current context.
+     * Return evenly spaced numbers over a specified interval on current device.
      *
      * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].
      *
@@ -689,7 +689,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray linspace(double start, double stop, int num) {
-        return linspace(start, stop, num, true, getContext());
+        return linspace(start, stop, num, true, getDevice());
     }
 
     /**
@@ -702,13 +702,13 @@ public interface NDManager extends AutoCloseable {
      * @param stop the end value of the sequence
      * @param num number of samples to generate
      * @param endpoint if {@code true}, stop is the last sample, otherwise, it is not included
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray linspace(double start, double stop, int num, boolean endpoint, Context context);
+    NDArray linspace(double start, double stop, int num, boolean endpoint, Device device);
 
     /**
-     * Draw random samples from a normal (Gaussian) distribution in current context.
+     * Draw random samples from a normal (Gaussian) distribution on current device.
      *
      * <p>Samples are uniformly distributed over the half-open interval ``[low, high)`` (includes
      * low, but excludes high). In other words, any value within the given interval is equally
@@ -722,7 +722,7 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray randomUniform(double low, double high, Shape shape) {
-        return randomUniform(low, high, shape, DataType.FLOAT32, getContext());
+        return randomUniform(low, high, shape, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -738,21 +738,21 @@ public interface NDManager extends AutoCloseable {
      *     high.
      * @param shape the {@link Shape} of the {@link software.amazon.ai.ndarray.NDArray}
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray randomUniform(double low, double high, Shape shape, DataType dataType, Context context);
+    NDArray randomUniform(double low, double high, Shape shape, DataType dataType, Device device);
 
     /**
      * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
-     * to a normal distribution parametrized by mean = 0 and standard deviation = 1 in current
-     * context.
+     * to a normal distribution parametrized by mean = 0 and standard deviation = 1 on current
+     * device.
      *
      * @param shape Output shape.
      * @return new instance of {@link NDArray}
      */
     default NDArray randomNormal(Shape shape) {
-        return randomNormal(0f, 1f, shape, DataType.FLOAT32, getContext());
+        return randomNormal(0f, 1f, shape, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -761,11 +761,11 @@ public interface NDManager extends AutoCloseable {
      *
      * @param shape Output shape.
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray randomNormal(Shape shape, DataType dataType, Context context) {
-        return randomNormal(0d, 1d, shape, dataType, context);
+    default NDArray randomNormal(Shape shape, DataType dataType, Device device) {
+        return randomNormal(0d, 1d, shape, dataType, device);
     }
 
     /**
@@ -777,10 +777,10 @@ public interface NDManager extends AutoCloseable {
      * @param scale Standard deviation (spread or "width") of the distribution.
      * @param shape Output shape.
      * @param dataType the {@link DataType} of the {@link software.amazon.ai.ndarray.NDArray}
-     * @param context the {@link Context} of the {@link software.amazon.ai.ndarray.NDArray}
+     * @param device the {@link Device} of the {@link software.amazon.ai.ndarray.NDArray}
      * @return new instance of {@link NDArray}
      */
-    NDArray randomNormal(double loc, double scale, Shape shape, DataType dataType, Context context);
+    NDArray randomNormal(double loc, double scale, Shape shape, DataType dataType, Device device);
 
     /**
      * Return a single sample from a multinomial distribution. The multinomial distribution is a
@@ -824,26 +824,26 @@ public interface NDManager extends AutoCloseable {
     /**
      * Creates a child NDManager.
      *
-     * <p>Child NDManager will inherit default {@link Context} from this NDManager.
+     * <p>Child NDManager will inherit default {@link Device} from this NDManager.
      *
      * @return a child NDManager
      */
     NDManager newSubManager();
 
     /**
-     * Creates a child NDManager with specified default {@link Context}.
+     * Creates a child NDManager with specified default {@link Device}.
      *
-     * @param context default {@link Context}
+     * @param device default {@link Device}
      * @return a child NDManager
      */
-    NDManager newSubManager(Context context);
+    NDManager newSubManager(Device device);
 
     /**
-     * Returns default {@link Context} of this NDManager.
+     * Returns default {@link Device} of this NDManager.
      *
-     * @return default {@link Context} of this NDManager
+     * @return default {@link Device} of this NDManager
      */
-    Context getContext();
+    Device getDevice();
 
     /**
      * Attaches an NDArray or NDManager to this manager.

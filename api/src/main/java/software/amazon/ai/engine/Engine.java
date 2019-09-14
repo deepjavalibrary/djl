@@ -20,7 +20,7 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.GradientCollector;
@@ -96,25 +96,24 @@ public abstract class Engine {
     public abstract int getGpuCount();
 
     /**
-     * Returns {@link MemoryUsage} of specified GPU context.
+     * Returns {@link MemoryUsage} of specified GPU device.
      *
-     * @param context the GPU {@link Context} to retrieve
-     * @return {@link MemoryUsage} of specified GPU context
+     * @param device the GPU {@link Device} to retrieve
+     * @return {@link MemoryUsage} of specified GPU device
      * @throws EngineException if operation is not supported
-     * @throws IllegalArgumentException if Context is not GPU context
+     * @throws IllegalArgumentException if Device is not GPU device
      */
-    public abstract MemoryUsage getGpuMemory(Context context);
+    public abstract MemoryUsage getGpuMemory(Device device);
 
     /**
-     * Returns system default context.
+     * Returns system default device.
      *
-     * <p>If the system has GPU available, then the default context is {@link
-     * software.amazon.ai.Context#gpu()}. Otherwise the default context returned is {@link
-     * Context#cpu()}
+     * <p>If the system has GPU available, then the default device is {@link Device#gpu()}.
+     * Otherwise the default device returned is {@link Device#cpu()}
      *
-     * @return default context
+     * @return default device
      */
-    public abstract Context defaultContext();
+    public abstract Device defaultDevice();
 
     /**
      * Returns the version of the deep learning framework.
@@ -126,10 +125,10 @@ public abstract class Engine {
     /**
      * Construct a new model.
      *
-     * @param context the context that model to be loaded
+     * @param device the device that model to be loaded
      * @return a new Model instance using the network defined in block
      */
-    public abstract Model newModel(Context context);
+    public abstract Model newModel(Device device);
 
     /**
      * Creates a new {@link GradientCollector} instance for this Engine.
@@ -151,17 +150,17 @@ public abstract class Engine {
     /**
      * Creates a new top-level {@link NDManager}.
      *
-     * <p>{@code NDManager} will inherit default {@link Context}.
+     * <p>{@code NDManager} will inherit default {@link Device}.
      *
      * @return Returns a new top-level {@code NDManager}
      */
     public abstract NDManager newBaseManager();
 
     /**
-     * Creates a new top-level {@link NDManager} with specified {@link Context}.
+     * Creates a new top-level {@link NDManager} with specified {@link Device}.
      *
-     * @param context default {@link Context}
+     * @param device default {@link Device}
      * @return Returns a new top-level {@code NDManager}
      */
-    public abstract NDManager newBaseManager(Context context);
+    public abstract NDManager newBaseManager(Device device);
 }

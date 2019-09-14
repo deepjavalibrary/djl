@@ -26,7 +26,7 @@ import javax.imageio.ImageIO;
 import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
@@ -66,10 +66,10 @@ public class PoseEstimationExample extends AbstractExample {
 
         ZooModel<BufferedImage, List<Joint>> pose = ModelZoo.SIMPLE_POSE.loadModel(criteria);
 
-        Context context = Context.defaultContext();
+        Device device = Device.defaultDevice();
 
         try (Predictor<BufferedImage, List<DetectedObject>> ssdPredictor =
-                ssd.newPredictor(context)) {
+                ssd.newPredictor(device)) {
             ssdResult = ssdPredictor.predict(img);
         }
         // Get the cropped image
@@ -88,7 +88,7 @@ public class PoseEstimationExample extends AbstractExample {
                         .collect(Collectors.toList());
 
         /* Pose recognition */
-        try (Predictor<BufferedImage, List<Joint>> posePredictor = pose.newPredictor(context)) {
+        try (Predictor<BufferedImage, List<Joint>> posePredictor = pose.newPredictor(device)) {
             posePredictor.setMetrics(metrics); // Let predictor collect metrics
             poseResult = new ArrayList<>();
             for (BufferedImage segmentedImg : filtered) {

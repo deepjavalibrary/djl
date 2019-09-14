@@ -36,7 +36,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.slf4j.Logger;
-import software.amazon.ai.Context;
+import software.amazon.ai.Device;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.metric.Metric;
 import software.amazon.ai.metric.Metrics;
@@ -106,7 +106,7 @@ public abstract class AbstractExample {
             logger.info(
                     "Running {} on: {}, iteration: {}, duration: {} minutes.",
                     getClass().getSimpleName(),
-                    Context.defaultContext(),
+                    Device.defaultDevice(),
                     iteration,
                     duration.toMinutes());
 
@@ -188,8 +188,8 @@ public abstract class AbstractExample {
         Engine engine = Engine.getInstance();
         int gpuCount = engine.getGpuCount();
         for (int i = 0; i < gpuCount; ++i) {
-            Context context = Context.gpu(i);
-            MemoryUsage mem = engine.getGpuMemory(context);
+            Device device = Device.gpu(i);
+            MemoryUsage mem = engine.getGpuMemory(device);
             metrics.addMetric("GPU-" + i, mem.getCommitted(), "bytes");
         }
     }
