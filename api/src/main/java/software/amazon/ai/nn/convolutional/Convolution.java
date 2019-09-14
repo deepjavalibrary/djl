@@ -12,17 +12,97 @@
  */
 package software.amazon.ai.nn.convolutional;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.BlockFactory;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.util.PairList;
 
-public interface Convolution extends Block {
+public abstract class Convolution extends AbstractBlock {
 
-    NDArray forward(NDArray data);
+    protected Shape kernel;
+    protected Shape stride;
+    protected Shape pad;
+    protected Shape dilate;
+    protected int numFilters;
+    protected int numGroups;
+    protected String layout;
+    protected boolean includeBias;
+
+    protected Parameter weight;
+    protected Parameter bias;
+
+    public Convolution(NDManager manager) {
+        super(manager);
+    }
+
+    protected abstract byte getVersion();
+
+    @Override
+    public NDList forward(NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(inputs);
+        NDArrayEx ex = inputs.get(0).getNDArrayInternal();
+        return ex.convolution(
+                inputs, kernel, stride, pad, numFilters, numGroups, layout, !includeBias, params);
+    }
+
+    @Override
+    public List<Parameter> getDirectParameters() {
+        List<Parameter> parameters = new ArrayList<>();
+        parameters.add(weight);
+        if (includeBias) {
+            parameters.add(bias);
+        }
+        return parameters;
+    }
+
+    @Override
+    public DataDesc[] describeInput() {
+        return new DataDesc[0];
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(getVersion());
+        weight.save(os);
+        if (bias != null) {
+            bias.save(os);
+        }
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != getVersion()) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        weight.load(is);
+        if (bias != null) {
+            bias.load(is);
+        }
+    }
+
+    private NDList opInputs(NDList inputs) {
+        ensureInitialized(inputs);
+        NDArray data = inputs.head();
+        if (bias == null) {
+            return new NDList(data, weight.getArray());
+        }
+        return new NDList(data, weight.getArray(), bias.getArray());
+    }
 
     @SuppressWarnings("rawtypes")
-    abstract class BaseBuilder<T extends BaseBuilder> {
+    public abstract static class BaseBuilder<T extends BaseBuilder> {
 
         protected BlockFactory factory;
         protected Shape kernel;

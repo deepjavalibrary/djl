@@ -26,6 +26,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.nn.recurrent.GRU;
@@ -93,7 +94,7 @@ public class MxGRU extends MxNNBlock implements GRU {
     public void beforeInitialize(NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
-        if (!isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
+        if (!Block.isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
             throw new UnsupportedOperationException("RNN requires TNC layout");
         }
     }

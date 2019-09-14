@@ -15,7 +15,6 @@ package org.apache.mxnet.nn;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
-import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.util.PairList;
@@ -42,31 +41,8 @@ public abstract class MxNNBlock extends AbstractBlock {
 
     protected abstract PairList<String, Object> opParams(PairList<String, Object> params);
 
-    /** {@inheritDoc} */
-    @Override
-    public void ensureInitialized(NDList inputs) {
-        super.ensureInitialized(inputs);
-        initialized = true;
-    }
-
     @Override
     public DataDesc[] describeInput() {
         return new DataDesc[] {new DataDesc(inputShape)};
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void backward() {}
-
-    protected boolean isLayoutSupported(LayoutType[] expectedLayout, LayoutType[] actualLayout) {
-        if (actualLayout.length != expectedLayout.length) {
-            return false;
-        }
-        for (int i = 0; i < actualLayout.length; i++) {
-            if (actualLayout[i] != LayoutType.UNKNOWN && actualLayout[i] != expectedLayout[i]) {
-                return false;
-            }
-        }
-        return true;
     }
 }

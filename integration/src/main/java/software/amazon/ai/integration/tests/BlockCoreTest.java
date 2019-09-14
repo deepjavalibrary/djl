@@ -177,7 +177,7 @@ public class BlockCoreTest {
                             .setBias(false)
                             .build();
             bn.setInitializer(Initializer.ONES, true);
-            NDArray out = bn.forward(input);
+            NDArray out = bn.forward(new NDList(input)).get(0);
             Assertions.assertEquals(expected, out);
             Assertions.assertTrue(out.getShape().equals(bn.getOutputShape(new Shape(1, 4, 4))));
         }
@@ -203,7 +203,7 @@ public class BlockCoreTest {
                             .setNumFilters(1)
                             .build();
             bn.setInitializer(Initializer.ONES, true);
-            NDArray out = bn.forward(input);
+            NDArray out = bn.forward(new NDList(input)).get(0);
             Assertions.assertAlmostEquals(expected, out);
         }
     }
@@ -230,7 +230,7 @@ public class BlockCoreTest {
                             .setNumFilters(1)
                             .build();
             bn.setInitializer(Initializer.ONES, true);
-            NDArray out = bn.forward(input);
+            NDArray out = bn.forward(new NDList(input)).get(0);
             Assertions.assertEquals(expected, out);
             Assertions.assertTrue(
                     out.getShape().equals(bn.getOutputShape(new Shape(1, 1, 3, 3, 3))));

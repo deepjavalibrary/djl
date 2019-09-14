@@ -15,9 +15,6 @@ package org.apache.mxnet.nn;
 import java.util.List;
 import java.util.function.Function;
 import org.apache.mxnet.engine.MxNDManager;
-import org.apache.mxnet.nn.convolutional.MxConv1D;
-import org.apache.mxnet.nn.convolutional.MxConv2D;
-import org.apache.mxnet.nn.convolutional.MxConv3D;
 import org.apache.mxnet.nn.core.MxEmbedding;
 import org.apache.mxnet.nn.core.MxLinear;
 import org.apache.mxnet.nn.core.MxPrelu;
@@ -32,9 +29,6 @@ import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.LambdaBlock;
 import software.amazon.ai.nn.ParallelBlock;
 import software.amazon.ai.nn.SequentialBlock;
-import software.amazon.ai.nn.convolutional.Conv1D;
-import software.amazon.ai.nn.convolutional.Conv2D;
-import software.amazon.ai.nn.convolutional.Conv3D;
 import software.amazon.ai.nn.core.Embedding;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.core.Prelu;
@@ -54,6 +48,8 @@ public class MxBlockFactory implements BlockFactory {
         this.manager = manager;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public MxNDManager getNDManager() {
         return manager;
     }
@@ -123,24 +119,6 @@ public class MxBlockFactory implements BlockFactory {
     @Override
     public Prelu createPrelu() {
         return new MxPrelu(manager);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Conv1D createConv1D(Conv1D.Builder builder) {
-        return new MxConv1D(manager, builder);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Conv2D createConv2D(Conv2D.Builder builder) {
-        return new MxConv2D(manager, builder);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Conv3D createConv3D(Conv3D.Builder builder) {
-        return new MxConv3D(manager, builder);
     }
 
     /** {@inheritDoc} */

@@ -112,6 +112,7 @@ public abstract class AbstractBlock implements Block {
             for (Parameter parameter : getDirectParameters()) {
                 parameter.initialize(inputs);
             }
+            initialized = true;
         }
     }
 

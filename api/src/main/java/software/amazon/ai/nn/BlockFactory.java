@@ -15,9 +15,7 @@ package software.amazon.ai.nn;
 import java.util.List;
 import java.util.function.Function;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.nn.convolutional.Conv1D;
-import software.amazon.ai.nn.convolutional.Conv2D;
-import software.amazon.ai.nn.convolutional.Conv3D;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.core.Embedding;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.core.Prelu;
@@ -30,6 +28,8 @@ import software.amazon.ai.training.Activation;
 
 /** An internal to create Neural Network {@link Block}s. */
 public interface BlockFactory {
+
+    NDManager getNDManager();
 
     Activation activation();
 
@@ -52,12 +52,6 @@ public interface BlockFactory {
     <T> Embedding<T> createEmbedding(Embedding.Builder<T> builder);
 
     Prelu createPrelu();
-
-    Conv1D createConv1D(Conv1D.Builder builder);
-
-    Conv2D createConv2D(Conv2D.Builder builder);
-
-    Conv3D createConv3D(Conv3D.Builder builder);
 
     RNN createRnn(RNN.Builder builder);
 

@@ -20,6 +20,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
@@ -65,4 +66,16 @@ public interface Block {
     void saveParameters(DataOutputStream os) throws IOException;
 
     void loadParameters(DataInputStream is) throws IOException;
+
+    static boolean isLayoutSupported(LayoutType[] expectedLayout, LayoutType[] actualLayout) {
+        if (actualLayout.length != expectedLayout.length) {
+            return false;
+        }
+        for (int i = 0; i < actualLayout.length; i++) {
+            if (actualLayout[i] != LayoutType.UNKNOWN && actualLayout[i] != expectedLayout[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

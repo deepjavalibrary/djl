@@ -17,6 +17,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.pooling.PoolingConvention;
 import software.amazon.ai.training.Activation;
+import software.amazon.ai.util.PairList;
 
 /** An internal interface that encapsulate engine specific operator methods. */
 public interface NDArrayEx {
@@ -260,6 +261,21 @@ public interface NDArrayEx {
             float clipGrad,
             float momentum,
             boolean lazyUpdate);
+
+    ////////////////////////////////////////
+    // Neural network
+    ////////////////////////////////////////
+
+    NDList convolution(
+            NDList inputs,
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            int numFilters,
+            int numGroups,
+            String layout,
+            boolean noBias,
+            PairList<String, Object> params);
 
     ////////////////////////////////////////
     // Miscellaneous

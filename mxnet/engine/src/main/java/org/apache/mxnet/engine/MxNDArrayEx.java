@@ -17,6 +17,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.pooling.PoolingConvention;
+import software.amazon.ai.util.PairList;
 
 class MxNDArrayEx implements NDArrayEx {
 
@@ -431,6 +432,35 @@ class MxNDArrayEx implements NDArrayEx {
         } else {
             manager.invoke("sgd_update", inputs, weights, params);
         }
+    }
+
+    ////////////////////////////////////////
+    // Neural network
+    ////////////////////////////////////////
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList convolution(
+            NDList inputs,
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            int numFilters,
+            int numGroups,
+            String layout,
+            boolean noBias,
+            PairList<String, Object> additional) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("kernel", kernel);
+        params.addParam("stride", stride);
+        params.addParam("pad", pad);
+        params.addParam("num_filter", numFilters);
+        params.addParam("num_group", numGroups);
+        params.add("layout", layout);
+        params.add("no_bias", noBias);
+        params.addAll(additional);
+
+        return manager.invoke("Convolution", inputs, params);
     }
 
     ////////////////////////////////////////
