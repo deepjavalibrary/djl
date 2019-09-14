@@ -16,5 +16,9 @@ import software.amazon.ai.ndarray.NDList;
 
 public interface Batchifier {
 
+    Batchifier STACK = new StackBatchifier();
+
     NDList batchify(NDList[] inputs);
+
+    NDList[] unbatchify(NDList inputs);
 }

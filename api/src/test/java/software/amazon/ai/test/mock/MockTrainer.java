@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.test.mock;
 
+import java.util.List;
 import java.util.Optional;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDManager;
@@ -37,7 +38,7 @@ public class MockTrainer<I, L, O> implements Trainer<I, L, O> {
     public void step() {}
 
     @Override
-    public O predict(I input) throws TranslateException {
+    public List<O> predict(List<I> input) throws TranslateException {
         return null;
     }
 

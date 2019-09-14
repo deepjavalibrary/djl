@@ -35,7 +35,7 @@ public class ImageNetTranslator extends ImageTranslator<List<Classification>> {
     private int topK = 5;
     private int imageWidth = 224;
     private int imageHeight = 224;
-    private DataDesc dataDesc = new DataDesc(new Shape(1, 3, imageHeight, imageWidth), "data");
+    private DataDesc dataDesc = new DataDesc(new Shape(3, imageHeight, imageWidth), "data");
 
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
@@ -54,7 +54,7 @@ public class ImageNetTranslator extends ImageTranslator<List<Classification>> {
     public List<Classification> processOutput(TranslatorContext ctx, NDList list)
             throws IOException {
         Model model = ctx.getModel();
-        NDArray array = list.get(0).get(0);
+        NDArray array = list.get(0);
 
         long length = array.getShape().head();
         length = Math.min(length, topK);

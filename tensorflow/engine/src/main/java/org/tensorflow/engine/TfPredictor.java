@@ -45,14 +45,14 @@ public class TfPredictor<I, O> implements Predictor<I, O> {
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("PMD.AvoidRethrowingException")
-    public O predict(I input) throws TranslateException {
+    public List<O> batchPredict(List<I> input) throws TranslateException {
         try (PredictorContext inputCtx = new PredictorContext();
                 PredictorContext outputCtx = new PredictorContext()) {
-            NDList ndList = translator.processInput(inputCtx, input);
+            NDList ndList = translator.processInputBatch(inputCtx, input);
 
             NDList result = forward(ndList, model);
 
-            return translator.processOutput(outputCtx, result);
+            return translator.processOutputBatch(outputCtx, result);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

@@ -12,6 +12,8 @@
  */
 package software.amazon.ai.inference;
 
+import java.util.Collections;
+import java.util.List;
 import software.amazon.ai.Model;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.translate.TranslateException;
@@ -42,13 +44,24 @@ import software.amazon.ai.translate.Translator;
 public interface Predictor<I, O> extends AutoCloseable {
 
     /**
-     * Predicts the method used for inference.
+     * Predicts an item for inference.
      *
      * @param input Input follows the inputObject
      * @return The Output object defined by user
      * @throws TranslateException if an error occurs during prediction
      */
-    O predict(I input) throws TranslateException;
+    default O predict(I input) throws TranslateException {
+        return batchPredict(Collections.singletonList(input)).get(0);
+    }
+
+    /**
+     * Predicts a batch for inference.
+     *
+     * @param input Inputs follows the inputObject
+     * @return The Output objects defined by user
+     * @throws TranslateException if an error occurs during prediction
+     */
+    List<O> batchPredict(List<I> input) throws TranslateException;
 
     /**
      * Attaches a Metrics param to use for benchmark.

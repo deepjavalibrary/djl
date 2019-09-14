@@ -631,7 +631,11 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDList split(int sections, int axis) {
-        return null;
+        NDList list = new NDList();
+        for (int i = 0; i < sections; i++) {
+            list.add(new MockNDArray(manager, device, getShape().slice(1), dataType, sparseFormat));
+        }
+        return list;
     }
 
     @Override
@@ -661,12 +665,14 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray stack(NDArray[] arrays, int axis) {
-        return null;
+        Shape newShape = new Shape(arrays.length + 1).addAll(getShape());
+        return new MockNDArray(manager, device, newShape, dataType, sparseFormat);
     }
 
     @Override
     public NDArray stack(NDList arrays, int axis) {
-        return null;
+        Shape newShape = new Shape(arrays.size() + 1).addAll(getShape());
+        return new MockNDArray(manager, device, newShape, dataType, sparseFormat);
     }
 
     @Override

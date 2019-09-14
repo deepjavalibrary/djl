@@ -107,7 +107,7 @@ public final class TrainMnist {
                         NDArray pred;
                         NDArray loss;
                         try (GradientCollector gradCol = GradientCollector.newInstance()) {
-                            pred = trainer.predict(new NDList(data)).get(0);
+                            pred = mlp.forward(new NDList(data)).get(0);
                             loss =
                                     Loss.softmaxCrossEntropyLoss(
                                             label, pred, 1.f, 0, -1, true, false);

@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
@@ -56,7 +57,6 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Batch> {
         private RandomAccessDataset<I, L> dataset;
         private Trainer<I, L, ?> trainer;
         private Iterator<List<Long>> sample;
-        private Batchifier batchifier;
         private Device pinDevice;
         private ExecutorService executor;
         private Queue<Future<Batch>> queue;
@@ -69,15 +69,9 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Batch> {
             this.dataset = dataset;
             this.trainer = trainer;
             this.sample = sampler.sample(trainer, dataset);
-            this.batchifier = config.getBatchifier();
             this.pinDevice = config.getPinDevice();
             this.executor = config.getExecutor();
             this.queue = new LinkedList<>();
-
-            if (batchifier == null) {
-                // default batchifier is StackBatchifier
-                batchifier = new StackBatchifier();
-            }
 
             // prefetch
             for (int i = 0; i < ((ThreadPoolExecutor) executor).getCorePoolSize() * 2; i++) {
@@ -126,17 +120,19 @@ public class MultithreadingDataIterable<I, L> implements Iterable<Batch> {
                 NDList[] data = new NDList[indices.size()];
                 NDList[] labels = new NDList[indices.size()];
                 TranslatorContext ctx = trainer.getPreprocessContext();
+                TrainTranslator<I, L, ?> translator = trainer.getTranslator();
                 for (int i = 0; i < indices.size(); i++) {
                     Pair<I, L> dataItem = dataset.get(indices.get(i));
                     Record record;
                     try {
-                        record = trainer.getTranslator().processInput(ctx, dataItem);
+                        record = translator.processInput(ctx, dataItem);
                     } catch (Exception e) {
                         throw new IllegalStateException("Failed to get next data item", e);
                     }
                     data[i] = record.getData();
                     labels[i] = record.getLabels();
                 }
+                Batchifier batchifier = translator.getBatchifier();
                 NDList batchData = batchifier.batchify(data);
                 NDList batchLabels = batchifier.batchify(labels);
                 // pin the device to specific context

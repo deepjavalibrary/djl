@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.engine;
 
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
@@ -58,18 +59,19 @@ public class MxPredictor<I, O> implements Predictor<I, O> {
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("PMD.AvoidRethrowingException")
-    public O predict(I input) throws TranslateException {
+    public List<O> batchPredict(List<I> input) throws TranslateException {
         timestamp = System.nanoTime();
 
         try (PredictorContext inputCtx = new PredictorContext();
                 PredictorContext outputCtx = new PredictorContext()) {
-            NDList ndList = translator.processInput(inputCtx, input);
+
+            NDList inputBatch = translator.processInputBatch(inputCtx, input);
             preprocessEnd();
 
-            NDList result = forward(ndList);
+            NDList result = forward(inputBatch);
             forwardEnd(result);
 
-            return translator.processOutput(outputCtx, result);
+            return translator.processOutputBatch(outputCtx, result);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

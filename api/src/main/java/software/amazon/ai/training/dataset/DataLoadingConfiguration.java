@@ -22,21 +22,15 @@ import software.amazon.ai.Device;
  */
 public final class DataLoadingConfiguration {
     private ExecutorService executor;
-    private Batchifier batchifier;
     private Device pinDevice;
 
     private DataLoadingConfiguration(Builder builder) {
         this.executor = builder.executor;
-        this.batchifier = builder.batchifier;
         this.pinDevice = builder.pinDevice;
     }
 
     public ExecutorService getExecutor() {
         return executor;
-    }
-
-    public Batchifier getBatchifier() {
-        return batchifier;
     }
 
     public Device getPinDevice() {
@@ -45,17 +39,11 @@ public final class DataLoadingConfiguration {
 
     public static final class Builder {
         private ExecutorService executor;
-        private Batchifier batchifier;
 
         private Device pinDevice;
 
         public Builder setExcutor(ExecutorService executor) {
             this.executor = executor;
-            return this;
-        }
-
-        public Builder setBatchifier(Batchifier batchifier) {
-            this.batchifier = batchifier;
             return this;
         }
 

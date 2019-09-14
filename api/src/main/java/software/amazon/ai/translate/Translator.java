@@ -12,6 +12,11 @@
  */
 package software.amazon.ai.translate;
 
+import java.util.ArrayList;
+import java.util.List;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.training.dataset.Batchifier;
+
 /**
  * The {@code Translator} interface provides model pre-processing and postprocessing functionality.
  *
@@ -68,4 +73,47 @@ package software.amazon.ai.translate;
  * @param <I> input type
  * @param <O> output type
  */
-public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {}
+public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
+
+    // Default to Stack batchifier
+    default Batchifier getBatchifier() {
+        return Batchifier.STACK;
+    }
+
+    /**
+     * Processes the inputs and converts it to batched NDList.
+     *
+     * @param ctx Toolkit that would help to creating input NDArray
+     * @param inputs Input Objects
+     * @return {@link NDList}
+     * @throws Exception if an error occurs during processing input
+     */
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    default NDList processInputBatch(TranslatorContext ctx, List<I> inputs) throws Exception {
+        int batchSize = inputs.size();
+        NDList[] preprocessed = new NDList[batchSize];
+        int index = 0;
+        for (I inp : inputs) {
+            preprocessed[index++] = processInput(ctx, inp);
+        }
+        return getBatchifier().batchify(preprocessed);
+    }
+
+    /**
+     * Processes the output batched NDList to the corresponding Output Objects.
+     *
+     * @param ctx Toolkit used to do postprocessing
+     * @param list Batched Output NDList after inference
+     * @return output objects
+     * @throws Exception if an error occurs during processing output
+     */
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    default List<O> processOutputBatch(TranslatorContext ctx, NDList list) throws Exception {
+        NDList[] unbatched = getBatchifier().unbatchify(list);
+        List<O> outputs = new ArrayList<>(unbatched.length);
+        for (NDList output : unbatched) {
+            outputs.add(processOutput(ctx, output));
+        }
+        return outputs;
+    }
+}

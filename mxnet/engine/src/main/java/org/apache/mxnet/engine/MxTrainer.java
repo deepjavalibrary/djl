@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.engine;
 
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,17 +86,17 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("PMD.AvoidRethrowingException")
-    public O predict(I input) throws TranslateException {
+    public List<O> predict(List<I> input) throws TranslateException {
         timestamp = System.nanoTime();
 
         try (TrainerContext inputCtx = new TrainerContext();
                 TrainerContext outputCtx = new TrainerContext()) {
-            NDList ndList = translator.processInput(inputCtx, input);
+            NDList ndList = translator.processInputBatch(inputCtx, input);
             predictPreprocessEnd();
 
             NDList result = block.forward(ndList);
             predictForwardEnd(result);
-            return translator.processOutput(outputCtx, result);
+            return translator.processOutputBatch(outputCtx, result);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

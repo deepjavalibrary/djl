@@ -13,6 +13,8 @@
 package software.amazon.ai.training;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDManager;
@@ -39,7 +41,18 @@ public interface Trainer<I, L, O> extends AutoCloseable {
      * @return The Output object defined by user
      * @throws TranslateException if an error occurs during prediction
      */
-    O predict(I input) throws TranslateException;
+    default O predict(I input) throws TranslateException {
+        return predict(Collections.singletonList(input)).get(0);
+    }
+
+    /**
+     * Predicts the method used for inference.
+     *
+     * @param input Inputs follows the inputObject
+     * @return The Output objects defined by user
+     * @throws TranslateException if an error occurs during prediction
+     */
+    List<O> predict(List<I> input) throws TranslateException;
 
     void step();
 

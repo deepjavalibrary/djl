@@ -27,9 +27,13 @@ import software.amazon.ai.modality.Classification;
 import software.amazon.ai.modality.cv.BoundingBox;
 import software.amazon.ai.modality.cv.DetectedObject;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.ndarray.types.SparseFormat;
 import software.amazon.ai.test.mock.EchoTranslator;
 import software.amazon.ai.test.mock.MockImageTranslator;
 import software.amazon.ai.test.mock.MockModel;
+import software.amazon.ai.test.mock.MockNDArray;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;
@@ -81,7 +85,13 @@ public class InferenceTest {
 
                     @Override
                     public NDList processInput(TranslatorContext ctx, String input) {
-                        return null;
+                        return new NDList(
+                                new MockNDArray(
+                                        null,
+                                        null,
+                                        new Shape(3, 24, 24),
+                                        DataType.FLOAT32,
+                                        SparseFormat.DENSE));
                     }
 
                     @Override

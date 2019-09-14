@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.test.mock;
 
+import java.util.List;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
@@ -37,7 +38,7 @@ public class MockPredictor<I, O> implements Predictor<I, O> {
 
     @Override
     @SuppressWarnings("PMD.AvoidRethrowingException")
-    public O predict(I input) throws TranslateException {
+    public List<O> batchPredict(List<I> input) throws TranslateException {
         if (metrics != null) {
             metrics.addMetric("Preprocess", 1, "nano");
             metrics.addMetric("Inference", 3, "nano");
@@ -45,8 +46,8 @@ public class MockPredictor<I, O> implements Predictor<I, O> {
         }
 
         try (PredictorContext ctx = new PredictorContext()) {
-            NDList ndList = translator.processInput(ctx, input);
-            return translator.processOutput(ctx, ndList);
+            NDList ndList = translator.processInputBatch(ctx, input);
+            return translator.processOutputBatch(ctx, ndList);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

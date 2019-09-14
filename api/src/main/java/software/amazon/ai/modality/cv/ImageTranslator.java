@@ -40,7 +40,7 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
         int w = input.getWidth();
         int h = input.getHeight();
-        Shape shape = new Shape(1, 3, h, w);
+        Shape shape = new Shape(3, h, w);
         DataDesc dataDesc = new DataDesc(shape);
 
         NDManager manager = ctx.getNDManager();

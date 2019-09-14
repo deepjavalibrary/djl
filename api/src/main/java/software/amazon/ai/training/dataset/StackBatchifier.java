@@ -12,8 +12,10 @@
  */
 package software.amazon.ai.training.dataset;
 
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.util.Pair;
 
 /**
  * StackBatchifier is used to merge a list of samples to form a mini-batch of NDArray(s). The is
@@ -43,9 +45,39 @@ public class StackBatchifier implements Batchifier {
         // stack all the data and labels together
         NDList result = new NDList(size);
         for (NDList list : dataList) {
-            result.add(NDArrays.stack(list));
+            NDArray stacked = NDArrays.stack(list);
+            stacked.getDataDescriptor().setName(list.get(0).getDataDescriptor().getName());
+            result.add(stacked);
         }
 
         return result;
+    }
+
+    @Override
+    public NDList[] unbatchify(NDList inputs) {
+        if (inputs.size() == 0) {
+            return new NDList[0];
+        }
+        int size = Math.toIntExact(inputs.get(0).size(0));
+        if (size == 0) {
+            return new NDList[0];
+        }
+
+        NDList[] dataList = new NDList[size];
+        for (int i = 0; i < size; i++) {
+            dataList[i] = new NDList();
+        }
+
+        for (Pair<String, NDArray> input : inputs) {
+            NDList splitList = input.getValue().split(size);
+            for (int i = 0; i < size; i++) {
+                splitList
+                        .get(i)
+                        .getDataDescriptor()
+                        .setName(input.getValue().getDataDescriptor().getName());
+                dataList[i].add(input.getKey(), splitList.get(i));
+            }
+        }
+        return dataList;
     }
 }
