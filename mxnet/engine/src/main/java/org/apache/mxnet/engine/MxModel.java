@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.nn.MxBlockFactory;
 import org.apache.mxnet.nn.MxSymbolBlock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
@@ -58,6 +60,8 @@ import software.amazon.ai.util.Pair;
  * obtain the parameter NDArrays
  */
 public class MxModel implements Model {
+
+    private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
     private Path modelDir;
     private MxNDManager manager;
@@ -280,6 +284,17 @@ public class MxModel implements Model {
     @Override
     public void close() {
         manager.close();
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void finalize() throws Throwable {
+        if (manager.isOpen()) {
+            logger.warn("MxModel was not closed explicitly.");
+            manager.close();
+        }
+        super.finalize();
     }
 
     private void loadParameters(

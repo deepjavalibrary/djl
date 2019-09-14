@@ -148,17 +148,18 @@ public class OptimizerTest {
     private NDArray runOptimizer(NDManager manager, Block block, Optimizer optim) {
         NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS));
         NDArray label = manager.arange(0, BATCH_SIZE);
-        TrainingController controller = new TrainingController(block.getParameters(), optim);
-        try (GradientCollector gradCol = GradientCollector.newInstance()) {
-            NDArray pred = block.forward(new NDList(data)).head();
-            NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
-            gradCol.backward(loss);
+        try (TrainingController controller = new TrainingController(block.getParameters(), optim)) {
+            try (GradientCollector gradCol = GradientCollector.newInstance()) {
+                NDArray pred = block.forward(new NDList(data)).head();
+                NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
+                gradCol.backward(loss);
+            }
+            controller.step();
+            return NDArrays.stack(
+                    block.getParameters()
+                            .stream()
+                            .map(paramPair -> paramPair.getValue().getArray().mean())
+                            .toArray(NDArray[]::new));
         }
-        controller.step();
-        return NDArrays.stack(
-                block.getParameters()
-                        .stream()
-                        .map(paramPair -> paramPair.getValue().getArray().mean())
-                        .toArray(NDArray[]::new));
     }
 }

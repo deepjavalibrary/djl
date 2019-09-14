@@ -165,15 +165,16 @@ public class GradientCollectorIntegrationTest {
                             .build();
             NDArray input = manager.ones(new Shape(100, 1, 28, 28));
             NDArray label = manager.ones(new Shape(100, 1));
-            TrainingController controller =
-                    new TrainingController(resNet50.getParameters(), optimizer);
+
+            PairList<String, Parameter> parameters = resNet50.getParameters();
+
+            TrainingController controller = new TrainingController(parameters, optimizer);
             try (GradientCollector gradCol = GradientCollector.newInstance()) {
                 NDArray pred = resNet50.forward(new NDList(input)).head();
                 NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
                 gradCol.backward(loss);
             }
             controller.step();
-            PairList<String, Parameter> parameters = controller.getParameters();
             NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
             NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(1.7576532f);
             NDArray expectedAtIndex87 = manager.ones(new Shape(32, 32, 3, 3));
