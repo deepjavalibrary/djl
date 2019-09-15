@@ -23,7 +23,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.training.initializer.Initializer;
@@ -41,8 +40,7 @@ public class BatchNorm extends AbstractBlock {
     private Parameter runningMean;
     private Parameter runningVar;
 
-    BatchNorm(NDManager manager, Builder builder) {
-        super(manager);
+    BatchNorm(Builder builder) {
         axis = builder.getAxis();
         epsilon = builder.getEpsilon();
         momentum = builder.getMomentum();
@@ -106,18 +104,17 @@ public class BatchNorm extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
-        runningMean.load(is);
-        runningVar.load(is);
+        runningMean.load(manager, is);
+        runningVar.load(manager, is);
     }
 
     public static final class Builder {
 
-        private BlockFactory factory;
         private int axis = 1;
         private float epsilon = 1E-5f;
         private float momentum = .9f;
@@ -132,11 +129,6 @@ public class BatchNorm extends AbstractBlock {
 
         public float getMomentum() {
             return momentum;
-        }
-
-        public Builder setFactory(BlockFactory factory) {
-            this.factory = factory;
-            return this;
         }
 
         public Builder setAxis(int val) {
@@ -155,7 +147,7 @@ public class BatchNorm extends AbstractBlock {
         }
 
         public BatchNorm build() {
-            return new BatchNorm(factory.getNDManager(), this);
+            return new BatchNorm(this);
         }
     }
 }

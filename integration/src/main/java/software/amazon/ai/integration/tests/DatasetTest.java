@@ -34,7 +34,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.nn.BlockFactory;
+import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
@@ -56,8 +56,7 @@ public class DatasetTest {
     @RunAsTest
     public void testSequenceSampler() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
             NDManager manager = model.getNDManager();
 
@@ -85,8 +84,7 @@ public class DatasetTest {
     @RunAsTest
     public void testRandomSampler() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
             NDManager manager = model.getNDManager();
 
@@ -112,8 +110,7 @@ public class DatasetTest {
     @RunAsTest
     public void testBatchSampler() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
             NDManager manager = model.getNDManager();
 
@@ -195,8 +192,7 @@ public class DatasetTest {
     @RunAsTest
     public void testArrayDataset() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
             NDManager manager = model.getNDManager();
 
@@ -256,8 +252,7 @@ public class DatasetTest {
     // @RunAsTest
     public void testMultithreading() throws IOException, InterruptedException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
             NDManager manager = model.getNDManager();
 
             ExecutorService executor =

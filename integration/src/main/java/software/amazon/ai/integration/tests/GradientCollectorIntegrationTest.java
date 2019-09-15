@@ -28,7 +28,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.GradientCollector;
@@ -76,7 +75,6 @@ public class GradientCollectorIntegrationTest {
     @RunAsTest
     public void testTrain() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
             int numOfData = 1000;
@@ -92,7 +90,7 @@ public class GradientCollectorIntegrationTest {
             label.add(
                     manager.randomNormal(
                             0, 0.01, label.getShape(), DataType.FLOAT32, manager.getDevice()));
-            Linear block = new Linear.Builder().setFactory(factory).setOutChannels(1).build();
+            Linear block = new Linear.Builder().setOutChannels(1).build();
             model.setBlock(block);
 
             model.setInitializer(Initializer.ONES);
@@ -144,12 +142,10 @@ public class GradientCollectorIntegrationTest {
     @RunAsTest
     public void testTrainResNet() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
             Block resNet50 =
                     new ResNetV1.Builder()
-                            .setFactory(factory)
                             .setImageShape(new Shape(1, 28, 28))
                             .setNumLayers(50)
                             .setOutSize(10)

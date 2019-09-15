@@ -28,7 +28,6 @@ import software.amazon.ai.modality.Classification;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.nn.core.Linear;
@@ -63,12 +62,11 @@ public final class TrainResnetWithCifar10 {
     }
 
     public static void reconstructBlock(Model model) {
-        BlockFactory factory = model.getBlockFactory();
         Block modifiedBlock = ((SymbolBlock) model.getBlock()).removeLastBlock();
-        SequentialBlock newBlock = factory.createSequential();
+        SequentialBlock newBlock = new SequentialBlock();
         newBlock.add(modifiedBlock);
         Linear linear = new Linear.Builder().setOutChannels(10).build();
-        linear.setInitializer(Initializer.ONES, true);
+        linear.setInitializer(model.getNDManager(), Initializer.ONES, true);
         newBlock.add(linear);
         model.setBlock(newBlock);
     }

@@ -37,7 +37,6 @@ import org.testng.annotations.Test;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
-import software.amazon.ai.nn.BlockFactory;
 
 // CHECKSTYLE:ON:AvoidStaticImport
 
@@ -116,7 +115,6 @@ public class MxEngineTest extends PowerMockTestCase {
         try (Model model = Model.newInstance()) {
             model.load(location, modelName, null, options);
             // In JNA.MXNDArrayLoad function, file name is stored as the first param name in Model
-            BlockFactory factory = model.getBlockFactory();
             String paramPath = model.getBlock().getDirectParameters().get(0).getName();
             return Paths.get(paramPath).toFile().getName();
         }

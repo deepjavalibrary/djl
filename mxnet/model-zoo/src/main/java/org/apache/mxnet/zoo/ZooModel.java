@@ -25,7 +25,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -40,12 +39,6 @@ public class ZooModel<I, O> implements Model {
     public ZooModel(Model model, Translator<I, O> translator) {
         this.model = model;
         this.translator = translator;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BlockFactory getBlockFactory() {
-        return model.getBlockFactory();
     }
 
     @Override

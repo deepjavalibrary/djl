@@ -14,7 +14,6 @@ package software.amazon.ai.nn.convolutional;
 
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
@@ -31,8 +30,7 @@ public class Conv1D extends Convolution {
     private static final String LAYOUT = "NCW";
     private static final byte VERSION = 1;
 
-    Conv1D(NDManager manager, Builder builder) {
-        super(manager);
+    Conv1D(Builder builder) {
         kernel = builder.getKernel();
         stride = builder.getStride() == null ? new Shape(1) : builder.getStride();
         pad = builder.getPad() == null ? new Shape(0) : builder.getPad();
@@ -57,9 +55,7 @@ public class Conv1D extends Convolution {
     protected void beforeInitialize(NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
-        if (!Block.isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
-            throw new UnsupportedOperationException("Conv1D requires NCW layout");
-        }
+        Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }
 
     @Override
@@ -99,7 +95,7 @@ public class Conv1D extends Convolution {
             if (kernel == null || numFilters == 0) {
                 throw new IllegalArgumentException("Kernel and numFilters must be set");
             }
-            return new Conv1D(factory.getNDManager(), this);
+            return new Conv1D(this);
         }
     }
 }

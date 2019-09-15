@@ -16,12 +16,14 @@ import java.util.Arrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
+import software.amazon.ai.nn.LambdaBlock;
+import software.amazon.ai.nn.ParallelBlock;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.nn.norm.BatchNorm;
 import software.amazon.ai.nn.pooling.Pool;
+import software.amazon.ai.training.Activation;
 
 /**
  * Generic implementation of ResNet adapted from
@@ -38,17 +40,15 @@ public final class ResNetV1 {
     private ResNetV1() {}
 
     public static Block residualUnit(
-            BlockFactory factory,
             int numFilters,
             final Shape stride,
             final boolean dimMatch,
             boolean bottleneck,
             float batchNormMomentum) {
-        SequentialBlock resUnit = factory.createSequential();
+        SequentialBlock resUnit = new SequentialBlock();
         if (bottleneck) {
             resUnit.add(
                             new Conv2D.Builder()
-                                    .setFactory(factory)
                                     .setKernel(new Shape(1, 1))
                                     .setNumFilters(numFilters / 4)
                                     .setStride(stride)
@@ -57,14 +57,12 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setFactory(factory)
                                     .setEpsilon(2E-5f)
                                     .setMomentum(batchNormMomentum)
                                     .build())
-                    .add(factory.activation().reluBlock())
+                    .add(Activation.reluBlock())
                     .add(
                             new Conv2D.Builder()
-                                    .setFactory(factory)
                                     .setKernel(new Shape(3, 3))
                                     .setNumFilters(numFilters / 4)
                                     .setStride(new Shape(1, 1))
@@ -73,14 +71,12 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setFactory(factory)
                                     .setEpsilon(2E-5f)
                                     .setMomentum(batchNormMomentum)
                                     .build())
-                    .add(factory.activation().reluBlock())
+                    .add(Activation.reluBlock())
                     .add(
                             new Conv2D.Builder()
-                                    .setFactory(factory)
                                     .setKernel(new Shape(1, 1))
                                     .setNumFilters(numFilters)
                                     .setStride(new Shape(1, 1))
@@ -89,7 +85,6 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setFactory(factory)
                                     .setEpsilon(2E-5f)
                                     .setMomentum(batchNormMomentum)
                                     .build());
@@ -97,7 +92,6 @@ public final class ResNetV1 {
         } else {
             resUnit.add(
                             new Conv2D.Builder()
-                                    .setFactory(factory)
                                     .setKernel(new Shape(3, 3))
                                     .setNumFilters(numFilters)
                                     .setStride(stride)
@@ -106,14 +100,12 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setFactory(factory)
                                     .setEpsilon(2E-5f)
                                     .setMomentum(batchNormMomentum)
                                     .build())
-                    .add(factory.activation().reluBlock())
+                    .add(Activation.reluBlock())
                     .add(
                             new Conv2D.Builder()
-                                    .setFactory(factory)
                                     .setKernel(new Shape(3, 3))
                                     .setNumFilters(numFilters)
                                     .setStride(new Shape(1, 1))
@@ -122,18 +114,16 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setFactory(factory)
                                     .setEpsilon(2E-5f)
                                     .setMomentum(batchNormMomentum)
                                     .build());
         }
-        SequentialBlock shortcut = factory.createSequential();
+        SequentialBlock shortcut = new SequentialBlock();
         if (dimMatch) {
-            shortcut.add(factory.createIdentityBlock());
+            shortcut.add(Activation.IDENTITY_BLOCK);
         } else {
             shortcut.add(
                             new Conv2D.Builder()
-                                    .setFactory(factory)
                                     .setKernel(new Shape(1, 1))
                                     .setNumFilters(numFilters)
                                     .setStride(stride)
@@ -142,12 +132,11 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setFactory(factory)
                                     .setEpsilon(2E-5f)
                                     .setMomentum(batchNormMomentum)
                                     .build());
         }
-        return factory.createParallel(
+        return new ParallelBlock(
                 list -> {
                     NDList unit = list.get(0);
                     NDList parallel = list.get(1);
@@ -159,12 +148,10 @@ public final class ResNetV1 {
     public static Block resnet(Builder builder) {
         int numStages = builder.units.length;
         long height = builder.imageShape.get(1);
-        BlockFactory factory = builder.factory;
-        SequentialBlock resNet = factory.createSequential();
+        SequentialBlock resNet = new SequentialBlock();
         if (height <= 32) {
             resNet.add(
                             new Conv2D.Builder()
-                                    .setFactory(factory)
                                     .setKernel(new Shape(3, 3))
                                     .setNumFilters(builder.filters[0])
                                     .setStride(new Shape(1, 1))
@@ -173,14 +160,12 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setFactory(factory)
                                     .setEpsilon(2E-5f)
                                     .setMomentum(builder.batchNormMomentum)
                                     .build());
         } else {
             resNet.add(
                             new Conv2D.Builder()
-                                    .setFactory(factory)
                                     .setKernel(new Shape(7, 7))
                                     .setNumFilters(builder.filters[0])
                                     .setStride(new Shape(2, 2))
@@ -189,13 +174,12 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setFactory(factory)
                                     .setEpsilon(2E-5f)
                                     .setMomentum(builder.batchNormMomentum)
                                     .build())
-                    .add(factory.activation().reluBlock())
+                    .add(Activation.reluBlock())
                     .add(
-                            factory.createLambda(
+                            new LambdaBlock(
                                     arrays ->
                                             new NDList(
                                                     Pool.maxPool(
@@ -208,7 +192,6 @@ public final class ResNetV1 {
         for (int i = 0; i < numStages; i++) {
             resNet.add(
                     residualUnit(
-                            factory,
                             builder.filters[i + 1],
                             resStride,
                             false,
@@ -217,7 +200,6 @@ public final class ResNetV1 {
             for (int j = 0; j < builder.units[i] - 1; j++) {
                 resNet.add(
                         residualUnit(
-                                factory,
                                 builder.filters[i + 1],
                                 new Shape(1, 1),
                                 true,
@@ -229,7 +211,7 @@ public final class ResNetV1 {
             }
         }
         return resNet.add(
-                        factory.createLambda(
+                        new LambdaBlock(
                                 arrays ->
                                         new NDList(
                                                 Pool.globalAvgPool(
@@ -237,22 +219,17 @@ public final class ResNetV1 {
                                                         new Shape(1, 1),
                                                         new Shape(0, 0)))))
                 .add(
-                        factory.createLambda(
+                        new LambdaBlock(
                                 arrays -> {
                                     long batch = arrays.head().getShape().get(0);
                                     return new NDList(arrays.head().reshape(batch, -1));
                                 }))
-                .add(
-                        new Linear.Builder()
-                                .setFactory(factory)
-                                .setOutChannels(builder.outSize)
-                                .build())
-                .add(factory.createLambda(arrays -> new NDList(arrays.head().softmax(0))));
+                .add(new Linear.Builder().setOutChannels(builder.outSize).build())
+                .add(new LambdaBlock(arrays -> new NDList(arrays.head().softmax(0))));
     }
 
     public static final class Builder {
 
-        BlockFactory factory;
         int numLayers;
         int numStages;
         long outSize;
@@ -261,11 +238,6 @@ public final class ResNetV1 {
         boolean bottleneck;
         int[] units;
         int[] filters;
-
-        public Builder setFactory(BlockFactory factory) {
-            this.factory = factory;
-            return this;
-        }
 
         /**
          * Sets the <b>Required</b> number of layers in the network.

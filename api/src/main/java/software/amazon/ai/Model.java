@@ -24,7 +24,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -119,13 +118,6 @@ public interface Model extends AutoCloseable {
      */
     void load(Path modelPath, String modelName, Device device, Map<String, String> options)
             throws IOException;
-
-    /**
-     * Get the factory from the Model.
-     *
-     * @return {@link BlockFactory}
-     */
-    BlockFactory getBlockFactory();
 
     /**
      * Get the block from the Model.

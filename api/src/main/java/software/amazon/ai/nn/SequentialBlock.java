@@ -32,12 +32,7 @@ public class SequentialBlock extends AbstractBlock {
 
     private static final byte VERSION = 1;
 
-    private List<Block> blocks;
-
-    public SequentialBlock(NDManager manager) {
-        super(manager);
-        this.blocks = new ArrayList<>();
-    }
+    private List<Block> blocks = new ArrayList<>();
 
     public SequentialBlock addAll(Block... blocks) {
         this.blocks.addAll(Arrays.asList(blocks));
@@ -58,7 +53,7 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     public SequentialBlock add(Function<NDList, NDList> f) {
-        blocks.add(new LambdaBlock(manager, f));
+        blocks.add(new LambdaBlock(f));
         initialized = false;
         return this;
     }
@@ -146,13 +141,13 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
         for (Block block : blocks) {
-            block.loadParameters(is);
+            block.loadParameters(manager, is);
         }
     }
 }

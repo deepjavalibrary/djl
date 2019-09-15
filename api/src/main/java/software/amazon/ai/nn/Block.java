@@ -28,8 +28,6 @@ import software.amazon.ai.util.PairList;
 /** An interface defining neural-network layers. */
 public interface Block {
 
-    NDManager getNDManager();
-
     NDList forward(NDList inputs, PairList<String, Object> params);
 
     NDList forward(NDList inputs);
@@ -40,13 +38,14 @@ public interface Block {
 
     List<Parameter> getDirectParameters();
 
-    void setInitializer(Initializer initializer);
+    void setInitializer(NDManager manager, Initializer initializer);
 
-    void setInitializer(Initializer initializer, boolean overwrite);
+    void setInitializer(NDManager manager, Initializer initializer, boolean overwrite);
 
-    void setInitializer(Initializer initializer, String paramName);
+    void setInitializer(NDManager manager, Initializer initializer, String paramName);
 
-    void setInitializer(Initializer initializer, String paramName, boolean overwrite);
+    void setInitializer(
+            NDManager manager, Initializer initializer, String paramName, boolean overwrite);
 
     // TODO: remove this API
     void ensureInitialized(NDList inputs);
@@ -65,17 +64,24 @@ public interface Block {
 
     void saveParameters(DataOutputStream os) throws IOException;
 
-    void loadParameters(DataInputStream is) throws IOException;
+    void loadParameters(NDManager manager, DataInputStream is) throws IOException;
 
-    static boolean isLayoutSupported(LayoutType[] expectedLayout, LayoutType[] actualLayout) {
+    static void validateLayout(LayoutType[] expectedLayout, LayoutType[] actualLayout) {
         if (actualLayout.length != expectedLayout.length) {
-            return false;
+            throw new UnsupportedOperationException(
+                    "Expected layout: "
+                            + LayoutType.toString(expectedLayout)
+                            + ", but got: "
+                            + LayoutType.toString(actualLayout));
         }
         for (int i = 0; i < actualLayout.length; i++) {
             if (actualLayout[i] != LayoutType.UNKNOWN && actualLayout[i] != expectedLayout[i]) {
-                return false;
+                throw new UnsupportedOperationException(
+                        "Expected layout: "
+                                + LayoutType.toString(expectedLayout)
+                                + ", but got: "
+                                + LayoutType.toString(actualLayout));
             }
         }
-        return true;
     }
 }

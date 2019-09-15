@@ -64,8 +64,7 @@ public class LSTM extends RecurrentCell {
     private Parameter state = new Parameter("state", this, ParameterType.OTHER);
     private Parameter stateCell = new Parameter("state_cell", this, ParameterType.OTHER);
 
-    LSTM(NDManager manager, Builder builder) {
-        super(manager);
+    LSTM(Builder builder) {
         mode = "lstm";
         stateSize = builder.getStateSize();
         dropRate = builder.getDropRate();
@@ -128,9 +127,7 @@ public class LSTM extends RecurrentCell {
     public void beforeInitialize(NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
-        if (!Block.isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
-            throw new UnsupportedOperationException("RNN requires TNC layout");
-        }
+        Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }
 
     @Override
@@ -199,16 +196,16 @@ public class LSTM extends RecurrentCell {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
         for (Parameter parameter : parameters) {
-            parameter.load(is);
+            parameter.load(manager, is);
         }
-        state.load(is);
-        stateCell.load(is);
+        state.load(manager, is);
+        stateCell.load(manager, is);
     }
 
     /** The Builder to construct a {@link LSTM} type of {@link Block}. */
@@ -224,7 +221,7 @@ public class LSTM extends RecurrentCell {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return new LSTM(factory.getNDManager(), this);
+            return new LSTM(this);
         }
     }
 }

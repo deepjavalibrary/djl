@@ -55,8 +55,7 @@ public class GRU extends RecurrentCell {
 
     private Parameter state = new Parameter("state", this, ParameterType.OTHER);
 
-    GRU(NDManager manager, Builder builder) {
-        super(manager);
+    GRU(Builder builder) {
         mode = "gru";
         stateSize = builder.getStateSize();
         dropRate = builder.getDropRate();
@@ -99,9 +98,7 @@ public class GRU extends RecurrentCell {
     public void beforeInitialize(NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
-        if (!Block.isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
-            throw new UnsupportedOperationException("RNN requires TNC layout");
-        }
+        Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }
 
     @Override
@@ -142,15 +139,15 @@ public class GRU extends RecurrentCell {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
         for (Parameter parameter : parameters) {
-            parameter.load(is);
+            parameter.load(manager, is);
         }
-        state.load(is);
+        state.load(manager, is);
     }
 
     private NDList opInputs(NDList inputs) {
@@ -187,7 +184,7 @@ public class GRU extends RecurrentCell {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return new GRU(factory.getNDManager(), this);
+            return new GRU(this);
         }
     }
 }

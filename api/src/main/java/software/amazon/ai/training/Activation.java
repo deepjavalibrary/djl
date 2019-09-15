@@ -15,8 +15,12 @@ package software.amazon.ai.training;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.LambdaBlock;
+import software.amazon.ai.nn.core.Prelu;
 
 public interface Activation {
+
+    Block IDENTITY_BLOCK = new LambdaBlock(x -> x);
 
     static NDArray relu(NDArray array) {
         return array.getNDArrayInternal().relu();
@@ -90,23 +94,43 @@ public interface Activation {
         return new NDList(arrays.get(0).getNDArrayInternal().swish(beta));
     }
 
-    Block reluBlock();
+    static Block reluBlock() {
+        return new LambdaBlock(Activation::relu);
+    }
 
-    Block sigmoidBlock();
+    static Block sigmoidBlock() {
+        return new LambdaBlock(Activation::sigmoid);
+    }
 
-    Block tanhBlock();
+    static Block tanhBlock() {
+        return new LambdaBlock(Activation::tanh);
+    }
 
-    Block softreluBlock();
+    static Block softreluBlock() {
+        return new LambdaBlock(Activation::softrelu);
+    }
 
-    Block leakyReluBlock(float alpha);
+    static Block leakyReluBlock(float alpha) {
+        return new LambdaBlock(arrays -> Activation.leakyRelu(arrays, alpha));
+    }
 
-    Block eluBlock(float alpha);
+    static Block eluBlock(float alpha) {
+        return new LambdaBlock(arrays -> Activation.elu(arrays, alpha));
+    }
 
-    Block seluBlock();
+    static Block seluBlock() {
+        return new LambdaBlock(Activation::selu);
+    }
 
-    Block geluBlock();
+    static Block geluBlock() {
+        return new LambdaBlock(Activation::gelu);
+    }
 
-    Block swishBlock(float beta);
+    static Block swishBlock(float beta) {
+        return new LambdaBlock(arrays -> Activation.swish(arrays, beta));
+    }
 
-    Block preluBlock();
+    static Block preluBlock() {
+        return new Prelu();
+    }
 }

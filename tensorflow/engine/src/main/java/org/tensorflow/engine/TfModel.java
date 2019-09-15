@@ -35,7 +35,6 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -112,11 +111,6 @@ public class TfModel implements Model {
 
     private byte[] getMetaGraphDef() {
         return bundle.metaGraphDef();
-    }
-
-    @Override
-    public BlockFactory getBlockFactory() {
-        return null;
     }
 
     @Override

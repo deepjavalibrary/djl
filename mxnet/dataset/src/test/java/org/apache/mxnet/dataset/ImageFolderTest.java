@@ -22,7 +22,7 @@ import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.BlockFactory;
+import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.translate.TrainTranslator;
@@ -38,8 +38,7 @@ public class ImageFolderTest {
                         .build();
 
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
             TrainTranslator<String, Integer, NDList> translator = dataset.defaultTranslator();
             try (Trainer<String, Integer, NDList> trainer = model.newTrainer(translator)) {

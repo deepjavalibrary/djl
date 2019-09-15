@@ -12,9 +12,7 @@
  */
 package software.amazon.ai.nn.recurrent;
 
-import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.AbstractBlock;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.recurrent.RNN.Activation;
 
 public abstract class RecurrentCell extends AbstractBlock {
@@ -27,14 +25,9 @@ public abstract class RecurrentCell extends AbstractBlock {
     protected boolean useBidirectional;
     protected boolean stateOutputs;
 
-    public RecurrentCell(NDManager manager) {
-        super(manager);
-    }
-
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
-        protected BlockFactory factory;
         protected float dropRate;
         protected long stateSize = -1;
         protected int numStackedLayers = -1;
@@ -84,11 +77,6 @@ public abstract class RecurrentCell extends AbstractBlock {
 
         public Activation getActivation() {
             return activation;
-        }
-
-        public T setFactory(BlockFactory factory) {
-            this.factory = factory;
-            return self();
         }
 
         /**

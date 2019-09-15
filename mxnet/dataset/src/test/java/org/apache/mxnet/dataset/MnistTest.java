@@ -18,8 +18,8 @@ import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
@@ -30,8 +30,7 @@ public class MnistTest {
     @Test
     public void testMnistLocal() throws IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
             NDManager manager = model.getNDManager();
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
@@ -58,8 +57,7 @@ public class MnistTest {
     @Test
     public void testMnistRemote() throws IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
             NDManager manager = model.getNDManager();
             Mnist mnist =

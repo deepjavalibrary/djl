@@ -42,8 +42,7 @@ public class RNN extends RecurrentCell {
     private Parameter h2hBias;
     private Parameter state;
 
-    RNN(NDManager manager, Builder builder) {
-        super(manager);
+    RNN(Builder builder) {
         mode = builder.getActivation() == Activation.RELU ? "rnn_relu" : "rnn_tanh";
         stateSize = builder.getStateSize();
         dropRate = builder.getDropRate();
@@ -92,9 +91,7 @@ public class RNN extends RecurrentCell {
     public void beforeInitialize(NDList inputs) {
         NDArray input = inputs.head();
         Shape inputShape = input.getShape();
-        if (!Block.isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
-            throw new UnsupportedOperationException("RNN requires TNC layout");
-        }
+        Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }
 
     /** {@inheritDoc} */
@@ -129,16 +126,16 @@ public class RNN extends RecurrentCell {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
-        i2hWeight.load(is);
-        h2hWeight.load(is);
-        i2hBias.load(is);
-        h2hBias.load(is);
-        state.load(is);
+        i2hWeight.load(manager, is);
+        h2hWeight.load(manager, is);
+        i2hBias.load(manager, is);
+        h2hBias.load(manager, is);
+        state.load(manager, is);
     }
 
     private NDList opInputs(NDList inputs) {
@@ -184,7 +181,7 @@ public class RNN extends RecurrentCell {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return new RNN(factory.getNDManager(), this);
+            return new RNN(this);
         }
     }
 

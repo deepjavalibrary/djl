@@ -19,8 +19,8 @@ import org.junit.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
@@ -38,8 +38,7 @@ public class CocoTest {
                         .build();
         coco.prepare();
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
             TrainTranslator<String, double[][], NDList> translator = coco.defaultTranslator();
             try (Trainer<String, double[][], NDList> trainer = model.newTrainer(translator)) {
                 Iterator<Batch> ds = trainer.iterateDataset(coco).iterator();

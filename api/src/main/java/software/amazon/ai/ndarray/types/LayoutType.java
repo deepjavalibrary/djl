@@ -29,6 +29,10 @@ public enum LayoutType {
         this.value = value;
     }
 
+    public char getValue() {
+        return value;
+    }
+
     public static LayoutType fromValue(char value) {
         for (LayoutType type : LayoutType.values()) {
             if (value == type.value) {
@@ -45,7 +49,11 @@ public enum LayoutType {
                 .toArray(LayoutType[]::new);
     }
 
-    public char getValue() {
-        return value;
+    public static String toString(LayoutType[] layouts) {
+        StringBuilder sb = new StringBuilder(layouts.length);
+        for (LayoutType layout : layouts) {
+            sb.append(layout.getValue());
+        }
+        return sb.toString();
     }
 }

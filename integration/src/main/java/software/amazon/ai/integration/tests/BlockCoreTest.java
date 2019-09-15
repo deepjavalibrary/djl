@@ -24,7 +24,6 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.convolutional.Conv1D;
 import software.amazon.ai.nn.convolutional.Conv2D;
 import software.amazon.ai.nn.convolutional.Conv3D;
@@ -50,15 +49,13 @@ public class BlockCoreTest {
     @RunAsTest
     public void testLinear() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
             NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             long outSize = 3;
 
-            Linear linearWithBias =
-                    new Linear.Builder().setFactory(factory).setOutChannels(outSize).build();
-            linearWithBias.setInitializer(Initializer.ONES, true);
+            Linear linearWithBias = new Linear.Builder().setOutChannels(outSize).build();
+            linearWithBias.setInitializer(manager, Initializer.ONES, true);
             NDArray outBias = linearWithBias.forward(new NDList(input)).head();
             NDArray expectedBias =
                     input.mmul(manager.ones(new Shape(outSize, 2)).transpose())
@@ -66,12 +63,9 @@ public class BlockCoreTest {
             Assertions.assertEquals(expectedBias, outBias);
 
             Linear linearWithoutBias =
-                    new Linear.Builder()
-                            .setFactory(factory)
-                            .setOutChannels(outSize)
-                            .setBias(false)
-                            .build();
-            linearWithoutBias.setInitializer(Initializer.ONES, true);
+                    new Linear.Builder().setOutChannels(outSize).setBias(false).build();
+
+            linearWithoutBias.setInitializer(manager, Initializer.ONES, true);
             NDArray outNoBias = linearWithoutBias.forward(new NDList(input)).head();
             NDArray expectedNoBias = input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
             Assertions.assertEquals(expectedNoBias, outNoBias);
@@ -81,7 +75,6 @@ public class BlockCoreTest {
     @RunAsTest
     public void testLinearWithDefinedLayout() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             NDArray input =
                     manager.create(
@@ -91,9 +84,8 @@ public class BlockCoreTest {
                                     new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL}));
             long outSize = 3;
 
-            Linear linearWithBias =
-                    new Linear.Builder().setFactory(factory).setOutChannels(outSize).build();
-            linearWithBias.setInitializer(Initializer.ONES, true);
+            Linear linearWithBias = new Linear.Builder().setOutChannels(outSize).build();
+            linearWithBias.setInitializer(manager, Initializer.ONES, true);
             NDArray outBias = linearWithBias.forward(new NDList(input)).head();
             NDArray expectedBias =
                     input.mmul(manager.ones(new Shape(outSize, 2)).transpose())
@@ -101,12 +93,9 @@ public class BlockCoreTest {
             Assertions.assertEquals(expectedBias, outBias);
 
             Linear linearWithoutBias =
-                    new Linear.Builder()
-                            .setFactory(factory)
-                            .setOutChannels(outSize)
-                            .setBias(false)
-                            .build();
-            linearWithoutBias.setInitializer(Initializer.ONES, true);
+                    new Linear.Builder().setOutChannels(outSize).setBias(false).build();
+
+            linearWithoutBias.setInitializer(manager, Initializer.ONES, true);
             NDArray outNoBias = linearWithoutBias.forward(new NDList(input)).head();
             NDArray expectedNoBias = input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
             Assertions.assertEquals(expectedNoBias, outNoBias);
@@ -116,12 +105,11 @@ public class BlockCoreTest {
     @RunAsTest
     public void testBatchNorm() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             NDArray expected = manager.create(new float[] {0, 1, 2, 3}, new Shape(2, 2));
-            BatchNorm bn = new BatchNorm.Builder().setFactory(factory).setAxis(1).build();
-            bn.setInitializer(Initializer.ONES);
+            BatchNorm bn = new BatchNorm.Builder().setAxis(1).build();
+            bn.setInitializer(manager, Initializer.ONES);
             NDArray out = bn.forward(new NDList(input)).head();
             Assertions.assertAlmostEquals(expected, out);
         }
@@ -130,11 +118,10 @@ public class BlockCoreTest {
     @RunAsTest
     public void testDropout() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
             NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
-            Dropout dropout = new Dropout.Builder().setFactory(factory).setProbability(.5f).build();
+            Dropout dropout = new Dropout.Builder().setProbability(.5f).build();
             NDArray out = dropout.forward(new NDList(input)).head();
             Assertions.assertTrue(out.lte(out).all());
         }
@@ -143,15 +130,13 @@ public class BlockCoreTest {
     @RunAsTest
     public void testEmbedding() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             Embedding<Character> block =
                     new Embedding.Builder<Character>()
-                            .setFactory(factory)
                             .setItems(Arrays.asList('a', 'b', 'c'))
                             .setEmbeddingSize(2)
                             .build();
-            block.setInitializer(Initializer.ONES);
+            block.setInitializer(manager, Initializer.ONES);
             Assertions.assertEquals(manager.create(new int[] {1, 1}), block.forward(manager, 'x'));
             Assertions.assertEquals(
                     manager.create(new int[] {1, 1, 1, 1}, new Shape(2, 2)),
@@ -162,7 +147,6 @@ public class BlockCoreTest {
     @RunAsTest
     public void testConv1D() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             NDArray input =
                     manager.create(
@@ -171,12 +155,11 @@ public class BlockCoreTest {
             NDArray expected = manager.create(new float[] {61, 55, 44}, new Shape(1, 1, 3));
             Conv1D bn =
                     new Conv1D.Builder()
-                            .setFactory(factory)
                             .setKernel(new Shape(2))
                             .setNumFilters(1)
                             .setBias(false)
                             .build();
-            bn.setInitializer(Initializer.ONES, true);
+            bn.setInitializer(manager, Initializer.ONES, true);
             NDArray out = bn.forward(new NDList(input)).get(0);
             Assertions.assertEquals(expected, out);
             Assertions.assertTrue(out.getShape().equals(bn.getOutputShape(new Shape(1, 4, 4))));
@@ -186,7 +169,6 @@ public class BlockCoreTest {
     @RunAsTest
     public void testConv2D() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             NDArray input =
                     manager.create(
@@ -196,13 +178,9 @@ public class BlockCoreTest {
                     manager.create(
                             new float[] {23, 25, 26, 22, 27, 24, 40, 32, 20},
                             new Shape(1, 1, 3, 3));
-            Conv2D bn =
-                    new Conv2D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(2, 2))
-                            .setNumFilters(1)
-                            .build();
-            bn.setInitializer(Initializer.ONES, true);
+            Conv2D bn = new Conv2D.Builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
+
+            bn.setInitializer(manager, Initializer.ONES, true);
             NDArray out = bn.forward(new NDList(input)).get(0);
             Assertions.assertAlmostEquals(expected, out);
         }
@@ -211,7 +189,6 @@ public class BlockCoreTest {
     @RunAsTest
     public void testConv3D() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             NDArray input =
                     manager.create(
@@ -223,13 +200,9 @@ public class BlockCoreTest {
             NDArray expected =
                     manager.create(
                             new float[] {61, 42, 55, 49, 56, 60, 57, 62}, new Shape(1, 1, 2, 2, 2));
-            Conv3D bn =
-                    new Conv3D.Builder()
-                            .setFactory(factory)
-                            .setKernel(new Shape(2, 2, 2))
-                            .setNumFilters(1)
-                            .build();
-            bn.setInitializer(Initializer.ONES, true);
+            Conv3D bn = new Conv3D.Builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
+
+            bn.setInitializer(manager, Initializer.ONES, true);
             NDArray out = bn.forward(new NDList(input)).get(0);
             Assertions.assertEquals(expected, out);
             Assertions.assertTrue(
@@ -240,17 +213,15 @@ public class BlockCoreTest {
     @RunAsTest
     public void testRNNTanh() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             NDArray input = manager.arange(0, 48, 1).reshape(new Shape(3, 4, 4));
             RNN rnn =
                     new RNN.Builder()
-                            .setFactory(factory)
                             .setStateSize(5)
                             .setNumStackedLayers(1)
                             .setActivation(RNN.Activation.TANH)
                             .build();
-            rnn.setInitializer(Initializer.ONES);
+            rnn.setInitializer(manager, Initializer.ONES);
             NDList outputs = rnn.forward(new NDList(input));
             NDArray out = outputs.get(0);
             Assertions.assertEquals(manager.ones(new Shape(3, 4, 5)), out);
@@ -260,17 +231,15 @@ public class BlockCoreTest {
     @RunAsTest
     public void testRNNRelu() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             NDArray input = manager.arange(0, 8, 1).reshape(new Shape(1, 2, 4));
             RNN rnn =
                     new RNN.Builder()
-                            .setFactory(factory)
                             .setStateSize(5)
                             .setNumStackedLayers(1)
                             .setActivation(RNN.Activation.RELU)
                             .build();
-            rnn.setInitializer(Initializer.ONES);
+            rnn.setInitializer(manager, Initializer.ONES);
             NDList outputs = rnn.forward(new NDList(input));
             NDArray out = outputs.get(0);
             NDArray expected =
@@ -284,17 +253,15 @@ public class BlockCoreTest {
     @RunAsTest
     public void testLstm() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             NDArray input = manager.arange(0, 8, 1).reshape(new Shape(1, 2, 4));
             LSTM lstm =
                     new LSTM.Builder()
-                            .setFactory(factory)
                             .setStateSize(4)
                             .setNumStackedLayers(1)
                             .setActivation(RNN.Activation.RELU)
                             .build();
-            lstm.setInitializer(Initializer.ONES);
+            lstm.setInitializer(manager, Initializer.ONES);
             NDList outputs = lstm.forward(new NDList(input));
             NDArray out = outputs.get(0);
             NDArray expected =
@@ -317,17 +284,15 @@ public class BlockCoreTest {
     @RunAsTest
     public void testGRU() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             NDArray input = manager.arange(0, 8, 1).reshape(new Shape(1, 2, 4));
             GRU lstm =
                     new GRU.Builder()
-                            .setFactory(factory)
                             .setStateSize(4)
                             .setNumStackedLayers(1)
                             .setActivation(RNN.Activation.RELU)
                             .build();
-            lstm.setInitializer(Initializer.ONES);
+            lstm.setInitializer(manager, Initializer.ONES);
             NDList outputs = lstm.forward(new NDList(input));
             NDArray out = outputs.get(0);
             Assertions.assertAlmostEquals(manager.ones(new Shape(1, 2, 4)), out);

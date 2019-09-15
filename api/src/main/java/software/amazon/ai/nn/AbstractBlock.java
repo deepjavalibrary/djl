@@ -25,16 +25,6 @@ import software.amazon.ai.util.PairList;
 public abstract class AbstractBlock implements Block {
 
     protected boolean initialized;
-    protected NDManager manager;
-
-    public AbstractBlock(NDManager manager) {
-        this.manager = manager;
-    }
-
-    @Override
-    public NDManager getNDManager() {
-        return manager;
-    }
 
     @Override
     public NDList forward(NDList inputs) {
@@ -50,34 +40,35 @@ public abstract class AbstractBlock implements Block {
     public void backward() {}
 
     @Override
-    public void setInitializer(Initializer initializer) {
-        setInitializer(initializer, false);
+    public void setInitializer(NDManager manager, Initializer initializer) {
+        setInitializer(manager, initializer, false);
     }
 
     @Override
-    public void setInitializer(Initializer initializer, boolean overwrite) {
+    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
         for (Parameter parameter : getDirectParameters()) {
-            parameter.setInitializer(initializer, overwrite);
+            parameter.setInitializer(manager, initializer, overwrite);
         }
         for (Block child : getChildren().values()) {
-            child.setInitializer(initializer, overwrite);
+            child.setInitializer(manager, initializer, overwrite);
         }
     }
 
     @Override
-    public void setInitializer(Initializer initializer, String paramName) {
-        setInitializer(initializer, paramName, false);
+    public void setInitializer(NDManager manager, Initializer initializer, String paramName) {
+        setInitializer(manager, initializer, paramName, false);
     }
 
     @Override
-    public void setInitializer(Initializer initializer, String paramName, boolean overwrite) {
+    public void setInitializer(
+            NDManager manager, Initializer initializer, String paramName, boolean overwrite) {
         Optional<Parameter> parameter =
                 getDirectParameters()
                         .stream()
                         .filter(pair -> pair.getName().equals(paramName))
                         .findFirst();
         if (parameter.isPresent()) {
-            parameter.get().setInitializer(initializer, overwrite);
+            parameter.get().setInitializer(manager, initializer, overwrite);
         } else {
             throw new IllegalArgumentException("Could not find parameter " + paramName);
         }
@@ -116,7 +107,7 @@ public abstract class AbstractBlock implements Block {
         if (!initialized) {
             beforeInitialize(inputs);
             for (Parameter parameter : getDirectParameters()) {
-                parameter.initialize(inputs);
+                parameter.initialize(inputs, false);
             }
             initialized = true;
         }

@@ -22,7 +22,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.util.PairList;
 
@@ -33,8 +32,7 @@ public class Dropout extends AbstractBlock {
     private float probability;
     private int[] sharedAxes;
 
-    Dropout(NDManager manager, Builder builder) {
-        super(manager);
+    Dropout(Builder builder) {
         probability = builder.getProbability();
         sharedAxes = builder.getSharedAxes();
     }
@@ -70,7 +68,7 @@ public class Dropout extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
@@ -79,7 +77,6 @@ public class Dropout extends AbstractBlock {
 
     public static final class Builder {
 
-        private BlockFactory factory;
         private float probability = 0.5f;
         private int[] sharedAxes = {};
 
@@ -89,11 +86,6 @@ public class Dropout extends AbstractBlock {
 
         public int[] getSharedAxes() {
             return sharedAxes;
-        }
-
-        public Builder setFactory(BlockFactory factory) {
-            this.factory = factory;
-            return this;
         }
 
         public Builder setProbability(float probability) {
@@ -107,7 +99,7 @@ public class Dropout extends AbstractBlock {
         }
 
         public Dropout build() {
-            return new Dropout(factory.getNDManager(), this);
+            return new Dropout(this);
         }
     }
 }

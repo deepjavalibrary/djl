@@ -33,9 +33,8 @@ public class Prelu extends AbstractBlock {
 
     private Parameter alpha;
 
-    public Prelu(NDManager manager) {
-        super(manager);
-        this.alpha = new Parameter("alpha", this, ParameterType.OTHER);
+    public Prelu() {
+        alpha = new Parameter("alpha", this, ParameterType.OTHER);
     }
 
     @Override
@@ -72,11 +71,11 @@ public class Prelu extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
-        alpha.load(is);
+        alpha.load(manager, is);
     }
 }

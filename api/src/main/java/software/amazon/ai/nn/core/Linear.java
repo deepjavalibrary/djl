@@ -26,7 +26,6 @@ import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.training.initializer.Initializer;
@@ -59,8 +58,7 @@ public class Linear extends AbstractBlock {
     private Parameter weight;
     private Parameter bias;
 
-    Linear(NDManager manager, Builder builder) {
-        super(manager);
+    Linear(Builder builder) {
         outChannels = builder.getOutChannels();
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (builder.isBias()) {
@@ -143,14 +141,14 @@ public class Linear extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
-        weight.load(is);
+        weight.load(manager, is);
         if (bias != null) {
-            bias.load(is);
+            bias.load(manager, is);
         }
     }
 
@@ -172,17 +170,11 @@ public class Linear extends AbstractBlock {
     /** The Builder to construct a {@link Linear} type of {@link Block}. */
     public static final class Builder {
 
-        private BlockFactory factory;
         private long outChannels;
         private boolean bias = true;
 
         public long getOutChannels() {
             return outChannels;
-        }
-
-        public Builder setFactory(BlockFactory factory) {
-            this.factory = factory;
-            return this;
         }
 
         /**
@@ -222,7 +214,7 @@ public class Linear extends AbstractBlock {
             if (outChannels == 0) {
                 throw new IllegalArgumentException("You must specify outChannels");
             }
-            return new Linear(factory.getNDManager(), this);
+            return new Linear(this);
         }
     }
 }

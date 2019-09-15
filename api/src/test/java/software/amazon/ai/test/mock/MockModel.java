@@ -28,7 +28,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -38,11 +37,6 @@ import software.amazon.ai.translate.Translator;
 public class MockModel implements Model {
 
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
-
-    @Override
-    public BlockFactory getBlockFactory() {
-        return null;
-    }
 
     @Override
     public void load(Path modelPath, String modelName, Device device, Map<String, String> options)

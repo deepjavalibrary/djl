@@ -49,6 +49,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     private static final byte VERSION = 1;
 
+    private NDManager manager;
     private CachedOp op;
     private Symbol symbol;
     private List<Parameter> params;
@@ -59,7 +60,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     public MxSymbolBlock(NDManager manager, Symbol symbol, List<Parameter> params) {
-        super(manager);
+        this.manager = manager;
         this.symbol = symbol;
         this.params = params;
         initialized = true;
@@ -170,20 +171,20 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     @Override
-    public void setInitializer(Initializer initializer, boolean overwrite) {
+    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
         for (Parameter param : params) {
-            param.setInitializer(initializer, overwrite);
+            param.setInitializer(manager, initializer, overwrite);
             param.reinitialize();
         }
     }
 
     @Override
-    public void setInitializer(Initializer initializer, String paramName) {
+    public void setInitializer(NDManager manager, Initializer initializer, String paramName) {
         Optional<Parameter> parameter =
                 params.stream().filter(pair -> pair.getName().equals(paramName)).findFirst();
         if (parameter.isPresent()) {
             Parameter param = parameter.get();
-            param.setInitializer(initializer);
+            param.setInitializer(manager, initializer, false);
             param.reinitialize();
         } else {
             throw new IllegalArgumentException("Could not find parameter " + paramName);
@@ -212,13 +213,13 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
         for (Parameter parameter : params) {
-            parameter.load(is);
+            parameter.load(this.manager, is);
         }
     }
 }

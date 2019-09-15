@@ -24,8 +24,9 @@ import software.amazon.ai.examples.training.util.Arguments;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
+import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
@@ -59,20 +60,20 @@ public final class TrainMnist {
         trainMnist(arguments);
     }
 
-    public static Block constructBlock(BlockFactory factory) {
-        return factory.createSequential()
-                .add(new Linear.Builder().setFactory(factory).setOutChannels(128).build())
-                .add(factory.activation().reluBlock())
-                .add(new Linear.Builder().setFactory(factory).setOutChannels(64).build())
-                .add(factory.activation().reluBlock())
-                .add(new Linear.Builder().setFactory(factory).setOutChannels(10).build());
+    public static Block constructBlock() {
+        return new SequentialBlock()
+                .add(new Linear.Builder().setOutChannels(128).build())
+                .add(Activation.reluBlock())
+                .add(new Linear.Builder().setOutChannels(64).build())
+                .add(Activation.reluBlock())
+                .add(new Linear.Builder().setOutChannels(10).build());
     }
 
     public static void trainMnist(Arguments arguments) throws IOException, TranslateException {
         int batchSize = arguments.getBatchSize();
+        Block mlp = constructBlock();
+
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            Block mlp = constructBlock(factory);
             model.setBlock(mlp);
 
             model.setInitializer(new NormalInitializer(0.01));

@@ -35,15 +35,12 @@ public class ParallelBlock extends AbstractBlock {
     private List<Block> blocks;
     private Function<List<NDList>, NDList> function;
 
-    public ParallelBlock(NDManager manager, Function<List<NDList>, NDList> function) {
-        super(manager);
+    public ParallelBlock(Function<List<NDList>, NDList> function) {
         this.function = function;
         blocks = new ArrayList<>();
     }
 
-    public ParallelBlock(
-            NDManager manager, Function<List<NDList>, NDList> function, List<Block> blocks) {
-        super(manager);
+    public ParallelBlock(Function<List<NDList>, NDList> function, List<Block> blocks) {
         this.function = function;
         this.blocks = blocks;
     }
@@ -67,7 +64,7 @@ public class ParallelBlock extends AbstractBlock {
     }
 
     public ParallelBlock add(Function<NDList, NDList> f) {
-        blocks.add(new LambdaBlock(manager, f));
+        blocks.add(new LambdaBlock(f));
         initialized = false;
         return this;
     }
@@ -124,13 +121,13 @@ public class ParallelBlock extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
         for (Block block : blocks) {
-            block.loadParameters(is);
+            block.loadParameters(manager, is);
         }
     }
 }

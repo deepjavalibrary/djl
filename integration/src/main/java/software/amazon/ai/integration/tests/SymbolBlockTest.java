@@ -32,7 +32,6 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.nn.core.Linear;
@@ -72,7 +71,7 @@ public class SymbolBlockTest {
             model.load(modelPathPrefix);
             NDManager manager = model.getNDManager();
             Block mlp = model.getBlock();
-            mlp.setInitializer(Initializer.ONES, true);
+            mlp.setInitializer(manager, Initializer.ONES, true);
             Pair<NDArray, NDArray> result = train(manager, mlp);
             Assertions.assertAlmostEquals(manager.create(6430785.5), result.getKey());
             Assertions.assertAlmostEquals(
@@ -117,13 +116,12 @@ public class SymbolBlockTest {
         Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
         try (Model model = Model.newInstance()) {
             model.load(modelPathPrefix);
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
             SymbolBlock mlp = (SymbolBlock) model.getBlock();
-            SequentialBlock newMlp = factory.createSequential();
+            SequentialBlock newMlp = new SequentialBlock();
             newMlp.add(mlp.removeLastBlock());
-            Linear linear = new Linear.Builder().setFactory(factory).setOutChannels(10).build();
-            linear.setInitializer(Initializer.ONES, true);
+            Linear linear = new Linear.Builder().setOutChannels(10).build();
+            linear.setInitializer(manager, Initializer.ONES, true);
             newMlp.add(linear);
 
             Pair<NDArray, NDArray> result = train(manager, mlp);

@@ -31,6 +31,7 @@ public class Parameter implements AutoCloseable {
 
     private static final int BUFFER_SIZE = 81920;
 
+    private NDManager manager;
     private String name;
     private Block block;
     private ParameterType type;
@@ -49,6 +50,7 @@ public class Parameter implements AutoCloseable {
     }
 
     public Parameter(String name, Block block, NDArray array) {
+        manager = array.getManager();
         this.name = name;
         this.block = block;
         this.array = array;
@@ -73,12 +75,13 @@ public class Parameter implements AutoCloseable {
         return array != null;
     }
 
-    public Parameter setInitializer(Initializer initializer) {
-        setInitializer(initializer, false);
+    public Parameter setInitializer(NDManager manager, Initializer initializer) {
+        setInitializer(manager, initializer, false);
         return this;
     }
 
-    public Parameter setInitializer(Initializer initializer, boolean overwrite) {
+    public Parameter setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
+        this.manager = manager;
         if (overwrite || this.initializer == null) {
             this.initializer = initializer;
         }
@@ -86,26 +89,26 @@ public class Parameter implements AutoCloseable {
     }
 
     public void reinitialize() {
+        Objects.requireNonNull(initializer, "No initializer has been set");
         if (!isInitialized()) {
             throw new IllegalStateException("This parameter is not initialized");
         }
-        Objects.requireNonNull(initializer, "No initializer has been set");
-        NDManager manager = block.getNDManager();
+
         array = initializer.initialize(manager, array.getShape(), array.getDataType());
         array.attachGradient();
-    }
 
-    public void initialize(NDList inputs) {
-        initialize(inputs, false);
+        // TODO: close old array
     }
 
     public void initialize(NDList inputs, boolean overwrite) {
-        if (!overwrite && isInitialized()) {
-            throw new IllegalStateException("This parameter is already initialized");
-        }
-
         Objects.requireNonNull(initializer, "No initializer has been set");
-        NDManager manager = block.getNDManager();
+
+        if (isInitialized()) {
+            if (!overwrite) {
+                throw new IllegalStateException("This parameter is already initialized");
+            }
+            // TODO: close old array
+        }
 
         array =
                 initializer.initialize(
@@ -167,18 +170,17 @@ public class Parameter implements AutoCloseable {
      * <p>Currently, we cannot deserialize into exact subclass of NDArray. The SparseNDArray and
      * Matrix will be restored as NDArray only.
      *
+     * @param manager NDManager
      * @param dis InputStream
      * @throws IOException if failed to write
      */
-    public void load(DataInputStream dis) throws IOException {
+    public void load(NDManager manager, DataInputStream dis) throws IOException {
         char magic = dis.readChar();
         if (magic == 'N') {
             return;
         } else if (magic != 'P') {
             throw new IllegalArgumentException("Invalid input data.");
         }
-
-        NDManager manager = block.getNDManager();
 
         // Version
         byte version = dis.readByte();

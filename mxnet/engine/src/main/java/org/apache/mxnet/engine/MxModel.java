@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
-import org.apache.mxnet.nn.MxBlockFactory;
 import org.apache.mxnet.nn.MxSymbolBlock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
@@ -65,7 +63,6 @@ public class MxModel implements Model {
 
     private Path modelDir;
     private MxNDManager manager;
-    private BlockFactory factory;
     private Block block;
     private DataDesc[] inputData;
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
@@ -73,7 +70,6 @@ public class MxModel implements Model {
     MxModel(Device device) {
         device = Device.defaultIfNull(device);
         manager = MxNDManager.getSystemManager().newSubManager(device);
-        factory = new MxBlockFactory(manager);
     }
 
     /**
@@ -129,12 +125,6 @@ public class MxModel implements Model {
         engine.setNumpyMode(true);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public BlockFactory getBlockFactory() {
-        return factory;
-    }
-
     @Override
     public Block getBlock() {
         return block;
@@ -182,7 +172,7 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer, boolean overwrite) {
-        block.setInitializer(initializer, overwrite);
+        block.setInitializer(manager, initializer, overwrite);
     }
 
     /** {@inheritDoc} */

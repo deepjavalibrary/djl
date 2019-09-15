@@ -25,7 +25,6 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
@@ -53,10 +52,9 @@ public class OptimizerTest {
     @RunAsTest
     public void testSgd() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
-            Block block = constructLinearBlock(factory);
+            Block block = constructLinearBlock(manager);
             Optimizer sgd =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
@@ -75,10 +73,9 @@ public class OptimizerTest {
     @RunAsTest
     public void testSgdWithMomentum() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
-            Block block = constructLinearBlock(factory);
+            Block block = constructLinearBlock(manager);
             Optimizer optim =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
@@ -98,10 +95,9 @@ public class OptimizerTest {
     @RunAsTest
     public void testNag() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
-            Block block = constructLinearBlock(factory);
+            Block block = constructLinearBlock(manager);
             Optimizer optim =
                     new Nag.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
@@ -122,9 +118,8 @@ public class OptimizerTest {
     @RunAsTest
     public void testAdam() throws FailedTestException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
-            Block block = constructLinearBlock(factory);
+            Block block = constructLinearBlock(manager);
             Optimizer optim =
                     new Adam.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
@@ -141,9 +136,9 @@ public class OptimizerTest {
         }
     }
 
-    private Block constructLinearBlock(BlockFactory factory) {
-        Linear linear = new Linear.Builder().setFactory(factory).setOutChannels(CHANNELS).build();
-        linear.setInitializer(Initializer.ONES, true);
+    private Block constructLinearBlock(NDManager manager) {
+        Linear linear = new Linear.Builder().setOutChannels(CHANNELS).build();
+        linear.setInitializer(manager, Initializer.ONES, true);
         return linear;
     }
 

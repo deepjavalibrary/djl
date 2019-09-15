@@ -17,8 +17,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.repository.Repository;
+import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
@@ -29,8 +29,7 @@ public class Cifar10Test {
     @Test
     public void testCifar10Local() throws IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
             Cifar10 cifar10 =
@@ -56,8 +55,7 @@ public class Cifar10Test {
     @Test
     public void testCifar10Remote() throws IOException {
         try (Model model = Model.newInstance()) {
-            BlockFactory factory = model.getBlockFactory();
-            model.setBlock(factory.createIdentityBlock());
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
             Cifar10 cifar10 =
                     new Cifar10.Builder()

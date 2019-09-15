@@ -23,7 +23,6 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.util.PairList;
 
@@ -40,10 +39,6 @@ public abstract class Convolution extends AbstractBlock {
 
     protected Parameter weight;
     protected Parameter bias;
-
-    public Convolution(NDManager manager) {
-        super(manager);
-    }
 
     protected abstract byte getVersion();
 
@@ -75,14 +70,14 @@ public abstract class Convolution extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != getVersion()) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
-        weight.load(is);
+        weight.load(manager, is);
         if (bias != null) {
-            bias.load(is);
+            bias.load(manager, is);
         }
     }
 
@@ -98,7 +93,6 @@ public abstract class Convolution extends AbstractBlock {
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
-        protected BlockFactory factory;
         protected Shape kernel;
         protected Shape stride;
         protected Shape pad;
@@ -133,11 +127,6 @@ public abstract class Convolution extends AbstractBlock {
 
         public boolean isIncludeBias() {
             return includeBias;
-        }
-
-        public T setFactory(BlockFactory factory) {
-            this.factory = factory;
-            return self();
         }
 
         /**

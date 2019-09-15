@@ -29,7 +29,6 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.util.PairList;
@@ -51,8 +50,7 @@ public class Embedding<T> extends AbstractBlock {
 
     private Parameter embedding;
 
-    public Embedding(NDManager manager, Builder<T> builder) {
-        super(manager);
+    public Embedding(Builder<T> builder) {
         embeddingSize = builder.getEmbeddingSize();
         useDefault = builder.isUseDefault();
         dataType = builder.getDataType();
@@ -143,12 +141,12 @@ public class Embedding<T> extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
-        embedding.load(is);
+        embedding.load(manager, is);
     }
 
     private NDList opInputs(NDList inputs) {
@@ -187,7 +185,6 @@ public class Embedding<T> extends AbstractBlock {
      */
     public static final class Builder<T> {
 
-        private BlockFactory factory;
         private Collection<T> items;
         private int embeddingSize;
         private boolean useDefault = true;
@@ -207,11 +204,6 @@ public class Embedding<T> extends AbstractBlock {
 
         public DataType getDataType() {
             return dataType;
-        }
-
-        public Builder<T> setFactory(BlockFactory factory) {
-            this.factory = factory;
-            return this;
         }
 
         /**
@@ -274,7 +266,7 @@ public class Embedding<T> extends AbstractBlock {
             if (embeddingSize == 0) {
                 throw new IllegalArgumentException("You must specify the embedding size");
             }
-            return new Embedding<>(factory.getNDManager(), this);
+            return new Embedding<>(this);
         }
     }
 }

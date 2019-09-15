@@ -29,8 +29,7 @@ public class LambdaBlock extends AbstractBlock {
 
     private Function<NDList, NDList> lambda;
 
-    public LambdaBlock(NDManager manager, Function<NDList, NDList> lambda) {
-        super(manager);
+    public LambdaBlock(Function<NDList, NDList> lambda) {
         this.lambda = lambda;
         initialized = true;
     }
@@ -61,7 +60,7 @@ public class LambdaBlock extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
