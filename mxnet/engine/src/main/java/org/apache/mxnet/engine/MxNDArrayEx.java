@@ -522,6 +522,61 @@ class MxNDArrayEx implements NDArrayEx {
         return manager.invoke("BatchNorm", inputs, params);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public NDList rnn(
+            NDList inputs,
+            String mode,
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs,
+            PairList<String, Object> additional) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("p", dropRate);
+        params.addParam("state_size", stateSize);
+        params.addParam("num_layers", numStackedLayers);
+        params.addParam("use_sequence_length", useSequenceLength);
+        params.addParam("bidirectional", useBidirectional);
+        params.addParam("state_outputs", stateOutputs);
+        params.addParam("mode", mode);
+        params.addAll(additional);
+
+        return manager.invoke("RNN", inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList rnn(
+            NDList inputs,
+            String mode,
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs,
+            double lstmStateClipMin,
+            double lstmStateClipMax,
+            PairList<String, Object> additional) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("mode", mode);
+        params.addParam("p", dropRate);
+        params.addParam("state_size", stateSize);
+        params.addParam("num_layers", numStackedLayers);
+        params.addParam("use_sequence_length", useSequenceLength);
+        params.addParam("bidirectional", useBidirectional);
+        params.addParam("state_outputs", stateOutputs);
+        params.addParam("lstm_state_clip_nan", true);
+        params.addParam("lstm_state_clip_min", lstmStateClipMin);
+        params.addParam("lstm_state_clip_max", lstmStateClipMax);
+        params.addAll(additional);
+
+        return manager.invoke("RNN", inputs, params);
+    }
+
     ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////

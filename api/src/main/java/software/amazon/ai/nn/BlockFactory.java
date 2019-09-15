@@ -17,9 +17,6 @@ import java.util.function.Function;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.core.Embedding;
-import software.amazon.ai.nn.recurrent.GRU;
-import software.amazon.ai.nn.recurrent.LSTM;
-import software.amazon.ai.nn.recurrent.RNN;
 import software.amazon.ai.training.Activation;
 
 /** An internal to create Neural Network {@link Block}s. */
@@ -40,10 +37,4 @@ public interface BlockFactory {
     LambdaBlock createLambda(Function<NDList, NDList> lambda);
 
     <T> Embedding<T> createEmbedding(Embedding.Builder<T> builder);
-
-    RNN createRnn(RNN.Builder builder);
-
-    LSTM createLstm(LSTM.Builder builder);
-
-    GRU createGru(GRU.Builder builder);
 }

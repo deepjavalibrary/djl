@@ -12,12 +12,170 @@
  */
 package software.amazon.ai.nn.recurrent;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDArrays;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.LayoutType;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
+import software.amazon.ai.util.PairList;
 
-public interface GRU extends RecurrentCell {
+public class GRU extends RecurrentCell {
+
+    private static final LayoutType[] EXPECTED_LAYOUT = {
+        LayoutType.TIME, LayoutType.BATCH, LayoutType.CHANNEL
+    };
+
+    private static final byte VERSION = 1;
+
+    private List<Parameter> parameters =
+            Arrays.asList(
+                    new Parameter("i2rWeight", this, ParameterType.WEIGHT),
+                    new Parameter("i2rBias", this, ParameterType.BIAS),
+                    new Parameter("h2rWeight", this, ParameterType.WEIGHT),
+                    new Parameter("h2rBias", this, ParameterType.BIAS),
+                    new Parameter("i2zWeight", this, ParameterType.WEIGHT),
+                    new Parameter("i2zBias", this, ParameterType.BIAS),
+                    new Parameter("h2zWeight", this, ParameterType.WEIGHT),
+                    new Parameter("h2zBias", this, ParameterType.BIAS),
+                    new Parameter("i2nWeight", this, ParameterType.WEIGHT),
+                    new Parameter("i2nBias", this, ParameterType.BIAS),
+                    new Parameter("h2nWeight", this, ParameterType.WEIGHT),
+                    new Parameter("h2nBias", this, ParameterType.BIAS));
+
+    private Parameter state = new Parameter("state", this, ParameterType.OTHER);
+
+    GRU(NDManager manager, Builder builder) {
+        super(manager);
+        mode = "gru";
+        stateSize = builder.getStateSize();
+        dropRate = builder.getDropRate();
+        numStackedLayers = builder.getNumStackedLayers();
+        useSequenceLength = builder.isUseSequenceLength();
+        useBidirectional = builder.isUseBidirectional();
+        stateOutputs = builder.isStateOutputs();
+    }
+
+    @Override
+    public NDList forward(NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(inputs);
+        NDArrayEx ex = inputs.head().getNDArrayInternal();
+        return ex.rnn(
+                inputs,
+                mode,
+                stateSize,
+                dropRate,
+                numStackedLayers,
+                useSequenceLength,
+                useBidirectional,
+                stateOutputs,
+                params);
+    }
+
+    @Override
+    public Shape getOutputShape(Shape... inputs) {
+        Shape inputShape = inputs[0];
+        return new Shape(inputShape.get(0), inputShape.get(1), stateSize);
+    }
+
+    @Override
+    public List<Parameter> getDirectParameters() {
+        List<Parameter> directParameters = new ArrayList<>(parameters);
+        directParameters.add(state);
+        return directParameters;
+    }
+
+    @Override
+    public void beforeInitialize(NDList inputs) {
+        NDArray input = inputs.head();
+        Shape inputShape = input.getShape();
+        if (!Block.isLayoutSupported(EXPECTED_LAYOUT, inputShape.getLayout())) {
+            throw new UnsupportedOperationException("RNN requires TNC layout");
+        }
+    }
+
+    @Override
+    public Shape getParameterShape(String name, NDList inputs) {
+        NDArray input = inputs.get(0);
+        long channelSize = input.getShape().get(2);
+        long batchSize = input.getShape().get(1);
+        switch (name) {
+            case "i2rWeight":
+            case "i2zWeight":
+            case "i2nWeight":
+                return new Shape(stateSize, channelSize);
+            case "h2rWeight":
+            case "h2zWeight":
+            case "h2nWeight":
+                return new Shape(stateSize, stateSize);
+            case "h2rBias":
+            case "i2rBias":
+            case "h2zBias":
+            case "i2zBias":
+            case "h2nBias":
+            case "i2nBias":
+                return new Shape(stateSize);
+            case "state":
+                return new Shape(numStackedLayers, batchSize, stateSize);
+            default:
+                throw new IllegalArgumentException("Invalid parameter name: " + name);
+        }
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        for (Parameter parameter : parameters) {
+            parameter.save(os);
+        }
+        state.save(os);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        for (Parameter parameter : parameters) {
+            parameter.load(is);
+        }
+        state.load(is);
+    }
+
+    private NDList opInputs(NDList inputs) {
+        if (inputs.size() != 1) {
+            throw new IllegalArgumentException("RNN requires exactly 1 NDArray");
+        }
+
+        ensureInitialized(inputs);
+
+        NDList result = new NDList();
+        NDList parameterList = new NDList();
+        for (Parameter parameter : parameters) {
+            parameterList.add(parameter.getName(), parameter.getArray().flatten());
+        }
+        result.add(inputs.get(0));
+        result.add(NDArrays.concat(parameterList));
+        result.add(state.getArray());
+        if (useSequenceLength) {
+            result.add(inputs.get(1));
+        }
+        return result;
+    }
 
     /** The Builder to construct a {@link GRU} type of {@link Block}. */
-    final class Builder extends BaseBuilder<Builder> {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         /** {@inheritDoc} */
         @Override
@@ -29,7 +187,7 @@ public interface GRU extends RecurrentCell {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
             }
-            return factory.createGru(this);
+            return new GRU(factory.getNDManager(), this);
         }
     }
 }

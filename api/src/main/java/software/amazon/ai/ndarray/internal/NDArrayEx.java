@@ -299,6 +299,30 @@ public interface NDArrayEx {
             int axis,
             PairList<String, Object> additional);
 
+    NDList rnn(
+            NDList inputs,
+            String mode,
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs,
+            PairList<String, Object> additional);
+
+    NDList rnn(
+            NDList inputs,
+            String mode,
+            long stateSize,
+            float dropRate,
+            int numStackedLayers,
+            boolean useSequenceLength,
+            boolean useBidirectional,
+            boolean stateOutputs,
+            double lstmStateClipMin,
+            double lstmStateClipMax,
+            PairList<String, Object> additional);
+
     ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////

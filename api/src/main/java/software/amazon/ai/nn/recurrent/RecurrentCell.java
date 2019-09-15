@@ -12,14 +12,27 @@
  */
 package software.amazon.ai.nn.recurrent;
 
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.recurrent.RNN.Activation;
 
-public interface RecurrentCell extends Block {
+public abstract class RecurrentCell extends AbstractBlock {
+
+    protected long stateSize;
+    protected float dropRate;
+    protected int numStackedLayers;
+    protected String mode;
+    protected boolean useSequenceLength;
+    protected boolean useBidirectional;
+    protected boolean stateOutputs;
+
+    public RecurrentCell(NDManager manager) {
+        super(manager);
+    }
 
     @SuppressWarnings("rawtypes")
-    abstract class BaseBuilder<T extends BaseBuilder> {
+    public abstract static class BaseBuilder<T extends BaseBuilder> {
 
         protected BlockFactory factory;
         protected float dropRate;
@@ -127,7 +140,7 @@ public interface RecurrentCell extends Block {
         }
 
         /**
-         * Sets the activation for the RNN - ReLu or Tanh
+         * Sets the activation for the RNN - ReLu or Tanh.
          *
          * @param activation Projection size.
          * @return Returns this Builder
