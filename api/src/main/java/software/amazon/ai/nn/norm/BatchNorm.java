@@ -12,15 +12,110 @@
  */
 package software.amazon.ai.nn.norm;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.nn.Block;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.BlockFactory;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
+import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.util.PairList;
 
-public interface BatchNorm extends Block {
+public class BatchNorm extends AbstractBlock {
 
-    NDArray forward(NDArray data);
+    private static final byte VERSION = 1;
 
-    final class Builder {
+    private int axis;
+    private float epsilon;
+    private float momentum;
+    private long inChannels;
+
+    private Parameter runningMean;
+    private Parameter runningVar;
+
+    BatchNorm(NDManager manager, Builder builder) {
+        super(manager);
+        axis = builder.getAxis();
+        epsilon = builder.getEpsilon();
+        momentum = builder.getMomentum();
+        runningMean = new Parameter("runningMean", this, ParameterType.OTHER, Initializer.ONES);
+        runningVar = new Parameter("runningVar", this, ParameterType.OTHER, Initializer.ONES);
+    }
+
+    @Override
+    public NDList forward(NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(inputs);
+        NDArrayEx ex = inputs.head().getNDArrayInternal();
+        return ex.batchNorm(inputs, epsilon, momentum, axis, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape getOutputShape(Shape... inputs) {
+        return inputs[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Parameter> getDirectParameters() {
+        return Arrays.asList(runningMean, runningVar);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void beforeInitialize(NDList inputs) {
+        inChannels = inputs.get(0).size(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape getParameterShape(String name, NDList inputs) {
+        switch (name) {
+            case "runningMean":
+            case "runningVar":
+                return new Shape(inChannels);
+            default:
+                throw new IllegalArgumentException("Invalid parameter name");
+        }
+    }
+
+    private NDList opInputs(NDList inputs) {
+        if (inputs.size() != 1) {
+            throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
+        }
+        ensureInitialized(inputs);
+        NDArray data = inputs.get(0);
+        NDArray gamma = data.getManager().ones(new Shape(inChannels));
+        NDArray beta = data.getManager().zeros(new Shape(inChannels));
+        return new NDList(data, gamma, beta, runningMean.getArray(), runningVar.getArray());
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        runningMean.save(os);
+        runningVar.save(os);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        runningMean.load(is);
+        runningVar.load(is);
+    }
+
+    public static final class Builder {
 
         private BlockFactory factory;
         private int axis = 1;
@@ -60,7 +155,7 @@ public interface BatchNorm extends Block {
         }
 
         public BatchNorm build() {
-            return factory.createBatchNorm2D(this);
+            return new BatchNorm(factory.getNDManager(), this);
         }
     }
 }

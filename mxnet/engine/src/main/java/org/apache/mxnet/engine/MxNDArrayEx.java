@@ -490,6 +490,38 @@ class MxNDArrayEx implements NDArrayEx {
         return manager.invoke("LeakyReLU", inputs, params);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public NDList dropout(
+            NDList inputs,
+            float probability,
+            int[] sharedAxes,
+            PairList<String, Object> additional) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("p", probability);
+        params.addTupleParam("axes", sharedAxes);
+        params.addAll(additional);
+
+        return manager.invoke("Dropout", inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList batchNorm(
+            NDList inputs,
+            float epsilon,
+            float momentum,
+            int axis,
+            PairList<String, Object> additional) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("eps", epsilon);
+        params.addParam("momentum", momentum);
+        params.addParam("axis", axis);
+        params.addAll(additional);
+
+        return manager.invoke("BatchNorm", inputs, params);
+    }
+
     ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////

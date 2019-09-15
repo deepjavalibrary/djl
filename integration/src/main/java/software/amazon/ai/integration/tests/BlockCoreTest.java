@@ -122,7 +122,7 @@ public class BlockCoreTest {
             NDArray expected = manager.create(new float[] {0, 1, 2, 3}, new Shape(2, 2));
             BatchNorm bn = new BatchNorm.Builder().setFactory(factory).setAxis(1).build();
             bn.setInitializer(Initializer.ONES);
-            NDArray out = bn.forward(input);
+            NDArray out = bn.forward(new NDList(input)).head();
             Assertions.assertAlmostEquals(expected, out);
         }
     }
@@ -135,7 +135,7 @@ public class BlockCoreTest {
 
             NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             Dropout dropout = new Dropout.Builder().setFactory(factory).setProbability(.5f).build();
-            NDArray out = dropout.forward(input);
+            NDArray out = dropout.forward(new NDList(input)).head();
             Assertions.assertTrue(out.lte(out).all());
         }
     }

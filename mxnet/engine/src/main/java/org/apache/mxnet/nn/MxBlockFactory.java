@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.function.Function;
 import org.apache.mxnet.engine.MxNDManager;
 import org.apache.mxnet.nn.core.MxEmbedding;
-import org.apache.mxnet.nn.norm.MxBatchNorm;
-import org.apache.mxnet.nn.norm.MxDropout;
 import org.apache.mxnet.nn.recurrent.MxGRU;
 import org.apache.mxnet.nn.recurrent.MxLSTM;
 import org.apache.mxnet.nn.recurrent.MxRNN;
@@ -28,8 +26,6 @@ import software.amazon.ai.nn.LambdaBlock;
 import software.amazon.ai.nn.ParallelBlock;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Embedding;
-import software.amazon.ai.nn.norm.BatchNorm;
-import software.amazon.ai.nn.norm.Dropout;
 import software.amazon.ai.nn.recurrent.GRU;
 import software.amazon.ai.nn.recurrent.LSTM;
 import software.amazon.ai.nn.recurrent.RNN;
@@ -85,18 +81,6 @@ public class MxBlockFactory implements BlockFactory {
     @Override
     public LambdaBlock createLambda(Function<NDList, NDList> lambda) {
         return new LambdaBlock(manager, lambda);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BatchNorm createBatchNorm2D(BatchNorm.Builder builder) {
-        return new MxBatchNorm(manager, builder);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Dropout createDropout(Dropout.Builder builder) {
-        return new MxDropout(manager, builder);
     }
 
     /** {@inheritDoc} */

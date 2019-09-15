@@ -12,15 +12,72 @@
  */
 package software.amazon.ai.nn.norm;
 
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.nn.Block;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.BlockFactory;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.util.PairList;
 
-public interface Dropout extends Block {
+public class Dropout extends AbstractBlock {
 
-    NDArray forward(NDArray data);
+    private static final byte VERSION = 1;
 
-    final class Builder {
+    private float probability;
+    private int[] sharedAxes;
+
+    Dropout(NDManager manager, Builder builder) {
+        super(manager);
+        probability = builder.getProbability();
+        sharedAxes = builder.getSharedAxes();
+    }
+
+    @Override
+    public NDList forward(NDList inputs, PairList<String, Object> params) {
+        if (inputs.size() != 1) {
+            throw new IllegalArgumentException("Dropout requires exactly 1 NDArray");
+        }
+        ensureInitialized(inputs);
+        NDArrayEx ex = inputs.head().getNDArrayInternal();
+        return ex.dropout(inputs, probability, sharedAxes, params);
+    }
+
+    @Override
+    public Shape getOutputShape(Shape... inputs) {
+        return inputs[0];
+    }
+
+    @Override
+    public List<Parameter> getDirectParameters() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Shape getParameterShape(String name, NDList inputs) {
+        throw new IllegalArgumentException("Dropout has no parameters");
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+    }
+
+    public static final class Builder {
 
         private BlockFactory factory;
         private float probability = 0.5f;
@@ -50,7 +107,7 @@ public interface Dropout extends Block {
         }
 
         public Dropout build() {
-            return factory.createDropout(this);
+            return new Dropout(factory.getNDManager(), this);
         }
     }
 }

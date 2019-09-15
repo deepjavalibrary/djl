@@ -286,6 +286,19 @@ public interface NDArrayEx {
 
     NDList prelu(NDList inputs, PairList<String, Object> additional);
 
+    NDList dropout(
+            NDList inputs,
+            float probability,
+            int[] sharedAxes,
+            PairList<String, Object> additional);
+
+    NDList batchNorm(
+            NDList inputs,
+            float epsilon,
+            float momentum,
+            int axis,
+            PairList<String, Object> additional);
+
     ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////
