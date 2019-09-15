@@ -15,6 +15,7 @@ package org.apache.mxnet.engine;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.pooling.PoolingConvention;
 import software.amazon.ai.util.PairList;
@@ -478,6 +479,24 @@ class MxNDArrayEx implements NDArrayEx {
         params.addAll(additional);
 
         return manager.invoke("FullyConnected", inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList embedding(
+            NDList inputs,
+            int numItems,
+            int embeddingSize,
+            DataType dataType,
+            PairList<String, Object> additional) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("input_dim", numItems);
+        params.addParam("output_dim", embeddingSize);
+        params.addParam("sparse_grad", true);
+        params.setDataType(dataType);
+        params.addAll(additional);
+
+        return manager.invoke("Embedding", inputs, params);
     }
 
     /** {@inheritDoc} */

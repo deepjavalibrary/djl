@@ -15,14 +15,12 @@ package org.apache.mxnet.nn;
 import java.util.List;
 import java.util.function.Function;
 import org.apache.mxnet.engine.MxNDManager;
-import org.apache.mxnet.nn.core.MxEmbedding;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.BlockFactory;
 import software.amazon.ai.nn.LambdaBlock;
 import software.amazon.ai.nn.ParallelBlock;
 import software.amazon.ai.nn.SequentialBlock;
-import software.amazon.ai.nn.core.Embedding;
 import software.amazon.ai.training.Activation;
 
 @SuppressWarnings("PMD.CouplingBetweenObjects")
@@ -75,11 +73,5 @@ public class MxBlockFactory implements BlockFactory {
     @Override
     public LambdaBlock createLambda(Function<NDList, NDList> lambda) {
         return new LambdaBlock(manager, lambda);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <T> Embedding<T> createEmbedding(Embedding.Builder<T> builder) {
-        return new MxEmbedding<>(manager, builder);
     }
 }

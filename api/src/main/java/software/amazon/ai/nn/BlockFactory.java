@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.function.Function;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.core.Embedding;
 import software.amazon.ai.training.Activation;
 
 /** An internal to create Neural Network {@link Block}s. */
@@ -35,6 +34,4 @@ public interface BlockFactory {
     ParallelBlock createParallel(Function<List<NDList>, NDList> function, List<Block> blocks);
 
     LambdaBlock createLambda(Function<NDList, NDList> lambda);
-
-    <T> Embedding<T> createEmbedding(Embedding.Builder<T> builder);
 }

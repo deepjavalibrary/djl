@@ -14,6 +14,7 @@ package software.amazon.ai.ndarray.internal;
 
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.pooling.PoolingConvention;
 import software.amazon.ai.training.Activation;
@@ -282,6 +283,13 @@ public interface NDArrayEx {
             long outChannels,
             boolean flatten,
             boolean noBias,
+            PairList<String, Object> additional);
+
+    NDList embedding(
+            NDList inputs,
+            int numItems,
+            int embeddingSize,
+            DataType dataType,
             PairList<String, Object> additional);
 
     NDList prelu(NDList inputs, PairList<String, Object> additional);

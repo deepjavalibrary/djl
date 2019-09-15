@@ -12,19 +12,81 @@
  */
 package software.amazon.ai.nn.core;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.BlockFactory;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
+import software.amazon.ai.util.PairList;
 
 /**
  * An Embedding block map a collection of items to 1-Dimensional representative {@link NDArray}s.
  *
  * @param <T> The type of item that should be embedded and map to the array
  */
-public interface Embedding<T> extends Block {
+public class Embedding<T> extends AbstractBlock {
+
+    private static final byte VERSION = 1;
+
+    private int embeddingSize;
+    private boolean useDefault;
+    private DataType dataType;
+    private Map<T, Integer> embedder;
+    private int numItems;
+
+    private Parameter embedding;
+
+    public Embedding(NDManager manager, Builder<T> builder) {
+        super(manager);
+        embeddingSize = builder.getEmbeddingSize();
+        useDefault = builder.isUseDefault();
+        dataType = builder.getDataType();
+        embedding = new Parameter("embedding", this, ParameterType.WEIGHT);
+        embedder = new ConcurrentHashMap<>(builder.getItems().size());
+        numItems = 0;
+        if (useDefault) {
+            numItems++;
+        }
+        for (T item : builder.getItems()) {
+            embedder.put(item, numItems++);
+        }
+    }
+
+    @Override
+    public Shape getOutputShape(Shape... inputs) {
+        return inputs[0].addAll(new Shape(embeddingSize));
+    }
+
+    @Override
+    public List<Parameter> getDirectParameters() {
+        return Collections.singletonList(embedding);
+    }
+
+    @Override
+    public void beforeInitialize(NDList inputs) {}
+
+    @Override
+    public Shape getParameterShape(String name, NDList inputs) {
+        if ("embedding".equals(name)) {
+            return new Shape(numItems, embeddingSize);
+        }
+        throw new IllegalArgumentException("Invalid parameter name");
+    }
 
     /**
      * Finds the embedding of items as a {@link NDArray}.
@@ -34,7 +96,9 @@ public interface Embedding<T> extends Block {
      * @return Returns a 3D NDArray where the first two embeddingSize correspond to the items, and
      *     the last dimension is the embedding.
      */
-    NDArray forward(NDManager manager, T[][] items);
+    public NDArray forward(NDManager manager, T[][] items) {
+        return forward(new NDList(manager.create(embed(items)))).head();
+    }
 
     /**
      * Finds the embedding of items as a {@link NDArray}.
@@ -44,7 +108,9 @@ public interface Embedding<T> extends Block {
      * @return Returns a 2D NDArray where the first dimension corresponds to the items, and the last
      *     dimension is the embedding.
      */
-    NDArray forward(NDManager manager, T[] items);
+    public NDArray forward(NDManager manager, T[] items) {
+        return forward(new NDList(manager.create(embed(items)))).head();
+    }
 
     /**
      * Finds the embedding of an item as a {@link NDArray}.
@@ -53,14 +119,73 @@ public interface Embedding<T> extends Block {
      * @param item The item to retrieve the embedding for
      * @return Returns the 1D NDArray of the embedding
      */
-    NDArray forward(NDManager manager, T item);
+    public NDArray forward(NDManager manager, T item) {
+        return forward(new NDList(manager.create(embed(item)))).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList forward(NDList inputs, PairList<String, Object> params) {
+        NDList opInputs = opInputs(inputs);
+
+        NDArrayEx ex = opInputs.head().getNDArrayInternal();
+        NDList result = ex.embedding(opInputs, numItems, embeddingSize, dataType, params);
+        if (inputs.head().getShape().dimension() == 0) {
+            result = new NDList(result.head().reshape(embeddingSize));
+        }
+        return result;
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        embedding.save(os);
+    }
+
+    @Override
+    public void loadParameters(DataInputStream is) throws IOException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        embedding.load(is);
+    }
+
+    private NDList opInputs(NDList inputs) {
+        ensureInitialized(inputs);
+        NDArray items = inputs.get(0);
+        if (items.getShape().dimension() == 0) {
+            return new NDList(items.reshape(1), embedding.getArray());
+        }
+        return new NDList(items, embedding.getArray());
+    }
+
+    private int[][] embed(T[][] items) {
+        return Arrays.stream(items).map(this::embed).toArray(int[][]::new);
+    }
+
+    private int[] embed(T[] items) {
+        return Arrays.stream(items).mapToInt(this::embed).toArray();
+    }
+
+    private int embed(T value) {
+        if (embedder.containsKey(value)) {
+            return embedder.get(value);
+        } else {
+            if (useDefault) {
+                return 0;
+            } else {
+                throw new IllegalArgumentException("The provided item was not found");
+            }
+        }
+    }
 
     /**
      * The Builder to construct a {@link Embedding} type of {@link Block}.
      *
      * @param <T> The type of object to embed
      */
-    class Builder<T> {
+    public static final class Builder<T> {
 
         private BlockFactory factory;
         private Collection<T> items;
@@ -149,7 +274,7 @@ public interface Embedding<T> extends Block {
             if (embeddingSize == 0) {
                 throw new IllegalArgumentException("You must specify the embedding size");
             }
-            return factory.createEmbedding(this);
+            return new Embedding<>(factory.getNDManager(), this);
         }
     }
 }
