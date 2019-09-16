@@ -50,7 +50,7 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
         NDArray array = manager.create(dataDesc);
         array.set(buffer);
 
-        return new NDList(normalize(array));
+        return new NDList(normalize(array.divi(255)));
     }
 
     /**

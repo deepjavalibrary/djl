@@ -79,10 +79,7 @@ public class SingleShotDetection {
                     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
                         // TODO: avoid hard code image size and threshold
                         input = Images.resizeImage(input, 512, 512);
-                        NDList list = super.processInput(ctx, input);
-                        list.get(0).divi(255);
-
-                        return list;
+                        return super.processInput(ctx, input);
                     }
 
                     @Override

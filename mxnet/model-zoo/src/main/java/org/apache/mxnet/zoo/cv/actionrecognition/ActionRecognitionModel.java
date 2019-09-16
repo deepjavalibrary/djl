@@ -12,6 +12,7 @@
  */
 package org.apache.mxnet.zoo.cv.actionrecognition;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -20,7 +21,7 @@ import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
 import software.amazon.ai.Model;
-import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.modality.Classification;
 import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Metadata;
@@ -28,10 +29,10 @@ import software.amazon.ai.repository.Repository;
 import software.amazon.ai.repository.VersionRange;
 
 public class ActionRecognitionModel {
-    private static final String ARTIFACT_ID = "inception";
-    private static final MRL INCEPTION =
-            new MRL(MRL.Model.CV.ACTION_RECOGNITION, ModelZoo.GROUP_ID, ARTIFACT_ID);
 
+    private static final String ARTIFACT_ID = "action_recognition";
+    private static final MRL ACTION_RECOGNITION =
+            new MRL(MRL.Model.CV.ACTION_RECOGNITION, ModelZoo.GROUP_ID, ARTIFACT_ID);
     private Repository repository;
     private Metadata metadata;
 
@@ -41,14 +42,15 @@ public class ActionRecognitionModel {
 
     private void locateMetadata() throws IOException, ModelNotFoundException {
         if (metadata == null) {
-            metadata = repository.locate(INCEPTION);
+            metadata = repository.locate(ACTION_RECOGNITION);
             if (metadata == null) {
-                throw new ModelNotFoundException("Simple Pose Models not found.");
+                throw new ModelNotFoundException(
+                        ACTION_RECOGNITION.getArtifactId() + "Models not found.");
             }
         }
     }
 
-    public ZooModel<NDList, NDList> loadModel(Map<String, String> criteria)
+    public ZooModel<BufferedImage, List<Classification>> loadModel(Map<String, String> criteria)
             throws IOException, ModelNotFoundException {
         locateMetadata();
         Artifact artifact = match(criteria);

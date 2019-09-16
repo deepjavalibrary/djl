@@ -35,5 +35,5 @@ public interface ModelZoo {
     SeResnext SE_RESNEXT = new SeResnext(REPOSITORY);
     SimplePoseModel SIMPLE_POSE = new SimplePoseModel(REPOSITORY);
     InstanceSegmentationModel MASK_RCNN = new InstanceSegmentationModel(REPOSITORY);
-    ActionRecognitionModel INCEPTION = new ActionRecognitionModel(REPOSITORY);
+    ActionRecognitionModel ACTION_RECOGNITION = new ActionRecognitionModel(REPOSITORY);
 }

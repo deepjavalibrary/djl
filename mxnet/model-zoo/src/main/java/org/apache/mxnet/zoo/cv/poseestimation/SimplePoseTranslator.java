@@ -13,21 +13,18 @@
 package org.apache.mxnet.zoo.cv.poseestimation;
 
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Images;
 import software.amazon.ai.modality.cv.Joint;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.index.NDIndex;
-import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;
 
-public class SimplePoseTranslator implements Translator<BufferedImage, List<Joint>> {
+public class SimplePoseTranslator extends ImageTranslator<List<Joint>> {
 
     private int imageWidth = 192;
     private int imageHeight = 256;
@@ -35,14 +32,7 @@ public class SimplePoseTranslator implements Translator<BufferedImage, List<Join
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
         input = Images.resizeImage(input, imageWidth, imageHeight);
-        Shape shape = new Shape(1, 3, imageHeight, imageWidth);
-        DataDesc dataDesc = new DataDesc(shape);
-        NDManager manager = ctx.getNDManager();
-        FloatBuffer buffer = Images.toFloatBuffer(manager, input);
-        NDArray array = manager.create(dataDesc);
-        array.set(buffer);
-
-        return new NDList(normalize(array.div(255)));
+        return super.processInput(ctx, input);
     }
 
     @Override
@@ -74,7 +64,8 @@ public class SimplePoseTranslator implements Translator<BufferedImage, List<Join
         return joints;
     }
 
-    private NDArray normalize(NDArray array) {
+    @Override
+    protected NDArray normalize(NDArray array) {
         float[] mean = {0.485f, 0.456f, 0.406f};
         float[] std = {0.229f, 0.224f, 0.225f};
         return Images.normalize(array, mean, std);

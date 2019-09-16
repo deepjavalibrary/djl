@@ -12,19 +12,59 @@
  */
 package org.apache.mxnet.zoo.cv.actionrecognition;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import software.amazon.ai.Model;
+import software.amazon.ai.modality.Classification;
+import software.amazon.ai.modality.cv.ImageTranslator;
+import software.amazon.ai.modality.cv.Images;
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;
+import software.amazon.ai.util.Utils;
 
-public class ActionRecognitionTranslator implements Translator<NDList, NDList> {
+public class ActionRecognitionTranslator extends ImageTranslator<List<Classification>> {
+
+    private static final int topK = 5;
 
     @Override
-    public NDList processOutput(TranslatorContext ctx, NDList list) {
-        return null;
+    public NDList processInput(TranslatorContext ctx, BufferedImage input) {
+        // 299 is the minimum length for inception, 224 for vgg
+        BufferedImage cropped = Images.centerCrop(input, 299, 299);
+        return super.processInput(ctx, cropped);
     }
 
     @Override
-    public NDList processInput(TranslatorContext ctx, NDList input) {
-        return null;
+    public List<Classification> processOutput(TranslatorContext ctx, NDList list)
+            throws IOException {
+        Model model = ctx.getModel();
+        NDArray probabilitiesNd = list.head().get(0);
+
+        long length = probabilitiesNd.getShape().head();
+        length = Math.min(length, topK);
+        List<Classification> ret = new ArrayList<>(Math.toIntExact(length));
+        NDArray sorted = probabilitiesNd.argsort(-1, false);
+        NDArray top = sorted.get(":" + topK);
+
+        float[] probabilities = probabilitiesNd.softmax(-1).toFloatArray();
+        int[] indices = top.toIntArray();
+
+        List<String> synset = model.getArtifact("classes.txt", Utils::readLines);
+        for (int i = 0; i < topK; ++i) {
+            int index = indices[i];
+            String className = synset.get(index);
+            Classification out = new Classification(className, probabilities[index]);
+            ret.add(out);
+        }
+        return ret;
+    }
+
+    @Override
+    protected NDArray normalize(NDArray array) {
+        float[] mean = {0.485f, 0.456f, 0.406f};
+        float[] std = {0.229f, 0.224f, 0.225f};
+        return Images.normalize(array, mean, std);
     }
 }

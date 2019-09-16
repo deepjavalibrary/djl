@@ -12,12 +12,16 @@
  */
 package software.amazon.ai.test.mock;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import software.amazon.ai.modality.cv.DetectedObject;
 import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Rectangle;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.ndarray.types.SparseFormat;
 import software.amazon.ai.translate.TranslatorContext;
 
 public class MockImageTranslator extends ImageTranslator<List<DetectedObject>> {
@@ -27,6 +31,13 @@ public class MockImageTranslator extends ImageTranslator<List<DetectedObject>> {
     public MockImageTranslator(String className) {
         output = new ArrayList<>(1);
         output.add(new DetectedObject(className, 0.8, new Rectangle(0, 0, 1, 1)));
+    }
+
+    @Override
+    public NDList processInput(TranslatorContext ctx, BufferedImage input) {
+        return new NDList(
+                new MockNDArray(
+                        null, null, new Shape(3, 24, 24), DataType.FLOAT32, SparseFormat.DENSE));
     }
 
     @Override
