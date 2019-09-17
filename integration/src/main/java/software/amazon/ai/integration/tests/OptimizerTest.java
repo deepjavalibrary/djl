@@ -56,19 +56,19 @@ public class OptimizerTest {
             BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
-            Block block = block(factory);
-            Optimizer optim =
+            Block block = constructLinearBlock(factory);
+            Optimizer sgd =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
-                            .setLearningRateTracker(LearningRateTracker.fixedLR(1E7f))
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
                             .build();
-            NDArray result = runOptimizer(manager, block, optim);
-            NDArray result2 = runOptimizer(manager, block, optim);
+            NDArray result = runOptimizer(manager, block, sgd);
+            NDArray result2 = runOptimizer(manager, block, sgd);
             // TODO: fix atol and rtol too large on GPU build
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.9963f, 1.0231f}), result, 4.2, 4.2);
+                    manager.create(new float[] {0.6600000262260437f, 0.8300000429153442f}), result);
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {1.0222f, 1.0625f}), result2, 4.2, 4.2);
+                    manager.create(new float[] {0.4593999981880188f, 0.729699969291687f}), result2);
         }
     }
 
@@ -78,20 +78,20 @@ public class OptimizerTest {
             BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
-            Block block = block(factory);
+            Block block = constructLinearBlock(factory);
             Optimizer optim =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
-                            .setLearningRateTracker(LearningRateTracker.fixedLR(1E7f))
-                            .optMomentum(1E2f)
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
+                            .optMomentum(0.9f)
                             .build();
             NDArray result = runOptimizer(manager, block, optim);
             NDArray result2 = runOptimizer(manager, block, optim);
             // TODO: fix atol and rtol too large on GPU build
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.9963f, 1.0231f}), result, 4.2, 4.2);
+                    manager.create(new float[] {0.6600000262260437f, 0.8300000429153442f}), result);
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.6516f, 3.3688f}), result2, 4.2, 4.2);
+                    manager.create(new float[] {0.15339994430541992f, 0.57669997215271f}), result2);
         }
     }
 
@@ -101,20 +101,21 @@ public class OptimizerTest {
             BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
 
-            Block block = block(factory);
+            Block block = constructLinearBlock(factory);
             Optimizer optim =
                     new Nag.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
-                            .setLearningRateTracker(LearningRateTracker.fixedLR(1E7f))
-                            .setMomentum(1E1f)
+                            .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
+                            .setMomentum(0.9f)
                             .build();
             NDArray result = runOptimizer(manager, block, optim);
             NDArray result2 = runOptimizer(manager, block, optim);
             // TODO: fix atol and rtol too large on GPU build
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.959f, 1.2541f}), result, 4.2, 4.2);
+                    manager.create(new float[] {0.3539999723434448f, 0.6769999861717224f}), result);
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {-0.61f, 5f}), result2, 4.2, 4.2);
+                    manager.create(new float[] {-0.06416600942611694f, 0.4679170250892639f}),
+                    result2);
         }
     }
 
@@ -123,35 +124,36 @@ public class OptimizerTest {
         try (Model model = Model.newInstance()) {
             BlockFactory factory = model.getBlockFactory();
             NDManager manager = model.getNDManager();
-            Block block = block(factory);
+            Block block = constructLinearBlock(factory);
             Optimizer optim =
                     new Adam.Builder()
                             .setRescaleGrad(1.0f / BATCH_SIZE)
-                            .optLearningRate(1E2f)
+                            .optLearningRate(0.1f)
                             .build();
             NDArray result = runOptimizer(manager, block, optim);
             NDArray result2 = runOptimizer(manager, block, optim);
             // TODO: fix atol and rtol too large on GPU build
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.8849f, 1.7222f}), result, 4.2, 4.2);
+                    manager.create(new float[] {0.8999999761581421f, 0.8999999761581421f}), result);
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {60.4156f, 61.2529f}), result2, 4.2, 4.2);
+                    manager.create(new float[] {0.8005584478378296f, 0.8005584478378296f}),
+                    result2);
         }
     }
 
-    private Block block(BlockFactory factory) {
+    private Block constructLinearBlock(BlockFactory factory) {
         Linear linear = new Linear.Builder().setFactory(factory).setOutChannels(CHANNELS).build();
         linear.setInitializer(Initializer.ONES, true);
         return linear;
     }
 
     private NDArray runOptimizer(NDManager manager, Block block, Optimizer optim) {
-        NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS));
-        NDArray label = manager.arange(0, BATCH_SIZE);
+        NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS)).mul(2);
+        NDArray label = data.mul(2);
         try (TrainingController controller = new TrainingController(block.getParameters(), optim)) {
             try (GradientCollector gradCol = GradientCollector.newInstance()) {
                 NDArray pred = block.forward(new NDList(data)).head();
-                NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
+                NDArray loss = Loss.l2Loss(label, pred);
                 gradCol.backward(loss);
             }
             controller.step();
