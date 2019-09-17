@@ -13,16 +13,12 @@
 package org.apache.mxnet.dataset;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.mxnet.engine.MxImages;
 import software.amazon.ai.modality.cv.Rectangle;
 import software.amazon.ai.ndarray.NDList;
@@ -46,14 +42,10 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
     private boolean prepared;
     private MxImages.Flag flag;
 
-    private String dataDir;
+    private Path dataDir;
+    private CocoUtils coco;
     private List<String> imagePaths;
     private List<double[][]> labels;
-    private List<Long> imageIds;
-    private Map<Long, CocoMetadata.Image> imageMap;
-    private Map<Long, CocoMetadata.Annotation> annotationMap;
-    private Map<Long, List<Long>> imageToAnn;
-    private Map<Long, Integer> categoryIdMap;
 
     public CocoDetection(Builder builder) {
         super(builder);
@@ -62,11 +54,8 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
         usage = builder.usage;
         flag = builder.flag;
         dataDir = builder.dataDir;
-        imageIds = new ArrayList<>();
-        imageMap = new HashMap<>();
-        annotationMap = new HashMap<>();
-        imageToAnn = new HashMap<>();
-        categoryIdMap = new HashMap<>();
+        imagePaths = new ArrayList<>();
+        labels = new ArrayList<>();
     }
 
     @Override
@@ -130,13 +119,23 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
         if (dataDir == null) {
             setDataDir();
         }
-        // load the json into memory
-        createIndex(usage);
-
-        imagePaths = new ArrayList<>(imageIds.size());
-        labels = new ArrayList<>(imageIds.size());
+        Path jsonFile;
+        switch (usage) {
+            case TRAIN:
+                jsonFile = Paths.get("annotations", "instances_train2017.json");
+                break;
+            case TEST:
+                jsonFile = Paths.get("annotations", "instances_val2017.json");
+                break;
+            case VALIDATION:
+            default:
+                throw new UnsupportedOperationException("Validation data not available.");
+        }
+        coco = new CocoUtils(jsonFile);
+        coco.prepare();
+        List<Long> imageIds = coco.getImageIds();
         for (long id : imageIds) {
-            String imagePath = getImagePath(id);
+            String imagePath = dataDir.resolve(coco.getRelativeImagePath(id)).toString();
             List<double[]> labelOfImageId = getLabels(id);
             if (imagePath != null && !labelOfImageId.isEmpty()) {
                 imagePaths.add(imagePath);
@@ -151,63 +150,7 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
     private void setDataDir() throws IOException {
         Path cacheDir = getRepository().getCacheDirectory();
         URI resourceUri = getArtifact().getResourceUri();
-        Path resourceDir = cacheDir.resolve(resourceUri.getPath());
-        dataDir = resourceDir.toString();
-    }
-
-    private void createIndex(Usage usage) throws IOException {
-        Path jsonFile;
-        switch (usage) {
-            case TRAIN:
-                jsonFile = Paths.get("annotations", "instances_train2017.json");
-                break;
-            case TEST:
-                jsonFile = Paths.get("annotations", "instances_val2017.json");
-                break;
-            case VALIDATION:
-            default:
-                throw new UnsupportedOperationException("Validation data not available.");
-        }
-
-        Path cocoPath = Paths.get(dataDir);
-        CocoMetadata metadata;
-        try (Reader reader = Files.newBufferedReader(cocoPath.resolve(jsonFile))) {
-            metadata = CocoMetadata.GSON.fromJson(reader, CocoMetadata.class);
-        }
-        for (CocoMetadata.Annotation annotation : metadata.getAnnotations()) {
-            long imageId = annotation.getImageId();
-            long id = annotation.getId();
-            if (!imageToAnn.containsKey(imageId)) {
-                imageToAnn.put(annotation.getImageId(), new ArrayList<>());
-            }
-            imageToAnn.get(imageId).add(id);
-            annotationMap.put(id, annotation);
-        }
-
-        for (CocoMetadata.Image image : metadata.getImages()) {
-            imageIds.add(image.getId());
-            imageMap.put(image.getId(), image);
-        }
-
-        // create categoryIndex
-        List<Long> categoryIds = new ArrayList<>();
-        for (CocoMetadata.Category category : metadata.getCategories()) {
-            categoryIds.add(category.getId());
-        }
-        for (int i = 0; i < categoryIds.size(); i++) {
-            categoryIdMap.put(categoryIds.get(i), i);
-        }
-        // sort to keep the dataset ordered
-        Collections.sort(imageIds);
-    }
-
-    private String getImagePath(long imageId) {
-        CocoMetadata.Image image = imageMap.get(imageId);
-        String[] cocoUrl = image.getCocoUrl().split("/");
-        Path path = Paths.get(dataDir);
-        return path.resolve(Paths.get(cocoUrl[cocoUrl.length - 2]))
-                .resolve(Paths.get(cocoUrl[cocoUrl.length - 1]))
-                .toString();
+        dataDir = cacheDir.resolve(resourceUri.getPath());
     }
 
     private double[] convertRecToList(Rectangle rect) {
@@ -220,20 +163,20 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
     }
 
     private List<double[]> getLabels(long imageId) {
-        List<Long> annotationIds = imageToAnn.get(imageId);
+        List<Long> annotationIds = coco.getAnnotationIdByImageId(imageId);
         if (annotationIds == null) {
             return Collections.emptyList();
         }
 
         List<double[]> label = new ArrayList<>();
         for (long annotationId : annotationIds) {
-            CocoMetadata.Annotation annotation = annotationMap.get(annotationId);
+            CocoMetadata.Annotation annotation = coco.getAnnotationById(annotationId);
             Rectangle bBox = annotation.getBoundingBox();
             if (annotation.getArea() > 0) {
                 double[] list = convertRecToList(bBox);
                 // add the category label
                 // map the original one to incremental index
-                list[4] = categoryIdMap.get(annotation.getCategoryId());
+                list[4] = coco.mapCategoryId(annotation.getCategoryId());
                 label.add(list);
             }
         }
@@ -247,7 +190,7 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
     @SuppressWarnings("rawtypes")
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private String dataDir;
+        private Path dataDir;
         private MxImages.Flag flag = MxImages.Flag.COLOR;
         private Repository repository = Datasets.REPOSITORY;
         private Artifact artifact;
@@ -279,7 +222,7 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
         }
 
         public Builder optDataDir(String dataDir) {
-            this.dataDir = dataDir;
+            this.dataDir = Paths.get(dataDir);
             return self();
         }
 
