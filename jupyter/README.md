@@ -41,6 +41,21 @@ chmod u+x gradlew
 jupyter notebook
 ```
 
+## Docker setup
 
+You may use Jupyter docker to have the same experience
 
+### Create docker image
 
+```
+docker build -t joule .
+```
+
+### Run docker image
+
+```
+docker run -p 8888:8888 -it joule
+```
+
+You can open the `http://localhost:8888` to see the hosted instance on docker. 
+Passed in the tokens provided in the docker message, and the docker is ready to go.
