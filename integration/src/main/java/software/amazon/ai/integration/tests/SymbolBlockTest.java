@@ -124,17 +124,17 @@ public class SymbolBlockTest {
             linear.setInitializer(manager, Initializer.ONES, true);
             newMlp.add(linear);
 
-            Pair<NDArray, NDArray> result = train(manager, mlp);
-            Assertions.assertAlmostEquals(manager.create(0.29814255237579346), result.getKey());
+            Pair<NDArray, NDArray> result = train(manager, newMlp);
+            Assertions.assertAlmostEquals(manager.create(18.357540130615234), result.getKey());
             Assertions.assertAlmostEquals(
                     manager.create(
                             new float[] {
-                                1.51564837e-01f,
-                                1.51564837e-01f,
-                                9.12832543e-02f,
-                                4.07614917e-01f,
-                                -1.78348269e-08f,
-                                -1.19209291e-08f
+                                1.54082624e-09f,
+                                1.54082624e-09f,
+                                3.12847304e-09f,
+                                1.39698386e-08f,
+                                -7.56020135e-09f,
+                                -2.30967991e-08f
                             }),
                     result.getValue());
         }
