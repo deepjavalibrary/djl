@@ -3,7 +3,6 @@ plugins {
 }
 
 group 'org.apache.mxnet'
-version '0.2.0-SNAPSHOT'
 
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
