@@ -31,6 +31,9 @@ public final class NDArrays {
      * @return the binary ndarray for "Equals" comparison.
      */
     public static boolean equals(NDArray a, Number n) {
+        if (a == null) {
+            return false;
+        }
         return a.contentEquals(n);
     }
 
@@ -42,6 +45,9 @@ public final class NDArrays {
      * @return the binary ndarray for "Equals" comparison.
      */
     public static boolean equals(NDArray a, NDArray b) {
+        if (a == null) {
+            return false;
+        }
         return a.contentEquals(b);
     }
 

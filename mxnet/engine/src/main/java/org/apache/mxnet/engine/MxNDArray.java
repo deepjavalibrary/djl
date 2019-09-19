@@ -433,6 +433,9 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public boolean contentEquals(NDArray other) {
+        if (other == null || (!getShape().equals(other.getShape()))) {
+            return false;
+        }
         try (NDArray result = eq(other)) {
             return result.nonzero() == result.size();
         }
@@ -449,14 +452,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray eq(Number other) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", other.toString());
-        return manager.invoke("_equal_scalar", this, params);
+        return manager.invoke("_npi_equal_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
-
-        return manager.invoke("_equal", new NDList(this, other), null).head();
+        return manager.invoke("_npi_equal", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -476,13 +478,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray neq(Number other) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", other.toString());
-        return manager.invoke("_npi_not_equal", this, params);
+        return manager.invoke("_npi_not_equal_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
-        return manager.invoke("_npi_equal", new NDList(this, other), null).head();
+        return manager.invoke("_npi_not_equal", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */

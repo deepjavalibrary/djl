@@ -38,9 +38,10 @@ public class NDArrayElementComparisonOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f});
             NDArray expect = manager.create(new float[] {1f, 2f});
-            if (!original.contentEquals(expect)) {
-                throw new FailedTestException("testContentEquals tests failed!");
-            }
+            Assertions.assertTrue(original.contentEquals(expect));
+            original = manager.ones(new Shape(2, 3));
+            expect = manager.ones(new Shape(1, 3));
+            Assertions.assertFalse(original.contentEquals(expect));
         }
     }
 
