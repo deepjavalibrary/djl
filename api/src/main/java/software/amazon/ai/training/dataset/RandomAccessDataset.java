@@ -27,11 +27,13 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
     protected long size;
     protected Sampler sampler;
     protected ExecutorService executor;
+    protected int prefetchNumber;
     protected Device device;
 
     public RandomAccessDataset(BaseBuilder<?> builder) {
         this.sampler = builder.getSampler();
         this.executor = builder.getExecutor();
+        this.prefetchNumber = builder.getPrefetchNumber();
         this.device = builder.getDevice();
     }
 
@@ -39,7 +41,7 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
 
     @Override
     public Iterable<Batch> getData(Trainer<I, L, ?> trainer) {
-        return new DataIterable<>(this, trainer, sampler, executor, device);
+        return new DataIterable<>(this, trainer, sampler, executor, prefetchNumber, device);
     }
 
     public long size() {
@@ -51,6 +53,7 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
 
         private Sampler sampler;
         private ExecutorService executor;
+        private int prefetchNumber;
         private Device device;
 
         public Sampler getSampler() {
@@ -83,8 +86,13 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
             return executor;
         }
 
-        public T optExcutor(ExecutorService executor) {
+        public int getPrefetchNumber() {
+            return prefetchNumber;
+        }
+
+        public T optExcutor(ExecutorService executor, int prefetchNumber) {
             this.executor = executor;
+            this.prefetchNumber = prefetchNumber;
             return self();
         }
 

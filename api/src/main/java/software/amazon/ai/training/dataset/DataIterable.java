@@ -20,7 +20,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
@@ -37,6 +36,7 @@ public class DataIterable<I, L> implements Iterable<Batch> {
     private Trainer<I, L, ?> trainer;
     private Sampler sampler;
     private ExecutorService executor;
+    private int preFetchNumber;
     private Device device;
 
     public DataIterable(
@@ -44,17 +44,19 @@ public class DataIterable<I, L> implements Iterable<Batch> {
             Trainer<I, L, ?> trainer,
             Sampler sampler,
             ExecutorService executor,
+            int preFetchNumber,
             Device device) {
         this.dataset = dataset;
         this.trainer = trainer;
         this.sampler = sampler;
         this.executor = executor;
+        this.preFetchNumber = preFetchNumber;
         this.device = device;
     }
 
     @Override
     public Iterator<Batch> iterator() {
-        return new DataIterator<>(dataset, trainer, sampler, executor, device);
+        return new DataIterator<>(dataset, trainer, sampler, executor, preFetchNumber, device);
     }
 
     private static class DataIterator<I, L> implements Iterator<Batch> {
@@ -72,6 +74,7 @@ public class DataIterable<I, L> implements Iterable<Batch> {
                 Trainer<I, L, ?> trainer,
                 Sampler sampler,
                 ExecutorService executor,
+                int prefetchNumber,
                 Device device) {
             this.dataset = dataset;
             this.trainer = trainer;
@@ -82,7 +85,7 @@ public class DataIterable<I, L> implements Iterable<Batch> {
             if (executor != null) {
                 queue = new LinkedList<>();
                 // prefetch
-                for (int i = 0; i < ((ThreadPoolExecutor) executor).getCorePoolSize() * 2; i++) {
+                for (int i = 0; i < prefetchNumber; i++) {
                     preFetch();
                 }
             }
@@ -99,9 +102,11 @@ public class DataIterable<I, L> implements Iterable<Batch> {
         @Override
         public Batch next() {
             if (executor == null) {
+                // single thread data loading with blocking fetch
                 List<Long> indices = sample.next();
                 return fetch(indices);
             } else {
+                // multithreading data loading with async fetch
                 preFetch();
                 Future<Batch> future = queue.poll();
                 try {
@@ -144,11 +149,10 @@ public class DataIterable<I, L> implements Iterable<Batch> {
 
         private void preFetch() {
             List<Long> indices;
-            if (sample.hasNext()) {
-                indices = sample.next();
-            } else {
+            if (!sample.hasNext()) {
                 return;
             }
+            indices = sample.next();
             Callable<Batch> task = new PreFetchCallable(indices);
             Future<Batch> result = executor.submit(task);
             queue.offer(result);
