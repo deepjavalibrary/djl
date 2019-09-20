@@ -13,7 +13,16 @@
 package software.amazon.ai.training.dataset;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.Trainer;
@@ -27,49 +36,84 @@ public class DataIterable<I, L> implements Iterable<Batch> {
     private RandomAccessDataset<I, L> dataset;
     private Trainer<I, L, ?> trainer;
     private Sampler sampler;
-    private DataLoadingConfiguration config;
+    private ExecutorService executor;
+    private Device device;
 
     public DataIterable(
             RandomAccessDataset<I, L> dataset,
             Trainer<I, L, ?> trainer,
             Sampler sampler,
-            DataLoadingConfiguration config) {
+            ExecutorService executor,
+            Device device) {
         this.dataset = dataset;
         this.trainer = trainer;
         this.sampler = sampler;
-        this.config = config;
+        this.executor = executor;
+        this.device = device;
     }
 
     @Override
     public Iterator<Batch> iterator() {
-        return new DataIterator<>(dataset, trainer, sampler, config);
+        return new DataIterator<>(dataset, trainer, sampler, executor, device);
     }
 
     private static class DataIterator<I, L> implements Iterator<Batch> {
         private RandomAccessDataset<I, L> dataset;
         private Trainer<I, L, ?> trainer;
         private Iterator<List<Long>> sample;
-        private Device pinDevice;
+        private ExecutorService executor;
+        private Device device;
+        // for multithreading
+        private Queue<Future<Batch>> queue;
+        private static final Logger logger = LoggerFactory.getLogger(DataIterable.class);
 
         public DataIterator(
                 RandomAccessDataset<I, L> dataset,
                 Trainer<I, L, ?> trainer,
                 Sampler sampler,
-                DataLoadingConfiguration config) {
+                ExecutorService executor,
+                Device device) {
             this.dataset = dataset;
             this.trainer = trainer;
             this.sample = sampler.sample(trainer, dataset);
-            this.pinDevice = config.getPinDevice();
+            this.executor = executor;
+            this.device = device;
+
+            if (executor != null) {
+                queue = new LinkedList<>();
+                // prefetch
+                for (int i = 0; i < ((ThreadPoolExecutor) executor).getCorePoolSize() * 2; i++) {
+                    preFetch();
+                }
+            }
         }
 
         @Override
         public boolean hasNext() {
+            if (executor != null) {
+                return !queue.isEmpty();
+            }
             return sample.hasNext();
         }
 
         @Override
         public Batch next() {
-            List<Long> indices = sample.next();
+            if (executor == null) {
+                List<Long> indices = sample.next();
+                return fetch(indices);
+            } else {
+                preFetch();
+                Future<Batch> future = queue.poll();
+                try {
+                    return future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error(e.getMessage());
+                }
+                throw new IllegalStateException("Data loading failed");
+            }
+        }
+
+        private Batch fetch(List<Long> indices) {
             NDList[] data = new NDList[indices.size()];
             NDList[] labels = new NDList[indices.size()];
             TranslatorContext ctx = trainer.getPreprocessContext();
@@ -89,13 +133,38 @@ public class DataIterable<I, L> implements Iterable<Batch> {
             NDList batchData = batchifier.batchify(data);
             NDList batchLabels = batchifier.batchify(labels);
             // pin to a specific device
-            if (pinDevice != null) {
-                batchData = batchData.asInContext(pinDevice, false);
-                batchLabels = batchLabels.asInContext(pinDevice, false);
+            if (device != null) {
+                batchData = batchData.asInContext(device, false);
+                batchLabels = batchLabels.asInContext(device, false);
             }
             Batch batch = new Batch(trainer.getManager(), batchData, batchLabels);
             ctx.close();
             return batch;
+        }
+
+        private void preFetch() {
+            List<Long> indices;
+            if (sample.hasNext()) {
+                indices = sample.next();
+            } else {
+                return;
+            }
+            Callable<Batch> task = new PreFetchCallable(indices);
+            Future<Batch> result = executor.submit(task);
+            queue.offer(result);
+        }
+
+        class PreFetchCallable implements Callable<Batch> {
+            private List<Long> indices;
+
+            public PreFetchCallable(List<Long> indices) {
+                this.indices = indices;
+            }
+
+            @Override
+            public Batch call() {
+                return fetch(indices);
+            }
         }
     }
 }

@@ -39,7 +39,6 @@ import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.BatchSampler;
-import software.amazon.ai.training.dataset.DataLoadingConfiguration;
 import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.SequenceSampler;
 
@@ -269,11 +268,8 @@ public class DatasetTest {
             Cifar10 cifar10 =
                     new Cifar10.Builder()
                             .setManager(manager)
-                            .optConfig(
-                                    new DataLoadingConfiguration.Builder()
-                                            .setExcutor(executor)
-                                            .build())
                             .setSampling(100)
+                            .optExcutor(executor)
                             .build();
 
             cifar10.prepare();

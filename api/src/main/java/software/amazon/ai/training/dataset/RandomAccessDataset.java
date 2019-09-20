@@ -13,6 +13,8 @@
 package software.amazon.ai.training.dataset;
 
 import java.util.RandomAccess;
+import java.util.concurrent.ExecutorService;
+import software.amazon.ai.Device;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.util.Pair;
 
@@ -24,18 +26,20 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
 
     protected long size;
     protected Sampler sampler;
-    protected DataLoadingConfiguration config;
+    protected ExecutorService executor;
+    protected Device device;
 
     public RandomAccessDataset(BaseBuilder<?> builder) {
         this.sampler = builder.getSampler();
-        this.config = builder.getConfig();
+        this.executor = builder.getExecutor();
+        this.device = builder.getDevice();
     }
 
     public abstract Pair<I, L> get(long index);
 
     @Override
     public Iterable<Batch> getData(Trainer<I, L, ?> trainer) {
-        return new DataIterable<>(this, trainer, sampler, config);
+        return new DataIterable<>(this, trainer, sampler, executor, device);
     }
 
     public long size() {
@@ -46,7 +50,8 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
         private Sampler sampler;
-        private DataLoadingConfiguration config;
+        private ExecutorService executor;
+        private Device device;
 
         public Sampler getSampler() {
             if (sampler == null) {
@@ -74,16 +79,21 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
             return self();
         }
 
-        public DataLoadingConfiguration getConfig() {
-            if (config != null) {
-                return config;
-            } else {
-                return new DataLoadingConfiguration.Builder().build();
-            }
+        public ExecutorService getExecutor() {
+            return executor;
         }
 
-        public T optConfig(DataLoadingConfiguration config) {
-            this.config = config;
+        public T optExcutor(ExecutorService executor) {
+            this.executor = executor;
+            return self();
+        }
+
+        public Device getDevice() {
+            return device;
+        }
+
+        public T optDevice(Device device) {
+            this.device = device;
             return self();
         }
 
