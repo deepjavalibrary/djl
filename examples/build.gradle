@@ -5,7 +5,7 @@ plugins {
 
 repositories {
     jcenter()
-    mavenLocal()
+    // mavenLocal()
     maven {
         url 'https://joule.s3.amazonaws.com/repo'
     }
@@ -34,7 +34,7 @@ test {
 }
 
 application {
-    mainClassName = System.getProperty("main", "software.amazon.ai.examples.ClassifyExample")
+    mainClassName = System.getProperty("main", "software.amazon.ai.examples.inference.ClassifyExample")
 }
 
 def getClassifier() {

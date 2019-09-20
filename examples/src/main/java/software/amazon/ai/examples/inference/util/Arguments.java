@@ -109,7 +109,7 @@ public class Arguments {
 
     public Path getImageFile() throws FileNotFoundException {
         if (imageFile == null) {
-            Path path = Paths.get(modelDir, "kitten.jpg");
+            Path path = Paths.get("src/test/resources/kitten.jpg");
             if (Files.notExists(path)) {
                 throw new FileNotFoundException("Missing --image parameter.");
             }
