@@ -42,8 +42,13 @@ public class ZooModel<I, O> implements Model {
     }
 
     @Override
-    public void load(Path modelPath, String modelName, Device device, Map<String, String> options) {
+    public void load(Path modelPath, String modelName, Map<String, String> options, Device device) {
         throw new IllegalArgumentException("ZooModel should not be re-loaded.");
+    }
+
+    @Override
+    public void save(Path modelPath, String modelName) throws IOException {
+        model.save(modelPath, modelName);
     }
 
     @Override

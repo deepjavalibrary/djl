@@ -82,7 +82,7 @@ public class TfModel implements Model {
     }
 
     @Override
-    public void load(Path modelPath, String modelName, Device device, Map<String, String> options)
+    public void load(Path modelPath, String modelName, Map<String, String> options, Device device)
             throws IOException {
         try {
             load(modelPath);
@@ -100,6 +100,9 @@ public class TfModel implements Model {
                         .withTags(tags)
                         .load();
     }
+
+    @Override
+    public void save(Path modelPath, String modelName) {}
 
     public org.tensorflow.Graph getTensorflowGraph() {
         return bundle.graph();

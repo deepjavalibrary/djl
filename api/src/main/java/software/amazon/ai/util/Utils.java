@@ -22,7 +22,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /** A class containing utility methods. */
 public final class Utils {
@@ -175,5 +179,26 @@ public final class Utils {
             ret[idx++] = n.floatValue();
         }
         return ret;
+    }
+
+    public static int getCurrentEpoch(Path modelDir, String modelName) throws IOException {
+        final Pattern pattern = Pattern.compile(Pattern.quote(modelName) + "-(\\d{4}).params");
+        List<Integer> checkpoints =
+                Files.walk(modelDir, 1)
+                        .map(
+                                p -> {
+                                    Matcher m = pattern.matcher(p.toFile().getName());
+                                    if (m.matches()) {
+                                        return Integer.parseInt(m.group(1));
+                                    }
+                                    return null;
+                                })
+                        .filter(Objects::nonNull)
+                        .sorted()
+                        .collect(Collectors.toList());
+        if (checkpoints.isEmpty()) {
+            return -1;
+        }
+        return checkpoints.get(checkpoints.size() - 1);
     }
 }

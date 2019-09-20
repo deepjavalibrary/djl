@@ -21,7 +21,6 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.initializer.Initializer;
 
@@ -57,7 +56,7 @@ public class Parameter implements AutoCloseable {
     }
 
     public String getName() {
-        return name;
+        return name == null ? "" : name;
     }
 
     public ParameterType getType() {
@@ -127,20 +126,13 @@ public class Parameter implements AutoCloseable {
         dos.writeChar('P');
         dos.writeByte(VERSION);
 
+        dos.writeUTF(getName());
+
         dos.writeUTF(array.getSparseFormat().name());
         dos.writeUTF(array.getDataType().name());
 
         Shape shape = array.getShape();
-        long[] shapeValue = shape.getShape();
-        dos.writeInt(shapeValue.length);
-        for (long l : shapeValue) {
-            dos.writeLong(l);
-        }
-        LayoutType[] layout = shape.getLayout();
-        dos.writeInt(layout.length);
-        for (LayoutType layoutType : layout) {
-            dos.writeChar(layoutType.getValue());
-        }
+        dos.write(shape.getEncoded());
 
         ByteBuffer bb = array.toByteBuffer();
         int length = bb.remaining();
@@ -188,28 +180,22 @@ public class Parameter implements AutoCloseable {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
 
+        String parameterName = dis.readUTF();
+        if (!parameterName.equals(getName())) {
+            throw new IllegalArgumentException(
+                    "Unexpected parameter name: " + parameterName + ", expected: " + name);
+        }
+
         dis.readUTF(); // ignore SparseFormat
 
         // DataType - 1 byte
         DataType dataType = DataType.valueOf(dis.readUTF());
 
         // Shape
-        int length = dis.readInt();
-        long[] shapeValue = new long[length];
-        for (int i = 0; i < length; ++i) {
-            shapeValue[i] = dis.readLong();
-        }
-
-        // Layout
-        length = dis.readInt();
-        char[] layout = new char[length];
-        for (int i = 0; i < length; ++i) {
-            layout[i] = dis.readChar();
-        }
-        Shape shape = new Shape(shapeValue, new String(layout));
+        Shape shape = Shape.decode(dis);
 
         // Data
-        length = dis.readInt();
+        int length = dis.readInt();
         ByteBuffer data = manager.allocateDirect(length);
 
         if (length > 0) {

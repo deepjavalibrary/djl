@@ -47,6 +47,8 @@ public interface Block {
     void setInitializer(
             NDManager manager, Initializer initializer, String paramName, boolean overwrite);
 
+    boolean isInitialized();
+
     // TODO: remove this API
     void ensureInitialized(NDList inputs);
 

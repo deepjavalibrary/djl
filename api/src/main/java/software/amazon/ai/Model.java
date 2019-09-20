@@ -103,7 +103,7 @@ public interface Model extends AutoCloseable {
      */
     default void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException {
-        load(modelPath, modelName, null, options);
+        load(modelPath, modelName, options, null);
     }
 
     /**
@@ -112,12 +112,21 @@ public interface Model extends AutoCloseable {
      *
      * @param modelPath the directory or file path of the model location
      * @param modelName model file name or assigned name
-     * @param device the device that model to be loaded
      * @param options engine specific load model options, see document for each engine
+     * @param device the device that model to be loaded
      * @throws IOException IO exception happened in loading
      */
-    void load(Path modelPath, String modelName, Device device, Map<String, String> options)
+    void load(Path modelPath, String modelName, Map<String, String> options, Device device)
             throws IOException;
+
+    /**
+     * Saves the model to specified {@code modelPath} with the name provided.
+     *
+     * @param modelPath the directory or file path of the model location
+     * @param modelName model file name or assigned name
+     * @throws IOException IO exception happened in loading
+     */
+    void save(Path modelPath, String modelName) throws IOException;
 
     /**
      * Get the block from the Model.

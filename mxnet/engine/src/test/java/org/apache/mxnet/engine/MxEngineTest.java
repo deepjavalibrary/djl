@@ -16,7 +16,9 @@ package org.apache.mxnet.engine;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.management.MemoryUsage;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -87,33 +89,40 @@ public class MxEngineTest extends PowerMockTestCase {
         Files.createFile(modelDir.resolve(modelName + "-symbol.json"));
 
         Path path122 = modelDir.resolve(modelName + "-0122.params");
-        Files.createFile(path122);
+        createParameterFile(path122);
+
         String result = loadModel(modelDir, modelName, null);
         Files.delete(path122);
         Assert.assertEquals(result, "A-0122.params");
 
         Path path1 = modelDir.resolve(modelName + "-0001.params");
-        Files.createFile(path1);
+        createParameterFile(path1);
         result = loadModel(modelDir, modelName, null);
         Files.delete(path1);
         Assert.assertEquals(result, "A-0001.params");
 
+        createParameterFile(path122);
         Map<String, String> options = new ConcurrentHashMap<>();
         options.put("epoch", String.valueOf(122));
         result = loadModel(modelDir, modelName, options);
         Assert.assertEquals(result, "A-0122.params");
 
-        Files.createFile(path122);
         Files.createFile(path1);
 
         result = loadModel(modelDir, modelName, options);
         Assert.assertEquals(result, "A-0122.params");
     }
 
+    private void createParameterFile(Path paramFile) throws IOException {
+        try (OutputStream os = Files.newOutputStream(paramFile)) {
+            os.write("TEST".getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
     private String loadModel(Path location, String modelName, Map<String, String> options)
             throws IOException {
         try (Model model = Model.newInstance()) {
-            model.load(location, modelName, null, options);
+            model.load(location, modelName, options);
             // In JNA.MXNDArrayLoad function, file name is stored as the first param name in Model
             String paramPath = model.getBlock().getDirectParameters().get(0).getName();
             return Paths.get(paramPath).toFile().getName();

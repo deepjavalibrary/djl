@@ -12,21 +12,20 @@
  */
 package org.apache.mxnet.engine;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.mxnet.jna.JnaUtils;
 import org.apache.mxnet.nn.MxSymbolBlock;
@@ -41,6 +40,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.Trainer;
@@ -49,6 +49,7 @@ import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.util.Pair;
+import software.amazon.ai.util.Utils;
 
 /**
  * {@code MxModel} is MXNet implementation of {@link Model}.
@@ -60,6 +61,8 @@ import software.amazon.ai.util.Pair;
 public class MxModel implements Model {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
+
+    private static final int MODEL_VERSION = 1;
 
     private Path modelDir;
     private MxNDManager manager;
@@ -87,42 +90,70 @@ public class MxModel implements Model {
      *
      * @param modelPath Directory of the model
      * @param modelName Name/Prefix of the model
-     * @param device the device that model to be loaded
      * @param options load model options, check document for specific engine
+     * @param device the device that model to be loaded
      * @throws IOException Exception for file loading
      */
     @Override
-    public void load(Path modelPath, String modelName, Device device, Map<String, String> options)
+    public void load(Path modelPath, String modelName, Map<String, String> options, Device device)
             throws IOException {
         MxEngine engine = ((MxEngine) Engine.getEngine(MxEngine.ENGINE_NAME));
         engine.setNumpyMode(false);
 
-        if (Files.isDirectory(modelPath)) {
+        try {
             modelDir = modelPath.toAbsolutePath();
-        } else {
-            modelDir = modelPath.toAbsolutePath().getParent();
-            if (modelDir == null) {
-                throw new AssertionError("Invalid path: " + modelPath.toString());
+            if (block == null) {
+                Path symbolFile = modelDir.resolve(modelName + "-symbol.json");
+                if (Files.notExists(symbolFile)) {
+                    throw new FileNotFoundException(
+                            "Symbol file not found in: "
+                                    + modelPath
+                                    + ", please set block manually.");
+                }
+                Symbol symbol = Symbol.load(manager, symbolFile.toAbsolutePath().toString());
+                block = new MxSymbolBlock(manager, symbol);
             }
+
+            loadParameters(modelName, options, device);
+
+            // TODO: Check if Symbol has all names that params file have
+        } finally {
+            engine.setNumpyMode(true);
         }
-        String modelPrefix = modelDir.resolve(modelName).toString();
-        if (block == null) {
-            Path symbolFile = Paths.get(modelPrefix + "-symbol.json");
-            if (Files.notExists(symbolFile)) {
-                throw new FileNotFoundException(
-                        "Failed to load "
-                                + modelPrefix
-                                + " symbol file, please set block manually.");
+    }
+
+    @Override
+    public void save(Path modelPath, String modelName) throws IOException {
+        if (Files.notExists(modelPath)) {
+            Files.createDirectories(modelPath);
+        }
+
+        if (block == null || !block.isInitialized()) {
+            throw new IllegalStateException("Model has not be trained or loaded yet.");
+        }
+
+        int epoch = Utils.getCurrentEpoch(modelDir, modelName) + 1;
+        Path paramFile = modelDir.resolve(String.format("%s-%04d.params", modelName, epoch));
+        try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(paramFile))) {
+            dos.writeBytes("JOUL");
+            dos.writeInt(MODEL_VERSION);
+            dos.writeUTF(modelName);
+            DataDesc[] descs = block.describeInput();
+            dos.writeInt(descs.length);
+            for (DataDesc desc : descs) {
+                String name = desc.getName();
+                if (name == null) {
+                    dos.writeUTF("");
+                } else {
+                    dos.writeUTF(name);
+                }
+
+                dos.writeUTF(desc.getDataType().name());
+                dos.write(desc.getShape().getEncoded());
             }
-            Symbol symbol = Symbol.load(manager, modelPrefix + "-symbol.json");
-            block = new MxSymbolBlock(manager, symbol);
+
+            block.saveParameters(dos);
         }
-
-        loadParameters(modelPrefix, modelName, device, options);
-
-        // TODO: Check if Symbol has all names that params file have
-
-        engine.setNumpyMode(true);
     }
 
     @Override
@@ -289,8 +320,7 @@ public class MxModel implements Model {
         super.finalize();
     }
 
-    private void loadParameters(
-            String modelPrefix, String modelName, Device device, Map<String, String> options)
+    private void loadParameters(String modelName, Map<String, String> options, Device device)
             throws IOException {
         device = Device.defaultIfNull(device);
         String epochOption = null;
@@ -299,30 +329,20 @@ public class MxModel implements Model {
         }
         int epoch;
         if (epochOption == null) {
-            final Pattern pattern = Pattern.compile(Pattern.quote(modelName) + "-(\\d{4}).params");
-            List<Integer> checkpoints =
-                    Files.walk(modelDir, 1)
-                            .map(
-                                    p -> {
-                                        Matcher m = pattern.matcher(p.toFile().getName());
-                                        if (m.matches()) {
-                                            return Integer.parseInt(m.group(1));
-                                        }
-                                        return null;
-                                    })
-                            .filter(Objects::nonNull)
-                            .sorted()
-                            .collect(Collectors.toList());
-            if (checkpoints.isEmpty()) {
-                throw new IOException("Parameter files not found: " + modelPrefix + "-0001.params");
+            epoch = Utils.getCurrentEpoch(modelDir, modelName);
+            if (epoch == -1) {
+                throw new IOException("Parameter file not found in: " + modelDir);
             }
-            epoch = checkpoints.get(checkpoints.size() - 1);
         } else {
             epoch = Integer.parseInt(epochOption);
         }
 
-        String paramFile = String.format("%s-%04d.params", modelPrefix, epoch);
-        NDList paramNDlist = JnaUtils.loadNdArray(manager, Paths.get(paramFile));
+        Path paramFile = modelDir.resolve(String.format("%s-%04d.params", modelName, epoch));
+        if (readParameters(paramFile)) {
+            return;
+        }
+
+        NDList paramNDlist = JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath());
 
         List<Parameter> parameters = block.getDirectParameters();
         for (Pair<String, NDArray> pair : paramNDlist) {
@@ -334,5 +354,34 @@ public class MxModel implements Model {
             NDArray array = pair.getValue().asInDevice(device, true);
             parameters.add(new Parameter(paramName, block, array));
         }
+    }
+
+    private boolean readParameters(Path paramFile) throws IOException {
+        try (DataInputStream dis = new DataInputStream(Files.newInputStream(paramFile))) {
+            byte[] buf = new byte[4];
+            dis.readFully(buf);
+            if (!"JOUL".equals(new String(buf, StandardCharsets.US_ASCII))) {
+                return false;
+            }
+
+            int version = dis.readInt();
+            if (version != MODEL_VERSION) {
+                throw new IOException("Unsupported model version: " + version);
+            }
+
+            String modelName = dis.readUTF();
+            logger.debug("Loading model parameter: {}", modelName);
+
+            int numberOfInputs = dis.readInt();
+            for (int i = 0; i < numberOfInputs; ++i) {
+                // TODO: store header information in model
+                dis.readUTF(); // input name
+                dis.readUTF(); // DataType
+                Shape.decode(dis);
+            }
+
+            block.loadParameters(manager, dis);
+        }
+        return true;
     }
 }

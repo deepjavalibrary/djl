@@ -12,6 +12,9 @@
  */
 package software.amazon.ai.ndarray.types;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -400,6 +403,24 @@ public class Shape {
         return layout;
     }
 
+    public String toLayoutString() {
+        return LayoutType.toString(layout);
+    }
+
+    public byte[] getEncoded() {
+        int length = 8 + shape.length * 8 + layout.length * 2;
+        ByteBuffer bb = ByteBuffer.allocate(length);
+        bb.putInt(shape.length);
+        for (long l : shape) {
+            bb.putLong(l);
+        }
+        bb.putInt(layout.length);
+        for (LayoutType layoutType : layout) {
+            bb.putChar(layoutType.getValue());
+        }
+        return bb.array();
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
@@ -434,9 +455,20 @@ public class Shape {
         return sb.toString();
     }
 
-    public String toLayoutString() {
-        StringBuilder builder = new StringBuilder();
-        Arrays.stream(layout).forEach(layoutType -> builder.append(layoutType.getValue()));
-        return builder.toString();
+    public static Shape decode(DataInputStream dis) throws IOException {
+        // Shape
+        int length = dis.readInt();
+        long[] shapeValue = new long[length];
+        for (int i = 0; i < length; ++i) {
+            shapeValue[i] = dis.readLong();
+        }
+
+        // Layout
+        length = dis.readInt();
+        char[] layout = new char[length];
+        for (int i = 0; i < length; ++i) {
+            layout[i] = dis.readChar();
+        }
+        return new Shape(shapeValue, new String(layout));
     }
 }

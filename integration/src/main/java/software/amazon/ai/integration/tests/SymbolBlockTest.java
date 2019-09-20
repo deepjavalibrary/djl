@@ -13,6 +13,7 @@
 package software.amazon.ai.integration.tests;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,10 +36,12 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.repository.ZipUtils;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.Pair;
+import software.amazon.ai.util.Utils;
 
 public class SymbolBlockTest {
 
@@ -52,9 +55,9 @@ public class SymbolBlockTest {
 
     @RunAsTest
     public void testInference() throws FailedTestException, IOException {
-        Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
+        Path modelDir = prepareModel();
         try (Model model = Model.newInstance()) {
-            model.load(modelPathPrefix);
+            model.load(modelDir);
             NDManager manager = model.getNDManager();
 
             Block block = model.getBlock();
@@ -66,9 +69,9 @@ public class SymbolBlockTest {
 
     @RunAsTest
     public void trainWithNewParam() throws FailedTestException, IOException {
-        Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
+        Path modelDir = prepareModel();
         try (Model model = Model.newInstance()) {
-            model.load(modelPathPrefix);
+            model.load(modelDir);
             NDManager manager = model.getNDManager();
             Block mlp = model.getBlock();
             mlp.setInitializer(manager, Initializer.ONES, true);
@@ -90,9 +93,9 @@ public class SymbolBlockTest {
 
     @RunAsTest
     public void trainWithExistParam() throws FailedTestException, IOException {
-        Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
+        Path modelDir = prepareModel();
         try (Model model = Model.newInstance()) {
-            model.load(modelPathPrefix);
+            model.load(modelDir);
             NDManager manager = model.getNDManager();
             Block mlp = model.getBlock();
             Pair<NDArray, NDArray> result = train(manager, mlp);
@@ -113,9 +116,9 @@ public class SymbolBlockTest {
 
     @RunAsTest
     public void trainWithCustomLayer() throws FailedTestException, IOException {
-        Path modelPathPrefix = Paths.get(prepareModel() + "/mnist");
+        Path modelDir = prepareModel();
         try (Model model = Model.newInstance()) {
-            model.load(modelPathPrefix);
+            model.load(modelDir);
             NDManager manager = model.getNDManager();
             SymbolBlock mlp = (SymbolBlock) model.getBlock();
             SequentialBlock newMlp = new SequentialBlock();
@@ -161,20 +164,24 @@ public class SymbolBlockTest {
         return new Pair<>(pred.mean(), gradMean);
     }
 
-    public static String prepareModel() throws IOException {
+    public static Path prepareModel() throws IOException {
         String source = "https://joule.s3.amazonaws.com/other+resources/mnistmlp.zip";
-        String dataDir = System.getProperty("user.home") + "/.joule_data";
-        String downloadDestination = dataDir + "/mnistmlp.zip";
-        String extractDestination = dataDir + "/mnist";
-        Path params = Paths.get(extractDestination + "/mnist-0000.params");
-        Path symbol = Paths.get(extractDestination + "/mnist-symbol.json");
+
+        Path dataDir = Paths.get(System.getProperty("user.home")).resolve(".joule_data");
+        Path downloadDestination = dataDir.resolve("mnistmlp.zip");
+        Path extractDestination = dataDir.resolve("mnist");
+        Path params = extractDestination.resolve("mnist-0000.params");
+        Path symbol = extractDestination.resolve("mnist-symbol.json");
+
         // download and unzip data if not exist
         if (!Files.exists(params) || !Files.exists(symbol)) {
-            if (!Files.exists(Paths.get(downloadDestination))) {
+            if (!Files.exists(downloadDestination)) {
                 FileUtils.download(source, dataDir, "mnistmlp.zip");
             }
-            FileUtils.unzip(downloadDestination, extractDestination);
-            FileUtils.deleteFileOrDir(downloadDestination);
+            try (InputStream is = Files.newInputStream(downloadDestination)) {
+                ZipUtils.unzip(is, extractDestination);
+            }
+            Utils.deleteQuietly(downloadDestination);
         }
         return extractDestination;
     }

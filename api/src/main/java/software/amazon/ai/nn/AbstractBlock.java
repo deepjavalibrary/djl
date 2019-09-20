@@ -103,6 +103,11 @@ public abstract class AbstractBlock implements Block {
     protected void beforeInitialize(NDList inputs) {}
 
     @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    @Override
     public void ensureInitialized(NDList inputs) {
         if (!initialized) {
             beforeInitialize(inputs);
