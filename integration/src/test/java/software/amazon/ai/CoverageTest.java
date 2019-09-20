@@ -13,13 +13,34 @@
 package software.amazon.ai;
 
 import java.io.IOException;
+import org.apache.mxnet.dataset.Cifar10;
+import org.apache.mxnet.engine.MxEngine;
+import org.apache.mxnet.zoo.ModelZoo;
 import org.testng.annotations.Test;
+import software.amazon.ai.repository.Repository;
 import software.amazon.ai.test.CoverageUtils;
+import software.amazon.ai.zoo.cv.classification.ResNetV1;
 
 public class CoverageTest {
 
     @Test
     public void test() throws IOException, ClassNotFoundException {
+        // API
         CoverageUtils.testGetterSetters(Device.class);
+
+        // model-zoo
+        CoverageUtils.testGetterSetters(ResNetV1.class);
+
+        // repository
+        CoverageUtils.testGetterSetters(Repository.class);
+
+        // mxnet-dataset
+        CoverageUtils.testGetterSetters(Cifar10.class);
+
+        // mxnet-engine
+        CoverageUtils.testGetterSetters(MxEngine.class);
+
+        // mxnet-model-zoo
+        CoverageUtils.testGetterSetters(ModelZoo.class);
     }
 }

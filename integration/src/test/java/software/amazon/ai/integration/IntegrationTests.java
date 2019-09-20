@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.integration;
 
+import org.apache.mxnet.jna.JnaUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -20,6 +21,10 @@ public class IntegrationTests {
     @Test
     public void runIntegrationTests() {
         String[] args = {};
+
+        JnaUtils.autogradSetIsRecording(false);
+        JnaUtils.autogradSetTraining(false);
+
         Assert.assertTrue(new IntegrationTest().runTests(args));
     }
 }

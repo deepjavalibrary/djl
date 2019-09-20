@@ -18,6 +18,7 @@ dependencies {
     compile project(":model-zoo")
     compile project(":mxnet:dataset")
     compile project(":mxnet:engine")
+    compile project(":mxnet:model-zoo")
 
     runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
 
@@ -57,7 +58,7 @@ jacocoTestReport {
     classDirectories = files()
 
     javaProjects().findAll { p ->
-        ![":mxnet:jnarator", ":tensorflow:engine"].contains(p.getPath())
+        ![":mxnet:jnarator", ":tensorflow:engine", ":examples"].contains(p.getPath())
     }.each { p ->
         additionalSourceDirs files((Set<File>) p.sourceSets.main.allJava.srcDirs)
         additionalClassDirs((FileCollection) p.sourceSets.main.output)
