@@ -13,31 +13,47 @@
 package software.amazon.ai.translate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import software.amazon.ai.ndarray.NDArray;
+import java.util.stream.Collectors;
+import software.amazon.ai.ndarray.NDList;
 
-public class Pipeline implements Transform {
+public class Pipeline extends TransformBlock {
 
-    private List<Transform> transforms;
+    private List<TransformBlock> transformBlocks;
 
     public Pipeline() {
-        transforms = new ArrayList<>();
+        transformBlocks = new ArrayList<>();
+    }
+
+    public Pipeline(Transform... transforms) {
+        transformBlocks =
+                Arrays.stream(transforms).map(TransformBlock::new).collect(Collectors.toList());
+    }
+
+    public Pipeline(TransformBlock... transformBlocks) {
+        this.transformBlocks = Arrays.asList(transformBlocks);
     }
 
     public Pipeline add(Transform transform) {
-        transforms.add(transform);
+        transformBlocks.add(new TransformBlock(transform));
+        return this;
+    }
+
+    public Pipeline add(TransformBlock transformBlock) {
+        transformBlocks.add(transformBlock);
         return this;
     }
 
     @Override
-    public NDArray transform(NDArray array, boolean close) {
-        if (transforms.isEmpty()) {
-            return array;
+    public NDList transform(NDList input, boolean close) {
+        if (transformBlocks.isEmpty()) {
+            return input;
         }
 
-        NDArray ret = transforms.get(0).transform(array, close);
-        for (int i = 1; i < transforms.size(); ++i) {
-            ret = transforms.get(i).transform(ret, true);
+        NDList ret = transformBlocks.get(0).transform(input, close);
+        for (int i = 1; i < transformBlocks.size(); ++i) {
+            ret = transformBlocks.get(i).transform(ret, true);
         }
         return ret;
     }

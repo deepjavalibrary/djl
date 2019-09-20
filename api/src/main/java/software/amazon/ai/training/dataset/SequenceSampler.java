@@ -14,13 +14,12 @@ package software.amazon.ai.training.dataset;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import software.amazon.ai.training.Trainer;
 
 /** Sampler the data from [0, dataset.size) sequentially. */
 public class SequenceSampler implements Sampler.SubSampler {
 
     @Override
-    public Iterator<Long> sample(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
+    public Iterator<Long> sample(RandomAccessDataset dataset) {
         return new Iterate(dataset);
     }
 
@@ -29,7 +28,7 @@ public class SequenceSampler implements Sampler.SubSampler {
         private long size;
         private long current;
 
-        Iterate(RandomAccessDataset<?, ?> dataset) {
+        Iterate(RandomAccessDataset dataset) {
             size = dataset.size();
             current = 0;
         }

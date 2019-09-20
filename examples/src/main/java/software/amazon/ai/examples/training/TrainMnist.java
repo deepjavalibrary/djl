@@ -18,6 +18,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.dataset.DatasetUtils;
 import org.apache.mxnet.dataset.Mnist;
+import org.apache.mxnet.dataset.transform.cv.ToTensor;
 import org.slf4j.Logger;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
@@ -32,7 +33,6 @@ import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.initializer.NormalInitializer;
@@ -41,6 +41,7 @@ import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
+import software.amazon.ai.translate.Pipeline;
 import software.amazon.ai.translate.TranslateException;
 
 public final class TrainMnist {
@@ -91,15 +92,16 @@ public final class TrainMnist {
                             .setRescaleGrad(1.0f / batchSize)
                             .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
                             .build();
+            Pipeline pipeline = new Pipeline(new ToTensor());
             Mnist mnist =
                     new Mnist.Builder()
                             .setManager(model.getNDManager())
                             .setUsage(Dataset.Usage.TRAIN)
                             .setSampling(batchSize, true, true)
+                            .optPipeline(pipeline)
                             .build();
             mnist.prepare();
-            try (Trainer<NDList, NDList, NDList> trainer =
-                    model.newTrainer(new ArrayDataset.DefaultTranslator(), optimizer, devices)) {
+            try (Trainer trainer = model.newTrainer(optimizer, devices)) {
                 int numEpoch = arguments.getEpoch();
 
                 Accuracy acc = new Accuracy();
@@ -109,7 +111,7 @@ public final class TrainMnist {
                     acc.reset();
                     lossMetric.reset();
                     for (Batch batch : trainer.iterateDataset(mnist)) {
-                        NDArray data = batch.getData().head().reshape(batchSize, 28 * 28).div(255f);
+                        NDArray data = batch.getData().head().reshape(batchSize, 28 * 28);
                         NDArray label = batch.getLabels().head();
                         NDList dataSplit = DatasetUtils.splitAndLoad(data, devices, false);
                         NDList labelSplit = DatasetUtils.splitAndLoad(label, devices, false);

@@ -15,33 +15,46 @@ package software.amazon.ai.training.dataset;
 import java.util.RandomAccess;
 import java.util.concurrent.ExecutorService;
 import software.amazon.ai.Device;
-import software.amazon.ai.training.Trainer;
-import software.amazon.ai.util.Pair;
+import software.amazon.ai.translate.Pipeline;
 
 /**
  * RandomAccessDataset represent the dataset that support random access reads. i.e. it could access
  * certain data item given the index
  */
-public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, RandomAccess {
+public abstract class RandomAccessDataset implements Dataset, RandomAccess {
 
     protected long size;
     protected Sampler sampler;
+    protected Batchifier batchifier;
+    protected Pipeline pipeline;
+    protected Pipeline targetPipeline;
     protected ExecutorService executor;
     protected int prefetchNumber;
     protected Device device;
 
     public RandomAccessDataset(BaseBuilder<?> builder) {
         this.sampler = builder.getSampler();
+        this.batchifier = builder.getBatchifier();
+        this.pipeline = builder.getPipeline();
+        this.targetPipeline = builder.getTargetPipeline();
         this.executor = builder.getExecutor();
         this.prefetchNumber = builder.getPrefetchNumber();
         this.device = builder.getDevice();
     }
 
-    public abstract Pair<I, L> get(long index);
+    public abstract Record get(long index);
 
     @Override
-    public Iterable<Batch> getData(Trainer<I, L, ?> trainer) {
-        return new DataIterable<>(this, trainer, sampler, executor, prefetchNumber, device);
+    public Iterable<Batch> getData() {
+        return new DataIterable(
+                this,
+                sampler,
+                batchifier,
+                pipeline,
+                targetPipeline,
+                executor,
+                prefetchNumber,
+                device);
     }
 
     public long size() {
@@ -52,6 +65,9 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
         private Sampler sampler;
+        private Batchifier batchifier;
+        private Pipeline pipeline;
+        private Pipeline targetPipeline;
         private ExecutorService executor;
         private int prefetchNumber;
         private Device device;
@@ -79,6 +95,36 @@ public abstract class RandomAccessDataset<I, L> implements Dataset<I, L>, Random
 
         public T setSampler(Sampler sampler) {
             this.sampler = sampler;
+            return self();
+        }
+
+        public Batchifier getBatchifier() {
+            if (batchifier == null) {
+                batchifier = Batchifier.STACK;
+            }
+            return batchifier;
+        }
+
+        public T optBatchier(Batchifier batchier) {
+            this.batchifier = batchier;
+            return self();
+        }
+
+        public Pipeline getPipeline() {
+            return pipeline;
+        }
+
+        public T optPipeline(Pipeline pipeline) {
+            this.pipeline = pipeline;
+            return self();
+        }
+
+        public Pipeline getTargetPipeline() {
+            return targetPipeline;
+        }
+
+        public T optTargetPipeline(Pipeline targetPipeline) {
+            this.targetPipeline = targetPipeline;
             return self();
         }
 

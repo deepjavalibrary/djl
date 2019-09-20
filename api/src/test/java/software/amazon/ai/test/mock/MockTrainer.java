@@ -12,28 +12,13 @@
  */
 package software.amazon.ai.test.mock;
 
-import java.util.List;
-import java.util.Optional;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.ModelSaver;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.TranslateException;
-import software.amazon.ai.translate.TranslatorContext;
 
-public class MockTrainer<I, L, O> implements Trainer<I, L, O> {
-
-    @Override
-    public TrainTranslator<I, L, O> getTranslator() {
-        return null;
-    }
-
-    @Override
-    public TranslatorContext getPreprocessContext() {
-        return null;
-    }
+public class MockTrainer implements Trainer {
 
     @Override
     public void step() {}
@@ -44,25 +29,12 @@ public class MockTrainer<I, L, O> implements Trainer<I, L, O> {
     }
 
     @Override
-    public List<O> predict(List<I> input) throws TranslateException {
-        return null;
-    }
-
-    @Override
     public void setMetrics(Metrics metrics) {}
 
     @Override
     public NDManager getManager() {
         return null;
     }
-
-    @Override
-    public Optional<Integer> getSeed() {
-        return Optional.empty();
-    }
-
-    @Override
-    public void setSeed(int seed) {}
 
     @Override
     public ModelSaver getModelSaver() {

@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -31,7 +30,7 @@ import software.amazon.ai.util.Utils;
  *
  * <p>Each sample is an image (in 3D NDArray) with shape (28, 28, 1).
  */
-public final class Mnist extends ArrayDataset implements ZooDataset<NDList, NDList> {
+public final class Mnist extends ArrayDataset implements ZooDataset {
 
     private static final String ARTIFACT_ID = "mnist";
 

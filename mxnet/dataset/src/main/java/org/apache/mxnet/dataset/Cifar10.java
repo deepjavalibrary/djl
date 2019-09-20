@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -30,7 +29,7 @@ import software.amazon.ai.util.Utils;
  * CIFAR10 image classification dataset from https://www.cs.toronto.edu/~kriz/cifar.html Each sample
  * is an image (in 3D NDArray) with shape (32, 32, 3).
  */
-public final class Cifar10 extends ArrayDataset implements ZooDataset<NDList, NDList> {
+public final class Cifar10 extends ArrayDataset implements ZooDataset {
 
     private static final String ARTIFACT_ID = "cifar10";
     // 3072 = 32 * 32 * 3, i.e. one image size, +1 here is label
@@ -117,7 +116,7 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset<NDList, ND
         size = labels[0].size();
     }
 
-    public NDArray readData(Artifact.Item item) throws IOException {
+    private NDArray readData(Artifact.Item item) throws IOException {
         try (InputStream is = repository.openStream(item, null)) {
             byte[] buf = Utils.toByteArray(is);
             int length = buf.length / DATA_AND_LABEL_SIZE;

@@ -22,20 +22,18 @@ import java.util.List;
 import org.apache.mxnet.engine.MxImages;
 import software.amazon.ai.modality.cv.Rectangle;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.training.dataset.Record;
-import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.TranslatorContext;
-import software.amazon.ai.util.Pair;
 
-public class CocoDetection extends RandomAccessDataset<String, double[][]>
-        implements ZooDataset<String, double[][]> {
+public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     private static final String ARTIFACT_ID = "coco";
 
+    private NDManager manager;
     private Repository repository;
     private Artifact artifact;
     private Usage usage;
@@ -49,6 +47,7 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
 
     public CocoDetection(Builder builder) {
         super(builder);
+        manager = builder.manager;
         repository = builder.repository;
         artifact = builder.artifact;
         usage = builder.usage;
@@ -109,9 +108,11 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
     }
 
     @Override
-    public Pair<String, double[][]> get(long index) {
+    public Record get(long index) {
         int idx = Math.toIntExact(index);
-        return new Pair<>(imagePaths.get(idx), labels.get(idx));
+        NDList d = new NDList(MxImages.read(manager, imagePaths.get(idx), flag));
+        NDList l = new NDList(manager.create(labels.get(idx)));
+        return new Record(d, l);
     }
 
     @Override
@@ -183,13 +184,9 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
         return label;
     }
 
-    public DefaultTranslator defaultTranslator() {
-        return new DefaultTranslator();
-    }
-
     @SuppressWarnings("rawtypes")
     public static final class Builder extends BaseBuilder<Builder> {
-
+        private NDManager manager;
         private Path dataDir;
         private MxImages.Flag flag = MxImages.Flag.COLOR;
         private Repository repository = Datasets.REPOSITORY;
@@ -198,6 +195,11 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
 
         @Override
         public Builder self() {
+            return this;
+        }
+
+        public Builder setManager(NDManager manager) {
+            this.manager = manager;
             return this;
         }
 
@@ -228,26 +230,6 @@ public class CocoDetection extends RandomAccessDataset<String, double[][]>
 
         public CocoDetection build() {
             return new CocoDetection(this);
-        }
-    }
-
-    private class DefaultTranslator implements TrainTranslator<String, double[][], NDList> {
-
-        @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) {
-            return null;
-        }
-
-        @Override
-        public NDList processInput(TranslatorContext ctx, String input) {
-            return new NDList(MxImages.read(ctx.getNDManager(), input, flag));
-        }
-
-        @Override
-        public Record processInput(TranslatorContext ctx, String input, double[][] label) {
-            NDList i = new NDList(MxImages.read(ctx.getNDManager(), input, flag));
-            NDList l = new NDList(ctx.getNDManager().create(label));
-            return new Record(i, l);
         }
     }
 }

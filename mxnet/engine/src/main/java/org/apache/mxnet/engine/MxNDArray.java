@@ -1452,7 +1452,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     // image op
 
     public NDArray toTensor() {
-        return manager.invoke("_npx__image_to_tensor", null);
+        return manager.invoke("_npx__image_to_tensor", this, null);
     }
 
     public NDArray normalize(float[] mean, float[] std) {

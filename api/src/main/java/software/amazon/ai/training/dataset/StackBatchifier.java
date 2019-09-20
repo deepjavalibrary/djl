@@ -42,12 +42,15 @@ public class StackBatchifier implements Batchifier {
                 dataList[i].add(input.get(i));
             }
         }
+
         // stack all the data and labels together
         NDList result = new NDList(size);
         for (NDList list : dataList) {
             NDArray stacked = NDArrays.stack(list);
             stacked.getDataDescriptor().setName(list.get(0).getDataDescriptor().getName());
             result.add(stacked);
+            // close the intermediate NDArray
+            list.close();
         }
 
         return result;

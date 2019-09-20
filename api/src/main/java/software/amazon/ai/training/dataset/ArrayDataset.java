@@ -15,9 +15,6 @@ package software.amazon.ai.training.dataset;
 import java.util.stream.Stream;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.TranslatorContext;
-import software.amazon.ai.util.Pair;
 
 /**
  * Dataset wrapping {@link NDArray}s. It is able to combine multiple data and labels. Each sample
@@ -37,7 +34,7 @@ import software.amazon.ai.util.Pair;
  *
  * @see Dataset
  */
-public class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
+public class ArrayDataset extends RandomAccessDataset {
 
     protected NDArray[] data;
     protected NDArray[] labels;
@@ -66,7 +63,7 @@ public class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
     }
 
     @Override
-    public Pair<NDList, NDList> get(long index) {
+    public Record get(long index) {
         NDList datum = new NDList();
         NDList label = new NDList();
         for (NDArray array : data) {
@@ -77,25 +74,7 @@ public class ArrayDataset extends RandomAccessDataset<NDList, NDList> {
                 label.add(array.get(index));
             }
         }
-        return new Pair<>(datum, label);
-    }
-
-    public static final class DefaultTranslator implements TrainTranslator<NDList, NDList, NDList> {
-
-        @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) {
-            return list;
-        }
-
-        @Override
-        public NDList processInput(TranslatorContext ctx, NDList input) {
-            return input;
-        }
-
-        @Override
-        public Record processInput(TranslatorContext ctx, NDList input, NDList label) {
-            return new Record(input, label);
-        }
+        return new Record(datum, label);
     }
 
     @SuppressWarnings("rawtypes")

@@ -16,12 +16,10 @@ import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
 
@@ -43,8 +41,7 @@ public class MnistTest {
                             .build();
 
             mnist.prepare();
-            try (Trainer<NDList, NDList, NDList> trainer =
-                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
+            try (Trainer trainer = model.newTrainer()) {
                 for (Batch batch : trainer.iterateDataset(mnist)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);
@@ -68,8 +65,7 @@ public class MnistTest {
                             .build();
 
             mnist.prepare();
-            try (Trainer<NDList, NDList, NDList> trainer =
-                    model.newTrainer(new ArrayDataset.DefaultTranslator())) {
+            try (Trainer trainer = model.newTrainer()) {
                 for (Batch batch : trainer.iterateDataset(mnist)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);

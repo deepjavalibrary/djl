@@ -12,14 +12,11 @@
  */
 package org.apache.mxnet.engine;
 
-import java.util.List;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.metric.Metrics;
-import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
@@ -27,52 +24,37 @@ import software.amazon.ai.training.ModelSaver;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.TranslatorContext;
-import software.amazon.ai.util.Pair;
 
-public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
+public class MxTrainer implements Trainer {
 
     private static final Logger logger = LoggerFactory.getLogger(MxTrainer.class);
 
     private MxModel model;
-    private TrainTranslator<I, L, O> translator;
     private Device[] devices;
     private Block block;
     private MxNDManager manager;
     private Metrics metrics;
-    private Integer seed;
-    private long timestamp;
     private TrainingController trainingController;
 
-    MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Device device) {
-        this(model, translator, new Device[] {device});
+    MxTrainer(MxModel model, Device device) {
+        this(model, new Device[] {device});
     }
 
-    MxTrainer(
-            MxModel model,
-            TrainTranslator<I, L, O> translator,
-            Optimizer optimizer,
-            Device device) {
-        this(model, translator, device);
+    MxTrainer(MxModel model, Optimizer optimizer, Device device) {
+        this(model, device);
         trainingController =
                 new TrainingController(block.getParameters(), optimizer, new Device[] {device});
     }
 
-    MxTrainer(
-            MxModel model,
-            TrainTranslator<I, L, O> translator,
-            Optimizer optimizer,
-            Device[] devices) {
-        this(model, translator, devices);
+    MxTrainer(MxModel model, Optimizer optimizer, Device[] devices) {
+        this(model, devices);
         trainingController = new TrainingController(block.getParameters(), optimizer, devices);
     }
 
-    MxTrainer(MxModel model, TrainTranslator<I, L, O> translator, Device[] devices) {
+    MxTrainer(MxModel model, Device[] devices) {
         this.model = model;
         this.manager = (MxNDManager) model.getNDManager().newSubManager();
-        this.translator = translator;
         this.devices = devices;
         this.block = model.getBlock();
     }
@@ -88,72 +70,8 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     }
 
     @Override
-    public TrainTranslator<I, L, O> getTranslator() {
-        return translator;
-    }
-
-    @Override
-    public TranslatorContext getPreprocessContext() {
-        return new TrainerContext();
-    }
-
-    @Override
     public NDList forward(NDList intput) {
         return block.forward(intput);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @SuppressWarnings("PMD.AvoidRethrowingException")
-    public List<O> predict(List<I> input) throws TranslateException {
-        timestamp = System.nanoTime();
-
-        try (TrainerContext inputCtx = new TrainerContext();
-                TrainerContext outputCtx = new TrainerContext()) {
-            NDList ndList = translator.processInputBatch(inputCtx, input);
-            predictPreprocessEnd();
-
-            NDList result = block.forward(ndList);
-            predictForwardEnd(result);
-            return translator.processOutputBatch(outputCtx, result);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new TranslateException(e);
-        } finally {
-            predictPostProcessEnd();
-        }
-    }
-
-    private void predictPreprocessEnd() {
-        if (metrics != null) {
-            long tmp = System.nanoTime();
-            long duration = tmp - timestamp;
-            timestamp = tmp;
-            metrics.addMetric("PredictPreprocess", duration, "nano");
-        }
-    }
-
-    private void predictForwardEnd(NDList list) {
-        if (metrics != null) {
-            // JnaUtils.waitAll();
-            for (Pair<String, NDArray> pair : list) {
-                ((MxNDArray) pair.getValue()).waitToRead();
-            }
-            long tmp = System.nanoTime();
-            long duration = tmp - timestamp;
-            timestamp = tmp;
-            metrics.addMetric("Inference", duration, "nano");
-        }
-    }
-
-    private void predictPostProcessEnd() {
-        if (metrics != null) {
-            long tmp = System.nanoTime();
-            long duration = tmp - timestamp;
-            timestamp = tmp;
-            metrics.addMetric("PredictPostprocess", duration, "nano");
-        }
     }
 
     @Override
@@ -164,16 +82,6 @@ public class MxTrainer<I, L, O> implements Trainer<I, L, O> {
     @Override
     public NDManager getManager() {
         return manager;
-    }
-
-    @Override
-    public Optional<Integer> getSeed() {
-        return Optional.ofNullable(seed);
-    }
-
-    @Override
-    public void setSeed(int seed) {
-        this.seed = seed;
     }
 
     @Override

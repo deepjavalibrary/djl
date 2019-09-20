@@ -110,8 +110,7 @@ public class GradientCollectorIntegrationTest {
                             .optLabels(label)
                             .setSampling(batchSize, true, true)
                             .build();
-            try (Trainer<NDList, NDList, NDList> trainer =
-                    model.newTrainer(new ArrayDataset.DefaultTranslator(), optimizer)) {
+            try (Trainer trainer = model.newTrainer(optimizer)) {
                 for (int epoch = 0; epoch < epochs; epoch++) {
                     lossMetric.reset();
                     for (Batch batch : trainer.iterateDataset(dataset)) {

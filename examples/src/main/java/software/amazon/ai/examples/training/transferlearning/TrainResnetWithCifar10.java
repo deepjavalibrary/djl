@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.dataset.Cifar10;
+import org.apache.mxnet.dataset.transform.cv.ToTensor;
 import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
@@ -35,7 +36,6 @@ import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.initializer.Initializer;
@@ -43,6 +43,7 @@ import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.translate.Pipeline;
 import software.amazon.ai.translate.TranslateException;
 
 public final class TrainResnetWithCifar10 {
@@ -82,26 +83,27 @@ public final class TrainResnetWithCifar10 {
         int batchSize = 50;
         int numEpoch = 2;
         Optimizer optimizer = new Adam.Builder().setRescaleGrad(1.0f / batchSize).build();
+        Pipeline pipeline = new Pipeline(new ToTensor());
         Cifar10 cifar10 =
                 new Cifar10.Builder()
                         .setManager(model.getNDManager())
                         .setUsage(Dataset.Usage.TRAIN)
                         .setSampling(batchSize)
+                        .optPipeline(pipeline)
                         .build();
         cifar10.prepare();
-        try (Trainer<NDList, NDList, NDList> trainer =
-                model.newTrainer(new ArrayDataset.DefaultTranslator(), optimizer)) {
+        try (Trainer trainer = model.newTrainer(optimizer)) {
             Accuracy acc = new Accuracy();
             LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
             for (int epoch = 0; epoch < numEpoch; epoch++) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
-                    NDArray data = batch.getData().head().transpose(0, 3, 1, 2).div(255f);
+                    NDList data = batch.getData();
                     NDArray label = batch.getLabels().head();
                     NDArray pred;
                     NDArray loss;
                     try (GradientCollector gradCol = GradientCollector.newInstance()) {
-                        pred = trainer.predict(new NDList(data)).get(0);
+                        pred = trainer.forward(data).get(0);
                         loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
                         gradCol.backward(loss);
                     }

@@ -31,7 +31,6 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 
 public class MockModel implements Model {
@@ -62,25 +61,22 @@ public class MockModel implements Model {
     public void setBlock(Block block) {}
 
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator) {
+    public Trainer newTrainer() {
         return null;
     }
 
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer) {
+    public Trainer newTrainer(Optimizer optimizer) {
         return null;
     }
 
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device) {
+    public Trainer newTrainer(Optimizer optimizer, Device device) {
         return null;
     }
 
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device[] devices) {
+    public Trainer newTrainer(Optimizer optimizer, Device[] devices) {
         return null;
     }
 

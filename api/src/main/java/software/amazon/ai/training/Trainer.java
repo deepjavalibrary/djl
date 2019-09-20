@@ -13,49 +13,19 @@
 package software.amazon.ai.training;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.TranslateException;
-import software.amazon.ai.translate.TranslatorContext;
 
-public interface Trainer<I, L, O> extends AutoCloseable {
+public interface Trainer extends AutoCloseable {
 
-    TrainTranslator<I, L, O> getTranslator();
-
-    TranslatorContext getPreprocessContext();
-
-    default Iterable<Batch> iterateDataset(Dataset<I, L> dataset) throws IOException {
-        return dataset.getData(this);
+    default Iterable<Batch> iterateDataset(Dataset dataset) throws IOException {
+        return dataset.getData();
     }
 
-    NDList forward(NDList intput);
-
-    /**
-     * Predicts the method used for inference.
-     *
-     * @param input Input follows the inputObject
-     * @return The Output object defined by user
-     * @throws TranslateException if an error occurs during prediction
-     */
-    default O predict(I input) throws TranslateException {
-        return predict(Collections.singletonList(input)).get(0);
-    }
-
-    /**
-     * Predicts the method used for inference.
-     *
-     * @param input Inputs follows the inputObject
-     * @return The Output objects defined by user
-     * @throws TranslateException if an error occurs during prediction
-     */
-    List<O> predict(List<I> input) throws TranslateException;
+    NDList forward(NDList input);
 
     void step();
 
@@ -67,10 +37,6 @@ public interface Trainer<I, L, O> extends AutoCloseable {
     void setMetrics(Metrics metrics);
 
     NDManager getManager();
-
-    Optional<Integer> getSeed();
-
-    void setSeed(int seed);
 
     ModelSaver getModelSaver();
 

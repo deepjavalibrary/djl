@@ -17,14 +17,12 @@ import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.translate.TrainTranslator;
 
 public class CocoTest {
     @Test
@@ -39,8 +37,7 @@ public class CocoTest {
         coco.prepare();
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
-            TrainTranslator<String, double[][], NDList> translator = coco.defaultTranslator();
-            try (Trainer<String, double[][], NDList> trainer = model.newTrainer(translator)) {
+            try (Trainer trainer = model.newTrainer()) {
                 Iterator<Batch> ds = trainer.iterateDataset(coco).iterator();
                 Batch batch = ds.next();
                 Assert.assertEquals(batch.getData().head().getShape(), new Shape(1, 426, 640, 3));

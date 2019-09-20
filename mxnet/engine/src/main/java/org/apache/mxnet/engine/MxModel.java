@@ -46,7 +46,6 @@ import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
@@ -168,30 +167,27 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator) {
-        return new MxTrainer<>(this, trainTranslator, manager.getDevice());
+    public Trainer newTrainer() {
+        return new MxTrainer(this, manager.getDevice());
     }
 
     /** {@inheritDoc} */
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer) {
-        return newTrainer(trainTranslator, optimizer, manager.getDevice());
+    public Trainer newTrainer(Optimizer optimizer) {
+        return newTrainer(optimizer, manager.getDevice());
     }
 
     /** {@inheritDoc} */
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device) {
+    public Trainer newTrainer(Optimizer optimizer, Device device) {
         device = Device.defaultIfNull(device, manager.getDevice());
-        return new MxTrainer<>(this, trainTranslator, optimizer, device);
+        return new MxTrainer(this, optimizer, device);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device[] devices) {
-        return new MxTrainer<>(this, trainTranslator, optimizer, devices);
+    public Trainer newTrainer(Optimizer optimizer, Device[] devices) {
+        return new MxTrainer(this, optimizer, devices);
     }
 
     /** {@inheritDoc} */

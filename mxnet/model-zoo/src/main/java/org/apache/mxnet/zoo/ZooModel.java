@@ -28,7 +28,6 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 
 public class ZooModel<I, O> implements Model {
@@ -63,28 +62,25 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator) {
-        return model.newTrainer(trainTranslator);
+    public Trainer newTrainer() {
+        return model.newTrainer();
     }
 
     /** {@inheritDoc} */
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer) {
-        return model.newTrainer(trainTranslator, optimizer, model.getNDManager().getDevice());
+    public Trainer newTrainer(Optimizer optimizer) {
+        return model.newTrainer(optimizer, model.getNDManager().getDevice());
     }
 
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device[] devices) {
-        return model.newTrainer(trainTranslator, optimizer, devices);
+    public Trainer newTrainer(Optimizer optimizer, Device[] devices) {
+        return model.newTrainer(optimizer, devices);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device) {
-        return model.newTrainer(trainTranslator, optimizer, device);
+    public Trainer newTrainer(Optimizer optimizer, Device device) {
+        return model.newTrainer(optimizer, device);
     }
 
     /** {@inheritDoc} */

@@ -15,7 +15,6 @@ package software.amazon.ai.training.dataset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import software.amazon.ai.training.Trainer;
 
 /** Wraps another subSampler to yield a mini-batch of indices. */
 public class BatchSampler implements Sampler {
@@ -35,9 +34,8 @@ public class BatchSampler implements Sampler {
     }
 
     @Override
-    public Iterator<List<Long>> sample(
-            Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
-        return new Iterate(trainer, dataset);
+    public Iterator<List<Long>> sample(RandomAccessDataset dataset) {
+        return new Iterate(dataset);
     }
 
     class Iterate implements Iterator<List<Long>> {
@@ -46,14 +44,14 @@ public class BatchSampler implements Sampler {
         private long current;
         private Iterator<Long> itemSampler;
 
-        Iterate(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
+        Iterate(RandomAccessDataset dataset) {
             current = 0;
             if (dropLast) {
                 this.size = dataset.size() / batchSize;
             } else {
                 this.size = (dataset.size() + batchSize - 1) / batchSize;
             }
-            itemSampler = subSampler.sample(trainer, dataset);
+            itemSampler = subSampler.sample(dataset);
         }
 
         @Override

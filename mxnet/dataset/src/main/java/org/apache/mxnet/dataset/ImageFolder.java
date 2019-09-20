@@ -21,10 +21,9 @@ import org.apache.mxnet.engine.MxImages.Flag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.training.dataset.Record;
-import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -32,17 +31,18 @@ import software.amazon.ai.util.PairList;
 // TODO put ImageFolder under mxnet for now it should be in Joule-api
 
 /** A dataset for loading image files stored in a folder structure. */
-public class ImageFolder extends RandomAccessDataset<String, Integer> {
-
+public class ImageFolder extends RandomAccessDataset {
     private static final String[] EXT = {".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"};
     private static final Logger logger = LoggerFactory.getLogger(ImageFolder.class);
 
+    private NDManager manager;
     private MxImages.Flag flag;
     private List<String> synsets;
     private PairList<String, Integer> items;
 
     public ImageFolder(Builder builder) {
         super(builder);
+        this.manager = builder.manager;
         this.flag = builder.getFlag();
         this.synsets = new ArrayList<>();
         this.items = new PairList<>();
@@ -50,8 +50,11 @@ public class ImageFolder extends RandomAccessDataset<String, Integer> {
     }
 
     @Override
-    public Pair<String, Integer> get(long index) {
-        return items.get(Math.toIntExact(index));
+    public Record get(long index) {
+        int idx = Math.toIntExact(index);
+        NDList d = new NDList(MxImages.read(manager, items.get(idx).getKey(), flag));
+        NDList l = new NDList(manager.create(items.get(idx).getValue()));
+        return new Record(d, l);
     }
 
     @Override
@@ -89,17 +92,19 @@ public class ImageFolder extends RandomAccessDataset<String, Integer> {
         }
     }
 
-    public DefaultTranslator defaultTranslator() {
-        return new DefaultTranslator();
-    }
-
     public static final class Builder extends BaseBuilder<Builder> {
 
+        private NDManager manager;
         private Flag flag = Flag.COLOR;
         private String root;
 
         @Override
         protected Builder self() {
+            return this;
+        }
+
+        public Builder setManager(NDManager manager) {
+            this.manager = manager;
             return this;
         }
 
@@ -123,26 +128,6 @@ public class ImageFolder extends RandomAccessDataset<String, Integer> {
 
         public ImageFolder build() {
             return new ImageFolder(this);
-        }
-    }
-
-    private class DefaultTranslator implements TrainTranslator<String, Integer, NDList> {
-
-        @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) {
-            return null;
-        }
-
-        @Override
-        public NDList processInput(TranslatorContext ctx, String input) {
-            return new NDList(MxImages.read(ctx.getNDManager(), input, flag));
-        }
-
-        @Override
-        public Record processInput(TranslatorContext ctx, String input, Integer label) {
-            NDList i = new NDList(MxImages.read(ctx.getNDManager(), input, flag));
-            NDList l = new NDList(ctx.getNDManager().create(label));
-            return new Record(i, l);
         }
     }
 }

@@ -24,31 +24,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.training.Trainer;
-import software.amazon.ai.translate.TrainTranslator;
-import software.amazon.ai.translate.TranslatorContext;
-import software.amazon.ai.util.Pair;
+import software.amazon.ai.translate.Pipeline;
 
 // TODO abstract a interface that could be inherited by this and Stream DataIterable
 // where the random reads is expensive
-public class DataIterable<I, L> implements Iterable<Batch> {
-    private RandomAccessDataset<I, L> dataset;
-    private Trainer<I, L, ?> trainer;
+public class DataIterable implements Iterable<Batch> {
+    private RandomAccessDataset dataset;
     private Sampler sampler;
+    private Batchifier batchifier;
+    private Pipeline pipeline;
+    private Pipeline targetPipeline;
     private ExecutorService executor;
     private int preFetchNumber;
     private Device device;
 
     public DataIterable(
-            RandomAccessDataset<I, L> dataset,
-            Trainer<I, L, ?> trainer,
+            RandomAccessDataset dataset,
             Sampler sampler,
+            Batchifier batchifier,
+            Pipeline pipeline,
+            Pipeline targetPipeline,
             ExecutorService executor,
             int preFetchNumber,
             Device device) {
         this.dataset = dataset;
-        this.trainer = trainer;
         this.sampler = sampler;
+        this.batchifier = batchifier;
+        this.pipeline = pipeline;
+        this.targetPipeline = targetPipeline;
         this.executor = executor;
         this.preFetchNumber = preFetchNumber;
         this.device = device;
@@ -56,13 +59,23 @@ public class DataIterable<I, L> implements Iterable<Batch> {
 
     @Override
     public Iterator<Batch> iterator() {
-        return new DataIterator<>(dataset, trainer, sampler, executor, preFetchNumber, device);
+        return new DataIterator(
+                dataset,
+                sampler,
+                batchifier,
+                pipeline,
+                targetPipeline,
+                executor,
+                preFetchNumber,
+                device);
     }
 
-    private static class DataIterator<I, L> implements Iterator<Batch> {
-        private RandomAccessDataset<I, L> dataset;
-        private Trainer<I, L, ?> trainer;
+    private static class DataIterator implements Iterator<Batch> {
+        private RandomAccessDataset dataset;
         private Iterator<List<Long>> sample;
+        private Batchifier batchifier;
+        private Pipeline pipeline;
+        private Pipeline targetPipeline;
         private ExecutorService executor;
         private Device device;
         // for multithreading
@@ -70,15 +83,19 @@ public class DataIterable<I, L> implements Iterable<Batch> {
         private static final Logger logger = LoggerFactory.getLogger(DataIterable.class);
 
         public DataIterator(
-                RandomAccessDataset<I, L> dataset,
-                Trainer<I, L, ?> trainer,
+                RandomAccessDataset dataset,
                 Sampler sampler,
+                Batchifier batchifier,
+                Pipeline pipeline,
+                Pipeline targetPipeline,
                 ExecutorService executor,
                 int prefetchNumber,
                 Device device) {
             this.dataset = dataset;
-            this.trainer = trainer;
-            this.sample = sampler.sample(trainer, dataset);
+            this.sample = sampler.sample(dataset);
+            this.batchifier = batchifier;
+            this.pipeline = pipeline;
+            this.targetPipeline = targetPipeline;
             this.executor = executor;
             this.device = device;
 
@@ -121,30 +138,27 @@ public class DataIterable<I, L> implements Iterable<Batch> {
         private Batch fetch(List<Long> indices) {
             NDList[] data = new NDList[indices.size()];
             NDList[] labels = new NDList[indices.size()];
-            TranslatorContext ctx = trainer.getPreprocessContext();
-            TrainTranslator<I, L, ?> translator = trainer.getTranslator();
             for (int i = 0; i < indices.size(); i++) {
-                Pair<I, L> dataItem = dataset.get(indices.get(i));
-                Record record;
-                try {
-                    record = translator.processInput(ctx, dataItem);
-                } catch (Exception e) {
-                    throw new IllegalStateException("Failed to get next data item", e);
-                }
+                Record record = dataset.get(indices.get(i));
                 data[i] = record.getData();
                 labels[i] = record.getLabels();
             }
-            Batchifier batchifier = translator.getBatchifier();
             NDList batchData = batchifier.batchify(data);
             NDList batchLabels = batchifier.batchify(labels);
+            // apply transform
+            if (pipeline != null) {
+                batchData = pipeline.transform(batchData, false);
+            }
+            // apply label transform
+            if (targetPipeline != null) {
+                batchLabels = targetPipeline.transform(batchLabels, false);
+            }
             // pin to a specific device
             if (device != null) {
                 batchData = batchData.asInContext(device, false);
                 batchLabels = batchLabels.asInContext(device, false);
             }
-            Batch batch = new Batch(trainer.getManager(), batchData, batchLabels);
-            ctx.close();
-            return batch;
+            return new Batch(batchData, batchLabels);
         }
 
         private void preFetch() {

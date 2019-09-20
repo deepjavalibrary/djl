@@ -18,7 +18,7 @@ import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.dataset.Dataset;
 
-public interface ZooDataset<I, L> extends Dataset<I, L> {
+public interface ZooDataset extends Dataset {
 
     MRL getMrl();
 

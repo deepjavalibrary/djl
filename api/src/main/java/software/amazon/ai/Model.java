@@ -27,7 +27,6 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.translate.TrainTranslator;
 import software.amazon.ai.translate.Translator;
 
 /**
@@ -147,54 +146,35 @@ public interface Model extends AutoCloseable {
     /**
      * Creates a new {@link Trainer} instance for a Model.
      *
-     * @param trainTranslator the translator for pre-processing and post-processing
-     * @param <I> Input data object for the Trainer
-     * @param <L> Label data object for the Trainer
-     * @param <O> Output Object for the Trainer
      * @return Trainer
      */
-    <I, L, O> Trainer<I, L, O> newTrainer(TrainTranslator<I, L, O> trainTranslator);
+    Trainer newTrainer();
 
     /**
      * Creates a new {@link Trainer} instance for a Model.
      *
-     * @param trainTranslator the translator for pre-processing and post-processing
      * @param optimizer optimizer used to train this model
-     * @param <I> Input data object for the Trainer
-     * @param <L> Label data object for the Trainer
-     * @param <O> Output Object for the Trainer
      * @return Trainer
      */
-    <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer);
+    Trainer newTrainer(Optimizer optimizer);
 
     /**
      * Creates a new {@link Trainer} instance for a Model.
      *
-     * @param trainTranslator the translator for pre-processing and post-processing
      * @param optimizer optimizer used to train this model
      * @param device device used for training the model, can be CPU/GPU
-     * @param <I> Input data object for the Trainer
-     * @param <L> Label data object for the Trainer
-     * @param <O> Output Object for the Trainer
      * @return Trainer
      */
-    <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device device);
+    Trainer newTrainer(Optimizer optimizer, Device device);
 
     /**
      * Creates a new {@link Trainer} instance for a Model.
      *
-     * @param trainTranslator the translator for pre-processing and post-processing
      * @param optimizer optimizer used to train this model
      * @param devices array of {@link Device} to run parallel, for multi-GPU training
-     * @param <I> Input data object for the Trainer
-     * @param <L> Label data object for the Trainer
-     * @param <O> Output Object for the Trainer
      * @return Trainer
      */
-    <I, L, O> Trainer<I, L, O> newTrainer(
-            TrainTranslator<I, L, O> trainTranslator, Optimizer optimizer, Device[] devices);
+    Trainer newTrainer(Optimizer optimizer, Device[] devices);
 
     /**
      * Creates a new Predictor based on the model.

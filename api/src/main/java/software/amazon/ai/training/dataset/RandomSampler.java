@@ -16,10 +16,16 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.stream.LongStream;
-import software.amazon.ai.training.Trainer;
 import software.amazon.ai.util.RandomUtils;
 
 public class RandomSampler implements Sampler.SubSampler {
+    private Integer seed;
+
+    public RandomSampler() {}
+
+    public RandomSampler(int seed) {
+        this.seed = seed;
+    }
 
     private static void swap(long[] arr, int i, int j) {
         long tmp = arr[i];
@@ -28,8 +34,8 @@ public class RandomSampler implements Sampler.SubSampler {
     }
 
     @Override
-    public Iterator<Long> sample(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
-        return new Iterate(trainer, dataset);
+    public Iterator<Long> sample(RandomAccessDataset dataset) {
+        return new Iterate(dataset, seed);
     }
 
     static class Iterate implements Iterator<Long> {
@@ -37,11 +43,11 @@ public class RandomSampler implements Sampler.SubSampler {
         private long[] indices;
         private long current;
 
-        Iterate(Trainer<?, ?, ?> trainer, RandomAccessDataset<?, ?> dataset) {
+        Iterate(RandomAccessDataset dataset, Integer seed) {
             long size = dataset.size();
             current = 0;
             indices = LongStream.range(0, size).toArray();
-            Random rnd = trainer.getSeed().map(Random::new).orElse(RandomUtils.RANDOM);
+            Random rnd = (seed != null) ? new Random(seed) : RandomUtils.RANDOM;
             // java array didn't support index greater than max integer
             // so cast to int for now
             for (int i = Math.toIntExact(size) - 1; i > 0; --i) {
