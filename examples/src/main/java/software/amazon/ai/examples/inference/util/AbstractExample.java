@@ -125,10 +125,13 @@ public abstract class AbstractExample {
 
                 logger.info("Inference result: {}", lastResult);
 
-                float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
-                float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1_000_000f;
-
-                logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
+                if (metrics.hasMetric("Inference")) {
+                    float p50 =
+                            metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
+                    float p90 =
+                            metrics.percentile("Inference", 90).getValue().longValue() / 1_000_000f;
+                    logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
+                }
 
                 dumpMemoryInfo(metrics, arguments.getLogDir());
 

@@ -65,6 +65,10 @@ public class Metrics {
         addMetric(new Metric(name, value, unit));
     }
 
+    public boolean hasMetric(String name) {
+        return metrics.containsKey(name);
+    }
+
     /**
      * Returns a list of {@link Metrics} with the specified metric name.
      *

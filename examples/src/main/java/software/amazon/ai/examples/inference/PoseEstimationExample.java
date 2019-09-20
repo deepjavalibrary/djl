@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,9 +27,11 @@ import javax.imageio.ImageIO;
 import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
+import org.slf4j.Logger;
 import software.amazon.ai.Device;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
+import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.cv.DetectedObject;
@@ -37,6 +40,8 @@ import software.amazon.ai.modality.cv.Joint;
 import software.amazon.ai.translate.TranslateException;
 
 public class PoseEstimationExample extends AbstractExample {
+
+    private static final Logger logger = LogUtils.getLogger(PoseEstimationExample.class);
 
     public static void main(String[] args) {
         new PoseEstimationExample().runExample(args);
@@ -86,6 +91,11 @@ public class PoseEstimationExample extends AbstractExample {
                                                 (int) (rect.getWidth() * imageWidth),
                                                 (int) (rect.getHeight() * imageHeight)))
                         .collect(Collectors.toList());
+
+        if (filtered.isEmpty()) {
+            logger.warn("No person found in image.");
+            return Collections.emptyList();
+        }
 
         /* Pose recognition */
         try (Predictor<BufferedImage, List<Joint>> posePredictor = pose.newPredictor(device)) {

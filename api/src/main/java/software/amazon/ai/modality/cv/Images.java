@@ -16,6 +16,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -139,6 +140,7 @@ public final class Images {
         Graphics2D g = (Graphics2D) image.getGraphics();
         int stroke = 2;
         g.setStroke(new BasicStroke(stroke));
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
@@ -147,6 +149,7 @@ public final class Images {
             String className = result.getClassName();
             BoundingBox box = result.getBoundingBox();
             g.setPaint(randomColor().darker());
+
             box.draw(g, imageWidth, imageHeight);
             Point p = box.getPoint();
             int x = (int) (p.getX() * imageWidth);

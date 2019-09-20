@@ -47,11 +47,11 @@ public class Arguments {
     public static Options getOptions() {
         Options options = new Options();
         options.addOption(
-                Option.builder("u")
-                        .longOpt("model-url")
+                Option.builder("p")
+                        .longOpt("model-dir")
                         .hasArg()
-                        .argName("MODEL-URL")
-                        .desc("URL to download model archive.")
+                        .argName("MODEL-DIR")
+                        .desc("Path to the model directory.")
                         .build());
         options.addOption(
                 Option.builder("n")
@@ -104,6 +104,9 @@ public class Arguments {
     }
 
     public String getModelName() {
+        if (modelName == null) {
+            throw new IllegalArgumentException("Missing --model-name parameter.");
+        }
         return modelName;
     }
 
