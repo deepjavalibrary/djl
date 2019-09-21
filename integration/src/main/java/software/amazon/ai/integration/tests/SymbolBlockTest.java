@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.mxnet.engine.MxGradientCollector;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -148,7 +149,7 @@ public class SymbolBlockTest {
         NDArray label = manager.arange(0, 10);
         NDArray gradMean;
         NDArray pred;
-        try (GradientCollector gradCol = GradientCollector.newInstance()) {
+        try (GradientCollector gradCol = new MxGradientCollector()) {
             pred = mlp.forward(new NDList(data)).head();
             NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
             gradCol.backward(loss);

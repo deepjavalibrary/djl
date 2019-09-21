@@ -59,15 +59,14 @@ public class GradientCollectorIntegrationTest {
     @RunAsTest
     public void testAutograd() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager();
-                GradientCollector gradCol = GradientCollector.newInstance()) {
+                MxGradientCollector gradCol = new MxGradientCollector()) {
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             lhs.attachGradient();
             // autograd automatically set recording and training during initialization
-            if (gradCol instanceof MxGradientCollector) {
-                Assertions.assertTrue(MxGradientCollector.isRecording());
-                Assertions.assertTrue(MxGradientCollector.isTraining());
-            }
+            Assertions.assertTrue(MxGradientCollector.isRecording());
+            Assertions.assertTrue(MxGradientCollector.isTraining());
+
             NDArray result = NDArrays.mmul(lhs, rhs);
             gradCol.backward(result);
         }
@@ -114,7 +113,7 @@ public class GradientCollectorIntegrationTest {
                 for (int epoch = 0; epoch < epochs; epoch++) {
                     lossMetric.reset();
                     for (Batch batch : trainer.iterateDataset(dataset)) {
-                        try (GradientCollector gradCol = GradientCollector.newInstance()) {
+                        try (GradientCollector gradCol = trainer.newGradientCollector()) {
 
                             NDArray x = batch.getData().head();
                             NDArray y = batch.getLabels().head();
@@ -165,7 +164,7 @@ public class GradientCollectorIntegrationTest {
             TrainingController controller =
                     new TrainingController(
                             parameters, optimizer, new Device[] {manager.getDevice()});
-            try (GradientCollector gradCol = GradientCollector.newInstance()) {
+            try (GradientCollector gradCol = new MxGradientCollector()) {
                 NDArray pred = resNet50.forward(new NDList(input)).head();
                 NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
                 gradCol.backward(loss);

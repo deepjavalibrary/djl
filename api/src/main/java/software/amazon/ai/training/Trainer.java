@@ -25,6 +25,8 @@ public interface Trainer extends AutoCloseable {
         return dataset.getData();
     }
 
+    GradientCollector newGradientCollector();
+
     NDList forward(NDList input);
 
     void step();

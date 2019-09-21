@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.training;
 
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDArray;
 
 /**
@@ -22,10 +21,6 @@ import software.amazon.ai.ndarray.NDArray;
  * final time.
  */
 public interface GradientCollector extends AutoCloseable {
-
-    static GradientCollector newInstance() {
-        return Engine.getInstance().newGradientCollector();
-    }
 
     /**
      * Run backward and calculate gradient w.r.t previously marked variable (head).

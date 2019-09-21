@@ -14,6 +14,7 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
+import org.apache.mxnet.engine.MxGradientCollector;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -39,7 +40,7 @@ public class NDArrayElementArithmeticOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray lhs = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
             NDArray result;
-            try (GradientCollector gradCol = GradientCollector.newInstance()) {
+            try (GradientCollector gradCol = new MxGradientCollector()) {
                 lhs.attachGradient();
                 result = NDArrays.add(lhs, 2);
                 // check add scalar result

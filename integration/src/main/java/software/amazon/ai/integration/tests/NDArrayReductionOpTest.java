@@ -54,7 +54,7 @@ public class NDArrayReductionOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
-            Float minAll = original.min().getFloat();
+            float minAll = original.min().getFloat();
             Assertions.assertEquals(2, minAll, "Incorrect min all");
 
             NDArray minAxes = original.min(new int[] {1});
@@ -72,7 +72,7 @@ public class NDArrayReductionOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
-            Float sumAll = original.sum().getFloat();
+            float sumAll = original.sum().getFloat();
             Assertions.assertEquals(20, sumAll, "Incorrect sum all");
             NDArray sumAxes = original.sum(new int[] {1});
             NDArray sumAxesExpected = manager.create(new float[] {6, 14});

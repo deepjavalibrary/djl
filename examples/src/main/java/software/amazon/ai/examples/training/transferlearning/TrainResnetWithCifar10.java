@@ -100,7 +100,7 @@ public final class TrainResnetWithCifar10 {
                     NDArray label = batch.getLabels().head();
                     NDArray pred;
                     NDArray loss;
-                    try (GradientCollector gradCol = GradientCollector.newInstance()) {
+                    try (GradientCollector gradCol = trainer.newGradientCollector()) {
                         pred = trainer.forward(data).get(0);
                         loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
                         gradCol.backward(loss);

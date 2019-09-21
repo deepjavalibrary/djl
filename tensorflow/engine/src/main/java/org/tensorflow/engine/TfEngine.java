@@ -18,7 +18,6 @@ import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.optimizer.Optimizer;
 
@@ -59,11 +58,6 @@ public class TfEngine extends Engine {
     @Override
     public String getVersion() {
         return TensorFlow.version();
-    }
-
-    @Override
-    public GradientCollector newGradientCollector() {
-        return null;
     }
 
     /** {@inheritDoc} */

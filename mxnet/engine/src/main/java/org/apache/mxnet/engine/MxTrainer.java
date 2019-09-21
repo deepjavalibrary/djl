@@ -20,6 +20,7 @@ import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ModelSaver;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingController;
@@ -57,6 +58,11 @@ public class MxTrainer implements Trainer {
         this.manager = (MxNDManager) model.getNDManager().newSubManager();
         this.devices = devices;
         this.block = model.getBlock();
+    }
+
+    @Override
+    public GradientCollector newGradientCollector() {
+        return new MxGradientCollector();
     }
 
     @Override

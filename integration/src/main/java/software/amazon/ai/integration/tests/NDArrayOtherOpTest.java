@@ -14,6 +14,7 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
+import org.apache.mxnet.engine.MxGradientCollector;
 import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -251,7 +252,7 @@ public class NDArrayOtherOpTest {
                     manager.create(new float[] {1, 3, 2, 4}, new Shape(2, 2, 1));
             Assertions.assertEquals(transposeAll, transposeAllExpected, "Incorrect transpose all");
 
-            NDArray transpose = original.transpose(new int[] {1, 0, 2});
+            NDArray transpose = original.transpose(1, 0, 2);
             NDArray transposeExpected =
                     manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 1, 2));
             Assertions.assertEquals(transpose, transposeExpected, "Incorrect transpose all");
@@ -325,7 +326,7 @@ public class NDArrayOtherOpTest {
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             NDArray result;
-            try (GradientCollector gradCol = GradientCollector.newInstance()) {
+            try (GradientCollector gradCol = new MxGradientCollector()) {
                 lhs.attachGradient();
                 result = NDArrays.mmul(lhs, rhs);
                 gradCol.backward(result);

@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.optimizer.Optimizer;
 
@@ -129,13 +128,6 @@ public abstract class Engine {
      * @return a new Model instance using the network defined in block
      */
     public abstract Model newModel(Device device);
-
-    /**
-     * Creates a new {@link GradientCollector} instance for this Engine.
-     *
-     * @return Returns the GradientCollector
-     */
-    public abstract GradientCollector newGradientCollector();
 
     /**
      * An internal helper to get the Engine specific implementation for parameter store.

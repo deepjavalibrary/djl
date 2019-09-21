@@ -13,12 +13,26 @@
 package software.amazon.ai.test.mock;
 
 import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ModelSaver;
 import software.amazon.ai.training.Trainer;
 
 public class MockTrainer implements Trainer {
+
+    @Override
+    public GradientCollector newGradientCollector() {
+        return new GradientCollector() {
+
+            @Override
+            public void backward(NDArray target) {}
+
+            @Override
+            public void close() {}
+        };
+    }
 
     @Override
     public void step() {}

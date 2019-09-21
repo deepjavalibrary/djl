@@ -42,7 +42,6 @@ import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
 import software.amazon.ai.translate.Pipeline;
-import software.amazon.ai.translate.TranslateException;
 
 public final class TrainMnist {
 
@@ -53,7 +52,7 @@ public final class TrainMnist {
 
     private TrainMnist() {}
 
-    public static void main(String[] args) throws IOException, TranslateException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException {
         Options options = Arguments.getOptions();
         DefaultParser parser = new DefaultParser();
         org.apache.commons.cli.CommandLine cmd = parser.parse(options, args, null, false);
@@ -71,7 +70,7 @@ public final class TrainMnist {
                 .add(new Linear.Builder().setOutChannels(10).build());
     }
 
-    public static void trainMnist(Arguments arguments) throws IOException, TranslateException {
+    public static void trainMnist(Arguments arguments) throws IOException {
         int batchSize = arguments.getBatchSize();
         Block mlp = constructBlock();
         int numGpus = arguments.getNumGpus();
@@ -117,7 +116,7 @@ public final class TrainMnist {
                         NDList labelSplit = DatasetUtils.splitAndLoad(label, devices, false);
                         NDArray[] pred = new NDArray[devices.length];
                         NDArray[] loss = new NDArray[devices.length];
-                        try (GradientCollector gradCol = GradientCollector.newInstance()) {
+                        try (GradientCollector gradCol = trainer.newGradientCollector()) {
                             for (int i = 0; i < dataSplit.size(); i++) {
                                 pred[i] = trainer.forward(new NDList(dataSplit.get(i))).get(0);
                                 loss[i] =

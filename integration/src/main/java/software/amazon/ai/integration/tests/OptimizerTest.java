@@ -14,6 +14,7 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
+import org.apache.mxnet.engine.MxGradientCollector;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.IntegrationTest;
@@ -149,7 +150,7 @@ public class OptimizerTest {
         try (TrainingController controller =
                 new TrainingController(
                         block.getParameters(), optim, new Device[] {manager.getDevice()})) {
-            try (GradientCollector gradCol = GradientCollector.newInstance()) {
+            try (GradientCollector gradCol = new MxGradientCollector()) {
                 NDArray pred = block.forward(new NDList(data)).head();
                 NDArray loss = Loss.l2Loss(label, pred);
                 gradCol.backward(loss);
