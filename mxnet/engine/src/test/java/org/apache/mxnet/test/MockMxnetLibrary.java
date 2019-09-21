@@ -541,38 +541,6 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
-    public int MXNDArrayLoad64(
-            String fname,
-            LongBuffer out_size,
-            PointerByReference out_arr,
-            LongBuffer out_name_size,
-            PointerByReference out_names) {
-        if (functions.containsKey("MXNDArrayLoad64")) {
-            return functions
-                    .get("MXNDArrayLoad64")
-                    .apply(new Object[] {fname, out_size, out_arr, out_name_size, out_names});
-        }
-
-        out_size.put(0, 3);
-        out_name_size.put(0, 3);
-
-        PointerArray ndarrays =
-                new PointerArray(
-                        TestHelper.toPointer("A:" + fname),
-                        TestHelper.toPointer("B:b"),
-                        TestHelper.toPointer("C:c"));
-        PointerArray names =
-                new PointerArray(
-                        TestHelper.toPointer("A:" + fname),
-                        TestHelper.toPointer("B:b"),
-                        TestHelper.toPointer("C:c"));
-
-        out_arr.setValue(ndarrays);
-        out_names.setValue(names);
-        return 0;
-    }
-
-    @Override
     public int MXNDArrayLoadFromBuffer(
             Pointer ndarray_buffer,
             NativeSize size,
@@ -583,25 +551,6 @@ public class MockMxnetLibrary implements MxnetLibrary {
         if (functions.containsKey("MXNDArrayLoadFromBuffer")) {
             return functions
                     .get("MXNDArrayLoadFromBuffer")
-                    .apply(
-                            new Object[] {
-                                ndarray_buffer, size, out_size, out_arr, out_name_size, out_names
-                            });
-        }
-        return 0;
-    }
-
-    @Override
-    public int MXNDArrayLoadFromBuffer64(
-            Pointer ndarray_buffer,
-            NativeSize size,
-            LongBuffer out_size,
-            PointerByReference out_arr,
-            LongBuffer out_name_size,
-            PointerByReference out_names) {
-        if (functions.containsKey("MXNDArrayLoadFromBuffer64")) {
-            return functions
-                    .get("MXNDArrayLoadFromBuffer64")
                     .apply(
                             new Object[] {
                                 ndarray_buffer, size, out_size, out_arr, out_name_size, out_names
@@ -1313,6 +1262,17 @@ public class MockMxnetLibrary implements MxnetLibrary {
         outputs.setValue(arr);
         Pointer sTypes = TestHelper.toPointer(new int[] {0, 0, 1});
         out_stypes.setValue(sTypes);
+        return 0;
+    }
+
+    @Override
+    public int MXCachedOpRegisterOpHook(
+            Pointer handle, CachedOpMonitorCallback callback, byte monitor_all) {
+        if (functions.containsKey("MXCachedOpRegisterOpHook")) {
+            return functions
+                    .get("MXCachedOpRegisterOpHook")
+                    .apply(new Object[] {handle, callback, monitor_all});
+        }
         return 0;
     }
 
@@ -2043,7 +2003,10 @@ public class MockMxnetLibrary implements MxnetLibrary {
             int num_offline,
             String[] offline_params,
             String quantized_dtype,
-            byte calib_quantize) {
+            byte calib_quantize,
+            String quantize_mode,
+            IntBuffer out_num_calib_names,
+            PointerByReference out_calib_names) {
         if (functions.containsKey("MXQuantizeSymbol")) {
             return functions
                     .get("MXQuantizeSymbol")
@@ -2059,7 +2022,10 @@ public class MockMxnetLibrary implements MxnetLibrary {
                                 num_offline,
                                 offline_params,
                                 quantized_dtype,
-                                calib_quantize
+                                calib_quantize,
+                                quantize_mode,
+                                out_num_calib_names,
+                                out_calib_names
                             });
         }
         return 0;
@@ -2164,6 +2130,36 @@ public class MockMxnetLibrary implements MxnetLibrary {
             return functions
                     .get("MXGenAtomicSymbolFromSymbol")
                     .apply(new Object[] {sym_handle, ret_sym_handle});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXOptimizeForBackend(
+            Pointer sym_handle,
+            String backend_name,
+            int dev_type,
+            PointerByReference ret_sym_handle,
+            int len,
+            PointerByReference in_args_handle,
+            int num_options,
+            String[] keys,
+            String[] vals) {
+        if (functions.containsKey("MXOptimizeForBackend")) {
+            return functions
+                    .get("MXOptimizeForBackend")
+                    .apply(
+                            new Object[] {
+                                sym_handle,
+                                backend_name,
+                                dev_type,
+                                ret_sym_handle,
+                                len,
+                                in_args_handle,
+                                num_options,
+                                keys,
+                                vals
+                            });
         }
         return 0;
     }
@@ -2885,6 +2881,42 @@ public class MockMxnetLibrary implements MxnetLibrary {
             return functions
                     .get("MXKVStorePullRowSparseEx")
                     .apply(new Object[] {handle, num, keys, vals, row_ids, priority});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXKVStorePushPull(
+            Pointer handle,
+            int vnum,
+            int[] vkeys,
+            int onum,
+            int[] okeys,
+            PointerByReference vals,
+            PointerByReference outs,
+            int priority) {
+        if (functions.containsKey("MXKVStorePushPull")) {
+            return functions
+                    .get("MXKVStorePushPull")
+                    .apply(new Object[] {handle, vnum, vkeys, onum, okeys, vals, outs, priority});
+        }
+        return 0;
+    }
+
+    @Override
+    public int MXKVStorePushPullEx(
+            Pointer handle,
+            int vnum,
+            String[] vkeys,
+            int onum,
+            String[] okeys,
+            PointerByReference vals,
+            PointerByReference outs,
+            int priority) {
+        if (functions.containsKey("MXKVStorePushPullEx")) {
+            return functions
+                    .get("MXKVStorePushPullEx")
+                    .apply(new Object[] {handle, vnum, vkeys, onum, okeys, vals, outs, priority});
         }
         return 0;
     }
