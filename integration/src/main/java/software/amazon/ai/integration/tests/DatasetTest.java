@@ -34,14 +34,19 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.training.Activation;
+import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.BatchSampler;
 import software.amazon.ai.training.dataset.RandomSampler;
 import software.amazon.ai.training.dataset.SequenceSampler;
+import software.amazon.ai.training.initializer.Initializer;
 
 public class DatasetTest {
+
+    private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
     public static void main(String[] args) {
         String[] cmd = {"-c", DatasetTest.class.getName()};
@@ -67,7 +72,7 @@ public class DatasetTest {
                             .build();
 
             List<Long> original = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
@@ -93,7 +98,7 @@ public class DatasetTest {
                             .setSampler(new BatchSampler(new RandomSampler(), 1, false))
                             .build();
             List<Long> original = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
@@ -118,7 +123,7 @@ public class DatasetTest {
                             .setSampler(new BatchSampler(new SequenceSampler(), 27, false))
                             .build();
             List<long[]> originalList = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
@@ -137,7 +142,7 @@ public class DatasetTest {
                             .setSampler(new BatchSampler(new RandomSampler(), 33, true))
                             .build();
             List<long[]> originalList2 = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 trainer.iterateDataset(dataset2)
                         .iterator()
                         .forEachRemaining(
@@ -153,7 +158,7 @@ public class DatasetTest {
                             .setSampler(new BatchSampler(new SequenceSampler(), 101, true))
                             .build();
             List<long[]> originalList3 = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 trainer.iterateDataset(dataset3)
                         .iterator()
                         .forEachRemaining(
@@ -169,7 +174,7 @@ public class DatasetTest {
                             .setSampler(new BatchSampler(new SequenceSampler(), 101, false))
                             .build();
             List<long[]> originalList4 = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 trainer.iterateDataset(dataset4)
                         .iterator()
                         .forEachRemaining(
@@ -198,7 +203,7 @@ public class DatasetTest {
                             .build();
 
             int index = 0;
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(dataset)) {
                     Assertions.assertEquals(
                             batch.getData().get(0),
@@ -267,7 +272,7 @@ public class DatasetTest {
                             .build();
 
             cifar10.prepare();
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     batch.close();
                 }

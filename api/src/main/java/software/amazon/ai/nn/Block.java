@@ -39,19 +39,15 @@ public interface Block {
 
     List<Parameter> getDirectParameters();
 
-    void setInitializer(NDManager manager, Initializer initializer, String paramName);
-
-    void setInitializer(NDManager manager, Initializer initializer);
-
-    void setInitializer(NDManager manager, Initializer initializer, boolean overwrite);
-
-    void setInitializer(NDManager manager, Initializer initializer, Device[] devices);
-
     void setInitializer(
             NDManager manager, Initializer initializer, boolean overwrite, Device[] devices);
 
     void setInitializer(
-            NDManager manager, Initializer initializer, String paramName, boolean overwrite);
+            NDManager manager,
+            Initializer initializer,
+            boolean overwrite,
+            Device[] devices,
+            String paramName);
 
     boolean isInitialized();
 

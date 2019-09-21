@@ -38,8 +38,11 @@ import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.repository.ZipUtils;
+import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
+import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
@@ -55,10 +58,11 @@ public class SymbolBlockTest {
     }
 
     @RunAsTest
-    public void testInference() throws FailedTestException, IOException {
+    public void testForward() throws FailedTestException, IOException {
         Path modelDir = prepareModel();
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
+
             NDManager manager = model.getNDManager();
 
             Block block = model.getBlock();
@@ -71,91 +75,110 @@ public class SymbolBlockTest {
     @RunAsTest
     public void trainWithNewParam() throws FailedTestException, IOException {
         Path modelDir = prepareModel();
+
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
-            NDManager manager = model.getNDManager();
-            Block mlp = model.getBlock();
-            mlp.setInitializer(manager, Initializer.ONES, true);
-            Pair<NDArray, NDArray> result = train(manager, mlp);
-            Assertions.assertAlmostEquals(manager.create(6430785.5), result.getKey());
-            Assertions.assertAlmostEquals(
-                    manager.create(
-                            new float[] {
-                                2.38418579e-06f,
-                                2.38418579e-06f,
-                                2.92435288e-05f,
-                                3.72529030e-08f,
-                                1.43556367e-03f,
-                                -2.30967991e-08f
-                            }),
-                    result.getValue());
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                NDManager manager = trainer.getManager();
+
+                Pair<NDArray, NDArray> result = train(manager, trainer, model.getBlock());
+                Assertions.assertAlmostEquals(manager.create(6430785.5), result.getKey());
+                Assertions.assertAlmostEquals(
+                        manager.create(
+                                new float[] {
+                                    2.38418579e-06f,
+                                    2.38418579e-06f,
+                                    2.92435288e-05f,
+                                    3.72529030e-08f,
+                                    1.43556367e-03f,
+                                    -2.30967991e-08f
+                                }),
+                        result.getValue());
+            }
         }
     }
 
     @RunAsTest
     public void trainWithExistParam() throws FailedTestException, IOException {
         Path modelDir = prepareModel();
+
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
-            NDManager manager = model.getNDManager();
-            Block mlp = model.getBlock();
-            Pair<NDArray, NDArray> result = train(manager, mlp);
-            Assertions.assertAlmostEquals(manager.create(0.29814255237579346), result.getKey());
-            Assertions.assertAlmostEquals(
-                    manager.create(
-                            new float[] {
-                                1.51564837e-01f,
-                                1.51564837e-01f,
-                                9.12832543e-02f,
-                                4.07614917e-01f,
-                                -1.78348269e-08f,
-                                -1.19209291e-08f
-                            }),
-                    result.getValue());
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                NDManager manager = trainer.getManager();
+
+                Pair<NDArray, NDArray> result = train(manager, trainer, model.getBlock());
+                Assertions.assertAlmostEquals(manager.create(0.29814255237579346), result.getKey());
+                Assertions.assertAlmostEquals(
+                        manager.create(
+                                new float[] {
+                                    1.51564837e-01f,
+                                    1.51564837e-01f,
+                                    9.12832543e-02f,
+                                    4.07614917e-01f,
+                                    -1.78348269e-08f,
+                                    -1.19209291e-08f
+                                }),
+                        result.getValue());
+            }
         }
     }
 
     @RunAsTest
     public void trainWithCustomLayer() throws FailedTestException, IOException {
         Path modelDir = prepareModel();
+
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
+
             NDManager manager = model.getNDManager();
+
             SymbolBlock mlp = (SymbolBlock) model.getBlock();
             SequentialBlock newMlp = new SequentialBlock();
             newMlp.add(mlp.removeLastBlock());
             Linear linear = new Linear.Builder().setOutChannels(10).build();
-            linear.setInitializer(manager, Initializer.ONES, true);
+
+            // TODO: Fix SymblocBlock reinitilize issue
+            linear.setInitializer(manager, Initializer.ONES, true, config.getDevices());
             newMlp.add(linear);
 
-            Pair<NDArray, NDArray> result = train(manager, newMlp);
-            Assertions.assertAlmostEquals(manager.create(18.357540130615234), result.getKey());
-            Assertions.assertAlmostEquals(
-                    manager.create(
-                            new float[] {
-                                1.54082624e-09f,
-                                1.54082624e-09f,
-                                3.12847304e-09f,
-                                1.39698386e-08f,
-                                -7.56020135e-09f,
-                                -2.30967991e-08f
-                            }),
-                    result.getValue());
+            model.setBlock(newMlp);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                Pair<NDArray, NDArray> result = train(manager, trainer, newMlp);
+                Assertions.assertAlmostEquals(manager.create(18.357540130615234), result.getKey());
+                Assertions.assertAlmostEquals(
+                        manager.create(
+                                new float[] {
+                                    1.54082624e-09f,
+                                    1.54082624e-09f,
+                                    3.12847304e-09f,
+                                    1.39698386e-08f,
+                                    -7.56020135e-09f,
+                                    -2.30967991e-08f
+                                }),
+                        result.getValue());
+            }
         }
     }
 
-    private Pair<NDArray, NDArray> train(NDManager manager, Block mlp) {
+    private Pair<NDArray, NDArray> train(NDManager manager, Trainer trainer, Block block) {
         NDArray data = manager.ones(new Shape(10, 28 * 28));
         NDArray label = manager.arange(0, 10);
         NDArray gradMean;
         NDArray pred;
         try (GradientCollector gradCol = new MxGradientCollector()) {
-            pred = mlp.forward(new NDList(data)).head();
+            pred = trainer.forward(new NDList(data)).head();
             NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
             gradCol.backward(loss);
         }
         List<NDArray> grads =
-                mlp.getParameters()
+                block.getParameters()
                         .stream()
                         .map(
                                 stringParameterPair ->

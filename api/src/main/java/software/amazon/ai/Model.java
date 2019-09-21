@@ -25,8 +25,7 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.initializer.Initializer;
-import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.translate.Translator;
 
 /**
@@ -146,35 +145,10 @@ public interface Model extends AutoCloseable {
     /**
      * Creates a new {@link Trainer} instance for a Model.
      *
+     * @param trainingConfig training configuration settings
      * @return Trainer
      */
-    Trainer newTrainer();
-
-    /**
-     * Creates a new {@link Trainer} instance for a Model.
-     *
-     * @param optimizer optimizer used to train this model
-     * @return Trainer
-     */
-    Trainer newTrainer(Optimizer optimizer);
-
-    /**
-     * Creates a new {@link Trainer} instance for a Model.
-     *
-     * @param optimizer optimizer used to train this model
-     * @param device device used for training the model, can be CPU/GPU
-     * @return Trainer
-     */
-    Trainer newTrainer(Optimizer optimizer, Device device);
-
-    /**
-     * Creates a new {@link Trainer} instance for a Model.
-     *
-     * @param optimizer optimizer used to train this model
-     * @param devices array of {@link Device} to run parallel, for multi-GPU training
-     * @return Trainer
-     */
-    Trainer newTrainer(Optimizer optimizer, Device[] devices);
+    Trainer newTrainer(TrainingConfig trainingConfig);
 
     /**
      * Creates a new Predictor based on the model.
@@ -198,14 +172,6 @@ public interface Model extends AutoCloseable {
      * @return instance of {@code Predictor}
      */
     <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device);
-
-    void setInitializer(Initializer initializer);
-
-    void setInitializer(Initializer initializer, boolean overwrite);
-
-    void setInitializer(Initializer initializer, Device[] devices);
-
-    void setInitializer(Initializer initializer, boolean overwrite, Device[] devices);
 
     /**
      * Returns the input descriptor of the model.

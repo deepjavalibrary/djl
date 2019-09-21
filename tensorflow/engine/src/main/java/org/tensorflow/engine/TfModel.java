@@ -36,8 +36,7 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.initializer.Initializer;
-import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.translate.Translator;
 
 public class TfModel implements Model {
@@ -123,40 +122,10 @@ public class TfModel implements Model {
     @Override
     public void setBlock(Block block) {}
 
-    /** {@inheritDoc} */
     @Override
-    public Trainer newTrainer() {
+    public Trainer newTrainer(TrainingConfig trainingConfig) {
         return null;
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public Trainer newTrainer(Optimizer optimizer) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Trainer newTrainer(Optimizer optimizer, Device device) {
-        return null;
-    }
-
-    @Override
-    public Trainer newTrainer(Optimizer optimizer, Device[] devices) {
-        return null;
-    }
-
-    @Override
-    public void setInitializer(Initializer initializer, Device[] devices) {}
-
-    @Override
-    public void setInitializer(Initializer initializer, boolean overwrite, Device[] devices) {}
-
-    @Override
-    public void setInitializer(Initializer initializer) {}
-
-    @Override
-    public void setInitializer(Initializer initializer, boolean overwrite) {}
 
     /** {@inheritDoc} */
     @Override

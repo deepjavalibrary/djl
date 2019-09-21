@@ -31,8 +31,7 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.initializer.Initializer;
-import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.translate.Translator;
 
 public class MockModel implements Model {
@@ -63,22 +62,7 @@ public class MockModel implements Model {
     public void setBlock(Block block) {}
 
     @Override
-    public Trainer newTrainer() {
-        return null;
-    }
-
-    @Override
-    public Trainer newTrainer(Optimizer optimizer) {
-        return null;
-    }
-
-    @Override
-    public Trainer newTrainer(Optimizer optimizer, Device device) {
-        return null;
-    }
-
-    @Override
-    public Trainer newTrainer(Optimizer optimizer, Device[] devices) {
+    public Trainer newTrainer(TrainingConfig trainingConfig) {
         return null;
     }
 
@@ -86,18 +70,6 @@ public class MockModel implements Model {
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
         return new BasePredictor<>(this, new MockNDManager(), translator, device);
     }
-
-    @Override
-    public void setInitializer(Initializer initializer) {}
-
-    @Override
-    public void setInitializer(Initializer initializer, boolean overwrite) {}
-
-    @Override
-    public void setInitializer(Initializer initializer, Device[] devices) {}
-
-    @Override
-    public void setInitializer(Initializer initializer, boolean overwrite, Device[] devices) {}
 
     @Override
     public DataDesc[] describeInput() {

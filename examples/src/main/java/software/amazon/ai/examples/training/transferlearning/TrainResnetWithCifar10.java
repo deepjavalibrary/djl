@@ -23,7 +23,6 @@ import org.apache.mxnet.zoo.ModelNotFoundException;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.apache.mxnet.zoo.ZooModel;
 import org.slf4j.Logger;
-import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.modality.Classification;
@@ -33,12 +32,14 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Adam;
@@ -61,20 +62,6 @@ public final class TrainResnetWithCifar10 {
         model.close();
     }
 
-    public static void reconstructBlock(Model model) {
-        Block modifiedBlock = ((SymbolBlock) model.getBlock()).removeLastBlock();
-        SequentialBlock newBlock = new SequentialBlock();
-        newBlock.add(modifiedBlock);
-        Linear linear = new Linear.Builder().setOutChannels(10).build();
-        linear.setInitializer(
-                model.getNDManager(),
-                Initializer.ONES,
-                true,
-                new Device[] {model.getNDManager().getDevice()});
-        newBlock.add(linear);
-        model.setBlock(newBlock);
-    }
-
     public static void trainCifar10(Model model) throws IOException {
         reconstructBlock(model);
 
@@ -90,7 +77,11 @@ public final class TrainResnetWithCifar10 {
                         .optPipeline(pipeline)
                         .build();
         cifar10.prepare();
-        try (Trainer trainer = model.newTrainer(optimizer)) {
+
+        TrainingConfig config =
+                new DefaultTrainingConfig(new NormalInitializer(0.01), false, optimizer);
+
+        try (Trainer trainer = model.newTrainer(config)) {
             Accuracy acc = new Accuracy();
             LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
@@ -116,5 +107,13 @@ public final class TrainResnetWithCifar10 {
                 logger.info("Epoch " + epoch + " finish");
             }
         }
+    }
+
+    private static void reconstructBlock(Model model) {
+        SequentialBlock newBlock = new SequentialBlock();
+        Block modifiedBlock = ((SymbolBlock) model.getBlock()).removeLastBlock();
+        newBlock.add(modifiedBlock);
+        newBlock.add(new Linear.Builder().setOutChannels(10).build());
+        model.setBlock(newBlock);
     }
 }

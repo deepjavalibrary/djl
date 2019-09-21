@@ -88,18 +88,6 @@ public class Parameter implements AutoCloseable {
         return arrays != null && !arrays.isEmpty() && arrays.size() == devices.length;
     }
 
-    public void setInitializer(NDManager manager, Initializer initializer) {
-        setInitializer(manager, initializer, false, new Device[] {manager.getDevice()});
-    }
-
-    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
-        setInitializer(manager, initializer, overwrite, new Device[] {manager.getDevice()});
-    }
-
-    public void setInitializer(NDManager manager, Initializer initializer, Device[] devices) {
-        setInitializer(manager, initializer, false, devices);
-    }
-
     public void setInitializer(
             NDManager manager, Initializer initializer, boolean overwrite, Device[] devices) {
         this.manager = manager;

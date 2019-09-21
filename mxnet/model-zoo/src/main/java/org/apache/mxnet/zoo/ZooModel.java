@@ -26,8 +26,7 @@ import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.initializer.Initializer;
-import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.translate.Translator;
 
 public class ZooModel<I, O> implements Model {
@@ -62,47 +61,8 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public Trainer newTrainer() {
-        return model.newTrainer();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Trainer newTrainer(Optimizer optimizer) {
-        return model.newTrainer(optimizer, model.getNDManager().getDevice());
-    }
-
-    @Override
-    public Trainer newTrainer(Optimizer optimizer, Device[] devices) {
-        return model.newTrainer(optimizer, devices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Trainer newTrainer(Optimizer optimizer, Device device) {
-        return model.newTrainer(optimizer, device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer) {
-        setInitializer(initializer, false);
-    }
-
-    @Override
-    public void setInitializer(Initializer initializer, Device[] devices) {
-        setInitializer(initializer, false, devices);
-    }
-
-    @Override
-    public void setInitializer(Initializer initializer, boolean overwrite, Device[] devices) {
-        model.setInitializer(initializer, overwrite, devices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer, boolean overwrite) {
-        model.setInitializer(initializer, overwrite);
+    public Trainer newTrainer(TrainingConfig trainingConfig) {
+        return model.newTrainer(trainingConfig);
     }
 
     public Predictor<I, O> newPredictor() {

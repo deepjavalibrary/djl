@@ -20,9 +20,12 @@ import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Activation;
+import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.training.initializer.Initializer;
 
 public class CocoTest {
     @Test
@@ -35,9 +38,11 @@ public class CocoTest {
                         .setSampling(1)
                         .build();
         coco.prepare();
+
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 Iterator<Batch> ds = trainer.iterateDataset(coco).iterator();
                 Batch batch = ds.next();
                 Assert.assertEquals(batch.getData().head().getShape(), new Shape(1, 426, 640, 3));

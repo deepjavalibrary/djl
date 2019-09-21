@@ -172,26 +172,28 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer, Device[] devices) {
-        setInitializer(manager, initializer, false, devices);
-    }
-
-    @Override
     public void setInitializer(
             NDManager manager, Initializer initializer, boolean overwrite, Device[] devices) {
         for (Parameter param : params) {
             param.setInitializer(manager, initializer, overwrite, devices);
-            param.reinitialize(devices);
+            if (overwrite) {
+                param.reinitialize(devices);
+            }
         }
     }
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer, String paramName) {
+    public void setInitializer(
+            NDManager manager,
+            Initializer initializer,
+            boolean overwrite,
+            Device[] devices,
+            String paramName) {
         Optional<Parameter> parameter =
                 params.stream().filter(pair -> pair.getName().equals(paramName)).findFirst();
         if (parameter.isPresent()) {
             Parameter param = parameter.get();
-            param.setInitializer(manager, initializer, false);
+            param.setInitializer(manager, initializer, false, devices);
             param.reinitialize();
         } else {
             throw new IllegalArgumentException("Could not find parameter " + paramName);

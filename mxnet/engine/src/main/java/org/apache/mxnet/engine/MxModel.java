@@ -44,6 +44,7 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.Translator;
@@ -167,26 +168,13 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public Trainer newTrainer() {
-        return new MxTrainer(this, manager.getDevice());
-    }
+    public Trainer newTrainer(TrainingConfig trainingConfig) {
+        Initializer initializer = trainingConfig.getInitializer();
+        Device[] devices = trainingConfig.getDevices();
+        boolean overwrite = trainingConfig.isOverwriteInitializer();
+        Optimizer optimizer = trainingConfig.getOptimizer();
+        block.setInitializer(manager, initializer, overwrite, devices);
 
-    /** {@inheritDoc} */
-    @Override
-    public Trainer newTrainer(Optimizer optimizer) {
-        return newTrainer(optimizer, manager.getDevice());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Trainer newTrainer(Optimizer optimizer, Device device) {
-        device = Device.defaultIfNull(device, manager.getDevice());
-        return new MxTrainer(this, optimizer, device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Trainer newTrainer(Optimizer optimizer, Device[] devices) {
         return new MxTrainer(this, optimizer, devices);
     }
 
@@ -195,30 +183,6 @@ public class MxModel implements Model {
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
         device = Device.defaultIfNull(device, manager.getDevice());
         return new MxPredictor<>(this, translator, device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer) {
-        setInitializer(initializer, false, new Device[] {manager.getDevice()});
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer, boolean overwrite) {
-        setInitializer(initializer, overwrite, new Device[] {manager.getDevice()});
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer, Device[] devices) {
-        setInitializer(initializer, false, devices);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer, boolean overwrite, Device[] devices) {
-        block.setInitializer(manager, initializer, overwrite, devices);
     }
 
     /** {@inheritDoc} */

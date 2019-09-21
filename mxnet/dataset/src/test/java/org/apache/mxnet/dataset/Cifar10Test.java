@@ -18,14 +18,19 @@ import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.Activation;
+import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset.Usage;
+import software.amazon.ai.training.initializer.Initializer;
 
 public class Cifar10Test {
 
     @Test
     public void testCifar10Local() throws IOException {
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 
@@ -39,7 +44,7 @@ public class Cifar10Test {
                             .build();
 
             cifar10.prepare();
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);
@@ -51,6 +56,8 @@ public class Cifar10Test {
 
     @Test
     public void testCifar10Remote() throws IOException {
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 
@@ -62,7 +69,7 @@ public class Cifar10Test {
                             .build();
 
             cifar10.prepare();
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);

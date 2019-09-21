@@ -30,9 +30,11 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Activation;
+import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.initializer.NormalInitializer;
@@ -61,37 +63,22 @@ public final class TrainMnist {
         trainMnist(arguments);
     }
 
-    public static Block constructBlock() {
-        return new SequentialBlock()
-                .add(new Linear.Builder().setOutChannels(128).build())
-                .add(Activation.reluBlock())
-                .add(new Linear.Builder().setOutChannels(64).build())
-                .add(Activation.reluBlock())
-                .add(new Linear.Builder().setOutChannels(10).build());
-    }
-
     public static void trainMnist(Arguments arguments) throws IOException {
         int batchSize = arguments.getBatchSize();
-        Block mlp = constructBlock();
-        int numGpus = arguments.getNumGpus();
+        Block block = constructBlock();
+
+        Optimizer optimizer =
+                new Sgd.Builder()
+                        .setRescaleGrad(1.0f / batchSize)
+                        .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
+                        .build();
+        TrainingConfig config =
+                new DefaultTrainingConfig(new NormalInitializer(0.01), false, optimizer);
+        Device[] devices = config.getDevices();
         try (Model model = Model.newInstance()) {
-            model.setBlock(mlp);
-            Device[] devices;
-            if (numGpus > 0) {
-                devices = new Device[numGpus];
-                for (int i = 0; i < numGpus; i++) {
-                    devices[i] = Device.gpu(i);
-                }
-            } else {
-                devices = new Device[] {model.getNDManager().getDevice()};
-            }
-            model.setInitializer(new NormalInitializer(0.01), devices);
-            Optimizer optimizer =
-                    new Sgd.Builder()
-                            .setRescaleGrad(1.0f / batchSize)
-                            .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
-                            .build();
             Pipeline pipeline = new Pipeline(new ToTensor());
+            model.setBlock(block);
+
             Mnist mnist =
                     new Mnist.Builder()
                             .setManager(model.getNDManager())
@@ -100,7 +87,7 @@ public final class TrainMnist {
                             .optPipeline(pipeline)
                             .build();
             mnist.prepare();
-            try (Trainer trainer = model.newTrainer(optimizer, devices)) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 int numEpoch = arguments.getEpoch();
 
                 Accuracy acc = new Accuracy();
@@ -153,5 +140,14 @@ public final class TrainMnist {
 
     public static float getLossValue() {
         return lossValue;
+    }
+
+    private static Block constructBlock() {
+        return new SequentialBlock()
+                .add(new Linear.Builder().setOutChannels(128).build())
+                .add(Activation.reluBlock())
+                .add(new Linear.Builder().setOutChannels(64).build())
+                .add(Activation.reluBlock())
+                .add(new Linear.Builder().setOutChannels(10).build());
     }
 }

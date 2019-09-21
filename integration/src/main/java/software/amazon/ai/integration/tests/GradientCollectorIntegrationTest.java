@@ -31,9 +31,11 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.core.Linear;
+import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
@@ -74,12 +76,23 @@ public class GradientCollectorIntegrationTest {
 
     @RunAsTest
     public void testTrain() throws FailedTestException, IOException {
-        try (Model model = Model.newInstance()) {
-            NDManager manager = model.getNDManager();
+        int numOfData = 1000;
+        int batchSize = 10;
+        int epochs = 10;
 
-            int numOfData = 1000;
-            int batchSize = 10;
-            int epochs = 10;
+        Optimizer optimizer =
+                new Sgd.Builder()
+                        .setRescaleGrad(1.0f / batchSize)
+                        .setLearningRateTracker(LearningRateTracker.fixedLR(.03f))
+                        .build();
+
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false, optimizer);
+
+        try (Model model = Model.newInstance()) {
+            Linear block = new Linear.Builder().setOutChannels(1).build();
+            model.setBlock(block);
+
+            NDManager manager = model.getNDManager();
 
             NDArray weight = manager.create(new float[] {2.f, -3.4f}, new Shape(2, 1));
             float bias = 4.2f;
@@ -90,16 +103,7 @@ public class GradientCollectorIntegrationTest {
             label.add(
                     manager.randomNormal(
                             0, 0.01, label.getShape(), DataType.FLOAT32, manager.getDevice()));
-            Linear block = new Linear.Builder().setOutChannels(1).build();
-            model.setBlock(block);
 
-            model.setInitializer(Initializer.ONES);
-
-            Optimizer optimizer =
-                    new Sgd.Builder()
-                            .setRescaleGrad(1.0f / batchSize)
-                            .setLearningRateTracker(LearningRateTracker.fixedLR(.03f))
-                            .build();
             NDArray loss;
             LossMetric lossMetric = new LossMetric("l2loss");
 
@@ -109,7 +113,7 @@ public class GradientCollectorIntegrationTest {
                             .optLabels(label)
                             .setSampling(batchSize, true, true)
                             .build();
-            try (Trainer trainer = model.newTrainer(optimizer)) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 for (int epoch = 0; epoch < epochs; epoch++) {
                     lossMetric.reset();
                     for (Batch batch : trainer.iterateDataset(dataset)) {
@@ -140,43 +144,50 @@ public class GradientCollectorIntegrationTest {
 
     @RunAsTest
     public void testTrainResNet() throws FailedTestException {
+        Optimizer optimizer =
+                new Nag.Builder()
+                        .setRescaleGrad(1.0f / 100)
+                        .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
+                        .setMomentum(0.9f)
+                        .build();
+
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false, optimizer);
+
+        Block resNet50 =
+                new ResNetV1.Builder()
+                        .setImageShape(new Shape(1, 28, 28))
+                        .setNumLayers(50)
+                        .setOutSize(10)
+                        .build();
+
         try (Model model = Model.newInstance()) {
-            NDManager manager = model.getNDManager();
-
-            Block resNet50 =
-                    new ResNetV1.Builder()
-                            .setImageShape(new Shape(1, 28, 28))
-                            .setNumLayers(50)
-                            .setOutSize(10)
-                            .build();
-
             model.setBlock(resNet50);
-            model.setInitializer(Initializer.ONES);
-            Optimizer optimizer =
-                    new Nag.Builder()
-                            .setRescaleGrad(1.0f / 100)
-                            .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
-                            .setMomentum(0.9f)
-                            .build();
-            NDArray input = manager.ones(new Shape(100, 1, 28, 28));
-            NDArray label = manager.ones(new Shape(100, 1));
-            PairList<String, Parameter> parameters = resNet50.getParameters();
-            TrainingController controller =
-                    new TrainingController(
-                            parameters, optimizer, new Device[] {manager.getDevice()});
-            try (GradientCollector gradCol = new MxGradientCollector()) {
-                NDArray pred = resNet50.forward(new NDList(input)).head();
-                NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
-                gradCol.backward(loss);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                NDManager manager = trainer.getManager();
+
+                NDArray input = manager.ones(new Shape(100, 1, 28, 28));
+                NDArray label = manager.ones(new Shape(100, 1));
+                PairList<String, Parameter> parameters = resNet50.getParameters();
+                TrainingController controller =
+                        new TrainingController(
+                                parameters, optimizer, new Device[] {manager.getDevice()});
+                try (GradientCollector gradCol = trainer.newGradientCollector()) {
+                    NDArray pred = resNet50.forward(new NDList(input)).head();
+                    NDArray loss =
+                            Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
+                    gradCol.backward(loss);
+                }
+                controller.step();
+                NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
+                NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(1.7576532f);
+                NDArray expectedAtIndex87 = manager.ones(new Shape(32, 32, 3, 3));
+                Assertions.assertEquals(expectedAtIndex0, parameters.get(0).getValue().getArray());
+                Assertions.assertEquals(expectedAtIndex1, parameters.get(1).getValue().getArray());
+                Assertions.assertEquals(
+                        expectedAtIndex87, parameters.get(87).getValue().getArray());
+                controller.close();
             }
-            controller.step();
-            NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
-            NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(1.7576532f);
-            NDArray expectedAtIndex87 = manager.ones(new Shape(32, 32, 3, 3));
-            Assertions.assertEquals(expectedAtIndex0, parameters.get(0).getValue().getArray());
-            Assertions.assertEquals(expectedAtIndex1, parameters.get(1).getValue().getArray());
-            Assertions.assertEquals(expectedAtIndex87, parameters.get(87).getValue().getArray());
-            controller.close();
         }
     }
 }

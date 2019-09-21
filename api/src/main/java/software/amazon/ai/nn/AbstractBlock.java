@@ -41,21 +41,6 @@ public abstract class AbstractBlock implements Block {
     public void backward() {}
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer) {
-        setInitializer(manager, initializer, false, new Device[] {manager.getDevice()});
-    }
-
-    @Override
-    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
-        setInitializer(manager, initializer, overwrite, new Device[] {manager.getDevice()});
-    }
-
-    @Override
-    public void setInitializer(NDManager manager, Initializer initializer, Device[] devices) {
-        setInitializer(manager, initializer, false, devices);
-    }
-
-    @Override
     public void setInitializer(
             NDManager manager, Initializer initializer, boolean overwrite, Device[] devices) {
         for (Parameter parameter : getDirectParameters()) {
@@ -67,23 +52,19 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer, String paramName) {
-        setInitializer(manager, initializer, paramName, false);
-    }
-
-    @Override
     public void setInitializer(
-            NDManager manager, Initializer initializer, String paramName, boolean overwrite) {
+            NDManager manager,
+            Initializer initializer,
+            boolean overwrite,
+            Device[] devices,
+            String paramName) {
         Optional<Parameter> parameter =
                 getDirectParameters()
                         .stream()
                         .filter(pair -> pair.getName().equals(paramName))
                         .findFirst();
         if (parameter.isPresent()) {
-            parameter
-                    .get()
-                    .setInitializer(
-                            manager, initializer, overwrite, new Device[] {manager.getDevice()});
+            parameter.get().setInitializer(manager, initializer, overwrite, devices);
         } else {
             throw new IllegalArgumentException("Could not find parameter " + paramName);
         }

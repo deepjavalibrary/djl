@@ -22,14 +22,21 @@ import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.Activation;
+import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.Batch;
+import software.amazon.ai.training.initializer.Initializer;
 
 public class ImageFolderTest {
 
     @Test
     public void testImageFolder() throws FailedTestException, IOException {
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+
         try (Model model = Model.newInstance()) {
+            model.setBlock(Activation.IDENTITY_BLOCK);
+
             ImageFolder dataset =
                     new ImageFolder.Builder()
                             .setManager(model.getNDManager())
@@ -37,9 +44,7 @@ public class ImageFolderTest {
                             .setSampling(1, false, false)
                             .build();
 
-            model.setBlock(Activation.IDENTITY_BLOCK);
-
-            try (Trainer trainer = model.newTrainer()) {
+            try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
                 NDArray cat =
                         MxImages.read(manager, "src/test/resources/imagefolder/cat/cat2.jpeg");
