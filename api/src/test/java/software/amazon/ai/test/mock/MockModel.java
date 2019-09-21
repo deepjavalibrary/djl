@@ -23,11 +23,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
+import software.amazon.ai.inference.BasePredictor;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -54,7 +56,7 @@ public class MockModel implements Model {
 
     @Override
     public Block getBlock() {
-        return null;
+        return new SequentialBlock();
     }
 
     @Override
@@ -82,7 +84,7 @@ public class MockModel implements Model {
 
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
-        return new MockPredictor<>(this, translator, device);
+        return new BasePredictor<>(this, new MockNDManager(), translator, device);
     }
 
     @Override
@@ -152,7 +154,7 @@ public class MockModel implements Model {
 
     @Override
     public NDManager getNDManager() {
-        return null;
+        return new MockNDManager();
     }
 
     @Override

@@ -12,20 +12,14 @@
  */
 package org.apache.mxnet.engine;
 
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
-import software.amazon.ai.Model;
+import software.amazon.ai.inference.BasePredictor;
 import software.amazon.ai.inference.Predictor;
-import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.nn.Block;
-import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.Translator;
-import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Pair;
 
 /**
@@ -36,147 +30,32 @@ import software.amazon.ai.util.Pair;
  * @param <I> Input Object
  * @param <O> Output Object
  */
-public class MxPredictor<I, O> implements Predictor<I, O> {
+public class MxPredictor<I, O> extends BasePredictor<I, O> {
 
     private static final Logger logger = LoggerFactory.getLogger(MxPredictor.class);
 
-    MxModel model;
-    private Translator<I, O> translator;
-    Device device;
-    private Block block;
-    MxNDManager manager;
-    Metrics metrics;
-    private long timestamp;
-
     MxPredictor(MxModel model, Translator<I, O> translator, Device device) {
-        this.manager = MxNDManager.getSystemManager().newSubManager(device);
-        this.model = model;
-        this.translator = translator;
-        this.device = device;
-        this.block = model.getBlock();
+        super(model, MxNDManager.getSystemManager().newSubManager(device), translator, device);
     }
 
-    /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("PMD.AvoidRethrowingException")
-    public List<O> batchPredict(List<I> input) throws TranslateException {
-        timestamp = System.nanoTime();
-
-        try (PredictorContext inputCtx = new PredictorContext();
-                PredictorContext outputCtx = new PredictorContext()) {
-
-            NDList inputBatch = translator.processInputBatch(inputCtx, input);
-            preprocessEnd();
-
-            NDList result = forward(inputBatch);
-            forwardEnd(result);
-
-            return translator.processOutputBatch(outputCtx, result);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new TranslateException(e);
-        } finally {
-            postProcessEnd();
+    protected void waitToRead(NDList list) {
+        for (Pair<String, NDArray> pair : list) {
+            ((MxNDArray) pair.getValue()).waitToRead();
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setMetrics(Metrics metrics) {
-        this.metrics = metrics;
-    }
-
-    private NDList forward(NDList ndList) {
-        return block.forward(ndList);
-    }
-
-    private void preprocessEnd() {
-        if (metrics != null) {
-            long tmp = System.nanoTime();
-            long duration = tmp - timestamp;
-            timestamp = tmp;
-            metrics.addMetric("Preprocess", duration, "nano");
-        }
-    }
-
-    private void forwardEnd(NDList list) {
-        if (metrics != null) {
-            // JnaUtils.waitAll();
-            for (Pair<String, NDArray> pair : list) {
-                ((MxNDArray) pair.getValue()).waitToRead();
-            }
-            long tmp = System.nanoTime();
-            long duration = tmp - timestamp;
-            timestamp = tmp;
-            metrics.addMetric("Inference", duration, "nano");
-        }
-    }
-
-    private void postProcessEnd() {
-        if (metrics != null) {
-            long tmp = System.nanoTime();
-            long duration = tmp - timestamp;
-            timestamp = tmp;
-            metrics.addMetric("Postprocess", duration, "nano");
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        manager.close();
     }
 
     /** {@inheritDoc} */
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (manager.isOpen()) {
+        if (((MxNDManager) manager).isOpen()) {
             if (logger.isDebugEnabled()) {
-                logger.warn("Model was not closed explicitly: {}", getClass().getSimpleName());
+                logger.warn(
+                        "MxPredictor was not closed explicitly: {}", getClass().getSimpleName());
             }
             close();
         }
         super.finalize();
-    }
-
-    private class PredictorContext implements TranslatorContext {
-
-        private NDManager ctxManager;
-
-        PredictorContext() {
-            ctxManager = manager.newSubManager();
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Model getModel() {
-            return model;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Device getDevice() {
-            return device;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public NDManager getNDManager() {
-            return ctxManager;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Metrics getMetrics() {
-            return metrics;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void close() {
-            ctxManager.close();
-        }
     }
 }

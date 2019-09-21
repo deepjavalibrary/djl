@@ -70,8 +70,8 @@ public class MxTrainer implements Trainer {
     }
 
     @Override
-    public NDList forward(NDList intput) {
-        return block.forward(intput);
+    public NDList forward(NDList input) {
+        return block.forward(input);
     }
 
     @Override

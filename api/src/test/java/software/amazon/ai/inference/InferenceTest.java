@@ -67,10 +67,6 @@ public class InferenceTest {
             BoundingBox box = detectedObject.getBoundingBox();
             Assert.assertEquals(Double.compare(box.getBounds().getHeight(), 1d), 0);
         }
-
-        int p50 = metrics.percentile("Preprocess", 50).getValue().intValue();
-        Assert.assertEquals(p50, 1);
-        Assert.assertEquals(Double.compare(metrics.mean("Inference"), 3d), 0);
     }
 
     @Test

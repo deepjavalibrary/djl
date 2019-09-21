@@ -32,6 +32,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.training.dataset.Batchifier;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;
@@ -126,6 +127,11 @@ public final class BertQaInferenceExample extends AbstractExample {
 
         BertTranslator(BertDataParser parser) {
             this.parser = parser;
+        }
+
+        @Override
+        public Batchifier getBatchifier() {
+            return null;
         }
 
         @Override

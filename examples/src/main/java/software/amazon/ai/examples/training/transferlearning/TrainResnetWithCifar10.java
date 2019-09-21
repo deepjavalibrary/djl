@@ -44,7 +44,6 @@ import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.Pipeline;
-import software.amazon.ai.translate.TranslateException;
 
 public final class TrainResnetWithCifar10 {
 
@@ -52,8 +51,7 @@ public final class TrainResnetWithCifar10 {
 
     private TrainResnetWithCifar10() {}
 
-    public static void main(String[] args)
-            throws IOException, ModelNotFoundException, TranslateException {
+    public static void main(String[] args) throws IOException, ModelNotFoundException {
         // load the model
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("layers", "152");
@@ -77,7 +75,7 @@ public final class TrainResnetWithCifar10 {
         model.setBlock(newBlock);
     }
 
-    public static void trainCifar10(Model model) throws IOException, TranslateException {
+    public static void trainCifar10(Model model) throws IOException {
         reconstructBlock(model);
 
         int batchSize = 50;
