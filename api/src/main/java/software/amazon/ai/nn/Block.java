@@ -29,6 +29,11 @@ import software.amazon.ai.util.PairList;
 /** An interface defining neural-network layers. */
 public interface Block {
 
+    default Block asInDevice(Device device, boolean copy) {
+        //  TODO: add implementation
+        return this;
+    }
+
     NDList forward(NDList inputs, PairList<String, Object> params);
 
     NDList forward(NDList inputs);

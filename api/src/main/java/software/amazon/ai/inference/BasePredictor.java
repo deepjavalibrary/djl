@@ -20,6 +20,7 @@ import software.amazon.ai.Model;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.dataset.Batchifier;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.Translator;
@@ -32,15 +33,15 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
 
     protected Model model;
     protected NDManager manager;
-    Device device;
     Metrics metrics;
+    private Block block;
 
     public BasePredictor(
             Model model, NDManager manager, Translator<I, O> translator, Device device) {
         this.model = model;
         this.manager = manager;
         this.translator = translator;
-        this.device = device;
+        block = model.getBlock().asInDevice(device, true);
     }
 
     /** {@inheritDoc} */
@@ -100,7 +101,7 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     protected void waitToRead(NDList list) {}
 
     protected NDList forward(NDList ndList) {
-        return model.getBlock().forward(ndList);
+        return block.forward(ndList);
     }
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -169,12 +170,6 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
         @Override
         public Model getModel() {
             return model;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Device getDevice() {
-            return device;
         }
 
         /** {@inheritDoc} */

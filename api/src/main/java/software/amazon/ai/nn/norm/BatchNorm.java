@@ -17,12 +17,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.training.initializer.Initializer;
@@ -46,6 +48,12 @@ public class BatchNorm extends AbstractBlock {
         momentum = builder.getMomentum();
         runningMean = new Parameter("runningMean", this, ParameterType.OTHER, Initializer.ONES);
         runningVar = new Parameter("runningVar", this, ParameterType.OTHER, Initializer.ONES);
+    }
+
+    @Override
+    public Block asInDevice(Device device, boolean copy) {
+
+        return null;
     }
 
     @Override

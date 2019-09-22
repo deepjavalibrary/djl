@@ -46,7 +46,6 @@ import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.initializer.Initializer;
-import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
@@ -172,10 +171,9 @@ public class MxModel implements Model {
         Initializer initializer = trainingConfig.getInitializer();
         Device[] devices = trainingConfig.getDevices();
         boolean overwrite = trainingConfig.isOverwriteInitializer();
-        Optimizer optimizer = trainingConfig.getOptimizer();
         block.setInitializer(manager, initializer, overwrite, devices);
 
-        return new MxTrainer(this, optimizer, devices);
+        return new MxTrainer(this, trainingConfig);
     }
 
     /** {@inheritDoc} */

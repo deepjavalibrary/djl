@@ -173,7 +173,7 @@ public class GradientCollectorIntegrationTest {
                         new TrainingController(
                                 parameters, optimizer, new Device[] {manager.getDevice()});
                 try (GradientCollector gradCol = trainer.newGradientCollector()) {
-                    NDArray pred = resNet50.forward(new NDList(input)).head();
+                    NDArray pred = trainer.forward(new NDList(input)).head();
                     NDArray loss =
                             Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
                     gradCol.backward(loss);

@@ -23,6 +23,7 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ModelSaver;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.translate.TranslatorContext;
@@ -32,32 +33,17 @@ public class MxTrainer implements Trainer {
     private static final Logger logger = LoggerFactory.getLogger(MxTrainer.class);
 
     private MxModel model;
-    private Device[] devices;
-    private Block block;
     private MxNDManager manager;
     private Metrics metrics;
     private TrainingController trainingController;
 
-    MxTrainer(MxModel model, Device device) {
-        this(model, new Device[] {device});
-    }
-
-    MxTrainer(MxModel model, Optimizer optimizer, Device device) {
-        this(model, device);
-        trainingController =
-                new TrainingController(block.getParameters(), optimizer, new Device[] {device});
-    }
-
-    MxTrainer(MxModel model, Optimizer optimizer, Device[] devices) {
-        this(model, devices);
-        trainingController = new TrainingController(block.getParameters(), optimizer, devices);
-    }
-
-    MxTrainer(MxModel model, Device[] devices) {
+    MxTrainer(MxModel model, TrainingConfig trainingConfig) {
         this.model = model;
         this.manager = (MxNDManager) model.getNDManager().newSubManager();
-        this.devices = devices;
-        this.block = model.getBlock();
+        Block block = model.getBlock();
+        Optimizer optimizer = trainingConfig.getOptimizer();
+        Device[] devices = trainingConfig.getDevices();
+        trainingController = new TrainingController(block.getParameters(), optimizer, devices);
     }
 
     @Override
@@ -77,7 +63,7 @@ public class MxTrainer implements Trainer {
 
     @Override
     public NDList forward(NDList input) {
-        return block.forward(input);
+        return model.getBlock().forward(input);
     }
 
     @Override
@@ -134,12 +120,6 @@ public class MxTrainer implements Trainer {
         @Override
         public Model getModel() {
             return model;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Device getDevice() {
-            return devices[0];
         }
 
         /** {@inheritDoc} */
