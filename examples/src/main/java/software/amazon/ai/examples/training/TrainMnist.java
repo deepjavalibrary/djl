@@ -89,6 +89,7 @@ public final class TrainMnist {
             mnist.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
                 int numEpoch = arguments.getEpoch();
+                int numOfSlices = devices.length;
 
                 Accuracy acc = new Accuracy();
                 LossMetric lossMetric = new LossMetric("softmaxCELoss");
@@ -97,30 +98,29 @@ public final class TrainMnist {
                     acc.reset();
                     lossMetric.reset();
                     for (Batch batch : trainer.iterateDataset(mnist)) {
-                        NDArray data = batch.getData().head().reshape(batchSize, 28 * 28);
-                        NDArray label = batch.getLabels().head();
-                        NDList dataSplit = DatasetUtils.splitAndLoad(data, devices, false);
-                        NDList labelSplit = DatasetUtils.splitAndLoad(label, devices, false);
-                        NDArray[] pred = new NDArray[devices.length];
-                        NDArray[] loss = new NDArray[devices.length];
+                        Batch[] split = DatasetUtils.split(batch, devices, false);
+
+                        NDArray[] pred = new NDArray[numOfSlices];
+                        NDArray[] loss = new NDArray[numOfSlices];
                         try (GradientCollector gradCol = trainer.newGradientCollector()) {
-                            for (int i = 0; i < dataSplit.size(); i++) {
-                                pred[i] = trainer.forward(new NDList(dataSplit.get(i))).get(0);
+                            for (int i = 0; i < numOfSlices; i++) {
+                                // MNIST only has one input
+                                NDArray data = split[i].getData().head();
+                                NDArray label = split[i].getLabels().head();
+
+                                data = data.reshape(batchSize, 28 * 28);
+
+                                pred[i] = trainer.forward(new NDList(data)).head();
                                 loss[i] =
                                         Loss.softmaxCrossEntropyLoss(
-                                                labelSplit.get(i),
-                                                pred[i],
-                                                1.f,
-                                                0,
-                                                -1,
-                                                true,
-                                                false);
+                                                label, pred[i], 1.f, 0, -1, true, false);
                                 gradCol.backward(loss[i]);
                             }
                         }
                         trainer.step();
-                        for (int i = 0; i < dataSplit.size(); i++) {
-                            acc.update(labelSplit.get(i), pred[i]);
+                        for (int i = 0; i < numOfSlices; i++) {
+                            NDArray label = split[i].getLabels().head();
+                            acc.update(label, pred[i]);
                             lossMetric.update(loss[i]);
                         }
                         batch.close();

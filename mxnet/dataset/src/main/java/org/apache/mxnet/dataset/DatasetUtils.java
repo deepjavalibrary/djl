@@ -12,87 +12,94 @@
  */
 package org.apache.mxnet.dataset;
 
+import java.util.Arrays;
 import java.util.stream.IntStream;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.training.dataset.Batch;
+import software.amazon.ai.util.Pair;
 
 public final class DatasetUtils {
+
     private DatasetUtils() {}
+
+    public static Batch[] split(Batch batch, Device[] devices, boolean evenSplit) {
+        int size = devices.length;
+        if (size == 1) {
+            Batch[] splitted = new Batch[1];
+            NDList data = batch.getData().asInDevice(devices[0], true);
+            NDList labels = batch.getLabels().asInDevice(devices[0], true);
+            splitted[0] = new Batch(data, labels);
+            return splitted;
+        }
+
+        NDList[] splittedData = split(batch.getData(), size, evenSplit);
+        NDList[] splittedLabels = split(batch.getLabels(), size, evenSplit);
+
+        Batch[] splitted = new Batch[splittedData.length];
+        for (int i = 0; i < splittedData.length; ++i) {
+            NDList data = splittedData[i].asInDevice(devices[i], true);
+            NDList labels = splittedLabels[i].asInDevice(devices[i], true);
+            splitted[i] = new Batch(data, labels);
+        }
+        return splitted;
+    }
+
+    private static NDList[] split(NDList list, int numOfSlice, boolean evenSplit) {
+        int batchSize = Math.toIntExact(list.head().size(0));
+        numOfSlice = Math.min(numOfSlice, batchSize);
+
+        NDList[] splitted = new NDList[numOfSlice];
+        Arrays.setAll(splitted, i -> new NDList());
+
+        for (Pair<String, NDArray> pair : list) {
+            String name = pair.getKey();
+            NDArray nd = pair.getValue();
+            NDList rows = split(nd, numOfSlice, evenSplit);
+
+            for (int i = 0; i < numOfSlice; ++i) {
+                splitted[i].add(name, rows.get(i));
+            }
+        }
+        return splitted;
+    }
+
     /**
      * Splits an {@code NDArray} into `numOfSlice` slices along `batchAxis`.
      *
      * <p>Usually used for data parallelism where each slices is sent to one device (i.e. GPU).
      *
-     * @param data a batch of {@code NDArray}.
+     * @param array a batch of {@code NDArray}.
      * @param numOfSlice number of desired slices.
-     * @param batchAxis the axis along which to slice.
      * @param evenSplit whether to force all slices to have the same number of elements.
      * @return return value is a NDList even if `numOfSlice` is 1.
      */
-    public static NDList splitData(NDArray data, int numOfSlice, int batchAxis, boolean evenSplit) {
-        long size = data.size(batchAxis);
+    private static NDList split(NDArray array, int numOfSlice, boolean evenSplit) {
+        int size = Math.toIntExact(array.size(0));
+        if (size < numOfSlice) {
+            throw new IllegalArgumentException(
+                    "Batch size(" + size + ") is less then slice number(" + numOfSlice + ").");
+        }
+
         if (evenSplit && size % numOfSlice != 0) {
             throw new IllegalArgumentException(
                     "data with shape "
                             + size
                             + " cannot be evenly split into "
                             + numOfSlice
-                            + " slices along axis "
-                            + batchAxis
                             + ". Use a batch size that's multiple of "
                             + numOfSlice
                             + " or set even_split=true to allow"
                             + " uneven partitioning of data.");
         }
-        // if size < numOfSlice, decrease numOfSlice to size
-        if (!evenSplit && size < numOfSlice) {
-            numOfSlice = Math.toIntExact(size);
-        }
-        long step = size / numOfSlice;
-        NDList slices;
-        if (evenSplit) {
-            slices = data.split(numOfSlice, batchAxis);
-        } else {
-            int[] indices =
-                    IntStream.range(1, numOfSlice).map(i -> Math.toIntExact(i * step)).toArray();
-            slices = data.split(indices, batchAxis);
-        }
-        return slices;
-    }
-    /**
-     * Splits an {@code NDArray} into `devices.length` slices along first axis and loads each slice
-     * to one device in `devices`.
-     *
-     * @param data a batch of {@code NDArray}.
-     * @param devices list of {@code Device}.
-     * @param evenSplit whether to force all slices to have the same number of elements.
-     * @return list of {@code NDArray}, each of whom corresponds to a device in `devices`.
-     */
-    public static NDList splitAndLoad(NDArray data, Device[] devices, boolean evenSplit) {
-        return splitAndLoad(data, devices, 0, evenSplit);
-    }
 
-    /**
-     * Splits an {@code NDArray} into `devices.length` slices along `batchAxis` and loads each slice
-     * to one device in `devices`.
-     *
-     * @param data a batch of {@code NDArray}.
-     * @param devices list of {@code Device}.
-     * @param batchAxis the axis along which to slice.
-     * @param evenSplit whether to force all slices to have the same number of elements.
-     * @return list of {@code NDArray}, each of whom corresponds to a device in `devices`.
-     */
-    public static NDList splitAndLoad(
-            NDArray data, Device[] devices, int batchAxis, boolean evenSplit) {
-        // null check
-        if (devices == null) {
-            throw new IllegalArgumentException("please specify valid devices");
+        if (evenSplit) {
+            return array.split(numOfSlice);
         }
-        if (devices.length == 1) {
-            return new NDList(data.asInDevice(devices[0], false));
-        }
-        NDList splices = splitData(data, devices.length, batchAxis, evenSplit);
-        return splices.asInDevice(devices, false);
+
+        int step = size / numOfSlice;
+        int[] indices = IntStream.range(1, numOfSlice).map(i -> i * step).toArray();
+        return array.split(indices);
     }
 }

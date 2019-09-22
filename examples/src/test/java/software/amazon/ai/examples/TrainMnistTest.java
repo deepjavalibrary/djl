@@ -20,6 +20,7 @@ import software.amazon.ai.examples.training.TrainMnist;
 import software.amazon.ai.translate.TranslateException;
 
 public class TrainMnistTest {
+
     @Test
     public void testTrainMnist() throws TranslateException, ParseException, IOException {
         String[] args = {"-e", "2"};

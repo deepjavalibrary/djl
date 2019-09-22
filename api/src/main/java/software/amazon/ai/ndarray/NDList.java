@@ -186,37 +186,16 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * Converts all the {@code NDArray} in {@code NDList} to a different {@link Device}.
      *
      * @param ctx {@link Device} to be set
-     * @param copy set {@code true} if you want to return a copy of the Existing {@code NDList}.
-     * @return the result {@code NDList} with the new {@link Device}
+     * @param copy set {@code true} if you want to return a copy of the underlying NDArray.
+     * @return a new {@code NDList} with the NDArrays on specified {@link Device}
      */
     public NDList asInDevice(Device ctx, boolean copy) {
-        return asInDevice(new Device[] {ctx}, copy);
-    }
+        NDList newNDList = new NDList(size());
+        for (Pair<String, NDArray> pair : list) {
+            NDArray array = pair.getValue().asInDevice(ctx, copy);
+            newNDList.add(pair.getKey(), array);
+        }
 
-    /**
-     * Converts all the {@code NDArray} in {@code NDList} to a different {@link Device}.
-     *
-     * @param devices array of {@link Device} to be set following the devices order
-     * @param copy set {@code true} if you want to return a copy of the Existing {@code NDList}.
-     * @return the result {@code NDList} with the new {@link Device}
-     */
-    public NDList asInDevice(Device[] devices, boolean copy) {
-        int length = (devices.length == 1) ? list.size() : Math.min(list.size(), devices.length);
-        if (!copy) {
-            PairList<String, NDArray> newPairList = new PairList<>(length);
-            for (int i = 0; i < length; i++) {
-                Device device = (devices.length == 1) ? devices[0] : devices[i];
-                newPairList.add(
-                        list.get(i).getKey(), list.get(i).getValue().asInDevice(device, false));
-            }
-            list = newPairList;
-            return this;
-        }
-        NDList newNDList = new NDList(length);
-        for (int i = 0; i < length; i++) {
-            Device device = (devices.length == 1) ? devices[0] : devices[i];
-            newNDList.add(list.get(i).getKey(), list.get(i).getValue().asInDevice(device, true));
-        }
         return newNDList;
     }
 
