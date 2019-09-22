@@ -189,8 +189,8 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * @param copy set {@code true} if you want to return a copy of the Existing {@code NDList}.
      * @return the result {@code NDList} with the new {@link Device}
      */
-    public NDList asInContext(Device ctx, boolean copy) {
-        return asInContext(new Device[] {ctx}, copy);
+    public NDList asInDevice(Device ctx, boolean copy) {
+        return asInDevice(new Device[] {ctx}, copy);
     }
 
     /**
@@ -200,7 +200,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * @param copy set {@code true} if you want to return a copy of the Existing {@code NDList}.
      * @return the result {@code NDList} with the new {@link Device}
      */
-    public NDList asInContext(Device[] devices, boolean copy) {
+    public NDList asInDevice(Device[] devices, boolean copy) {
         int length = (devices.length == 1) ? list.size() : Math.min(list.size(), devices.length);
         if (!copy) {
             PairList<String, NDArray> newPairList = new PairList<>(length);

@@ -93,6 +93,6 @@ public final class DatasetUtils {
             return new NDList(data.asInDevice(devices[0], false));
         }
         NDList splices = splitData(data, devices.length, batchAxis, evenSplit);
-        return splices.asInContext(devices, false);
+        return splices.asInDevice(devices, false);
     }
 }

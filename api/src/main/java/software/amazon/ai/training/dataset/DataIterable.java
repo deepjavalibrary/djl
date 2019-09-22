@@ -155,8 +155,8 @@ public class DataIterable implements Iterable<Batch> {
             }
             // pin to a specific device
             if (device != null) {
-                batchData = batchData.asInContext(device, false);
-                batchLabels = batchLabels.asInContext(device, false);
+                batchData = batchData.asInDevice(device, false);
+                batchLabels = batchLabels.asInDevice(device, false);
             }
             return new Batch(batchData, batchLabels);
         }
