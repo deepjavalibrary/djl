@@ -17,7 +17,6 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.GradientCollector;
-import software.amazon.ai.training.ModelSaver;
 import software.amazon.ai.training.Trainer;
 
 public class MockTrainer implements Trainer {
@@ -49,17 +48,6 @@ public class MockTrainer implements Trainer {
     public NDManager getManager() {
         return null;
     }
-
-    @Override
-    public ModelSaver getModelSaver() {
-        return null;
-    }
-
-    @Override
-    public void setModelSaver(ModelSaver modelSaver) {}
-
-    @Override
-    public void checkpoint() {}
 
     @Override
     public void close() {}

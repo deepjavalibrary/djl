@@ -40,12 +40,6 @@ public interface Trainer extends AutoCloseable {
 
     NDManager getManager();
 
-    ModelSaver getModelSaver();
-
-    void setModelSaver(ModelSaver modelSaver);
-
-    void checkpoint();
-
     /** {@inheritDoc} */
     @Override
     void close();

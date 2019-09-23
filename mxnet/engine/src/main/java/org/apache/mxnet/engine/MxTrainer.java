@@ -21,7 +21,6 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.training.GradientCollector;
-import software.amazon.ai.training.ModelSaver;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.TrainingController;
@@ -75,17 +74,6 @@ public class MxTrainer implements Trainer {
     public NDManager getManager() {
         return manager;
     }
-
-    @Override
-    public ModelSaver getModelSaver() {
-        return null;
-    }
-
-    @Override
-    public void setModelSaver(ModelSaver modelSaver) {}
-
-    @Override
-    public void checkpoint() {}
 
     /** {@inheritDoc} */
     @SuppressWarnings("deprecation")
