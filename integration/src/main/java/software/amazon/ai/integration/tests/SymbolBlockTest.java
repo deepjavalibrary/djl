@@ -133,7 +133,7 @@ public class SymbolBlockTest {
             Linear linear = new Linear.Builder().setOutChannels(10).build();
 
             // TODO: Fix SymblocBlock reinitilize issue
-            linear.setInitializer(manager, Initializer.ONES, true, config.getDevices());
+            linear.setInitializer(manager, Initializer.ONES, true);
             newMlp.add(linear);
 
             model.setBlock(newMlp);

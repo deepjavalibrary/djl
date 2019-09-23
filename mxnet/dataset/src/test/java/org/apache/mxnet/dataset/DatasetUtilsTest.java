@@ -44,7 +44,9 @@ public class DatasetUtilsTest {
                 Assert.assertEquals(array.getDevice(), devices[i]);
 
                 Assertions.assertEquals(
-                        data.get(String.format("%d:%d", i * step, (i + 1) * step)), array);
+                        data.get(String.format("%d:%d", i * step, (i + 1) * step))
+                                .asInDevice(devices[i], true),
+                        array);
             }
         }
     }
@@ -68,11 +70,15 @@ public class DatasetUtilsTest {
                 Assert.assertEquals(array.getDevice(), devices[i]);
                 if (i == split.length - 1) {
                     Assertions.assertEquals(
-                            data.get(String.format("%d:%d", i * step, data.size(0))), array);
+                            data.get(String.format("%d:%d", i * step, data.size(0)))
+                                    .asInDevice(devices[i], true),
+                            array);
                     return;
                 }
                 Assertions.assertEquals(
-                        data.get(String.format("%d:%d", i * step, (i + 1) * step)), array);
+                        data.get(String.format("%d:%d", i * step, (i + 1) * step))
+                                .asInDevice(devices[i], true),
+                        array);
             }
         }
     }
@@ -96,11 +102,15 @@ public class DatasetUtilsTest {
                 Assert.assertEquals(array.getDevice(), devices[i]);
                 if (i == split.length - 1) {
                     Assertions.assertEquals(
-                            data.get(String.format("%d:%d", i * step, data.size(0))), array);
+                            data.get(String.format("%d:%d", i * step, data.size(0)))
+                                    .asInDevice(devices[i], true),
+                            array);
                     return;
                 }
                 Assertions.assertEquals(
-                        data.get(String.format("%d:%d", i * step, (i + 1) * step)), array);
+                        data.get(String.format("%d:%d", i * step, (i + 1) * step))
+                                .asInDevice(devices[i], true),
+                        array);
             }
         }
     }

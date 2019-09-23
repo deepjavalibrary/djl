@@ -40,8 +40,9 @@ import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
-import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Optimizer;
+import software.amazon.ai.training.optimizer.Sgd;
+import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
 import software.amazon.ai.translate.Pipeline;
 import software.amazon.ai.zoo.ModelNotFoundException;
 import software.amazon.ai.zoo.ZooModel;
@@ -67,7 +68,11 @@ public final class TrainResnetWithCifar10 {
 
         int batchSize = 50;
         int numEpoch = 2;
-        Optimizer optimizer = new Adam.Builder().setRescaleGrad(1.0f / batchSize).build();
+        Optimizer optimizer =
+                new Sgd.Builder()
+                        .setRescaleGrad(1.0f / batchSize)
+                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
+                        .build();
         Pipeline pipeline = new Pipeline(new ToTensor());
         Cifar10 cifar10 =
                 new Cifar10.Builder()

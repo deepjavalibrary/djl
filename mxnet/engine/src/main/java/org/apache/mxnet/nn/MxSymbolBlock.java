@@ -30,7 +30,6 @@ import org.apache.mxnet.engine.Symbol;
 import org.apache.mxnet.jna.JnaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -171,23 +170,18 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     @Override
-    public void setInitializer(
-            NDManager manager, Initializer initializer, boolean overwrite, Device[] devices) {
+    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
         for (Parameter param : params) {
-            param.setInitializer(manager, initializer, overwrite, devices);
+            param.setInitializer(manager, initializer, overwrite);
             if (overwrite) {
-                param.reinitialize(devices);
+                param.reinitialize();
             }
         }
     }
 
     @Override
     public void setInitializer(
-            NDManager manager,
-            Initializer initializer,
-            boolean overwrite,
-            Device[] devices,
-            String paramName) {
+            NDManager manager, Initializer initializer, boolean overwrite, String paramName) {
         Parameter param =
                 params.stream()
                         .filter(pair -> pair.getName().equals(paramName))
@@ -196,7 +190,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
                                 () ->
                                         new IllegalArgumentException(
                                                 "Could not find parameter " + paramName));
-        param.setInitializer(manager, initializer, false, devices);
+        param.setInitializer(manager, initializer, false);
         param.reinitialize();
     }
 

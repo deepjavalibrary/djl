@@ -13,7 +13,6 @@
 package software.amazon.ai.nn;
 
 import java.util.List;
-import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -40,23 +39,18 @@ public abstract class AbstractBlock implements Block {
     public void backward() {}
 
     @Override
-    public void setInitializer(
-            NDManager manager, Initializer initializer, boolean overwrite, Device[] devices) {
+    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
         for (Parameter parameter : getDirectParameters()) {
-            parameter.setInitializer(manager, initializer, overwrite, devices);
+            parameter.setInitializer(manager, initializer, overwrite);
         }
         for (Block child : getChildren().values()) {
-            child.setInitializer(manager, initializer, overwrite, devices);
+            child.setInitializer(manager, initializer, overwrite);
         }
     }
 
     @Override
     public void setInitializer(
-            NDManager manager,
-            Initializer initializer,
-            boolean overwrite,
-            Device[] devices,
-            String paramName) {
+            NDManager manager, Initializer initializer, boolean overwrite, String paramName) {
         Parameter parameter =
                 getDirectParameters()
                         .stream()
@@ -66,7 +60,7 @@ public abstract class AbstractBlock implements Block {
                                 () ->
                                         new IllegalArgumentException(
                                                 "Could not find parameter " + paramName));
-        parameter.setInitializer(manager, initializer, overwrite, devices);
+        parameter.setInitializer(manager, initializer, overwrite);
     }
 
     @Override

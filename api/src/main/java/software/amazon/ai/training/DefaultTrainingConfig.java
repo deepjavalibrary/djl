@@ -22,29 +22,48 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private Initializer initializer;
     private Optimizer optimizer;
     private boolean overwriteInitializer;
+    private Device[] devices;
 
     public DefaultTrainingConfig(Initializer initializer, boolean overwriteInitializer) {
         this(initializer, overwriteInitializer, null);
     }
 
     public DefaultTrainingConfig(
-            Initializer initializer, boolean overwriteInitializer, Optimizer optimizer) {
+            Initializer initializer,
+            boolean overwriteInitializer,
+            Optimizer optimizer,
+            int numGpus) {
         this.initializer = initializer;
         this.overwriteInitializer = overwriteInitializer;
         this.optimizer = optimizer;
+        if (numGpus > 0) {
+            devices = new Device[numGpus];
+            for (int i = 0; i < numGpus; i++) {
+                devices[i] = Device.gpu(i);
+            }
+        } else {
+            devices = new Device[] {Device.cpu()};
+        }
+    }
+
+    public DefaultTrainingConfig(
+            Initializer initializer,
+            boolean overwriteInitializer,
+            Optimizer optimizer,
+            Device[] devices) {
+        this.initializer = initializer;
+        this.overwriteInitializer = overwriteInitializer;
+        this.optimizer = optimizer;
+        this.devices = devices;
+    }
+
+    public DefaultTrainingConfig(
+            Initializer initializer, boolean overwriteInitializer, Optimizer optimizer) {
+        this(initializer, overwriteInitializer, optimizer, Engine.getInstance().getGpuCount());
     }
 
     @Override
     public Device[] getDevices() {
-        int numGpus = Engine.getInstance().getGpuCount();
-        if (numGpus <= 0) {
-            return new Device[] {Device.cpu()};
-        }
-
-        Device[] devices = new Device[numGpus];
-        for (int i = 0; i < numGpus; i++) {
-            devices[i] = Device.gpu(i);
-        }
         return devices;
     }
 

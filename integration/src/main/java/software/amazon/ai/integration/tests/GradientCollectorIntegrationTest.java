@@ -15,7 +15,6 @@ package software.amazon.ai.integration.tests;
 import java.io.IOException;
 import org.apache.mxnet.engine.MxGradientCollector;
 import org.testng.annotations.Test;
-import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -33,7 +32,6 @@ import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
-import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.initializer.Initializer;
@@ -158,16 +156,13 @@ public class GradientCollectorIntegrationTest {
                 NDArray input = manager.ones(new Shape(100, 1, 28, 28));
                 NDArray label = manager.ones(new Shape(100, 1));
                 PairList<String, Parameter> parameters = resNet50.getParameters();
-                TrainingController controller =
-                        new TrainingController(
-                                parameters, optimizer, new Device[] {manager.getDevice()});
                 try (GradientCollector gradCol = trainer.newGradientCollector()) {
                     NDArray pred = trainer.forward(new NDList(input)).head();
                     NDArray loss =
                             Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
                     gradCol.backward(loss);
                 }
-                controller.step();
+                trainer.step();
                 NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
                 NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(1.7576532f);
                 NDArray expectedAtIndex87 = manager.ones(new Shape(32, 32, 3, 3));
@@ -175,7 +170,6 @@ public class GradientCollectorIntegrationTest {
                 Assertions.assertEquals(expectedAtIndex1, parameters.get(1).getValue().getArray());
                 Assertions.assertEquals(
                         expectedAtIndex87, parameters.get(87).getValue().getArray());
-                controller.close();
             }
         }
     }

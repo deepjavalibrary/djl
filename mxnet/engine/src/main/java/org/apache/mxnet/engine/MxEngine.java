@@ -18,8 +18,6 @@ import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.training.ParameterStore;
-import software.amazon.ai.training.optimizer.Optimizer;
 
 public class MxEngine extends Engine {
 
@@ -76,12 +74,6 @@ public class MxEngine extends Engine {
     @Override
     public Model newModel(Device device) {
         return new MxModel(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU) {
-        return new MxParameterStore(aggregateOnGPU, optimizer);
     }
 
     /** {@inheritDoc} */

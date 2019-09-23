@@ -18,8 +18,6 @@ import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.training.ParameterStore;
-import software.amazon.ai.training.optimizer.Optimizer;
 
 public class TfEngine extends Engine {
 
@@ -58,12 +56,6 @@ public class TfEngine extends Engine {
     @Override
     public String getVersion() {
         return TensorFlow.version();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU) {
-        return null;
     }
 
     @Override

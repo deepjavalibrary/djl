@@ -64,12 +64,12 @@ public class Pair<K, V> {
             return false;
         }
         Pair<?, ?> pair = (Pair<?, ?>) o;
-        return key.equals(pair.key);
+        return key.equals(pair.key) && value.equals(pair.value);
     }
 
     /** {@inheritDoc} */
     @Override
     public int hashCode() {
-        return Objects.hash(key);
+        return Objects.hash(key, value);
     }
 }

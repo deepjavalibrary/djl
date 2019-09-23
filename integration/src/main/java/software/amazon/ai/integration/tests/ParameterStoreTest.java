@@ -13,7 +13,7 @@
 
 package software.amazon.ai.integration.tests;
 
-import org.apache.mxnet.engine.MxParameterStore;
+import org.apache.mxnet.engine.MxParameterServer;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.exceptions.FailedTestException;
@@ -21,7 +21,7 @@ import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.training.ParameterStore;
+import software.amazon.ai.training.ParameterServer;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
@@ -40,7 +40,7 @@ public class ParameterStoreTest {
                             .setRescaleGrad(1.0f / 32)
                             .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
                             .build();
-            try (ParameterStore ps = new MxParameterStore(false, optimizer)) {
+            try (ParameterServer ps = new MxParameterServer(optimizer)) {
                 ps.init(0, weight);
                 ps.push(0, grad);
                 ps.pull(0, weight);

@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.training.ParameterStore;
-import software.amazon.ai.training.optimizer.Optimizer;
 
 /**
  * The {@code Engine} interface shadows differences between each deep learning framework.
@@ -128,16 +126,6 @@ public abstract class Engine {
      * @return a new Model instance using the network defined in block
      */
     public abstract Model newModel(Device device);
-
-    /**
-     * An internal helper to get the Engine specific implementation for parameter store.
-     *
-     * @param optimizer The optimizer that defines how to update parameters
-     * @param aggregateOnGPU whether to aggregate gradients on GPU for multi GPU training, if false,
-     *     gradients will be copied to CPU for aggregation
-     * @return {@link ParameterStore} object
-     */
-    public abstract ParameterStore newParameterStore(Optimizer optimizer, boolean aggregateOnGPU);
 
     /**
      * Creates a new top-level {@link NDManager}.

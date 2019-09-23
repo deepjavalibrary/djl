@@ -17,13 +17,13 @@ import com.sun.jna.Pointer;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.training.ParameterStore;
+import software.amazon.ai.training.ParameterServer;
 import software.amazon.ai.training.optimizer.Optimizer;
 
-public class MxParameterStore extends NativeResource implements ParameterStore {
+public class MxParameterServer extends NativeResource implements ParameterServer {
 
-    public MxParameterStore(boolean aggregateOnGPU, Optimizer optimizer) {
-        super(createdKVStore(aggregateOnGPU));
+    public MxParameterServer(Optimizer optimizer) {
+        super(createdKVStore());
         setOptimizer(optimizer);
     }
 
@@ -52,6 +52,10 @@ public class MxParameterStore extends NativeResource implements ParameterStore {
         int[] keys = {key};
         NDList vals = new NDList(value);
         JnaUtils.parameterStorePull(getHandle(), 1, keys, vals, 0);
+    }
+
+    private static Pointer createdKVStore() {
+        return createdKVStore(true);
     }
 
     private static Pointer createdKVStore(boolean aggregateOnGPU) {

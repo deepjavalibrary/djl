@@ -16,15 +16,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.initializer.Initializer;
 
 public class Parameter implements AutoCloseable {
@@ -38,8 +37,9 @@ public class Parameter implements AutoCloseable {
     private Block block;
     private ParameterType type;
     private Initializer initializer;
-    private Map<Integer, NDArray> arrays = new ConcurrentHashMap<>();
-    private Device[] devices;
+    private NDArray array;
+    // use ParameterStore to store copies of array on multi devices
+    private ParameterStore parameterStore;
 
     public Parameter(String name, Block block, ParameterType type) {
         this(name, block, type, null);
@@ -56,9 +56,7 @@ public class Parameter implements AutoCloseable {
         manager = array.getManager();
         this.name = name;
         this.block = block;
-        Device device = array.getDevice();
-        devices = new Device[] {device};
-        arrays.put(device.getDeviceId(), array);
+        this.array = array;
     }
 
     public String getName() {
@@ -70,59 +68,43 @@ public class Parameter implements AutoCloseable {
     }
 
     public NDArray getArray() {
-        return getArray(devices[0].getDeviceId());
-    }
-
-    public NDArray getArray(Device device) {
-        return getArray(device.getDeviceId());
-    }
-
-    public NDArray getArray(int deviceId) {
         if (!isInitialized()) {
             throw new IllegalStateException("The array has not been initialized");
         }
-        return arrays.get(deviceId);
+        return array;
+    }
+
+    public NDArray getArray(Device device) {
+        if (parameterStore != null) {
+            return parameterStore.getValue(this, device);
+        } else {
+            return getArray();
+        }
     }
 
     public boolean isInitialized() {
-        return arrays != null && !arrays.isEmpty() && arrays.size() == devices.length;
+        return array != null;
     }
 
-    public void setInitializer(
-            NDManager manager, Initializer initializer, boolean overwrite, Device[] devices) {
+    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
         this.manager = manager;
         if (overwrite || this.initializer == null) {
             this.initializer = initializer;
         }
-        this.devices = devices;
     }
 
-    public void reinitialize(Device[] devices) {
+    public void reinitialize() {
         if (!isInitialized()) {
             throw new IllegalStateException("This parameter is not initialized");
         }
         Objects.requireNonNull(initializer, "No initializer has been set");
-        this.devices = devices;
-        NDArray oldArray = arrays.get(0);
-        NDArray newArray =
-                initializer.initialize(
-                        manager, oldArray.getShape(), oldArray.getDataType(), devices[0]);
-        oldArray.close();
-        arrays.put(devices[0].getDeviceId(), newArray);
-        // multi-gpu
-        if (devices.length > 1) {
-            for (int i = 1; i < devices.length; i++) {
-                NDArray arrayCopy = newArray.asInDevice(devices[i], true);
-                arrayCopy.attachGradient();
-                // close the old array
-                arrays.get(devices[i].getDeviceId()).close();
-                arrays.put(devices[i].getDeviceId(), arrayCopy);
-            }
+        NDArray newArray = initializer.initialize(manager, array.getShape(), array.getDataType());
+        if (parameterStore != null) {
+            parameterStore.initialize(this, newArray);
+        } else {
+            newArray.attachGradient();
+            array = newArray;
         }
-    }
-
-    public void reinitialize() {
-        reinitialize(devices);
     }
 
     public void initialize(NDList inputs, boolean overwrite) {
@@ -138,22 +120,21 @@ public class Parameter implements AutoCloseable {
         for (int i = 0; i < shapes.length; ++i) {
             shapes[i] = inputs.get(i).getShape();
         }
-        NDArray array =
+        array =
                 initializer.initialize(
                         manager,
                         block.getParameterShape(name, shapes),
-                        inputs.head().getDataType(),
-                        devices[0]);
-        array.attachGradient();
-        arrays.put(devices[0].getDeviceId(), array);
-        // multi gpu
-        if (devices.length > 1) {
-            for (int i = 1; i < devices.length; i++) {
-                NDArray arrayCopy = array.asInDevice(devices[i], true);
-                arrayCopy.attachGradient();
-                arrays.put(devices[i].getDeviceId(), arrayCopy);
-            }
+                        inputs.head().getDataType());
+
+        if (parameterStore != null) {
+            parameterStore.initialize(this, array);
+        } else {
+            array.attachGradient();
         }
+    }
+
+    public void setParameterStore(ParameterStore parameterStore) {
+        this.parameterStore = parameterStore;
     }
 
     public void save(DataOutputStream dos) throws IOException {
@@ -167,13 +148,13 @@ public class Parameter implements AutoCloseable {
 
         dos.writeUTF(getName());
 
-        dos.writeUTF(arrays.get(0).getSparseFormat().name());
-        dos.writeUTF(arrays.get(0).getDataType().name());
+        dos.writeUTF(array.getSparseFormat().name());
+        dos.writeUTF(array.getDataType().name());
 
-        Shape shape = arrays.get(0).getShape();
+        Shape shape = array.getShape();
         dos.write(shape.getEncoded());
 
-        ByteBuffer bb = arrays.get(0).toByteBuffer();
+        ByteBuffer bb = array.toByteBuffer();
         int length = bb.remaining();
         dos.writeInt(length);
 
@@ -250,15 +231,13 @@ public class Parameter implements AutoCloseable {
             data.rewind();
         }
 
-        arrays.put(0, manager.create(dataType.asDataType(data), shape));
+        array = manager.create(dataType.asDataType(data), shape);
     }
 
     @Override
     public void close() {
-        if (arrays != null && !arrays.isEmpty()) {
-            for (NDArray array : arrays.values()) {
-                array.close();
-            }
+        if (array != null) {
+            array.close();
         }
     }
 
@@ -273,11 +252,11 @@ public class Parameter implements AutoCloseable {
         Parameter parameter = (Parameter) o;
         return Objects.equals(name, parameter.name)
                 && type == parameter.type
-                && Objects.equals(arrays.get(0), parameter.arrays.get(0));
+                && Objects.equals(array, parameter.getArray());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, arrays.get(0));
+        return Objects.hash(name, type, array);
     }
 }

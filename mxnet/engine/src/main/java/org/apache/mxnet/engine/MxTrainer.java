@@ -12,20 +12,26 @@
  */
 package org.apache.mxnet.engine;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
-import software.amazon.ai.Model;
 import software.amazon.ai.metric.Metrics;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.GradientCollector;
+import software.amazon.ai.training.ParameterServer;
+import software.amazon.ai.training.ParameterStore;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
-import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.translate.TranslatorContext;
+import software.amazon.ai.util.PairList;
 
 public class MxTrainer implements Trainer {
 
@@ -33,16 +39,28 @@ public class MxTrainer implements Trainer {
 
     private MxModel model;
     private MxNDManager manager;
+    // this is performance metrics similar to predictor metrics, not training accuracy or loss
+    // currently not implemented
     private Metrics metrics;
-    private TrainingController trainingController;
+    private Optimizer optimizer;
+    private Device[] devices;
+    private PairList<String, Parameter> parameters;
+    private ParameterStore parameterStore;
+    private boolean gradientsChecked;
 
     MxTrainer(MxModel model, TrainingConfig trainingConfig) {
         this.model = model;
         this.manager = (MxNDManager) model.getNDManager().newSubManager();
         Block block = model.getBlock();
-        Optimizer optimizer = trainingConfig.getOptimizer();
-        Device[] devices = trainingConfig.getDevices();
-        trainingController = new TrainingController(block.getParameters(), optimizer, devices);
+        optimizer = trainingConfig.getOptimizer();
+        devices = trainingConfig.getDevices();
+        parameters = block.getParameters();
+        if (devices.length > 1) {
+            parameterStore = new ParameterStore(parameters, devices);
+            parameters
+                    .stream()
+                    .forEach(param -> param.getValue().setParameterStore(parameterStore));
+        }
     }
 
     @Override
@@ -50,14 +68,10 @@ public class MxTrainer implements Trainer {
         return new MxGradientCollector();
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void step() {
-        if (trainingController == null) {
-            throw new IllegalStateException(
-                    "No optimizer is set for trainer, please initialize"
-                            + "your trainer with an Optimizer.");
-        }
-        trainingController.step();
+    public ParameterServer newParameterServer(Optimizer optimizer) {
+        return new MxParameterServer(optimizer);
     }
 
     @Override
@@ -65,14 +79,71 @@ public class MxTrainer implements Trainer {
         return model.getBlock().forward(input);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void step() {
+        if (optimizer == null) {
+            throw new IllegalStateException(
+                    "No optimizer is set for trainer, please initialize"
+                            + "your trainer with an Optimizer.");
+        }
+        if (!gradientsChecked) {
+            checkGradients();
+        }
+        if (parameterStore != null) {
+            parameterStore.updateAllParameters(optimizer);
+        } else {
+            optimizer.updateAllParameters(parameters);
+        }
+    }
+
     @Override
     public void setMetrics(Metrics metrics) {
         this.metrics = metrics;
     }
 
+    public Metrics getMetrics() {
+        return metrics;
+    }
+
     @Override
     public NDManager getManager() {
         return manager;
+    }
+
+    /**
+     * Check if all gradients are zeros, prevent users from calling step() without running {@code
+     * backward}.
+     */
+    private void checkGradients() {
+        List<NDArray> grads = new ArrayList<>();
+        if (parameterStore != null) {
+            parameterStore.setParameterServer(newParameterServer(optimizer));
+            for (Parameter parameter : parameters.values()) {
+                // only check one device
+                grads.add(parameterStore.getValue(parameter, devices[0]));
+            }
+        } else {
+
+            grads.addAll(
+                    parameters
+                            .stream()
+                            .map(pair -> pair.getValue().getArray().getGradient())
+                            .collect(Collectors.toList()));
+        }
+        NDArray gradSum = NDArrays.stack(grads.stream().map(NDArray::sum).toArray(NDArray[]::new));
+        float[] sums = gradSum.sum().toFloatArray();
+        float sum = 0f;
+        for (float num : sums) {
+            sum += num;
+        }
+        if (sum == 0f) {
+            throw new IllegalStateException(
+                    "Gradient values are all zeros, please call gradientCollector.backward() on"
+                            + "your target NDArray (usually loss), before calling step() ");
+        }
+
+        gradientsChecked = true;
     }
 
     /** {@inheritDoc} */
@@ -91,40 +162,8 @@ public class MxTrainer implements Trainer {
     @Override
     public void close() {
         manager.close();
-        if (trainingController != null) {
-            trainingController.close();
-        }
-    }
-
-    private class TrainerContext implements TranslatorContext {
-
-        private NDManager ctxManager;
-
-        TrainerContext() {
-            ctxManager = manager.newSubManager();
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Model getModel() {
-            return model;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public NDManager getNDManager() {
-            return ctxManager;
-        }
-
-        @Override
-        public Metrics getMetrics() {
-            return metrics;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void close() {
-            ctxManager.close();
+        if (parameterStore != null) {
+            parameterStore.close();
         }
     }
 }

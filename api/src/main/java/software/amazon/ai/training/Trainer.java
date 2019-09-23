@@ -18,6 +18,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
+import software.amazon.ai.training.optimizer.Optimizer;
 
 public interface Trainer extends AutoCloseable {
 
@@ -27,8 +28,17 @@ public interface Trainer extends AutoCloseable {
 
     GradientCollector newGradientCollector();
 
+    /**
+     * An internal helper to get the Engine specific implementation for parameter store.
+     *
+     * @param optimizer The optimizer that defines how to update parameters
+     * @return {@link ParameterServer} object
+     */
+    ParameterServer newParameterServer(Optimizer optimizer);
+
     NDList forward(NDList input);
 
+    /** Makes one step of parameter update. */
     void step();
 
     /**

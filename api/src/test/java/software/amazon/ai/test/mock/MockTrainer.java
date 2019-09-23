@@ -17,7 +17,9 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.GradientCollector;
+import software.amazon.ai.training.ParameterServer;
 import software.amazon.ai.training.Trainer;
+import software.amazon.ai.training.optimizer.Optimizer;
 
 public class MockTrainer implements Trainer {
 
@@ -31,6 +33,11 @@ public class MockTrainer implements Trainer {
             @Override
             public void close() {}
         };
+    }
+
+    @Override
+    public ParameterServer newParameterServer(Optimizer optimizer) {
+        return null;
     }
 
     @Override

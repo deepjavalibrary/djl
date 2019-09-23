@@ -14,7 +14,6 @@ package software.amazon.ai.integration.tests;
 
 import org.apache.mxnet.engine.MxGradientCollector;
 import org.testng.annotations.Test;
-import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
@@ -30,7 +29,6 @@ import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
-import software.amazon.ai.training.TrainingController;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Nag;
@@ -58,8 +56,8 @@ public class OptimizerTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
-                NDArray result = runOptimizer(manager, block, sgd);
-                NDArray result2 = runOptimizer(manager, block, sgd);
+                NDArray result = runOptimizer(manager, trainer, block);
+                NDArray result2 = runOptimizer(manager, trainer, block);
                 // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(
                         manager.create(new float[] {0.6600000262260437f, 0.8300000429153442f}),
@@ -88,8 +86,8 @@ public class OptimizerTest {
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
 
-                NDArray result = runOptimizer(manager, block, optim);
-                NDArray result2 = runOptimizer(manager, block, optim);
+                NDArray result = runOptimizer(manager, trainer, block);
+                NDArray result2 = runOptimizer(manager, trainer, block);
                 // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(
                         manager.create(new float[] {0.6600000262260437f, 0.8300000429153442f}),
@@ -117,8 +115,8 @@ public class OptimizerTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
-                NDArray result = runOptimizer(manager, block, optim);
-                NDArray result2 = runOptimizer(manager, block, optim);
+                NDArray result = runOptimizer(manager, trainer, block);
+                NDArray result2 = runOptimizer(manager, trainer, block);
                 // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(
                         manager.create(new float[] {0.3539999723434448f, 0.6769999861717224f}),
@@ -142,8 +140,8 @@ public class OptimizerTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
-                NDArray result = runOptimizer(manager, block, optim);
-                NDArray result2 = runOptimizer(manager, block, optim);
+                NDArray result = runOptimizer(manager, trainer, block);
+                NDArray result2 = runOptimizer(manager, trainer, block);
                 // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(
                         manager.create(new float[] {0.8999999761581421f, 0.8999999761581421f}),
@@ -155,23 +153,19 @@ public class OptimizerTest {
         }
     }
 
-    private NDArray runOptimizer(NDManager manager, Block block, Optimizer optim) {
+    private NDArray runOptimizer(NDManager manager, Trainer trainer, Block block) {
         NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS)).mul(2);
         NDArray label = data.mul(2);
-        try (TrainingController controller =
-                new TrainingController(
-                        block.getParameters(), optim, new Device[] {manager.getDevice()})) {
-            try (GradientCollector gradCol = new MxGradientCollector()) {
-                NDArray pred = block.forward(new NDList(data)).head();
-                NDArray loss = Loss.l2Loss(label, pred);
-                gradCol.backward(loss);
-            }
-            controller.step();
-            return NDArrays.stack(
-                    block.getParameters()
-                            .stream()
-                            .map(paramPair -> paramPair.getValue().getArray().mean())
-                            .toArray(NDArray[]::new));
+        try (GradientCollector gradCol = new MxGradientCollector()) {
+            NDArray pred = trainer.forward(new NDList(data)).head();
+            NDArray loss = Loss.l2Loss(label, pred);
+            gradCol.backward(loss);
         }
+        trainer.step();
+        return NDArrays.stack(
+                block.getParameters()
+                        .stream()
+                        .map(paramPair -> paramPair.getValue().getArray().mean())
+                        .toArray(NDArray[]::new));
     }
 }

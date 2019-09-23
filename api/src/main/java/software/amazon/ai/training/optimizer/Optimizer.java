@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.training.ParameterServer;
 import software.amazon.ai.util.PairList;
 
 /** MXNet helper containing base implementations for optimizers. */
@@ -41,8 +42,7 @@ public abstract class Optimizer {
 
     /**
      * Update a {@code PairList} of parameters one step at time. Assumes parameters are on the same
-     * device. This will be used when updating parameters locally, not on {@link
-     * software.amazon.ai.training.ParameterStore}.
+     * device. This will be used when updating parameters locally, not on {@link ParameterServer}.
      *
      * @param parameters a {@code PairList} of parameters from network to update
      */

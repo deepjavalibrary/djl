@@ -37,7 +37,7 @@ import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.initializer.NormalInitializer;
+import software.amazon.ai.training.initializer.XavierInitializer;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -65,6 +65,7 @@ public final class TrainMnist {
 
     public static void trainMnist(Arguments arguments) throws IOException {
         int batchSize = arguments.getBatchSize();
+        int numGpus = arguments.getNumGpus();
         Block block = constructBlock();
 
         Optimizer optimizer =
@@ -73,7 +74,7 @@ public final class TrainMnist {
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
         TrainingConfig config =
-                new DefaultTrainingConfig(new NormalInitializer(0.01), false, optimizer);
+                new DefaultTrainingConfig(new XavierInitializer(), false, optimizer, numGpus);
         Device[] devices = config.getDevices();
         try (Model model = Model.newInstance()) {
             Pipeline pipeline = new Pipeline(new ToTensor());
@@ -108,7 +109,7 @@ public final class TrainMnist {
                                 NDArray data = split[i].getData().head();
                                 NDArray label = split[i].getLabels().head();
 
-                                data = data.reshape(batchSize, 28 * 28);
+                                data = data.reshape(batchSize / numOfSlices, 28 * 28);
 
                                 pred[i] = trainer.forward(new NDList(data)).head();
                                 loss[i] =
