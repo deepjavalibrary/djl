@@ -496,7 +496,6 @@ public final class JnaUtils {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXNDArrayGetShapeEx(ndArray, dim, ref));
         int nDim = dim.get();
-        // scalar case TODO(Jake) it should be -1 when numpy flag is on
         if (nDim == 0) {
             return new Shape();
         }

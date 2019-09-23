@@ -21,7 +21,6 @@ public class IntegrationTests {
     @Test
     public void runIntegrationTests() {
         String[] args = {};
-
         JnaUtils.autogradSetIsRecording(false);
         JnaUtils.autogradSetTraining(false);
 
