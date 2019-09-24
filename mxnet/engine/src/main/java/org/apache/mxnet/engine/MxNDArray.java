@@ -21,7 +21,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -285,9 +284,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(NDIndex index, NDArray value) {
-        Optional<NDIndexFullSlice> hasFullSlice = index.getAsFullSlice(getShape());
-        if (hasFullSlice.isPresent()) {
-            NDIndexFullSlice fullSlice = hasFullSlice.get();
+        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
+        if (fullSlice != null) {
             MxOpParams params = new MxOpParams();
             params.addTupleParam("begin", fullSlice.getMin());
             params.addTupleParam("end", fullSlice.getMax());
@@ -325,9 +323,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(NDIndex index, Number value) {
-        Optional<NDIndexFullSlice> hasFullSlice = index.getAsFullSlice(getShape());
-        if (hasFullSlice.isPresent()) {
-            NDIndexFullSlice fullSlice = hasFullSlice.get();
+        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
+        if (fullSlice != null) {
             MxOpParams params = new MxOpParams();
             params.addTupleParam("begin", fullSlice.getMin());
             params.addTupleParam("end", fullSlice.getMax());
@@ -343,16 +340,16 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void setScalar(NDIndex index, Number value) {
-        Optional<NDIndexFullSlice> hasFullSlice = index.getAsFullSlice(getShape());
-        if (hasFullSlice.isPresent()) {
-            if (hasFullSlice.get().getShape().size() != 1) {
+        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
+        if (fullSlice != null) {
+            if (fullSlice.getShape().size() != 1) {
                 throw new IllegalArgumentException("The provided index does not set a scalar");
             }
             set(index, value);
             return;
         }
         throw new UnsupportedOperationException(
-                "setScalar() currently supports all, fixed, and slices indices");
+                "set() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */
@@ -362,9 +359,8 @@ public class MxNDArray extends NativeResource implements NDArray {
             return this;
         }
 
-        Optional<NDIndexFullSlice> hasFullSlice = index.getAsFullSlice(getShape());
-        if (hasFullSlice.isPresent()) {
-            NDIndexFullSlice fullSlice = hasFullSlice.get();
+        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
+        if (fullSlice != null) {
             MxOpParams params = new MxOpParams();
             params.addTupleParam("begin", fullSlice.getMin());
             params.addTupleParam("end", fullSlice.getMax());

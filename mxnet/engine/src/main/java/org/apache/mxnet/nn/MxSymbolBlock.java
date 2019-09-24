@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.apache.mxnet.engine.CachedOp;
@@ -189,15 +188,16 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
             boolean overwrite,
             Device[] devices,
             String paramName) {
-        Optional<Parameter> parameter =
-                params.stream().filter(pair -> pair.getName().equals(paramName)).findFirst();
-        if (parameter.isPresent()) {
-            Parameter param = parameter.get();
-            param.setInitializer(manager, initializer, false, devices);
-            param.reinitialize();
-        } else {
-            throw new IllegalArgumentException("Could not find parameter " + paramName);
-        }
+        Parameter param =
+                params.stream()
+                        .filter(pair -> pair.getName().equals(paramName))
+                        .findFirst()
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Could not find parameter " + paramName));
+        param.setInitializer(manager, initializer, false, devices);
+        param.reinitialize();
     }
 
     @Override

@@ -13,7 +13,6 @@
 package software.amazon.ai.nn;
 
 import java.util.List;
-import java.util.Optional;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -58,16 +57,16 @@ public abstract class AbstractBlock implements Block {
             boolean overwrite,
             Device[] devices,
             String paramName) {
-        Optional<Parameter> parameter =
+        Parameter parameter =
                 getDirectParameters()
                         .stream()
                         .filter(pair -> pair.getName().equals(paramName))
-                        .findFirst();
-        if (parameter.isPresent()) {
-            parameter.get().setInitializer(manager, initializer, overwrite, devices);
-        } else {
-            throw new IllegalArgumentException("Could not find parameter " + paramName);
-        }
+                        .findFirst()
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Could not find parameter " + paramName));
+        parameter.setInitializer(manager, initializer, overwrite, devices);
     }
 
     @Override
