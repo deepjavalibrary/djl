@@ -37,6 +37,8 @@ application {
     mainClassName = System.getProperty("main", "software.amazon.ai.examples.inference.ClassifyExample")
 }
 
+tasks.distTar.enabled = false
+
 def getClassifier() {
     String osName = System.getProperty("os.name")
     String osPrefix;

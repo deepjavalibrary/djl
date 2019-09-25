@@ -27,20 +27,6 @@ dependencies {
     }
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': "software.amazon.ai.integration.tests.MxNDArrayOperatorsTest"
-    }
-    includeEmptyDirs = false
-    from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
-
-    exclude "META-INF/maven/**"
-    exclude "META-INF/INDEX.LIST"
-    exclude "META-INF/MANIFEST*"
-    exclude "META-INF//LICENSE*"
-    exclude "META-INF//NOTICE*"
-}
-
 task copyDependencies(type: Copy) {
     into "build/dependencies"
     from configurations.runtime
@@ -77,6 +63,8 @@ jacocoTestReport {
     }
 }
 
+
+tasks.distTar.enabled = false
 test.finalizedBy project.tasks.jacocoTestReport
 
 check.dependsOn jacocoTestReport
