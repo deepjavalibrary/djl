@@ -60,7 +60,8 @@ public class RemoteRepository extends AbstractRepository {
             try (Reader reader = Files.newBufferedReader(cacheFile)) {
                 Metadata metadata = GSON.fromJson(reader, Metadata.class);
                 Date lastUpdated = metadata.getLastUpdated();
-                if (System.currentTimeMillis() - lastUpdated.getTime() < ONE_DAY) {
+                if (Boolean.getBoolean("offline")
+                        || System.currentTimeMillis() - lastUpdated.getTime() < ONE_DAY) {
                     metadata.setRepositoryUri(mrlUri);
                     return metadata;
                 }
