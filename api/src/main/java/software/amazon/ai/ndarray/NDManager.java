@@ -851,9 +851,10 @@ public interface NDManager extends AutoCloseable {
      *
      * <p>Attached resource will be closed when this manager is closed.
      *
+     * @param resourceId unique resourceId
      * @param resource {@link AutoCloseable} resource to be attached
      */
-    void attach(AutoCloseable resource);
+    void attach(String resourceId, AutoCloseable resource);
 
     /**
      * Detaches an NDArray from this NDManager's lifecycle.
@@ -862,9 +863,9 @@ public interface NDManager extends AutoCloseable {
      * Failed to close the resource has to wait on GC to be freed, and might cause out of native
      * memory.
      *
-     * @param resource NDArray to be remove out of this NDManager's lifecycle
+     * @param resourceId resourceId to be remove out of this NDManager's lifecycle
      */
-    void detach(AutoCloseable resource);
+    void detach(String resourceId);
 
     /**
      * An engine specific generic invocation to native operator.

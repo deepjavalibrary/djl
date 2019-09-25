@@ -16,6 +16,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.tensorflow.Graph;
 import org.tensorflow.Session;
@@ -35,16 +36,18 @@ public class TfNDManager implements NDManager, AutoCloseable {
     private static int nameAssignment = 1;
 
     private NDManager parent;
+    private String uid;
     private Device device;
     Graph graph;
     Session session;
-    private Map<AutoCloseable, AutoCloseable> resources;
+    private Map<String, AutoCloseable> resources;
 
     private TfNDManager(NDManager parent, Device device, Graph graph) {
         this.parent = parent;
         this.device = device;
         this.graph = graph;
         resources = new ConcurrentHashMap<>();
+        uid = UUID.randomUUID().toString();
     }
 
     public static TfNDManager newBaseManager() {
@@ -207,26 +210,26 @@ public class TfNDManager implements NDManager, AutoCloseable {
     @Override
     public TfNDManager newSubManager(Device device) {
         TfNDManager manager = new TfNDManager(this, device, graph);
-        resources.put(manager, manager);
+        resources.put(manager.uid, manager);
         return manager;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void attach(AutoCloseable resource) {
-        resources.put(resource, resource);
+    public void attach(String resourceId, AutoCloseable resource) {
+        resources.put(resourceId, resource);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void detach(AutoCloseable resource) {
-        resources.remove(resource);
+    public void detach(String resourceId) {
+        resources.remove(resourceId);
     }
 
     /** {@inheritDoc} */
     @Override
     public void close() {
-        for (AutoCloseable resource : resources.keySet()) {
+        for (AutoCloseable resource : resources.values()) {
             try {
                 resource.close();
             } catch (Exception ignore) {
@@ -234,7 +237,7 @@ public class TfNDManager implements NDManager, AutoCloseable {
             }
         }
         resources = null;
-        parent.detach(this);
+        parent.detach(uid);
     }
 
     private static final class SystemManager extends TfNDManager {
@@ -246,11 +249,11 @@ public class TfNDManager implements NDManager, AutoCloseable {
 
         /** {@inheritDoc} */
         @Override
-        public void attach(AutoCloseable resource) {}
+        public void attach(String resrouceId, AutoCloseable resource) {}
 
         /** {@inheritDoc} */
         @Override
-        public void detach(AutoCloseable resource) {}
+        public void detach(String resourceId) {}
 
         /** {@inheritDoc} */
         @Override

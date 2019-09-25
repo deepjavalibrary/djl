@@ -295,6 +295,12 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public String getUid() {
+        return 'M' + array.getUid();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public DataType getDataType() {
         return array.getDataType();
     }

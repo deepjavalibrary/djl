@@ -13,11 +13,13 @@
 package org.apache.mxnet.engine;
 
 import com.sun.jna.Pointer;
+import java.lang.ref.WeakReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.mxnet.jna.JnaUtils;
@@ -44,14 +46,16 @@ public class MxNDManager implements NDManager {
     private static final NDList EMPTY = new NDList(0);
 
     private NDManager parent;
+    private String uid;
     private Device device;
-    private Map<AutoCloseable, AutoCloseable> resources;
+    private Map<String, WeakReference<AutoCloseable>> resources;
     private AtomicBoolean closed = new AtomicBoolean(false);
 
     private MxNDManager(NDManager parent, Device device) {
         this.parent = parent;
         this.device = Device.defaultIfNull(device);
         resources = new ConcurrentHashMap<>();
+        uid = UUID.randomUUID().toString();
     }
 
     static MxNDManager getSystemManager() {
@@ -65,13 +69,13 @@ public class MxNDManager implements NDManager {
 
     public MxNDArray create(Pointer handle) {
         MxNDArray array = new MxNDArray(this, handle);
-        attach(array);
+        attach(array.getUid(), array);
         return array;
     }
 
     public MxSparseNDArray create(Pointer handle, SparseFormat fmt) {
         MxSparseNDArray array = new MxSparseNDArray(this, handle, fmt);
-        attach(array);
+        attach(array.getUid(), array);
         return array;
     }
 
@@ -81,7 +85,7 @@ public class MxNDManager implements NDManager {
         dev = Device.defaultIfNull(dev, device);
         Pointer handle = JnaUtils.createNdArray(dev, shape, dataType, shape.dimension(), false);
         MxNDArray array = new MxNDArray(this, handle, dev, shape, dataType);
-        attach(array);
+        attach(array.getUid(), array);
         return array;
     }
 
@@ -265,7 +269,7 @@ public class MxNDManager implements NDManager {
     @Override
     public MxNDManager newSubManager(Device dev) {
         MxNDManager manager = new MxNDManager(this, dev);
-        attach(manager);
+        attach(manager.uid, manager);
         return manager;
     }
 
@@ -277,20 +281,21 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized void attach(AutoCloseable resource) {
+    public synchronized void attach(String resourceId, AutoCloseable resource) {
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
-        resources.put(resource, resource);
+        WeakReference<AutoCloseable> ref = new WeakReference<>(resource);
+        resources.put(resourceId, ref);
     }
 
     /** {@inheritDoc} */
     @Override
-    public synchronized void detach(AutoCloseable resource) {
+    public synchronized void detach(String resourceId) {
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
-        resources.remove(resource);
+        resources.remove(resourceId);
     }
 
     /** {@inheritDoc} */
@@ -317,14 +322,17 @@ public class MxNDManager implements NDManager {
     @Override
     public synchronized void close() {
         if (!closed.getAndSet(true)) {
-            for (AutoCloseable resource : resources.keySet()) {
-                try {
-                    resource.close();
-                } catch (Exception ignore) {
-                    // ignore
+            for (WeakReference<AutoCloseable> resource : resources.values()) {
+                AutoCloseable closeable = resource.get();
+                if (closeable != null) {
+                    try {
+                        closeable.close();
+                    } catch (Exception ignore) {
+                        // ignore
+                    }
                 }
             }
-            parent.detach(this);
+            parent.detach(uid);
             resources.clear();
         }
     }
@@ -352,11 +360,11 @@ public class MxNDManager implements NDManager {
 
         /** {@inheritDoc} */
         @Override
-        public void attach(AutoCloseable resource) {}
+        public void attach(String resourceId, AutoCloseable resource) {}
 
         /** {@inheritDoc} */
         @Override
-        public void detach(AutoCloseable resource) {}
+        public void detach(String resourceId) {}
 
         /** {@inheritDoc} */
         @Override

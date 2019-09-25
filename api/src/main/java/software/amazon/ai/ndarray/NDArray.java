@@ -45,6 +45,8 @@ public interface NDArray extends AutoCloseable {
      */
     NDManager getManager();
 
+    String getUid();
+
     /**
      * Returns the {@link DataType} of the {@code NDArray}.
      *
@@ -118,7 +120,7 @@ public interface NDArray extends AutoCloseable {
      */
     default void attach(NDManager manager) {
         detach();
-        getManager().attach(manager);
+        getManager().attach(getUid(), manager);
     }
 
     /**
@@ -128,7 +130,7 @@ public interface NDArray extends AutoCloseable {
      * to close the resource has to wait on GC to be freed, and might cause out of native memory.
      */
     default void detach() {
-        getManager().detach(this);
+        getManager().detach(getUid());
     }
 
     /**

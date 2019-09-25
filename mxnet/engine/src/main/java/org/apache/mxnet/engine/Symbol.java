@@ -36,7 +36,9 @@ public class Symbol extends NativeResource {
     Symbol(MxNDManager manager, Pointer pointer) {
         super(pointer);
         this.manager = manager;
-        manager.attach(this);
+        manager.attach(getUid(), this);
+        //        argParams = JnaUtils.listSymbolArguments(getHandle());
+        //        auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }
 
     public static Symbol load(MxNDManager manager, String path) {

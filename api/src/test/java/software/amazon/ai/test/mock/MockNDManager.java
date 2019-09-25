@@ -123,10 +123,10 @@ public class MockNDManager implements NDManager {
     }
 
     @Override
-    public void attach(AutoCloseable resource) {}
+    public void attach(String resourceId, AutoCloseable resource) {}
 
     @Override
-    public void detach(AutoCloseable resource) {}
+    public void detach(String resourceId) {}
 
     @Override
     public void invoke(String operation, NDList src, NDList dest, PairList<String, ?> params) {}

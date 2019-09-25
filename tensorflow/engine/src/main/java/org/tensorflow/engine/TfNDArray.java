@@ -15,6 +15,7 @@ package org.tensorflow.engine;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import org.tensorflow.Operation;
@@ -35,6 +36,7 @@ import software.amazon.ai.ndarray.types.SparseFormat;
 
 public class TfNDArray implements NDArray {
 
+    private String uid = UUID.randomUUID().toString();
     private Tensor<?> tensor;
     private Output<?> out;
     private Shape shape;
@@ -42,19 +44,19 @@ public class TfNDArray implements NDArray {
 
     TfNDArray(NDManager manager, Tensor<?> tensor) {
         this.manager = (TfNDManager) manager;
-        this.manager.attach(this);
+        this.manager.attach(getUid(), this);
         this.tensor = tensor;
     }
 
     TfNDArray(NDManager manager, Output<?> out) {
         this.manager = (TfNDManager) manager;
-        this.manager.attach(this);
+        this.manager.attach(getUid(), this);
         this.out = out;
     }
 
     public TfNDArray(NDManager manager, Shape shape, FloatBuffer data) {
         this.manager = (TfNDManager) manager;
-        this.manager.attach(this);
+        this.manager.attach(getUid(), this);
         tensor = Tensor.create(shape.getShape(), data);
         this.shape = shape;
     }
@@ -69,6 +71,11 @@ public class TfNDArray implements NDArray {
     @Override
     public NDManager getManager() {
         return manager;
+    }
+
+    @Override
+    public final String getUid() {
+        return uid;
     }
 
     /** {@inheritDoc} */

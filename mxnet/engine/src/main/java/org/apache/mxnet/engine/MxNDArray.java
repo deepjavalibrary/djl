@@ -126,13 +126,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public void attach(NDManager manager) {
         detach();
         this.manager = (MxNDManager) manager;
-        manager.attach(this);
+        manager.attach(getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(this);
+        manager.detach(getUid());
         manager = MxNDManager.getSystemManager();
     }
 

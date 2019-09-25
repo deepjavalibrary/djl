@@ -71,7 +71,7 @@ public class CachedOp extends NativeResource {
         this.paramIndicesMap = paramIndices.toMap();
         // holds all parameter and data NDArray values, final inputs to CachedOp
         this.manager = manager;
-        manager.attach(this);
+        manager.attach(getUid(), this);
     }
 
     /**

@@ -18,6 +18,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.util.UUID;
 import java.util.function.Predicate;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.Matrix;
@@ -35,6 +36,7 @@ import software.amazon.ai.ndarray.types.SparseFormat;
 public class MockNDArray implements NDArray {
 
     private Device device;
+    private String uid;
     private SparseFormat sparseFormat;
     private DataType dataType;
     private Shape shape;
@@ -54,11 +56,17 @@ public class MockNDArray implements NDArray {
         this.shape = shape;
         this.dataType = dataType;
         this.sparseFormat = sparseFormat;
+        uid = UUID.randomUUID().toString();
     }
 
     @Override
     public NDManager getManager() {
         return manager;
+    }
+
+    @Override
+    public String getUid() {
+        return uid;
     }
 
     @Override

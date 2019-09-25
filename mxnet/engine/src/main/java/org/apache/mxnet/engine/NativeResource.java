@@ -26,7 +26,7 @@ public abstract class NativeResource implements AutoCloseable {
 
     protected NativeResource(Pointer pointer) {
         this.handle = new AtomicReference<>(pointer);
-        if (logger.isDebugEnabled()) {
+        if (logger.isTraceEnabled()) {
             exception = new Exception();
         }
     }
@@ -43,6 +43,10 @@ public abstract class NativeResource implements AutoCloseable {
         return pointer;
     }
 
+    public final String getUid() {
+        return String.valueOf(Pointer.nativeValue(handle.get()));
+    }
+
     /** {@inheritDoc} */
     @Override
     public void close() {
@@ -54,8 +58,11 @@ public abstract class NativeResource implements AutoCloseable {
     @Override
     protected void finalize() throws Throwable {
         if (handle.get() != null) {
-            logger.warn("Resource was not closed explicitly: {}", getClass().getSimpleName());
             if (exception != null) {
+                logger.warn(
+                        "Resource ({}) was not closed explicitly: {}",
+                        getUid(),
+                        getClass().getSimpleName());
                 logger.warn("Resource was created:", exception);
             }
         }
