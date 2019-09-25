@@ -14,8 +14,8 @@ package org.apache.mxnet.dataset;
 
 import java.io.IOException;
 import java.util.Iterator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Repository;
@@ -28,20 +28,23 @@ import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.initializer.Initializer;
 
 public class CocoTest {
+
     @Test
     public void testCocoLocal() throws IOException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/repo");
-        CocoDetection coco =
-                new CocoDetection.Builder()
-                        .setUsage(Dataset.Usage.TEST)
-                        .optRepository(repository)
-                        .setSampling(1)
-                        .build();
-        coco.prepare();
-
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
+
+            Repository repository = Repository.newInstance("test", "src/test/resources/repo");
+            CocoDetection coco =
+                    new CocoDetection.Builder()
+                            .setManager(model.getNDManager())
+                            .setUsage(Dataset.Usage.TEST)
+                            .optRepository(repository)
+                            .setSampling(1)
+                            .build();
+            coco.prepare();
+
             try (Trainer trainer = model.newTrainer(config)) {
                 Iterator<Batch> ds = trainer.iterateDataset(coco).iterator();
                 Batch batch = ds.next();

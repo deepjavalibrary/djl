@@ -8,7 +8,9 @@ dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
     compile project(":model-zoo")
 
-    testCompile "org.testng:testng:${testng_version}"
+    testCompile ("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 

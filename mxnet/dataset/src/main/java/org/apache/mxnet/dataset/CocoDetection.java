@@ -118,15 +118,18 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     @Override
     public void prepareData(Usage usage) throws IOException {
         if (dataDir == null) {
-            setDataDir();
+            Path cacheDir = getRepository().getCacheDirectory();
+            URI resourceUri = getArtifact().getResourceUri();
+            dataDir = cacheDir.resolve(resourceUri.getPath());
         }
+
         Path jsonFile;
         switch (usage) {
             case TRAIN:
-                jsonFile = Paths.get("annotations", "instances_train2017.json");
+                jsonFile = dataDir.resolve("annotations").resolve("instances_train2017.json");
                 break;
             case TEST:
-                jsonFile = Paths.get("annotations", "instances_val2017.json");
+                jsonFile = dataDir.resolve("annotations").resolve("instances_val2017.json");
                 break;
             case VALIDATION:
             default:
@@ -146,12 +149,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
         // set the size
         size = imagePaths.size();
-    }
-
-    private void setDataDir() throws IOException {
-        Path cacheDir = getRepository().getCacheDirectory();
-        URI resourceUri = getArtifact().getResourceUri();
-        dataDir = cacheDir.resolve(resourceUri.getPath());
     }
 
     private double[] convertRecToList(Rectangle rect) {
