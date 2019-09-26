@@ -1,3 +1,7 @@
+plugins {
+    id 'maven-publish'
+}
+
 dependencies {
     compile project(":joule-api")
     compile project(":repository")
@@ -6,4 +10,43 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId project.getGroup()
+            artifactId 'model-zoo'
+            version rootProject.getVersion()
+            from components.java
+            artifacts = [jar, javadocJar, sourcesJar]
+            pom {
+                name = "Joule Repository API"
+                description = "A respository specification for Deep Learning resources"
+                url = "http://aws.amazon.com/Joule"
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://aws.amazon.com/apache2.0/'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "local"
+            url = project.buildDir.absolutePath + '/repo'
+        }
+    }
 }

@@ -2,8 +2,6 @@ plugins {
     id 'maven-publish'
 }
 
-version '0.3.0-SNAPSHOT'
-
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
     compile "com.google.code.gson:gson:${gson_version}"
