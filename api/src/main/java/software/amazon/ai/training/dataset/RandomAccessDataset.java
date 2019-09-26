@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.RandomAccess;
 import java.util.concurrent.ExecutorService;
 import software.amazon.ai.Device;
+import software.amazon.ai.translate.Batchifier;
 import software.amazon.ai.translate.Pipeline;
 
 /**

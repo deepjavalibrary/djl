@@ -12,8 +12,6 @@
  */
 package software.amazon.ai.translate;
 
-import software.amazon.ai.training.dataset.Batchifier;
-
 /**
  * The {@code Translator} interface provides model pre-processing and postprocessing functionality.
  *

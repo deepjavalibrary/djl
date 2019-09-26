@@ -21,7 +21,7 @@ import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.training.dataset.Batchifier;
+import software.amazon.ai.translate.Batchifier;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;

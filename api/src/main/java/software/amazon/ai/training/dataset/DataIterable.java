@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.translate.Batchifier;
 import software.amazon.ai.translate.Pipeline;
 
 // TODO abstract a interface that could be inherited by this and Stream DataIterable
