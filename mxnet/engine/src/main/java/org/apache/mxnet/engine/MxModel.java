@@ -331,6 +331,9 @@ public class MxModel implements Model {
             NDArray array = pair.getValue().asInDevice(device, true);
             parameters.add(new Parameter(paramName, block, array));
         }
+
+        // parameter has been copied to device, we should close them here.
+        paramNDlist.close();
     }
 
     private boolean readParameters(Path paramFile) throws IOException {
