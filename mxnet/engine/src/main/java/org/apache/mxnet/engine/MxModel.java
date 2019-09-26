@@ -178,9 +178,8 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
-        device = Device.defaultIfNull(device, manager.getDevice());
-        return new MxPredictor<>(this, translator, device);
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
+        return new MxPredictor<>(this, translator, manager.getDevice());
     }
 
     /** {@inheritDoc} */

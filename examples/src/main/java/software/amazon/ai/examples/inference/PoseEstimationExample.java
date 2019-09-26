@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.slf4j.Logger;
-import software.amazon.ai.Device;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.examples.inference.util.LogUtils;
@@ -51,8 +50,6 @@ public class PoseEstimationExample extends AbstractExample {
     protected List<List<Joint>> predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
         /* Section SSD */
-        List<DetectedObject> ssdResult;
-        List<List<Joint>> poseResult;
         Path imageFile = arguments.getImageFile();
         BufferedImage img = Images.loadImageFromFile(imageFile);
         int imageWidth = img.getWidth();
@@ -64,19 +61,12 @@ public class PoseEstimationExample extends AbstractExample {
         criteria.put("dataset", "voc");
         ZooModel<BufferedImage, List<DetectedObject>> ssd = ModelZoo.SSD.loadModel(criteria);
 
-        criteria = new ConcurrentHashMap<>();
-        criteria.put("flavor", "v1b");
-        criteria.put("backbone", "resnet18");
-        criteria.put("dataset", "imagenet");
-
-        ZooModel<BufferedImage, List<Joint>> pose = ModelZoo.SIMPLE_POSE.loadModel(criteria);
-
-        Device device = Device.defaultDevice();
-
-        try (Predictor<BufferedImage, List<DetectedObject>> ssdPredictor =
-                ssd.newPredictor(device)) {
-            ssdResult = ssdPredictor.predict(img);
+        List<DetectedObject> ssdResult;
+        try (Predictor<BufferedImage, List<DetectedObject>> predictor = ssd.newPredictor()) {
+            ssdResult = predictor.predict(img);
         }
+        ssd.close();
+
         // Get the cropped image
         List<BufferedImage> filtered =
                 ssdResult
@@ -98,14 +88,20 @@ public class PoseEstimationExample extends AbstractExample {
         }
 
         /* Pose recognition */
-        try (Predictor<BufferedImage, List<Joint>> posePredictor = pose.newPredictor(device)) {
-            posePredictor.setMetrics(metrics); // Let predictor collect metrics
-            poseResult = new ArrayList<>();
+        criteria = new ConcurrentHashMap<>();
+        criteria.put("flavor", "v1b");
+        criteria.put("backbone", "resnet18");
+        criteria.put("dataset", "imagenet");
+
+        ZooModel<BufferedImage, List<Joint>> pose = ModelZoo.SIMPLE_POSE.loadModel(criteria);
+
+        List<List<Joint>> poseResult = new ArrayList<>();
+        try (Predictor<BufferedImage, List<Joint>> predictor = pose.newPredictor()) {
             for (BufferedImage segmentedImg : filtered) {
-                poseResult.add(posePredictor.predict(segmentedImg));
+                poseResult.add(predictor.predict(segmentedImg));
             }
-            collectMemoryInfo(metrics);
         }
+        pose.close();
 
         drawJoints(
                 filtered.get(0),
@@ -115,8 +111,6 @@ public class PoseEstimationExample extends AbstractExample {
                         .filter(ele -> ele.getConfidence() > 0.2f)
                         .collect(Collectors.toList()),
                 arguments.getLogDir());
-        ssd.close();
-        pose.close();
         return poseResult;
     }
 

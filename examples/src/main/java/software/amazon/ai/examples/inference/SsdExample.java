@@ -46,19 +46,18 @@ public final class SsdExample extends AbstractExample {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = Images.loadImageFromFile(imageFile);
 
+        // Device is not not required, default device will be used by Model if not provided.
+        // Change to a specific device if needed.
+        Device device = Device.defaultDevice();
+
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("size", "512");
         criteria.put("backbone", "resnet50_v1");
         criteria.put("dataset", "voc");
-        ZooModel<BufferedImage, List<DetectedObject>> model = ModelZoo.SSD.loadModel(criteria);
+        ZooModel<BufferedImage, List<DetectedObject>> model =
+                ModelZoo.SSD.loadModel(criteria, device);
 
-        // Following device is not not required, default device will be used by Predictor without
-        // passing device to model.newPredictor(translator)
-        // Change to a specific device if needed.
-        Device device = Device.defaultDevice();
-
-        try (Predictor<BufferedImage, List<DetectedObject>> predictor =
-                model.newPredictor(device)) {
+        try (Predictor<BufferedImage, List<DetectedObject>> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {

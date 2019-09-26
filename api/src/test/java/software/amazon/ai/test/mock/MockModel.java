@@ -37,6 +37,7 @@ import software.amazon.ai.translate.Translator;
 public class MockModel implements Model {
 
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
+    private Device device;
 
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options, Device device)
@@ -44,6 +45,7 @@ public class MockModel implements Model {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException("File not found: " + modelPath);
         }
+        this.device = device;
     }
 
     @Override
@@ -67,7 +69,7 @@ public class MockModel implements Model {
     }
 
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         return new BasePredictor<>(this, new MockNDManager(), translator, device);
     }
 

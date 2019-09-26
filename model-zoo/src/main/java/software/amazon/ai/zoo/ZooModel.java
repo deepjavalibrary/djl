@@ -66,17 +66,13 @@ public class ZooModel<I, O> implements Model {
     }
 
     public Predictor<I, O> newPredictor() {
-        return newPredictor(translator, null);
-    }
-
-    public Predictor<I, O> newPredictor(Device device) {
-        return newPredictor(translator, device);
+        return newPredictor(translator);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <P, Q> Predictor<P, Q> newPredictor(Translator<P, Q> translator, Device device) {
-        return model.newPredictor(translator, device);
+    public <P, Q> Predictor<P, Q> newPredictor(Translator<P, Q> translator) {
+        return model.newPredictor(translator);
     }
 
     public Translator<I, O> getTranslator() {

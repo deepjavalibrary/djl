@@ -129,7 +129,7 @@ public class TfModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         return new TfPredictor<>(this, translator);
     }
 

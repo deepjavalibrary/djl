@@ -43,18 +43,17 @@ public final class ClassifyExample extends AbstractExample {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = Images.loadImageFromFile(imageFile);
 
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("layers", "18");
-        criteria.put("flavor", "v1");
-        ZooModel<BufferedImage, List<Classification>> model = ModelZoo.RESNET.loadModel(criteria);
-
-        // Following device is not required, default device will be used by Predictor without
-        // passing device to model.newPredictor(translator)
+        // Device is not not required, default device will be used by Model if not provided.
         // Change to a specific device if needed.
         Device device = Device.defaultDevice();
 
-        try (Predictor<BufferedImage, List<Classification>> predictor =
-                model.newPredictor(device)) {
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        criteria.put("layers", "18");
+        criteria.put("flavor", "v1");
+        ZooModel<BufferedImage, List<Classification>> model =
+                ModelZoo.RESNET.loadModel(criteria, device);
+
+        try (Predictor<BufferedImage, List<Classification>> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {

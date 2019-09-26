@@ -55,10 +55,14 @@ public final class BertQaInferenceExample extends AbstractExample {
         Path modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
 
-        Model model = Model.newInstance();
+        // Device is not not required, default device will be used by Model if not provided.
+        // Change to a specific device if needed.
+        Device device = Device.defaultDevice();
+        Model model = Model.newInstance(device);
         model.load(modelDir, modelName);
 
         QAInput input = new QAInput(arguments);
+
         BertDataParser parser = model.getArtifact("vocab.json", BertDataParser::parse);
 
         logger.info("Question: {}", input.getQuestion());
@@ -66,12 +70,7 @@ public final class BertQaInferenceExample extends AbstractExample {
 
         BertTranslator translator = new BertTranslator(parser);
 
-        // Following device is not not required, default device will be used by Predictor without
-        // passing device to model.newPredictor(translator)
-        // Change to a specific device if needed.
-        Device device = Device.defaultDevice();
-
-        try (Predictor<QAInput, String> predictor = model.newPredictor(translator, device)) {
+        try (Predictor<QAInput, String> predictor = model.newPredictor(translator)) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {

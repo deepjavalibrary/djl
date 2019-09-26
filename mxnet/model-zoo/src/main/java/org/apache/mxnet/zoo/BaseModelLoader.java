@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.MRL;
@@ -54,6 +55,11 @@ public abstract class BaseModelLoader<I, O> {
 
     public ZooModel<I, O> loadModel(Map<String, String> criteria)
             throws IOException, ModelNotFoundException {
+        return loadModel(criteria, Device.defaultDevice());
+    }
+
+    public ZooModel<I, O> loadModel(Map<String, String> criteria, Device device)
+            throws IOException, ModelNotFoundException {
         Artifact artifact = match(criteria);
         if (artifact == null) {
             throw new ModelNotFoundException("Model not found.");
@@ -62,7 +68,7 @@ public abstract class BaseModelLoader<I, O> {
         Path dir = repository.getCacheDirectory();
         String relativePath = artifact.getResourceUri().getPath();
         Path modelPath = dir.resolve(relativePath);
-        Model model = Model.newInstance();
+        Model model = Model.newInstance(device);
         model.load(modelPath, artifact.getName());
         return new ZooModel<>(model, getTranslator());
     }

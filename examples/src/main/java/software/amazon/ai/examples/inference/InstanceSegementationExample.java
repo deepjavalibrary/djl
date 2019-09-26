@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
 import org.apache.mxnet.zoo.ModelZoo;
-import software.amazon.ai.Device;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
@@ -51,19 +50,16 @@ public class InstanceSegementationExample extends AbstractExample {
         criteria.put("flavor", "v1b");
         criteria.put("backbone", "resnet18");
         criteria.put("dataset", "coco");
-        ZooModel<BufferedImage, List<DetectedObject>> instanceSeg =
+        ZooModel<BufferedImage, List<DetectedObject>> model =
                 ModelZoo.MASK_RCNN.loadModel(criteria);
 
-        Device device = Device.defaultDevice();
-
-        try (Predictor<BufferedImage, List<DetectedObject>> instancePredictor =
-                instanceSeg.newPredictor(device)) {
-            instancePredictor.setMetrics(metrics); // Let predictor collect metrics
-            result = instancePredictor.predict(img);
+        try (Predictor<BufferedImage, List<DetectedObject>> predictor = model.newPredictor()) {
+            predictor.setMetrics(metrics); // Let predictor collect metrics
+            result = predictor.predict(img);
             collectMemoryInfo(metrics);
         }
 
-        instanceSeg.close();
+        model.close();
         drawBoundingBox(img, result, arguments.getLogDir());
         return result;
     }

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.zoo.ModelZoo;
-import software.amazon.ai.Device;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
@@ -49,10 +48,7 @@ public class ActionRecognition extends AbstractExample {
         ZooModel<BufferedImage, List<Classification>> inception =
                 ModelZoo.ACTION_RECOGNITION.loadModel(criteria);
 
-        Device device = Device.defaultDevice();
-
-        try (Predictor<BufferedImage, List<Classification>> action =
-                inception.newPredictor(device)) {
+        try (Predictor<BufferedImage, List<Classification>> action = inception.newPredictor()) {
             action.setMetrics(metrics); // Let predictor collect metrics
             result = action.predict(img);
             collectMemoryInfo(metrics);

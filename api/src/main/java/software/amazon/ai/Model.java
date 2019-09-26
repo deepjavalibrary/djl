@@ -67,7 +67,17 @@ public interface Model extends AutoCloseable {
      * @return a new Model instance
      */
     static Model newInstance() {
-        return Engine.getInstance().newModel(Device.defaultDevice());
+        return newInstance(Device.defaultDevice());
+    }
+
+    /**
+     * Create an empty model instance on specified {@link Device}.
+     *
+     * @param device the device that model to be loaded
+     * @return a new Model instance
+     */
+    static Model newInstance(Device device) {
+        return Engine.getInstance().newModel(device);
     }
 
     /**
@@ -158,20 +168,7 @@ public interface Model extends AutoCloseable {
      * @param <O> Output object come from postprocessing
      * @return instance of {@code Predictor}
      */
-    default <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return newPredictor(translator, null);
-    }
-
-    /**
-     * Creates a new Predictor based on the model.
-     *
-     * @param translator The Object used for preprocessing and post processing
-     * @param device device used for the inference
-     * @param <I> Input object for preprocessing
-     * @param <O> Output object come from postprocessing
-     * @return instance of {@code Predictor}
-     */
-    <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device);
+    <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator);
 
     /**
      * Returns the input descriptor of the model.
