@@ -27,7 +27,6 @@ import org.tensorflow.framework.MetaGraphDef;
 import org.tensorflow.framework.SignatureDef;
 import org.tensorflow.framework.TensorInfo;
 import org.tensorflow.framework.TensorShapeProto;
-import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
@@ -80,7 +79,7 @@ public class TfModel implements Model {
     }
 
     @Override
-    public void load(Path modelPath, String modelName, Map<String, String> options, Device device)
+    public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException {
         try {
             load(modelPath);

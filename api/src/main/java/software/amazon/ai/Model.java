@@ -87,7 +87,7 @@ public interface Model extends AutoCloseable {
      * @throws IOException IO exception happened in loading
      */
     default void load(Path modelPath) throws IOException {
-        load(modelPath, modelPath.toFile().getName(), null, null);
+        load(modelPath, modelPath.toFile().getName(), null);
     }
 
     /**
@@ -98,7 +98,7 @@ public interface Model extends AutoCloseable {
      * @throws IOException IO exception happened in loading
      */
     default void load(Path modelPath, String modelName) throws IOException {
-        load(modelPath, modelName, null, null);
+        load(modelPath, modelName, null);
     }
 
     /**
@@ -109,23 +109,7 @@ public interface Model extends AutoCloseable {
      * @param options engine specific load model options, see document for each engine
      * @throws IOException IO exception happened in loading
      */
-    default void load(Path modelPath, String modelName, Map<String, String> options)
-            throws IOException {
-        load(modelPath, modelName, options, null);
-    }
-
-    /**
-     * Loads the model on specified {@code device} from the {@code modelPath} with the name and
-     * options provided.
-     *
-     * @param modelPath the directory or file path of the model location
-     * @param modelName model file name or assigned name
-     * @param options engine specific load model options, see document for each engine
-     * @param device the device that model to be loaded
-     * @throws IOException IO exception happened in loading
-     */
-    void load(Path modelPath, String modelName, Map<String, String> options, Device device)
-            throws IOException;
+    void load(Path modelPath, String modelName, Map<String, String> options) throws IOException;
 
     /**
      * Saves the model to specified {@code modelPath} with the name provided.

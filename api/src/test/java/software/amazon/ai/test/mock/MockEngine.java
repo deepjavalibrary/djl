@@ -29,7 +29,7 @@ public class MockEngine extends Engine {
 
     @Override
     public Model newModel(Device device) {
-        return new MockModel();
+        return new MockModel(device);
     }
 
     @Override

@@ -39,13 +39,16 @@ public class MockModel implements Model {
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
     private Device device;
 
+    public MockModel(Device device) {
+        this.device = device;
+    }
+
     @Override
-    public void load(Path modelPath, String modelName, Map<String, String> options, Device device)
+    public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException("File not found: " + modelPath);
         }
-        this.device = device;
     }
 
     @Override

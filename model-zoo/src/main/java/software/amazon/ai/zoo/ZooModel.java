@@ -18,7 +18,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Function;
-import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.ndarray.NDManager;
@@ -40,7 +39,7 @@ public class ZooModel<I, O> implements Model {
     }
 
     @Override
-    public void load(Path modelPath, String modelName, Map<String, String> options, Device device) {
+    public void load(Path modelPath, String modelName, Map<String, String> options) {
         throw new IllegalArgumentException("ZooModel should not be re-loaded.");
     }
 

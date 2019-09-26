@@ -21,6 +21,7 @@ import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.Classification;
@@ -109,7 +110,7 @@ public class InferenceTest {
     public void testTranslatException() throws TranslateException {
         EchoTranslator<String> translator = new EchoTranslator<>();
         translator.setInputException(new TranslateException("Some exception"));
-        Model model = new MockModel();
+        Model model = new MockModel(Device.defaultDevice());
         Predictor<String, String> predictor = model.newPredictor(translator);
         String result = predictor.predict("input");
         Assert.assertEquals(result, "input");

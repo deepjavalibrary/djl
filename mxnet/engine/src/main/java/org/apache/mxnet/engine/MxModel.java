@@ -90,11 +90,10 @@ public class MxModel implements Model {
      * @param modelPath Directory of the model
      * @param modelName Name/Prefix of the model
      * @param options load model options, check document for specific engine
-     * @param device the device that model to be loaded
      * @throws IOException Exception for file loading
      */
     @Override
-    public void load(Path modelPath, String modelName, Map<String, String> options, Device device)
+    public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException {
         MxEngine engine = ((MxEngine) Engine.getEngine(MxEngine.ENGINE_NAME));
         engine.setNumpyMode(false);
@@ -113,7 +112,7 @@ public class MxModel implements Model {
                 block = new MxSymbolBlock(manager, symbol);
             }
 
-            loadParameters(modelName, options, device);
+            loadParameters(modelName, options);
 
             // TODO: Check if Symbol has all names that params file have
         } finally {
@@ -296,9 +295,7 @@ public class MxModel implements Model {
         super.finalize();
     }
 
-    private void loadParameters(String modelName, Map<String, String> options, Device device)
-            throws IOException {
-        device = Device.defaultIfNull(device);
+    private void loadParameters(String modelName, Map<String, String> options) throws IOException {
         String epochOption = null;
         if (options != null) {
             epochOption = options.get("epoch");
@@ -319,6 +316,7 @@ public class MxModel implements Model {
         }
 
         NDList paramNDlist = JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath());
+        Device device = manager.getDevice();
 
         List<Parameter> parameters = block.getDirectParameters();
         for (Pair<String, NDArray> pair : paramNDlist) {
@@ -327,12 +325,14 @@ public class MxModel implements Model {
                 throw new IllegalArgumentException("Array names must be present in parameter file");
             }
             String paramName = key.split(":", 2)[1];
-            NDArray array = pair.getValue().asInDevice(device, true);
+            NDArray array = pair.getValue().asInDevice(device, false);
             parameters.add(new Parameter(paramName, block, array));
         }
 
-        // parameter has been copied to device, we should close them here.
-        paramNDlist.close();
+        if (!device.equals(Device.cpu())) {
+            // MXNet always load parameters on CPU, we only close parameters if we copied them.
+            paramNDlist.close();
+        }
     }
 
     private boolean readParameters(Path paramFile) throws IOException {
