@@ -342,12 +342,9 @@ public class NDArrayOtherOpTest {
             float[] mean = {0.3f, 0.4f, 0.5f};
             float[] std = {0.8f, 0.8f, 0.8f};
             NDArray normalized = input.getNDArrayInternal().normalize(mean, std);
-            Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.875f}), normalized.get(0, 0, 0));
-            Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.75f}), normalized.get(1, 0, 0));
-            Assertions.assertAlmostEquals(
-                    manager.create(new float[] {0.625f}), normalized.get(2, 0, 0));
+            Assertions.assertAlmostEquals(manager.create(0.875f), normalized.get(0, 0, 0));
+            Assertions.assertAlmostEquals(manager.create(0.75f), normalized.get(1, 0, 0));
+            Assertions.assertAlmostEquals(manager.create(0.625f), normalized.get(2, 0, 0));
         }
     }
 }

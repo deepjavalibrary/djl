@@ -135,11 +135,15 @@ public final class Assertions {
 
     public static void assertAlmostEquals(
             NDArray actual, NDArray expected, double rtol, double atol) throws FailedTestException {
+        if (!actual.getShape().equals(expected.getShape())) {
+            throw new FailedTestException(
+                    getDefaultErrorMessage(
+                            actual.getShape(),
+                            expected.getShape(),
+                            "The shape of two NDArray are different!"));
+        }
         Number[] actualDoubleArray = actual.toArray();
         Number[] expectedDoubleArray = expected.toArray();
-        if (actualDoubleArray.length != expectedDoubleArray.length) {
-            throw new FailedTestException("The length of two NDArray are different!");
-        }
         for (int i = 0; i < actualDoubleArray.length; i++) {
             double a = actualDoubleArray[i].doubleValue();
             double b = expectedDoubleArray[i].doubleValue();
@@ -152,17 +156,6 @@ public final class Assertions {
     public static void assertAlmostEquals(NDArray actual, NDArray expected)
             throws FailedTestException {
         assertAlmostEquals(actual, expected, 1e-5, 1e-3);
-    }
-
-    public static void assertNonZeroNumber(NDArray array, int number, String errorMessage)
-            throws FailedTestException {
-        if (array.nonzero() != number) {
-            throw new FailedTestException(getDefaultErrorMessage(array, number, errorMessage));
-        }
-    }
-
-    public static void assertNonZeroNumber(NDArray array, int number) throws FailedTestException {
-        assertNonZeroNumber(array, number, "Assertion failed!");
     }
 
     public static void assertInPlace(NDArray actual, NDArray expected, String errorMessage)

@@ -55,12 +55,12 @@ public class ImageFolderTest {
                 Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
 
                 Batch catBatch = ds.next();
-                Assertions.assertAlmostEquals(cat, catBatch.getData().head());
+                Assertions.assertAlmostEquals(cat.expandDims(0), catBatch.getData().head());
                 Assertions.assertEquals(manager.create(new int[] {0}), catBatch.getLabels().head());
                 catBatch.close();
 
                 Batch dogBatch = ds.next();
-                Assertions.assertAlmostEquals(dog, dogBatch.getData().head());
+                Assertions.assertAlmostEquals(dog.expandDims(0), dogBatch.getData().head());
                 Assertions.assertEquals(manager.create(new int[] {1}), dogBatch.getLabels().head());
                 dogBatch.close();
             }
