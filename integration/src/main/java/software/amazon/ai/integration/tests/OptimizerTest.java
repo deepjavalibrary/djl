@@ -48,7 +48,7 @@ public class OptimizerTest {
         Optimizer sgd =
                 new Sgd.Builder()
                         .setRescaleGrad(1.0f / BATCH_SIZE)
-                        .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
+                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true, sgd);
@@ -76,7 +76,7 @@ public class OptimizerTest {
         Optimizer optim =
                 new Sgd.Builder()
                         .setRescaleGrad(1.0f / BATCH_SIZE)
-                        .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
+                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .optMomentum(0.9f)
                         .build();
 
@@ -106,7 +106,7 @@ public class OptimizerTest {
         Optimizer optim =
                 new Nag.Builder()
                         .setRescaleGrad(1.0f / BATCH_SIZE)
-                        .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
+                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .setMomentum(0.9f)
                         .build();
 

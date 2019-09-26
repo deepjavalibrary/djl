@@ -72,7 +72,7 @@ public class GradientCollectorIntegrationTest {
         Optimizer optimizer =
                 new Sgd.Builder()
                         .setRescaleGrad(1.0f / batchSize)
-                        .setLearningRateTracker(LearningRateTracker.fixedLR(.03f))
+                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
                         .build();
 
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false, optimizer);
@@ -136,7 +136,7 @@ public class GradientCollectorIntegrationTest {
         Optimizer optimizer =
                 new Nag.Builder()
                         .setRescaleGrad(1.0f / 100)
-                        .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
+                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .setMomentum(0.9f)
                         .build();
 

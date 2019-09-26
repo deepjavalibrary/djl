@@ -38,7 +38,7 @@ public class ParameterStoreTest {
             Optimizer optimizer =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / 32)
-                            .setLearningRateTracker(LearningRateTracker.fixedLR(.03f))
+                            .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
                             .build();
             try (ParameterStore ps = new MxParameterStore(false, optimizer)) {
                 ps.init(0, weight);

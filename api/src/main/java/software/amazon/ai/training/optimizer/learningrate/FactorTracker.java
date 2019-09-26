@@ -20,46 +20,46 @@ public class FactorTracker extends LearningRateTracker {
     private static final Logger logger = LoggerFactory.getLogger(FactorTracker.class);
 
     private float factor;
-    private float stopFactorLr;
+    private float stopFactorLearningRate;
     private float step;
     private int count;
 
     public FactorTracker(
-            float baseLr,
+            float baseLearningRate,
             int warmupSteps,
-            float warmupBeginLr,
+            float warmupBeginLearningRate,
             WarmupMode warmupMode,
             int step,
             float factor,
-            float stopFactorLR) {
-        super(baseLr, warmupSteps, warmupBeginLr, warmupMode);
+            float stopFactorLearningRate) {
+        super(baseLearningRate, warmupSteps, warmupBeginLearningRate, warmupMode);
         this.step = step;
         this.factor = factor;
-        this.stopFactorLr = stopFactorLR;
+        this.stopFactorLearningRate = stopFactorLearningRate;
         this.count = 0;
     }
 
     @Override
     public float getNewLearningRate(int numUpdate) {
         if (numUpdate < warmupSteps) {
-            return getWarmupLr(numUpdate);
+            return getWarmupLearningRate(numUpdate);
         }
         while (numUpdate > count + step) {
             count += step;
-            baseLr = factor;
-            if (baseLr < stopFactorLr) {
-                baseLr = stopFactorLr;
+            baseLearningRate = factor;
+            if (baseLearningRate < stopFactorLearningRate) {
+                baseLearningRate = stopFactorLearningRate;
                 logger.debug(
                         "Update[{}]: now learning rate arrived at {}, will not change in the future",
                         numUpdate,
-                        String.format("%.5e", baseLr));
+                        String.format("%.5e", baseLearningRate));
             } else {
                 logger.debug(
                         "Update[{}]: Change learning rate to {}",
                         numUpdate,
-                        String.format("%.5e", baseLr));
+                        String.format("%.5e", baseLearningRate));
             }
         }
-        return baseLr;
+        return baseLearningRate;
     }
 }

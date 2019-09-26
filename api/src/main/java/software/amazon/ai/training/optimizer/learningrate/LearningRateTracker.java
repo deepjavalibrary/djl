@@ -15,41 +15,47 @@ package software.amazon.ai.training.optimizer.learningrate;
 public abstract class LearningRateTracker {
 
     // TODO: Add abstraction on Joule level
-    float baseLr;
+    float baseLearningRate;
     int warmupSteps;
-    float warmupBeginLr;
-    float warmupFinalLr;
+    float warmupBeginLearningRate;
+    float warmupFinalLearningRate;
     WarmupMode warmupMode;
 
     /**
      * A tracker returns a new learning rate based on the number of updates that have been
      * performed.
      *
-     * @param baseLR The initial learning rate
+     * @param baseLearningRate The initial learning rate
      * @param warmupSteps number of warmup steps used before this scheduler starts decay
-     * @param warmupBeginLr if using warmup, the learning rate from which it starts warming up
+     * @param warmupBeginLearningRate if using warmup, the learning rate from which it starts
+     *     warming up
      * @param warmupMode warmup can be done in two modes. 'linear' mode gradually increases lr with
      *     each step in equal increments 'constant' mode keeps lr at warmup_begin_lr for
      *     warmup_steps
      */
-    LearningRateTracker(float baseLR, int warmupSteps, float warmupBeginLr, WarmupMode warmupMode) {
-        this.baseLr = baseLR;
+    LearningRateTracker(
+            float baseLearningRate,
+            int warmupSteps,
+            float warmupBeginLearningRate,
+            WarmupMode warmupMode) {
+        this.baseLearningRate = baseLearningRate;
         this.warmupSteps = warmupSteps;
-        this.warmupBeginLr = warmupBeginLr;
+        this.warmupBeginLearningRate = warmupBeginLearningRate;
         this.warmupMode = warmupMode;
-        this.warmupFinalLr = baseLR;
+        this.warmupFinalLearningRate = baseLearningRate;
     }
 
-    float getWarmupLr(int numUpdate) {
+    float getWarmupLearningRate(int numUpdate) {
         if (warmupMode == WarmupMode.LINEAR) {
-            return warmupBeginLr + (warmupFinalLr - warmupBeginLr) * numUpdate / warmupSteps;
+            return warmupBeginLearningRate
+                    + (warmupFinalLearningRate - warmupBeginLearningRate) * numUpdate / warmupSteps;
         }
-        return warmupBeginLr;
+        return warmupBeginLearningRate;
     }
 
     public abstract float getNewLearningRate(int numUpdate);
 
-    public static LearningRateTracker fixedLR(float lr) {
-        return new FixedLearningRate(lr);
+    public static LearningRateTracker fixedLearningRate(float learningRate) {
+        return new FixedLearningRate(learningRate);
     }
 }

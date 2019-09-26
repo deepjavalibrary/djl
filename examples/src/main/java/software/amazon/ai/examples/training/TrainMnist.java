@@ -70,7 +70,7 @@ public final class TrainMnist {
         Optimizer optimizer =
                 new Sgd.Builder()
                         .setRescaleGrad(1.0f / batchSize)
-                        .setLearningRateTracker(LearningRateTracker.fixedLR(0.1f))
+                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
         TrainingConfig config =
                 new DefaultTrainingConfig(new NormalInitializer(0.01), false, optimizer);
