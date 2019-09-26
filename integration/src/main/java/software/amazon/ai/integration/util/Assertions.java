@@ -86,6 +86,18 @@ public final class Assertions {
         }
     }
 
+    public static void assertEquals(NDArray[] actual, NDArray[] expected, String errorMessage)
+            throws FailedTestException {
+        assertEquals(
+                actual.length,
+                expected.length,
+                getDefaultErrorMessage(actual.length, expected.length, errorMessage));
+        int size = expected.length;
+        for (int i = 0; i < size; i++) {
+            assertEquals(actual[i], expected[i], "The NDArrays differ on element " + i);
+        }
+    }
+
     public static void assertEquals(NDArray actual, NDArray expected) throws FailedTestException {
         assertEquals(actual, expected, "Two NDArrays are different!");
     }

@@ -32,25 +32,31 @@ public class ParameterStoreTest {
     public void testParameterStore() throws FailedTestException {
         try (Model model = Model.newInstance()) {
             NDManager manager = model.getNDManager();
+            int arraySize = 2;
             NDArray weight = manager.create(new float[] {1.f, 1.f}, new Shape(1, 2));
-            NDArray grad = manager.create(new float[] {2.f, 2.f}, new Shape(1, 2));
-
+            NDArray[] weights = {weight};
+            NDArray[] grads = new NDArray[arraySize];
+            for (int i = 0; i < arraySize; i++) {
+                grads[i] = manager.create(new float[] {2.f, 2.f}, new Shape(1, 2));
+            }
+            NDArray expectedWeight = manager.create(new float[] {4.f, 4.f}, new Shape(1, 2));
             Optimizer optimizer =
                     new Sgd.Builder()
                             .setRescaleGrad(1.0f / 32)
                             .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
                             .build();
+
             try (ParameterServer ps = new MxParameterServer(optimizer)) {
-                ps.init(0, weight);
-                ps.push(0, grad);
-                ps.pull(0, weight);
+                ps.init(0, weights);
+                ps.push(0, grads);
+                ps.pull(0, weights);
                 Assertions.assertEquals(
-                        weight,
-                        grad,
+                        weights[0],
+                        expectedWeight,
                         "Parameter Store updated wrong result: actual "
-                                + weight
+                                + weights[0]
                                 + ", expected "
-                                + grad);
+                                + expectedWeight);
             }
         }
     }

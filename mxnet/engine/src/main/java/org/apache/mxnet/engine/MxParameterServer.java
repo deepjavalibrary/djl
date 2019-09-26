@@ -14,6 +14,7 @@
 package org.apache.mxnet.engine;
 
 import com.sun.jna.Pointer;
+import java.util.Arrays;
 import org.apache.mxnet.jna.JnaUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -29,29 +30,31 @@ public class MxParameterServer extends NativeResource implements ParameterServer
 
     /** {@inheritDoc} */
     @Override
-    public void init(int key, NDArray value) {
-        // TODO: handle list
-        int[] keys = {key};
-        NDList vals = new NDList(value);
-        JnaUtils.parameterStoreInit(getHandle(), 1, keys, vals);
+    public void init(int key, NDArray[] values) {
+        // We are suppoting a single key on multiple devices right now
+        // Duplicate keys, to length of values, may need to change in future
+        int[] keys = new int[values.length];
+        Arrays.fill(keys, key);
+        NDList vals = new NDList(values);
+        JnaUtils.parameterStoreInit(getHandle(), values.length, keys, vals);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void push(int key, NDArray value) {
-        // TODO: handle list
-        int[] keys = {key};
-        NDList vals = new NDList(value);
-        JnaUtils.parameterStorePush(getHandle(), 1, keys, vals, 0);
+    public void push(int key, NDArray[] values) {
+        int[] keys = new int[values.length];
+        Arrays.fill(keys, key);
+        NDList vals = new NDList(values);
+        JnaUtils.parameterStorePush(getHandle(), values.length, keys, vals, 0);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void pull(int key, NDArray value) {
-        // TODO: handle list
-        int[] keys = {key};
-        NDList vals = new NDList(value);
-        JnaUtils.parameterStorePull(getHandle(), 1, keys, vals, 0);
+    public void pull(int key, NDArray[] values) {
+        int[] keys = new int[values.length];
+        Arrays.fill(keys, key);
+        NDList vals = new NDList(values);
+        JnaUtils.parameterStorePull(getHandle(), values.length, keys, vals, 0);
     }
 
     private static Pointer createdKVStore() {
