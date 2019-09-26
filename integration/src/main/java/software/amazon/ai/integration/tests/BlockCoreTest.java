@@ -18,12 +18,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.stream.Stream;
+import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -49,15 +47,7 @@ import software.amazon.ai.util.PairList;
 
 public class BlockCoreTest {
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", BlockCoreTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testLinear() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
@@ -98,7 +88,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testLinearWithDefinedLayout() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
@@ -149,7 +139,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testBatchNorm() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
@@ -170,7 +160,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testDropout() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
@@ -190,7 +180,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testEmbedding() throws FailedTestException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
@@ -215,7 +205,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testConv1D() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
@@ -247,7 +237,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testConv2D() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
@@ -274,7 +264,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testConv3D() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
@@ -307,7 +297,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testRNNTanh() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
@@ -332,7 +322,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testRNNRelu() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
@@ -361,7 +351,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testLstm() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
@@ -399,7 +389,7 @@ public class BlockCoreTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testGRU() throws FailedTestException, IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 

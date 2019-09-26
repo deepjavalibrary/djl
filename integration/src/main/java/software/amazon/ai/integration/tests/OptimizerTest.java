@@ -12,15 +12,12 @@
  */
 package software.amazon.ai.integration.tests;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxGradientCollector;
+import org.testng.annotations.Test;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
@@ -46,15 +43,7 @@ public class OptimizerTest {
     private static final int BATCH_SIZE = 10;
     private static final int CHANNELS = 10;
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", OptimizerTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testSgd() throws FailedTestException {
         Optimizer sgd =
                 new Sgd.Builder()
@@ -82,7 +71,7 @@ public class OptimizerTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testSgdWithMomentum() throws FailedTestException {
         Optimizer optim =
                 new Sgd.Builder()
@@ -112,7 +101,7 @@ public class OptimizerTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testNag() throws FailedTestException {
         Optimizer optim =
                 new Nag.Builder()
@@ -141,7 +130,7 @@ public class OptimizerTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testAdam() throws FailedTestException {
         Optimizer optim =
                 new Adam.Builder().setRescaleGrad(1.0f / BATCH_SIZE).optLearningRate(0.1f).build();

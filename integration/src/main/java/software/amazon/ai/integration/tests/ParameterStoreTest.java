@@ -13,14 +13,11 @@
 
 package software.amazon.ai.integration.tests;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxParameterStore;
+import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
@@ -31,15 +28,7 @@ import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
 
 public class ParameterStoreTest {
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", ParameterStoreTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testParameterStore() throws FailedTestException {
         try (Model model = Model.newInstance()) {
             NDManager manager = model.getNDManager();

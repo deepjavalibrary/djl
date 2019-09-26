@@ -21,15 +21,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 import org.apache.mxnet.dataset.Cifar10;
 import org.apache.mxnet.jna.JnaUtils;
+import org.testng.annotations.Test;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
@@ -48,15 +46,7 @@ public class DatasetTest {
 
     private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", DatasetTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testSequenceSampler() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
@@ -83,7 +73,7 @@ public class DatasetTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testRandomSampler() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
@@ -108,7 +98,7 @@ public class DatasetTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testBatchSampler() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
@@ -186,7 +176,7 @@ public class DatasetTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testArrayDataset() throws FailedTestException, IOException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
@@ -245,7 +235,7 @@ public class DatasetTest {
     }
 
     // this is just to demonstrate how multithreading dataloader will look like
-    // @RunAsTest
+    @Test(enabled = false)
     public void testMultithreading() throws IOException, InterruptedException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);

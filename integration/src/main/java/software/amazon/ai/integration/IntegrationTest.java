@@ -39,9 +39,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
+import org.testng.annotations.Test;
 import software.amazon.ai.integration.util.Arguments;
 import software.amazon.ai.integration.util.LogUtils;
-import software.amazon.ai.integration.util.RunAsTest;
 
 public class IntegrationTest {
 
@@ -100,11 +100,9 @@ public class IntegrationTest {
                 // TODO: collect performance data
                 for (int i = 0; i < iteration; i++) {
                     try {
-                        if (method.isAnnotationPresent(RunAsTest.class)) {
-                            totalMethodCount++;
-                            method.invoke(testObject);
-                            logger.info("Test {}.{} PASSED", testClass, method.getName());
-                        }
+                        totalMethodCount++;
+                        method.invoke(testObject);
+                        logger.info("Test {}.{} PASSED", testClass, method.getName());
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         logger.error("Test {}.{} FAILED", testClass, method.getName());
                         logger.error("", e.getCause());
@@ -136,7 +134,8 @@ public class IntegrationTest {
                 Object obj = ctor.newInstance();
                 if (methodName != null) {
                     Method method = clazz.getDeclaredMethod(methodName);
-                    if (method.isAnnotationPresent(RunAsTest.class)) {
+                    Test testMethod = method.getAnnotation(Test.class);
+                    if (testMethod != null && testMethod.enabled()) {
                         map.put(obj, Collections.singletonList(method));
                     } else {
                         logger.error("Invalid method name: {}. Not a test.", methodName);
@@ -161,7 +160,11 @@ public class IntegrationTest {
     private static List<Method> getTestsInClass(Class<?> clazz) {
         Method[] methods = clazz.getDeclaredMethods();
         return Arrays.stream(methods)
-                .filter(o -> o.isAnnotationPresent(RunAsTest.class))
+                .filter(
+                        o -> {
+                            Test testMethod = o.getAnnotation(Test.class);
+                            return testMethod != null && testMethod.enabled();
+                        })
                 .collect(Collectors.toList());
     }
 

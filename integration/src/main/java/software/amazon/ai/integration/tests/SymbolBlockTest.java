@@ -17,17 +17,14 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxGradientCollector;
+import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.FileUtils;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
@@ -49,15 +46,7 @@ import software.amazon.ai.util.Utils;
 
 public class SymbolBlockTest {
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", SymbolBlockTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testForward() throws FailedTestException, IOException {
         Path modelDir = prepareModel();
         try (Model model = Model.newInstance()) {
@@ -72,7 +61,7 @@ public class SymbolBlockTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void trainWithNewParam() throws FailedTestException, IOException {
         Path modelDir = prepareModel();
 
@@ -100,7 +89,7 @@ public class SymbolBlockTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void trainWithExistParam() throws FailedTestException, IOException {
         Path modelDir = prepareModel();
 
@@ -128,7 +117,7 @@ public class SymbolBlockTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void trainWithCustomLayer() throws FailedTestException, IOException {
         Path modelDir = prepareModel();
 

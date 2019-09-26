@@ -19,22 +19,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.IntStream;
 import org.apache.mxnet.engine.MxEngine;
+import org.testng.annotations.Test;
 import software.amazon.ai.engine.Engine;
-import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 
 public class NDArrayIOTest {
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", NDArrayIOTest.class.getName()};
-        new IntegrationTest().runTests(cmd);
-    }
-
-    @RunAsTest
+    @Test
     public void testNDArrayLoad() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             ((MxEngine) Engine.getInstance()).setNumpyMode(false);
@@ -57,7 +51,7 @@ public class NDArrayIOTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testNDArraySaveLoadDict() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             File tmpfileNames = File.createTempFile("ndarray_list", "bin");
@@ -75,7 +69,7 @@ public class NDArrayIOTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testNDArraySaveLoadList() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             File tmpfileNames = File.createTempFile("ndarray_list", "bin");

@@ -12,12 +12,9 @@
  */
 package software.amazon.ai.integration.tests;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-import software.amazon.ai.integration.IntegrationTest;
+import org.testng.annotations.Test;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDManager;
@@ -25,15 +22,7 @@ import software.amazon.ai.ndarray.types.Shape;
 
 public class NDArrayElementComparisonOpTest {
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", NDArrayElementComparisonOpTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testContentEquals() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f});
@@ -45,7 +34,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testEqualsForEqualNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray ndArray1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
@@ -57,7 +46,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testEqualsForScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray ndArray = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
@@ -66,7 +55,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testEqualsForUnEqualNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray ndArray1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 4));
@@ -78,7 +67,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testGreaterThanScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1, 0, 2f, 2f, 4f}, new Shape(1, 5));
@@ -87,7 +76,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testGreaterThanOrEqualToScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 2f, 4f}, new Shape(1, 4));
@@ -97,7 +86,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testGreaterThanAndLessThan() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray ndArray1 =
@@ -111,7 +100,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testGreaterThanAndLessThanEquals() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray ndArray1 =
@@ -125,7 +114,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testLesserThanOrEqualToScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 2f, 4f, 5f}, new Shape(1, 5));
@@ -135,7 +124,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testLesserThanScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 2f, 4f, 5f}, new Shape(1, 5));
@@ -144,7 +133,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testMax() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray oringal1 = manager.create(new float[] {1f, 2f, 3f, 4f, 5f});
@@ -160,7 +149,7 @@ public class NDArrayElementComparisonOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testMin() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray oringal1 = manager.create(new float[] {1f, 2f, 3f, 4f, 5f});

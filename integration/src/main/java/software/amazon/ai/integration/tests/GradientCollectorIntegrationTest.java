@@ -13,15 +13,12 @@
 package software.amazon.ai.integration.tests;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxGradientCollector;
+import org.testng.annotations.Test;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.IntegrationTest;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
@@ -50,15 +47,7 @@ import software.amazon.ai.zoo.cv.classification.ResNetV1;
 
 public class GradientCollectorIntegrationTest {
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", GradientCollectorIntegrationTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testAutograd() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager();
                 MxGradientCollector gradCol = new MxGradientCollector()) {
@@ -74,7 +63,7 @@ public class GradientCollectorIntegrationTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testTrain() throws FailedTestException, IOException {
         int numOfData = 1000;
         int batchSize = 10;
@@ -142,7 +131,7 @@ public class GradientCollectorIntegrationTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testTrainResNet() throws FailedTestException {
         Optimizer optimizer =
                 new Nag.Builder()

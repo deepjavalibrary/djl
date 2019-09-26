@@ -12,12 +12,9 @@
  */
 package software.amazon.ai.integration.tests;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-import software.amazon.ai.integration.IntegrationTest;
+import org.testng.annotations.Test;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDManager;
@@ -25,15 +22,7 @@ import software.amazon.ai.ndarray.types.Shape;
 
 public class NDArrayLogicalOpTest {
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", NDArrayLogicalOpTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testLogicalAnd() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original1 = manager.arange(10);
@@ -44,7 +33,7 @@ public class NDArrayLogicalOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testLogicalOr() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original1 = manager.arange(10);
@@ -55,7 +44,7 @@ public class NDArrayLogicalOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testLogicalXor() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original1 = manager.arange(10);
@@ -66,7 +55,7 @@ public class NDArrayLogicalOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testLogicalNot() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new double[] {-2., 0., 1.});

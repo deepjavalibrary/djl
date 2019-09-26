@@ -12,27 +12,16 @@
  */
 package software.amazon.ai.integration.tests;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-import software.amazon.ai.integration.IntegrationTest;
+import org.testng.annotations.Test;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 
 public class NDArrayReductionOpTest {
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", NDArrayReductionOpTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testMax() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
@@ -49,7 +38,7 @@ public class NDArrayReductionOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testMin() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
@@ -67,7 +56,7 @@ public class NDArrayReductionOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testSum() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
@@ -84,7 +73,7 @@ public class NDArrayReductionOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testProd() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
@@ -105,7 +94,7 @@ public class NDArrayReductionOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testMean() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
@@ -121,8 +110,9 @@ public class NDArrayReductionOpTest {
             Assertions.assertEquals(meanKeepExpected, meanKeep, "Incorrect mean keep");
         }
     }
+
     // TODO disable for now
-    // @RunAsTest
+    @Test(enabled = false)
     public void testTrace() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.arange(8).reshape(new Shape(2, 2, 2)).trace();

@@ -12,12 +12,9 @@
  */
 package software.amazon.ai.integration.tests;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-import software.amazon.ai.integration.IntegrationTest;
+import org.testng.annotations.Test;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
@@ -25,15 +22,7 @@ import software.amazon.ai.nn.pooling.Pool;
 
 public class PoolingOperatorsTest {
 
-    public static void main(String[] args) {
-        String[] cmd = {"-c", PoolingOperatorsTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
-
-    @RunAsTest
+    @Test
     public void testMaxPool() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
@@ -49,7 +38,7 @@ public class PoolingOperatorsTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testSumPool() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
@@ -66,7 +55,7 @@ public class PoolingOperatorsTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testAvgPool() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
@@ -81,7 +70,7 @@ public class PoolingOperatorsTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testLpPool() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =

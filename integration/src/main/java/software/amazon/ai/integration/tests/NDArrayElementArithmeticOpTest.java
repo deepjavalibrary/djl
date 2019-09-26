@@ -12,15 +12,12 @@
  */
 package software.amazon.ai.integration.tests;
 
-import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import org.apache.mxnet.engine.MxGradientCollector;
-import software.amazon.ai.integration.IntegrationTest;
+import org.testng.annotations.Test;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
-import software.amazon.ai.integration.util.RunAsTest;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDManager;
@@ -28,14 +25,6 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.GradientCollector;
 
 public class NDArrayElementArithmeticOpTest {
-
-    public static void main(String[] args) {
-        String[] cmd = {"-c", NDArrayElementArithmeticOpTest.class.getName()};
-        new IntegrationTest()
-                .runTests(
-                        Stream.concat(Arrays.stream(cmd), Arrays.stream(args))
-                                .toArray(String[]::new));
-    }
 
     private void testCornerCase(
             NDManager manager,
@@ -139,7 +128,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testAddScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray lhs = manager.create(new float[] {1f, 2f, 3f, 4f});
@@ -176,7 +165,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testAddNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray addend = manager.create(new float[] {1f, 2f, 3f, 4f});
@@ -213,7 +202,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testSubScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray minuend = manager.create(new float[] {6, 9, 12, 11, 0});
@@ -234,7 +223,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testSubNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray minuend = manager.create(new float[] {6, 9, 12, 15, 0});
@@ -256,7 +245,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testReverseSubScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray minuend = manager.create(new float[] {6, 91, 12, 215, 180});
@@ -280,7 +269,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testReverseSubNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray minuend = manager.create(new float[] {6, 9, 12, 15, 45});
@@ -329,7 +318,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testMulScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray multiplicand = manager.create(new float[] {6, 9, -12, 15, 0});
@@ -352,7 +341,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testMulNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray multiplicand = manager.create(new float[] {6, 9, 12, 15, 0});
@@ -392,7 +381,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testDivScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray dividend = manager.create(new float[] {6, 9, 12, 15, 0});
@@ -413,7 +402,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testDivNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray dividend = manager.create(new float[] {6, 9, 12, 15, 0});
@@ -435,7 +424,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testReverseDivScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray dividend = manager.create(new float[] {6, 9, 12, 15, 45});
@@ -456,7 +445,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testReverseDivNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray dividend = manager.create(new float[] {6, 9, 12, 15, 45});
@@ -492,7 +481,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testModScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray dividend = manager.create(new float[] {5, 6, 7, 8, 9});
@@ -513,7 +502,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testModNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray dividend = manager.create(new float[] {7, 8, 9, 10, 11});
@@ -535,7 +524,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testReverseModScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray dividend = manager.create(new float[] {5, 6, 7, 8, 9});
@@ -558,7 +547,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testReverseModNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray dividend = manager.create(new float[] {7, 8, 9, 10, 11});
@@ -594,7 +583,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testPowScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {6, 0, -1, 5, 2}, new Shape(1, 5));
@@ -611,7 +600,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testPowNDArray() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {6, 9, 12, 2, 0});
@@ -633,7 +622,7 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
-    @RunAsTest
+    @Test
     public void testReversePowScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {3, 4, 5, 6, 7});
