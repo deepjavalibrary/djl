@@ -221,12 +221,60 @@ public final class NDArrays {
      *
      * @param a the ndarray holding the elements to be compared. They must have the same shape, or
      *     shapes that can be broadcast to a single shape.
+     * @param n the number to be compared against
+     * @return the maximum of a and b, element-wise
+     */
+    public static NDArray max(NDArray a, Number n) {
+        return a.getNDArrayInternal().max(n);
+    }
+
+    /**
+     * Returns element-wise maximum of the input arrays with broadcasting.
+     *
+     * @param n the number to be compared against
+     * @param a the ndarray holding the elements to be compared. They must have the same shape, or
+     *     shapes that can be broadcast to a single shape.
+     * @return the maximum of a and b, element-wise
+     */
+    public static NDArray max(Number n, NDArray a) {
+        return max(a, n);
+    }
+
+    /**
+     * Returns element-wise maximum of the input arrays with broadcasting.
+     *
+     * @param a the ndarray holding the elements to be compared. They must have the same shape, or
+     *     shapes that can be broadcast to a single shape.
      * @param b the ndarray holding the elements to be compared. They must have the same shape, or
      *     shapes that can be broadcast to a single shape.
      * @return the maximum of a and b, element-wise
      */
     public static NDArray max(NDArray a, NDArray b) {
         return a.getNDArrayInternal().max(b);
+    }
+
+    /**
+     * Returns element-wise minimum of the input arrays with broadcasting.
+     *
+     * @param a the ndarray holding the elements to be compared. They must have the same shape, or
+     *     shapes that can be broadcast to a single shape.
+     * @param n the number to be compared against
+     * @return the minimum of a and b, element-wise
+     */
+    public static NDArray min(NDArray a, Number n) {
+        return a.getNDArrayInternal().min(n);
+    }
+
+    /**
+     * Returns element-wise minimum of the input arrays with broadcasting.
+     *
+     * @param n the number to be compared against
+     * @param a the ndarray holding the elements to be compared. They must have the same shape, or
+     *     shapes that can be broadcast to a single shape.
+     * @return the minimum of a and b, element-wise
+     */
+    public static NDArray min(Number n, NDArray a) {
+        return min(a, n);
     }
 
     /**

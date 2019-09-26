@@ -422,6 +422,9 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public boolean contentEquals(Number number) {
+        if (number == null) {
+            return false;
+        }
         try (NDArray result = eq(number)) {
             return result.nonzero() == result.size();
         }
@@ -430,6 +433,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public boolean contentEquals(NDArray other) {
         if (other == null || (!getShape().equals(other.getShape()))) {
+            return false;
+        }
+        if (getDataType() != other.getDataType()) {
             return false;
         }
         try (NDArray result = eq(other)) {
@@ -516,13 +522,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray lt(Number other) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", other.toString());
-        return manager.invoke("_lesser_scalar", this, params);
+        return manager.invoke("_npi_less_scalar", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
-        return manager.invoke("_lesser", new NDList(this, other), null).head();
+        return manager.invoke("_npi_less", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -536,7 +542,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lte(NDArray other) {
-        return manager.invoke("_lesser_equal", new NDList(this, other), null).head();
+        return manager.invoke("_npi_less_equal", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
@@ -1500,8 +1506,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public long nonzero() {
+        // TODO switch to use nonzero op in mxnet
         MxNDArray zeros = (MxNDArray) eq(0);
-        NDArray sum = manager.invoke("sum", eq(zeros).eq(zeros), null);
+        NDArray sum = manager.invoke("_np_sum", eq(zeros).eq(zeros), null);
         return sum.toArray()[0].intValue();
     }
 
