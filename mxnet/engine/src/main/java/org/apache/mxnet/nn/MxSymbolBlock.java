@@ -204,7 +204,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     public void beforeInitialize(NDList inputs) {}
 
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
         for (Parameter param : params) {
             if (param.getName().equals(name)) {
                 return param.getArray().getShape();

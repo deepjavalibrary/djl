@@ -83,7 +83,7 @@ public class BatchNorm extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
         switch (name) {
             case "runningMean":
             case "runningVar":

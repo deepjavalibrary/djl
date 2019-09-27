@@ -102,10 +102,10 @@ public class GRU extends RecurrentCell {
     }
 
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
-        NDArray input = inputs.get(0);
-        long channelSize = input.getShape().get(2);
-        long batchSize = input.getShape().get(1);
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
+        Shape shape = inputShapes[0];
+        long channelSize = shape.get(2);
+        long batchSize = shape.get(1);
         switch (name) {
             case "i2rWeight":
             case "i2zWeight":

@@ -117,7 +117,7 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
         throw new IllegalArgumentException("SequentialBlocks have no parameters");
     }
 

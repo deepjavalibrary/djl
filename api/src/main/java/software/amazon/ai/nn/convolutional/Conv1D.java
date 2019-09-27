@@ -69,9 +69,8 @@ public class Conv1D extends Convolution {
     }
 
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
-        NDArray input = inputs.head();
-        Shape inputShape = input.getShape();
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
+        Shape inputShape = inputShapes[0];
         switch (name) {
             case "weight":
                 return new Shape(numFilters, inputShape.get(1), kernel.get(0));

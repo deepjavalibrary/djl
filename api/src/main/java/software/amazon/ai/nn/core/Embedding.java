@@ -79,7 +79,7 @@ public class Embedding<T> extends AbstractBlock {
     public void beforeInitialize(NDList inputs) {}
 
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
         if ("embedding".equals(name)) {
             return new Shape(numItems, embeddingSize);
         }

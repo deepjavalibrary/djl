@@ -57,7 +57,7 @@ public class Prelu extends AbstractBlock {
     }
 
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
         if ("alpha".equals(name)) { // TODO: This should return Shape()
             return new Shape(1);
         }

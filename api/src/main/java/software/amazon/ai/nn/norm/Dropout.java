@@ -58,7 +58,7 @@ public class Dropout extends AbstractBlock {
     }
 
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
         throw new IllegalArgumentException("Dropout has no parameters");
     }
 

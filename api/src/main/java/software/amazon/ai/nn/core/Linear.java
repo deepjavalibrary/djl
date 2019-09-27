@@ -121,7 +121,7 @@ public class Linear extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
         switch (name) {
             case "weight":
                 return new Shape(outChannels).addAll(inChannels);

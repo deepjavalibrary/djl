@@ -63,7 +63,7 @@ public interface Block {
 
     DataDesc[] describeInput();
 
-    Shape getParameterShape(String name, NDList inputs);
+    Shape getParameterShape(String name, Shape[] inputShapes);
 
     PairList<String, Block> getChildren();
 

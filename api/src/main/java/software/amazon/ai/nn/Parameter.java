@@ -134,10 +134,14 @@ public class Parameter implements AutoCloseable {
             }
             // TODO: close old array
         }
+        Shape[] shapes = new Shape[inputs.size()];
+        for (int i = 0; i < shapes.length; ++i) {
+            shapes[i] = inputs.get(i).getShape();
+        }
         NDArray array =
                 initializer.initialize(
                         manager,
-                        block.getParameterShape(name, inputs),
+                        block.getParameterShape(name, shapes),
                         inputs.head().getDataType(),
                         devices[0]);
         array.attachGradient();

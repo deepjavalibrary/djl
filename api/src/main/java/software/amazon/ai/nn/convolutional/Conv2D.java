@@ -76,12 +76,11 @@ public class Conv2D extends Convolution {
     }
 
     @Override
-    public Shape getParameterShape(String name, NDList inputs) {
-        NDArray input = inputs.head();
-        Shape inputShape = input.getShape();
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
+        Shape shape = inputShapes[0];
         switch (name) {
             case "weight":
-                return new Shape(numFilters, inputShape.get(1), kernel.get(0), kernel.get(1));
+                return new Shape(numFilters, shape.get(1), kernel.get(0), kernel.get(1));
             case "bias":
                 return new Shape(numFilters);
             default:
