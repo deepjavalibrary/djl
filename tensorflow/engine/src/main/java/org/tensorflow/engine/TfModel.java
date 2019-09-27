@@ -175,9 +175,15 @@ public class TfModel implements Model {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager getNDManager() {
         return null;
+    }
+
+    @Override
+    public DataType getDataType() {
+        return DataType.FLOAT32;
     }
 
     /** {@inheritDoc} */

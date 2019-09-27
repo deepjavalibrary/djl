@@ -219,6 +219,8 @@ public interface Model extends AutoCloseable {
      */
     InputStream getArtifactAsStream(String name) throws IOException;
 
+    DataType getDataType();
+
     /**
      * Casts the model to support a different precision level.
      *

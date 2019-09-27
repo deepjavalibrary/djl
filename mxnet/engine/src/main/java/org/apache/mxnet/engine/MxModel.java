@@ -66,11 +66,13 @@ public class MxModel implements Model {
     private Path modelDir;
     private MxNDManager manager;
     private Block block;
+    private DataType dataType;
     private DataDesc[] inputData;
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
 
     MxModel(Device device) {
         device = Device.defaultIfNull(device);
+        dataType = DataType.FLOAT32;
         manager = MxNDManager.getSystemManager().newSubManager(device);
     }
 
@@ -136,6 +138,7 @@ public class MxModel implements Model {
             dos.writeBytes("JOUL");
             dos.writeInt(MODEL_VERSION);
             dos.writeUTF(modelName);
+            dos.writeUTF(dataType.name());
             DataDesc[] descs = block.describeInput();
             dos.writeInt(descs.length);
             for (DataDesc desc : descs) {
@@ -180,9 +183,20 @@ public class MxModel implements Model {
         return new MxPredictor<>(this, translator, manager.getDevice());
     }
 
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public DataType getDataType() {
+        return dataType;
+    }
+
     /** {@inheritDoc} */
     @Override
     public void cast(DataType dataType) {
+        this.dataType = dataType;
         block.cast(dataType);
     }
 
@@ -328,6 +342,9 @@ public class MxModel implements Model {
             parameters.add(new Parameter(paramName, block, array));
         }
 
+        // TODO: Find a better to infer model DataType from SymbolBlock.
+        dataType = parameters.get(0).getArray().getDataType();
+
         if (!device.equals(Device.cpu())) {
             // MXNet always load parameters on CPU, we only close parameters if we copied them.
             paramNDlist.close();
@@ -349,6 +366,8 @@ public class MxModel implements Model {
 
             String modelName = dis.readUTF();
             logger.debug("Loading model parameter: {}", modelName);
+
+            dataType = DataType.valueOf(dis.readUTF());
 
             int numberOfInputs = dis.readInt();
             for (int i = 0; i < numberOfInputs; ++i) {

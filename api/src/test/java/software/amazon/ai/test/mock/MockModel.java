@@ -135,6 +135,11 @@ public class MockModel implements Model {
     }
 
     @Override
+    public DataType getDataType() {
+        return DataType.FLOAT32;
+    }
+
+    @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }

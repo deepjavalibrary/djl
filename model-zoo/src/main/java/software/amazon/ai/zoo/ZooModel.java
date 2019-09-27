@@ -126,6 +126,12 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public DataType getDataType() {
+        return model.getDataType();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void cast(DataType dataType) {
         model.cast(dataType);
     }
