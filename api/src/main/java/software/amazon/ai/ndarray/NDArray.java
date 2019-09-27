@@ -123,11 +123,11 @@ public interface NDArray extends AutoCloseable {
     /**
      * Converts the NDArray to a different {@link Device}.
      *
-     * @param ctx {@link Device} to be set
+     * @param device {@link Device} to be set
      * @param copy set {@code true} if you want to return a copy of the Existing {@code NDArray}.
      * @return the result {@code NDArray} with the new {@link Device}
      */
-    NDArray asInDevice(Device ctx, boolean copy);
+    NDArray asInDevice(Device device, boolean copy);
 
     /**
      * Converts the NDArray to a different {@link DataType}.

@@ -12,49 +12,68 @@
  */
 package software.amazon.ai.translate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.util.Pair;
+import software.amazon.ai.util.PairList;
 
-public class Pipeline extends TransformBlock {
+public class Pipeline {
 
-    private List<TransformBlock> transformBlocks;
+    private PairList<String, Transform> transforms;
 
     public Pipeline() {
-        transformBlocks = new ArrayList<>();
+        transforms = new PairList<>();
     }
 
     public Pipeline(Transform... transforms) {
-        transformBlocks =
-                Arrays.stream(transforms).map(TransformBlock::new).collect(Collectors.toList());
-    }
-
-    public Pipeline(TransformBlock... transformBlocks) {
-        this.transformBlocks = Arrays.asList(transformBlocks);
+        this.transforms = new PairList<>();
+        for (Transform transform : transforms) {
+            this.transforms.add(null, transform);
+        }
     }
 
     public Pipeline add(Transform transform) {
-        transformBlocks.add(new TransformBlock(transform));
+        transforms.add(null, transform);
         return this;
     }
 
-    public Pipeline add(TransformBlock transformBlock) {
-        transformBlocks.add(transformBlock);
+    public Pipeline add(String name, Transform transform) {
+        transforms.add(name, transform);
         return this;
     }
 
-    @Override
     public NDList transform(NDList input, boolean close) {
-        if (transformBlocks.isEmpty()) {
+        if (transforms.isEmpty() || input.isEmpty()) {
             return input;
         }
 
-        NDList ret = transformBlocks.get(0).transform(input, close);
-        for (int i = 1; i < transformBlocks.size(); ++i) {
-            ret = transformBlocks.get(i).transform(ret, true);
+        NDArray[] arrays = input.toArray();
+        String[] strings = new String[input.size()];
+
+        Map<String, Integer> map = new ConcurrentHashMap<>();
+        // create mapping
+        for (int i = 0; i < input.size(); i++) {
+            String key = input.getWithTag(i).getKey();
+            if (key != null) {
+                map.put(key, i);
+            }
+            strings[i] = key;
         }
-        return ret;
+        // apply transform
+        for (Pair<String, Transform> transform : transforms) {
+            int index = (transform.getKey() != null) ? map.getOrDefault(transform.getKey(), -1) : 0;
+            if (index == -1) {
+                throw new IllegalArgumentException(
+                        transform.getKey() + " can't be found in input NDList");
+            }
+            arrays[index] = transform.getValue().transform(arrays[index], close);
+        }
+        // restore the NDList
+        NDList res = new NDList(input.size());
+        IntStream.range(0, input.size()).forEach(i -> res.add(strings[i], arrays[i]));
+        return res;
     }
 }

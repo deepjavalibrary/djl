@@ -132,6 +132,15 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
+     * Returns true if size() is 0.
+     *
+     * @return true if size() is 0, otherwise false.
+     */
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    /**
      * Returns the key-value pair at the specified position in this list.
      *
      * @param index index of the element to return

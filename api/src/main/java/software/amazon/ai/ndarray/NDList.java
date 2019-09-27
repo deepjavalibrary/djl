@@ -78,6 +78,15 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     }
 
     /**
+     * Returns true if size() is 0.
+     *
+     * @return true if size() is 0, otherwise false.
+     */
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    /**
      * Removes the first occurrence of the specified element from this NDList if it is present
      * (optional operation).
      *
