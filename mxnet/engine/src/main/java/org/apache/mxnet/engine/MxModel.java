@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -98,11 +99,14 @@ public class MxModel implements Model {
     public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException {
         MxEngine engine = ((MxEngine) Engine.getEngine(MxEngine.ENGINE_NAME));
+        // TODO: currently, most of the models are saved into non-numpy model
+        // loading that way may cause problems. Wait MXNet 1.6fixes
         engine.setNumpyMode(false);
 
         try {
             modelDir = modelPath.toAbsolutePath();
             if (block == null) {
+                // load MxSymbolBlock
                 Path symbolFile = modelDir.resolve(modelName + "-symbol.json");
                 if (Files.notExists(symbolFile)) {
                     throw new FileNotFoundException(
@@ -111,7 +115,8 @@ public class MxModel implements Model {
                                     + ", please set block manually.");
                 }
                 Symbol symbol = Symbol.load(manager, symbolFile.toAbsolutePath().toString());
-                block = new MxSymbolBlock(manager, symbol);
+                // TODO: change default name "data" to model-specific one
+                block = new MxSymbolBlock(manager, symbol, Collections.singletonList("data"));
             }
 
             loadParameters(modelName, options);
@@ -331,7 +336,7 @@ public class MxModel implements Model {
         NDList paramNDlist = JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath());
         Device device = manager.getDevice();
 
-        List<Parameter> parameters = block.getDirectParameters();
+        List<Parameter> parameters = new ArrayList<>();
         for (Pair<String, NDArray> pair : paramNDlist) {
             String key = pair.getKey();
             if (key == null) {
@@ -341,6 +346,7 @@ public class MxModel implements Model {
             NDArray array = pair.getValue().asInDevice(device, false);
             parameters.add(new Parameter(paramName, block, array));
         }
+        ((MxSymbolBlock) block).setParams(parameters);
 
         // TODO: Find a better to infer model DataType from SymbolBlock.
         dataType = parameters.get(0).getArray().getDataType();

@@ -21,8 +21,10 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -909,6 +911,24 @@ public final class JnaUtils {
         return toStringArray(ref, size.get());
     }
 
+    public static String[] listSymbolArguments(Pointer symbol) {
+        IntBuffer size = IntBuffer.allocate(1);
+        PointerByReference ref = new PointerByReference();
+
+        checkCall(LIB.MXSymbolListArguments(symbol, size, ref));
+
+        return toStringArray(ref, size.get());
+    }
+
+    public static String[] listSymbolAuxiliaryStates(Pointer symbol) {
+        IntBuffer size = IntBuffer.allocate(1);
+        PointerByReference ref = new PointerByReference();
+
+        checkCall(LIB.MXSymbolListAuxiliaryStates(symbol, size, ref));
+
+        return toStringArray(ref, size.get());
+    }
+
     public static Pointer getSymbolInternals(Pointer symbol) {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXSymbolGetInternals(symbol, ref));
@@ -1006,6 +1026,82 @@ public final class JnaUtils {
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXSymbolCreateFromFile(path, ref));
         return ref.getValue();
+    }
+
+    private static List<Shape> recoverShape(
+            NativeSizeByReference size, PointerByReference nDim, PointerByReference data) {
+        int shapeLength = (int) size.getValue().longValue();
+        if (shapeLength == 0) {
+            return new ArrayList<>();
+        }
+        int[] dims = nDim.getValue().getIntArray(0, shapeLength);
+        int flattenedLength = 0;
+        for (int dim : dims) {
+            flattenedLength += dim;
+        }
+        long[] flattenedShapes = data.getValue().getPointer(0).getLongArray(0, flattenedLength);
+        int idx = 0;
+        List<Shape> result = new ArrayList<>();
+        for (int dim : dims) {
+            long[] shape = new long[dim];
+            System.arraycopy(flattenedShapes, idx, shape, 0, dim);
+            idx += dim;
+            result.add(new Shape(shape));
+        }
+        return result;
+    }
+
+    public static List<List<Shape>> inferShape(Symbol symbol, PairList<String, Shape> args) {
+
+        Pointer handler = symbol.getHandle();
+        int numArgs = args.size();
+        String[] keys = args.keys().toArray(new String[0]);
+        // the following two is also the representation of
+        // CSR NDArray
+        long[] indPtr = new long[numArgs + 1];
+        Shape flattened = new Shape();
+        indPtr[0] = 0;
+        for (int i = 0; i < args.size(); i++) {
+            Shape shape = args.valueAt(i);
+            indPtr[i + 1] = shape.dimension();
+            flattened = flattened.addAll(shape);
+        }
+        long[] flattenedShapeArray = flattened.getShape();
+
+        NativeSizeByReference inShapeSize = new NativeSizeByReference();
+        PointerByReference inShapeNDim = new PointerByReference();
+        PointerByReference inShapeData = new PointerByReference();
+        NativeSizeByReference outShapeSize = new NativeSizeByReference();
+        PointerByReference outShapeNDim = new PointerByReference();
+        PointerByReference outShapeData = new PointerByReference();
+        NativeSizeByReference auxShapeSize = new NativeSizeByReference();
+        PointerByReference auxShapeNDim = new PointerByReference();
+        PointerByReference auxShapeData = new PointerByReference();
+        IntBuffer complete = IntBuffer.allocate(1);
+        checkCall(
+                LIB.MXSymbolInferShapeEx64(
+                        handler,
+                        numArgs,
+                        keys,
+                        indPtr,
+                        flattenedShapeArray,
+                        inShapeSize,
+                        inShapeNDim,
+                        inShapeData,
+                        outShapeSize,
+                        outShapeNDim,
+                        outShapeData,
+                        auxShapeSize,
+                        auxShapeNDim,
+                        auxShapeData,
+                        complete));
+        if (complete.get() != 0) {
+            return Arrays.asList(
+                    recoverShape(inShapeSize, inShapeNDim, inShapeData),
+                    recoverShape(outShapeSize, outShapeNDim, outShapeData),
+                    recoverShape(auxShapeSize, auxShapeNDim, auxShapeData));
+        }
+        return null;
     }
 
     /* Need tests

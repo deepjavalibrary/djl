@@ -90,7 +90,7 @@ public abstract class AbstractBlock implements Block {
         if (!initialized) {
             beforeInitialize(inputs);
             for (Parameter parameter : getDirectParameters()) {
-                parameter.initialize(inputs, false);
+                parameter.initialize(inputs);
             }
             initialized = true;
         }
@@ -99,6 +99,11 @@ public abstract class AbstractBlock implements Block {
     @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Unimplemented method cast");
+    }
+
+    @Override
+    public void clear() {
+        getParameters().forEach(param -> param.getValue().close());
     }
 
     private ParameterList getChildrenParameters() {

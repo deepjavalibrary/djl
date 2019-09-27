@@ -93,43 +93,28 @@ public class Parameter implements AutoCloseable {
         }
     }
 
-    public void reinitialize() {
+    public void initialize(NDList inputs) {
+
         if (!isInitialized()) {
-            throw new IllegalStateException("This parameter is not initialized");
-        }
-        Objects.requireNonNull(initializer, "No initializer has been set");
-        NDArray newArray = initializer.initialize(manager, array.getShape(), array.getDataType());
-        if (parameterStore != null) {
-            parameterStore.initialize(this, newArray);
-        } else {
-            newArray.attachGradient();
-            array = newArray;
-        }
-    }
-
-    public void initialize(NDList inputs, boolean overwrite) {
-        Objects.requireNonNull(initializer, "No initializer has been set");
-
-        if (isInitialized()) {
-            if (!overwrite) {
-                throw new IllegalStateException("This parameter is already initialized");
+            Objects.requireNonNull(initializer, "No initializer has been set");
+            Shape[] shapes = new Shape[inputs.size()];
+            for (int i = 0; i < shapes.length; ++i) {
+                shapes[i] = inputs.get(i).getShape();
             }
-            // TODO: close old array
+            array =
+                    initializer.initialize(
+                            manager,
+                            block.getParameterShape(name, shapes),
+                            inputs.head().getDataType());
         }
-        Shape[] shapes = new Shape[inputs.size()];
-        for (int i = 0; i < shapes.length; ++i) {
-            shapes[i] = inputs.get(i).getShape();
-        }
-        array =
-                initializer.initialize(
-                        manager,
-                        block.getParameterShape(name, shapes),
-                        inputs.head().getDataType());
 
         if (parameterStore != null) {
             parameterStore.initialize(this, array);
         } else {
-            array.attachGradient();
+            // TODO: If no initializer
+            if (initializer != null) {
+                array.attachGradient();
+            }
         }
     }
 
@@ -238,6 +223,7 @@ public class Parameter implements AutoCloseable {
     public void close() {
         if (array != null) {
             array.close();
+            array = null;
         }
     }
 

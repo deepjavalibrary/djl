@@ -56,6 +56,8 @@ public interface Block {
 
     void cast(DataType dataType);
 
+    void clear();
+
     DataDesc[] describeInput();
 
     Shape getParameterShape(String name, Shape[] inputShapes);

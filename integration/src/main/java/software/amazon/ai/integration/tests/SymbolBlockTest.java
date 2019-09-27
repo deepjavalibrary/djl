@@ -64,17 +64,17 @@ public class SymbolBlockTest {
     @Test
     public void trainWithNewParam() throws FailedTestException, IOException {
         Path modelDir = prepareModel();
-
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
-
+            model.getBlock().clear();
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
 
                 Pair<NDArray, NDArray> result = train(manager, trainer, model.getBlock());
-                Assertions.assertAlmostEquals(manager.create(6430785.5), result.getKey());
+                Assertions.assertAlmostEquals(result.getKey(), manager.create(6430785.5));
                 Assertions.assertAlmostEquals(
+                        result.getValue(),
                         manager.create(
                                 new float[] {
                                     2.38418579e-06f,
@@ -83,8 +83,7 @@ public class SymbolBlockTest {
                                     3.72529030e-08f,
                                     1.43556367e-03f,
                                     -2.30967991e-08f
-                                }),
-                        result.getValue());
+                                }));
             }
         }
     }
@@ -132,7 +131,6 @@ public class SymbolBlockTest {
             newMlp.add(mlp.removeLastBlock());
             Linear linear = new Linear.Builder().setOutChannels(10).build();
 
-            // TODO: Fix SymblocBlock reinitilize issue
             linear.setInitializer(manager, Initializer.ONES, true);
             newMlp.add(linear);
 

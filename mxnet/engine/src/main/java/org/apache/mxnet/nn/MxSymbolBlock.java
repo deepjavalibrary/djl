@@ -37,8 +37,8 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.nn.SymbolBlock;
-import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 // TODO: Need to add Memory management for all params
@@ -52,17 +52,13 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     private CachedOp op;
     private Symbol symbol;
     private List<Parameter> params;
-    private boolean paramGradientsAttached;
+    private List<String> inputNames;
+    private Map<String, Shape> paramShapes;
 
-    public MxSymbolBlock(NDManager manager, Symbol symbol) {
-        this(manager, symbol, new ArrayList<>());
-    }
-
-    public MxSymbolBlock(NDManager manager, Symbol symbol, List<Parameter> params) {
+    public MxSymbolBlock(NDManager manager, Symbol symbol, List<String> names) {
         this.manager = manager;
         this.symbol = symbol;
-        this.params = params;
-        initialized = true;
+        this.inputNames = names;
     }
 
     /**
@@ -87,7 +83,9 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
                 params.stream()
                         .filter(ele -> set.contains(ele.getName()))
                         .collect(Collectors.toList());
-        return new MxSymbolBlock(manager, sliced, slicedParams);
+        MxSymbolBlock slicedBlock = new MxSymbolBlock(manager, sliced, inputNames);
+        slicedBlock.setParams(slicedParams);
+        return slicedBlock;
     }
 
     /**
@@ -99,8 +97,27 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         return symbol;
     }
 
-    @Override
-    public DataDesc[] describeInput() {
+    /**
+     * Set parameter for this SymbolBlock.
+     *
+     * @param params {@link Parameter} to set for SymbolBlock
+     */
+    public void setParams(List<Parameter> params) {
+        if (this.params != null) {
+            this.params.forEach(Parameter::close);
+        }
+        this.params = params;
+        // Double check if the input name is match
+        inferInputNames();
+    }
+
+    private List<String> getParamNames() {
+        List<String> nameList = Arrays.asList(symbol.getAllNames());
+        inputNames.forEach(nameList::remove);
+        return nameList;
+    }
+
+    private void inferInputNames() {
         String[] allNames = symbol.getAllNames();
         Map<String, Integer> map = new ConcurrentHashMap<>(allNames.length * 3 / 2);
         List<String> paramNames =
@@ -112,10 +129,22 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         for (String name : paramNames) {
             map.remove(name);
         }
-        DataDesc[] inputData = new DataDesc[map.size()];
+        this.inputNames = new ArrayList<>(map.keySet());
+    }
 
-        index = 0;
-        for (String name : map.keySet()) {
+    private void initializeEmptyParams() {
+        params =
+                getParamNames()
+                        .stream()
+                        .map(name -> new Parameter(name, this, ParameterType.OTHER))
+                        .collect(Collectors.toList());
+    }
+
+    @Override
+    public DataDesc[] describeInput() {
+        DataDesc[] inputData = new DataDesc[inputNames.size()];
+        int index = 0;
+        for (String name : inputNames) {
             inputData[index++] = new DataDesc(new Shape(), name);
         }
         return inputData;
@@ -134,20 +163,11 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
-        if (!paramGradientsAttached) {
-            initializeGradients();
-        }
+        ensureInitialized(inputs);
         if (op == null) {
             op = JnaUtils.createCachedOp(this, (MxNDManager) manager);
         }
         return op.forward(inputs);
-    }
-
-    public void initializeGradients() {
-        for (Parameter param : params) {
-            param.getArray().attachGradient();
-        }
-        paramGradientsAttached = true;
     }
 
     @Override
@@ -160,6 +180,9 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     @Override
     public List<Parameter> getDirectParameters() {
+        if (params == null) {
+            initializeEmptyParams();
+        }
         return params;
     }
 
@@ -170,41 +193,22 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     }
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
-        for (Parameter param : params) {
-            param.setInitializer(manager, initializer, overwrite);
-            if (overwrite) {
-                param.reinitialize();
-            }
-        }
-    }
-
-    @Override
-    public void setInitializer(
-            NDManager manager, Initializer initializer, boolean overwrite, String paramName) {
-        Parameter param =
-                params.stream()
-                        .filter(pair -> pair.getName().equals(paramName))
-                        .findFirst()
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Could not find parameter " + paramName));
-        param.setInitializer(manager, initializer, false);
-        param.reinitialize();
-    }
-
-    @Override
     public void beforeInitialize(NDList inputs) {}
 
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
-        for (Parameter param : params) {
-            if (param.getName().equals(name)) {
-                return param.getArray().getShape();
+        if (paramShapes == null) {
+            PairList<String, Shape> pairs = new PairList<>();
+            for (int i = 0; i < inputNames.size(); i++) {
+                pairs.add(inputNames.get(i), inputShapes[i]);
             }
+            paramShapes = symbol.inferShape(pairs);
         }
-        throw new IllegalArgumentException("Name " + name + " not found");
+        if (paramShapes.containsKey(name)) {
+            return paramShapes.get(name);
+        } else {
+            throw new IllegalArgumentException("Name " + name + " not found");
+        }
     }
 
     @Override
@@ -221,8 +225,10 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
+        initializeEmptyParams();
         for (Parameter parameter : params) {
             parameter.load(this.manager, is);
         }
+        setParams(params);
     }
 }
