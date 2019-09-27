@@ -69,8 +69,6 @@ public interface Block {
 
     PairList<String, Parameter> getParameters();
 
-    PairList<String, Parameter> getChildrenParameters();
-
     void saveParameters(DataOutputStream os) throws IOException;
 
     void loadParameters(NDManager manager, DataInputStream is) throws IOException;

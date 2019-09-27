@@ -84,17 +84,6 @@ public abstract class AbstractBlock implements Block {
         return parameters;
     }
 
-    @Override
-    public ParameterList getChildrenParameters() {
-        ParameterList parameters = new ParameterList();
-        for (Pair<String, Block> childPair : getChildren()) {
-            for (Pair<String, Parameter> paramPair : childPair.getValue().getParameters()) {
-                parameters.add(childPair.getKey() + "_" + paramPair.getKey(), paramPair.getValue());
-            }
-        }
-        return parameters;
-    }
-
     protected void beforeInitialize(NDList inputs) {}
 
     @Override
@@ -116,5 +105,15 @@ public abstract class AbstractBlock implements Block {
     @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Unimplemented method cast");
+    }
+
+    private ParameterList getChildrenParameters() {
+        ParameterList parameters = new ParameterList();
+        for (Pair<String, Block> childPair : getChildren()) {
+            for (Pair<String, Parameter> paramPair : childPair.getValue().getParameters()) {
+                parameters.add(childPair.getKey() + "_" + paramPair.getKey(), paramPair.getValue());
+            }
+        }
+        return parameters;
     }
 }

@@ -123,10 +123,13 @@ public class SequentialBlock extends AbstractBlock {
 
     @Override
     public BlockList getChildren() {
-        BlockList children = new BlockList(blocks.size());
-        for (int i = 0; i < blocks.size(); i++) {
+        int size = blocks.size();
+        BlockList children = new BlockList(size);
+        int precision = (int) Math.log10(size) + 1;
+        String format = "%0" + precision + "d:%s";
+        for (int i = 0; i < size; ++i) {
             Block block = blocks.get(i);
-            String name = String.format("%02d:%s", i, block.getClass().getSimpleName());
+            String name = String.format(format, i, block.getClass().getSimpleName());
             children.add(name, block);
         }
         return children;
