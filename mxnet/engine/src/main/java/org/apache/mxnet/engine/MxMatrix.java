@@ -330,8 +330,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asInDevice(Device ctx, boolean copy) {
-        return array.asInDevice(ctx, copy);
+    public NDArray asInDevice(Device dev, boolean copy) {
+        return array.asInDevice(dev, copy);
     }
 
     /** {@inheritDoc} */
@@ -386,11 +386,6 @@ public class MxMatrix implements Matrix {
     @Override
     public void copyTo(NDArray arr) {
         array.copyTo(arr);
-    }
-
-    @Override
-    public NDArray dup() {
-        return array.dup();
     }
 
     /** {@inheritDoc} */

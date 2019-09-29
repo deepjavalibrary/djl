@@ -138,20 +138,20 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray asInDevice(Device ctx, boolean copy) {
-        if (ctx.equals(getDevice()) && !copy) {
-            return this;
+    public NDArray asInDevice(Device dev, boolean copy) {
+        if (dev.equals(getDevice()) && !copy) {
+            return slice();
         }
-        MxNDArray nd = manager.create(getShape(), getDataType(), ctx);
+        MxNDArray nd = manager.create(getShape(), getDataType(), dev);
         copyTo(nd);
         return nd;
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray asType(DataType dtype, boolean copy) {
+    public NDArray asType(DataType dtype, boolean copy) {
         if (dtype.equals(getDataType()) && !copy) {
-            return this;
+            return slice();
         }
         MxNDArray nd = manager.create(getShape(), dtype, getDevice());
         copyTo(nd);
@@ -355,8 +355,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray get(NDIndex index) {
-        if (index.getRank() == 0) {
-            return this;
+        if (index.getRank() == 0 && getShape().isScalar()) {
+            // TODO: return a slice once MXNet support it
+            return dup();
         }
 
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
@@ -394,12 +395,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         NDList src = new NDList(this);
         NDList dest = new NDList(ndArray);
         manager.invoke("_npi_copyto", src, dest, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray dup() {
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
@@ -595,7 +590,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             throw new IllegalArgumentException("Default type is not allowed");
         }
         if (fmt == getSparseFormat()) {
-            return this;
+            return slice();
         }
         return castStorage(fmt);
     }
@@ -1247,7 +1242,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray toDense() {
         if (!isSparse()) {
-            return this;
+            return slice();
         }
         return castStorage(SparseFormat.DENSE);
     }

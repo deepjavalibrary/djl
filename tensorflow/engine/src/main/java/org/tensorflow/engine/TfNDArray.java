@@ -127,7 +127,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asInDevice(Device ctx, boolean copy) {
+    public NDArray asInDevice(Device device, boolean copy) {
         return null;
     }
 
@@ -186,12 +186,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void copyTo(NDArray array) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray dup() {
-        return null;
-    }
 
     /** {@inheritDoc} */
     @Override

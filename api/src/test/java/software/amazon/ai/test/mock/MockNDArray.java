@@ -92,7 +92,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray asInDevice(Device ctx, boolean copy) {
+    public NDArray asInDevice(Device device, boolean copy) {
         return this;
     }
 
@@ -177,11 +177,6 @@ public class MockNDArray implements NDArray {
 
     @Override
     public void copyTo(NDArray array) {}
-
-    @Override
-    public NDArray dup() {
-        return null;
-    }
 
     @Override
     public NDArray zerosLike() {

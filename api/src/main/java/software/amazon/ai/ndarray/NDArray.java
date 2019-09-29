@@ -519,11 +519,25 @@ public interface NDArray extends AutoCloseable {
     void copyTo(NDArray array);
 
     /**
+     * Creates a new NDArray whose content is a shared of this NDArray's content.
+     *
+     * @return the new NDArray
+     */
+    default NDArray slice() {
+        // TODO: MXNet doesn't support view, return a copy for now
+        return dup();
+    }
+
+    /**
      * Returns a copy of this NDArray.
      *
      * @return a copy of this NDArray
      */
-    NDArray dup();
+    default NDArray dup() {
+        NDArray nd = getManager().create(getShape(), getDataType(), getDevice());
+        copyTo(nd);
+        return nd;
+    }
 
     /**
      * Returns an array of zeros with the same {@link Shape}, {@link DataType} and {@link

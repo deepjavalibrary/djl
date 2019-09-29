@@ -228,14 +228,14 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     /**
      * Converts all the {@code NDArray} in {@code NDList} to a different {@link Device}.
      *
-     * @param ctx {@link Device} to be set
+     * @param device {@link Device} to be set
      * @param copy set {@code true} if you want to return a copy of the underlying NDArray.
      * @return a new {@code NDList} with the NDArrays on specified {@link Device}
      */
-    public NDList asInDevice(Device ctx, boolean copy) {
+    public NDList asInDevice(Device device, boolean copy) {
         NDList newNDList = new NDList(size());
         for (Pair<String, NDArray> pair : list) {
-            NDArray array = pair.getValue().asInDevice(ctx, copy);
+            NDArray array = pair.getValue().asInDevice(device, copy);
             newNDList.add(pair.getKey(), array);
         }
 
