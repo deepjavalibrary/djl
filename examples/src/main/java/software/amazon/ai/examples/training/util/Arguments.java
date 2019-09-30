@@ -15,6 +15,7 @@ package software.amazon.ai.examples.training.util;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import software.amazon.ai.engine.Engine;
 
 public class Arguments {
     private int epoch;
@@ -35,7 +36,7 @@ public class Arguments {
         if (cmd.hasOption("num-gpus")) {
             numGpus = Integer.parseInt(cmd.getOptionValue("num-gpus"));
         } else {
-            numGpus = 0;
+            numGpus = Engine.getInstance().getGpuCount() > 0 ? 1 : 0;
         }
     }
 

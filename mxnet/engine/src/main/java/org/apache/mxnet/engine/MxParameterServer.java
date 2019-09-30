@@ -16,6 +16,7 @@ package org.apache.mxnet.engine;
 import com.sun.jna.Pointer;
 import java.util.Arrays;
 import org.apache.mxnet.jna.JnaUtils;
+import org.apache.mxnet.jna.MxnetLibrary;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.ParameterServer;
@@ -41,38 +42,28 @@ public class MxParameterServer extends NativeResource implements ParameterServer
 
     /** {@inheritDoc} */
     @Override
-    public void push(int key, NDArray[] values) {
+    public void push(int key, NDArray[] values, int priority) {
         int[] keys = new int[values.length];
         Arrays.fill(keys, key);
         NDList vals = new NDList(values);
-        JnaUtils.parameterStorePush(getHandle(), values.length, keys, vals, 0);
+        JnaUtils.parameterStorePush(getHandle(), values.length, keys, vals, priority);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void pull(int key, NDArray[] values) {
+    public void pull(int key, NDArray[] values, int priority) {
         int[] keys = new int[values.length];
         Arrays.fill(keys, key);
         NDList vals = new NDList(values);
-        JnaUtils.parameterStorePull(getHandle(), values.length, keys, vals, 0);
+        JnaUtils.parameterStorePull(getHandle(), values.length, keys, vals, priority);
+    }
+
+    final void setOptimizer(Optimizer optimizer) {
+        JnaUtils.parameterStoreSetUpdater(getHandle(), new OptimizerCallback(optimizer), null);
     }
 
     private static Pointer createdKVStore() {
-        return createdKVStore(true);
-    }
-
-    private static Pointer createdKVStore(boolean aggregateOnGPU) {
-        Pointer handle;
-        if (aggregateOnGPU) {
-            handle = JnaUtils.parameterStoreCreate("device");
-        } else {
-            handle = JnaUtils.parameterStoreCreate("local");
-        }
-        return handle;
-    }
-
-    private void setOptimizer(Optimizer optimizer) { // NOPMD
-        // TODO: call KVStore JnaUtils
+        return JnaUtils.parameterStoreCreate("device");
     }
 
     @Override
@@ -80,6 +71,24 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
             JnaUtils.parameterStoreClose(pointer);
+        }
+    }
+
+    private static class OptimizerCallback implements MxnetLibrary.MXKVStoreUpdater {
+        private Optimizer optimizer;
+
+        OptimizerCallback(Optimizer optimizer) {
+            this.optimizer = optimizer;
+        }
+
+        @Override
+        public void apply(int key, Pointer recv, Pointer local, Pointer handle) {
+            // updater callback arguments order is: index, gradient, weight.
+            NDArray grad = MxNDManager.getSystemManager().create(local);
+            NDArray weight = MxNDManager.getSystemManager().create(recv);
+            optimizer.update(key, grad, weight);
+            grad.close();
+            weight.close();
         }
     }
 }

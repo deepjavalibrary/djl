@@ -15,16 +15,18 @@ package software.amazon.ai.integration.tests;
 
 import org.apache.mxnet.engine.MxParameterServer;
 import org.testng.annotations.Test;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.ParameterServer;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
+import software.amazon.ai.util.PairList;
 
 public class ParameterStoreTest {
 
@@ -33,30 +35,72 @@ public class ParameterStoreTest {
         try (Model model = Model.newInstance()) {
             NDManager manager = model.getNDManager();
             int arraySize = 2;
-            NDArray weight = manager.create(new float[] {1.f, 1.f}, new Shape(1, 2));
+            NDArray weight = manager.randomNormal(new Shape(5, 5)).asInDevice(Device.cpu(0), true);
+            NDArray grad = manager.randomNormal(new Shape(5, 5)).asInDevice(Device.cpu(0), true);
             NDArray[] weights = {weight};
             NDArray[] grads = new NDArray[arraySize];
             for (int i = 0; i < arraySize; i++) {
-                grads[i] = manager.create(new float[] {2.f, 2.f}, new Shape(1, 2));
+                grads[i] = grad.asInDevice(Device.cpu(i), true);
             }
-            NDArray expectedWeight = manager.create(new float[] {4.f, 4.f}, new Shape(1, 2));
+            float lr = .1f;
+            NDArray expectedWeight = weight.add(grad.mul(arraySize).mul(lr));
             Optimizer optimizer =
-                    new Sgd.Builder()
-                            .setRescaleGrad(1.0f / 32)
-                            .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
+                    new TestOptimizer.Builder()
+                            .setRescaleGrad(1.0f)
+                            .setLearningRateTracker(LearningRateTracker.fixedLearningRate(lr))
                             .build();
 
             try (ParameterServer ps = new MxParameterServer(optimizer)) {
                 ps.init(0, weights);
-                ps.push(0, grads);
-                ps.pull(0, weights);
-                Assertions.assertEquals(
-                        weights[0],
-                        expectedWeight,
-                        "Parameter Store updated wrong result: actual "
-                                + weights[0]
-                                + ", expected "
-                                + expectedWeight);
+                ps.push(0, grads, 0);
+                ps.pull(0, weights, 0);
+                Assertions.assertAlmostEquals(weights[0], expectedWeight);
+            }
+        }
+    }
+
+    private static class TestOptimizer extends Optimizer {
+        private LearningRateTracker learningRateTracker;
+
+        protected TestOptimizer(TestOptimizer.Builder builder) {
+            super(builder);
+            learningRateTracker = builder.getLearningRateTracker();
+        }
+
+        @Override
+        protected boolean initializeStates(PairList<String, Parameter> parameters) {
+            return true;
+        }
+
+        @Override
+        public void update(int index, NDArray weight, NDArray grad) {
+            weight.addi(grad.mul(learningRateTracker.getNewLearningRate(0)));
+        }
+
+        public static final class Builder extends BaseBuilder<TestOptimizer.Builder> {
+
+            private LearningRateTracker learningRateTracker;
+
+            public TestOptimizer.Builder setLearningRateTracker(
+                    LearningRateTracker learningRateTracker) {
+                this.learningRateTracker = learningRateTracker;
+                return this;
+            }
+
+            public LearningRateTracker getLearningRateTracker() {
+                return learningRateTracker;
+            }
+
+            @Override
+            protected TestOptimizer.Builder self() {
+                return this;
+            }
+
+            public TestOptimizer build() {
+                if (learningRateTracker == null) {
+                    throw new IllegalArgumentException("No lrTracker set");
+                }
+                return new TestOptimizer(this);
             }
         }
     }

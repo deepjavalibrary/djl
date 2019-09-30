@@ -16,22 +16,13 @@ import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import software.amazon.ai.engine.Engine;
 import software.amazon.ai.examples.training.TrainMnist;
-import software.amazon.ai.translate.TranslateException;
 
 public class TrainMnistTest {
 
     @Test
-    public void testTrainMnist() throws TranslateException, ParseException, IOException {
-        int numGpus = Engine.getInstance().getGpuCount();
-        String[] args;
-        if (numGpus > 1) {
-            // TODO: revalidate this args after multi-gpu api finalized
-            args = new String[] {"-e", "4", "-b", "128", "-g", "2"};
-        } else {
-            args = new String[] {"-e", "2"};
-        }
+    public void testTrainMnist() throws ParseException, IOException {
+        String[] args = new String[] {"-e", "2"};
         TrainMnist.main(args);
         Assert.assertTrue(TrainMnist.getAccuracy() > 0.9f);
         Assert.assertTrue(TrainMnist.getLossValue() < 0.2f);

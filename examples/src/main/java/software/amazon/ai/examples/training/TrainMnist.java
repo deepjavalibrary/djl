@@ -67,7 +67,6 @@ public final class TrainMnist {
         int batchSize = arguments.getBatchSize();
         int numGpus = arguments.getNumGpus();
         Block block = constructBlock();
-
         Optimizer optimizer =
                 new Sgd.Builder()
                         .setRescaleGrad(1.0f / batchSize)

@@ -161,9 +161,9 @@ public class MxTrainer implements Trainer {
 
     @Override
     public void close() {
-        manager.close();
         if (parameterStore != null) {
             parameterStore.close();
         }
+        manager.close();
     }
 }

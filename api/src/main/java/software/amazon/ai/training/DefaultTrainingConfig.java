@@ -37,6 +37,11 @@ public class DefaultTrainingConfig implements TrainingConfig {
         this.overwriteInitializer = overwriteInitializer;
         this.optimizer = optimizer;
         if (numGpus > 0) {
+            int maxGpus = Engine.getInstance().getGpuCount();
+            if (numGpus > maxGpus) {
+                throw new IllegalStateException(
+                        "numGpus: " + numGpus + "is larger than available gpus: " + maxGpus);
+            }
             devices = new Device[numGpus];
             for (int i = 0; i < numGpus; i++) {
                 devices[i] = Device.gpu(i);
@@ -59,7 +64,13 @@ public class DefaultTrainingConfig implements TrainingConfig {
 
     public DefaultTrainingConfig(
             Initializer initializer, boolean overwriteInitializer, Optimizer optimizer) {
-        this(initializer, overwriteInitializer, optimizer, Engine.getInstance().getGpuCount());
+        // use 1 GPU if GPU detected by default because training code for 1 CPU/GPU is the same,
+        // but multi-gpu requires user code change.
+        this(
+                initializer,
+                overwriteInitializer,
+                optimizer,
+                Engine.getInstance().getGpuCount() > 0 ? 1 : 0);
     }
 
     @Override

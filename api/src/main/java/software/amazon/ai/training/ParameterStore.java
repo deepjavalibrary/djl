@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.util.Pair;
@@ -37,33 +36,20 @@ public class ParameterStore implements AutoCloseable {
 
     public void setParameterServer(ParameterServer parameterServer) {
         this.parameterServer = parameterServer;
+        // initialize parameter value
+        for (int i = 0; i < parameters.size(); i++) {
+            parameterServer.init(i, new NDArray[] {parameters.get(i).getValue().getArray()});
+        }
     }
 
     public void updateAllParameters(Optimizer optimizer) {
-        fakeReduceOnParameterStore(optimizer);
-    }
-
-    // TODO: remove this method, and make optimizer update methods protected
-    void fakeReduceOnParameterStore(Optimizer optimizer) {
-        int numDevices = devices.length;
         for (int i = 0; i < parameters.size(); i++) {
             NDArray[] grads = getAllGradients(parameters.get(i).getValue());
+            parameterServer.push(i, grads, -i);
+        }
+        for (int i = 0; i < parameters.size(); i++) {
             NDArray[] paramValues = getAllValues(parameters.get(i).getValue());
-            for (int j = 0; j < numDevices; j++) {
-                grads[j] = grads[j].asInDevice(Device.cpu(0), true);
-            }
-            NDArray stackedGrads = NDArrays.stack(grads);
-            NDArray mean = stackedGrads.mean(new int[] {0});
-            for (int j = 0; j < numDevices; j++) {
-                NDArray meanGPU = mean.asInDevice(devices[j], true);
-                optimizer.update(i, paramValues[j], meanGPU);
-                meanGPU.close();
-            }
-            mean.close();
-            stackedGrads.close();
-            for (int j = 0; j < numDevices; j++) {
-                grads[j].close();
-            }
+            parameterServer.pull(i, paramValues, -i);
         }
     }
 
@@ -105,6 +91,7 @@ public class ParameterStore implements AutoCloseable {
 
     @Override
     public void close() {
+        parameterValues.values().stream().forEach(val -> val.close());
         parameterValues.clear();
         parameterServer.close();
     }
