@@ -30,9 +30,10 @@ public final class Assertions {
     private static <T> String getDefaultErrorMessage(T actual, T expected, String errorMessage) {
         StringBuilder sb = new StringBuilder(100);
         if (errorMessage != null) {
-            sb.append(errorMessage).append(System.lineSeparator());
+            sb.append(errorMessage);
         }
-        sb.append("Expected: ")
+        sb.append(System.lineSeparator())
+                .append("Expected: ")
                 .append(expected)
                 .append(System.lineSeparator())
                 .append("Actual: ")
