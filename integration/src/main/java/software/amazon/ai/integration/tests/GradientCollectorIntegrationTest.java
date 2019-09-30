@@ -56,7 +56,7 @@ public class GradientCollectorIntegrationTest {
             Assertions.assertTrue(MxGradientCollector.isRecording());
             Assertions.assertTrue(MxGradientCollector.isTraining());
 
-            NDArray result = NDArrays.mmul(lhs, rhs);
+            NDArray result = NDArrays.dot(lhs, rhs);
             gradCol.backward(result);
         }
     }
@@ -85,7 +85,7 @@ public class GradientCollectorIntegrationTest {
             float bias = 4.2f;
             NDArray data = manager.randomNormal(new Shape(numOfData, weight.size(0)));
             // y = w * x + b
-            NDArray label = data.mmul(weight).add(bias);
+            NDArray label = data.dot(weight).add(bias);
             // add noise
             label.add(
                     manager.randomNormal(

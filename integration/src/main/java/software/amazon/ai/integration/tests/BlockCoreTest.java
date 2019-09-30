@@ -62,7 +62,7 @@ public class BlockCoreTest {
 
                 NDArray outBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedBias =
-                        input.mmul(manager.ones(new Shape(outSize, 2)).transpose())
+                        input.dot(manager.ones(new Shape(outSize, 2)).transpose())
                                 .add(manager.ones(new Shape(2, outSize)));
                 Assertions.assertEquals(expectedBias, outBias);
 
@@ -79,8 +79,7 @@ public class BlockCoreTest {
                 NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
 
                 NDArray outNoBias = trainer.forward(new NDList(input)).head();
-                NDArray expectedNoBias =
-                        input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
+                NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
                 Assertions.assertEquals(expectedNoBias, outNoBias);
 
                 testEncode(manager, block);
@@ -108,7 +107,7 @@ public class BlockCoreTest {
 
                 NDArray outBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedBias =
-                        input.mmul(manager.ones(new Shape(outSize, 2)).transpose())
+                        input.dot(manager.ones(new Shape(outSize, 2)).transpose())
                                 .add(manager.ones(new Shape(2, outSize)));
                 Assertions.assertEquals(expectedBias, outBias);
 
@@ -130,8 +129,7 @@ public class BlockCoreTest {
                                         new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL}));
 
                 NDArray outNoBias = trainer.forward(new NDList(input)).head();
-                NDArray expectedNoBias =
-                        input.mmul(manager.ones(new Shape(outSize, 2)).transpose());
+                NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
                 Assertions.assertEquals(expectedNoBias, outNoBias);
 
                 testEncode(manager, block);

@@ -382,6 +382,70 @@ public class NDArrayElementArithmeticOpTest {
     }
 
     @Test
+    public void testDot() throws FailedTestException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
+            NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
+            NDArray result;
+            NDArray actual;
+            // test 2D * 2D
+            try (GradientCollector gradCol = new MxGradientCollector()) {
+                lhs.attachGradient();
+                result = NDArrays.dot(lhs, rhs);
+                gradCol.backward(result);
+                actual = manager.create(new float[] {33, 14}, new Shape(2, 1));
+                Assertions.assertEquals(
+                        actual, result, "Matrix multiplication: Incorrect value in result ndarray");
+
+                NDArray expectedGradient =
+                        manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
+                Assertions.assertEquals(
+                        expectedGradient,
+                        lhs.getGradient(),
+                        "Matrix multiplication: Incorrect gradient after backward");
+            }
+            // test 1D * 1D
+            lhs = manager.create(new float[] {1f, 2f});
+            rhs = manager.create(new float[] {3f, 4f});
+            actual = manager.create(11f);
+            Assertions.assertEquals(actual, lhs.dot(rhs));
+            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            // test scalar * ND
+            lhs = manager.create(3f);
+            rhs = manager.create(new float[] {2f, 3f});
+            actual = manager.create(new float[] {6f, 9f});
+            Assertions.assertEquals(actual, lhs.dot(rhs));
+            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            // test 1D * ND
+            lhs = manager.create(new float[] {1f, 2f});
+            rhs = manager.arange(1, 5).reshape(2, 2);
+            actual = manager.create(new float[] {7f, 10f});
+            Assertions.assertEquals(actual, lhs.dot(rhs));
+            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            // test MD * ND
+            lhs = manager.create(new float[] {1f, 2f}, new Shape(2, 1));
+            rhs = manager.arange(1, 5).reshape(2, 1, 2);
+            actual =
+                    manager.create(
+                            new float[] {1f, 2f, 3f, 4f, 2f, 4f, 6f, 8f}, new Shape(2, 2, 2));
+            Assertions.assertEquals(actual, lhs.dot(rhs));
+            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            // scalar
+            lhs = manager.create(4f);
+            rhs = manager.create(2f);
+            actual = manager.create(8f);
+            Assertions.assertEquals(actual, lhs.dot(rhs));
+            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            // zero-dim
+            lhs = manager.create(new Shape(2, 0));
+            rhs = manager.create(new Shape(0, 2));
+            actual = manager.zeros(new Shape(2, 2));
+            Assertions.assertEquals(actual, lhs.dot(rhs));
+            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+        }
+    }
+
+    @Test
     public void testDivScalar() throws FailedTestException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray dividend = manager.create(new float[] {6, 9, 12, 15, 0});

@@ -948,7 +948,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mmul(NDArray other) {
+    public NDArray dot(NDArray other) {
         return null;
     }
 

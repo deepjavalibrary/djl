@@ -2111,7 +2111,7 @@ public interface NDArray extends AutoCloseable {
      * @param other the other matrix to perform matrix multiply with
      * @return the result of the matrix multiplication
      */
-    NDArray mmul(NDArray other);
+    NDArray dot(NDArray other);
 
     /**
      * Clips (limit) the values in an array.
@@ -2182,6 +2182,16 @@ public interface NDArray extends AutoCloseable {
      * @return the broadcasted NDArray
      */
     NDArray broadcast(Shape shape);
+
+    /**
+     * Broadcasts this NDArray to be the specified shape.
+     *
+     * @param shape the new shape of this NDArray
+     * @return the broadcasted NDArray
+     */
+    default NDArray broadcast(long... shape) {
+        return broadcast(new Shape(shape));
+    }
 
     /**
      * Checks 2 NDArrays for equal shapes.

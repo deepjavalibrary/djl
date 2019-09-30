@@ -1285,7 +1285,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         PointerArray pa =
                 new PointerArray(
                         TestHelper.toPointer("softmax"),
-                        TestHelper.toPointer("_copyto"),
+                        TestHelper.toPointer("_npi_copyto"),
                         TestHelper.toPointer("_np_zeros_like"));
         out_size.put(0, 3);
         out_array.setValue(pa);

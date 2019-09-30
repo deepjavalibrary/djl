@@ -805,7 +805,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray mmul(NDArray other) {
+    public NDArray dot(NDArray other) {
         return null;
     }
 

@@ -305,7 +305,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             prepareValue.add(prepareValue.peek().broadcast(fullSlice.getShape()));
 
             manager.invoke(
-                    "_slice_assign",
+                    "_npi_slice_assign",
                     new NDList(this, prepareValue.peek()),
                     new NDList(this),
                     params);
@@ -330,7 +330,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             params.addTupleParam("end", fullSlice.getMax());
             params.addTupleParam("step", fullSlice.getStep());
             params.addParam("scalar", value);
-            manager.invoke("_slice_assign_scalar", new NDList(this), new NDList(this), params);
+            manager.invoke("_npi_slice_assign_scalar", new NDList(this), new NDList(this), params);
             return;
         }
         throw new UnsupportedOperationException(
@@ -365,7 +365,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             params.addTupleParam("begin", fullSlice.getMin());
             params.addTupleParam("end", fullSlice.getMax());
             params.addTupleParam("step", fullSlice.getStep());
-            NDArray result = manager.invoke("slice", this, params);
+            NDArray result = manager.invoke("_npi_slice", this, params);
             if (!fullSlice.getToSqueeze().isEmpty()) {
                 NDArray oldResult = result;
                 result =
@@ -393,7 +393,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
         NDList src = new NDList(this);
         NDList dest = new NDList(ndArray);
-        manager.invoke("_copyto", src, dest, null);
+        manager.invoke("_npi_copyto", src, dest, null);
     }
 
     /** {@inheritDoc} */
@@ -544,7 +544,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray add(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_plus_scalar", this, params);
+        return manager.invoke("_npi_add_scalar", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1270,7 +1270,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray tile(long repeats) {
-        long[] repeatsArray = new long[getShape().dimension()];
+        // zero-dim
+        if (getShape().size() == 0) {
+            return this;
+        }
+        // scalar
+        int dim = (getShape().dimension() != 0) ? getShape().dimension() : 1;
+        long[] repeatsArray = new long[dim];
         Arrays.fill(repeatsArray, repeats);
         return tile(repeatsArray);
     }
@@ -1278,6 +1284,10 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray tile(int axis, long repeats) {
+        // scalar
+        if (getShape().dimension() == 0) {
+            throw new IllegalArgumentException("scalar didn't support specifying axis");
+        }
         long[] repeatsArray = new long[getShape().dimension()];
         Arrays.fill(repeatsArray, 1);
         repeatsArray[withAxis(axis)] = repeats;
@@ -1300,7 +1310,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray repeat(long repeats) {
-        long[] repeatsArray = new long[getShape().dimension()];
+        // zero-dim
+        if (getShape().size() == 0) {
+            return this;
+        }
+        // scalar
+        int dim = (getShape().dimension() != 0) ? getShape().dimension() : 1;
+        long[] repeatsArray = new long[dim];
         Arrays.fill(repeatsArray, repeats);
         return repeat(repeatsArray);
     }
@@ -1316,6 +1332,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray repeat(long[] repeats) {
+        // TODO get rid of for loop once bug in MXNet np.repeat is fixed
         NDArray array = this;
         int baseAxis = getShape().dimension() - repeats.length;
         for (int i = 0; i < repeats.length; i++) {
@@ -1341,7 +1358,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mmul(NDArray other) {
+    public NDArray dot(NDArray other) {
         return manager.invoke("_np_dot", new NDList(this, other), null).head();
     }
 
@@ -1484,7 +1501,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
         long[] repeats = new long[dimension];
         for (int i = 0; i < dimension; i++) {
-            if (desiredShape.get(i) % curShape.get(i) != 0) {
+            if (curShape.get(i) == 0 || desiredShape.get(i) % curShape.get(i) != 0) {
                 throw new IllegalArgumentException(
                         "The desired shape is not a multiple of the original shape");
             }

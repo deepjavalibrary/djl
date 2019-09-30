@@ -1089,8 +1089,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mmul(NDArray other) {
-        return array.mmul(other);
+    public NDArray dot(NDArray other) {
+        return array.dot(other);
     }
 
     /** {@inheritDoc} */

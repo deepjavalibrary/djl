@@ -711,8 +711,8 @@ public final class NDArrays {
      * @param b the second NDArray to multiply
      * @return the result of the addition
      */
-    public static NDArray mmul(NDArray a, NDArray b) {
-        return a.mmul(b);
+    public static NDArray dot(NDArray a, NDArray b) {
+        return a.dot(b);
     }
 
     /**
