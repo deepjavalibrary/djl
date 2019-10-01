@@ -98,7 +98,7 @@ public class GradientCollectorIntegrationTest {
                     new ArrayDataset.Builder()
                             .setData(data)
                             .optLabels(label)
-                            .setSampling(batchSize, true, true)
+                            .setRandomSampling(batchSize)
                             .build();
             try (Trainer trainer = model.newTrainer(config)) {
                 for (int epoch = 0; epoch < epochs; epoch++) {

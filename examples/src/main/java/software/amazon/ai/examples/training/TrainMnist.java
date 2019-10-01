@@ -83,7 +83,7 @@ public final class TrainMnist {
                     new Mnist.Builder()
                             .setManager(model.getNDManager())
                             .setUsage(Dataset.Usage.TRAIN)
-                            .setSampling(batchSize, true, true)
+                            .setRandomSampling(batchSize)
                             .optPipeline(pipeline)
                             .build();
             mnist.prepare();

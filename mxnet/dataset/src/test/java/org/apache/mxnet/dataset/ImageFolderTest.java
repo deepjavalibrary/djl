@@ -41,7 +41,7 @@ public class ImageFolderTest {
                     new ImageFolder.Builder()
                             .setManager(model.getNDManager())
                             .setRoot("src/test/resources/imagefolder")
-                            .setSampling(1, false, false)
+                            .setSequenceSampling(1, false)
                             .build();
             dataset.prepare();
 

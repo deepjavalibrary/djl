@@ -37,7 +37,7 @@ public class PikachuTest {
                         .setUsage(Dataset.Usage.TEST)
                         .setManager(NDManager.newBaseManager())
                         .optRepository(repository)
-                        .setSampling(1)
+                        .setRandomSampling(1)
                         .build();
         pikachu.prepare();
         TrainingConfig config = new DefaultTrainingConfig(new NormalInitializer(0.01), false);

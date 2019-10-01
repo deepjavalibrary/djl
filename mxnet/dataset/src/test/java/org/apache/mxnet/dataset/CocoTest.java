@@ -41,7 +41,7 @@ public class CocoTest {
                             .setManager(model.getNDManager())
                             .setUsage(Dataset.Usage.TEST)
                             .optRepository(repository)
-                            .setSampling(1)
+                            .setRandomSampling(1)
                             .build();
             coco.prepare();
 

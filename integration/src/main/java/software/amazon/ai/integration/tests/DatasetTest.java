@@ -189,7 +189,7 @@ public class DatasetTest {
                     new ArrayDataset.Builder()
                             .setData(data)
                             .optLabels(label)
-                            .setSampling(20, false)
+                            .setSequenceSampling(20)
                             .build();
 
             int index = 0;
@@ -208,7 +208,7 @@ public class DatasetTest {
                         new ArrayDataset.Builder()
                                 .setData(data)
                                 .optLabels(label)
-                                .setSampling(15, false)
+                                .setSequenceSampling(15)
                                 .build();
                 index = 0;
                 for (Batch batch : trainer.iterateDataset(dataset)) {
@@ -255,7 +255,7 @@ public class DatasetTest {
             Cifar10 cifar10 =
                     new Cifar10.Builder()
                             .setManager(manager)
-                            .setSampling(100)
+                            .setRandomSampling(100)
                             // you could start trying prefetchNumber with 2 * number of threads.
                             // This number should be adjusted based on your machines and data.
                             .optExcutor(executor, 4)

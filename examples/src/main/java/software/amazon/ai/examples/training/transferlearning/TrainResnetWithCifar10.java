@@ -78,7 +78,7 @@ public final class TrainResnetWithCifar10 {
                 new Cifar10.Builder()
                         .setManager(model.getNDManager())
                         .setUsage(Dataset.Usage.TRAIN)
-                        .setSampling(batchSize)
+                        .setRandomSampling(batchSize)
                         .optPipeline(pipeline)
                         .build();
         cifar10.prepare();
