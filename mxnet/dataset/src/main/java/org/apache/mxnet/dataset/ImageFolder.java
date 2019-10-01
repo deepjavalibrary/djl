@@ -13,7 +13,8 @@
 package org.apache.mxnet.dataset;
 
 import java.io.IOException;
-import org.apache.mxnet.engine.MxImages;
+import java.nio.file.Paths;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.training.dataset.Record;
 
@@ -28,16 +29,19 @@ public final class ImageFolder extends AbstractImageFolder {
     }
 
     @Override
-    public Record get(long index) {
+    public Record get(long index) throws IOException {
         int idx = Math.toIntExact(index);
-        NDList d = new NDList(MxImages.read(manager, items.get(idx).getKey(), flag));
+        NDList d =
+                new NDList(
+                        BufferedImageUtils.readFileToArray(
+                                manager, Paths.get(items.get(idx).getKey()), flag));
         NDList l = new NDList(manager.create(items.get(idx).getValue()));
         return new Record(d, l);
     }
 
     @Override
     protected NDList readImage(String image) throws IOException {
-        return new NDList(MxImages.read(manager, image, flag));
+        return new NDList(BufferedImageUtils.readFileToArray(manager, Paths.get(image), flag));
     }
 
     @Override

@@ -16,8 +16,9 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.modality.cv.Images;
 import software.amazon.ai.modality.cv.Joint;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.index.NDIndex;
@@ -31,7 +32,7 @@ public class SimplePoseTranslator extends ImageTranslator<List<Joint>> {
 
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-        input = Images.resizeImage(input, imageWidth, imageHeight);
+        input = BufferedImageUtils.resize(input, imageWidth, imageHeight);
         return super.processInput(ctx, input);
     }
 
@@ -68,6 +69,6 @@ public class SimplePoseTranslator extends ImageTranslator<List<Joint>> {
     protected NDArray normalize(NDArray array) {
         float[] mean = {0.485f, 0.456f, 0.406f};
         float[] std = {0.229f, 0.224f, 0.225f};
-        return Images.normalize(array, mean, std);
+        return NDImageUtils.normalize(array, mean, std);
     }
 }

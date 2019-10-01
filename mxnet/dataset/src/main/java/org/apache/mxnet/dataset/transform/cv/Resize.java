@@ -12,7 +12,7 @@
  */
 package org.apache.mxnet.dataset.transform.cv;
 
-import org.apache.mxnet.engine.MxImages;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.translate.Transform;
 
@@ -30,6 +30,6 @@ public class Resize implements Transform {
 
     @Override
     public NDArray transform(NDArray array, boolean close) {
-        return MxImages.resize(array, size);
+        return NDImageUtils.resize(array, size);
     }
 }

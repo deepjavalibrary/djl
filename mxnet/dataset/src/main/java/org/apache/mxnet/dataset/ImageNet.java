@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import org.apache.mxnet.engine.MxImages;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.repository.NakedRepository;
 import software.amazon.ai.repository.Repository;
@@ -106,8 +106,8 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 
     @Override
     protected NDList readImage(String image) throws IOException {
-        String imagePath = root.resolve(image).toString();
-        return new NDList(MxImages.read(manager, imagePath, flag));
+        Path imagePath = root.resolve(image);
+        return new NDList(BufferedImageUtils.readFileToArray(manager, imagePath, flag));
     }
 
     public static class Builder extends AbstractImageFolder.BaseBuilder<Builder> {

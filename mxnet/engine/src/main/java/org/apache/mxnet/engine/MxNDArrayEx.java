@@ -251,14 +251,6 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     @Override
-    public NDArray normalize(float[] mean, float[] std) {
-        MxOpParams params = new MxOpParams();
-        params.addTupleParam("mean", mean);
-        params.addTupleParam("std", std);
-        return manager.invoke("normalize", array, params);
-    }
-
-    @Override
     public NDArray globalMaxPool(Shape stride, Shape pad, PoolingConvention poolingConvention) {
         MxOpParams params = new MxOpParams();
         params.addParam("stride", stride);
@@ -610,6 +602,40 @@ class MxNDArrayEx implements NDArrayEx {
         params.addAll(additional);
 
         return manager.invoke("RNN", inputs, params);
+    }
+
+    ////////////////////////////////////////
+    // Image and CV
+    ////////////////////////////////////////
+
+    @Override
+    public NDArray normalize(float[] mean, float[] std) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("mean", mean);
+        params.addTupleParam("std", std);
+        return manager.invoke("_npx__image_normalize", array, params);
+    }
+
+    @Override
+    public NDArray toTensor() {
+        return manager.invoke("_npx__image_to_tensor", array, null);
+    }
+
+    @Override
+    public NDArray resize(int[] size) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("size", size);
+        return manager.invoke("_npx__image_resize", array, params);
+    }
+
+    @Override
+    public NDArray crop(int x, int y, int width, int height) {
+        MxOpParams params = new MxOpParams();
+        params.add("x", x);
+        params.add("y", y);
+        params.add("width", width);
+        params.add("height", height);
+        return manager.invoke("_npx__image_crop", array, params);
     }
 
     ////////////////////////////////////////

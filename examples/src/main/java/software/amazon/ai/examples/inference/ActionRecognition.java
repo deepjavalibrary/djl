@@ -24,7 +24,7 @@ import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.Classification;
-import software.amazon.ai.modality.cv.Images;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.zoo.ModelNotFoundException;
 import software.amazon.ai.zoo.ZooModel;
@@ -41,7 +41,7 @@ public class ActionRecognition extends AbstractExample {
 
         List<Classification> result;
         Path imageFile = arguments.getImageFile();
-        BufferedImage img = Images.loadImageFromFile(imageFile);
+        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("backbone", "inceptionv3");
         criteria.put("dataset", "ucf101");

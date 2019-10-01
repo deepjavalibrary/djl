@@ -19,7 +19,8 @@ import java.util.List;
 import software.amazon.ai.Model;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.modality.cv.Images;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.translate.TranslatorContext;
@@ -32,7 +33,7 @@ public class ActionRecognitionTranslator extends ImageTranslator<List<Classifica
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
         // 299 is the minimum length for inception, 224 for vgg
-        BufferedImage cropped = Images.centerCrop(input, 299, 299);
+        BufferedImage cropped = BufferedImageUtils.centerCrop(input, 299, 299);
         return super.processInput(ctx, cropped);
     }
 
@@ -65,6 +66,6 @@ public class ActionRecognitionTranslator extends ImageTranslator<List<Classifica
     protected NDArray normalize(NDArray array) {
         float[] mean = {0.485f, 0.456f, 0.406f};
         float[] std = {0.229f, 0.224f, 0.225f};
-        return Images.normalize(array, mean, std);
+        return NDImageUtils.normalize(array, mean, std);
     }
 }

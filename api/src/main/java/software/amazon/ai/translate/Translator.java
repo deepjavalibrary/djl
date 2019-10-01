@@ -34,7 +34,7 @@ package software.amazon.ai.translate;
  *
  *     &#064;Override
  *     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
- *         BufferedImage image = Images.resizeImage(input, imageWidth, imageHeight);
+ *         BufferedImage image = Images.resize(input, imageWidth, imageHeight);
  *         FloatBuffer buffer = Images.toFloatBuffer(image);
  *
  *         return new NDList(ctx.getNDManager().create(dataDesc, buffer));

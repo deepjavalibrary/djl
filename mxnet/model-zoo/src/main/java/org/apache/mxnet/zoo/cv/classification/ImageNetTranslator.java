@@ -20,7 +20,7 @@ import java.util.List;
 import software.amazon.ai.Model;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.modality.cv.Images;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.translate.TranslatorContext;
@@ -34,8 +34,8 @@ public class ImageNetTranslator extends ImageTranslator<List<Classification>> {
 
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-        BufferedImage image = Images.centerCrop(input);
-        image = Images.resizeImage(image, imageWidth, imageHeight);
+        BufferedImage image = BufferedImageUtils.centerCrop(input);
+        image = BufferedImageUtils.resize(image, imageWidth, imageHeight);
 
         return super.processInput(ctx, image);
     }

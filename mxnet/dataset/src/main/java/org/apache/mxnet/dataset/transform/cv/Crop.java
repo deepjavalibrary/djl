@@ -12,7 +12,7 @@
  */
 package org.apache.mxnet.dataset.transform.cv;
 
-import org.apache.mxnet.engine.MxImages;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.translate.Transform;
 
@@ -32,6 +32,6 @@ public class Crop implements Transform {
 
     @Override
     public NDArray transform(NDArray array, boolean close) {
-        return MxImages.crop(array, x, y, width, height);
+        return NDImageUtils.crop(array, x, y, width, height);
     }
 }

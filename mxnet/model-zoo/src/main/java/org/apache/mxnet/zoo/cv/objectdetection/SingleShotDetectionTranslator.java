@@ -19,8 +19,8 @@ import java.util.List;
 import software.amazon.ai.Model;
 import software.amazon.ai.modality.cv.DetectedObject;
 import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.modality.cv.Images;
 import software.amazon.ai.modality.cv.Rectangle;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.translate.TranslatorContext;
@@ -33,7 +33,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<List<Detected
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
         // TODO: avoid hard code image size and threshold
-        input = Images.resizeImage(input, 512, 512);
+        input = BufferedImageUtils.resize(input, 512, 512);
         return super.processInput(ctx, input);
     }
 

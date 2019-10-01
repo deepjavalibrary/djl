@@ -13,12 +13,13 @@
 package org.apache.mxnet.dataset;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Iterator;
-import org.apache.mxnet.engine.MxImages;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.Activation;
@@ -48,9 +49,12 @@ public class ImageFolderTest {
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
                 NDArray cat =
-                        MxImages.read(manager, "src/test/resources/imagefolder/cat/cat2.jpeg");
+                        BufferedImageUtils.readFileToArray(
+                                manager, Paths.get("src/test/resources/imagefolder/cat/cat2.jpeg"));
                 NDArray dog =
-                        MxImages.read(manager, "src/test/resources/imagefolder/dog/puppy1.jpg");
+                        BufferedImageUtils.readFileToArray(
+                                manager,
+                                Paths.get("src/test/resources/imagefolder/dog/puppy1.jpg"));
 
                 Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
 

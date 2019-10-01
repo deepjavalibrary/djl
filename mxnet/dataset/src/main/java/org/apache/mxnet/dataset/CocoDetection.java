@@ -19,8 +19,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.mxnet.engine.MxImages;
 import software.amazon.ai.modality.cv.Rectangle;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils.Flag;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Artifact;
@@ -38,11 +40,11 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     private Artifact artifact;
     private Usage usage;
     private boolean prepared;
-    private MxImages.Flag flag;
+    private Flag flag;
 
     private Path dataDir;
     private CocoUtils coco;
-    private List<String> imagePaths;
+    private List<Path> imagePaths;
     private List<double[][]> labels;
 
     public CocoDetection(Builder builder) {
@@ -108,9 +110,10 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     }
 
     @Override
-    public Record get(long index) {
+    public Record get(long index) throws IOException {
         int idx = Math.toIntExact(index);
-        NDList d = new NDList(MxImages.read(manager, imagePaths.get(idx), flag));
+        NDList d =
+                new NDList(BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag));
         NDList l = new NDList(manager.create(labels.get(idx)));
         return new Record(d, l);
     }
@@ -139,7 +142,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         coco.prepare();
         List<Long> imageIds = coco.getImageIds();
         for (long id : imageIds) {
-            String imagePath = dataDir.resolve(coco.getRelativeImagePath(id)).toString();
+            Path imagePath = dataDir.resolve(coco.getRelativeImagePath(id));
             List<double[]> labelOfImageId = getLabels(id);
             if (imagePath != null && !labelOfImageId.isEmpty()) {
                 imagePaths.add(imagePath);
@@ -185,7 +188,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     public static final class Builder extends BaseBuilder<Builder> {
         private NDManager manager;
         private Path dataDir;
-        private MxImages.Flag flag = MxImages.Flag.COLOR;
+        private Flag flag = NDImageUtils.Flag.COLOR;
         private Repository repository = Datasets.REPOSITORY;
         private Artifact artifact;
         private Usage usage;
@@ -215,7 +218,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
             return self();
         }
 
-        public Builder optFlag(MxImages.Flag flag) {
+        public Builder optFlag(Flag flag) {
             this.flag = flag;
             return self();
         }

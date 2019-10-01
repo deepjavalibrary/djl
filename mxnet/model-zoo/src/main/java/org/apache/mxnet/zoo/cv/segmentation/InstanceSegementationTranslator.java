@@ -19,8 +19,9 @@ import java.util.List;
 import software.amazon.ai.Model;
 import software.amazon.ai.modality.cv.DetectedObject;
 import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.modality.cv.Images;
 import software.amazon.ai.modality.cv.Mask;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
@@ -104,13 +105,13 @@ public class InstanceSegementationTranslator extends ImageTranslator<List<Detect
         width = Math.round(width * scale);
         height = Math.round(height * scale);
 
-        return Images.resizeImage(img, width, height);
+        return BufferedImageUtils.resize(img, width, height);
     }
 
     @Override
     protected NDArray normalize(NDArray array) {
         float[] mean = {0.485f, 0.456f, 0.406f};
         float[] std = {0.229f, 0.224f, 0.225f};
-        return Images.normalize(array, mean, std);
+        return NDImageUtils.normalize(array, mean, std);
     }
 }

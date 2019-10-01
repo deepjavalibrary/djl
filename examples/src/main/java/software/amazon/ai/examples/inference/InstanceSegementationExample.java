@@ -27,7 +27,8 @@ import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.cv.DetectedObject;
-import software.amazon.ai.modality.cv.Images;
+import software.amazon.ai.modality.cv.ImageVisualization;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.zoo.ModelNotFoundException;
 import software.amazon.ai.zoo.ZooModel;
@@ -44,7 +45,7 @@ public class InstanceSegementationExample extends AbstractExample {
 
         List<DetectedObject> result;
         Path imageFile = arguments.getImageFile();
-        BufferedImage img = Images.loadImageFromFile(imageFile);
+        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("flavor", "v1b");
@@ -74,7 +75,7 @@ public class InstanceSegementationExample extends AbstractExample {
         Path dir = Paths.get(logDir);
         Files.createDirectories(dir);
 
-        Images.drawBoundingBox(img, predictResult);
+        ImageVisualization.drawBoundingBoxes(img, predictResult);
 
         Path out = Paths.get(logDir, "imgSeg.jpg");
         ImageIO.write(img, "jpg", out.toFile());

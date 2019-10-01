@@ -14,6 +14,7 @@ package software.amazon.ai.modality.cv;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -45,7 +46,7 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
 
         NDManager manager = ctx.getNDManager();
 
-        FloatBuffer buffer = Images.toFloatBuffer(manager, input);
+        FloatBuffer buffer = BufferedImageUtils.toFloatBuffer(manager, input);
 
         NDArray array = manager.create(dataDesc);
         array.set(buffer);

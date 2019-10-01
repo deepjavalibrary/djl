@@ -10,26 +10,29 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package software.amazon.ai.modality.cv;
+package software.amazon.ai.modality.cv.util;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
-import java.util.List;
 import javax.imageio.ImageIO;
+import software.amazon.ai.modality.cv.util.NDImageUtils.Flag;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.RandomUtils;
 
-/** {@code Images} is an image processing utility that can load, reshape and convert images. */
-public final class Images {
+/**
+ * {@code BufferedImageUtils} is an image processing utility that can load, reshape and convert
+ * images using {@link BufferedImage}.
+ */
+public final class BufferedImageUtils {
+
+    private static final Flag DEFAULT_FLAG = Flag.COLOR;
 
     static {
         if (System.getProperty("apple.awt.UIElement") == null) {
@@ -38,17 +41,17 @@ public final class Images {
         }
     }
 
-    private Images() {}
+    private BufferedImageUtils() {}
 
     /**
      * Loads the image from the file specified.
      *
-     * @param file the file to be loaded
+     * @param path the file path to be loaded
      * @return a {@link BufferedImage}
      * @throws IOException file is not found
      */
-    public static BufferedImage loadImageFromFile(Path file) throws IOException {
-        return ImageIO.read(file.toFile());
+    public static BufferedImage fromFile(Path path) throws IOException {
+        return ImageIO.read(path.toFile());
     }
 
     /**
@@ -59,7 +62,7 @@ public final class Images {
      * @param newHeight the new height of the reshaped image
      * @return reshaped {@link BufferedImage}
      */
-    public static BufferedImage resizeImage(BufferedImage image, int newWidth, int newHeight) {
+    public static BufferedImage resize(BufferedImage image, int newWidth, int newHeight) {
         BufferedImage resizedImage =
                 new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = resizedImage.createGraphics();
@@ -130,64 +133,12 @@ public final class Images {
         return ret;
     }
 
-    /**
-     * Draws the bounding box on an image.
-     *
-     * @param image the input image
-     * @param detections the object detection results
-     */
-    public static void drawBoundingBox(BufferedImage image, List<DetectedObject> detections) {
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        int stroke = 2;
-        g.setStroke(new BasicStroke(stroke));
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
-
-        for (DetectedObject result : detections) {
-            String className = result.getClassName();
-            BoundingBox box = result.getBoundingBox();
-            g.setPaint(randomColor().darker());
-
-            box.draw(g, imageWidth, imageHeight);
-            Point p = box.getPoint();
-            int x = (int) (p.getX() * imageWidth);
-            int y = (int) (p.getY() * imageHeight);
-            drawText(g, className, x, y, stroke, 4);
-        }
-        g.dispose();
-    }
-
-    /**
-     * Draws all joints of a body on an image.
-     *
-     * @param image the input image
-     * @param joints the joints of the body
-     */
-    public static void drawJoints(BufferedImage image, List<Joint> joints) {
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        int stroke = 2;
-        g.setStroke(new BasicStroke(stroke));
-
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
-
-        for (Joint joint : joints) {
-            g.setPaint(randomColor().darker());
-            int x = (int) (joint.getX() * imageWidth);
-            int y = (int) (joint.getY() * imageHeight);
-            g.fillOval(x, y, 10, 10);
-        }
-        g.dispose();
-    }
-
-    private static Color randomColor() {
+    public static Color randomColor() {
         return new Color(RandomUtils.nextInt(255));
     }
 
     /**
-     * Converts image to a float buffer.
+     * Converts image to an RGB float buffer.
      *
      * @param manager {@link NDManager} to allocate direct buffer
      * @param image the buffered image to be converted
@@ -220,31 +171,44 @@ public final class Images {
     }
 
     /**
-     * Normalize a NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard deviation.
+     * Converts {@code BufferedImage} to RGB NDArray.
      *
-     * <p>Given mean `(m1, ..., mn)` and std `(s\ :sub:`1`\ , ..., s\ :sub:`n`)` for `n` channels,
-     * this transform normalizes each channel of the input tensor with: output[i] = (input[i] - m\
-     * :sub:`i`\ ) / s\ :sub:`i`
-     *
-     * @param input the input image NDArray
-     * @param mean mean value for each channel
-     * @param std standard deviation for each channel
-     * @return the result of normalization
+     * @param manager {@link NDManager} to create new NDArray with
+     * @param image the buffered image to be converted
+     * @return {@link NDArray}
      */
-    public static NDArray normalize(NDArray input, float[] mean, float[] std) {
-        return input.getNDArrayInternal().normalize(mean, std);
+    public static NDArray toNDArray(NDManager manager, BufferedImage image) {
+        return toNDArray(manager, image, DEFAULT_FLAG);
     }
 
-    private static void drawText(Graphics2D g, String text, int x, int y, int stroke, int padding) {
-        FontMetrics metrics = g.getFontMetrics();
-        x += stroke / 2;
-        y += stroke / 2;
-        int width = metrics.stringWidth(text) + padding * 2 - stroke / 2;
-        int height = metrics.getHeight() + metrics.getDescent();
-        int ascent = metrics.getAscent();
-        java.awt.Rectangle background = new java.awt.Rectangle(x, y, width, height);
-        g.fill(background);
-        g.setPaint(Color.WHITE);
-        g.drawString(text, x + padding, y + ascent);
+    /**
+     * Converts {@code BufferedImage} to NDArray with designated color mode.
+     *
+     * @param manager {@link NDManager} to create new NDArray with
+     * @param image the buffered image to be converted
+     * @param flag The color mode
+     * @return {@link NDArray}
+     */
+    public static NDArray toNDArray(NDManager manager, BufferedImage image, Flag flag) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        NDArray rgb = manager.create(toFloatBuffer(manager, image), new Shape(height, width, 3));
+        if (flag == Flag.COLOR) {
+            return rgb;
+        } else if (flag == Flag.GRAYSCALE) {
+            return rgb.mean(new int[] {0});
+        } else {
+            throw new IllegalArgumentException("Cannot convert to NDArray with flag: " + flag);
+        }
+    }
+
+    public static NDArray readFileToArray(NDManager manager, Path path) throws IOException {
+        return readFileToArray(manager, path, DEFAULT_FLAG);
+    }
+
+    public static NDArray readFileToArray(NDManager manager, Path path, Flag flag)
+            throws IOException {
+        BufferedImage image = fromFile(path);
+        return toNDArray(manager, image, flag);
     }
 }

@@ -19,11 +19,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.mxnet.engine.MxImages;
-import org.apache.mxnet.engine.MxImages.Flag;
 import org.apache.mxnet.utils.ThrowingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils.Flag;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Artifact;
@@ -41,7 +41,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     private static final Logger logger = LoggerFactory.getLogger(AbstractImageFolder.class);
 
     protected NDManager manager;
-    protected MxImages.Flag flag;
+    protected Flag flag;
     protected List<String> synsets;
     protected PairList<String, Integer> items;
 
@@ -156,7 +156,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
             extends RandomAccessDataset.BaseBuilder<T> {
 
         private NDManager manager;
-        private Flag flag = Flag.COLOR;
+        private Flag flag = NDImageUtils.Flag.COLOR;
 
         public Flag getFlag() {
             return flag;

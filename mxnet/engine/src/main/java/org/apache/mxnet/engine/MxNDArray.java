@@ -1450,35 +1450,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         return manager.invoke("argmin", this, params);
     }
 
-    // TODO put image op only in MxNDArray, might consider moving to NDArray
-    // image op
-
-    public NDArray toTensor() {
-        return manager.invoke("_npx__image_to_tensor", this, null);
-    }
-
-    public NDArray normalize(float[] mean, float[] std) {
-        MxOpParams params = new MxOpParams();
-        params.addTupleParam("mean", mean);
-        params.addTupleParam("std", std);
-        return manager.invoke("_npx__image_normalize", this, params);
-    }
-
-    public NDArray resize(int[] size) {
-        MxOpParams params = new MxOpParams();
-        params.addTupleParam("size", size);
-        return manager.invoke("_npx__image_resize", this, params);
-    }
-
-    public NDArray crop(int x, int y, int width, int height) {
-        MxOpParams params = new MxOpParams();
-        params.add("x", x);
-        params.add("y", y);
-        params.add("width", width);
-        params.add("height", height);
-        return manager.invoke("_npx__image_crop", this, params);
-    }
-
     /** {@inheritDoc} */
     @Override
     public Number percentileNumber(Number percentile) {

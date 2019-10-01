@@ -25,7 +25,7 @@ import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.Classification;
-import software.amazon.ai.modality.cv.Images;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.zoo.ModelNotFoundException;
 import software.amazon.ai.zoo.ZooModel;
@@ -41,7 +41,7 @@ public final class ClassifyExample extends AbstractExample {
             throws IOException, ModelNotFoundException, TranslateException {
         Classification predictResult = null;
         Path imageFile = arguments.getImageFile();
-        BufferedImage img = Images.loadImageFromFile(imageFile);
+        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
         // Device is not not required, default device will be used by Model if not provided.
         // Change to a specific device if needed.

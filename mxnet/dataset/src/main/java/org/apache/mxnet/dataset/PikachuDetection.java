@@ -25,7 +25,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.mxnet.engine.MxImages;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils.Flag;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.repository.Artifact;
@@ -47,10 +49,10 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     private Artifact artifact;
     private Usage usage;
     private boolean prepared;
-    private MxImages.Flag flag = MxImages.Flag.COLOR;
+    private Flag flag = NDImageUtils.Flag.COLOR;
 
     private Path dataDir;
-    private List<String> imagePaths;
+    private List<Path> imagePaths;
     private List<double[]> labels;
 
     public PikachuDetection(Builder builder) {
@@ -148,7 +150,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
 
                 // Class label
                 labelArray[4] = 1;
-                imagePaths.add(usagePath.resolve(imgName).toAbsolutePath().toString());
+                imagePaths.add(usagePath.resolve(imgName));
                 labels.add(labelArray);
             }
         }
@@ -162,9 +164,10 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     }
 
     @Override
-    public Record get(long index) {
+    public Record get(long index) throws IOException {
         int idx = Math.toIntExact(index);
-        NDList d = new NDList(MxImages.read(manager, imagePaths.get(idx), flag));
+        NDList d =
+                new NDList(BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag));
         NDList l = new NDList(manager.create(labels.get(idx)));
         return new Record(d, l);
     }
