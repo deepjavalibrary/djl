@@ -285,8 +285,8 @@ public abstract class NDFormat {
                 exponential = true;
                 precision = Math.min(PRECISION, (int) Math.log10(max) + 1);
             } else {
-                int size = (int) Math.log10(max) + 1;
-                int negativeSize = (int) Math.log10(negativeMax) + 2;
+                int size = (max != 0) ? (int) Math.log10(max) + 1 : 1;
+                int negativeSize = (negativeMax != 0) ? (int) Math.log10(negativeMax) + 2 : 2;
                 totalLength = Math.max(size, negativeSize);
             }
         }

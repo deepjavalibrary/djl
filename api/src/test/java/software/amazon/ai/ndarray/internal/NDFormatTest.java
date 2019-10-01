@@ -64,6 +64,11 @@ public class NDFormatTest {
             array = manager.create(data);
             str = NDFormat.format(array);
             Assert.assertEquals(str, "ND: (3) cpu(0) int32" + LF + "[   1, -256, 1000]" + LF);
+            // test corner case where log10 produce -inf
+            data = new int[] {0, 0};
+            array = manager.create(data);
+            str = NDFormat.format(array);
+            Assert.assertEquals(str, "ND: (2) cpu(0) int32" + LF + "[ 0,  0]" + LF);
         }
     }
 
