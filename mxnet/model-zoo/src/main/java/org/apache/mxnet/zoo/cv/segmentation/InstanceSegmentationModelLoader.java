@@ -13,10 +13,9 @@
 package org.apache.mxnet.zoo.cv.segmentation;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 import org.apache.mxnet.zoo.BaseModelLoader;
 import org.apache.mxnet.zoo.ModelZoo;
-import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.repository.Anchor;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.MRL.Model.CV;
@@ -24,7 +23,7 @@ import software.amazon.ai.repository.Repository;
 import software.amazon.ai.translate.Translator;
 
 public class InstanceSegmentationModelLoader
-        extends BaseModelLoader<BufferedImage, List<DetectedObject>> {
+        extends BaseModelLoader<BufferedImage, DetectedObjects> {
 
     private static final Anchor BASE_ANCHOR = CV.INSTANCE_SEGMENTATION;
     private static final String GROUP_ID = ModelZoo.GROUP_ID;
@@ -36,7 +35,7 @@ public class InstanceSegmentationModelLoader
     }
 
     @Override
-    public Translator<BufferedImage, List<DetectedObject>> getTranslator() {
+    public Translator<BufferedImage, DetectedObjects> getTranslator() {
         return new InstanceSegementationTranslator();
     }
 }

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Collections;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -25,8 +25,7 @@ import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.Classification;
-import software.amazon.ai.modality.cv.BoundingBox;
-import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -59,14 +58,14 @@ public class InferenceTest {
         MockImageTranslator translator = new MockImageTranslator("cat");
 
         Metrics metrics = new Metrics();
-        try (Predictor<BufferedImage, List<DetectedObject>> ssd = model.newPredictor(translator)) {
+        try (Predictor<BufferedImage, DetectedObjects> ssd = model.newPredictor(translator)) {
             ssd.setMetrics(metrics);
-            List<DetectedObject> result = ssd.predict(image);
-            DetectedObject detectedObject = result.get(0);
-            Assert.assertEquals(detectedObject.getClassName(), "cat");
+            DetectedObjects result = ssd.predict(image);
 
-            BoundingBox box = detectedObject.getBoundingBox();
-            Assert.assertEquals(Double.compare(box.getBounds().getHeight(), 1d), 0);
+            DetectedObjects.Item object = result.items().get(0);
+            Assert.assertEquals("cat", object.getClassName());
+            Assert.assertEquals(
+                    Double.compare(object.getBoundingBox().getBounds().getHeight(), 1d), 0);
         }
     }
 
@@ -76,7 +75,7 @@ public class InferenceTest {
         Model model = Model.newInstance();
         model.load(modelDir);
 
-        final String data = "cat";
+        final String className = "cat";
         Translator<String, Classification> translator =
                 new Translator<String, Classification>() {
 
@@ -93,16 +92,17 @@ public class InferenceTest {
 
                     @Override
                     public Classification processOutput(TranslatorContext ctx, NDList list) {
-                        return new Classification(data, 0.9d);
+                        return new Classification(
+                                Collections.singletonList(className),
+                                Collections.singletonList(0.9d));
                     }
                 };
         Metrics metrics = new Metrics();
 
         try (Predictor<String, Classification> classifier = model.newPredictor(translator)) {
             classifier.setMetrics(metrics);
-            Classification result = classifier.predict(data);
-            Assert.assertEquals(result.getClassName(), "cat");
-            Assert.assertEquals(Double.compare(result.getProbability(), 0.9d), 0);
+            Classification result = classifier.predict(className);
+            Assert.assertEquals(Double.compare(result.get(className).getProbability(), 0.9d), 0);
         }
     }
 

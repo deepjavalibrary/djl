@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
@@ -27,7 +26,7 @@ import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
-import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.modality.cv.ImageVisualization;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.translate.TranslateException;
@@ -41,9 +40,9 @@ public final class SsdExample extends AbstractExample {
     }
 
     @Override
-    public DetectedObject predict(Arguments arguments, Metrics metrics, int iteration)
+    public DetectedObjects predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
-        List<DetectedObject> predictResult = null;
+        DetectedObjects predictResult = null;
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
@@ -55,10 +54,9 @@ public final class SsdExample extends AbstractExample {
         criteria.put("size", "512");
         criteria.put("backbone", "resnet50_v1");
         criteria.put("dataset", "voc");
-        ZooModel<BufferedImage, List<DetectedObject>> model =
-                ModelZoo.SSD.loadModel(criteria, device);
+        ZooModel<BufferedImage, DetectedObjects> model = ModelZoo.SSD.loadModel(criteria, device);
 
-        try (Predictor<BufferedImage, List<DetectedObject>> predictor = model.newPredictor()) {
+        try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
@@ -70,11 +68,10 @@ public final class SsdExample extends AbstractExample {
         drawBoundingBox(img, predictResult, arguments.getLogDir());
 
         model.close();
-        return predictResult.get(0);
+        return predictResult;
     }
 
-    private void drawBoundingBox(
-            BufferedImage img, List<DetectedObject> predictResult, String logDir)
+    private void drawBoundingBox(BufferedImage img, DetectedObjects predictResult, String logDir)
             throws IOException {
         if (logDir == null) {
             return;

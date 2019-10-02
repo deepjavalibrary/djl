@@ -14,7 +14,6 @@ package org.apache.mxnet.zoo.cv.actionrecognition;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import software.amazon.ai.Model;
 import software.amazon.ai.modality.Classification;
@@ -26,9 +25,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Utils;
 
-public class ActionRecognitionTranslator extends ImageTranslator<List<Classification>> {
-
-    private static final int topK = 5;
+public class ActionRecognitionTranslator extends ImageTranslator<Classification> {
 
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
@@ -38,28 +35,11 @@ public class ActionRecognitionTranslator extends ImageTranslator<List<Classifica
     }
 
     @Override
-    public List<Classification> processOutput(TranslatorContext ctx, NDList list)
-            throws IOException {
+    public Classification processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
         NDArray probabilitiesNd = list.head().get(0);
-
-        long length = probabilitiesNd.getShape().head();
-        length = Math.min(length, topK);
-        List<Classification> ret = new ArrayList<>(Math.toIntExact(length));
-        NDArray sorted = probabilitiesNd.argsort(-1, false);
-        NDArray top = sorted.get(":" + topK);
-
-        float[] probabilities = probabilitiesNd.softmax(-1).toFloatArray();
-        int[] indices = top.toIntArray();
-
         List<String> synset = model.getArtifact("classes.txt", Utils::readLines);
-        for (int i = 0; i < topK; ++i) {
-            int index = indices[i];
-            String className = synset.get(index);
-            Classification out = new Classification(className, probabilities[index]);
-            ret.add(out);
-        }
-        return ret;
+        return new Classification(synset, probabilitiesNd);
     }
 
     @Override

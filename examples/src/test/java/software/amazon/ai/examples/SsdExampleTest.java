@@ -16,7 +16,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.examples.inference.SsdExample;
 import software.amazon.ai.examples.inference.util.AbstractExample;
-import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.DetectedObjects;
 
 public class SsdExampleTest {
 
@@ -28,8 +28,9 @@ public class SsdExampleTest {
             "-n", MODEL_NAME, "-i", "src/test/resources/3dogs.jpg", "-c", "1", "-l", "build/logs"
         };
         Assert.assertTrue(new SsdExample().runExample(args));
-        DetectedObject result = (DetectedObject) AbstractExample.getPredictResult();
-        Assert.assertEquals(result.getClassName(), "dog");
-        Assert.assertTrue(Double.compare(result.getProbability(), 0.8) > 0);
+        DetectedObjects result = (DetectedObjects) AbstractExample.getPredictResult();
+        DetectedObjects.Item best = result.best();
+        Assert.assertEquals(best.getClassName(), "dog");
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.8) > 0);
     }
 }

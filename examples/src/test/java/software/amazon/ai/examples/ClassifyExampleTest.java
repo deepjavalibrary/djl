@@ -29,7 +29,8 @@ public class ClassifyExampleTest {
         };
         Assert.assertTrue(new ClassifyExample().runExample(args));
         Classification result = (Classification) AbstractExample.getPredictResult();
-        Assert.assertEquals(result.getClassName(), "n02123045 tabby, tabby cat");
-        Assert.assertTrue(Double.compare(result.getProbability(), 0.4) > 0);
+        Classification.Item best = result.best();
+        Assert.assertEquals(best.getClassName(), "n02123045 tabby, tabby cat");
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.4) > 0);
     }
 }

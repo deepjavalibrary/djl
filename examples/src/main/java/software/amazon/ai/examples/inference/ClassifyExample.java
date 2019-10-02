@@ -15,7 +15,6 @@ package software.amazon.ai.examples.inference;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.zoo.ModelZoo;
@@ -50,15 +49,13 @@ public final class ClassifyExample extends AbstractExample {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("layers", "18");
         criteria.put("flavor", "v1");
-        ZooModel<BufferedImage, List<Classification>> model =
-                ModelZoo.RESNET.loadModel(criteria, device);
+        ZooModel<BufferedImage, Classification> model = ModelZoo.RESNET.loadModel(criteria, device);
 
-        try (Predictor<BufferedImage, List<Classification>> predictor = model.newPredictor()) {
+        try (Predictor<BufferedImage, Classification> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
-                List<Classification> result = predictor.predict(img);
-                predictResult = result.get(0);
+                predictResult = predictor.predict(img);
                 printProgress(iteration, i);
                 collectMemoryInfo(metrics);
             }

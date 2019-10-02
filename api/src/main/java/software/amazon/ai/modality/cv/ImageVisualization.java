@@ -31,7 +31,7 @@ public final class ImageVisualization {
      * @param image the input image
      * @param detections the object detection results
      */
-    public static void drawBoundingBoxes(BufferedImage image, List<DetectedObject> detections) {
+    public static void drawBoundingBoxes(BufferedImage image, DetectedObjects detections) {
         Graphics2D g = (Graphics2D) image.getGraphics();
         int stroke = 2;
         g.setStroke(new BasicStroke(stroke));
@@ -40,7 +40,7 @@ public final class ImageVisualization {
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-        for (DetectedObject result : detections) {
+        for (DetectedObjects.Item result : detections.items()) {
             String className = result.getClassName();
             BoundingBox box = result.getBoundingBox();
             g.setPaint(BufferedImageUtils.randomColor().darker());

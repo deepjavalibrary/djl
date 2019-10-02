@@ -13,7 +13,6 @@
 package org.apache.mxnet.zoo.cv.classification;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 import org.apache.mxnet.zoo.BaseModelLoader;
 import org.apache.mxnet.zoo.ModelZoo;
 import software.amazon.ai.modality.Classification;
@@ -24,7 +23,7 @@ import software.amazon.ai.repository.Repository;
 import software.amazon.ai.translate.Translator;
 
 public abstract class ImageNetBaseModelLoader
-        extends BaseModelLoader<BufferedImage, List<Classification>> {
+        extends BaseModelLoader<BufferedImage, Classification> {
 
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = ModelZoo.GROUP_ID;
@@ -34,7 +33,7 @@ public abstract class ImageNetBaseModelLoader
     }
 
     @Override
-    public Translator<BufferedImage, List<Classification>> getTranslator() {
+    public Translator<BufferedImage, Classification> getTranslator() {
         return new ImageNetTranslator();
     }
 }

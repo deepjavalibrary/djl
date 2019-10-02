@@ -15,7 +15,6 @@ package software.amazon.ai.examples.inference;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.zoo.ModelZoo;
@@ -36,19 +35,19 @@ public class ActionRecognition extends AbstractExample {
     }
 
     @Override
-    protected List<Classification> predict(Arguments arguments, Metrics metrics, int iteration)
+    protected Classification predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
 
-        List<Classification> result;
+        Classification result;
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("backbone", "inceptionv3");
         criteria.put("dataset", "ucf101");
-        ZooModel<BufferedImage, List<Classification>> inception =
+        ZooModel<BufferedImage, Classification> inception =
                 ModelZoo.ACTION_RECOGNITION.loadModel(criteria);
 
-        try (Predictor<BufferedImage, List<Classification>> action = inception.newPredictor()) {
+        try (Predictor<BufferedImage, Classification> action = inception.newPredictor()) {
             action.setMetrics(metrics); // Let predictor collect metrics
             result = action.predict(img);
             collectMemoryInfo(metrics);

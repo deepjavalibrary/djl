@@ -31,7 +31,7 @@ import software.amazon.ai.examples.inference.util.Arguments;
 import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
-import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.modality.cv.ImageVisualization;
 import software.amazon.ai.modality.cv.Joint;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
@@ -60,10 +60,10 @@ public class PoseEstimationExample extends AbstractExample {
         criteria.put("size", "512");
         criteria.put("backbone", "resnet50_v1");
         criteria.put("dataset", "voc");
-        ZooModel<BufferedImage, List<DetectedObject>> ssd = ModelZoo.SSD.loadModel(criteria);
+        ZooModel<BufferedImage, DetectedObjects> ssd = ModelZoo.SSD.loadModel(criteria);
 
-        List<DetectedObject> ssdResult;
-        try (Predictor<BufferedImage, List<DetectedObject>> predictor = ssd.newPredictor()) {
+        DetectedObjects ssdResult;
+        try (Predictor<BufferedImage, DetectedObjects> predictor = ssd.newPredictor()) {
             ssdResult = predictor.predict(img);
         }
         ssd.close();
@@ -71,6 +71,7 @@ public class PoseEstimationExample extends AbstractExample {
         // Get the cropped image
         List<BufferedImage> filtered =
                 ssdResult
+                        .items()
                         .stream()
                         .filter(obj -> obj.getClassName().equals("person"))
                         .map(obj -> obj.getBoundingBox().getBounds())

@@ -13,9 +13,8 @@
 package software.amazon.ai.test.mock;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import software.amazon.ai.modality.cv.DetectedObject;
+import java.util.Collections;
+import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Rectangle;
 import software.amazon.ai.ndarray.NDList;
@@ -24,13 +23,16 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
 import software.amazon.ai.translate.TranslatorContext;
 
-public class MockImageTranslator extends ImageTranslator<List<DetectedObject>> {
+public class MockImageTranslator extends ImageTranslator<DetectedObjects> {
 
-    private List<DetectedObject> output;
+    private DetectedObjects output;
 
     public MockImageTranslator(String className) {
-        output = new ArrayList<>(1);
-        output.add(new DetectedObject(className, 0.8, new Rectangle(0, 0, 1, 1)));
+        output =
+                new DetectedObjects(
+                        Collections.singletonList(className),
+                        Collections.singletonList(0.8),
+                        Collections.singletonList(new Rectangle(0, 0, 1, 1)));
     }
 
     @Override
@@ -41,11 +43,11 @@ public class MockImageTranslator extends ImageTranslator<List<DetectedObject>> {
     }
 
     @Override
-    public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list) {
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         return output;
     }
 
-    public void setOutput(List<DetectedObject> output) {
+    public void setOutput(DetectedObjects output) {
         this.output = output;
     }
 }

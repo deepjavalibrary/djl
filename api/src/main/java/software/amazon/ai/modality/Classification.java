@@ -12,47 +12,52 @@
  */
 package software.amazon.ai.modality;
 
-/** {@code Classification} is the container to store the classification result. */
-public class Classification {
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import software.amazon.ai.modality.Classification.Item;
+import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.types.DataType;
 
-    private String className;
-    private double probability;
+/** {@code Classification} is the container to store the classification results. */
+public final class Classification extends AbstractClassifications<Item> {
 
-    /**
-     * Constructs a {@code Classification} instance with {@code className} and <code>
-     * probability</code>.
-     *
-     * @param className the class name
-     * @param probability the probability
-     */
-    public Classification(String className, double probability) {
-        this.className = className;
-        this.probability = probability;
+    public Classification(List<String> classNames, List<Double> probabilities) {
+        super(classNames, probabilities);
     }
 
-    /**
-     * Returns the class name.
-     *
-     * @return Class name
-     */
-    public String getClassName() {
-        return className;
+    public Classification(List<String> classNames, NDArray probabilities) {
+        super(
+                classNames,
+                Arrays.stream(probabilities.asType(DataType.FLOAT64, false).toDoubleArray())
+                        .boxed()
+                        .collect(Collectors.toList()));
     }
 
-    /**
-     * Returns the probability.
-     *
-     * <p>Probability explains how accurately the classifier identified the target class
-     *
-     * @return Probability
-     */
-    public double getProbability() {
-        return probability;
+    public Item get(String className) {
+        for (int i = 0; i < classNames.size(); i++) {
+            if (classNames.get(i).equals(className)) {
+                return item(i);
+            }
+        }
+        return null;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public String toString() {
-        return "class: \"" + className + "\", probability: " + probability;
+    protected Item item(int index) {
+        return new Item(index);
+    }
+
+    public final class Item extends AbstractClassifications<Item>.Item {
+
+        protected Item(int index) {
+            super(index);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public String toString() {
+            return "class: \"" + getClassName() + "\", probability: " + getProbability();
+        }
     }
 }

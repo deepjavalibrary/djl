@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import software.amazon.ai.Model;
-import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.BoundingBox;
+import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Rectangle;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
@@ -26,7 +27,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Utils;
 
-public class SingleShotDetectionTranslator extends ImageTranslator<List<DetectedObject>> {
+public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjects> {
 
     private static final float THRESHOLD = 0.2f;
 
@@ -38,8 +39,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<List<Detected
     }
 
     @Override
-    public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list)
-            throws IOException {
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
         List<String> classes = model.getArtifact("classes.txt", Utils::readLines);
 
@@ -47,11 +47,13 @@ public class SingleShotDetectionTranslator extends ImageTranslator<List<Detected
         float[] probabilities = list.get(1).toFloatArray();
         NDArray boundingBoxes = list.get(2);
 
-        List<DetectedObject> ret = new ArrayList<>();
+        List<String> retNames = new ArrayList<>();
+        List<Double> retProbs = new ArrayList<>();
+        List<BoundingBox> retBB = new ArrayList<>();
 
         for (int i = 0; i < classIds.length; ++i) {
             int classId = (int) classIds[i];
-            float probability = probabilities[i];
+            double probability = probabilities[i];
             if (classId > 0 && probability > THRESHOLD) {
                 if (classId >= classes.size()) {
                     throw new AssertionError("Unexpected index: " + classId);
@@ -64,10 +66,12 @@ public class SingleShotDetectionTranslator extends ImageTranslator<List<Detected
                 double h = box[3] / 512 - y;
 
                 Rectangle rect = new Rectangle(x, y, w, h);
-                ret.add(new DetectedObject(className, probability, rect));
+                retNames.add(className);
+                retProbs.add(probability);
+                retBB.add(rect);
             }
         }
 
-        return ret;
+        return new DetectedObjects(retNames, retProbs, retBB);
     }
 }

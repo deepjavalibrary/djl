@@ -14,7 +14,6 @@ package software.amazon.ai.examples.training.transferlearning;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mxnet.dataset.Cifar10;
@@ -58,7 +57,7 @@ public final class TrainResnetWithCifar10 {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("layers", "152");
         criteria.put("flavor", "v1d");
-        ZooModel<BufferedImage, List<Classification>> model = ModelZoo.RESNET.loadModel(criteria);
+        ZooModel<BufferedImage, Classification> model = ModelZoo.RESNET.loadModel(criteria);
         trainCifar10(model);
         model.close();
     }

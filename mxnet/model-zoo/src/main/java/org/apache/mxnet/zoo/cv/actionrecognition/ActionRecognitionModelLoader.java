@@ -13,7 +13,6 @@
 package org.apache.mxnet.zoo.cv.actionrecognition;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 import org.apache.mxnet.zoo.BaseModelLoader;
 import org.apache.mxnet.zoo.ModelZoo;
 import software.amazon.ai.modality.Classification;
@@ -23,8 +22,7 @@ import software.amazon.ai.repository.MRL.Model.CV;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.translate.Translator;
 
-public class ActionRecognitionModelLoader
-        extends BaseModelLoader<BufferedImage, List<Classification>> {
+public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage, Classification> {
 
     private static final Anchor BASE_ANCHOR = CV.ACTION_RECOGNITION;
     private static final String GROUP_ID = ModelZoo.GROUP_ID;
@@ -36,7 +34,7 @@ public class ActionRecognitionModelLoader
     }
 
     @Override
-    public Translator<BufferedImage, List<Classification>> getTranslator() {
+    public Translator<BufferedImage, Classification> getTranslator() {
         return new ActionRecognitionTranslator();
     }
 }

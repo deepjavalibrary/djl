@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import software.amazon.ai.Model;
-import software.amazon.ai.modality.cv.DetectedObject;
+import software.amazon.ai.modality.cv.BoundingBox;
+import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Mask;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
@@ -28,7 +29,7 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Utils;
 
-public class InstanceSegementationTranslator extends ImageTranslator<List<DetectedObject>> {
+public class InstanceSegementationTranslator extends ImageTranslator<DetectedObjects> {
 
     private static final float THRESHOLD = 0.3f;
     private static final int SHORT_EDGE = 600;
@@ -45,8 +46,7 @@ public class InstanceSegementationTranslator extends ImageTranslator<List<Detect
     }
 
     @Override
-    public List<DetectedObject> processOutput(TranslatorContext ctx, NDList list)
-            throws IOException {
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
         List<String> classes = model.getArtifact("classes.txt", Utils::readLines);
 
@@ -55,11 +55,13 @@ public class InstanceSegementationTranslator extends ImageTranslator<List<Detect
         NDArray boundingBoxes = list.get(2);
         NDArray masks = list.get(3);
 
-        List<DetectedObject> result = new ArrayList<>();
+        List<String> retNames = new ArrayList<>();
+        List<Double> retProbs = new ArrayList<>();
+        List<BoundingBox> retBB = new ArrayList<>();
 
         for (int i = 0; i < ids.length; ++i) {
             int classId = (int) ids[i];
-            float probability = scores[i];
+            double probability = scores[i];
             if (classId >= 0 && probability > THRESHOLD) {
                 if (classId >= classes.size()) {
                     throw new AssertionError("Unexpected index: " + classId);
@@ -81,10 +83,12 @@ public class InstanceSegementationTranslator extends ImageTranslator<List<Detect
 
                 Mask mask = new Mask(x, y, w, h, maskVal);
 
-                result.add(new DetectedObject(className, probability, mask));
+                retNames.add(className);
+                retProbs.add(probability);
+                retBB.add(mask);
             }
         }
-        return result;
+        return new DetectedObjects(retNames, retProbs, retBB);
     }
 
     /**
