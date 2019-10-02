@@ -12,17 +12,22 @@
  */
 package software.amazon.ai.examples.training.transferlearning;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.mxnet.dataset.Cifar10;
+import org.apache.mxnet.dataset.DatasetUtils;
 import org.apache.mxnet.dataset.transform.cv.ToTensor;
 import org.apache.mxnet.zoo.ModelZoo;
 import org.slf4j.Logger;
+import software.amazon.ai.Device;
 import software.amazon.ai.Model;
 import software.amazon.ai.examples.inference.util.LogUtils;
-import software.amazon.ai.modality.Classification;
+import software.amazon.ai.examples.training.util.Arguments;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -46,33 +51,67 @@ import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
 import software.amazon.ai.translate.Pipeline;
 import software.amazon.ai.zoo.ModelNotFoundException;
-import software.amazon.ai.zoo.ZooModel;
+import software.amazon.ai.zoo.cv.classification.ResNetV1;
 
 public final class TrainResnetWithCifar10 {
 
     private static final Logger logger = LogUtils.getLogger(TrainResnetWithCifar10.class);
 
+    private static float accuracy;
+    private static float lossValue;
+
     private TrainResnetWithCifar10() {}
 
-    public static void main(String[] args) throws IOException, ModelNotFoundException {
+    public static void main(String[] args)
+            throws IOException, ParseException, ModelNotFoundException {
+        Options options = Arguments.getOptions();
+        DefaultParser parser = new DefaultParser();
+        org.apache.commons.cli.CommandLine cmd = parser.parse(options, args, null, false);
+        Arguments arguments = new Arguments(cmd);
         // load the model
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("layers", "152");
-        criteria.put("flavor", "v1d");
-        ZooModel<BufferedImage, Classification> model = ModelZoo.RESNET.loadModel(criteria);
-        trainCifar10(model);
-        model.close();
+        Model resnet50v1 = getModel(arguments.getIsSymbolic(), arguments.getPreTrained());
+        trainResNetV1(resnet50v1, arguments);
+        resnet50v1.close();
     }
 
-    public static void trainCifar10(Model model) throws IOException {
-        reconstructBlock(model);
+    private static Model getModel(boolean isSymbolic, boolean preTrained)
+            throws IOException, ModelNotFoundException {
+        if (isSymbolic) {
+            // load the model
+            Map<String, String> criteria = new ConcurrentHashMap<>();
+            criteria.put("layers", "152");
+            criteria.put("flavor", "v1d");
+            Model model = ModelZoo.RESNET.loadModel(criteria);
+            SequentialBlock newBlock = new SequentialBlock();
+            Block modifiedBlock = ((SymbolBlock) model.getBlock()).removeLastBlock();
+            newBlock.add(modifiedBlock);
+            newBlock.add(new Linear.Builder().setOutChannels(10).build());
+            model.setBlock(newBlock);
+            if (!preTrained) {
+                model.getBlock().clear();
+            }
+            return model;
+        } else {
+            Model model = Model.newInstance();
+            Block resNet50 =
+                    new ResNetV1.Builder()
+                            .setImageShape(new Shape(3, 32, 32))
+                            .setNumLayers(50)
+                            .setOutSize(10)
+                            .build();
+            model.setBlock(resNet50);
+            return model;
+        }
+    }
 
-        int batchSize = 50;
-        int numEpoch = 2;
+    public static void trainResNetV1(Model model, Arguments arguments) throws IOException {
+        int batchSize = arguments.getBatchSize();
+        int numGpus = arguments.getNumGpus();
+
         Optimizer optimizer =
                 new Sgd.Builder()
                         .setRescaleGrad(1.0f / batchSize)
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
+                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.01f))
                         .build();
         Pipeline pipeline = new Pipeline(new ToTensor());
         Cifar10 cifar10 =
@@ -84,9 +123,22 @@ public final class TrainResnetWithCifar10 {
                         .build();
         cifar10.prepare();
 
-        TrainingConfig config = new DefaultTrainingConfig(new NormalInitializer(0.01), optimizer);
+        Device[] devices;
+        if (numGpus > 0) {
+            devices = new Device[numGpus];
+            for (int i = 0; i < numGpus; i++) {
+                devices[i] = Device.gpu(i);
+            }
+        } else {
+            devices = new Device[] {Device.defaultDevice()};
+        }
+        TrainingConfig config =
+                new DefaultTrainingConfig(new NormalInitializer(0.01), optimizer, devices);
 
         try (Trainer trainer = model.newTrainer(config)) {
+            int numEpoch = arguments.getEpoch();
+            int numOfSlices = devices.length;
+
             Accuracy acc = new Accuracy();
             LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
@@ -94,34 +146,60 @@ public final class TrainResnetWithCifar10 {
             trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
             for (int epoch = 0; epoch < numEpoch; epoch++) {
+                // reset loss and accuracy
+                acc.reset();
+                lossMetric.reset();
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
-                    NDList data = batch.getData();
-                    NDArray label = batch.getLabels().head();
-                    NDArray pred;
-                    NDArray loss;
+                    Batch[] split = DatasetUtils.split(batch, devices, false);
+
+                    NDList pred = new NDList();
+                    NDList loss = new NDList();
+
                     try (GradientCollector gradCol = trainer.newGradientCollector()) {
-                        pred = trainer.forward(data).get(0);
-                        loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
-                        gradCol.backward(loss);
+                        for (int i = 0; i < numOfSlices; i++) {
+                            NDArray data = split[i].getData().head();
+                            NDArray label = split[i].getLabels().head();
+                            NDArray prediction = trainer.forward(new NDList(data)).head();
+                            NDArray l =
+                                    Loss.softmaxCrossEntropyLoss(
+                                            label, prediction, 1.f, 0, -1, true, false);
+                            pred.add(prediction);
+                            loss.add(l);
+                            gradCol.backward(l);
+                        }
                     }
                     trainer.step();
-                    acc.update(label, pred);
+                    acc.update(
+                            new NDList(
+                                    Arrays.stream(split)
+                                            .map(Batch::getLabels)
+                                            .map(NDList::head)
+                                            .toArray(NDArray[]::new)),
+                            pred);
                     lossMetric.update(loss);
+                    lossValue = lossMetric.getMetric().getValue();
+                    accuracy = acc.getMetric().getValue();
+                    logger.info("Loss: " + lossValue + " accuracy: " + accuracy);
+                    for (Batch b : split) {
+                        b.close();
+                    }
+                    pred.close();
+                    loss.close();
                     batch.close();
-                    float lossValue = lossMetric.getMetric().getValue();
-                    float accuracy = acc.getMetric().getValue();
-                    logger.info("The loss value is " + lossValue + " and accuracy: " + accuracy);
                 }
+                lossValue = lossMetric.getMetric().getValue();
+                accuracy = acc.getMetric().getValue();
+                logger.info("Loss: " + lossValue + " accuracy: " + accuracy);
                 logger.info("Epoch " + epoch + " finish");
             }
         }
     }
 
-    private static void reconstructBlock(Model model) {
-        SequentialBlock newBlock = new SequentialBlock();
-        Block modifiedBlock = ((SymbolBlock) model.getBlock()).removeLastBlock();
-        newBlock.add(modifiedBlock);
-        newBlock.add(new Linear.Builder().setOutChannels(10).build());
-        model.setBlock(newBlock);
+    public static float getAccuracy() {
+        return accuracy;
+    }
+
+    public static float getLossValue() {
+        return lossValue;
     }
 }

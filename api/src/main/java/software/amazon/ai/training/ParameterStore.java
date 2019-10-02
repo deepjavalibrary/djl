@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.nn.Parameter;
-import software.amazon.ai.training.optimizer.Optimizer;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -42,7 +41,7 @@ public class ParameterStore implements AutoCloseable {
         }
     }
 
-    public void updateAllParameters(Optimizer optimizer) {
+    public void updateAllParameters() {
         for (int i = 0; i < parameters.size(); i++) {
             NDArray[] grads = getAllGradients(parameters.get(i).getValue());
             parameterServer.push(i, grads, -i);

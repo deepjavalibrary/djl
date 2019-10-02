@@ -101,7 +101,7 @@ public class MxTrainer implements Trainer {
             checkGradients();
         }
         if (parameterStore != null) {
-            parameterStore.updateAllParameters(optimizer);
+            parameterStore.updateAllParameters();
         } else {
             optimizer.updateAllParameters(parameters);
         }

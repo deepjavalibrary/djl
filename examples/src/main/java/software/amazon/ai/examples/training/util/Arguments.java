@@ -21,6 +21,8 @@ public class Arguments {
     private int epoch;
     private int batchSize;
     private int numGpus;
+    private boolean isSymbolic;
+    private boolean preTrained;
 
     public Arguments(CommandLine cmd) {
         if (cmd.hasOption("epoch")) {
@@ -37,6 +39,16 @@ public class Arguments {
             numGpus = Integer.parseInt(cmd.getOptionValue("num-gpus"));
         } else {
             numGpus = Engine.getInstance().getGpuCount() > 0 ? 1 : 0;
+        }
+        if (cmd.hasOption("symbolic-model")) {
+            isSymbolic = Boolean.parseBoolean(cmd.getOptionValue("symbolic-model"));
+        } else {
+            isSymbolic = true;
+        }
+        if (cmd.hasOption("pre-trained")) {
+            preTrained = Boolean.parseBoolean(cmd.getOptionValue("pre-trained"));
+        } else {
+            preTrained = true;
         }
     }
 
@@ -63,6 +75,20 @@ public class Arguments {
                         .argName("NUMGPUS")
                         .desc("Number of GPUs used for training")
                         .build());
+        options.addOption(
+                Option.builder("s")
+                        .longOpt("symbolic-model")
+                        .hasArg()
+                        .argName("SYMBOLIC")
+                        .desc("Use symbolic model, use imperative model if false")
+                        .build());
+        options.addOption(
+                Option.builder("p")
+                        .longOpt("pre-trained")
+                        .hasArg()
+                        .argName("PRE-TRAINED")
+                        .desc("Use pre-trained weights")
+                        .build());
         return options;
     }
 
@@ -76,5 +102,13 @@ public class Arguments {
 
     public int getNumGpus() {
         return numGpus;
+    }
+
+    public boolean getIsSymbolic() {
+        return isSymbolic;
+    }
+
+    public boolean getPreTrained() {
+        return preTrained;
     }
 }

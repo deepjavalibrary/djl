@@ -459,7 +459,7 @@ class MxNDArrayEx implements NDArrayEx {
             PairList<String, Object> additional) {
         MxOpParams params = new MxOpParams();
         params.addParam("num_hidden", outChannels);
-        params.addParam("flatten", false);
+        params.addParam("flatten", flatten);
         params.addParam("no_bias", noBias);
         params.addAll(additional);
 

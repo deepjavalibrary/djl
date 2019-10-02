@@ -79,19 +79,24 @@ public class Accuracy extends TrainingMetrics {
     /** {@inheritDoc} */
     @Override
     public void update(NDList labels, NDList predictions) {
-        // Accuracy only support one type of label/prediction
-        if (labels.size() != 1 || predictions.size() != 1) {
-            throw new IllegalArgumentException(
-                    "NDList labels and prediction size "
-                            + "must be 1 for Accuracy. For batch data please use a NDArray with first"
-                            + "dimension as batch axis.");
+        if (labels.size() != predictions.size()) {
+            throw new IllegalArgumentException("labels and prediction length does not match.");
         }
-        update(labels.get(0), predictions.get(0));
+        for (int i = 0; i < labels.size(); i++) {
+            update(labels.get(i), predictions.get(i));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     protected void update(NDArray loss) {
+        throw new UnsupportedOperationException(
+                "Accuracy does not support update based on loss NDArray.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void update(NDList loss) {
         throw new UnsupportedOperationException(
                 "Accuracy does not support update based on loss NDArray.");
     }

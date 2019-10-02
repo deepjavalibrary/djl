@@ -68,9 +68,7 @@ public class XavierInitializer implements Initializer {
     }
 
     public XavierInitializer() {
-        randomType = RandomType.UNIFORM;
-        factorType = FactorType.AVG;
-        magnitude = 3;
+        this(RandomType.UNIFORM, FactorType.AVG, 3);
     }
 
     /** {@inheritDoc} */
@@ -81,9 +79,9 @@ public class XavierInitializer implements Initializer {
         long dimension = shape.dimension();
         if (dimension < 2) {
             throw new IllegalArgumentException(
-                    "XavierInitializer cannot be applied to Shape with dimension: , "
+                    "XavierInitializer cannot be applied to Shape with dimension: "
                             + dimension
-                            + "it requires shape to be at least 2D.");
+                            + ", it requires shape to be at least 2D.");
         } else if (dimension == 2) {
             hwScale = 1.0;
         } else {

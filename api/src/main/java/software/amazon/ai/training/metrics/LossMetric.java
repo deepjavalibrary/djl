@@ -51,6 +51,15 @@ public class LossMetric extends TrainingMetrics {
 
     /** {@inheritDoc} */
     @Override
+    public void update(NDList loss) {
+        for (NDArray array : loss.toArray()) {
+            totalLoss += array.sum().getFloat();
+            totalInstances += array.size();
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void reset() {
         totalLoss = 0.f;
         totalInstances = 0;

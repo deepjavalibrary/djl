@@ -54,6 +54,8 @@ abstract class TrainingMetrics {
      */
     protected abstract void update(NDArray loss);
 
+    protected abstract void update(NDList loss);
+
     /** reset metric values. */
     public abstract void reset();
 

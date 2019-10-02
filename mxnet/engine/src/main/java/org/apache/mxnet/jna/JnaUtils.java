@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.mxnet.engine.CachedOp;
 import org.apache.mxnet.engine.DeviceType;
@@ -43,6 +44,7 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
+import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -1661,46 +1663,42 @@ public final class JnaUtils {
      */
     public static CachedOp createCachedOp(MxSymbolBlock block, MxNDManager manager) {
         Symbol symbol = block.getSymbol();
-        PairList<String, MxNDArray> parameters = new PairList<>();
-        block.getDirectParameters()
-                .forEach(param -> parameters.add(param.getName(), (MxNDArray) param.getArray()));
 
-        String[] allNames = symbol.getAllNames();
+        List<Parameter> parameters = block.getDirectParameters();
 
-        // We assume missing parameters are required input, which must be supplied by user.
-        int inputSize = allNames.length - parameters.size();
-        Map<String, MxNDArray> paramMap = parameters.toMap();
+        // All inputs to Cached op consists of input data and parameters
+        // We assume missing parameters are required input data, which must be supplied by user.
+        String[] allInputNames = symbol.getAllNames();
 
-        // prepare the cachedOp element
-        PairList<String, Integer> inputs = new PairList<>(inputSize);
-        MxNDArray[] inputNDArray = new MxNDArray[allNames.length];
-
-        int[] paramIndices = new int[parameters.size()];
-
-        // Start forming input array and param indices
-        int paramLoc = 0;
-        for (int i = 0; i < allNames.length; ++i) {
-            String paramName = allNames[i];
-            MxNDArray array = paramMap.get(paramName);
-            if (array != null) {
-                paramIndices[paramLoc] = i;
-                inputNDArray[i] = array;
-                paramLoc++;
+        // record data index in all inputs
+        PairList<String, Integer> dataIndices = new PairList<>();
+        // record parameter index in all inputs
+        PairList<String, Integer> paramIndices = new PairList<>();
+        List<String> parameterNames =
+                parameters.stream().map(Parameter::getName).collect(Collectors.toList());
+        for (int i = 0; i < allInputNames.length; ++i) {
+            String inputName = allInputNames[i];
+            if (parameterNames.contains(inputName)) {
+                // if input name is param, record its index
+                paramIndices.add(inputName, i);
             } else {
-                inputs.add(paramName, i);
+                // if input name is data, record its index
+                dataIndices.add(inputName, i);
             }
         }
 
         // Creating CachedOp
         // static_alloc and static_shape are enabled by default
         String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
-        String[] values = {inputs.values().toString(), Arrays.toString(paramIndices), "1", "1"};
+        String[] values = {
+            dataIndices.values().toString(), paramIndices.values().toString(), "1", "1"
+        };
 
         Pointer symbolHandle = symbol.getHandle();
         PointerByReference ref = new PointerByReference();
         checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
 
-        return new CachedOp(ref.getValue(), manager, inputNDArray, inputs);
+        return new CachedOp(ref.getValue(), manager, parameters, paramIndices, dataIndices);
     }
 
     public static void freeCachedOp(Pointer handle) {

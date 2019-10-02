@@ -16,6 +16,7 @@ package org.apache.mxnet.engine;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.mxnet.jna.LibUtils;
@@ -34,6 +35,9 @@ import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
+import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
+import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.util.PairList;
 
 // CHECKSTYLE:ON:AvoidStaticImport
@@ -53,19 +57,39 @@ public class CachedOpTest extends PowerMockTestCase {
     @Test
     public void testForward() {
         try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager()) {
-            MxNDArray[] params = {
-                null,
-                (MxNDArray) manager.create(new Shape(2)),
-                (MxNDArray) manager.create(new Shape(3)),
-                null,
-                null,
-                (MxNDArray) manager.create(new Shape(5)),
-                (MxNDArray) manager.create(new Shape(6))
-            };
-            List<String> names = Arrays.asList("data0", "data1", "data2");
-            List<Integer> locations = Arrays.asList(0, 3, 4);
-            PairList<String, Integer> inputNames = new PairList<>(names, locations);
-            CachedOp co = new CachedOp(new PointerArray(), manager, params, inputNames);
+            List<Parameter> params = new ArrayList<>();
+            params.add(
+                    new Parameter(
+                            "array0",
+                            new SequentialBlock(),
+                            manager.create(new Shape(2)),
+                            ParameterType.WEIGHT));
+            params.add(
+                    new Parameter(
+                            "array1",
+                            new SequentialBlock(),
+                            manager.create(new Shape(3)),
+                            ParameterType.WEIGHT));
+            params.add(
+                    new Parameter(
+                            "array2",
+                            new SequentialBlock(),
+                            manager.create(new Shape(5)),
+                            ParameterType.WEIGHT));
+            params.add(
+                    new Parameter(
+                            "array3",
+                            new SequentialBlock(),
+                            manager.create(new Shape(6)),
+                            ParameterType.WEIGHT));
+            List<String> names = Arrays.asList("array0", "array1", "array2", "array3");
+            List<Integer> locations = Arrays.asList(1, 2, 5, 6);
+            PairList<String, Integer> paramIndices = new PairList<>(names, locations);
+            names = Arrays.asList("data0", "data1", "data2");
+            locations = Arrays.asList(0, 3, 4);
+            PairList<String, Integer> dataIndices = new PairList<>(names, locations);
+            CachedOp co =
+                    new CachedOp(new PointerArray(), manager, params, paramIndices, dataIndices);
             logger.info("Test: Positioned input");
             NDList input =
                     new NDList(
@@ -73,29 +97,32 @@ public class CachedOpTest extends PowerMockTestCase {
                             manager.create(new Shape(4)),
                             manager.create(new Shape(5)));
             co.forward(input);
-            Assert.assertEquals(params[0].getShape(), new Shape(2));
-            Assert.assertEquals(params[3].getShape(), new Shape(4));
-            Assert.assertEquals(params[4].getShape(), new Shape(5));
+            MxNDArray[] inputNDArray = co.getInputNDArray();
+            Assert.assertEquals(inputNDArray[0].getShape(), new Shape(2));
+            Assert.assertEquals(inputNDArray[3].getShape(), new Shape(4));
+            Assert.assertEquals(inputNDArray[4].getShape(), new Shape(5));
             logger.info("Test: Named input");
             input = new NDList();
             input.add("data2", manager.create(new Shape(2)));
             input.add("data1", manager.create(new Shape(4)));
             input.add("data0", manager.create(new Shape(5)));
             co.forward(input);
-            Assert.assertEquals(params[0].getShape(), new Shape(5));
-            Assert.assertEquals(params[3].getShape(), new Shape(4));
-            Assert.assertEquals(params[4].getShape(), new Shape(2));
+            inputNDArray = co.getInputNDArray();
+            Assert.assertEquals(inputNDArray[0].getShape(), new Shape(5));
+            Assert.assertEquals(inputNDArray[3].getShape(), new Shape(4));
+            Assert.assertEquals(inputNDArray[4].getShape(), new Shape(2));
             logger.info("Test: No input, expect warnings");
             input = new NDList();
             co.forward(input);
-            Assert.assertEquals(params[0].getShape(), new Shape(1));
-            Assert.assertEquals(params[3].getShape(), new Shape(1));
-            Assert.assertEquals(params[4].getShape(), new Shape(1));
+            inputNDArray = co.getInputNDArray();
+            Assert.assertEquals(inputNDArray[0].getShape(), new Shape(1));
+            Assert.assertEquals(inputNDArray[3].getShape(), new Shape(1));
+            Assert.assertEquals(inputNDArray[4].getShape(), new Shape(1));
             logger.info("Test: Check the remaining params");
-            Assert.assertEquals(params[1].getShape(), new Shape(2));
-            Assert.assertEquals(params[2].getShape(), new Shape(3));
-            Assert.assertEquals(params[5].getShape(), new Shape(5));
-            Assert.assertEquals(params[6].getShape(), new Shape(6));
+            Assert.assertEquals(inputNDArray[1].getShape(), new Shape(2));
+            Assert.assertEquals(inputNDArray[2].getShape(), new Shape(3));
+            Assert.assertEquals(inputNDArray[5].getShape(), new Shape(5));
+            Assert.assertEquals(inputNDArray[6].getShape(), new Shape(6));
             logger.info("Test: Illegal inputs");
             final NDList input2 = new NDList();
             input2.add("data_not_exist", null);
