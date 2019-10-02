@@ -235,9 +235,8 @@ public class TfNDArray implements NDArray {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean equalsWithEps(Object o, double eps) {
+    public boolean allClose(NDArray other, float rtol, float atol, boolean equalNan) {
         return false;
     }
 
@@ -774,19 +773,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray stack(NDArray[] arrays, int axis) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray stack(NDList arrays, int axis) {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public NDArray concat(NDArray[] arrays, int axis) {
+    public NDArray concat(NDList arrays, int axis) {
         return null;
     }
 

@@ -209,7 +209,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public boolean equalsWithEps(Object o, double eps) {
+    public boolean allClose(NDArray other, float rtol, float atol, boolean equalNan) {
         return false;
     }
 
@@ -664,19 +664,13 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray stack(NDArray[] arrays, int axis) {
-        Shape newShape = new Shape(arrays.length + 1).addAll(getShape());
-        return new MockNDArray(manager, device, newShape, dataType, sparseFormat);
-    }
-
-    @Override
     public NDArray stack(NDList arrays, int axis) {
         Shape newShape = new Shape(arrays.size() + 1).addAll(getShape());
         return new MockNDArray(manager, device, newShape, dataType, sparseFormat);
     }
 
     @Override
-    public NDArray concat(NDArray[] arrays, int axis) {
+    public NDArray concat(NDList arrays, int axis) {
         return null;
     }
 

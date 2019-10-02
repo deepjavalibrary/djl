@@ -87,8 +87,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     }
 
     /**
-     * Removes the first occurrence of the specified element from this NDList if it is present
-     * (optional operation).
+     * Removes the first occurrence of the specified element from this NDList if it is present.
      *
      * <p>If this list does not contain the element, it is unchanged. More formally, removes the
      * element with the lowest index {@code i} such that {@code
@@ -100,6 +99,41 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      */
     public NDArray remove(String name) {
         return list.remove(name);
+    }
+
+    /**
+     * Removes the index of the specified element from this NDList if it is present.
+     *
+     * @param index the index of the element to remove
+     * @return the element which got removed
+     */
+    public NDArray remove(int index) {
+        return list.remove(index);
+    }
+
+    /**
+     * Returns a view of the portion of this NDList between the specified <tt>fromIndex</tt>.
+     * inclusive, and <tt>toIndex</tt>, exclusive.
+     *
+     * @param fromIndex the start index (inclusive)
+     * @param toIndex the end index (exclusive)
+     * @return a view of the portion of this NDList
+     */
+    public NDList subList(int fromIndex, int toIndex) {
+        NDList subList = new NDList();
+        subList.addAll(list.subList(fromIndex, toIndex));
+        return subList;
+    }
+
+    /**
+     * Returns a view of the portion of this NDList between the specified <tt>fromIndex</tt>.
+     * inclusive, and to the end
+     *
+     * @param fromIndex the start index (inclusive)
+     * @return a view of the portion of this NDList
+     */
+    public NDList subList(int fromIndex) {
+        return subList(fromIndex, size());
     }
 
     /**

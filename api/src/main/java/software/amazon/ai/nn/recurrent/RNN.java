@@ -153,11 +153,10 @@ public class RNN extends RecurrentCell {
         NDArray parameters = i2hWeight.getArray().flatten();
         parameters =
                 parameters.concat(
-                        new NDArray[] {
-                            i2hBias.getArray().flatten(),
-                            h2hWeight.getArray().flatten(),
-                            h2hBias.getArray().flatten()
-                        });
+                        new NDList(
+                                i2hBias.getArray().flatten(),
+                                h2hWeight.getArray().flatten(),
+                                h2hBias.getArray().flatten()));
 
         result.add(inputs.get(0));
         result.add(parameters);

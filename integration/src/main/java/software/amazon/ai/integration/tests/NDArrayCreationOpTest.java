@@ -19,6 +19,7 @@ import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
+import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -48,7 +49,7 @@ public class NDArrayCreationOpTest {
             // test 2d
             double[][] data2D = {data, data};
             array = manager.create(data2D);
-            actual = NDArrays.stack(new NDArray[] {manager.create(data), manager.create(data)});
+            actual = NDArrays.stack(new NDList(manager.create(data), manager.create(data)));
             Assertions.assertEquals(actual, array);
         }
     }

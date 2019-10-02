@@ -229,8 +229,43 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         if (index == -1) {
             return null;
         }
+        return remove(index);
+    }
+
+    /**
+     * Removes the key-value pair using index.
+     *
+     * @param index the index of the element to remove
+     * @return the value of the removed element, {@code null} if not found
+     */
+    public V remove(int index) {
         keys.remove(index);
         return values.remove(index);
+    }
+
+    /**
+     * Returns a view of the portion of this PairList between the specified <tt>fromIndex</tt>.
+     * inclusive, and to the end.
+     *
+     * @param fromIndex the start index (inclusive)
+     * @return a view of the portion of this PairList
+     */
+    public PairList<K, V> subList(int fromIndex) {
+        return subList(fromIndex, size());
+    }
+
+    /**
+     * Returns a view of the portion of this PairList between the specified <tt>fromIndex</tt>.
+     * inclusive, and <tt>toIndex</tt>, exclusive.
+     *
+     * @param fromIndex the start index (inclusive)
+     * @param toIndex the end index (exclusive)
+     * @return a view of the portion of this PairList
+     */
+    public PairList<K, V> subList(int fromIndex, int toIndex) {
+        List<K> subKeys = keys.subList(fromIndex, toIndex);
+        List<V> subValues = values.subList(fromIndex, toIndex);
+        return new PairList<>(subKeys, subValues);
     }
 
     /**

@@ -131,7 +131,9 @@ public class MxTrainer implements Trainer {
                             .map(pair -> pair.getValue().getArray().getGradient())
                             .collect(Collectors.toList()));
         }
-        NDArray gradSum = NDArrays.stack(grads.stream().map(NDArray::sum).toArray(NDArray[]::new));
+        NDArray gradSum =
+                NDArrays.stack(
+                        new NDList(grads.stream().map(NDArray::sum).toArray(NDArray[]::new)));
         float[] sums = gradSum.sum().toFloatArray();
         float sum = 0f;
         for (float num : sums) {

@@ -423,10 +423,9 @@ public class MxMatrix implements Matrix {
         return array.contentEquals(other);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean equalsWithEps(Object o, double eps) {
-        return array.equalsWithEps(o, eps);
+    public boolean allClose(NDArray other, float rtol, float atol, boolean equalNan) {
+        return array.allClose(other, rtol, atol, equalNan);
     }
 
     /** {@inheritDoc} */
@@ -935,19 +934,12 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray stack(NDArray[] arrays, int axis) {
-        return array.stack(arrays, axis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray stack(NDList arrays, int axis) {
         return array.stack(arrays, axis);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public NDArray concat(NDArray[] arrays, int axis) {
+    public NDArray concat(NDList arrays, int axis) {
         return array.concat(arrays, axis);
     }
 

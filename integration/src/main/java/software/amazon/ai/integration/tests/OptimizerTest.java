@@ -163,9 +163,10 @@ public class OptimizerTest {
         }
         trainer.step();
         return NDArrays.stack(
-                block.getParameters()
-                        .stream()
-                        .map(paramPair -> paramPair.getValue().getArray().mean())
-                        .toArray(NDArray[]::new));
+                new NDList(
+                        block.getParameters()
+                                .stream()
+                                .map(paramPair -> paramPair.getValue().getArray().mean())
+                                .toArray(NDArray[]::new)));
     }
 }

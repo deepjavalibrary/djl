@@ -414,12 +414,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         return manager.invoke("_np_ones_like", this, null);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDArray like() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
     @Override
     public boolean contentEquals(Number number) {
         if (number == null) {
@@ -445,7 +439,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equalsWithEps(Object o, double eps) {
+    public boolean allClose(NDArray other, float rtol, float atol, boolean equalNan) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
@@ -604,12 +598,6 @@ public class MxNDArray extends NativeResource implements NDArray {
             current = next;
         }
         return current;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isSparse() {
-        return getSparseFormat() != SparseFormat.DENSE;
     }
 
     /** {@inheritDoc} */
@@ -1100,24 +1088,19 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray stack(NDArray[] arrays, int axis) {
+    public NDArray stack(NDList arrays, int axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
-        NDArray[] srcArray = new NDArray[arrays.length + 1];
+        NDArray[] srcArray = new NDArray[arrays.size() + 1];
         srcArray[0] = this;
-        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
+        System.arraycopy(arrays.toArray(), 0, srcArray, 1, arrays.size());
         return manager.invoke("_npi_stack", new NDList(srcArray), params).head();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray stack(NDList arrays, int axis) {
-        return stack(arrays.toArray(), axis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray concat(NDArray[] arrays, int axis) {
+    public NDArray concat(NDList list, int axis) {
+        NDArray[] arrays = list.toArray();
         if (Stream.of(arrays).allMatch(array -> array.getShape().dimension() == 0)) {
             throw new IllegalArgumentException(
                     "scalar(zero-dimensional) arrays cannot be concatenated");
@@ -1416,12 +1399,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equalShapes(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray argmax() {
         return manager.invoke("_npi_argmax", this, null);
     }
@@ -1486,7 +1463,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        return getShape().size() == 0;
     }
 
     /** {@inheritDoc} */

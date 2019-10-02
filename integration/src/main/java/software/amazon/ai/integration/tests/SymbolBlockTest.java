@@ -171,7 +171,9 @@ public class SymbolBlockTest {
                                 stringParameterPair ->
                                         stringParameterPair.getValue().getArray().getGradient())
                         .collect(Collectors.toList());
-        gradMean = NDArrays.stack(grads.stream().map(NDArray::mean).toArray(NDArray[]::new));
+        gradMean =
+                NDArrays.stack(
+                        new NDList(grads.stream().map(NDArray::mean).toArray(NDArray[]::new)));
         return new Pair<>(pred.mean(), gradMean);
     }
 
