@@ -75,7 +75,7 @@ public class ParallelBlock extends AbstractBlock {
                 blocks.stream()
                         .map(
                                 block -> {
-                                    block.ensureInitialized(inputs);
+                                    block.initialize(inputs);
                                     return block.forward(inputs, params);
                                 })
                         .collect(Collectors.toList()));

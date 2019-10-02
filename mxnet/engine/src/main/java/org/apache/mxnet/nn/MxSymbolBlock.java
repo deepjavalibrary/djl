@@ -163,7 +163,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
-        ensureInitialized(inputs);
+        initialize(inputs);
         if (op == null) {
             op = JnaUtils.createCachedOp(this, (MxNDManager) manager);
         }

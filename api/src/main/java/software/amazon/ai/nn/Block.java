@@ -51,8 +51,7 @@ public interface Block {
 
     boolean isInitialized();
 
-    // TODO: remove this API
-    void ensureInitialized(NDList inputs);
+    void initialize(NDList inputs);
 
     void cast(DataType dataType);
 

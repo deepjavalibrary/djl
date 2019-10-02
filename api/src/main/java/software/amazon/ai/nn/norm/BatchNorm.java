@@ -97,7 +97,7 @@ public class BatchNorm extends AbstractBlock {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
         }
-        ensureInitialized(inputs);
+        initialize(inputs);
         NDArray data = inputs.get(0);
         NDArray gamma = data.getManager().ones(new Shape(inChannels));
         NDArray beta = data.getManager().zeros(new Shape(inChannels));

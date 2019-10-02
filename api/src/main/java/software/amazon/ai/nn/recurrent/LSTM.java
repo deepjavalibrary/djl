@@ -168,7 +168,7 @@ public class LSTM extends RecurrentCell {
             throw new IllegalArgumentException("RNN requires exactly 1 NDArray");
         }
 
-        ensureInitialized(inputs);
+        initialize(inputs);
 
         NDList result = new NDList();
         NDList parameterList = new NDList();

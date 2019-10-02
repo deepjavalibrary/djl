@@ -72,7 +72,7 @@ public class SequentialBlock extends AbstractBlock {
         NDList current = inputs;
         for (Block block : blocks) {
             NDList previous = current;
-            block.ensureInitialized(current);
+            block.initialize(current);
             current = block.forward(current);
             if (previous != inputs) {
                 previous.close();

@@ -86,7 +86,7 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public void ensureInitialized(NDList inputs) {
+    public void initialize(NDList inputs) {
         if (!initialized) {
             beforeInitialize(inputs);
             for (Parameter parameter : getDirectParameters()) {

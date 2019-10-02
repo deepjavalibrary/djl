@@ -39,7 +39,7 @@ public class Prelu extends AbstractBlock {
 
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
-        ensureInitialized(inputs);
+        initialize(inputs);
         NDArray head = inputs.head();
         inputs = new NDList(head, alpha.getArray());
         NDArrayEx ex = head.getNDArrayInternal();

@@ -150,7 +150,7 @@ public class Embedding<T> extends AbstractBlock {
     }
 
     private NDList opInputs(NDList inputs) {
-        ensureInitialized(inputs);
+        initialize(inputs);
         NDArray items = inputs.get(0);
         if (items.getShape().dimension() == 0) {
             return new NDList(items.reshape(1), embedding.getArray());

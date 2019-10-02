@@ -154,7 +154,7 @@ public class Linear extends AbstractBlock {
     }
 
     private NDList opInputs(NDList inputs) {
-        ensureInitialized(inputs);
+        initialize(inputs);
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
         }
