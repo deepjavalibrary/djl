@@ -42,21 +42,19 @@ public class Parameter implements AutoCloseable {
     private ParameterStore parameterStore;
 
     public Parameter(String name, Block block, ParameterType type) {
-        this(name, block, type, null);
-    }
-
-    public Parameter(String name, Block block, ParameterType type, Initializer initializer) {
         this.name = name;
         this.block = block;
         this.type = type;
-        this.initializer = initializer;
+        this.initializer = type.getInitializer();
     }
 
-    public Parameter(String name, Block block, NDArray array) {
+    public Parameter(String name, Block block, NDArray array, ParameterType type) {
         manager = array.getManager();
         this.name = name;
         this.block = block;
         this.array = array;
+        this.type = type;
+        this.initializer = type.getInitializer();
     }
 
     public String getName() {

@@ -19,7 +19,6 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
-import software.amazon.ai.training.initializer.Initializer;
 
 public class Conv3D extends Convolution {
 
@@ -42,7 +41,7 @@ public class Conv3D extends Convolution {
 
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (includeBias) {
-            bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);
+            bias = new Parameter("bias", this, ParameterType.BIAS);
         }
     }
 

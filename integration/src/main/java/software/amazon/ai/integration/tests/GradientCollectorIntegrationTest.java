@@ -164,10 +164,11 @@ public class GradientCollectorIntegrationTest {
                 }
                 trainer.step();
                 NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
-                NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(1.7576532f);
+                NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(.8577);
                 NDArray expectedAtIndex87 = manager.ones(new Shape(32, 32, 3, 3));
-                Assertions.assertEquals(expectedAtIndex0, parameters.get(0).getValue().getArray());
-                Assertions.assertEquals(expectedAtIndex1, parameters.get(1).getValue().getArray());
+                Assertions.assertEquals(parameters.get(0).getValue().getArray(), expectedAtIndex0);
+                Assertions.assertAlmostEquals(
+                        parameters.get(1).getValue().getArray(), expectedAtIndex1);
                 Assertions.assertEquals(
                         expectedAtIndex87, parameters.get(87).getValue().getArray());
             }

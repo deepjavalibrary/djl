@@ -44,6 +44,7 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.initializer.Initializer;
@@ -313,6 +314,21 @@ public class MxModel implements Model {
         super.finalize();
     }
 
+    private static ParameterType inferType(String name) {
+        if (name.endsWith("bias")) {
+            return ParameterType.BIAS;
+        } else if (name.endsWith("gamma")) {
+            return ParameterType.GAMMA;
+        } else if (name.endsWith("beta")) {
+            return ParameterType.BETA;
+        } else if (name.endsWith("moving_mean") || name.endsWith("running_mean")) {
+            return ParameterType.RUNNING_MEAN;
+        } else if (name.endsWith("moving_var") || name.endsWith("running_var")) {
+            return ParameterType.RUNNING_VAR;
+        }
+        return ParameterType.OTHER;
+    }
+
     private void loadParameters(String modelName, Map<String, String> options) throws IOException {
         String epochOption = null;
         if (options != null) {
@@ -344,7 +360,7 @@ public class MxModel implements Model {
             }
             String paramName = key.split(":", 2)[1];
             NDArray array = pair.getValue().asInDevice(device, false);
-            parameters.add(new Parameter(paramName, block, array));
+            parameters.add(new Parameter(paramName, block, array, inferType(paramName)));
         }
         ((MxSymbolBlock) block).setParams(parameters);
 

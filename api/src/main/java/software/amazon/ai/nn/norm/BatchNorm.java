@@ -27,7 +27,6 @@ import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
-import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.PairList;
 
 public class BatchNorm extends AbstractBlock {
@@ -46,8 +45,8 @@ public class BatchNorm extends AbstractBlock {
         axis = builder.getAxis();
         epsilon = builder.getEpsilon();
         momentum = builder.getMomentum();
-        runningMean = new Parameter("runningMean", this, ParameterType.OTHER, Initializer.ONES);
-        runningVar = new Parameter("runningVar", this, ParameterType.OTHER, Initializer.ONES);
+        runningMean = new Parameter("runningMean", this, ParameterType.RUNNING_MEAN);
+        runningVar = new Parameter("runningVar", this, ParameterType.RUNNING_VAR);
     }
 
     @Override

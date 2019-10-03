@@ -12,8 +12,24 @@
  */
 package software.amazon.ai.nn;
 
+import software.amazon.ai.training.initializer.Initializer;
+
 public enum ParameterType {
-    WEIGHT,
-    BIAS,
-    OTHER
+    WEIGHT(null),
+    BIAS(Initializer.ZEROS),
+    GAMMA(Initializer.ONES),
+    BETA(Initializer.ZEROS),
+    RUNNING_MEAN(Initializer.ZEROS),
+    RUNNING_VAR(Initializer.ONES),
+    OTHER(null);
+
+    private final Initializer initializer;
+
+    ParameterType(Initializer initializer) {
+        this.initializer = initializer;
+    }
+
+    public Initializer getInitializer() {
+        return initializer;
+    }
 }

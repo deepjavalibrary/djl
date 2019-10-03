@@ -29,7 +29,6 @@ import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
-import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -63,7 +62,7 @@ public class Linear extends AbstractBlock {
         outChannels = builder.getOutChannels();
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (builder.isBias()) {
-            bias = new Parameter("bias", this, ParameterType.BIAS, Initializer.ZEROS);
+            bias = new Parameter("bias", this, ParameterType.BIAS);
         }
     }
 

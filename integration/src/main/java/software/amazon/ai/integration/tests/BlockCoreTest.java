@@ -148,10 +148,10 @@ public class BlockCoreTest {
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
                 NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
-                NDArray expected = manager.create(new float[] {0, 1, 2, 3}, new Shape(2, 2));
+                NDArray expected = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
 
                 NDArray out = trainer.forward(new NDList(input)).head();
-                Assertions.assertAlmostEquals(expected, out);
+                Assertions.assertAlmostEquals(out, expected);
 
                 testEncode(manager, block);
             }
@@ -340,9 +340,9 @@ public class BlockCoreTest {
                 NDArray out = outputs.get(0);
                 NDArray expected =
                         manager.create(
-                                new float[] {13, 13, 13, 13, 13, 29, 29, 29, 29, 29},
+                                new float[] {7, 12, 12, 12, 12, 23, 28, 28, 28, 28},
                                 new Shape(1, 2, 5));
-                Assertions.assertEquals(expected, out);
+                Assertions.assertEquals(out, expected);
 
                 testEncode(manager, block);
             }
@@ -370,17 +370,11 @@ public class BlockCoreTest {
                 NDArray expected =
                         manager.create(
                                 new float[] {
-                                    0.9640276f,
-                                    0.9640276f,
-                                    0.9640276f,
-                                    0.9640276f,
-                                    0.9640276f,
-                                    0.9640276f,
-                                    0.9640276f,
-                                    0.9640276f
+                                    0.9638f, 0.9631f, 0.9576f, 0.964f, 0.9639f, 0.964f, 0.9576f,
+                                    0.964f
                                 },
                                 new Shape(1, 2, 4));
-                Assertions.assertAlmostEquals(expected, out);
+                Assertions.assertAlmostEquals(out, expected);
 
                 testEncode(manager, block);
             }
