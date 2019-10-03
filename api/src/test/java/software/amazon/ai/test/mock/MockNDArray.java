@@ -224,16 +224,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray eps(Number other) {
-        return null;
-    }
-
-    @Override
-    public NDArray eps(NDArray other) {
-        return null;
-    }
-
-    @Override
     public NDArray neq(Number other) {
         return null;
     }

@@ -459,18 +459,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eps(Number other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray eps(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray neq(Number other) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", other.toString());
@@ -1180,26 +1168,29 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(int[] axes) {
-        if (axes.length != 1) {
-            // TODO:
-            throw new UnsupportedOperationException("Not implemented");
-        }
-        MxOpParams params = new MxOpParams();
-        params.addParam("axis", axes[0]);
-        return manager.invoke("_npx_softmax", this, params);
+        return softmax(axes, 1.0);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(int[] axes, double temperature) {
-        if (axes.length != 1) {
-            // TODO:
-            throw new UnsupportedOperationException("Not implemented");
-        }
         MxOpParams params = new MxOpParams();
-        params.addParam("axis", axes[0]);
-        params.addParam("temperature", temperature);
-        return manager.invoke("_npx_softmax", this, params);
+        if (axes.length != 1) {
+            long size = shape.size(axes);
+            NDArray transposed = transpose(axes);
+            Shape transposedShape = transposed.getShape();
+            Shape sliced = transposed.getShape().slice(axes.length);
+            NDArray array = transposed.reshape(new Shape(size).addAll(sliced));
+            params.addParam("axis", 0);
+            params.addParam("temperature", temperature);
+            return manager.invoke("_npx_softmax", array, params)
+                    .reshape(transposedShape)
+                    .transpose(axes);
+        } else {
+            params.addParam("axis", axes[0]);
+            params.addParam("temperature", temperature);
+            return manager.invoke("_npx_softmax", this, params);
+        }
     }
 
     /** {@inheritDoc} */

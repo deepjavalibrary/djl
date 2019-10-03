@@ -607,22 +607,6 @@ public interface NDArray extends AutoCloseable {
     NDArray eq(NDArray other);
 
     /**
-     * Returns the binary NDArray for "Epsilon equals" comparison.
-     *
-     * @param other the number to compare
-     * @return the binary NDArray for "Epsilon equals" comparison
-     */
-    NDArray eps(Number other);
-
-    /**
-     * Returns the binary NDArray for "Epsilon equals" comparison.
-     *
-     * @param other the NDArray to compare
-     * @return the binary NDArray for "Epsilon equals" comparison
-     */
-    NDArray eps(NDArray other);
-
-    /**
      * Returns the binary NDArray for "Not equals" comparison.
      *
      * @param other the number to compare

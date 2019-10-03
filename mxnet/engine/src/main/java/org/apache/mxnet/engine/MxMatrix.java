@@ -442,18 +442,6 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eps(Number other) {
-        return array.eps(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray eps(NDArray other) {
-        return array.eps(other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray neq(Number other) {
         return array.neq(other);
     }

@@ -254,18 +254,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eps(Number other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray eps(NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray neq(Number other) {
         return null;
     }
