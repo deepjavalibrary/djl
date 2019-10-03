@@ -30,28 +30,24 @@ public class NDArrayNumericOpTest {
             data = DoubleStream.of(data).map(x -> -x).toArray();
             NDArray actual = manager.create(data);
             Assertions.assertEquals(actual, array.neg());
-            Assertions.assertEquals(actual, array.negi());
-            Assertions.assertInPlace(array, array.negi());
+            Assertions.assertInPlaceEquals(actual, array.negi(), array);
             // test multi-dim
             data = new double[] {-2.2, 2.2, 3, -0.2, 2.76, 0.0002};
             array = manager.create(data, new Shape(2, 3));
             data = DoubleStream.of(data).map(x -> -x).toArray();
             actual = manager.create(data, new Shape(2, 3));
             Assertions.assertEquals(actual, array.neg());
-            Assertions.assertEquals(actual, array.negi());
-            Assertions.assertInPlace(array, array.negi());
+            Assertions.assertInPlaceEquals(actual, array.negi(), array);
             // test scalar
             array = manager.create(3f);
             actual = manager.create(-3f);
             Assertions.assertEquals(actual, array.neg());
-            Assertions.assertEquals(actual, array.negi());
-            Assertions.assertInPlace(array, array.negi());
+            Assertions.assertInPlaceEquals(actual, array.negi(), array);
             // test zero-dim
             array = manager.create(new Shape(2, 0, 1));
             actual = manager.create(new Shape(2, 0, 1));
             Assertions.assertEquals(actual, array.neg());
-            Assertions.assertEquals(actual, array.negi());
-            Assertions.assertInPlace(array, array.negi());
+            Assertions.assertInPlaceEquals(actual, array.negi(), array);
         }
     }
 

@@ -240,10 +240,12 @@ public class NDArrayOtherOpTest {
             NDArray actual =
                     manager.create(new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f});
             Assertions.assertEquals(actual, array.cumsum());
+            Assertions.assertInPlaceEquals(actual, array.cumsumi(), array);
 
             array = manager.create(new float[] {1f, 2f, 3f, 5f, 8f, 13f});
             actual = manager.create(new float[] {1f, 3f, 6f, 11f, 19f, 32f});
             Assertions.assertEquals(actual, array.cumsum(0));
+            Assertions.assertInPlaceEquals(actual, array.cumsumi(0), array);
 
             // test multi-dim
             array = manager.arange(10).reshape(2, 1, 5, 1);
@@ -252,24 +254,32 @@ public class NDArrayOtherOpTest {
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 7f, 9f, 11f, 13f},
                             new Shape(2, 1, 5, 1));
             Assertions.assertEquals(actual, array.cumsum(0));
+            Assertions.assertInPlaceEquals(actual, array.cumsumi(0), array);
+
             array = manager.arange(10).reshape(2, 1, 5, 1);
             actual =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
                             new Shape(2, 1, 5, 1));
             Assertions.assertEquals(actual, array.cumsum(1));
+            Assertions.assertInPlaceEquals(actual, array.cumsumi(1), array);
+
             array = manager.arange(10).reshape(2, 1, 5, 1);
             actual =
                     manager.create(
                             new float[] {0f, 1f, 3f, 6f, 10f, 5f, 11f, 18f, 26f, 35f},
                             new Shape(2, 1, 5, 1));
             Assertions.assertEquals(actual, array.cumsum(2));
+            Assertions.assertInPlaceEquals(actual, array.cumsumi(2), array);
+
             array = manager.arange(10).reshape(2, 1, 5, 1);
             actual =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
                             new Shape(2, 1, 5, 1));
             Assertions.assertEquals(actual, array.cumsum(3));
+            Assertions.assertInPlaceEquals(actual, array.cumsumi(3), array);
+
             // Note that shape after cumsum op with zero-dim and scalar case change
             // test scalar
             array = manager.create(1f);

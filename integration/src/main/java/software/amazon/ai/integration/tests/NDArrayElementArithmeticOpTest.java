@@ -156,10 +156,8 @@ public class NDArrayElementArithmeticOpTest {
             // test inplace
             lhs = manager.create(new float[] {1f, 2f, 3f, 4f});
             result = NDArrays.addi(lhs, 2);
-            Assertions.assertInPlace(lhs, result, "In-place summation failed");
             NDArray actual = manager.create(new float[] {3f, 4f, 5f, 6f});
-            Assertions.assertEquals(actual, result, "Incorrect value in summed array");
-
+            Assertions.assertInPlaceEquals(actual, result, lhs);
             testScalarCornerCase(manager, NDArrays::add, Float::sum, false);
             testScalarCornerCase(manager, NDArrays::addi, Float::sum, true);
         }
@@ -176,10 +174,8 @@ public class NDArrayElementArithmeticOpTest {
                     "None in-place operator returned in-place result");
 
             result = NDArrays.addi(addend, addendum);
-            Assertions.assertInPlace(result, addend, "In-place summation failed");
-
             NDArray actual = manager.create(new float[] {3f, 5f, 7f, 9f});
-            Assertions.assertEquals(actual, result, "Incorrect value in summed array");
+            Assertions.assertInPlaceEquals(actual, result, addend);
 
             NDArray[] toAddAll = {
                 manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
@@ -211,12 +207,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {3, 6, 9, 8, -3});
             Assertions.assertEquals(
                     actual, result, "Scalar subtraction: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place subtraction: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    minuend, inPlaceResult, "Scalar subtraction: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, minuend);
 
             testScalarCornerCase(manager, NDArrays::sub, (x, y) -> x - y, false);
             testScalarCornerCase(manager, NDArrays::subi, (x, y) -> x - y, true);
@@ -233,12 +224,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {4, 6, 8, 10, -6});
             Assertions.assertEquals(
                     actual, result, "Element wise subtraction: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place subtraction: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    minuend, inPlaceResult, "Element wise subtraction: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, minuend);
 
             testCornerCase(manager, NDArrays::sub, (x, y) -> x - y, false);
             testCornerCase(manager, NDArrays::subi, (x, y) -> x - y, true);
@@ -256,13 +242,7 @@ public class NDArrayElementArithmeticOpTest {
                     actual,
                     result,
                     "Scalar reverse subtraction: Incorrect value in result ndarray");
-            Assertions.assertTrue(
-                    NDArrays.equals(actual, inPlaceResult),
-                    "Scalar in-place reverse subtraction: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    minuend,
-                    inPlaceResult,
-                    "Scalar reverse subtraction: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, minuend);
 
             testReverseScalarCornerCase(manager, NDArrays::sub, (x, y) -> x - y, false);
             testReverseScalarCornerCase(manager, NDArrays::subi, (x, y) -> x - y, true);
@@ -281,14 +261,7 @@ public class NDArrayElementArithmeticOpTest {
                     actual,
                     result,
                     "Reverse Element wise subtraction: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Reverse Element wise in-place subtraction: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    minuend,
-                    inPlaceResult,
-                    "Reverse Element wise subtraction: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, minuend);
 
             NDArray scalarNDArray = manager.create(5f);
             testReverseCornerCase(
@@ -327,15 +300,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {18, 27, -36, 45, 0});
             Assertions.assertEquals(
                     actual, result, "Scalar multiplication: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place multiplication: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    multiplicand,
-                    inPlaceResult,
-                    "Scalar multiplication: In-place operation failed");
-
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, multiplicand);
             testScalarCornerCase(manager, NDArrays::mul, (x, y) -> x * y, false);
             testScalarCornerCase(manager, NDArrays::muli, (x, y) -> x * y, true);
         }
@@ -353,14 +318,7 @@ public class NDArrayElementArithmeticOpTest {
                     actual,
                     result,
                     "Element wise multiplication: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place multiplication: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    multiplicand,
-                    inPlaceResult,
-                    "Element wise multiplication: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, multiplicand);
 
             NDArray[] toMulAll = {
                 manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
@@ -454,12 +412,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {2, 3, 4, 5, 0});
             Assertions.assertEquals(
                     actual, result, "Scalar division: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place division: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    dividend, inPlaceResult, "Scalar division: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
             testScalarCornerCase(manager, NDArrays::div, (x, y) -> x / y, false);
             testScalarCornerCase(manager, NDArrays::divi, (x, y) -> x / y, true);
@@ -476,12 +429,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {3, 3, 3, 3, 0});
             Assertions.assertEquals(
                     actual, result, "Element wise Division: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place division: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    dividend, inPlaceResult, "Element wise division: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
             testCornerCase(manager, NDArrays::div, (x, y) -> x / y, false);
             testCornerCase(manager, NDArrays::divi, (x, y) -> x / y, true);
@@ -497,12 +445,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {30, 20, 15, 12, 4});
             Assertions.assertEquals(
                     actual, result, "Scalar reverse division: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place reverse division: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    dividend, inPlaceResult, "Scalar reverse division: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
             testReverseScalarCornerCase(manager, NDArrays::sub, (x, y) -> x - y, false);
             testReverseScalarCornerCase(manager, NDArrays::subi, (x, y) -> x - y, true);
@@ -521,13 +464,7 @@ public class NDArrayElementArithmeticOpTest {
                     actual,
                     result,
                     "Reverse Element wise Division: Incorrect value in result ndarray");
-            Assertions.assertTrue(
-                    NDArrays.equals(actual, inPlaceResult),
-                    "Reverse Element wise in-place division: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    dividend,
-                    inPlaceResult,
-                    "Reverse Element wise division: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
             NDArray scalarNDArray = manager.create(24f);
             testReverseCornerCase(
@@ -554,12 +491,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {2, 0, 1, 2, 0});
             Assertions.assertEquals(
                     actual, result, "Scalar Remainder: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place Remainder: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    dividend, inPlaceResult, "Scalar division: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
             testScalarCornerCase(manager, NDArray::mod, (x, y) -> x % y, false);
             testScalarCornerCase(manager, NDArray::modi, (x, y) -> x % y, true);
@@ -576,12 +508,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {1, 2, 1, 0, 5});
             Assertions.assertEquals(
                     actual, result, "Element wise Remainder: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place Remainder: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    dividend, inPlaceResult, "Element wise Remainder: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
             testCornerCase(manager, NDArrays::mod, (x, y) -> x % y, false);
             testCornerCase(manager, NDArrays::modi, (x, y) -> x % y, true);
@@ -597,14 +524,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {0, 0, 5, 4, 0});
             Assertions.assertEquals(
                     actual, result, "Scalar reverse Remainder: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place reverse Remainder: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    dividend,
-                    inPlaceResult,
-                    "Scalar Remainder division: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
             testReverseScalarCornerCase(manager, NDArrays::mod, (x, y) -> x % y, false);
             testReverseScalarCornerCase(manager, NDArrays::modi, (x, y) -> x % y, true);
@@ -623,14 +543,7 @@ public class NDArrayElementArithmeticOpTest {
                     actual,
                     result,
                     "Reverse Element wise Remainder: Incorrect value in result ndarray");
-            Assertions.assertTrue(
-                    NDArrays.equals(actual, inPlaceResult),
-                    "Reverse Element wise in-place Remainder: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    dividend,
-                    inPlaceResult,
-                    "Reverse Element wise Remainder: In-place operation failed");
-
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
             NDArray scalarNDArray = manager.create(20f);
             testReverseCornerCase(
                     manager,
@@ -655,9 +568,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray inPlaceResult = array.powi(2);
             NDArray actual = manager.create(new float[] {36, 0, 1, 25, 4}, new Shape(1, 5));
             Assertions.assertAlmostEquals(actual, result);
-            Assertions.assertAlmostEquals(actual, inPlaceResult);
-            Assertions.assertInPlace(
-                    array, inPlaceResult, "Scalar power: In-place operation failed");
+            Assertions.assertInPlaceAlmostEquals(actual, inPlaceResult, array);
 
             testScalarCornerCase(manager, NDArray::pow, (x, y) -> (float) Math.pow(x, y), false);
             testScalarCornerCase(manager, NDArray::powi, (x, y) -> (float) Math.pow(x, y), true);
@@ -674,12 +585,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {216, 1, 12, 0.25f, 0});
             Assertions.assertEquals(
                     actual, result, "Scalar power: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place power: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    array, inPlaceResult, "Scalar power: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, array);
 
             testCornerCase(manager, NDArrays::pow, (x, y) -> (float) Math.pow(x, y), false);
             testCornerCase(manager, NDArrays::powi, (x, y) -> (float) Math.pow(x, y), true);
@@ -695,12 +601,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {8, 16, 32, 64, 128});
             Assertions.assertEquals(
                     actual, power, "Scalar reverse power: Incorrect value in result ndarray");
-            Assertions.assertEquals(
-                    actual,
-                    inPlaceResult,
-                    "Scalar in-place reverse power: Incorrect value in result ndarray");
-            Assertions.assertInPlace(
-                    array, inPlaceResult, "Scalar reverse division: In-place operation failed");
+            Assertions.assertInPlaceEquals(actual, inPlaceResult, array);
 
             testReverseScalarCornerCase(
                     manager, NDArrays::pow, (x, y) -> (float) Math.pow(x, y), false);

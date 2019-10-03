@@ -128,6 +128,16 @@ public final class Assertions {
         }
     }
 
+    public static void assertAlmostEquals(NDArray actual, NDArray expected)
+            throws FailedTestException {
+        assertAlmostEquals(actual, expected, 1e-5, 1e-3);
+    }
+
+    public static void assertAlmostEquals(NDList actual, NDList expected)
+            throws FailedTestException {
+        assertAlmostEquals(actual, expected, 1e-5, 1e-3);
+    }
+
     public static void assertAlmostEquals(NDList actual, NDList expected, double rtol, double atol)
             throws FailedTestException {
         assertEquals(
@@ -139,11 +149,6 @@ public final class Assertions {
         for (int i = 0; i < size; i++) {
             assertAlmostEquals(actual.get(i), expected.get(i), rtol, atol);
         }
-    }
-
-    public static void assertAlmostEquals(NDList actual, NDList expected)
-            throws FailedTestException {
-        assertAlmostEquals(actual, expected, 1e-5, 1e-3);
     }
 
     public static void assertAlmostEquals(
@@ -166,11 +171,6 @@ public final class Assertions {
         }
     }
 
-    public static void assertAlmostEquals(NDArray actual, NDArray expected)
-            throws FailedTestException {
-        assertAlmostEquals(actual, expected, 1e-5, 1e-3);
-    }
-
     public static void assertInPlace(NDArray actual, NDArray expected, String errorMessage)
             throws FailedTestException {
         if (actual != expected) {
@@ -181,6 +181,31 @@ public final class Assertions {
     public static void assertInPlace(NDArray actual, NDArray expected) throws FailedTestException {
         assertInPlace(
                 actual, expected, getDefaultErrorMessage(actual, expected, "Assertion failed!"));
+    }
+
+    public static void assertInPlaceEquals(NDArray actual, NDArray expected, NDArray original)
+            throws FailedTestException {
+        assertEquals(
+                actual, expected, getDefaultErrorMessage(actual, expected, "Assert Equal failed!"));
+        assertInPlace(
+                original,
+                expected,
+                getDefaultErrorMessage(original, expected, "Assert Inplace failed!"));
+    }
+
+    public static void assertInPlaceAlmostEquals(NDArray actual, NDArray expected, NDArray original)
+            throws FailedTestException {
+        assertInPlaceAlmostEquals(actual, expected, original, 1e-5, 1e-3);
+    }
+
+    public static void assertInPlaceAlmostEquals(
+            NDArray actual, NDArray expected, NDArray original, double rtol, double atol)
+            throws FailedTestException {
+        assertAlmostEquals(actual, expected, rtol, atol);
+        assertInPlace(
+                original,
+                expected,
+                getDefaultErrorMessage(original, expected, "Assert Inplace failed!"));
     }
 
     @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DoNotUseThreads"})
