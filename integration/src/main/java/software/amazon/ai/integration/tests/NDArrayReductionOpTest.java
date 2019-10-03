@@ -13,6 +13,7 @@
 package software.amazon.ai.integration.tests;
 
 import org.testng.annotations.Test;
+import software.amazon.ai.engine.EngineException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
@@ -23,94 +24,137 @@ public class NDArrayReductionOpTest {
     @Test
     public void testMax() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
-            float maxAll = original.max().getFloat();
-            Assertions.assertEquals(8, maxAll, "Incorrect max all");
+            NDArray array = manager.create(new float[] {1f, 2f, 5f, 1f});
+            Assertions.assertEquals(5f, array.max().getFloat());
 
-            NDArray maxAxes = original.max(new int[] {1});
-            NDArray maxAxesExpected = manager.create(new float[] {4, 8});
-            Assertions.assertEquals(maxAxesExpected, maxAxes, "Incorrect max axes");
+            array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
+            float maxAll = array.max().getFloat();
+            Assertions.assertEquals(8f, maxAll, "Incorrect max all");
 
-            NDArray maxKeep = original.max(new int[] {0}, true);
-            NDArray maxKeepExpected = manager.create(new float[] {6, 8}, new Shape(1, 2));
-            Assertions.assertEquals(maxKeepExpected, maxKeep, "Incorrect max keep");
+            NDArray maxAxes = array.max(new int[] {1});
+            NDArray maxAxesActual = manager.create(new float[] {4f, 8f});
+            Assertions.assertEquals(maxAxesActual, maxAxes, "Incorrect max axes");
+
+            NDArray maxKeep = array.max(new int[] {0}, true);
+            NDArray maxKeepActual = manager.create(new float[] {6f, 8f}, new Shape(1, 2));
+            Assertions.assertEquals(maxKeepActual, maxKeep, "Incorrect max keep");
+
+            // test scalar
+            array = manager.create(5f);
+            Assertions.assertEquals(5f, array.max().getFloat());
+            // zero-dim
+            array = manager.create(new Shape(1, 0));
+            Assertions.assertThrows(array::max, EngineException.class);
         }
     }
 
     @Test
     public void testMin() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
+            NDArray array = manager.create(new float[] {2f, 1f, 5f, 0f});
+            Assertions.assertEquals(0f, array.min().getFloat());
 
-            float minAll = original.min().getFloat();
-            Assertions.assertEquals(2, minAll, "Incorrect min all");
+            array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
+            float minAll = array.min().getFloat();
+            Assertions.assertEquals(2f, minAll, "Incorrect min all");
 
-            NDArray minAxes = original.min(new int[] {1});
-            NDArray minAxesExpected = manager.create(new float[] {2, 6});
-            Assertions.assertEquals(minAxesExpected, minAxes, "Incorrect min axes");
+            NDArray minAxes = array.min(new int[] {1});
+            NDArray minAxesActual = manager.create(new float[] {2f, 6f});
+            Assertions.assertEquals(minAxesActual, minAxes, "Incorrect min axes");
 
-            NDArray minKeep = original.min(new int[] {0}, true);
-            NDArray minKeepExpected = manager.create(new float[] {2, 4}, new Shape(1, 2));
-            Assertions.assertEquals(minKeepExpected, minKeep, "Incorrect min keep");
+            NDArray minKeep = array.min(new int[] {0}, true);
+            NDArray minKeepActual = manager.create(new float[] {2f, 4f}, new Shape(1, 2));
+            Assertions.assertEquals(minKeepActual, minKeep, "Incorrect min keep");
+
+            // test scalar
+            array = manager.create(0f);
+            Assertions.assertEquals(0f, array.min().getFloat());
+            // zero-dim
+            array = manager.create(new Shape(0, 2, 0));
+            Assertions.assertThrows(array::min, EngineException.class);
         }
     }
 
     @Test
     public void testSum() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
+            NDArray array = manager.create(new float[] {1f, 2f, 3f, 5f});
+            Assertions.assertEquals(11f, array.sum().getFloat());
 
-            float sumAll = original.sum().getFloat();
-            Assertions.assertEquals(20, sumAll, "Incorrect sum all");
-            NDArray sumAxes = original.sum(new int[] {1});
-            NDArray sumAxesExpected = manager.create(new float[] {6, 14});
-            Assertions.assertEquals(sumAxesExpected, sumAxes, "Incorrect sum axes");
+            array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
+            float sumAll = array.sum().getFloat();
+            Assertions.assertEquals(20f, sumAll, "Incorrect sum all");
+            NDArray sumAxes = array.sum(new int[] {1});
+            NDArray sumAxesActual = manager.create(new float[] {6f, 14f});
+            Assertions.assertEquals(sumAxesActual, sumAxes, "Incorrect sum axes");
 
-            NDArray sumKeep = original.sum(new int[] {0}, true);
-            NDArray sumKeepExpected = manager.create(new float[] {8, 12}, new Shape(1, 2));
-            Assertions.assertEquals(sumKeepExpected, sumKeep, "Incorrect sum keep");
+            NDArray sumKeep = array.sum(new int[] {0}, true);
+            NDArray sumKeepActual = manager.create(new float[] {8f, 12f}, new Shape(1, 2));
+            Assertions.assertEquals(sumKeepActual, sumKeep, "Incorrect sum keep");
+
+            // scalar
+            array = manager.create(2f);
+            Assertions.assertEquals(2f, array.sum().getFloat());
+            // zero-dim
+            array = manager.create(new Shape(1, 1, 0));
+            Assertions.assertEquals(0f, array.sum().getFloat());
         }
     }
 
     @Test
     public void testProd() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
+            NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f});
+            Assertions.assertEquals(24f, array.prod().getFloat());
 
-            float prodAll = original.prod().getFloat();
-            Assertions.assertEquals(384, prodAll, "Incorrect max axes");
-            if (prodAll != 384) {
-                throw new AssertionError("Incorrect prod all");
-            }
+            array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
 
-            NDArray prodAxes = original.prod(new int[] {1});
-            NDArray prodAxesExpected = manager.create(new float[] {8, 48});
-            Assertions.assertEquals(prodAxesExpected, prodAxes, "Incorrect prod axes");
+            float prodAll = array.prod().getFloat();
+            Assertions.assertEquals(384f, prodAll, "Incorrect prod axes");
 
-            NDArray prodKeep = original.prod(new int[] {0}, true);
-            NDArray prodKeepExpected = manager.create(new float[] {12, 32}, new Shape(1, 2));
-            Assertions.assertEquals(prodKeepExpected, prodKeep, "Incorrect prod keep");
+            NDArray prodAxes = array.prod(new int[] {1});
+            NDArray prodAxesActual = manager.create(new float[] {8f, 48f});
+            Assertions.assertEquals(prodAxesActual, prodAxes, "Incorrect prod axes");
+
+            NDArray prodKeep = array.prod(new int[] {0}, true);
+            NDArray prodKeepActual = manager.create(new float[] {12f, 32f}, new Shape(1, 2));
+            Assertions.assertEquals(prodKeepActual, prodKeep, "Incorrect prod keep");
+
+            // scalar
+            array = manager.create(5f);
+            Assertions.assertEquals(5f, array.prod().getFloat());
+            // zero-dim
+            array = manager.create(new Shape(0, 0, 0));
+            Assertions.assertEquals(1f, array.prod().getFloat());
         }
     }
 
     @Test
     public void testMean() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
+            NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f});
+            Assertions.assertEquals(2.5f, array.mean().getFloat());
 
-            float meanAll = original.mean().getFloat();
-            Assertions.assertEquals(5, meanAll, "Incorrect mean all");
-            NDArray meanAxes = original.mean(new int[] {1});
-            NDArray meanAxesExpected = manager.create(new float[] {3, 7});
-            Assertions.assertEquals(meanAxesExpected, meanAxes, "Incorrect mean axes");
+            array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
+            float meanAll = array.mean().getFloat();
+            Assertions.assertEquals(5f, meanAll, "Incorrect mean all");
+            NDArray meanAxes = array.mean(new int[] {1});
+            NDArray meanAxesActual = manager.create(new float[] {3f, 7f});
+            Assertions.assertEquals(meanAxesActual, meanAxes, "Incorrect mean axes");
 
-            NDArray meanKeep = original.mean(new int[] {0}, true);
-            NDArray meanKeepExpected = manager.create(new float[] {4, 6}, new Shape(1, 2));
-            Assertions.assertEquals(meanKeepExpected, meanKeep, "Incorrect mean keep");
+            NDArray meanKeep = array.mean(new int[] {0}, true);
+            NDArray meanKeepActaul = manager.create(new float[] {4f, 6f}, new Shape(1, 2));
+            Assertions.assertEquals(meanKeepActaul, meanKeep, "Incorrect mean keep");
+
+            // scalar
+            array = manager.create(5f);
+            Assertions.assertEquals(5f, array.mean().getFloat());
+            // zero-dim
+            array = manager.create(new Shape(0, 0, 0));
+            Assertions.assertEquals(Float.NaN, array.mean().getFloat());
         }
     }
-
-    // TODO disable for now
+    // TODO update libmxnet to get trace op
     @Test(enabled = false)
     public void testTrace() {
         try (NDManager manager = NDManager.newBaseManager()) {

@@ -1053,6 +1053,15 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray squeeze() {
+        // MXNet engine handle scalar case with condition of presence of "axis"
+        // so can't rely on default one
+        MxOpParams params = new MxOpParams();
+        return manager.invoke("_np_squeeze", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray squeeze(int[] axes) {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);

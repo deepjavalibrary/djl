@@ -96,12 +96,12 @@ public final class Assertions {
         assertEquals(actual, expected, "Two NDArrays are different!");
     }
 
-    public static void assertEquals(float actual, float expected) {
-        assertEquals(actual, expected, "Two floats are different!");
+    public static <T extends Number> void assertEquals(T actual, T expected) {
+        assertEquals(actual, expected, "Two numbers are different!");
     }
 
-    public static void assertEquals(float actual, float expected, String errorMessage) {
-        if (actual != expected) {
+    public static <T extends Number> void assertEquals(T actual, T expected, String errorMessage) {
+        if (!actual.equals(expected)) {
             throw new AssertionError(getDefaultErrorMessage(actual, expected, errorMessage));
         }
     }

@@ -114,8 +114,7 @@ public class NDArrayCreationOpTest {
             Assertions.assertEquals(actual, array);
         }
     }
-
-    // TODO disable for now
+    // eye op not yet merge into MXNet master
     @Test(enabled = false)
     public void testEye() {
         try (NDManager manager = NDManager.newBaseManager()) {
