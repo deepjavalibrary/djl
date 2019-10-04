@@ -21,9 +21,12 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
+import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.AbstractBlock;
+import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.util.PairList;
 
 public abstract class Convolution extends AbstractBlock {
@@ -34,20 +37,84 @@ public abstract class Convolution extends AbstractBlock {
     protected Shape dilate;
     protected int numFilters;
     protected int numGroups;
-    protected String layout;
     protected boolean includeBias;
 
     protected Parameter weight;
     protected Parameter bias;
 
+    public Convolution(BaseBuilder<?> builder) {
+        kernel = builder.getKernel();
+        stride = builder.getStride();
+        pad = builder.getPad();
+        dilate = builder.getDilate();
+        numFilters = builder.getNumFilters();
+        numGroups = builder.getNumGroups();
+        includeBias = builder.isIncludeBias();
+
+        weight = new Parameter("weight", this, ParameterType.WEIGHT);
+        if (includeBias) {
+            bias = new Parameter("bias", this, ParameterType.BIAS);
+        }
+    }
+
     protected abstract byte getVersion();
+
+    protected abstract LayoutType[] getExpectedLayout();
+
+    protected abstract String getStringLayout();
+
+    protected abstract int numDimensions();
 
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
         inputs = opInputs(inputs);
         NDArrayEx ex = inputs.get(0).getNDArrayInternal();
         return ex.convolution(
-                inputs, kernel, stride, pad, numFilters, numGroups, layout, !includeBias, params);
+                inputs,
+                kernel,
+                stride,
+                pad,
+                numFilters,
+                numGroups,
+                getStringLayout(),
+                !includeBias,
+                params);
+    }
+
+    @Override
+    protected void beforeInitialize(Shape[] inputs) {
+        Shape inputShape = inputs[0];
+        Block.validateLayout(getExpectedLayout(), inputShape.getLayout());
+    }
+
+    @Override
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+        long[] shape = new long[numDimensions()];
+        shape[0] = inputs[0].get(0);
+        shape[1] = numFilters;
+        for (int i = 0; i < numDimensions() - 2; i++) {
+            shape[2 + i] =
+                    (inputs[0].get(2 + i)
+                                            + 2 * pad.get(i)
+                                            - dilate.get(0) * (kernel.get(i) - 1)
+                                            - 1)
+                                    / stride.get(0)
+                            + 1;
+        }
+        return new Shape[] {new Shape(shape)};
+    }
+
+    @Override
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
+        Shape shape = inputShapes[0];
+        switch (name) {
+            case "weight":
+                return new Shape(numFilters, shape.get(1)).addAll(kernel);
+            case "bias":
+                return new Shape(numFilters);
+            default:
+                throw new IllegalArgumentException("Invalid parameter name");
+        }
     }
 
     @Override
@@ -204,6 +271,12 @@ public abstract class Convolution extends AbstractBlock {
         public T setBias(boolean includeBias) {
             this.includeBias = includeBias;
             return self();
+        }
+
+        protected void validate() {
+            if (kernel == null || numFilters == 0) {
+                throw new IllegalArgumentException("Kernel and numFilters must be set");
+            }
         }
 
         protected abstract T self();

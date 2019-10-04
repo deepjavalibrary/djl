@@ -12,36 +12,21 @@
  */
 package software.amazon.ai.nn.convolutional;
 
-import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.Parameter;
-import software.amazon.ai.nn.ParameterType;
 
 public class Conv3D extends Convolution {
 
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.DEPTH, LayoutType.HEIGHT, LayoutType.WIDTH
     };
-
-    private static final String LAYOUT = "NCDHW";
+    private static final String STRING_LAYOUT = "NCDHW";
+    private static final int NUM_DIMENSIONS = 5;
     private static final byte VERSION = 1;
 
     Conv3D(Builder builder) {
-        kernel = builder.getKernel();
-        stride = builder.getStride() == null ? new Shape(1, 1, 1) : builder.getStride();
-        pad = builder.getPad() == null ? new Shape(0, 0, 0) : builder.getPad();
-        dilate = builder.getDilate() == null ? new Shape(1, 1, 1) : builder.getDilate();
-        numFilters = builder.getNumFilters();
-        numGroups = builder.getNumGroups();
-        layout = LAYOUT;
-        includeBias = builder.isIncludeBias();
-
-        weight = new Parameter("weight", this, ParameterType.WEIGHT);
-        if (includeBias) {
-            bias = new Parameter("bias", this, ParameterType.BIAS);
-        }
+        super(builder);
     }
 
     @Override
@@ -50,44 +35,28 @@ public class Conv3D extends Convolution {
     }
 
     @Override
-    protected void beforeInitialize(Shape[] inputs) {
-        Shape inputShape = inputs[0];
-        Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
+    protected LayoutType[] getExpectedLayout() {
+        return EXPECTED_LAYOUT;
     }
 
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
-        long[] shape = new long[5];
-        shape[0] = inputs[0].get(0);
-        shape[1] = numFilters;
-        for (int i = 0; i < 3; i++) {
-            shape[2 + i] =
-                    (inputs[0].get(2 + i)
-                                            + 2 * pad.get(i)
-                                            - dilate.get(0) * (kernel.get(i) - 1)
-                                            - 1)
-                                    / stride.get(0)
-                            + 1;
-        }
-        return new Shape[] {new Shape(shape)};
+    protected String getStringLayout() {
+        return STRING_LAYOUT;
     }
 
     @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        Shape shape = inputShapes[0];
-        switch (name) {
-            case "weight":
-                return new Shape(
-                        numFilters, shape.get(1), kernel.get(0), kernel.get(1), kernel.get(2));
-            case "bias":
-                return new Shape(numFilters);
-            default:
-                throw new IllegalArgumentException("Invalid parameter name");
-        }
+    protected int numDimensions() {
+        return NUM_DIMENSIONS;
     }
 
     /** The Builder to construct a {@link Conv3D} type of {@link Block}. */
     public static final class Builder extends BaseBuilder<Builder> {
+
+        public Builder() {
+            stride = new Shape(1, 1, 1);
+            pad = new Shape(0, 0, 0);
+            dilate = new Shape(1, 1, 1);
+        }
 
         /** {@inheritDoc} */
         @Override
@@ -96,9 +65,7 @@ public class Conv3D extends Convolution {
         }
 
         public Conv3D build() {
-            if (kernel == null || numFilters == 0) {
-                throw new IllegalArgumentException("Kernel and numFilters must be set");
-            }
+            validate();
             return new Conv3D(this);
         }
     }
