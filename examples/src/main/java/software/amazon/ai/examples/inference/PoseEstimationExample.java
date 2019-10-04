@@ -33,7 +33,7 @@ import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.modality.cv.ImageVisualization;
-import software.amazon.ai.modality.cv.Joint;
+import software.amazon.ai.modality.cv.Joints;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.translate.TranslateException;
 import software.amazon.ai.zoo.ModelNotFoundException;
@@ -48,7 +48,7 @@ public class PoseEstimationExample extends AbstractExample {
     }
 
     @Override
-    protected List<List<Joint>> predict(Arguments arguments, Metrics metrics, int iteration)
+    protected List<Joints> predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
         /* Section SSD */
         Path imageFile = arguments.getImageFile();
@@ -95,10 +95,10 @@ public class PoseEstimationExample extends AbstractExample {
         criteria.put("backbone", "resnet18");
         criteria.put("dataset", "imagenet");
 
-        ZooModel<BufferedImage, List<Joint>> pose = ModelZoo.SIMPLE_POSE.loadModel(criteria);
+        ZooModel<BufferedImage, Joints> pose = ModelZoo.SIMPLE_POSE.loadModel(criteria);
 
-        List<List<Joint>> poseResult = new ArrayList<>();
-        try (Predictor<BufferedImage, List<Joint>> predictor = pose.newPredictor()) {
+        List<Joints> poseResult = new ArrayList<>();
+        try (Predictor<BufferedImage, Joints> predictor = pose.newPredictor()) {
             for (BufferedImage segmentedImg : filtered) {
                 poseResult.add(predictor.predict(segmentedImg));
             }
@@ -107,17 +107,18 @@ public class PoseEstimationExample extends AbstractExample {
 
         drawJoints(
                 filtered.get(0),
-                poseResult
-                        .get(0)
-                        .stream()
-                        .filter(ele -> ele.getConfidence() > 0.2f)
-                        .collect(Collectors.toList()),
+                new Joints(
+                        poseResult
+                                .get(0)
+                                .getJoints()
+                                .stream()
+                                .filter(ele -> ele.getConfidence() > 0.2f)
+                                .collect(Collectors.toList())),
                 arguments.getLogDir());
         return poseResult;
     }
 
-    private void drawJoints(BufferedImage img, List<Joint> joints, String logDir)
-            throws IOException {
+    private void drawJoints(BufferedImage img, Joints joints, String logDir) throws IOException {
         if (logDir == null) {
             return;
         }

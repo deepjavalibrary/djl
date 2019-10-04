@@ -13,17 +13,16 @@
 package org.apache.mxnet.zoo.cv.poseestimation;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 import org.apache.mxnet.zoo.BaseModelLoader;
 import org.apache.mxnet.zoo.ModelZoo;
-import software.amazon.ai.modality.cv.Joint;
+import software.amazon.ai.modality.cv.Joints;
 import software.amazon.ai.repository.Anchor;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.MRL.Model.CV;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.translate.Translator;
 
-public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, List<Joint>> {
+public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints> {
 
     private static final Anchor BASE_ANCHOR = CV.POSE_ESTIMATION;
     private static final String GROUP_ID = ModelZoo.GROUP_ID;
@@ -35,7 +34,7 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, List<J
     }
 
     @Override
-    public Translator<BufferedImage, List<Joint>> getTranslator() {
+    public Translator<BufferedImage, Joints> getTranslator() {
         return new SimplePoseTranslator();
     }
 }

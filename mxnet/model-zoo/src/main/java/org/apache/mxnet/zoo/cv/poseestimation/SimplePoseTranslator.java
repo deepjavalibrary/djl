@@ -16,7 +16,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.modality.cv.Joint;
+import software.amazon.ai.modality.cv.Joints;
+import software.amazon.ai.modality.cv.Joints.Joint;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.ndarray.NDArray;
@@ -25,7 +26,7 @@ import software.amazon.ai.ndarray.index.NDIndex;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.translate.TranslatorContext;
 
-public class SimplePoseTranslator extends ImageTranslator<List<Joint>> {
+public class SimplePoseTranslator extends ImageTranslator<Joints> {
 
     private int imageWidth = 192;
     private int imageHeight = 256;
@@ -37,7 +38,7 @@ public class SimplePoseTranslator extends ImageTranslator<List<Joint>> {
     }
 
     @Override
-    public List<Joint> processOutput(TranslatorContext ctx, NDList list) {
+    public Joints processOutput(TranslatorContext ctx, NDList list) {
         NDArray pred = list.head();
         int numJoints = (int) pred.getShape().get(1);
         int height = (int) pred.getShape().get(2);
@@ -54,7 +55,7 @@ public class SimplePoseTranslator extends ImageTranslator<List<Joint>> {
         NDArray predMask = maxValues.gt(0.0).tile(2, 2);
         float[] flattened = result.mul(predMask).toFloatArray();
         float[] flattenedConfidence = maxValues.toFloatArray();
-        List<Joint> joints = new ArrayList<>();
+        List<Joint> joints = new ArrayList<>(numJoints);
         for (int i = 0; i < numJoints; i++) {
             joints.add(
                     new Joint(
@@ -62,7 +63,7 @@ public class SimplePoseTranslator extends ImageTranslator<List<Joint>> {
                             flattened[i * 2 + 1] / height,
                             flattenedConfidence[i]));
         }
-        return joints;
+        return new Joints(joints);
     }
 
     @Override

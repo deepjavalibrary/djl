@@ -18,7 +18,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.util.List;
+import software.amazon.ai.modality.cv.Joints.Joint;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 
 public final class ImageVisualization {
@@ -73,7 +73,7 @@ public final class ImageVisualization {
      * @param image the input image
      * @param joints the joints of the body
      */
-    public static void drawJoints(BufferedImage image, List<Joint> joints) {
+    public static void drawJoints(BufferedImage image, Joints joints) {
         Graphics2D g = (Graphics2D) image.getGraphics();
         int stroke = 2;
         g.setStroke(new BasicStroke(stroke));
@@ -81,7 +81,7 @@ public final class ImageVisualization {
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-        for (Joint joint : joints) {
+        for (Joint joint : joints.getJoints()) {
             g.setPaint(BufferedImageUtils.randomColor().darker());
             int x = (int) (joint.getX() * imageWidth);
             int y = (int) (joint.getY() * imageHeight);
