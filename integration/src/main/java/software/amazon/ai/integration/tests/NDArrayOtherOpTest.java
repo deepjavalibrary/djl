@@ -15,7 +15,6 @@ package software.amazon.ai.integration.tests;
 import org.apache.mxnet.engine.MxNDArray;
 import org.testng.annotations.Test;
 import software.amazon.ai.engine.EngineException;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
@@ -29,7 +28,7 @@ import software.amazon.ai.ndarray.types.Shape;
 public class NDArrayOtherOpTest {
 
     @Test
-    public void testGet() throws FailedTestException {
+    public void testGet() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             Assertions.assertEquals(original, original.get(new NDIndex()));
@@ -51,7 +50,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testSetArray() throws FailedTestException {
+    public void testSetArray() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             NDArray actual = manager.create(new float[] {9, 10, 3, 4}, new Shape(2, 2));
@@ -62,7 +61,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testSetArrayBroadcast() throws FailedTestException {
+    public void testSetArrayBroadcast() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2, 1));
             NDArray actual = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2, 1));
@@ -73,7 +72,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testSetNumber() throws FailedTestException {
+    public void testSetNumber() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             NDArray actual = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2));
@@ -83,7 +82,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testSetScalar() throws FailedTestException {
+    public void testSetScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             original.setScalar(new NDIndex(0, 0), 0);
@@ -93,7 +92,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testCopyTo() throws FailedTestException {
+    public void testCopyTo() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray array2 = manager.create(new Shape(4));
@@ -118,7 +117,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testNonZero() throws FailedTestException {
+    public void testNonZero() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray ndArray1 = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray ndArray2 = manager.create(new float[] {1f, 2f, 0f, 4f});
@@ -144,7 +143,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testArgsort() throws FailedTestException {
+    public void testArgsort() {
         // TODO switch to numpy argsort
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {-1f, 2f, 0f, 999f, -998f});
@@ -169,7 +168,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testSort() throws FailedTestException {
+    public void testSort() {
         // TODO switch to numpy sort
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {2f, 1f, 4f, 3f});
@@ -209,7 +208,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testSoftmax() throws FailedTestException {
+    public void testSoftmax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.ones(new Shape(10));
             NDArray actual = manager.zeros(new Shape(10)).add(0.1f);
@@ -234,7 +233,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testCumsum() throws FailedTestException {
+    public void testCumsum() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10);
             NDArray actual =
@@ -293,7 +292,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testTile() throws FailedTestException {
+    public void testTile() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
 
@@ -339,7 +338,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testRepeat() throws FailedTestException {
+    public void testRepeat() {
         // TODO add scalar and zero-dim test cases after fix the bug in MXNet np.repeat
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
@@ -368,7 +367,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testClip() throws FailedTestException {
+    public void testClip() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray actual = manager.create(new float[] {2f, 2f, 3f, 3f});
@@ -393,7 +392,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testSwapAxes() throws FailedTestException {
+    public void testSwapAxes() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10).reshape(new Shape(2, 5));
             NDArray actual =
@@ -411,7 +410,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testTranspose() throws FailedTestException {
+    public void testTranspose() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 2, 2));
 
@@ -442,7 +441,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testBroadcast() throws FailedTestException {
+    public void testBroadcast() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1, 2});
             NDArray broadcasted = array.broadcast(2, 2);
@@ -468,7 +467,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testArgmax() throws FailedTestException {
+    public void testArgmax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array =
                     manager.create(
@@ -506,7 +505,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testArgmin() throws FailedTestException {
+    public void testArgmin() {
         // TODO switch to numpy argmin
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
@@ -532,7 +531,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testNormalize() throws FailedTestException {
+    public void testNormalize() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray input = manager.ones(new Shape(3, 4, 2));
             float[] mean = {0.3f, 0.4f, 0.5f};

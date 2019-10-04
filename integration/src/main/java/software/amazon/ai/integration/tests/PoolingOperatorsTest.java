@@ -13,7 +13,6 @@
 package software.amazon.ai.integration.tests;
 
 import org.testng.annotations.Test;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
@@ -23,7 +22,7 @@ import software.amazon.ai.nn.pooling.Pool;
 public class PoolingOperatorsTest {
 
     @Test
-    public void testMaxPool() throws FailedTestException {
+    public void testMaxPool() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
                     manager.create(
@@ -39,7 +38,7 @@ public class PoolingOperatorsTest {
     }
 
     @Test
-    public void testSumPool() throws FailedTestException {
+    public void testSumPool() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
                     manager.create(
@@ -56,7 +55,7 @@ public class PoolingOperatorsTest {
     }
 
     @Test
-    public void testAvgPool() throws FailedTestException {
+    public void testAvgPool() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
                     manager.create(
@@ -71,7 +70,7 @@ public class PoolingOperatorsTest {
     }
 
     @Test
-    public void testLpPool() throws FailedTestException {
+    public void testLpPool() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
                     manager.create(

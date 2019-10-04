@@ -15,7 +15,6 @@ package software.amazon.ai.integration.tests;
 import java.nio.FloatBuffer;
 import java.util.stream.IntStream;
 import org.testng.annotations.Test;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
@@ -28,7 +27,7 @@ import software.amazon.ai.ndarray.types.SparseFormat;
 public class NDArrayCreationOpTest {
 
     @Test
-    public void testCreation() throws FailedTestException {
+    public void testCreation() {
         // TODO add more test cases to make it robust
         try (NDManager manager = NDManager.newBaseManager()) {
             // test scalar
@@ -55,7 +54,7 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
-    public void testCreateCSRMatrix() throws FailedTestException {
+    public void testCreateCSRMatrix() {
         try (NDManager factory = NDManager.newBaseManager()) {
             float[] actual = {7, 8, 9};
             FloatBuffer buf = FloatBuffer.wrap(actual);
@@ -71,7 +70,7 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
-    public void testCreateRowSparseMatrix() throws FailedTestException {
+    public void testCreateRowSparseMatrix() {
         try (NDManager factory = NDManager.newBaseManager()) {
             float[] actual = {1, 2, 3, 4, 5, 6};
             FloatBuffer buf = FloatBuffer.wrap(actual);
@@ -89,7 +88,7 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
-    public void testCreateNDArrayAndConvertToSparse() throws FailedTestException {
+    public void testCreateNDArrayAndConvertToSparse() {
         try (NDManager factory = NDManager.newBaseManager()) {
             NDArray nd = factory.ones(new Shape(3, 5));
             NDArray sparse = nd.toSparse(SparseFormat.CSR);
@@ -98,7 +97,7 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
-    public void testArange() throws FailedTestException {
+    public void testArange() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
             NDArray actual = manager.arange(0, 10, 1);
@@ -118,7 +117,7 @@ public class NDArrayCreationOpTest {
 
     // TODO disable for now
     @Test(enabled = false)
-    public void testEye() throws FailedTestException {
+    public void testEye() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.eye(2);
             NDArray actual = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
@@ -136,7 +135,7 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
-    public void testLinspace() throws FailedTestException {
+    public void testLinspace() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.linspace(0.0, 9.0, 10, true, manager.getDevice());
             NDArray actual = manager.arange(10);

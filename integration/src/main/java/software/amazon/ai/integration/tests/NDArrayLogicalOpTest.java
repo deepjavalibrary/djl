@@ -13,7 +13,6 @@
 package software.amazon.ai.integration.tests;
 
 import org.testng.annotations.Test;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
@@ -23,7 +22,7 @@ import software.amazon.ai.ndarray.types.Shape;
 public class NDArrayLogicalOpTest {
 
     @Test
-    public void testLogicalAnd() throws FailedTestException {
+    public void testLogicalAnd() {
         // TODO switch to numpy & add scalar & zero-dim test
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.arange(10);
@@ -42,7 +41,7 @@ public class NDArrayLogicalOpTest {
     }
 
     @Test
-    public void testLogicalOr() throws FailedTestException {
+    public void testLogicalOr() {
         // TODO switch to numpy & add scalar & zero-dim test
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.arange(10);
@@ -61,7 +60,7 @@ public class NDArrayLogicalOpTest {
     }
 
     @Test
-    public void testLogicalXor() throws FailedTestException {
+    public void testLogicalXor() {
         // TODO switch to numpy & add scalar & zero-dim test
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.arange(10);
@@ -78,7 +77,7 @@ public class NDArrayLogicalOpTest {
     }
 
     @Test
-    public void testLogicalNot() throws FailedTestException {
+    public void testLogicalNot() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {-2f, 0f, 1f});
             NDArray actual = manager.create(new float[] {0f, 1f, 0f});

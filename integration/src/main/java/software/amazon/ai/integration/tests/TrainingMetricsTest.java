@@ -14,7 +14,6 @@
 package software.amazon.ai.integration.tests;
 
 import org.testng.annotations.Test;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
@@ -25,7 +24,7 @@ import software.amazon.ai.training.metrics.TopKAccuracy;
 public class TrainingMetricsTest {
 
     @Test
-    public void testAccuracy() throws FailedTestException {
+    public void testAccuracy() {
         try (NDManager manager = NDManager.newBaseManager()) {
 
             NDArray predictions =
@@ -44,7 +43,7 @@ public class TrainingMetricsTest {
     }
 
     @Test
-    public void testTopKAccuracy() throws FailedTestException {
+    public void testTopKAccuracy() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray predictions =
                     manager.create(

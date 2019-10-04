@@ -15,7 +15,6 @@ package software.amazon.ai.integration.tests;
 import org.apache.mxnet.engine.MxGradientCollector;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
@@ -42,7 +41,7 @@ public class OptimizerTest {
     private static final int CHANNELS = 10;
 
     @Test
-    public void testSgd() throws FailedTestException {
+    public void testSgd() {
         Optimizer sgd =
                 new Sgd.Builder()
                         .setRescaleGrad(1.0f / BATCH_SIZE)
@@ -70,7 +69,7 @@ public class OptimizerTest {
     }
 
     @Test
-    public void testSgdWithMomentum() throws FailedTestException {
+    public void testSgdWithMomentum() {
         Optimizer optim =
                 new Sgd.Builder()
                         .setRescaleGrad(1.0f / BATCH_SIZE)
@@ -100,7 +99,7 @@ public class OptimizerTest {
     }
 
     @Test
-    public void testNag() throws FailedTestException {
+    public void testNag() {
         Optimizer optim =
                 new Nag.Builder()
                         .setRescaleGrad(1.0f / BATCH_SIZE)
@@ -129,7 +128,7 @@ public class OptimizerTest {
     }
 
     @Test
-    public void testAdam() throws FailedTestException {
+    public void testAdam() {
         Optimizer optim =
                 new Adam.Builder().setRescaleGrad(1.0f / BATCH_SIZE).optLearningRate(0.1f).build();
 

@@ -14,7 +14,6 @@ package software.amazon.ai.integration.tests;
 
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -30,7 +29,7 @@ public class ActivationTest {
     private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
     @Test
-    public void testRelu() throws FailedTestException {
+    public void testRelu() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.reluBlock());
 
@@ -47,7 +46,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testSigmoid() throws FailedTestException {
+    public void testSigmoid() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.sigmoidBlock());
 
@@ -65,7 +64,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testTanh() throws FailedTestException {
+    public void testTanh() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.tanhBlock());
 
@@ -82,7 +81,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testSoftrelu() throws FailedTestException {
+    public void testSoftrelu() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.softreluBlock());
 
@@ -100,7 +99,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testLeakyrelu() throws FailedTestException {
+    public void testLeakyrelu() {
         try (Model model = Model.newInstance()) {
             float alpha = 1.0f;
             model.setBlock(Activation.leakyReluBlock(alpha));
@@ -119,7 +118,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testElu() throws FailedTestException {
+    public void testElu() {
         try (Model model = Model.newInstance()) {
             float alpha = 1.0f;
             model.setBlock(Activation.eluBlock(alpha));
@@ -138,7 +137,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testSelu() throws FailedTestException {
+    public void testSelu() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.seluBlock());
 
@@ -156,7 +155,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testGelu() throws FailedTestException {
+    public void testGelu() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.geluBlock());
 
@@ -174,7 +173,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testSwish() throws FailedTestException {
+    public void testSwish() {
         try (Model model = Model.newInstance()) {
             float beta = 1.0f;
             model.setBlock(Activation.swishBlock(beta));
@@ -193,7 +192,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testPrelu() throws FailedTestException {
+    public void testPrelu() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.preluBlock());
 

@@ -12,7 +12,6 @@
  */
 package software.amazon.ai.integration.util;
 
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
@@ -41,30 +40,27 @@ public final class Assertions {
         return sb.toString();
     }
 
-    public static void assertTrue(boolean statement, String errorMessage)
-            throws FailedTestException {
+    public static void assertTrue(boolean statement, String errorMessage) {
         if (!statement) {
-            throw new FailedTestException(errorMessage);
+            throw new AssertionError(errorMessage);
         }
     }
 
-    public static void assertTrue(boolean statement) throws FailedTestException {
+    public static void assertTrue(boolean statement) {
         assertTrue(statement, "Statement is not True!");
     }
 
-    public static void assertFalse(boolean statement, String errorMessage)
-            throws FailedTestException {
+    public static void assertFalse(boolean statement, String errorMessage) {
         if (statement) {
-            throw new FailedTestException(errorMessage);
+            throw new AssertionError(errorMessage);
         }
     }
 
-    public static void assertFalse(boolean statement) throws FailedTestException {
+    public static void assertFalse(boolean statement) {
         assertFalse(statement, "Statement is not False!");
     }
 
-    public static void assertEquals(NDList actual, NDList expected, String errorMessage)
-            throws FailedTestException {
+    public static void assertEquals(NDList actual, NDList expected, String errorMessage) {
         assertEquals(
                 actual.size(),
                 expected.size(),
@@ -75,19 +71,17 @@ public final class Assertions {
         }
     }
 
-    public static void assertEquals(NDList actual, NDList expected) throws FailedTestException {
+    public static void assertEquals(NDList actual, NDList expected) {
         assertEquals(actual, expected, "Two NDArrays are different!");
     }
 
-    public static void assertEquals(NDArray actual, NDArray expected, String errorMessage)
-            throws FailedTestException {
+    public static void assertEquals(NDArray actual, NDArray expected, String errorMessage) {
         if (!NDArrays.equals(actual, expected)) {
-            throw new FailedTestException(getDefaultErrorMessage(actual, expected, errorMessage));
+            throw new AssertionError(getDefaultErrorMessage(actual, expected, errorMessage));
         }
     }
 
-    public static void assertEquals(NDArray[] actual, NDArray[] expected, String errorMessage)
-            throws FailedTestException {
+    public static void assertEquals(NDArray[] actual, NDArray[] expected, String errorMessage) {
         assertEquals(
                 actual.length,
                 expected.length,
@@ -98,48 +92,44 @@ public final class Assertions {
         }
     }
 
-    public static void assertEquals(NDArray actual, NDArray expected) throws FailedTestException {
+    public static void assertEquals(NDArray actual, NDArray expected) {
         assertEquals(actual, expected, "Two NDArrays are different!");
     }
 
-    public static void assertEquals(float actual, float expected) throws FailedTestException {
+    public static void assertEquals(float actual, float expected) {
         assertEquals(actual, expected, "Two floats are different!");
     }
 
-    public static void assertEquals(float actual, float expected, String errorMessage)
-            throws FailedTestException {
+    public static void assertEquals(float actual, float expected, String errorMessage) {
         if (actual != expected) {
-            throw new FailedTestException(getDefaultErrorMessage(actual, expected, errorMessage));
+            throw new AssertionError(getDefaultErrorMessage(actual, expected, errorMessage));
         }
     }
 
-    public static void assertEquals(Parameter actual, Parameter expected)
-            throws FailedTestException {
+    public static void assertEquals(Parameter actual, Parameter expected) {
         if (!actual.equals(expected)) {
-            throw new FailedTestException(
+            throw new AssertionError(
                     getDefaultErrorMessage(actual, expected, "Two Parameters are different!"));
         }
     }
 
-    public static void assertEquals(Shape actual, Shape expected) throws FailedTestException {
+    public static void assertEquals(Shape actual, Shape expected) {
         if (!actual.equals(expected)) {
-            throw new FailedTestException(
+            throw new AssertionError(
                     getDefaultErrorMessage(actual, expected, "Two Shapes are different!"));
         }
     }
 
-    public static void assertAlmostEquals(NDArray actual, NDArray expected)
-            throws FailedTestException {
+    public static void assertAlmostEquals(NDArray actual, NDArray expected) {
         assertAlmostEquals(actual, expected, 1e-5, 1e-3);
     }
 
-    public static void assertAlmostEquals(NDList actual, NDList expected)
-            throws FailedTestException {
+    public static void assertAlmostEquals(NDList actual, NDList expected) {
         assertAlmostEquals(actual, expected, 1e-5, 1e-3);
     }
 
-    public static void assertAlmostEquals(NDList actual, NDList expected, double rtol, double atol)
-            throws FailedTestException {
+    public static void assertAlmostEquals(
+            NDList actual, NDList expected, double rtol, double atol) {
         assertEquals(
                 actual.size(),
                 expected.size(),
@@ -152,9 +142,9 @@ public final class Assertions {
     }
 
     public static void assertAlmostEquals(
-            NDArray actual, NDArray expected, double rtol, double atol) throws FailedTestException {
+            NDArray actual, NDArray expected, double rtol, double atol) {
         if (!actual.getShape().equals(expected.getShape())) {
-            throw new FailedTestException(
+            throw new AssertionError(
                     getDefaultErrorMessage(
                             actual.getShape(),
                             expected.getShape(),
@@ -166,25 +156,23 @@ public final class Assertions {
             double a = actualDoubleArray[i].doubleValue();
             double b = expectedDoubleArray[i].doubleValue();
             if (Math.abs(a - b) > (atol + rtol * Math.abs(b))) {
-                throw new FailedTestException(getDefaultErrorMessage(a, b));
+                throw new AssertionError(getDefaultErrorMessage(actual, expected));
             }
         }
     }
 
-    public static void assertInPlace(NDArray actual, NDArray expected, String errorMessage)
-            throws FailedTestException {
+    public static void assertInPlace(NDArray actual, NDArray expected, String errorMessage) {
         if (actual != expected) {
-            throw new FailedTestException(errorMessage);
+            throw new AssertionError(errorMessage);
         }
     }
 
-    public static void assertInPlace(NDArray actual, NDArray expected) throws FailedTestException {
+    public static void assertInPlace(NDArray actual, NDArray expected) {
         assertInPlace(
                 actual, expected, getDefaultErrorMessage(actual, expected, "Assertion failed!"));
     }
 
-    public static void assertInPlaceEquals(NDArray actual, NDArray expected, NDArray original)
-            throws FailedTestException {
+    public static void assertInPlaceEquals(NDArray actual, NDArray expected, NDArray original) {
         assertEquals(
                 actual, expected, getDefaultErrorMessage(actual, expected, "Assert Equal failed!"));
         assertInPlace(
@@ -193,14 +181,13 @@ public final class Assertions {
                 getDefaultErrorMessage(original, expected, "Assert Inplace failed!"));
     }
 
-    public static void assertInPlaceAlmostEquals(NDArray actual, NDArray expected, NDArray original)
-            throws FailedTestException {
+    public static void assertInPlaceAlmostEquals(
+            NDArray actual, NDArray expected, NDArray original) {
         assertInPlaceAlmostEquals(actual, expected, original, 1e-5, 1e-3);
     }
 
     public static void assertInPlaceAlmostEquals(
-            NDArray actual, NDArray expected, NDArray original, double rtol, double atol)
-            throws FailedTestException {
+            NDArray actual, NDArray expected, NDArray original, double rtol, double atol) {
         assertAlmostEquals(actual, expected, rtol, atol);
         assertInPlace(
                 original,
@@ -209,23 +196,22 @@ public final class Assertions {
     }
 
     @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DoNotUseThreads"})
-    public static void assertThrows(Runnable function, Class<?> exceptionClass, String errorMessage)
-            throws FailedTestException {
+    public static void assertThrows(
+            Runnable function, Class<?> exceptionClass, String errorMessage) {
         try {
             function.run();
         } catch (Exception e) {
             if (exceptionClass.isInstance(e)) {
                 return;
             } else {
-                throw new FailedTestException(errorMessage + " - wrong exception type thrown");
+                throw new AssertionError(errorMessage + " - wrong exception type thrown");
             }
         }
-        throw new FailedTestException(errorMessage + " - did not throw an exception");
+        throw new AssertionError(errorMessage + " - did not throw an exception");
     }
 
     @SuppressWarnings("PMD.DoNotUseThreads")
-    public static void assertThrows(Runnable function, Class<?> exceptionClass)
-            throws FailedTestException {
+    public static void assertThrows(Runnable function, Class<?> exceptionClass) {
         assertThrows(function, exceptionClass, "Assertion failed!");
     }
 }

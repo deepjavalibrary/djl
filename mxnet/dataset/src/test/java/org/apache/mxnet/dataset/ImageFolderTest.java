@@ -17,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.modality.cv.util.NDImageUtils;
@@ -33,7 +32,7 @@ import software.amazon.ai.training.initializer.Initializer;
 public class ImageFolderTest {
 
     @Test
-    public void testImageFolder() throws FailedTestException, IOException {
+    public void testImageFolder() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
         try (Model model = Model.newInstance()) {

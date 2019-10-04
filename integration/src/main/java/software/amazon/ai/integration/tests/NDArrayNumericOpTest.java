@@ -14,7 +14,6 @@ package software.amazon.ai.integration.tests;
 
 import java.util.stream.DoubleStream;
 import org.testng.annotations.Test;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
@@ -23,7 +22,7 @@ import software.amazon.ai.ndarray.types.Shape;
 public class NDArrayNumericOpTest {
 
     @Test
-    public void testNegation() throws FailedTestException {
+    public void testNegation() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {6, 9, -12, -11, 0};
             NDArray array = manager.create(data);
@@ -52,7 +51,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testAbs() throws FailedTestException {
+    public void testAbs() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
             NDArray array = manager.create(data);
@@ -76,7 +75,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testSquare() throws FailedTestException {
+    public void testSquare() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
             NDArray array = manager.create(data);
@@ -100,7 +99,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testCbrt() throws FailedTestException {
+    public void testCbrt() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
@@ -124,7 +123,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testFloor() throws FailedTestException {
+    public void testFloor() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0};
             NDArray array = manager.create(data);
@@ -148,7 +147,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testCeil() throws FailedTestException {
+    public void testCeil() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
@@ -172,7 +171,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testRound() throws FailedTestException {
+    public void testRound() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
@@ -197,7 +196,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testTrunc() throws FailedTestException {
+    public void testTrunc() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
@@ -221,7 +220,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testExp() throws FailedTestException {
+    public void testExp() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
@@ -245,7 +244,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testLog() throws FailedTestException {
+    public void testLog() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
@@ -269,7 +268,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testLog10() throws FailedTestException {
+    public void testLog10() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.12, 3.584, 4.334, 5.111, 223.23423};
             NDArray array = manager.create(data);
@@ -293,7 +292,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testLog2() throws FailedTestException {
+    public void testLog2() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
@@ -317,7 +316,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testSin() throws FailedTestException {
+    public void testSin() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
@@ -341,7 +340,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testCos() throws FailedTestException {
+    public void testCos() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
@@ -365,7 +364,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testTan() throws FailedTestException {
+    public void testTan() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {0.0, Math.PI / 4.0, Math.PI / 2.0};
             NDArray array = manager.create(data);
@@ -389,7 +388,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testAsin() throws FailedTestException {
+    public void testAsin() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, -1.0, -0.22, 0.4, 0.1234};
             NDArray array = manager.create(data);
@@ -413,7 +412,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testAcos() throws FailedTestException {
+    public void testAcos() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {-1.0, -0.707, 0.0, 0.707, 1.0};
             NDArray array = manager.create(data);
@@ -437,7 +436,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testAtan() throws FailedTestException {
+    public void testAtan() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {-1.0, 0.0, 1.0};
             NDArray array = manager.create(data);
@@ -461,7 +460,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testToDegrees() throws FailedTestException {
+    public void testToDegrees() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {0, Math.PI / 2, Math.PI, 3 * Math.PI / 2, 2 * Math.PI};
             NDArray array = manager.create(data);
@@ -488,7 +487,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testToRadians() throws FailedTestException {
+    public void testToRadians() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {0.0, 90.0, 180.0, 270.0, 360.0};
             NDArray array = manager.create(data);
@@ -516,7 +515,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testSinh() throws FailedTestException {
+    public void testSinh() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
@@ -540,7 +539,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testCosh() throws FailedTestException {
+    public void testCosh() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
@@ -564,7 +563,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testTanh() throws FailedTestException {
+    public void testTanh() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
@@ -588,7 +587,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testAsinh() throws FailedTestException {
+    public void testAsinh() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {Math.E, 10.0};
             NDArray array = manager.create(data);
@@ -616,7 +615,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testAcosh() throws FailedTestException {
+    public void testAcosh() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {Math.E, 10.0};
             NDArray array = manager.create(data);
@@ -644,7 +643,7 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
-    public void testAtanh() throws FailedTestException {
+    public void testAtanh() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {0.0, -0.5};
             NDArray array = manager.create(data);

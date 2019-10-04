@@ -21,7 +21,6 @@ import java.util.stream.IntStream;
 import org.apache.mxnet.engine.MxEngine;
 import org.testng.annotations.Test;
 import software.amazon.ai.engine.Engine;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -29,7 +28,7 @@ import software.amazon.ai.ndarray.NDManager;
 public class NDArrayIOTest {
 
     @Test
-    public void testNDArrayLoad() throws FailedTestException {
+    public void testNDArrayLoad() {
         try (NDManager manager = NDManager.newBaseManager()) {
             ((MxEngine) Engine.getInstance()).setNumpyMode(false);
             Path arraysDictPath =
@@ -45,14 +44,14 @@ public class NDArrayIOTest {
             Assertions.assertTrue(arraysList.getWithTag(0).getKey() == null);
             Assertions.assertTrue(arraysList.getWithTag(1).getKey() == null);
         } catch (URISyntaxException e) {
-            throw new FailedTestException("URI parsing failed for test resources.", e);
+            throw new AssertionError("URI parsing failed for test resources.", e);
         } finally {
             ((MxEngine) Engine.getInstance()).setNumpyMode(true);
         }
     }
 
     @Test
-    public void testNDArraySaveLoadDict() throws FailedTestException {
+    public void testNDArraySaveLoadDict() {
         try (NDManager manager = NDManager.newBaseManager()) {
             File tmpfileNames = File.createTempFile("ndarray_list", "bin");
             int size = 10;
@@ -65,12 +64,12 @@ public class NDArrayIOTest {
             Assertions.assertEquals(ndList, readNdList);
             tmpfileNames.deleteOnExit();
         } catch (IOException e) {
-            throw new FailedTestException("IOException while creating temporary file.", e);
+            throw new AssertionError("IOException while creating temporary file.", e);
         }
     }
 
     @Test
-    public void testNDArraySaveLoadList() throws FailedTestException {
+    public void testNDArraySaveLoadList() {
         try (NDManager manager = NDManager.newBaseManager()) {
             File tmpfileNames = File.createTempFile("ndarray_list", "bin");
             int size = 10;
@@ -82,7 +81,7 @@ public class NDArrayIOTest {
             Assertions.assertEquals(ndList, readNdList);
             tmpfileNames.deleteOnExit();
         } catch (IOException e) {
-            throw new FailedTestException("IOException while creating temporary file.", e);
+            throw new AssertionError("IOException while creating temporary file.", e);
         }
     }
 }

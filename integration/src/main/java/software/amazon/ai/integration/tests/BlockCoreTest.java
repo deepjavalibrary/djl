@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -48,7 +47,7 @@ import software.amazon.ai.util.PairList;
 public class BlockCoreTest {
 
     @Test
-    public void testLinear() throws FailedTestException, IOException {
+    public void testLinear() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
         long outSize = 3;
@@ -88,7 +87,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testLinearWithDefinedLayout() throws FailedTestException, IOException {
+    public void testLinearWithDefinedLayout() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
         long outSize = 3;
@@ -138,7 +137,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testBatchNorm() throws FailedTestException, IOException {
+    public void testBatchNorm() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
         Block block = new BatchNorm.Builder().setAxis(1).build();
@@ -159,7 +158,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testDropout() throws FailedTestException, IOException {
+    public void testDropout() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
         Block block = new Dropout.Builder().setProbability(.5f).build();
@@ -179,7 +178,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testEmbedding() throws FailedTestException {
+    public void testEmbedding() {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
         Embedding<Character> block =
@@ -204,7 +203,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConv1D() throws FailedTestException, IOException {
+    public void testConv1D() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
         Block block =
@@ -236,7 +235,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConv2D() throws FailedTestException, IOException {
+    public void testConv2D() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
         Block block = new Conv2D.Builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
@@ -263,7 +262,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConv3D() throws FailedTestException, IOException {
+    public void testConv3D() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
         Block block = new Conv3D.Builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
@@ -296,7 +295,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testRNNTanh() throws FailedTestException, IOException {
+    public void testRNNTanh() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
 
         Block block =
@@ -321,7 +320,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testRNNRelu() throws FailedTestException, IOException {
+    public void testRNNRelu() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
         Block block =
@@ -350,7 +349,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testLstm() throws FailedTestException, IOException {
+    public void testLstm() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
         Block block =
@@ -382,7 +381,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testGRU() throws FailedTestException, IOException {
+    public void testGRU() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
         GRU block =
@@ -408,8 +407,7 @@ public class BlockCoreTest {
         }
     }
 
-    private void testEncode(NDManager manager, Block block)
-            throws IOException, FailedTestException {
+    private void testEncode(NDManager manager, Block block) throws IOException {
         PairList<String, Parameter> original = block.getParameters();
         File temp = File.createTempFile("block", ".param");
         DataOutputStream os = new DataOutputStream(Files.newOutputStream(temp.toPath()));

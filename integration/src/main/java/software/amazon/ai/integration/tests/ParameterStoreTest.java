@@ -17,7 +17,6 @@ import org.apache.mxnet.engine.MxParameterServer;
 import org.testng.annotations.Test;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
@@ -31,7 +30,7 @@ import software.amazon.ai.util.PairList;
 public class ParameterStoreTest {
 
     @Test
-    public void testParameterStore() throws FailedTestException {
+    public void testParameterStore() {
         try (Model model = Model.newInstance()) {
             NDManager manager = model.getNDManager();
             int arraySize = 2;

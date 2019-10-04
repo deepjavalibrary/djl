@@ -13,7 +13,6 @@
 package software.amazon.ai.integration.tests;
 
 import org.testng.annotations.Test;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
@@ -22,7 +21,7 @@ import software.amazon.ai.ndarray.types.Shape;
 public class NDArrayReductionOpTest {
 
     @Test
-    public void testMax() throws FailedTestException {
+    public void testMax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
             float maxAll = original.max().getFloat();
@@ -39,7 +38,7 @@ public class NDArrayReductionOpTest {
     }
 
     @Test
-    public void testMin() throws FailedTestException {
+    public void testMin() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
@@ -57,7 +56,7 @@ public class NDArrayReductionOpTest {
     }
 
     @Test
-    public void testSum() throws FailedTestException {
+    public void testSum() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
@@ -74,14 +73,14 @@ public class NDArrayReductionOpTest {
     }
 
     @Test
-    public void testProd() throws FailedTestException {
+    public void testProd() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
             float prodAll = original.prod().getFloat();
             Assertions.assertEquals(384, prodAll, "Incorrect max axes");
             if (prodAll != 384) {
-                throw new FailedTestException("Incorrect prod all");
+                throw new AssertionError("Incorrect prod all");
             }
 
             NDArray prodAxes = original.prod(new int[] {1});
@@ -95,7 +94,7 @@ public class NDArrayReductionOpTest {
     }
 
     @Test
-    public void testMean() throws FailedTestException {
+    public void testMean() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {2, 4, 6, 8}, new Shape(2, 2));
 
@@ -113,7 +112,7 @@ public class NDArrayReductionOpTest {
 
     // TODO disable for now
     @Test(enabled = false)
-    public void testTrace() throws FailedTestException {
+    public void testTrace() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.arange(8).reshape(new Shape(2, 2, 2)).trace();
             NDArray expect = manager.create(new float[] {6f, 8f});

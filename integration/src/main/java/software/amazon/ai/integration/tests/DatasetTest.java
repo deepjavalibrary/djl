@@ -26,7 +26,6 @@ import org.apache.mxnet.jna.JnaUtils;
 import org.testng.annotations.Test;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
@@ -47,7 +46,7 @@ public class DatasetTest {
     private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
 
     @Test
-    public void testSequenceSampler() throws FailedTestException, IOException {
+    public void testSequenceSampler() throws IOException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 
@@ -74,7 +73,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testRandomSampler() throws FailedTestException, IOException {
+    public void testRandomSampler() throws IOException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 
@@ -99,7 +98,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testBatchSampler() throws FailedTestException, IOException {
+    public void testBatchSampler() throws IOException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 
@@ -177,7 +176,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testArrayDataset() throws FailedTestException, IOException {
+    public void testArrayDataset() throws IOException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 

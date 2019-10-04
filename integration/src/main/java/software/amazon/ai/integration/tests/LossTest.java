@@ -14,7 +14,6 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import org.testng.annotations.Test;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
@@ -24,7 +23,7 @@ import software.amazon.ai.training.Loss;
 public class LossTest {
 
     @Test
-    public void l1LossTest() throws FailedTestException {
+    public void l1LossTest() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
@@ -35,7 +34,7 @@ public class LossTest {
     }
 
     @Test
-    public void l2LossTest() throws FailedTestException {
+    public void l2LossTest() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
@@ -47,7 +46,7 @@ public class LossTest {
     }
 
     @Test
-    public void softmaxCrossEntropyTest() throws FailedTestException {
+    public void softmaxCrossEntropyTest() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(1));
@@ -58,7 +57,7 @@ public class LossTest {
     }
 
     @Test
-    public void hingeLossTest() throws FailedTestException {
+    public void hingeLossTest() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5)).neg();
@@ -70,7 +69,7 @@ public class LossTest {
     }
 
     @Test
-    public void sigmoidBinaryCrossEntropyLossTest() throws FailedTestException {
+    public void sigmoidBinaryCrossEntropyLossTest() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));

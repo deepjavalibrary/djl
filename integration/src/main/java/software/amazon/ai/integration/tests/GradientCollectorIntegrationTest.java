@@ -16,7 +16,6 @@ import java.io.IOException;
 import org.apache.mxnet.engine.MxGradientCollector;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
@@ -46,7 +45,7 @@ import software.amazon.ai.zoo.cv.classification.ResNetV1;
 public class GradientCollectorIntegrationTest {
 
     @Test
-    public void testAutograd() throws FailedTestException {
+    public void testAutograd() {
         try (NDManager manager = NDManager.newBaseManager();
                 MxGradientCollector gradCol = new MxGradientCollector()) {
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
@@ -62,7 +61,7 @@ public class GradientCollectorIntegrationTest {
     }
 
     @Test
-    public void testTrain() throws FailedTestException, IOException {
+    public void testTrain() throws IOException {
         int numOfData = 1000;
         int batchSize = 10;
         int epochs = 10;
@@ -130,7 +129,7 @@ public class GradientCollectorIntegrationTest {
     }
 
     @Test
-    public void testTrainResNet() throws FailedTestException {
+    public void testTrainResNet() {
         Optimizer optimizer =
                 new Nag.Builder()
                         .setRescaleGrad(1.0f / 100)

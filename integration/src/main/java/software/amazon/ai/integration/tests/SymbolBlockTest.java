@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import org.apache.mxnet.engine.MxGradientCollector;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.integration.util.FileUtils;
 import software.amazon.ai.ndarray.NDArray;
@@ -47,7 +46,7 @@ import software.amazon.ai.util.Utils;
 public class SymbolBlockTest {
 
     @Test
-    public void testForward() throws FailedTestException, IOException {
+    public void testForward() throws IOException {
         Path modelDir = prepareModel();
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
@@ -62,7 +61,7 @@ public class SymbolBlockTest {
     }
 
     @Test
-    public void trainWithNewParam() throws FailedTestException, IOException {
+    public void trainWithNewParam() throws IOException {
         Path modelDir = prepareModel();
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
         try (Model model = Model.newInstance()) {
@@ -89,7 +88,7 @@ public class SymbolBlockTest {
     }
 
     @Test
-    public void trainWithExistParam() throws FailedTestException, IOException {
+    public void trainWithExistParam() throws IOException {
         Path modelDir = prepareModel();
 
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
@@ -117,7 +116,7 @@ public class SymbolBlockTest {
     }
 
     @Test
-    public void trainWithCustomLayer() throws FailedTestException, IOException {
+    public void trainWithCustomLayer() throws IOException {
         Path modelDir = prepareModel();
 
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);

@@ -15,7 +15,6 @@ package org.apache.mxnet.dataset;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.Device;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
@@ -26,7 +25,7 @@ import software.amazon.ai.training.dataset.Batch;
 public class DatasetUtilsTest {
 
     @Test
-    public void testSplitEven() throws FailedTestException {
+    public void testSplitEven() {
         try (NDManager manager = NDManager.newBaseManager()) {
             Device[] devices = new Device[] {Device.cpu(0), Device.cpu(1), Device.cpu(2)};
 
@@ -52,7 +51,7 @@ public class DatasetUtilsTest {
     }
 
     @Test
-    public void testSplitUnevenData() throws FailedTestException {
+    public void testSplitUnevenData() {
         try (NDManager manager = NDManager.newBaseManager()) {
             Device[] devices = new Device[] {Device.cpu(0), Device.cpu(1), Device.cpu(2)};
 
@@ -84,7 +83,7 @@ public class DatasetUtilsTest {
     }
 
     @Test
-    public void testSplitSmailerBatchSize() throws FailedTestException {
+    public void testSplitSmailerBatchSize() {
         try (NDManager manager = NDManager.newBaseManager()) {
             Device[] devices = new Device[] {Device.cpu(0), Device.cpu(1), Device.cpu(2)};
 

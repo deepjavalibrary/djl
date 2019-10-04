@@ -14,7 +14,6 @@ package software.amazon.ai.integration.tests;
 
 import java.util.Arrays;
 import org.testng.annotations.Test;
-import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
@@ -25,7 +24,7 @@ import software.amazon.ai.ndarray.types.Shape;
 public class NDArrayShapesManipulationOpTest {
 
     @Test
-    public void testSplit() throws FailedTestException {
+    public void testSplit() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDList splitted = original.split(2);
@@ -39,7 +38,7 @@ public class NDArrayShapesManipulationOpTest {
     }
 
     @Test
-    public void testFlatten() throws FailedTestException {
+    public void testFlatten() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             NDArray flattened = original.flatten();
@@ -49,7 +48,7 @@ public class NDArrayShapesManipulationOpTest {
     }
 
     @Test
-    public void testReshape() throws FailedTestException {
+    public void testReshape() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
                     manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(3, 2));
@@ -63,7 +62,7 @@ public class NDArrayShapesManipulationOpTest {
     }
 
     @Test
-    public void testExpandDim() throws FailedTestException {
+    public void testExpandDim() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new int[] {1, 2});
             Assertions.assertTrue(
@@ -74,7 +73,7 @@ public class NDArrayShapesManipulationOpTest {
     }
 
     @Test
-    public void testSqueeze() throws FailedTestException {
+    public void testSqueeze() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.ones(new Shape(1, 2, 1, 3, 1));
             Assertions.assertTrue(
@@ -92,7 +91,7 @@ public class NDArrayShapesManipulationOpTest {
     }
 
     @Test
-    public void testStack() throws FailedTestException {
+    public void testStack() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f});
             NDArray expect = manager.create(new float[] {1f, 2f, 1f, 2f}, new Shape(2, 2));
@@ -101,7 +100,7 @@ public class NDArrayShapesManipulationOpTest {
     }
 
     @Test
-    public void testConcat() throws FailedTestException {
+    public void testConcat() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray concatedND = manager.create(new float[] {1f});
             NDArray concatedND2 = manager.create(new float[] {2f});
