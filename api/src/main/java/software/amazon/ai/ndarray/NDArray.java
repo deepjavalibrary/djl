@@ -700,6 +700,28 @@ public interface NDArray extends AutoCloseable {
      */
     NDArray lte(NDArray other);
 
+    // TODO where operator is not compliant with numpy
+    /**
+     * Return the elements, either from this NDArray or other, depending on the condition.
+     *
+     * <p>Given three ndarrays, condition, this, and other, return an ndarray with the elements from
+     * this or other, depending on the elements from condition are true or false. The other array
+     * must have the same shape as this. If condition has the same shape as this, each element in
+     * the output array is from this if the corresponding element in the condition is true, and from
+     * other if false.
+     *
+     * <p>If condition does not have the same shape as this, it must be a 1D array whose size is the
+     * same as this array's first dimension size. Each row of the output array is from this array's
+     * row if the corresponding element from condition is true, and from other’s row if false.
+     *
+     * <p>Note that all non-zero values are interpreted as True in condition.
+     *
+     * @param condition Condition array
+     * @param other the other ndarray
+     * @return result NDArray
+     */
+    NDArray where(NDArray condition, NDArray other);
+
     ////////////////////////////////////////
     // Operators: Element Arithmetic
     ////////////////////////////////////////

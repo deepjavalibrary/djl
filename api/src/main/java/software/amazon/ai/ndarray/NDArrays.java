@@ -290,6 +290,18 @@ public final class NDArrays {
         return a.getNDArrayInternal().min(b);
     }
 
+    /**
+     * Return the elements, either from this NDArray or other, depending on the condition.
+     *
+     * @param condition Condition array
+     * @param a first NDArray
+     * @param b the other NDArray
+     * @return result NDArray
+     */
+    public static NDArray where(NDArray condition, NDArray a, NDArray b) {
+        return a.where(condition, b);
+    }
+
     ////////////////////////////////////////
     // Operators: Element Arithmetic
     ////////////////////////////////////////

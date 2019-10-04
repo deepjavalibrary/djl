@@ -389,5 +389,47 @@ public interface NDArrayEx {
         return pick(index, axis, keepDims, "clip");
     }
 
+    // TODO Add default implementation
+
+    /**
+     * Compute Multibox training targets.
+     *
+     * @param inputs NDList of (anchors, labels, and class prediction)
+     * @param iouThreshold Anchor-GroundTruth overlap threshold to be regarded as a positive match
+     * @param ignoreLabel Label for ignored anchors
+     * @param negativeMiningRatio Max negative to positive samples ratio, use -1 to disable mining
+     * @param negativeMiningThreshold Threshold used for negative mining
+     * @param minNegativeSamples Minimum number of negative samples
+     * @return an NDList of (bounding box labels, bounding box masks, class labels)
+     */
+    NDList multiBoxTarget(
+            NDList inputs,
+            float iouThreshold,
+            float ignoreLabel,
+            float negativeMiningRatio,
+            float negativeMiningThreshold,
+            int minNegativeSamples);
+
+    /**
+     * Convert multibox detection predictions.
+     *
+     * @param inputs NDList of (anchors, labels, and class prediction)
+     * @param clip Clip out-of-boundary boxes
+     * @param threshold Threshold to be a positive prediction
+     * @param backgroundId Background id
+     * @param nmsThreashold Non-maximum suppression threshold
+     * @param forceSuppress Suppress all detections regardless of class_id
+     * @param nmsTopK Keep maximum top k detections before nms, -1 for no limit
+     * @return an NDList
+     */
+    NDList multiBoxDetection(
+            NDList inputs,
+            boolean clip,
+            float threshold,
+            int backgroundId,
+            float nmsThreashold,
+            boolean forceSuppress,
+            int nmsTopK);
+
     NDArray getArray();
 }

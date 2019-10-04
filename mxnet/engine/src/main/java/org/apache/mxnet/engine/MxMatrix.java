@@ -495,6 +495,11 @@ public class MxMatrix implements Matrix {
         return array.lte(other);
     }
 
+    @Override
+    public NDArray where(NDArray condition, NDArray other) {
+        return array.where(condition, other);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray add(Number n) {

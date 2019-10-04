@@ -181,6 +181,60 @@ public class NDArrayElementComparisonOpTest {
     }
 
     @Test
+    public void testWhere() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array1 = manager.create(new float[] {1f, 2f, 2f, 4f, 5f, 4f});
+            NDArray array2 = manager.create(new float[] {2f, 1f, 3f, 5f, 4f, 5f});
+            NDArray condition = manager.create(new float[] {1, 1, 0, 1, 0, 0});
+            NDArray result = NDArrays.where(condition, array1, array2);
+            NDArray actual = manager.create(new float[] {1f, 2f, 3f, 4f, 4f, 5f});
+            Assertions.assertEquals(result, actual, "where: Incorrect comparison");
+
+            array1 = manager.create(new float[] {0f, 3f, 5f, 7f, 10f, 3f, 2f, 2f}, new Shape(2, 4));
+            array2 =
+                    manager.create(
+                            new float[] {-2f, 43f, 2f, 7f, 10f, 3f, -234f, 66f}, new Shape(2, 4));
+            condition =
+                    manager.create(new float[] {0f, 1f, 0f, 1f, 1f, 1f, 0f, 1f}, new Shape(2, 4));
+            actual =
+                    manager.create(
+                            new float[] {-2f, 3f, 2f, 7f, 10f, 3f, -234f, 2f}, new Shape(2, 4));
+            result = NDArrays.where(condition, array1, array2);
+            Assertions.assertEquals(result, actual, "where: Incorrect comparison");
+
+            // test with broadcasting
+            array1 =
+                    manager.create(
+                            new float[] {0f, 3f, 5f, 9f, 11f, 12f, -2f, -4f}, new Shape(2, 4));
+            array2 =
+                    manager.create(
+                            new float[] {-2f, 43f, 2f, 7f, 10f, 3f, -234f, 66f}, new Shape(2, 4));
+            condition = manager.create(new float[] {0f, 1f}, new Shape(2));
+            actual =
+                    manager.create(
+                            new float[] {-2f, 43f, 2f, 7f, 11f, 12f, -2f, -4f}, new Shape(2, 4));
+            result = NDArrays.where(condition, array1, array2);
+            Assertions.assertEquals(result, actual, "where: Incorrect comparison");
+
+            // test scalar with scalar
+            array1 = manager.create(4f);
+            array2 = manager.create(6f);
+            condition = manager.create(0f);
+            result = NDArrays.where(condition, array1, array2);
+            actual = manager.create(6f);
+            Assertions.assertEquals(result, actual, "where: Incorrect comparison");
+
+            // test zero-dim
+            array1 = manager.create(new Shape(1, 0, 0));
+            array2 = manager.create(new Shape(1, 0, 0));
+            condition = manager.create(new Shape(1, 0, 0));
+            result = NDArrays.where(condition, array1, array2);
+            actual = manager.create(new Shape(1, 0, 0));
+            Assertions.assertEquals(result, actual, "where: Incorrect comparison");
+        }
+    }
+
+    @Test
     public void testGreaterThanOrEqualToScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 2f, 4f});

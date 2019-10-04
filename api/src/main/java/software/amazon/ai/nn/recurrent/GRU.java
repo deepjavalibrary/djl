@@ -25,6 +25,7 @@ import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockList;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.util.PairList;
@@ -120,6 +121,11 @@ public class GRU extends RecurrentCell {
             default:
                 throw new IllegalArgumentException("Invalid parameter name: " + name);
         }
+    }
+
+    @Override
+    public PairList<String, Block> getChildren() {
+        return new BlockList();
     }
 
     @Override

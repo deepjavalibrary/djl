@@ -275,6 +275,7 @@ public interface NDManager extends AutoCloseable {
         for (double[] d : data) {
             buffer.put(d);
         }
+        // TODO Check this. It may not work with Java 11
         buffer.rewind();
         return create(buffer, new Shape(data.length, data[0].length));
     }

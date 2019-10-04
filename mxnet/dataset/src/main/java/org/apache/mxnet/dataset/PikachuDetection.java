@@ -28,8 +28,10 @@ import java.util.Map;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.modality.cv.util.NDImageUtils.Flag;
+import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.MRL;
 import software.amazon.ai.repository.Repository;
@@ -53,7 +55,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
 
     private Path dataDir;
     private List<Path> imagePaths;
-    private List<double[]> labels;
+    private List<float[]> labels;
 
     public PikachuDetection(Builder builder) {
         super(builder);
@@ -136,12 +138,12 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         usagePath = dataDir.resolve(usagePath);
         Path indexFile = usagePath.resolve("index.file");
         try (Reader reader = Files.newBufferedReader(indexFile)) {
-            Type mapType = new TypeToken<Map<String, List<Double>>>() {}.getType();
-            Map<String, List<Double>> metadata = GSON.fromJson(reader, mapType);
-            for (Map.Entry<String, List<Double>> entry : metadata.entrySet()) {
-                double[] labelArray = new double[5];
+            Type mapType = new TypeToken<Map<String, List<Float>>>() {}.getType();
+            Map<String, List<Float>> metadata = GSON.fromJson(reader, mapType);
+            for (Map.Entry<String, List<Float>> entry : metadata.entrySet()) {
+                float[] labelArray = new float[5];
                 String imgName = entry.getKey();
-                List<Double> label = entry.getValue();
+                List<Float> label = entry.getValue();
                 // Offset labels
                 labelArray[0] = label.get(5);
                 labelArray[1] = label.get(6);
@@ -149,7 +151,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
                 labelArray[3] = label.get(8);
 
                 // Class label
-                labelArray[4] = 1;
+                labelArray[4] = label.get(4);
                 imagePaths.add(usagePath.resolve(imgName));
                 labels.add(labelArray);
             }
@@ -167,8 +169,11 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     public Record get(long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
-                new NDList(BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag));
-        NDList l = new NDList(manager.create(labels.get(idx)));
+                new NDList(
+                        BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag)
+                                .transpose(2, 0, 1));
+        NDArray label = manager.create(labels.get(idx));
+        NDList l = new NDList(label.reshape(new Shape(1).addAll(label.getShape())));
         return new Record(d, l);
     }
 

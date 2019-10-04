@@ -269,6 +269,11 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
+    public NDArray where(NDArray condition, NDArray other) {
+        return null;
+    }
+
+    @Override
     public NDArray add(Number n) {
         return null;
     }

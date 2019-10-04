@@ -15,6 +15,8 @@ package software.amazon.ai.nn.convolutional;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
+import software.amazon.ai.nn.BlockList;
+import software.amazon.ai.util.PairList;
 
 public class Conv1D extends Convolution {
 
@@ -48,6 +50,11 @@ public class Conv1D extends Convolution {
     @Override
     protected int numDimensions() {
         return NUM_DIMENSIONS;
+    }
+
+    @Override
+    public PairList<String, Block> getChildren() {
+        return new BlockList();
     }
 
     /** The Builder to construct a {@link Conv1D} type of {@link Block}. */

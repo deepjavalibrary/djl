@@ -66,6 +66,11 @@ public class LambdaBlock extends AbstractBlock {
     }
 
     @Override
+    public PairList<String, Block> getChildren() {
+        return new BlockList();
+    }
+
+    @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
     }

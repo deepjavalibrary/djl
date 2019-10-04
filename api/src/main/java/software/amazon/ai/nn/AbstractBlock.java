@@ -78,11 +78,6 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public BlockList getChildren() {
-        return new BlockList();
-    }
-
-    @Override
     public ParameterList getParameters() {
         ParameterList parameters = new ParameterList();
         List<Parameter> directParams = getDirectParameters();

@@ -524,6 +524,15 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray where(NDArray condition, NDArray other) {
+        if (!getShape().equals(other.getShape())) {
+            throw new IllegalArgumentException("Both NDArray must have same shape");
+        }
+        return manager.invoke("where", new NDList(condition, this, other), null).head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray add(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());

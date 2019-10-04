@@ -628,6 +628,43 @@ class MxNDArrayEx implements NDArrayEx {
         params.add("mode", mode);
         return manager.invoke("pick", new NDList(array, index), params).head();
     }
+    /** {@inheritDoc} */
+    @Override
+    public NDList multiBoxTarget(
+            NDList inputs,
+            float iouThreshold,
+            float ignoreLabel,
+            float negativeMiningRatio,
+            float negativeMiningThreshold,
+            int minNegativeSamples) {
+        MxOpParams parameters = new MxOpParams();
+        parameters.add("minimum_negative_samples", minNegativeSamples);
+        parameters.add("overlap_threshold", iouThreshold);
+        parameters.add("ignore_label", ignoreLabel);
+        parameters.add("negative_mining_ratio", negativeMiningRatio);
+        parameters.add("negative_mining_thresh", negativeMiningThreshold);
+        return manager.invoke("MultiBoxTarget", inputs, parameters);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList multiBoxDetection(
+            NDList inputs,
+            boolean clip,
+            float threshold,
+            int backgroundId,
+            float nmsThreashold,
+            boolean forceSuppress,
+            int nmsTopK) {
+        MxOpParams parameters = new MxOpParams();
+        parameters.add("clip", clip);
+        parameters.add("threshold", threshold);
+        parameters.add("background_id", backgroundId);
+        parameters.add("nms_threshold", nmsThreashold);
+        parameters.add("force_suppress", forceSuppress);
+        parameters.add("nms_topk", nmsTopK);
+        return manager.invoke("MultiBoxDetection", inputs, parameters);
+    }
 
     @Override
     public NDArray getArray() {
