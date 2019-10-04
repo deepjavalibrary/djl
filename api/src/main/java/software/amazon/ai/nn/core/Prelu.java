@@ -57,8 +57,8 @@ public class Prelu extends AbstractBlock {
 
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
-        if ("alpha".equals(name)) { // TODO: This should return Shape()
-            return new Shape(1);
+        if ("alpha".equals(name)) {
+            return new Shape();
         }
         throw new IllegalArgumentException("Invalid parameter name");
     }

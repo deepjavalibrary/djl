@@ -38,6 +38,20 @@ public class PoolingOperatorsTest {
     }
 
     @Test
+    public void testGlobalMaxPool() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original =
+                    manager.create(
+                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
+                            new Shape(1, 1, 4, 4));
+            NDArray maxPoolActual = Pool.globalMaxPool(original);
+            NDArray maxPoolExpected = manager.create(new float[] {13}, new Shape(1, 1, 1, 1));
+            Assertions.assertEquals(
+                    maxPoolExpected, maxPoolActual, "Global Max Pooling operation failed");
+        }
+    }
+
+    @Test
     public void testSumPool() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
@@ -51,6 +65,20 @@ public class PoolingOperatorsTest {
                             new float[] {22, 24, 25, 21, 26, 23, 39, 31, 19},
                             new Shape(1, 1, 3, 3));
             Assertions.assertEquals(maxPoolExpected, maxPoolActual, "Sum Pooling operation failed");
+        }
+    }
+
+    @Test
+    public void testGlobalSumPool() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original =
+                    manager.create(
+                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
+                            new Shape(1, 1, 4, 4));
+            NDArray sumPoolActual = Pool.globalSumPool(original);
+            NDArray sumPoolExpected = manager.create(new float[] {105}, new Shape(1, 1, 1, 1));
+            Assertions.assertEquals(
+                    sumPoolExpected, sumPoolActual, "Global Sum Pooling operation failed");
         }
     }
 
@@ -70,6 +98,20 @@ public class PoolingOperatorsTest {
     }
 
     @Test
+    public void testGlobalAvgPool() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original =
+                    manager.create(
+                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
+                            new Shape(1, 1, 4, 4));
+            NDArray avgPoolActual = Pool.globalAvgPool(original);
+            NDArray avgPoolExpected = manager.create(new float[] {6.5625f}, new Shape(1, 1, 1, 1));
+            Assertions.assertEquals(
+                    avgPoolExpected, avgPoolActual, "Global Avg Pooling operation failed");
+        }
+    }
+
+    @Test
     public void testLpPool() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original =
@@ -83,6 +125,20 @@ public class PoolingOperatorsTest {
                             new float[] {22, 24, 25, 21, 26, 23, 39, 31, 19},
                             new Shape(1, 1, 3, 3));
             Assertions.assertEquals(maxPoolExpected, maxPoolActual, "Sum Pooling operation failed");
+        }
+    }
+
+    @Test
+    public void testGlobalLpPool() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original =
+                    manager.create(
+                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
+                            new Shape(1, 1, 4, 4));
+            NDArray lpPoolActual = Pool.globalLpPool(original, 1);
+            NDArray lpPoolExpected = manager.create(new float[] {105}, new Shape(1, 1, 1, 1));
+            Assertions.assertEquals(
+                    lpPoolExpected, lpPoolActual, "Global Lp Pooling operation failed");
         }
     }
 }

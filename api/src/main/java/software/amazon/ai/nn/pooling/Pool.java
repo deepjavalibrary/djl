@@ -55,26 +55,10 @@ public final class Pool {
      * Performs Global Max Pooling on the input.
      *
      * @param data ndarray on which max pooling is performed
-     * @param stride stride to be used for each dimension
-     * @param pad padding to be set in each dimension
-     * @param poolingConvention the pooling convention to be used
      * @return NDArray after applying global max pooling
      */
-    public static NDArray globalMaxPool(
-            NDArray data, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        return data.getNDArrayInternal().globalMaxPool(stride, pad, poolingConvention);
-    }
-
-    /**
-     * Performs Global Max Pooling on the input.
-     *
-     * @param data ndarray on which max pooling is performed
-     * @param stride stride to be used for each dimension
-     * @param pad padding to be set in each dimension
-     * @return NDArray after applying global max pooling
-     */
-    public static NDArray globalMaxPool(NDArray data, Shape stride, Shape pad) {
-        return globalMaxPool(data, stride, pad, PoolingConvention.VALID);
+    public static NDArray globalMaxPool(NDArray data) {
+        return data.getNDArrayInternal().globalMaxPool();
     }
 
     /**
@@ -113,26 +97,10 @@ public final class Pool {
      * Performs Global Sum Pooling on the input.
      *
      * @param data ndarray on which sum pooling is performed
-     * @param stride stride to be used for each dimension
-     * @param pad padding to be set in each dimension
-     * @param poolingConvention the pooling convention to be used
      * @return NDArray after applying global sum pooling
      */
-    public static NDArray globalSumPool(
-            NDArray data, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        return data.getNDArrayInternal().globalSumPool(stride, pad, poolingConvention);
-    }
-
-    /**
-     * Performs Global Sum Pooling on the input.
-     *
-     * @param data ndarray on which sum pooling is performed
-     * @param stride stride to be used for each dimension
-     * @param pad padding to be set in each dimension
-     * @return NDArray after applying global sum pooling
-     */
-    public static NDArray globalSumPool(NDArray data, Shape stride, Shape pad) {
-        return globalSumPool(data, stride, pad, PoolingConvention.VALID);
+    public static NDArray globalSumPool(NDArray data) {
+        return data.getNDArrayInternal().globalSumPool();
     }
 
     /**
@@ -174,32 +142,10 @@ public final class Pool {
      * Performs Global Avg Pooling on the input.
      *
      * @param data ndarray on which average pooling is performed
-     * @param stride stride to be used for each dimension
-     * @param pad padding to be set in each dimension
-     * @param poolingConvention the pooling convention to be used
-     * @param countIncludePad Whether to include padding for calculations
      * @return NDArray after applying global avg pooling
      */
-    public static NDArray globalAvgPool(
-            NDArray data,
-            Shape stride,
-            Shape pad,
-            PoolingConvention poolingConvention,
-            boolean countIncludePad) {
-        return data.getNDArrayInternal()
-                .globalAvgPool(stride, pad, poolingConvention, countIncludePad);
-    }
-
-    /**
-     * Performs Global Avg Pooling on the input.
-     *
-     * @param data ndarray on which average pooling is performed
-     * @param stride stride to be used for each dimension
-     * @param pad padding to be set in each dimension
-     * @return NDArray after applying global avg pooling
-     */
-    public static NDArray globalAvgPool(NDArray data, Shape stride, Shape pad) {
-        return globalAvgPool(data, stride, pad, PoolingConvention.VALID, true);
+    public static NDArray globalAvgPool(NDArray data) {
+        return data.getNDArrayInternal().globalAvgPool();
     }
 
     /**
@@ -210,7 +156,7 @@ public final class Pool {
      * @param stride stride to be used for each dimension
      * @param pad padding to be set in each dimension
      * @param poolingConvention the pooling convention to be used
-     * @param pValue Whether to perform global pooling
+     * @param pValue the power of the pooling
      * @return NDArray after applying lp pooling
      */
     public static NDArray lpPool(
@@ -230,7 +176,7 @@ public final class Pool {
      * @param kernel shape of the kernel to be used
      * @param stride stride to be used for each dimension
      * @param pad padding to be set in each dimension
-     * @param pValue Whether to perform global pooling
+     * @param pValue the power of the pooling
      * @return NDArray after applying lp pooling
      */
     public static NDArray lpPool(NDArray data, Shape kernel, Shape stride, Shape pad, int pValue) {
@@ -242,31 +188,10 @@ public final class Pool {
      * Performs Global LP Pooling on the input.
      *
      * @param data ndarray on which LP pooling is performed
-     * @param stride stride to be used for each dimension
-     * @param pad padding to be set in each dimension
-     * @param pValue Whether to perform global pooling
-     * @param poolingConvention the pooling convention to be used
+     * @param pValue the power of the pooling
      * @return NDArray after applying global lp pooling
      */
-    public static NDArray globalLpPool(
-            NDArray data,
-            Shape stride,
-            Shape pad,
-            PoolingConvention poolingConvention,
-            int pValue) {
-        return data.getNDArrayInternal().globalLpPool(stride, pad, poolingConvention, pValue);
-    }
-
-    /**
-     * Performs Global LP Pooling on the input.
-     *
-     * @param data ndarray on which LP pooling is performed
-     * @param stride stride to be used for each dimension
-     * @param pad padding to be set in each dimension
-     * @param pValue Whether to perform global pooling
-     * @return NDArray after applying global lp pooling
-     */
-    public static NDArray globalLpPool(NDArray data, Shape stride, Shape pad, int pValue) {
-        return data.getNDArrayInternal().globalLpPool(stride, pad, PoolingConvention.VALID, pValue);
+    public static NDArray globalLpPool(NDArray data, int pValue) {
+        return data.getNDArrayInternal().globalLpPool(pValue);
     }
 }

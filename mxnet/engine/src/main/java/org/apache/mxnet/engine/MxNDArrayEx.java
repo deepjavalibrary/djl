@@ -251,15 +251,10 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     @Override
-    public NDArray globalMaxPool(Shape stride, Shape pad, PoolingConvention poolingConvention) {
+    public NDArray globalMaxPool() {
         MxOpParams params = new MxOpParams();
-        params.addParam("stride", stride);
         params.add("pool_type", "max");
-        params.addParam("pad", pad);
         params.addParam("global_pool", true);
-        if (poolingConvention != null) {
-            params.add("pooling_convention", poolingConvention.name().toLowerCase());
-        }
         return pool(params);
     }
 
@@ -278,15 +273,10 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     @Override
-    public NDArray globalSumPool(Shape stride, Shape pad, PoolingConvention poolingConvention) {
+    public NDArray globalSumPool() {
         MxOpParams params = new MxOpParams();
         params.add("pool_type", "sum");
-        params.addParam("stride", stride);
-        params.addParam("pad", pad);
         params.addParam("global_pool", true);
-        if (poolingConvention != null) {
-            params.add("pooling_convention", poolingConvention.name().toLowerCase());
-        }
         return pool(params);
     }
 
@@ -310,17 +300,10 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     @Override
-    public NDArray globalAvgPool(
-            Shape stride, Shape pad, PoolingConvention poolingConvention, boolean countIncludePad) {
+    public NDArray globalAvgPool() {
         MxOpParams params = new MxOpParams();
         params.add("pool_type", "avg");
-        params.addParam("stride", stride);
-        params.addParam("pad", pad);
         params.addParam("global_pool", true);
-        params.addParam("count_include_pad", countIncludePad);
-        if (poolingConvention != null) {
-            params.add("pooling_convention", poolingConvention.name().toLowerCase());
-        }
         return pool(params);
     }
 
@@ -344,15 +327,9 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     @Override
-    public NDArray globalLpPool(
-            Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue) {
+    public NDArray globalLpPool(int pValue) {
         MxOpParams params = new MxOpParams();
         params.add("pool_type", "lp");
-        params.addParam("stride", stride);
-        params.addParam("pad", pad);
-        if (poolingConvention != null) {
-            params.add("pooling_convention", poolingConvention.name().toLowerCase());
-        }
         params.addParam("p_value", pValue);
         params.addParam("global_pool", true);
         return pool(params);

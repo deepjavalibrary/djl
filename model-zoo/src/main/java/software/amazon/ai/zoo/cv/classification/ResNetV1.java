@@ -210,14 +210,7 @@ public final class ResNetV1 {
                 resStride = new Shape(2, 2);
             }
         }
-        return resNet.add(
-                        new LambdaBlock(
-                                arrays ->
-                                        new NDList(
-                                                Pool.globalAvgPool(
-                                                        arrays.head(),
-                                                        new Shape(1, 1),
-                                                        new Shape(0, 0)))))
+        return resNet.add(new LambdaBlock(arrays -> new NDList(Pool.globalAvgPool(arrays.head()))))
                 .add(
                         new LambdaBlock(
                                 arrays -> {

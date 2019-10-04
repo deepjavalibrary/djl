@@ -210,11 +210,11 @@ public interface NDArrayEx {
 
     NDArray maxPool(Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention);
 
-    NDArray globalMaxPool(Shape stride, Shape pad, PoolingConvention poolingConvention);
+    NDArray globalMaxPool();
 
     NDArray sumPool(Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention);
 
-    NDArray globalSumPool(Shape stride, Shape pad, PoolingConvention poolingConvention);
+    NDArray globalSumPool();
 
     NDArray avgPool(
             Shape kernel,
@@ -223,13 +223,12 @@ public interface NDArrayEx {
             PoolingConvention poolingConvention,
             boolean countIncludePad);
 
-    NDArray globalAvgPool(
-            Shape stride, Shape pad, PoolingConvention poolingConvention, boolean countIncludePad);
+    NDArray globalAvgPool();
 
     NDArray lpPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue);
 
-    NDArray globalLpPool(Shape stride, Shape pad, PoolingConvention poolingConvention, int pValue);
+    NDArray globalLpPool(int pValue);
 
     ////////////////////////////////////////
     // Optimizer
