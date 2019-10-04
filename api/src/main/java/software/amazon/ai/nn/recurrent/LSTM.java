@@ -64,13 +64,8 @@ public class LSTM extends RecurrentCell {
     private Parameter stateCell = new Parameter("state_cell", this, ParameterType.OTHER);
 
     LSTM(Builder builder) {
+        super(builder);
         mode = "lstm";
-        stateSize = builder.getStateSize();
-        dropRate = builder.getDropRate();
-        numStackedLayers = builder.getNumStackedLayers();
-        useSequenceLength = builder.isUseSequenceLength();
-        useBidirectional = builder.isUseBidirectional();
-        stateOutputs = builder.isStateOutputs();
         clipLstmState = builder.isClipLstmState();
         lstmStateClipMin = builder.getLstmStateClipMin();
         lstmStateClipMax = builder.getLstmStateClipMax();

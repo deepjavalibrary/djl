@@ -55,13 +55,8 @@ public class GRU extends RecurrentCell {
     private Parameter state = new Parameter("state", this, ParameterType.OTHER);
 
     GRU(Builder builder) {
+        super(builder);
         mode = "gru";
-        stateSize = builder.getStateSize();
-        dropRate = builder.getDropRate();
-        numStackedLayers = builder.getNumStackedLayers();
-        useSequenceLength = builder.isUseSequenceLength();
-        useBidirectional = builder.isUseBidirectional();
-        stateOutputs = builder.isStateOutputs();
     }
 
     @Override

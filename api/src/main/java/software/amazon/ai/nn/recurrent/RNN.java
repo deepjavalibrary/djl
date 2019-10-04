@@ -43,13 +43,8 @@ public class RNN extends RecurrentCell {
     private Parameter state;
 
     RNN(Builder builder) {
+        super(builder);
         mode = builder.getActivation() == Activation.RELU ? "rnn_relu" : "rnn_tanh";
-        stateSize = builder.getStateSize();
-        dropRate = builder.getDropRate();
-        numStackedLayers = builder.getNumStackedLayers();
-        useSequenceLength = builder.isUseSequenceLength();
-        useBidirectional = builder.isUseBidirectional();
-        stateOutputs = builder.isStateOutputs();
         i2hWeight = new Parameter("i2h_weight", this, ParameterType.WEIGHT);
         h2hWeight = new Parameter("h2h_weight", this, ParameterType.WEIGHT);
         i2hBias = new Parameter("i2h_bias", this, ParameterType.BIAS);

@@ -25,6 +25,15 @@ public abstract class RecurrentCell extends AbstractBlock {
     protected boolean useBidirectional;
     protected boolean stateOutputs;
 
+    public RecurrentCell(BaseBuilder<?> builder) {
+        stateSize = builder.getStateSize();
+        dropRate = builder.getDropRate();
+        numStackedLayers = builder.getNumStackedLayers();
+        useSequenceLength = builder.isUseSequenceLength();
+        useBidirectional = builder.isUseBidirectional();
+        stateOutputs = builder.isStateOutputs();
+    }
+
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
