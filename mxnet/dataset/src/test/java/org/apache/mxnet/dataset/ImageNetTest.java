@@ -40,7 +40,7 @@ public class ImageNetTest {
         imagenet.prepare();
 
         try (Model model = Model.newInstance()) {
-            TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+            TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(imagenet)) {
                     Assert.assertEquals(batch.getData().size(), 1);

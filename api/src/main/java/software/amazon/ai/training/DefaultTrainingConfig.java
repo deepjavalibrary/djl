@@ -21,27 +21,19 @@ public class DefaultTrainingConfig implements TrainingConfig {
 
     private Initializer initializer;
     private Optimizer optimizer;
-    private boolean overwriteInitializer;
     private Device[] devices;
 
-    public DefaultTrainingConfig(Initializer initializer, boolean overwriteInitializer) {
-        this(initializer, overwriteInitializer, null);
+    public DefaultTrainingConfig(Initializer initializer) {
+        this(initializer, null);
     }
 
-    public DefaultTrainingConfig(
-            Initializer initializer,
-            boolean overwriteInitializer,
-            Optimizer optimizer,
-            int numGpus) {
+    public DefaultTrainingConfig(Initializer initializer, Optimizer optimizer) {
         this.initializer = initializer;
-        this.overwriteInitializer = overwriteInitializer;
         this.optimizer = optimizer;
+        int numGpus = Engine.getInstance().getGpuCount();
         if (numGpus > 0) {
-            int maxGpus = Engine.getInstance().getGpuCount();
-            if (numGpus > maxGpus) {
-                throw new IllegalStateException(
-                        "numGpus: " + numGpus + "is larger than available gpus: " + maxGpus);
-            }
+            // TODO: Use single GPU by default for now.
+            numGpus = 1;
             devices = new Device[numGpus];
             for (int i = 0; i < numGpus; i++) {
                 devices[i] = Device.gpu(i);
@@ -51,26 +43,10 @@ public class DefaultTrainingConfig implements TrainingConfig {
         }
     }
 
-    public DefaultTrainingConfig(
-            Initializer initializer,
-            boolean overwriteInitializer,
-            Optimizer optimizer,
-            Device[] devices) {
+    public DefaultTrainingConfig(Initializer initializer, Optimizer optimizer, Device[] devices) {
         this.initializer = initializer;
-        this.overwriteInitializer = overwriteInitializer;
         this.optimizer = optimizer;
         this.devices = devices;
-    }
-
-    public DefaultTrainingConfig(
-            Initializer initializer, boolean overwriteInitializer, Optimizer optimizer) {
-        // use 1 GPU if GPU detected by default because training code for 1 CPU/GPU is the same,
-        // but multi-gpu requires user code change.
-        this(
-                initializer,
-                overwriteInitializer,
-                optimizer,
-                Engine.getInstance().getGpuCount() > 0 ? 1 : 0);
     }
 
     @Override
@@ -81,11 +57,6 @@ public class DefaultTrainingConfig implements TrainingConfig {
     @Override
     public Initializer getInitializer() {
         return initializer;
-    }
-
-    @Override
-    public boolean isOverwriteInitializer() {
-        return overwriteInitializer;
     }
 
     @Override

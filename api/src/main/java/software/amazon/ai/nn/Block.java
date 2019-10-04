@@ -44,10 +44,9 @@ public interface Block {
 
     List<Parameter> getDirectParameters();
 
-    void setInitializer(NDManager manager, Initializer initializer, boolean overwrite);
+    void setInitializer(NDManager manager, Initializer initializer);
 
-    void setInitializer(
-            NDManager manager, Initializer initializer, boolean overwrite, String paramName);
+    void setInitializer(NDManager manager, Initializer initializer, String paramName);
 
     boolean isInitialized();
 

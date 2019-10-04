@@ -82,8 +82,7 @@ public final class TrainResnetWithCifar10 {
                         .build();
         cifar10.prepare();
 
-        TrainingConfig config =
-                new DefaultTrainingConfig(new NormalInitializer(0.01), false, optimizer);
+        TrainingConfig config = new DefaultTrainingConfig(new NormalInitializer(0.01), optimizer);
 
         try (Trainer trainer = model.newTrainer(config)) {
             Accuracy acc = new Accuracy();

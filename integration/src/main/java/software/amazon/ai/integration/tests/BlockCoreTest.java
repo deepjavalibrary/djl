@@ -48,7 +48,7 @@ public class BlockCoreTest {
 
     @Test
     public void testLinear() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         long outSize = 3;
         Block block = new Linear.Builder().setOutChannels(outSize).build();
@@ -62,8 +62,8 @@ public class BlockCoreTest {
                 NDArray outBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedBias =
                         input.dot(manager.ones(new Shape(outSize, 2)).transpose())
-                                .add(manager.ones(new Shape(2, outSize)));
-                Assertions.assertEquals(expectedBias, outBias);
+                                .add(manager.zeros(new Shape(2, outSize)));
+                Assertions.assertEquals(outBias, expectedBias);
 
                 testEncode(manager, block);
             }
@@ -79,7 +79,7 @@ public class BlockCoreTest {
 
                 NDArray outNoBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
-                Assertions.assertEquals(expectedNoBias, outNoBias);
+                Assertions.assertEquals(outNoBias, expectedNoBias);
 
                 testEncode(manager, block);
             }
@@ -88,7 +88,7 @@ public class BlockCoreTest {
 
     @Test
     public void testLinearWithDefinedLayout() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         long outSize = 3;
         Block block = new Linear.Builder().setOutChannels(outSize).build();
@@ -107,8 +107,8 @@ public class BlockCoreTest {
                 NDArray outBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedBias =
                         input.dot(manager.ones(new Shape(outSize, 2)).transpose())
-                                .add(manager.ones(new Shape(2, outSize)));
-                Assertions.assertEquals(expectedBias, outBias);
+                                .add(manager.zeros(new Shape(2, outSize)));
+                Assertions.assertEquals(outBias, expectedBias);
 
                 testEncode(manager, block);
             }
@@ -129,7 +129,7 @@ public class BlockCoreTest {
 
                 NDArray outNoBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
-                Assertions.assertEquals(expectedNoBias, outNoBias);
+                Assertions.assertEquals(outNoBias, expectedNoBias);
 
                 testEncode(manager, block);
             }
@@ -138,7 +138,7 @@ public class BlockCoreTest {
 
     @Test
     public void testBatchNorm() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block = new BatchNorm.Builder().setAxis(1).build();
         try (Model model = Model.newInstance()) {
@@ -159,7 +159,7 @@ public class BlockCoreTest {
 
     @Test
     public void testDropout() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block = new Dropout.Builder().setProbability(.5f).build();
         try (Model model = Model.newInstance()) {
@@ -179,7 +179,7 @@ public class BlockCoreTest {
 
     @Test
     public void testEmbedding() {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Embedding<Character> block =
                 new Embedding.Builder<Character>()
@@ -194,17 +194,17 @@ public class BlockCoreTest {
 
                 // TODO: use trainer.forward
                 Assertions.assertEquals(
-                        manager.create(new int[] {1, 1}), block.forward(manager, 'x'));
+                        block.forward(manager, 'x'), manager.create(new int[] {1, 1}));
                 Assertions.assertEquals(
-                        manager.create(new int[] {1, 1, 1, 1}, new Shape(2, 2)),
-                        block.forward(manager, new Character[] {'a', 'b'}));
+                        block.forward(manager, new Character[] {'a', 'b'}),
+                        manager.create(new int[] {1, 1, 1, 1}, new Shape(2, 2)));
             }
         }
     }
 
     @Test
     public void testConv1D() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block =
                 new Conv1D.Builder()
@@ -224,10 +224,10 @@ public class BlockCoreTest {
                                 new Shape(1, 4, 4));
                 NDArray expected = manager.create(new float[] {61, 55, 44}, new Shape(1, 1, 3));
                 NDArray out = trainer.forward(new NDList(input)).get(0);
-                Assertions.assertEquals(expected, out);
+                Assertions.assertEquals(out, expected);
 
                 Shape outputShape = block.getOutputShape(new Shape(1, 4, 4));
-                Assertions.assertTrue(out.getShape().equals(outputShape));
+                Assertions.assertEquals(out.getShape(), outputShape);
 
                 testEncode(manager, block);
             }
@@ -236,7 +236,7 @@ public class BlockCoreTest {
 
     @Test
     public void testConv2D() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block = new Conv2D.Builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
         try (Model model = Model.newInstance()) {
@@ -250,11 +250,11 @@ public class BlockCoreTest {
                                 new Shape(1, 1, 4, 4));
                 NDArray expected =
                         manager.create(
-                                new float[] {23, 25, 26, 22, 27, 24, 40, 32, 20},
+                                new float[] {22, 24, 25, 21, 26, 23, 39, 31, 19},
                                 new Shape(1, 1, 3, 3));
 
                 NDArray out = trainer.forward(new NDList(input)).get(0);
-                Assertions.assertAlmostEquals(expected, out);
+                Assertions.assertAlmostEquals(out, expected);
 
                 testEncode(manager, block);
             }
@@ -263,7 +263,7 @@ public class BlockCoreTest {
 
     @Test
     public void testConv3D() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block = new Conv3D.Builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
         try (Model model = Model.newInstance()) {
@@ -280,14 +280,14 @@ public class BlockCoreTest {
                                 new Shape(1, 1, 3, 3, 3));
                 NDArray expected =
                         manager.create(
-                                new float[] {61, 42, 55, 49, 56, 60, 57, 62},
+                                new float[] {60, 41, 54, 48, 55, 59, 56, 61},
                                 new Shape(1, 1, 2, 2, 2));
 
                 NDArray out = trainer.forward(new NDList(input)).get(0);
-                Assertions.assertEquals(expected, out);
+                Assertions.assertEquals(out, expected);
 
                 Shape outputShape = block.getOutputShape(new Shape(1, 1, 3, 3, 3));
-                Assertions.assertTrue(out.getShape().equals(outputShape));
+                Assertions.assertEquals(out.getShape(), outputShape);
 
                 testEncode(manager, block);
             }
@@ -296,7 +296,7 @@ public class BlockCoreTest {
 
     @Test
     public void testRNNTanh() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block =
                 new RNN.Builder()
@@ -312,7 +312,7 @@ public class BlockCoreTest {
                 NDArray input = manager.arange(0, 48, 1).reshape(new Shape(3, 4, 4));
                 NDList outputs = trainer.forward(new NDList(input));
                 NDArray out = outputs.get(0);
-                Assertions.assertEquals(manager.ones(new Shape(3, 4, 5)), out);
+                Assertions.assertAlmostEquals(out, manager.ones(new Shape(3, 4, 5)));
 
                 testEncode(manager, block);
             }
@@ -321,7 +321,7 @@ public class BlockCoreTest {
 
     @Test
     public void testRNNRelu() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block =
                 new RNN.Builder()
@@ -350,7 +350,7 @@ public class BlockCoreTest {
 
     @Test
     public void testLstm() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block =
                 new LSTM.Builder()
@@ -382,7 +382,7 @@ public class BlockCoreTest {
 
     @Test
     public void testGRU() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         GRU block =
                 new GRU.Builder()
@@ -400,7 +400,7 @@ public class BlockCoreTest {
 
                 NDList outputs = trainer.forward(new NDList(input));
                 NDArray out = outputs.get(0);
-                Assertions.assertAlmostEquals(manager.ones(new Shape(1, 2, 4)), out);
+                Assertions.assertAlmostEquals(out, manager.ones(new Shape(1, 2, 4)));
 
                 testEncode(manager, block);
             }

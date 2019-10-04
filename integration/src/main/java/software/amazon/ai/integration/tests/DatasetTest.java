@@ -43,7 +43,7 @@ import software.amazon.ai.training.initializer.Initializer;
 
 public class DatasetTest {
 
-    private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+    private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
     @Test
     public void testSequenceSampler() throws IOException {

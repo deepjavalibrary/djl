@@ -31,7 +31,7 @@ public class CocoTest {
 
     @Test
     public void testCocoLocal() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 

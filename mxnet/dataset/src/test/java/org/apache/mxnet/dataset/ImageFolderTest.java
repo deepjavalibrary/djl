@@ -33,7 +33,7 @@ public class ImageFolderTest {
 
     @Test
     public void testImageFolder() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);

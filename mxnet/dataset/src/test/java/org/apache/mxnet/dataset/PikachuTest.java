@@ -40,7 +40,7 @@ public class PikachuTest {
                         .setRandomSampling(1)
                         .build();
         pikachu.prepare();
-        TrainingConfig config = new DefaultTrainingConfig(new NormalInitializer(0.01), false);
+        TrainingConfig config = new DefaultTrainingConfig(new NormalInitializer(0.01));
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
             try (Trainer trainer = model.newTrainer(config)) {

@@ -72,9 +72,19 @@ public final class TrainMnist {
                         .setRescaleGrad(1.0f / batchSize)
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
+
+        Device[] devices;
+        if (numGpus > 1) {
+            devices = new Device[numGpus];
+            for (int i = 0; i < numGpus; i++) {
+                devices[i] = Device.gpu(i);
+            }
+        } else {
+            devices = new Device[] {Device.defaultDevice()};
+        }
+
         TrainingConfig config =
-                new DefaultTrainingConfig(new XavierInitializer(), false, optimizer, numGpus);
-        Device[] devices = config.getDevices();
+                new DefaultTrainingConfig(new XavierInitializer(), optimizer, devices);
         try (Model model = Model.newInstance()) {
             Pipeline pipeline = new Pipeline(new ToTensor());
             model.setBlock(block);

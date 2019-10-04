@@ -39,18 +39,17 @@ public abstract class AbstractBlock implements Block {
     public void backward() {}
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
+    public void setInitializer(NDManager manager, Initializer initializer) {
         for (Parameter parameter : getDirectParameters()) {
-            parameter.setInitializer(manager, initializer, overwrite);
+            parameter.setInitializer(manager, initializer, false);
         }
         for (Block child : getChildren().values()) {
-            child.setInitializer(manager, initializer, overwrite);
+            child.setInitializer(manager, initializer);
         }
     }
 
     @Override
-    public void setInitializer(
-            NDManager manager, Initializer initializer, boolean overwrite, String paramName) {
+    public void setInitializer(NDManager manager, Initializer initializer, String paramName) {
         Parameter parameter =
                 getDirectParameters()
                         .stream()
@@ -60,7 +59,7 @@ public abstract class AbstractBlock implements Block {
                                 () ->
                                         new IllegalArgumentException(
                                                 "Could not find parameter " + paramName));
-        parameter.setInitializer(manager, initializer, overwrite);
+        parameter.setInitializer(manager, initializer, true);
     }
 
     @Override

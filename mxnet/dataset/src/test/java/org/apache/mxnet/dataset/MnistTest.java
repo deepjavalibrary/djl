@@ -30,7 +30,7 @@ public class MnistTest {
 
     @Test
     public void testMnistLocal() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
@@ -58,7 +58,7 @@ public class MnistTest {
 
     @Test
     public void testMnistRemote() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);

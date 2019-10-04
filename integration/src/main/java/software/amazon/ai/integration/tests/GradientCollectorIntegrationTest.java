@@ -72,7 +72,7 @@ public class GradientCollectorIntegrationTest {
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false, optimizer);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optimizer);
 
         try (Model model = Model.newInstance()) {
             Linear block = new Linear.Builder().setOutChannels(1).build();
@@ -137,7 +137,7 @@ public class GradientCollectorIntegrationTest {
                         .setMomentum(0.9f)
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false, optimizer);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optimizer);
 
         Block resNet50 =
                 new ResNetV1.Builder()

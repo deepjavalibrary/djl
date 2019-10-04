@@ -177,8 +177,7 @@ public class MxModel implements Model {
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         Initializer initializer = trainingConfig.getInitializer();
-        boolean overwrite = trainingConfig.isOverwriteInitializer();
-        block.setInitializer(manager, initializer, overwrite);
+        block.setInitializer(manager, initializer);
 
         return new MxTrainer(this, trainingConfig);
     }

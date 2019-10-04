@@ -29,7 +29,7 @@ public class Cifar10Test {
 
     @Test
     public void testCifar10Local() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
@@ -56,7 +56,7 @@ public class Cifar10Test {
 
     @Test
     public void testCifar10Remote() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);

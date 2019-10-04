@@ -48,7 +48,7 @@ public class OptimizerTest {
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true, sgd);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, sgd);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -58,12 +58,9 @@ public class OptimizerTest {
                 NDArray result = runOptimizer(manager, trainer, block);
                 NDArray result2 = runOptimizer(manager, trainer, block);
                 // TODO: fix atol and rtol too large on GPU build
+                Assertions.assertAlmostEquals(result, manager.create(new float[] {0.68f, -0.16f}));
                 Assertions.assertAlmostEquals(
-                        manager.create(new float[] {0.6600000262260437f, 0.8300000429153442f}),
-                        result);
-                Assertions.assertAlmostEquals(
-                        manager.create(new float[] {0.4593999981880188f, 0.729699969291687f}),
-                        result2);
+                        result2, manager.create(new float[] {0.4912f, -0.2544f}));
             }
         }
     }
@@ -77,7 +74,7 @@ public class OptimizerTest {
                         .optMomentum(0.9f)
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true, optim);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optim);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -88,12 +85,9 @@ public class OptimizerTest {
                 NDArray result = runOptimizer(manager, trainer, block);
                 NDArray result2 = runOptimizer(manager, trainer, block);
                 // TODO: fix atol and rtol too large on GPU build
+                Assertions.assertAlmostEquals(result, manager.create(new float[] {0.68f, -0.16f}));
                 Assertions.assertAlmostEquals(
-                        manager.create(new float[] {0.6600000262260437f, 0.8300000429153442f}),
-                        result);
-                Assertions.assertAlmostEquals(
-                        manager.create(new float[] {0.15339994430541992f, 0.57669997215271f}),
-                        result2);
+                        result2, manager.create(new float[] {0.2032f, -0.3984f}));
             }
         }
     }
@@ -107,7 +101,7 @@ public class OptimizerTest {
                         .setMomentum(0.9f)
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true, optim);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optim);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -118,11 +112,9 @@ public class OptimizerTest {
                 NDArray result2 = runOptimizer(manager, trainer, block);
                 // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(
-                        manager.create(new float[] {0.3539999723434448f, 0.6769999861717224f}),
-                        result);
+                        result, manager.create(new float[] {0.392f, -0.304f}));
                 Assertions.assertAlmostEquals(
-                        manager.create(new float[] {-0.06416600942611694f, 0.4679170250892639f}),
-                        result2);
+                        result2, manager.create(new float[] {-0.0016f, -0.5008f}));
             }
         }
     }
@@ -132,7 +124,7 @@ public class OptimizerTest {
         Optimizer optim =
                 new Adam.Builder().setRescaleGrad(1.0f / BATCH_SIZE).optLearningRate(0.1f).build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true, optim);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optim);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -143,11 +135,11 @@ public class OptimizerTest {
                 NDArray result2 = runOptimizer(manager, trainer, block);
                 // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(
-                        manager.create(new float[] {0.8999999761581421f, 0.8999999761581421f}),
-                        result);
+                        result,
+                        manager.create(new float[] {0.8999999761581421f, 0.8999999761581421f}));
                 Assertions.assertAlmostEquals(
-                        manager.create(new float[] {0.8005584478378296f, 0.8005584478378296f}),
-                        result2);
+                        result2,
+                        manager.create(new float[] {0.8005584478378296f, 0.8005584478378296f}));
             }
         }
     }

@@ -26,7 +26,7 @@ import software.amazon.ai.training.initializer.Initializer;
 
 public class ActivationTest {
 
-    private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+    private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
     @Test
     public void testRelu() {

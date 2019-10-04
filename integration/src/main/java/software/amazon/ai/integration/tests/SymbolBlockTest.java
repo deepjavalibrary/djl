@@ -63,7 +63,7 @@ public class SymbolBlockTest {
     @Test
     public void trainWithNewParam() throws IOException {
         Path modelDir = prepareModel();
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, true);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
             model.getBlock().clear();
@@ -71,16 +71,16 @@ public class SymbolBlockTest {
                 NDManager manager = trainer.getManager();
 
                 Pair<NDArray, NDArray> result = train(manager, trainer, model.getBlock());
-                Assertions.assertAlmostEquals(result.getKey(), manager.create(6430785.5));
+                Assertions.assertAlmostEquals(result.getKey(), manager.create(6422528.0));
                 Assertions.assertAlmostEquals(
                         result.getValue(),
                         manager.create(
                                 new float[] {
                                     2.38418579e-06f,
                                     2.38418579e-06f,
-                                    2.92435288e-05f,
+                                    2.92062759e-05f,
                                     3.72529030e-08f,
-                                    1.43556367e-03f,
+                                    -4.03289776e-03f,
                                     -2.30967991e-08f
                                 }));
             }
@@ -91,7 +91,7 @@ public class SymbolBlockTest {
     public void trainWithExistParam() throws IOException {
         Path modelDir = prepareModel();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
 
@@ -99,8 +99,9 @@ public class SymbolBlockTest {
                 NDManager manager = trainer.getManager();
 
                 Pair<NDArray, NDArray> result = train(manager, trainer, model.getBlock());
-                Assertions.assertAlmostEquals(manager.create(0.29814255237579346), result.getKey());
+                Assertions.assertAlmostEquals(result.getKey(), manager.create(0.29814255237579346));
                 Assertions.assertAlmostEquals(
+                        result.getValue(),
                         manager.create(
                                 new float[] {
                                     1.51564837e-01f,
@@ -109,8 +110,7 @@ public class SymbolBlockTest {
                                     4.07614917e-01f,
                                     -1.78348269e-08f,
                                     -1.19209291e-08f
-                                }),
-                        result.getValue());
+                                }));
             }
         }
     }
@@ -119,7 +119,7 @@ public class SymbolBlockTest {
     public void trainWithCustomLayer() throws IOException {
         Path modelDir = prepareModel();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, false);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
 
@@ -130,15 +130,16 @@ public class SymbolBlockTest {
             newMlp.add(mlp.removeLastBlock());
             Linear linear = new Linear.Builder().setOutChannels(10).build();
 
-            linear.setInitializer(manager, Initializer.ONES, true);
+            linear.setInitializer(manager, Initializer.ONES);
             newMlp.add(linear);
 
             model.setBlock(newMlp);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Pair<NDArray, NDArray> result = train(manager, trainer, newMlp);
-                Assertions.assertAlmostEquals(manager.create(18.357540130615234), result.getKey());
+                Assertions.assertAlmostEquals(result.getKey(), manager.create(17.357540130615234));
                 Assertions.assertAlmostEquals(
+                        result.getValue(),
                         manager.create(
                                 new float[] {
                                     1.54082624e-09f,
@@ -147,8 +148,7 @@ public class SymbolBlockTest {
                                     1.39698386e-08f,
                                     -7.56020135e-09f,
                                     -2.30967991e-08f
-                                }),
-                        result.getValue());
+                                }));
             }
         }
     }

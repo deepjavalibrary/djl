@@ -22,7 +22,5 @@ public interface TrainingConfig {
 
     Initializer getInitializer();
 
-    boolean isOverwriteInitializer();
-
     Optimizer getOptimizer();
 }
