@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.mxnet.dataset.transform.cv.Resize;
 import org.apache.mxnet.utils.ThrowingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import software.amazon.ai.repository.Artifact;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.training.dataset.RandomAccessDataset;
 import software.amazon.ai.training.dataset.Record;
+import software.amazon.ai.translate.Transform;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
 
@@ -42,6 +44,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
 
     protected NDManager manager;
     protected Flag flag;
+    protected Transform resize;
     protected List<String> synsets;
     protected PairList<String, Integer> items;
 
@@ -49,6 +52,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         super(builder);
         this.manager = builder.getManager();
         this.flag = builder.getFlag();
+        this.resize = builder.getResize();
         this.synsets = new ArrayList<>();
         this.items = new PairList<>();
     }
@@ -56,7 +60,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     @Override
     public Record get(long index) throws IOException {
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
-        NDList d = readImage(item.getKey());
+        NDList d = resize.transform(readImage(item.getKey()));
         NDList l = new NDList(manager.create(item.getValue()));
         return new Record(d, l);
     }
@@ -104,8 +108,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     protected void listImages(Repository repository, Artifact.Item item) throws IOException {
         String[] classes = repository.listDirectory(item, "");
         if (classes.length == 0) {
-            throw new IllegalArgumentException(
-                    String.format("No classes found in " + item.getName()));
+            throw new IllegalArgumentException("No classes found in " + item.getName());
         }
         listImages(repository, item, classes);
     }
@@ -157,6 +160,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
 
         private NDManager manager;
         private Flag flag = NDImageUtils.Flag.COLOR;
+        private Transform resize;
 
         public Flag getFlag() {
             return flag;
@@ -173,6 +177,23 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
 
         public T setManager(NDManager manager) {
             this.manager = manager;
+            return self();
+        }
+
+        public Transform getResize() {
+            if (resize == null) {
+                throw new IllegalArgumentException("setResize is required.");
+            }
+            return resize;
+        }
+
+        public T setResize(Transform resize) {
+            this.resize = resize;
+            return self();
+        }
+
+        public T setResize(int height, int width) {
+            this.resize = new Resize(new int[] {height, width});
             return self();
         }
     }

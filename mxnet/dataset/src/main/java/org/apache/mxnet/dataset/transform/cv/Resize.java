@@ -28,6 +28,10 @@ public class Resize implements Transform {
         this.size = size;
     }
 
+    public Resize(int height, int width) {
+        this.size = new int[] {height, width};
+    }
+
     @Override
     public NDArray transform(NDArray array, boolean close) {
         return NDImageUtils.resize(array, size);

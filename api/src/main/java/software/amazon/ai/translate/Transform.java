@@ -13,6 +13,8 @@
 package software.amazon.ai.translate;
 
 import software.amazon.ai.ndarray.NDArray;
+import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.util.Pair;
 
 public interface Transform {
 
@@ -21,4 +23,16 @@ public interface Transform {
     }
 
     NDArray transform(NDArray array, boolean close);
+
+    default NDList transform(NDList list) {
+        return transform(list, false);
+    }
+
+    default NDList transform(NDList list, boolean close) {
+        NDList result = new NDList(list.size());
+        for (Pair<String, NDArray> pair : list) {
+            result.add(pair.getKey(), transform(pair.getValue(), close));
+        }
+        return result;
+    }
 }

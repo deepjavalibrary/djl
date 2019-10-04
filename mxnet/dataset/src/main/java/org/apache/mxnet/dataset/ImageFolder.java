@@ -33,8 +33,9 @@ public final class ImageFolder extends AbstractImageFolder {
         int idx = Math.toIntExact(index);
         NDList d =
                 new NDList(
-                        BufferedImageUtils.readFileToArray(
-                                manager, Paths.get(items.get(idx).getKey()), flag));
+                        resize.transform(
+                                BufferedImageUtils.readFileToArray(
+                                        manager, Paths.get(items.get(idx).getKey()), flag)));
         NDList l = new NDList(manager.create(items.get(idx).getValue()));
         return new Record(d, l);
     }

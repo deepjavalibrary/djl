@@ -21,8 +21,16 @@ import software.amazon.ai.ndarray.NDArray;
 public final class NDImageUtils {
     private NDImageUtils() {}
 
+    public static NDArray resize(NDArray image, int size) {
+        return image.getNDArrayInternal().resize(new int[] {size, size});
+    }
+
     public static NDArray resize(NDArray image, int[] size) {
         return image.getNDArrayInternal().resize(size);
+    }
+
+    public static NDArray resize(NDArray image, int height, int width) {
+        return image.getNDArrayInternal().resize(new int[] {height, width});
     }
 
     /**

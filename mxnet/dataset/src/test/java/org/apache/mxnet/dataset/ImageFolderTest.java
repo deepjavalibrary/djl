@@ -20,6 +20,7 @@ import software.amazon.ai.Model;
 import software.amazon.ai.integration.exceptions.FailedTestException;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.training.Activation;
@@ -42,6 +43,7 @@ public class ImageFolderTest {
                     new ImageFolder.Builder()
                             .setManager(model.getNDManager())
                             .setRoot("src/test/resources/imagefolder")
+                            .setResize(100, 100)
                             .setSequenceSampling(1, false)
                             .build();
             dataset.prepare();
@@ -59,12 +61,16 @@ public class ImageFolderTest {
                 Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
 
                 Batch catBatch = ds.next();
-                Assertions.assertAlmostEquals(cat.expandDims(0), catBatch.getData().head());
+                Assertions.assertAlmostEquals(
+                        NDImageUtils.resize(cat, 100, 100).expandDims(0),
+                        catBatch.getData().head());
                 Assertions.assertEquals(manager.create(new int[] {0}), catBatch.getLabels().head());
                 catBatch.close();
 
                 Batch dogBatch = ds.next();
-                Assertions.assertAlmostEquals(dog.expandDims(0), dogBatch.getData().head());
+                Assertions.assertAlmostEquals(
+                        NDImageUtils.resize(dog, 100, 100).expandDims(0),
+                        dogBatch.getData().head());
                 Assertions.assertEquals(manager.create(new int[] {1}), dogBatch.getLabels().head());
                 dogBatch.close();
             }
