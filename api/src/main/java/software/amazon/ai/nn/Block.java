@@ -40,17 +40,13 @@ public interface Block {
 
     void backward();
 
-    Shape getOutputShape(Shape... inputs);
+    void setInitializer(Initializer initializer);
 
-    List<Parameter> getDirectParameters();
+    void setInitializer(Initializer initializer, String paramName);
 
-    void setInitializer(NDManager manager, Initializer initializer);
-
-    void setInitializer(NDManager manager, Initializer initializer, String paramName);
+    Shape[] initialize(NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes);
 
     boolean isInitialized();
-
-    void initialize(NDList inputs);
 
     void cast(DataType dataType);
 
@@ -58,11 +54,15 @@ public interface Block {
 
     DataDesc[] describeInput();
 
-    Shape getParameterShape(String name, Shape[] inputShapes);
-
     PairList<String, Block> getChildren();
 
+    List<Parameter> getDirectParameters();
+
     PairList<String, Parameter> getParameters();
+
+    Shape getParameterShape(String name, Shape[] inputShapes);
+
+    Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes);
 
     void saveParameters(DataOutputStream os) throws IOException;
 

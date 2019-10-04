@@ -126,6 +126,12 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public void setDataType(DataType dataType) {
+        model.setDataType(dataType);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public DataType getDataType() {
         return model.getDataType();
     }

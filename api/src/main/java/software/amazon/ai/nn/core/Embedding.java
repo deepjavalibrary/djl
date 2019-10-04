@@ -66,17 +66,14 @@ public class Embedding<T> extends AbstractBlock {
     }
 
     @Override
-    public Shape getOutputShape(Shape... inputs) {
-        return inputs[0].addAll(new Shape(embeddingSize));
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+        return new Shape[] {inputShapes[0].addAll(new Shape(embeddingSize))};
     }
 
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.singletonList(embedding);
     }
-
-    @Override
-    public void beforeInitialize(NDList inputs) {}
 
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
@@ -150,7 +147,6 @@ public class Embedding<T> extends AbstractBlock {
     }
 
     private NDList opInputs(NDList inputs) {
-        initialize(inputs);
         NDArray items = inputs.get(0);
         if (items.getShape().dimension() == 0) {
             return new NDList(items.reshape(1), embedding.getArray());

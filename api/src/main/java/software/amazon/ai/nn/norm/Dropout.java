@@ -42,14 +42,13 @@ public class Dropout extends AbstractBlock {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Dropout requires exactly 1 NDArray");
         }
-        initialize(inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
         return ex.dropout(inputs, probability, sharedAxes, params);
     }
 
     @Override
-    public Shape getOutputShape(Shape... inputs) {
-        return inputs[0];
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+        return new Shape[] {inputShapes[0]};
     }
 
     @Override

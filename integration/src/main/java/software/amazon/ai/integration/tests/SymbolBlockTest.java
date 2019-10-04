@@ -28,6 +28,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
@@ -130,7 +131,7 @@ public class SymbolBlockTest {
             newMlp.add(mlp.removeLastBlock());
             Linear linear = new Linear.Builder().setOutChannels(10).build();
 
-            linear.setInitializer(manager, Initializer.ONES);
+            linear.setInitializer(Initializer.ONES);
             newMlp.add(linear);
 
             model.setBlock(newMlp);
@@ -154,7 +155,10 @@ public class SymbolBlockTest {
     }
 
     private Pair<NDArray, NDArray> train(NDManager manager, Trainer trainer, Block block) {
-        NDArray data = manager.ones(new Shape(10, 28 * 28));
+        Shape inputShape = new Shape(10, 28 * 28);
+        trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
+        NDArray data = manager.ones(inputShape);
         NDArray label = manager.arange(0, 10);
         NDArray gradMean;
         NDArray pred;

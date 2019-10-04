@@ -181,6 +181,11 @@ public class TfModel implements Model {
         return null;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void setDataType(DataType dataType) {}
+
+    /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
         return DataType.FLOAT32;

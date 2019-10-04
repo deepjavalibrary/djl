@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -82,9 +81,9 @@ public class GRU extends RecurrentCell {
     }
 
     @Override
-    public Shape getOutputShape(Shape... inputs) {
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         Shape inputShape = inputs[0];
-        return new Shape(inputShape.get(0), inputShape.get(1), stateSize);
+        return new Shape[] {new Shape(inputShape.get(0), inputShape.get(1), stateSize)};
     }
 
     @Override
@@ -95,9 +94,8 @@ public class GRU extends RecurrentCell {
     }
 
     @Override
-    public void beforeInitialize(NDList inputs) {
-        NDArray input = inputs.head();
-        Shape inputShape = input.getShape();
+    public void beforeInitialize(Shape[] inputShapes) {
+        Shape inputShape = inputShapes[0];
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }
 
@@ -154,8 +152,6 @@ public class GRU extends RecurrentCell {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("RNN requires exactly 1 NDArray");
         }
-
-        initialize(inputs);
 
         NDList result = new NDList();
         NDList parameterList = new NDList();

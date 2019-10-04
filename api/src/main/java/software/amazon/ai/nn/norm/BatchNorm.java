@@ -64,8 +64,8 @@ public class BatchNorm extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape getOutputShape(Shape... inputs) {
-        return inputs[0];
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+        return new Shape[] {inputShapes[0]};
     }
 
     /** {@inheritDoc} */
@@ -76,8 +76,8 @@ public class BatchNorm extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void beforeInitialize(NDList inputs) {
-        inChannels = inputs.get(0).size(axis);
+    public void beforeInitialize(Shape[] inputShapes) {
+        inChannels = inputShapes[0].size(axis);
     }
 
     /** {@inheritDoc} */
@@ -96,7 +96,6 @@ public class BatchNorm extends AbstractBlock {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
         }
-        initialize(inputs);
         NDArray data = inputs.get(0);
         NDArray gamma = data.getManager().ones(new Shape(inChannels));
         NDArray beta = data.getManager().zeros(new Shape(inChannels));

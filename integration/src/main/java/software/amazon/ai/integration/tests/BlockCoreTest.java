@@ -24,6 +24,8 @@ import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
@@ -56,8 +58,11 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(2, 2);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
 
                 NDArray outBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedBias =
@@ -74,8 +79,11 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(2, 2);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
 
                 NDArray outNoBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
@@ -96,13 +104,14 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape =
+                        new Shape(
+                                new long[] {2, 2},
+                                new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL});
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
-                NDArray input =
-                        manager.create(
-                                new float[] {1, 2, 3, 4},
-                                new Shape(
-                                        new long[] {2, 2},
-                                        new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL}));
+                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
 
                 NDArray outBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedBias =
@@ -119,13 +128,14 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape =
+                        new Shape(
+                                new long[] {2, 2},
+                                new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL});
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
-                NDArray input =
-                        manager.create(
-                                new float[] {1, 2, 3, 4},
-                                new Shape(
-                                        new long[] {2, 2},
-                                        new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL}));
+                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
 
                 NDArray outNoBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
@@ -145,9 +155,12 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(2, 2);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
-                NDArray expected = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
+                NDArray expected = manager.create(new float[] {1, 2, 3, 4}, inputShape);
 
                 NDArray out = trainer.forward(new NDList(input)).head();
                 Assertions.assertAlmostEquals(out, expected);
@@ -166,9 +179,12 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(2, 2);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
 
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
                 NDArray out = trainer.forward(new NDList(input)).head();
                 Assertions.assertTrue(out.lte(out).all());
 
@@ -188,8 +204,12 @@ public class BlockCoreTest {
                         .build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
+            model.setDataType(DataType.INT32);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(2);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
 
                 // TODO: use trainer.forward
@@ -217,17 +237,20 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 4, 4);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
                 NDArray input =
                         manager.create(
                                 new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                                new Shape(1, 4, 4));
+                                inputShape);
                 NDArray expected = manager.create(new float[] {61, 55, 44}, new Shape(1, 1, 3));
                 NDArray out = trainer.forward(new NDList(input)).get(0);
                 Assertions.assertEquals(out, expected);
 
-                Shape outputShape = block.getOutputShape(new Shape(1, 4, 4));
-                Assertions.assertEquals(out.getShape(), outputShape);
+                Shape[] outputShape = block.getOutputShapes(manager, new Shape[] {inputShape});
+                Assertions.assertEquals(out.getShape(), outputShape[0]);
 
                 testEncode(manager, block);
             }
@@ -243,11 +266,14 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 1, 4, 4);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
                 NDArray input =
                         manager.create(
                                 new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                                new Shape(1, 1, 4, 4));
+                                inputShape);
                 NDArray expected =
                         manager.create(
                                 new float[] {22, 24, 25, 21, 26, 23, 39, 31, 19},
@@ -270,6 +296,9 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 1, 3, 3, 3);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
                 NDArray input =
                         manager.create(
@@ -277,7 +306,7 @@ public class BlockCoreTest {
                                     9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4, 4, 9, 7, 5,
                                     11, 2, 5, 13, 10, 8, 4
                                 },
-                                new Shape(1, 1, 3, 3, 3));
+                                inputShape);
                 NDArray expected =
                         manager.create(
                                 new float[] {60, 41, 54, 48, 55, 59, 56, 61},
@@ -286,8 +315,9 @@ public class BlockCoreTest {
                 NDArray out = trainer.forward(new NDList(input)).get(0);
                 Assertions.assertEquals(out, expected);
 
-                Shape outputShape = block.getOutputShape(new Shape(1, 1, 3, 3, 3));
-                Assertions.assertEquals(out.getShape(), outputShape);
+                Shape[] outputShape =
+                        block.getOutputShapes(manager, new Shape[] {new Shape(1, 1, 3, 3, 3)});
+                Assertions.assertEquals(out.getShape(), outputShape[0]);
 
                 testEncode(manager, block);
             }
@@ -308,8 +338,11 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(3, 4, 4);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.arange(0, 48, 1).reshape(new Shape(3, 4, 4));
+                NDArray input = manager.arange(0, 48, 1).reshape(inputShape);
                 NDList outputs = trainer.forward(new NDList(input));
                 NDArray out = outputs.get(0);
                 Assertions.assertAlmostEquals(out, manager.ones(new Shape(3, 4, 5)));
@@ -333,8 +366,11 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 2, 4);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.arange(0, 8, 1).reshape(new Shape(1, 2, 4));
+                NDArray input = manager.arange(0, 8, 1).reshape(inputShape);
                 NDList outputs = trainer.forward(new NDList(input));
                 NDArray out = outputs.get(0);
                 NDArray expected =
@@ -362,8 +398,11 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 2, 4);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.arange(0, 8, 1).reshape(new Shape(1, 2, 4));
+                NDArray input = manager.arange(0, 8, 1).reshape(inputShape);
                 NDList outputs = trainer.forward(new NDList(input));
                 NDArray out = outputs.get(0);
                 NDArray expected =
@@ -394,9 +433,12 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 2, 4);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
 
-                NDArray input = manager.arange(0, 8, 1).reshape(new Shape(1, 2, 4));
+                NDArray input = manager.arange(0, 8, 1).reshape(inputShape);
 
                 NDList outputs = trainer.forward(new NDList(input));
                 NDArray out = outputs.get(0);

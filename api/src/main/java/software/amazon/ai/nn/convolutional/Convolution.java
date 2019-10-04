@@ -82,7 +82,6 @@ public abstract class Convolution extends AbstractBlock {
     }
 
     private NDList opInputs(NDList inputs) {
-        initialize(inputs);
         NDArray data = inputs.head();
         if (bias == null) {
             return new NDList(data, weight.getArray());

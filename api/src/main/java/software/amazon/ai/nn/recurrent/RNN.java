@@ -75,9 +75,9 @@ public class RNN extends RecurrentCell {
 
     /** {@inheritDoc} */
     @Override
-    public Shape getOutputShape(Shape... inputs) {
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         Shape inputShape = inputs[0];
-        return new Shape(inputShape.get(0), inputShape.get(1), stateSize);
+        return new Shape[] {new Shape(inputShape.get(0), inputShape.get(1), stateSize)};
     }
 
     /** {@inheritDoc} */
@@ -88,9 +88,8 @@ public class RNN extends RecurrentCell {
 
     /** {@inheritDoc} */
     @Override
-    public void beforeInitialize(NDList inputs) {
-        NDArray input = inputs.head();
-        Shape inputShape = input.getShape();
+    public void beforeInitialize(Shape[] inputs) {
+        Shape inputShape = inputs[0];
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }
 
@@ -146,8 +145,6 @@ public class RNN extends RecurrentCell {
             throw new IllegalArgumentException(
                     "Input must include data, and sequenceLength as useSequenceLength is set to true");
         }
-
-        initialize(inputs);
 
         NDList result = new NDList();
         NDArray parameters = i2hWeight.getArray().flatten();

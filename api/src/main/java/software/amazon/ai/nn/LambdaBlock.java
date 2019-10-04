@@ -40,8 +40,19 @@ public class LambdaBlock extends AbstractBlock {
     }
 
     @Override
-    public Shape getOutputShape(Shape... inputs) {
-        return null;
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+        try (NDManager subManager = manager.newSubManager()) {
+            NDList input = new NDList(inputShapes.length);
+            for (Shape shape : inputShapes) {
+                input.add(subManager.create(shape));
+            }
+            NDList output = lambda.apply(input);
+            Shape[] outputShapes = new Shape[output.size()];
+            for (int i = 0; i < output.size(); ++i) {
+                outputShapes[i] = output.get(i).getShape();
+            }
+            return outputShapes;
+        }
     }
 
     @Override

@@ -75,8 +75,8 @@ public class Linear extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape getOutputShape(Shape... inputs) {
-        return new Shape(inputs[0].get(0), outChannels);
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+        return new Shape[] {new Shape(inputs[0].get(0), outChannels)};
     }
 
     /** {@inheritDoc} */
@@ -95,8 +95,8 @@ public class Linear extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void beforeInitialize(NDList inputs) {
-        Shape input = inputs.head().getShape();
+    public void beforeInitialize(Shape[] inputShapes) {
+        Shape input = inputShapes[0];
         if (input.isLayoutKnown()) {
             inChannels = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
             inputShape =
@@ -153,7 +153,6 @@ public class Linear extends AbstractBlock {
     }
 
     private NDList opInputs(NDList inputs) {
-        initialize(inputs);
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
         }

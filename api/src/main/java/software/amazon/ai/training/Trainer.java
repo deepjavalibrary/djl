@@ -16,11 +16,14 @@ import java.io.IOException;
 import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.optimizer.Optimizer;
 
 public interface Trainer extends AutoCloseable {
+
+    void initialize(DataDesc[] inputDescriptor);
 
     default Iterable<Batch> iterateDataset(Dataset dataset) throws IOException {
         return dataset.getData();

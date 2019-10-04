@@ -19,7 +19,6 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -32,10 +31,10 @@ public class Parameter implements AutoCloseable {
 
     private static final int BUFFER_SIZE = 81920;
 
-    private NDManager manager;
     private String name;
     private Block block;
     private ParameterType type;
+    private DataType mandatoryDataType;
     private Initializer initializer;
     private NDArray array;
     // use ParameterStore to store copies of array on multi devices
@@ -49,7 +48,6 @@ public class Parameter implements AutoCloseable {
     }
 
     public Parameter(String name, Block block, NDArray array, ParameterType type) {
-        manager = array.getManager();
         this.name = name;
         this.block = block;
         this.array = array;
@@ -80,39 +78,37 @@ public class Parameter implements AutoCloseable {
         }
     }
 
+    public void setMandatoryDataType(DataType mandatoryDataType) {
+        this.mandatoryDataType = mandatoryDataType;
+    }
+
     public boolean isInitialized() {
         return array != null;
     }
 
-    public void setInitializer(NDManager manager, Initializer initializer, boolean overwrite) {
-        this.manager = manager;
+    public void setInitializer(Initializer initializer, boolean overwrite) {
         if (overwrite || this.initializer == null) {
             this.initializer = initializer;
         }
     }
 
-    public void initialize(NDList inputs) {
-
+    public void initialize(
+            NDManager manager, DataType dataType, Shape[] inputShapes, Device[] devices) {
+        Objects.requireNonNull(initializer, "No initializer has been set");
         if (!isInitialized()) {
-            Objects.requireNonNull(initializer, "No initializer has been set");
-            Shape[] shapes = new Shape[inputs.size()];
-            for (int i = 0; i < shapes.length; ++i) {
-                shapes[i] = inputs.get(i).getShape();
-            }
+            Shape shape = block.getParameterShape(name, inputShapes);
             array =
                     initializer.initialize(
                             manager,
-                            block.getParameterShape(name, shapes),
-                            inputs.head().getDataType());
+                            shape,
+                            mandatoryDataType == null ? dataType : mandatoryDataType,
+                            devices[0]);
         }
 
         if (parameterStore != null) {
             parameterStore.initialize(this, array);
         } else {
-            // TODO: If no initializer
-            if (initializer != null) {
-                array.attachGradient();
-            }
+            array.attachGradient();
         }
     }
 

@@ -13,6 +13,7 @@
 package org.apache.mxnet.engine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -23,6 +24,8 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.training.GradientCollector;
@@ -61,6 +64,13 @@ public class MxTrainer implements Trainer {
                     .stream()
                     .forEach(param -> param.getValue().setParameterStore(parameterStore));
         }
+    }
+
+    @Override
+    public void initialize(DataDesc[] inputDescriptor) {
+        Shape[] shapes =
+                Arrays.stream(inputDescriptor).map(DataDesc::getShape).toArray(Shape[]::new);
+        model.getBlock().initialize(manager, model.getDataType(), devices, shapes);
     }
 
     @Override

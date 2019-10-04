@@ -12,8 +12,7 @@
  */
 package software.amazon.ai.nn.convolutional;
 
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
@@ -51,20 +50,19 @@ public class Conv1D extends Convolution {
     }
 
     @Override
-    protected void beforeInitialize(NDList inputs) {
-        NDArray input = inputs.head();
-        Shape inputShape = input.getShape();
+    protected void beforeInitialize(Shape[] inputs) {
+        Shape inputShape = inputs[0];
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }
 
     @Override
-    public Shape getOutputShape(Shape... inputs) {
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         long batchSize = inputs[0].get(0);
         long outWidth =
                 (inputs[0].get(2) + 2 * pad.get(0) - dilate.get(0) * (kernel.get(0) - 1) - 1)
                                 / stride.get(0)
                         + 1;
-        return new Shape(batchSize, numFilters, outWidth);
+        return new Shape[] {new Shape(batchSize, numFilters, outWidth)};
     }
 
     @Override

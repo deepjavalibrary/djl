@@ -39,7 +39,6 @@ public class Prelu extends AbstractBlock {
 
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
-        initialize(inputs);
         NDArray head = inputs.head();
         inputs = new NDList(head, alpha.getArray());
         NDArrayEx ex = head.getNDArrayInternal();
@@ -47,8 +46,8 @@ public class Prelu extends AbstractBlock {
     }
 
     @Override
-    public Shape getOutputShape(Shape... inputs) {
-        return inputs[0];
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+        return new Shape[] {inputs[0]};
     }
 
     @Override

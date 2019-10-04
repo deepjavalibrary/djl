@@ -135,6 +135,9 @@ public class MockModel implements Model {
     }
 
     @Override
+    public void setDataType(DataType dataType) {}
+
+    @Override
     public DataType getDataType() {
         return DataType.FLOAT32;
     }

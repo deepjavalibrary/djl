@@ -21,6 +21,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
@@ -100,6 +101,9 @@ public class GradientCollectorIntegrationTest {
                             .setRandomSampling(batchSize)
                             .build();
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(batchSize, weight.size(0));
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 for (int epoch = 0; epoch < epochs; epoch++) {
                     lossMetric.reset();
                     for (Batch batch : trainer.iterateDataset(dataset)) {
@@ -150,9 +154,12 @@ public class GradientCollectorIntegrationTest {
             model.setBlock(resNet50);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(100, 1, 28, 28);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 NDManager manager = trainer.getManager();
 
-                NDArray input = manager.ones(new Shape(100, 1, 28, 28));
+                NDArray input = manager.ones(inputShape);
                 NDArray label = manager.ones(new Shape(100, 1));
                 PairList<String, Parameter> parameters = resNet50.getParameters();
                 try (GradientCollector gradCol = trainer.newGradientCollector()) {

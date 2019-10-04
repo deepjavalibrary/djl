@@ -219,6 +219,8 @@ public interface Model extends AutoCloseable {
      */
     InputStream getArtifactAsStream(String name) throws IOException;
 
+    void setDataType(DataType dataType);
+
     DataType getDataType();
 
     /**

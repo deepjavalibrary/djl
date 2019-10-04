@@ -16,12 +16,16 @@ import software.amazon.ai.metric.Metrics;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.training.GradientCollector;
 import software.amazon.ai.training.ParameterServer;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.optimizer.Optimizer;
 
 public class MockTrainer implements Trainer {
+
+    @Override
+    public void initialize(DataDesc[] inputDescriptor) {}
 
     @Override
     public GradientCollector newGradientCollector() {

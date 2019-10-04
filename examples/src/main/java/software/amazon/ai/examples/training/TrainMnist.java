@@ -26,6 +26,8 @@ import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.examples.training.util.Arguments;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.core.Linear;
@@ -101,6 +103,9 @@ public final class TrainMnist {
                 int numEpoch = arguments.getEpoch();
                 int numOfSlices = devices.length;
 
+                Shape inputShape = new Shape(batchSize / numOfSlices, 28 * 28);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
                 Accuracy acc = new Accuracy();
                 LossMetric lossMetric = new LossMetric("softmaxCELoss");
                 for (int epoch = 0; epoch < numEpoch; epoch++) {
@@ -118,7 +123,7 @@ public final class TrainMnist {
                                 NDArray data = split[i].getData().head();
                                 NDArray label = split[i].getLabels().head();
 
-                                data = data.reshape(batchSize / numOfSlices, 28 * 28);
+                                data = data.reshape(inputShape);
 
                                 pred[i] = trainer.forward(new NDList(data)).head();
                                 loss[i] =

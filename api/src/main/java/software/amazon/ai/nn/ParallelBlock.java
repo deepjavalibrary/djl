@@ -22,8 +22,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
@@ -73,27 +75,51 @@ public class ParallelBlock extends AbstractBlock {
     public NDList forward(NDList inputs, PairList<String, Object> params) {
         return function.apply(
                 blocks.stream()
-                        .map(
-                                block -> {
-                                    block.initialize(inputs);
-                                    return block.forward(inputs, params);
-                                })
+                        .map(block -> block.forward(inputs, params))
                         .collect(Collectors.toList()));
     }
 
     @Override
-    public Shape getOutputShape(Shape... inputs) {
-        return null;
+    public Shape[] initialize(
+            NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes) {
+        if (!initialized) {
+            beforeInitialize(inputShapes);
+            for (Block child : getChildren().values()) {
+                child.initialize(manager, dataType, devices, inputShapes);
+            }
+            initialized = true;
+        }
+        return getOutputShapes(manager, inputShapes);
+    }
+
+    @Override
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+        if (blocks.isEmpty()) {
+            throw new IllegalArgumentException("The sequential block is empty");
+        }
+
+        try (NDManager subManager = manager.newSubManager()) {
+            List<NDList> inputs = new ArrayList<>();
+            for (Block block : blocks) {
+                Shape[] shapes = block.getOutputShapes(manager, inputShapes);
+                NDList output = new NDList(shapes.length);
+                for (Shape shape : shapes) {
+                    output.add(subManager.create(shape));
+                }
+                inputs.add(output);
+            }
+            NDList output = function.apply(inputs);
+            Shape[] outputShapes = new Shape[output.size()];
+            for (int i = 0; i < output.size(); ++i) {
+                outputShapes[i] = output.get(i).getShape();
+            }
+            return outputShapes;
+        }
     }
 
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.emptyList();
-    }
-
-    @Override
-    public void beforeInitialize(NDList inputs) {
-        initialized = true;
     }
 
     @Override

@@ -25,6 +25,8 @@ import software.amazon.ai.examples.inference.util.LogUtils;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.SequentialBlock;
 import software.amazon.ai.nn.SymbolBlock;
@@ -87,6 +89,9 @@ public final class TrainResnetWithCifar10 {
         try (Trainer trainer = model.newTrainer(config)) {
             Accuracy acc = new Accuracy();
             LossMetric lossMetric = new LossMetric("softmaxCELoss");
+
+            Shape inputShape = new Shape(batchSize, 3, 32, 32);
+            trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
             for (int epoch = 0; epoch < numEpoch; epoch++) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {

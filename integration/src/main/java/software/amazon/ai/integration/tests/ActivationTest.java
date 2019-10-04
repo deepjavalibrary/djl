@@ -18,6 +18,8 @@ import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.Trainer;
@@ -197,6 +199,7 @@ public class ActivationTest {
             model.setBlock(Activation.preluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(3))});
                 NDManager manager = trainer.getManager();
 
                 NDArray original = manager.create(new float[] {-1, 0, 2});

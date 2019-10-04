@@ -20,6 +20,7 @@ import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDArrays;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
+import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.core.Linear;
@@ -54,6 +55,8 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(BATCH_SIZE, CHANNELS))});
+
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);
                 NDArray result2 = runOptimizer(manager, trainer, block);
@@ -80,6 +83,8 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(BATCH_SIZE, CHANNELS))});
+
                 NDManager manager = trainer.getManager();
 
                 NDArray result = runOptimizer(manager, trainer, block);
@@ -107,6 +112,8 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(BATCH_SIZE, CHANNELS))});
+
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);
                 NDArray result2 = runOptimizer(manager, trainer, block);
@@ -130,6 +137,8 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(BATCH_SIZE, CHANNELS))});
+
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);
                 NDArray result2 = runOptimizer(manager, trainer, block);

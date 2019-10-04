@@ -54,6 +54,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     private List<Parameter> params;
     private List<String> inputNames;
     private Map<String, Shape> paramShapes;
+    private Shape[] outputShapes;
 
     public MxSymbolBlock(NDManager manager, Symbol symbol, List<String> names) {
         this.manager = manager;
@@ -132,7 +133,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         this.inputNames = new ArrayList<>(map.keySet());
     }
 
-    private void initializeEmptyParams() {
+    private void createEmptyParams() {
         params =
                 getParamNames()
                         .stream()
@@ -163,7 +164,6 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     @Override
     public NDList forward(NDList inputs, PairList<String, Object> params) {
-        initialize(inputs);
         if (op == null) {
             op = JnaUtils.createCachedOp(this, (MxNDManager) manager);
         }
@@ -174,14 +174,21 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     public void backward() {}
 
     @Override
-    public Shape getOutputShape(Shape... inputs) {
-        return null;
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+        if (outputShapes == null) {
+            String[] outputNames = symbol.getOutputNames();
+            outputShapes = new Shape[outputNames.length];
+            for (int i = 0; i < outputShapes.length; ++i) {
+                outputShapes[i] = getParameterShape(outputNames[i], inputShapes);
+            }
+        }
+        return outputShapes;
     }
 
     @Override
     public List<Parameter> getDirectParameters() {
         if (params == null) {
-            initializeEmptyParams();
+            createEmptyParams();
         }
         return params;
     }
@@ -191,9 +198,6 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         List<String> layerNames = getLayerNames();
         return getLayer(layerNames.get(layerNames.size() - 2));
     }
-
-    @Override
-    public void beforeInitialize(NDList inputs) {}
 
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
@@ -225,7 +229,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
-        initializeEmptyParams();
+        createEmptyParams();
         for (Parameter parameter : params) {
             parameter.load(this.manager, is);
         }

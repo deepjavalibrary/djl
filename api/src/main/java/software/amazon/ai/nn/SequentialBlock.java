@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
@@ -72,7 +73,6 @@ public class SequentialBlock extends AbstractBlock {
         NDList current = inputs;
         for (Block block : blocks) {
             NDList previous = current;
-            block.initialize(current);
             current = block.forward(current);
             if (previous != inputs) {
                 previous.close();
@@ -82,25 +82,34 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     @Override
-    public Shape getOutputShape(Shape... inputs) {
+    public Shape[] initialize(
+            NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes) {
+        if (!initialized) {
+            beforeInitialize(inputShapes);
+            Shape[] shapes = inputShapes;
+            for (Block child : getChildren().values()) {
+                shapes = child.initialize(manager, dataType, devices, shapes);
+            }
+            initialized = true;
+        }
+        return getOutputShapes(manager, inputShapes);
+    }
+
+    @Override
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         if (blocks.isEmpty()) {
             throw new IllegalArgumentException("The sequential block is empty");
         }
         Shape[] current = inputs;
         for (Block block : blocks) {
-            current = new Shape[] {block.getOutputShape(current)};
+            current = block.getOutputShapes(manager, current);
         }
-        return current[0];
+        return current;
     }
 
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.emptyList();
-    }
-
-    @Override
-    public void beforeInitialize(NDList inputs) {
-        initialized = true;
     }
 
     @Override

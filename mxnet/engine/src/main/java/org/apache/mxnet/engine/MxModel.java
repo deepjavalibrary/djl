@@ -177,7 +177,7 @@ public class MxModel implements Model {
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         Initializer initializer = trainingConfig.getInitializer();
-        block.setInitializer(manager, initializer);
+        block.setInitializer(initializer);
 
         return new MxTrainer(this, trainingConfig);
     }
@@ -188,6 +188,8 @@ public class MxModel implements Model {
         return new MxPredictor<>(this, translator, manager.getDevice());
     }
 
+    /** {@inheritDoc} */
+    @Override
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }

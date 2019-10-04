@@ -222,7 +222,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray getGradient() {
         Pointer pointer = JnaUtils.getGradient(getHandle());
         if (pointer == null) {
-            throw new NullPointerException(
+            throw new IllegalStateException(
                     "No gradient attached to this NDArray, please call array.attachGradient()"
                             + "on your NDArray or block.setInitializer() on your Block");
         }

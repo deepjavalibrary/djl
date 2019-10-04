@@ -13,10 +13,12 @@
 package software.amazon.ai.nn;
 
 import java.util.List;
+import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
+import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.training.initializer.Initializer;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
@@ -39,17 +41,17 @@ public abstract class AbstractBlock implements Block {
     public void backward() {}
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer) {
+    public void setInitializer(Initializer initializer) {
         for (Parameter parameter : getDirectParameters()) {
-            parameter.setInitializer(manager, initializer, false);
+            parameter.setInitializer(initializer, false);
         }
         for (Block child : getChildren().values()) {
-            child.setInitializer(manager, initializer);
+            child.setInitializer(initializer);
         }
     }
 
     @Override
-    public void setInitializer(NDManager manager, Initializer initializer, String paramName) {
+    public void setInitializer(Initializer initializer, String paramName) {
         Parameter parameter =
                 getDirectParameters()
                         .stream()
@@ -59,7 +61,20 @@ public abstract class AbstractBlock implements Block {
                                 () ->
                                         new IllegalArgumentException(
                                                 "Could not find parameter " + paramName));
-        parameter.setInitializer(manager, initializer, true);
+        parameter.setInitializer(initializer, true);
+    }
+
+    @Override
+    public Shape[] initialize(
+            NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes) {
+        if (!initialized) {
+            beforeInitialize(inputShapes);
+            for (Parameter parameter : getDirectParameters()) {
+                parameter.initialize(manager, dataType, inputShapes, devices);
+            }
+            initialized = true;
+        }
+        return getOutputShapes(manager, inputShapes);
     }
 
     @Override
@@ -77,22 +92,11 @@ public abstract class AbstractBlock implements Block {
         return parameters;
     }
 
-    protected void beforeInitialize(NDList inputs) {}
+    protected void beforeInitialize(Shape[] inputShapes) {}
 
     @Override
     public boolean isInitialized() {
         return initialized;
-    }
-
-    @Override
-    public void initialize(NDList inputs) {
-        if (!initialized) {
-            beforeInitialize(inputs);
-            for (Parameter parameter : getDirectParameters()) {
-                parameter.initialize(inputs);
-            }
-            initialized = true;
-        }
     }
 
     @Override
