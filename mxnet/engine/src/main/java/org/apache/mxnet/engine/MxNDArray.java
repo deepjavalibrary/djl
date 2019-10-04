@@ -1038,24 +1038,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray reshape(Shape shape) {
-        long count = shape.getUnknownValueCount();
-        if (count == 0 && getShape().size() != shape.size()) {
-            throw new IllegalArgumentException(
-                    "The given shape " + shape + " does not match the current shape " + getShape());
-        }
-        // check multiply -1 in shape
-        if (count > 1) {
-            throw new IllegalArgumentException(
-                    "Shape could only have a single unknown dimension (-1).");
-        }
-        // check size outside the -1 is divisible factor of the original size
-        long sizeWithoutUnknown =
-                Arrays.stream(shape.getShape()).filter(s -> s != -1).reduce(1, Math::multiplyExact);
-        if (getShape().size() % sizeWithoutUnknown != 0) {
-            throw new IllegalArgumentException("The given shape does not match the current shape");
-        }
-        Pointer pointer = JnaUtils.reshape(getHandle(), shape.getShape(), false);
-        return manager.create(pointer);
+        MxOpParams params = new MxOpParams();
+        params.addParam("newshape", shape);
+        return manager.invoke("_np_reshape", this, params);
     }
 
     /** {@inheritDoc} */

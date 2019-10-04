@@ -549,14 +549,14 @@ public final class JnaUtils {
         return ref.getValue();
     }
 
-    public static Pointer reshape(Pointer ndArray, long[] dims, boolean reverse) {
+    /* public static Pointer reshape(Pointer ndArray, long[] dims, boolean reverse) {
         PointerByReference ref = new PointerByReference();
         byte reverseByte = reverse ? (byte) 1 : 0;
         checkCall(
                 LIB.MXNDArrayReshape64(
                         ndArray, dims.length, LongBuffer.wrap(dims), reverseByte, ref));
         return ref.getValue();
-    }
+    } */
 
     /////////////////////////////////
     // MxGradientCollector
