@@ -17,27 +17,57 @@ Joule API provide native Java development experience, just another regular java 
 Joule's ergonomic API interface is designed to guide developer with best practice to accomplish
 deep learning task.
 
-The following is an example of how to write inference code:
+The following is pseudo code of how to write inference code:
 
 ```java
-    // Assume user has a pre-trained already, they just need load it
-    Model model = Model.load(modelDir, modelName);
+    // Assume user uses a pre-trained model from model zoo, they just need to load it
+    Map<String, String> criteria = new HashMap<>();
+    criteria.put("layers", "18");
+    criteria.put("flavor", "v1");
 
-    // User must implement Translator interface, read Translator document for detail.
-    Translator translator = new MyTranslator();
+    // Load pre-trained model from model zoo
+    try (Model<BufferedImage, Classifications> model = MxModelZoo.RESNET.loadModel(criteria)) {
+        try (Predictor<BufferedImage, Classifications> predictor = model.newPredictor()) {
+            BufferedImage img = readImage(); // read image
+            Classifications result = predictor.predict(img);
 
-    // User can specify GPU/CPU Device to run inference session.
-    // This device is optional, Predictor can pick up default Device if not specified.
-    // See Device.defaultDevice()
-    Device device = Device.defaultDevice();
-
-    // Next user need create a Predictor, and use Predictor.predict()
-    // to get prediction.
-    try (Predictor<BufferedImage, List<DetectedObject>> predictor =
-            model.newPredictor(translator, device)) {
-        List<DetectedObject> result = predictor.predict(img);
+            // get the classification and probability
+            ...
+        }
     }
 ```
+
+The following is pseudo code of how to write training code:
+
+```java
+    // Construct your neural network with built-in blocks
+    Block block = new ResnetV1();
+
+    // setup your training configurations, such as Initializer, Optimizer, Loss ...
+    TrainingConfig config = setupTrainingConfig();
+
+    // configure inputShape based on batch size and number of GPU
+    Shape inputShape = new Shape(batchSize / numGpu, 28 * 28);
+
+    try (Model model = Model.newInstance()) { // Create an empty model
+        model.setBlock(block); // set neural network to model
+
+        // Prepare training and validating data set
+        Mnist trainSet = new Mnist.Builder().setUsage(Usage.TRAIN).build();
+        Mnist validateSet = new Mnist.Builder().setUsage(Usage.VALIDATION).build();
+
+        try (Trainer trainer = model.newTrainer(config)) { // Create training session
+            trainer.init(new DataDesc[] {new DataDesc(inputShape)}); // initialize trainer
+
+            // Train the model with train/validate dataset             
+            TrainingUtils.fit(trainer, trainSet, validateSet);
+        }
+
+        // Save the model
+        model.save(modelDir, "myMnist");
+    }
+```
+
 
 ## Release Notes
 * 0.1.0 Initial release
