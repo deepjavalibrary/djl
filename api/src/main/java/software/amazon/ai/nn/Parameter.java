@@ -37,6 +37,7 @@ public class Parameter implements AutoCloseable {
     private DataType mandatoryDataType;
     private Initializer initializer;
     private NDArray array;
+    private boolean requireGrad;
     // use ParameterStore to store copies of array on multi devices
     private ParameterStore parameterStore;
 
@@ -45,14 +46,25 @@ public class Parameter implements AutoCloseable {
         this.block = block;
         this.type = type;
         this.initializer = type.getInitializer();
+        requireGrad = true;
     }
 
-    public Parameter(String name, Block block, NDArray array, ParameterType type) {
+    public Parameter(String name, Block block, ParameterType type, boolean requireGrad) {
+        this.name = name;
+        this.block = block;
+        this.type = type;
+        this.initializer = type.getInitializer();
+        this.requireGrad = requireGrad;
+    }
+
+    public Parameter(
+            String name, Block block, NDArray array, ParameterType type, boolean requireGrad) {
         this.name = name;
         this.block = block;
         this.array = array;
         this.type = type;
         this.initializer = type.getInitializer();
+        this.requireGrad = requireGrad;
     }
 
     public String getName() {
@@ -76,6 +88,10 @@ public class Parameter implements AutoCloseable {
         } else {
             return getArray();
         }
+    }
+
+    public boolean requireGradient() {
+        return requireGrad;
     }
 
     public void setMandatoryDataType(DataType mandatoryDataType) {
@@ -108,7 +124,9 @@ public class Parameter implements AutoCloseable {
         if (parameterStore != null) {
             parameterStore.initialize(this, array);
         } else {
-            array.attachGradient();
+            if (requireGradient()) {
+                array.attachGradient();
+            }
         }
     }
 

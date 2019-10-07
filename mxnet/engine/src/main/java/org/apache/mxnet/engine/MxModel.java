@@ -22,9 +22,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -349,6 +352,9 @@ public class MxModel implements Model {
         if (readParameters(paramFile)) {
             return;
         }
+        // Loading MXNet saved parameters
+        Set<String> auxNames =
+                new HashSet<>(Arrays.asList(((MxSymbolBlock) block).getSymbol().getAuxNames()));
 
         NDList paramNDlist = JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath());
         Device device = manager.getDevice();
@@ -361,7 +367,9 @@ public class MxModel implements Model {
             }
             String paramName = key.split(":", 2)[1];
             NDArray array = pair.getValue().asInDevice(device, false);
-            parameters.add(new Parameter(paramName, block, array, inferType(paramName)));
+            boolean requireGrad = !auxNames.contains(paramName);
+            parameters.add(
+                    new Parameter(paramName, block, array, inferType(paramName), requireGrad));
         }
         ((MxSymbolBlock) block).setParams(parameters);
 

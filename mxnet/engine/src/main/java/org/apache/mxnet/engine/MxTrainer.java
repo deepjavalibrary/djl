@@ -129,16 +129,19 @@ public class MxTrainer implements Trainer {
         List<NDArray> grads = new ArrayList<>();
         if (parameterStore != null) {
             parameterStore.setParameterServer(newParameterServer(optimizer));
-            for (Parameter parameter : parameters.values()) {
-                // only check one device
-                grads.add(parameterStore.getValue(parameter, devices[0]));
-            }
+            parameters
+                    .values()
+                    .stream()
+                    .filter(Parameter::requireGradient)
+                    .forEach(param -> grads.add(parameterStore.getValue(param, devices[0])));
         } else {
 
             grads.addAll(
                     parameters
+                            .values()
                             .stream()
-                            .map(pair -> pair.getValue().getArray().getGradient())
+                            .filter(Parameter::requireGradient)
+                            .map(param -> param.getArray().getGradient())
                             .collect(Collectors.toList()));
         }
         NDArray gradSum =

@@ -52,9 +52,12 @@ public abstract class Optimizer {
             statesInitialized = initializeStates(parameters);
         }
         for (int i = 0; i < parameters.size(); i++) {
-            NDArray paramArray = parameters.get(i).getValue().getArray();
-            NDArray grad = paramArray.getGradient();
-            update(i, paramArray, grad);
+            Parameter param = parameters.get(i).getValue();
+            if (param.requireGradient()) {
+                NDArray paramArray = param.getArray();
+                NDArray grad = paramArray.getGradient();
+                update(i, paramArray, grad);
+            }
         }
     }
 

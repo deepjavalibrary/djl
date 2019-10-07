@@ -43,19 +43,27 @@ public class ParameterStore implements AutoCloseable {
 
     public void updateAllParameters() {
         for (int i = 0; i < parameters.size(); i++) {
-            NDArray[] grads = getAllGradients(parameters.get(i).getValue());
-            parameterServer.push(i, grads, -i);
+            Parameter param = parameters.get(i).getValue();
+            if (param.requireGradient()) {
+                NDArray[] grads = getAllGradients(param);
+                parameterServer.push(i, grads, -i);
+            }
         }
         for (int i = 0; i < parameters.size(); i++) {
-            NDArray[] paramValues = getAllValues(parameters.get(i).getValue());
-            parameterServer.pull(i, paramValues, -i);
+            Parameter param = parameters.get(i).getValue();
+            if (param.requireGradient()) {
+                NDArray[] paramValues = getAllValues(param);
+                parameterServer.pull(i, paramValues, -i);
+            }
         }
     }
 
     public void initialize(Parameter parameter, NDArray array) {
         for (Device device : devices) {
             NDArray arrayCopy = array.asInDevice(device, true);
-            arrayCopy.attachGradient();
+            if (parameter.requireGradient()) {
+                arrayCopy.attachGradient();
+            }
             parameterValues.put(new Pair<>(device.getDeviceId(), parameter), arrayCopy);
         }
     }
@@ -90,7 +98,7 @@ public class ParameterStore implements AutoCloseable {
 
     @Override
     public void close() {
-        parameterValues.values().stream().forEach(val -> val.close());
+        parameterValues.values().forEach(NDArray::close);
         parameterValues.clear();
         parameterServer.close();
     }
