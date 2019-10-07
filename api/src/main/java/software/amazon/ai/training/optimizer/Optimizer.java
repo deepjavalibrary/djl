@@ -25,6 +25,7 @@ public abstract class Optimizer {
     protected float rescaleGrad;
     protected float clipGrad;
     private float weightDecays;
+    private int beginNumUpdate;
     private int numUpdate;
     private boolean statesInitialized;
     private Map<Integer, Integer> updateCounts = new ConcurrentHashMap<>();
@@ -33,7 +34,7 @@ public abstract class Optimizer {
         this.rescaleGrad = builder.getRescaleGrad();
         this.weightDecays = builder.getWeightDecays();
         this.clipGrad = builder.getClipGrad();
-        this.numUpdate = builder.getBeginNumUpdate();
+        this.beginNumUpdate = builder.getBeginNumUpdate();
 
         if (rescaleGrad == 0) {
             throw new IllegalArgumentException("The rescaleGrad should be set");
@@ -66,9 +67,12 @@ public abstract class Optimizer {
     }
 
     protected int updateCount(int index) {
-        int count = updateCounts.compute(index, (key, val) -> (val == null) ? numUpdate : val + 1);
+        // if index exists, increment update count, if not, use begin number of update + 1
+        int count =
+                updateCounts.compute(
+                        index, (key, val) -> (val == null) ? beginNumUpdate + 1 : val + 1);
         numUpdate = Math.max(numUpdate, count);
-        return count;
+        return numUpdate;
     }
 
     // TODO: make this protected after integrate with PS store
