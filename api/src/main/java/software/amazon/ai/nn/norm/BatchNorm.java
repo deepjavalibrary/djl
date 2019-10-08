@@ -45,8 +45,8 @@ public class BatchNorm extends AbstractBlock {
         axis = builder.getAxis();
         epsilon = builder.getEpsilon();
         momentum = builder.getMomentum();
-        runningMean = new Parameter("runningMean", this, ParameterType.RUNNING_MEAN);
-        runningVar = new Parameter("runningVar", this, ParameterType.RUNNING_VAR);
+        runningMean = new Parameter("runningMean", this, ParameterType.RUNNING_MEAN, false);
+        runningVar = new Parameter("runningVar", this, ParameterType.RUNNING_VAR, false);
     }
 
     @Override

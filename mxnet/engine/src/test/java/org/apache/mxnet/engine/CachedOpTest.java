@@ -63,25 +63,29 @@ public class CachedOpTest extends PowerMockTestCase {
                             "array0",
                             new SequentialBlock(),
                             manager.create(new Shape(2)),
-                            ParameterType.WEIGHT));
+                            ParameterType.WEIGHT,
+                            true));
             params.add(
                     new Parameter(
                             "array1",
                             new SequentialBlock(),
                             manager.create(new Shape(3)),
-                            ParameterType.WEIGHT));
+                            ParameterType.WEIGHT,
+                            true));
             params.add(
                     new Parameter(
                             "array2",
                             new SequentialBlock(),
                             manager.create(new Shape(5)),
-                            ParameterType.WEIGHT));
+                            ParameterType.WEIGHT,
+                            true));
             params.add(
                     new Parameter(
                             "array3",
                             new SequentialBlock(),
                             manager.create(new Shape(6)),
-                            ParameterType.WEIGHT));
+                            ParameterType.WEIGHT,
+                            true));
             List<String> names = Arrays.asList("array0", "array1", "array2", "array3");
             List<Integer> locations = Arrays.asList(1, 2, 5, 6);
             PairList<String, Integer> paramIndices = new PairList<>(names, locations);

@@ -85,6 +85,7 @@ public final class TrainResnetWithCifar10 {
             SequentialBlock newBlock = new SequentialBlock();
             Block modifiedBlock = ((SymbolBlock) model.getBlock()).removeLastBlock();
             newBlock.add(modifiedBlock);
+            newBlock.add(x -> new NDList(x.head().squeeze()));
             newBlock.add(new Linear.Builder().setOutChannels(10).build());
             model.setBlock(newBlock);
             if (!preTrained) {
