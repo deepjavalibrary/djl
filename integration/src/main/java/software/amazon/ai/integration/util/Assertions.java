@@ -19,6 +19,8 @@ import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Parameter;
 
 public final class Assertions {
+    private static final double RTOL = 1e-5;
+    private static final double ATOL = 1e-3;
 
     private Assertions() {}
 
@@ -121,11 +123,26 @@ public final class Assertions {
     }
 
     public static void assertAlmostEquals(NDArray actual, NDArray expected) {
-        assertAlmostEquals(actual, expected, 1e-5, 1e-3);
+        assertAlmostEquals(actual, expected, RTOL, ATOL);
     }
 
     public static void assertAlmostEquals(NDList actual, NDList expected) {
-        assertAlmostEquals(actual, expected, 1e-5, 1e-3);
+        assertAlmostEquals(actual, expected, RTOL, ATOL);
+    }
+
+    public static void assertAlmostEquals(float actual, float expected) {
+        assertAlmostEquals(actual, expected, RTOL, ATOL);
+    }
+
+    public static void assertAlmostEquals(float actual, float expected, double rtol, double atol) {
+        assertAlmostEquals((double) actual, (double) expected, rtol, atol);
+    }
+
+    public static void assertAlmostEquals(
+            double actual, double expected, double rtol, double atol) {
+        if (Math.abs(actual - expected) > (atol + rtol * Math.abs(expected))) {
+            throw new AssertionError(getDefaultErrorMessage(actual, expected));
+        }
     }
 
     public static void assertAlmostEquals(
@@ -183,7 +200,7 @@ public final class Assertions {
 
     public static void assertInPlaceAlmostEquals(
             NDArray actual, NDArray expected, NDArray original) {
-        assertInPlaceAlmostEquals(actual, expected, original, 1e-5, 1e-3);
+        assertInPlaceAlmostEquals(actual, expected, original, RTOL, ATOL);
     }
 
     public static void assertInPlaceAlmostEquals(

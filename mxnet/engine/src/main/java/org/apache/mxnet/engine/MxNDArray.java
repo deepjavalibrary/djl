@@ -1172,6 +1172,10 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(int[] axes, double temperature) {
+        // TODO remove this after MXNet softmax fix zero-dim issue
+        if (isEmpty()) {
+            return getManager().create(getShape());
+        }
         MxOpParams params = new MxOpParams();
         if (axes.length != 1) {
             long size = shape.size(axes);
@@ -1461,9 +1465,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public long nonzero() {
         // TODO switch to use nonzero op in mxnet
+        if (isEmpty()) {
+            return 0;
+        }
         MxNDArray zeros = (MxNDArray) eq(0);
         NDArray sum = manager.invoke("_np_sum", eq(zeros).eq(zeros), null);
-        return sum.toArray()[0].intValue();
+        return sum.toArray()[0].longValue();
     }
 
     /** {@inheritDoc} */

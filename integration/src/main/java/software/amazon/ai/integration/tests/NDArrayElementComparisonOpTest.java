@@ -20,6 +20,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 
 public class NDArrayElementComparisonOpTest {
+
     @Test
     public void testContentEquals() {
         try (NDManager manager = NDManager.newBaseManager()) {

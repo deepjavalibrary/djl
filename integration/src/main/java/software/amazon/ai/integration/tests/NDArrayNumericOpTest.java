@@ -280,14 +280,14 @@ public class NDArrayNumericOpTest {
             array = manager.create(data, new Shape(2, 2));
             data = DoubleStream.of(data).map(Math::log10).toArray();
             actual = manager.create(data, new Shape(2, 2));
-            Assertions.assertEquals(actual, array.log10());
+            Assertions.assertAlmostEquals(actual, array.log10());
             // test scalar
             array = manager.create(1e-5);
             actual = manager.create(-5.0);
-            Assertions.assertEquals(actual, array.log10());
+            Assertions.assertAlmostEquals(actual, array.log10());
             // test zero-dim
             array = manager.create(new Shape(0, 0));
-            Assertions.assertEquals(array, array.log10());
+            Assertions.assertAlmostEquals(array, array.log10());
         }
     }
 
@@ -304,14 +304,14 @@ public class NDArrayNumericOpTest {
             array = manager.create(data, new Shape(2, 3, 1));
             data = DoubleStream.of(data).map(x -> Math.log10(x) / Math.log10(2)).toArray();
             actual = manager.create(data, new Shape(2, 3, 1));
-            Assertions.assertEquals(actual, array.log2());
+            Assertions.assertAlmostEquals(actual, array.log2());
             // test scalar
             array = manager.create(1f);
             actual = manager.create(0f);
-            Assertions.assertEquals(actual, array.log2());
+            Assertions.assertAlmostEquals(actual, array.log2());
             // test zero-dim
             array = manager.create(new Shape(0, 0));
-            Assertions.assertEquals(array, array.log2());
+            Assertions.assertAlmostEquals(array, array.log2());
         }
     }
 

@@ -36,7 +36,7 @@ public class NDArrayElementArithmeticOpTest {
         NDArray array1 = manager.create(x1);
         NDArray array2 = manager.create(x2);
         NDArray result = arrayArithmeticOp.apply(array1, array2);
-        Assertions.assertEquals(arithmeticOp.apply(x1, x2), result.getFloat());
+        Assertions.assertAlmostEquals(arithmeticOp.apply(x1, x2), result.getFloat());
         if (inplace) {
             Assertions.assertInPlace(array1, result);
         } else {
@@ -91,7 +91,7 @@ public class NDArrayElementArithmeticOpTest {
         float x2 = 4f;
         NDArray ndArray = manager.create(x1);
         NDArray result = arrayArithmeticOp.apply(ndArray, x2);
-        Assertions.assertEquals(arithmeticOp.apply(x1, x2), result.getFloat());
+        Assertions.assertAlmostEquals(arithmeticOp.apply(x1, x2), result.getFloat());
         if (inplace) {
             Assertions.assertInPlace(ndArray, result);
         } else {
