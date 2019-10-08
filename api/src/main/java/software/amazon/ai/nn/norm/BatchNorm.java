@@ -23,14 +23,13 @@ import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockList;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterBlock;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.util.PairList;
 
-public class BatchNorm extends AbstractBlock {
+public class BatchNorm extends ParameterBlock {
 
     private static final byte VERSION = 1;
 
@@ -91,11 +90,6 @@ public class BatchNorm extends AbstractBlock {
             default:
                 throw new IllegalArgumentException("Invalid parameter name");
         }
-    }
-
-    @Override
-    public PairList<String, Block> getChildren() {
-        return new BlockList();
     }
 
     private NDList opInputs(NDList inputs) {

@@ -12,10 +12,10 @@
  */
 package software.amazon.ai.nn.recurrent;
 
-import software.amazon.ai.nn.AbstractBlock;
+import software.amazon.ai.nn.ParameterBlock;
 import software.amazon.ai.nn.recurrent.RNN.Activation;
 
-public abstract class RecurrentCell extends AbstractBlock {
+public abstract class RecurrentCell extends ParameterBlock {
 
     protected long stateSize;
     protected float dropRate;

@@ -23,13 +23,13 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterBlock;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.util.PairList;
 
-public abstract class Convolution extends AbstractBlock {
+public abstract class Convolution extends ParameterBlock {
 
     protected Shape kernel;
     protected Shape stride;

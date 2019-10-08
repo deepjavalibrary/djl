@@ -35,16 +35,14 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.AbstractBlock;
-import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockList;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterBlock;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.util.PairList;
 
 // TODO: Need to add Memory management for all params
-public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
+public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
@@ -215,11 +213,6 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         } else {
             throw new IllegalArgumentException("Name " + name + " not found");
         }
-    }
-
-    @Override
-    public PairList<String, Block> getChildren() {
-        return new BlockList();
     }
 
     @Override

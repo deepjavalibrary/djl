@@ -13,9 +13,7 @@
 package software.amazon.ai.nn;
 
 import java.util.List;
-import software.amazon.ai.Device;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
@@ -62,19 +60,6 @@ public abstract class AbstractBlock implements Block {
                                         new IllegalArgumentException(
                                                 "Could not find parameter " + paramName));
         parameter.setInitializer(initializer, true);
-    }
-
-    @Override
-    public Shape[] initialize(
-            NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes) {
-        if (!initialized) {
-            beforeInitialize(inputShapes);
-            for (Parameter parameter : getDirectParameters()) {
-                parameter.initialize(manager, dataType, inputShapes, devices);
-            }
-            initialized = true;
-        }
-        return getOutputShapes(manager, inputShapes);
     }
 
     @Override

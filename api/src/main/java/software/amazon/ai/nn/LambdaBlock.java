@@ -23,7 +23,7 @@ import software.amazon.ai.ndarray.NDManager;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.util.PairList;
 
-public class LambdaBlock extends AbstractBlock {
+public class LambdaBlock extends ParameterBlock {
 
     private static final byte VERSION = 1;
 
@@ -63,11 +63,6 @@ public class LambdaBlock extends AbstractBlock {
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         throw new IllegalArgumentException("LambdaBlocks have no parameters");
-    }
-
-    @Override
-    public PairList<String, Block> getChildren() {
-        return new BlockList();
     }
 
     @Override

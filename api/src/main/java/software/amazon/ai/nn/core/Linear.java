@@ -25,10 +25,9 @@ import software.amazon.ai.ndarray.internal.NDArrayEx;
 import software.amazon.ai.ndarray.types.DataDesc;
 import software.amazon.ai.ndarray.types.LayoutType;
 import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.AbstractBlock;
 import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.BlockList;
 import software.amazon.ai.nn.Parameter;
+import software.amazon.ai.nn.ParameterBlock;
 import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.PairList;
@@ -47,7 +46,7 @@ import software.amazon.ai.util.PairList;
  *
  * <p>The Linear block should be constructed using {@link Linear.Builder}.
  */
-public class Linear extends AbstractBlock {
+public class Linear extends ParameterBlock {
 
     private static final byte VERSION = 1;
 
@@ -130,11 +129,6 @@ public class Linear extends AbstractBlock {
             default:
                 throw new IllegalArgumentException("Invalid parameter name");
         }
-    }
-
-    @Override
-    public PairList<String, Block> getChildren() {
-        return new BlockList();
     }
 
     @Override
