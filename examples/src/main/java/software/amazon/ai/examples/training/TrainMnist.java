@@ -34,12 +34,12 @@ import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.Activation;
 import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.GradientCollector;
-import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.initializer.XavierInitializer;
+import software.amazon.ai.training.loss.Loss;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -125,9 +125,7 @@ public final class TrainMnist {
                                 data = data.reshape(inputShape);
 
                                 pred[i] = trainer.forward(new NDList(data)).head();
-                                loss[i] =
-                                        Loss.softmaxCrossEntropyLoss(
-                                                label, pred[i], 1.f, 0, -1, true, false);
+                                loss[i] = Loss.softmaxCrossEntropyLoss().getLoss(label, pred[i]);
                                 gradCol.backward(loss[i]);
                             }
                         }

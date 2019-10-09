@@ -26,10 +26,10 @@ import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.GradientCollector;
-import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.training.loss.Loss;
 import software.amazon.ai.training.optimizer.Adam;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -155,7 +155,7 @@ public class OptimizerTest {
         NDArray label = data.mul(2);
         try (GradientCollector gradCol = new MxGradientCollector()) {
             NDArray pred = trainer.forward(new NDList(data)).head();
-            NDArray loss = Loss.l2Loss(label, pred);
+            NDArray loss = Loss.l2Loss().getLoss(label, pred);
             gradCol.backward(loss);
         }
         trainer.step();

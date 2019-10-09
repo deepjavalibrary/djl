@@ -37,10 +37,10 @@ import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.repository.ZipUtils;
 import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.GradientCollector;
-import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.training.loss.Loss;
 import software.amazon.ai.util.Pair;
 import software.amazon.ai.util.Utils;
 
@@ -164,7 +164,7 @@ public class SymbolBlockTest {
         NDArray pred;
         try (GradientCollector gradCol = new MxGradientCollector()) {
             pred = trainer.forward(new NDList(data)).head();
-            NDArray loss = Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
+            NDArray loss = Loss.softmaxCrossEntropyLoss().getLoss(label, pred);
             gradCol.backward(loss);
         }
         List<NDArray> grads =

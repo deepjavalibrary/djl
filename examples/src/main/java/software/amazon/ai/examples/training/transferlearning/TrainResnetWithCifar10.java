@@ -38,12 +38,12 @@ import software.amazon.ai.nn.SymbolBlock;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.GradientCollector;
-import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.dataset.Dataset;
 import software.amazon.ai.training.initializer.NormalInitializer;
+import software.amazon.ai.training.loss.Loss;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -160,9 +160,7 @@ public final class TrainResnetWithCifar10 {
                             NDArray data = split[i].getData().head();
                             NDArray label = split[i].getLabels().head();
                             NDArray prediction = trainer.forward(new NDList(data)).head();
-                            NDArray l =
-                                    Loss.softmaxCrossEntropyLoss(
-                                            label, prediction, 1.f, 0, -1, true, false);
+                            NDArray l = Loss.softmaxCrossEntropyLoss().getLoss(label, prediction);
                             pred.add(prediction);
                             loss.add(l);
                             gradCol.backward(l);

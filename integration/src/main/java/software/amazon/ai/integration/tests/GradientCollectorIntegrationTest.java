@@ -29,12 +29,12 @@ import software.amazon.ai.nn.Parameter;
 import software.amazon.ai.nn.core.Linear;
 import software.amazon.ai.training.DefaultTrainingConfig;
 import software.amazon.ai.training.GradientCollector;
-import software.amazon.ai.training.Loss;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.dataset.ArrayDataset;
 import software.amazon.ai.training.dataset.Batch;
 import software.amazon.ai.training.initializer.Initializer;
+import software.amazon.ai.training.loss.Loss;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Nag;
 import software.amazon.ai.training.optimizer.Optimizer;
@@ -112,7 +112,7 @@ public class GradientCollectorIntegrationTest {
                             NDArray x = batch.getData().head();
                             NDArray y = batch.getLabels().head();
                             NDArray yHat = block.forward(new NDList(x)).head();
-                            loss = Loss.l2Loss(y, yHat, 1, 0);
+                            loss = Loss.l2Loss().getLoss(y, yHat);
                             gradCol.backward(loss);
                         }
                         trainer.step();
@@ -164,8 +164,7 @@ public class GradientCollectorIntegrationTest {
                 PairList<String, Parameter> parameters = resNet50.getParameters();
                 try (GradientCollector gradCol = trainer.newGradientCollector()) {
                     NDArray pred = trainer.forward(new NDList(input)).head();
-                    NDArray loss =
-                            Loss.softmaxCrossEntropyLoss(label, pred, 1.f, 0, -1, true, false);
+                    NDArray loss = Loss.softmaxCrossEntropyLoss().getLoss(label, pred);
                     gradCol.backward(loss);
                 }
                 trainer.step();
