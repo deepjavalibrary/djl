@@ -23,7 +23,6 @@ public class NDArrayLogicalOpTest {
 
     @Test
     public void testLogicalAnd() {
-        // TODO switch to numpy & add scalar & zero-dim test
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.arange(10);
             NDArray array2 = manager.arange(10);
@@ -37,12 +36,26 @@ public class NDArrayLogicalOpTest {
                             new float[] {1f, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 1f, 1f}, new Shape(2, 5));
             Assertions.assertEquals(actual, array1.logicalAnd(array2));
             Assertions.assertEquals(actual, NDArrays.logicalAnd(array1, array2));
+            // scalar
+            array1 = manager.create(1f);
+            array2 = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
+            actual = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
+            Assertions.assertEquals(actual, array1.logicalAnd(array2));
+            Assertions.assertEquals(actual, NDArrays.logicalAnd(array1, array2));
+            array2 = manager.create(0f);
+            Assertions.assertEquals(0f, array1.logicalAnd(array2).getFloat());
+            Assertions.assertEquals(0f, NDArrays.logicalAnd(array1, array2).getFloat());
+
+            // zero-dim
+            array1 = manager.create(new Shape(0, 1));
+            array2 = manager.create(new Shape(1, 0, 2));
+            Assertions.assertEquals(array2, array1.logicalAnd(array2));
+            Assertions.assertEquals(array2, NDArrays.logicalAnd(array1, array2));
         }
     }
 
     @Test
     public void testLogicalOr() {
-        // TODO switch to numpy & add scalar & zero-dim test
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.arange(10);
             NDArray array2 = manager.arange(10);
@@ -56,12 +69,22 @@ public class NDArrayLogicalOpTest {
                             new float[] {1f, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 1f, 1f}, new Shape(5, 2));
             Assertions.assertEquals(actual, array1.logicalOr(array2));
             Assertions.assertEquals(actual, NDArrays.logicalOr(array1, array2));
+            // scalar
+            array1 = manager.create(1f);
+            array2 = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
+            actual = manager.create(new float[] {1f, 1f, 1f, 1f}, new Shape(2, 2));
+            Assertions.assertEquals(actual, array1.logicalOr(array2));
+            Assertions.assertEquals(actual, NDArrays.logicalOr(array1, array2));
+            // zero-dim
+            array1 = manager.create(new Shape(0, 1));
+            array2 = manager.create(new Shape(1, 0, 2));
+            Assertions.assertEquals(array2, array1.logicalOr(array2));
+            Assertions.assertEquals(array2, NDArrays.logicalOr(array1, array2));
         }
     }
 
     @Test
     public void testLogicalXor() {
-        // TODO switch to numpy & add scalar & zero-dim test
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.arange(10);
             NDArray array2 = manager.arange(10);
@@ -73,6 +96,17 @@ public class NDArrayLogicalOpTest {
             actual = manager.zeros(new Shape(2, 1, 5));
             Assertions.assertEquals(actual, array1.logicalXor(array2));
             Assertions.assertEquals(actual, NDArrays.logicalXor(array1, array2));
+            // scalar
+            array1 = manager.create(1f);
+            array2 = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
+            actual = manager.create(new float[] {0f, 1f, 1f, 0f}, new Shape(2, 2));
+            Assertions.assertEquals(actual, array1.logicalXor(array2));
+            Assertions.assertEquals(actual, NDArrays.logicalXor(array1, array2));
+            // zero-dim
+            array1 = manager.create(new Shape(0, 1));
+            array2 = manager.create(new Shape(1, 0, 2));
+            Assertions.assertEquals(array2, array1.logicalXor(array2));
+            Assertions.assertEquals(array2, NDArrays.logicalXor(array1, array2));
         }
     }
 

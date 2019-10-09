@@ -1116,18 +1116,21 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logicalAnd(NDArray other) {
+        // TODO switch to numpy op, although current op support zero-dim, scalar
         return manager.invoke("broadcast_logical_and", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalOr(NDArray other) {
+        // TODO switch to numpy op, although current op support zero-dim, scalar
         return manager.invoke("broadcast_logical_or", new NDList(this, other), null).head();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalXor(NDArray other) {
+        // TODO switch to numpy op, although current op support zero-dim, scalar
         return manager.invoke("broadcast_logical_xor", new NDList(this, other), null).head();
     }
 

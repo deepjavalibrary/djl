@@ -28,7 +28,6 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testCreation() {
-        // TODO add more test cases to make it robust
         try (NDManager manager = NDManager.newBaseManager()) {
             // test scalar
             NDArray array = manager.create(-100f);
