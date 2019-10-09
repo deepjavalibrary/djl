@@ -75,6 +75,10 @@ public class Parameter implements AutoCloseable {
         return type;
     }
 
+    public void setArray(NDArray array) {
+        this.array = array;
+    }
+
     public NDArray getArray() {
         if (!isInitialized()) {
             throw new IllegalStateException("The array has not been initialized");

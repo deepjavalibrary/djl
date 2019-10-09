@@ -128,7 +128,8 @@ public class SymbolBlockTest {
 
             SymbolBlock mlp = (SymbolBlock) model.getBlock();
             SequentialBlock newMlp = new SequentialBlock();
-            newMlp.add(mlp.removeLastBlock());
+            mlp.removeLastBlock();
+            newMlp.add(mlp);
             Linear linear = new Linear.Builder().setOutChannels(10).build();
 
             linear.setInitializer(Initializer.ONES);

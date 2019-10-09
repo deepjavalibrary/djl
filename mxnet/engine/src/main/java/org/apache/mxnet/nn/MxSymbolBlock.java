@@ -21,8 +21,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.Set;
 import org.apache.mxnet.engine.CachedOp;
 import org.apache.mxnet.engine.MxModel;
 import org.apache.mxnet.engine.MxNDManager;
@@ -60,6 +59,21 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         this.manager = manager;
         this.symbol = symbol;
         this.inputNames = names;
+        params = new ArrayList<>();
+
+        Set<String> inputNameSet = new HashSet<>(names);
+        Set<String> auxNameSet = new HashSet<>(Arrays.asList(symbol.getAuxNames()));
+
+        String[] allNames = symbol.getAllNames();
+        for (String name : allNames) {
+            if (inputNameSet.contains(name)) {
+                continue;
+            }
+            ParameterType type = inferType(name);
+            boolean requireGrad = !auxNameSet.contains(name);
+
+            params.add(new Parameter(name, this, type, requireGrad));
+        }
     }
 
     /**
@@ -72,24 +86,6 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     }
 
     /**
-     * Extract the middle layer of SymbolBlock.
-     *
-     * @param name the layer name. Can be found in {@link MxSymbolBlock#getLayerNames()}
-     * @return sliced SymbolBlock
-     */
-    public SymbolBlock getLayer(String name) {
-        Symbol sliced = symbol.get(name);
-        HashSet<String> set = new HashSet<>(Arrays.asList(sliced.getAllNames()));
-        List<Parameter> slicedParams =
-                params.stream()
-                        .filter(ele -> set.contains(ele.getName()))
-                        .collect(Collectors.toList());
-        MxSymbolBlock slicedBlock = new MxSymbolBlock(manager, sliced, inputNames);
-        slicedBlock.setParams(slicedParams);
-        return slicedBlock;
-    }
-
-    /**
      * Returns the Symbolic graph from the model.
      *
      * @return {@link Symbol} object
@@ -98,47 +94,10 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         return symbol;
     }
 
-    /**
-     * Set parameter for this SymbolBlock.
-     *
-     * @param params {@link Parameter} to set for SymbolBlock
-     */
-    public void setParams(List<Parameter> params) {
-        if (this.params != null) {
-            this.params.forEach(Parameter::close);
-        }
-        this.params = params;
-        // Double check if the input name is match
-        inferInputNames();
-    }
-
     private List<String> getParamNames() {
         List<String> nameList = Arrays.asList(symbol.getAllNames());
         inputNames.forEach(nameList::remove);
         return nameList;
-    }
-
-    private void inferInputNames() {
-        String[] allNames = symbol.getAllNames();
-        Map<String, Integer> map = new ConcurrentHashMap<>(allNames.length * 3 / 2);
-        List<String> paramNames =
-                params.stream().map(Parameter::getName).collect(Collectors.toList());
-        int index = 0;
-        for (String name : allNames) {
-            map.put(name, index++);
-        }
-        for (String name : paramNames) {
-            map.remove(name);
-        }
-        this.inputNames = new ArrayList<>(map.keySet());
-    }
-
-    private void createEmptyParams() {
-        params =
-                getParamNames()
-                        .stream()
-                        .map(name -> new Parameter(name, this, ParameterType.OTHER))
-                        .collect(Collectors.toList());
     }
 
     @Override
@@ -187,16 +146,25 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
 
     @Override
     public List<Parameter> getDirectParameters() {
-        if (params == null) {
-            createEmptyParams();
-        }
         return params;
     }
 
     @Override
-    public SymbolBlock removeLastBlock() {
+    public void removeLastBlock() {
         List<String> layerNames = getLayerNames();
-        return getLayer(layerNames.get(layerNames.size() - 2));
+        String layerName = layerNames.get(layerNames.size() - 2);
+
+        Symbol sliced = symbol.get(layerName);
+        symbol.close();
+        symbol = sliced;
+
+        HashSet<String> set = new HashSet<>(Arrays.asList(symbol.getAllNames()));
+        for (int i = params.size() - 1; i >= 0; --i) {
+            Parameter parameter = params.get(i);
+            if (!set.contains(parameter.getName())) {
+                params.remove(i).close();
+            }
+        }
     }
 
     @Override
@@ -229,10 +197,23 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
-        createEmptyParams();
         for (Parameter parameter : params) {
             parameter.load(this.manager, is);
         }
-        setParams(params);
+    }
+
+    private static ParameterType inferType(String name) {
+        if (name.endsWith("bias")) {
+            return ParameterType.BIAS;
+        } else if (name.endsWith("gamma")) {
+            return ParameterType.GAMMA;
+        } else if (name.endsWith("beta")) {
+            return ParameterType.BETA;
+        } else if (name.endsWith("moving_mean") || name.endsWith("running_mean")) {
+            return ParameterType.RUNNING_MEAN;
+        } else if (name.endsWith("moving_var") || name.endsWith("running_var")) {
+            return ParameterType.RUNNING_VAR;
+        }
+        return ParameterType.OTHER;
     }
 }

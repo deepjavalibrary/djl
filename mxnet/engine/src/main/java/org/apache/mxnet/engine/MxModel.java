@@ -22,12 +22,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -47,7 +44,6 @@ import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.nn.Block;
 import software.amazon.ai.nn.Parameter;
-import software.amazon.ai.nn.ParameterType;
 import software.amazon.ai.training.Trainer;
 import software.amazon.ai.training.TrainingConfig;
 import software.amazon.ai.training.initializer.Initializer;
@@ -318,21 +314,6 @@ public class MxModel implements Model {
         super.finalize();
     }
 
-    private static ParameterType inferType(String name) {
-        if (name.endsWith("bias")) {
-            return ParameterType.BIAS;
-        } else if (name.endsWith("gamma")) {
-            return ParameterType.GAMMA;
-        } else if (name.endsWith("beta")) {
-            return ParameterType.BETA;
-        } else if (name.endsWith("moving_mean") || name.endsWith("running_mean")) {
-            return ParameterType.RUNNING_MEAN;
-        } else if (name.endsWith("moving_var") || name.endsWith("running_var")) {
-            return ParameterType.RUNNING_VAR;
-        }
-        return ParameterType.OTHER;
-    }
-
     private void loadParameters(String modelName, Map<String, String> options) throws IOException {
         String epochOption = null;
         if (options != null) {
@@ -352,26 +333,26 @@ public class MxModel implements Model {
         if (readParameters(paramFile)) {
             return;
         }
-        // Loading MXNet saved parameters
-        Set<String> auxNames =
-                new HashSet<>(Arrays.asList(((MxSymbolBlock) block).getSymbol().getAuxNames()));
 
         NDList paramNDlist = JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath());
         Device device = manager.getDevice();
 
-        List<Parameter> parameters = new ArrayList<>();
+        List<Parameter> parameters = block.getDirectParameters();
+        Map<String, Parameter> map = new ConcurrentHashMap<>();
+        parameters.forEach(p -> map.put(p.getName(), p));
+
         for (Pair<String, NDArray> pair : paramNDlist) {
             String key = pair.getKey();
             if (key == null) {
                 throw new IllegalArgumentException("Array names must be present in parameter file");
             }
+
             String paramName = key.split(":", 2)[1];
+            Parameter parameter = map.get(paramName);
+
             NDArray array = pair.getValue().asInDevice(device, false);
-            boolean requireGrad = !auxNames.contains(paramName);
-            parameters.add(
-                    new Parameter(paramName, block, array, inferType(paramName), requireGrad));
+            parameter.setArray(array);
         }
-        ((MxSymbolBlock) block).setParams(parameters);
 
         // TODO: Find a better to infer model DataType from SymbolBlock.
         dataType = parameters.get(0).getArray().getDataType();

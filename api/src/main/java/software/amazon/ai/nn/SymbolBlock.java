@@ -14,5 +14,5 @@ package software.amazon.ai.nn;
 
 public interface SymbolBlock extends Block {
 
-    SymbolBlock removeLastBlock();
+    void removeLastBlock();
 }

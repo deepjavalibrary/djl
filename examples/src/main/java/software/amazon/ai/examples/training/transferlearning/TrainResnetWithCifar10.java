@@ -83,8 +83,9 @@ public final class TrainResnetWithCifar10 {
             criteria.put("flavor", "v1d");
             Model model = ModelZoo.RESNET.loadModel(criteria);
             SequentialBlock newBlock = new SequentialBlock();
-            Block modifiedBlock = ((SymbolBlock) model.getBlock()).removeLastBlock();
-            newBlock.add(modifiedBlock);
+            SymbolBlock block = (SymbolBlock) model.getBlock();
+            block.removeLastBlock();
+            newBlock.add(block);
             newBlock.add(x -> new NDList(x.head().squeeze()));
             newBlock.add(new Linear.Builder().setOutChannels(10).build());
             model.setBlock(newBlock);
