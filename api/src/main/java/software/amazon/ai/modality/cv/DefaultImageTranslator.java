@@ -17,9 +17,25 @@ import software.amazon.ai.translate.TranslatorContext;
 
 public class DefaultImageTranslator extends ImageTranslator<NDList> {
 
+    public DefaultImageTranslator(BaseBuilder<?> builder) {
+        super(builder);
+    }
+
     @Override
     public NDList processOutput(TranslatorContext ctx, NDList list) {
         list.detach();
         return list;
+    }
+
+    class Builder extends ImageTranslator.BaseBuilder<Builder> {
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        public DefaultImageTranslator build() {
+            return new DefaultImageTranslator(this);
+        }
     }
 }

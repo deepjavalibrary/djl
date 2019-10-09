@@ -48,7 +48,7 @@ public class CocoTest {
             try (Trainer trainer = model.newTrainer(config)) {
                 Iterator<Batch> ds = trainer.iterateDataset(coco).iterator();
                 Batch batch = ds.next();
-                Assert.assertEquals(batch.getData().head().getShape(), new Shape(1, 426, 640, 3));
+                Assert.assertEquals(batch.getData().head().getShape(), new Shape(1, 3, 426, 640));
                 Assert.assertEquals(batch.getLabels().head().getShape(), new Shape(1, 20, 5));
             }
         }

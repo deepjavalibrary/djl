@@ -41,7 +41,10 @@ public class SingleShotDetectionModelLoader
 
     @Override
     public Translator<BufferedImage, DetectedObjects> getTranslator() {
-        return new SingleShotDetectionTranslator();
+        return new SingleShotDetectionTranslator.Builder()
+                .optResize(512, 512)
+                .setSynsetArtifactName("classes.txt")
+                .build();
     }
 
     @Override

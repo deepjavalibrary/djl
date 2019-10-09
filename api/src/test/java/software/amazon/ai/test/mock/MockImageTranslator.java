@@ -15,15 +15,15 @@ package software.amazon.ai.test.mock;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import software.amazon.ai.modality.cv.DetectedObjects;
-import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Rectangle;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.DataType;
 import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.ndarray.types.SparseFormat;
+import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;
 
-public class MockImageTranslator extends ImageTranslator<DetectedObjects> {
+public class MockImageTranslator implements Translator<BufferedImage, DetectedObjects> {
 
     private DetectedObjects output;
 

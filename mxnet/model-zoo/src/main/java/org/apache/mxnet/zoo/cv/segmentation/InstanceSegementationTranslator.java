@@ -22,7 +22,6 @@ import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Mask;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
-import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.types.Shape;
@@ -31,11 +30,21 @@ import software.amazon.ai.util.Utils;
 
 public class InstanceSegementationTranslator extends ImageTranslator<DetectedObjects> {
 
-    private static final float THRESHOLD = 0.3f;
-    private static final int SHORT_EDGE = 600;
-    private static final int MAX_EDGE = 1000;
+    private String synsetArtifactName;
+    private float threshold;
+    private int shortEdge;
+    private int maxEdge;
+
     private int rescaledWidth;
     private int rescaledHeight;
+
+    public InstanceSegementationTranslator(Builder builder) {
+        super(builder);
+        synsetArtifactName = builder.synsetArtifactName;
+        this.threshold = builder.threshold;
+        this.shortEdge = builder.shortEdge;
+        this.maxEdge = builder.maxEdge;
+    }
 
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage image) {
@@ -48,7 +57,7 @@ public class InstanceSegementationTranslator extends ImageTranslator<DetectedObj
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
-        List<String> classes = model.getArtifact("classes.txt", Utils::readLines);
+        List<String> classes = model.getArtifact(synsetArtifactName, Utils::readLines);
 
         float[] ids = list.get(0).toFloatArray();
         float[] scores = list.get(1).toFloatArray();
@@ -62,7 +71,7 @@ public class InstanceSegementationTranslator extends ImageTranslator<DetectedObj
         for (int i = 0; i < ids.length; ++i) {
             int classId = (int) ids[i];
             double probability = scores[i];
-            if (classId >= 0 && probability > THRESHOLD) {
+            if (classId >= 0 && probability > threshold) {
                 if (classId >= classes.size()) {
                     throw new AssertionError("Unexpected index: " + classId);
                 }
@@ -102,9 +111,9 @@ public class InstanceSegementationTranslator extends ImageTranslator<DetectedObj
         int height = img.getHeight();
         int min = Math.min(width, height);
         int max = Math.max(width, height);
-        float scale = SHORT_EDGE / (float) min;
-        if (Math.round(scale * max) > MAX_EDGE) {
-            scale = MAX_EDGE / (float) max;
+        float scale = shortEdge / (float) min;
+        if (Math.round(scale * max) > maxEdge) {
+            scale = maxEdge / (float) max;
         }
         width = Math.round(width * scale);
         height = Math.round(height * scale);
@@ -112,10 +121,43 @@ public class InstanceSegementationTranslator extends ImageTranslator<DetectedObj
         return BufferedImageUtils.resize(img, width, height);
     }
 
-    @Override
-    protected NDArray normalize(NDArray array) {
-        float[] mean = {0.485f, 0.456f, 0.406f};
-        float[] std = {0.229f, 0.224f, 0.225f};
-        return NDImageUtils.normalize(array, mean, std);
+    public static class Builder extends BaseBuilder<Builder> {
+
+        private String synsetArtifactName;
+        private float threshold = 0.3f;
+        private int shortEdge = 600;
+        private int maxEdge = 1000;
+
+        public Builder setSynsetArtifactName(String synsetArtifactName) {
+            this.synsetArtifactName = synsetArtifactName;
+            return this;
+        }
+
+        public Builder optThreshold(float threshold) {
+            this.threshold = threshold;
+            return this;
+        }
+
+        public Builder optShortEdge(int shortEdge) {
+            this.shortEdge = shortEdge;
+            return this;
+        }
+
+        public Builder optMaxEdge(int maxEdge) {
+            this.maxEdge = maxEdge;
+            return this;
+        }
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        public InstanceSegementationTranslator build() {
+            if (synsetArtifactName == null) {
+                throw new IllegalArgumentException("You must specify a synset artifact name");
+            }
+            return new InstanceSegementationTranslator(this);
+        }
     }
 }

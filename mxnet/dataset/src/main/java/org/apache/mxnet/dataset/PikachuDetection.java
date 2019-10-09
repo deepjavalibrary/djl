@@ -169,9 +169,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     public Record get(long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
-                new NDList(
-                        BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag)
-                                .transpose(2, 0, 1));
+                new NDList(BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag));
         NDArray label = manager.create(labels.get(idx));
         NDList l = new NDList(label.reshape(new Shape(1).addAll(label.getShape())));
         return new Record(d, l);

@@ -192,7 +192,7 @@ public final class BufferedImageUtils {
     public static NDArray toNDArray(NDManager manager, BufferedImage image, Flag flag) {
         int width = image.getWidth();
         int height = image.getHeight();
-        NDArray rgb = manager.create(toFloatBuffer(manager, image), new Shape(height, width, 3));
+        NDArray rgb = manager.create(toFloatBuffer(manager, image), new Shape(3, height, width));
         if (flag == Flag.COLOR) {
             return rgb;
         } else if (flag == Flag.GRAYSCALE) {

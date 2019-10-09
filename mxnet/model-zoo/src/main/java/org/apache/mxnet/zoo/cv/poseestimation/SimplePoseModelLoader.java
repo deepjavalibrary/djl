@@ -35,6 +35,10 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
 
     @Override
     public Translator<BufferedImage, Joints> getTranslator() {
-        return new SimplePoseTranslator();
+        return new SimplePoseTranslator.Builder()
+                .optResize(256, 192)
+                .optNormalize(
+                        new float[] {0.485f, 0.456f, 0.406f}, new float[] {0.229f, 0.224f, 0.225f})
+                .build();
     }
 }

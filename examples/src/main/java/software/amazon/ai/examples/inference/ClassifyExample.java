@@ -42,7 +42,7 @@ public final class ClassifyExample extends AbstractExample {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
-        // Device is not not required, default device will be used by Model if not provided.
+        // Device is not required, default device will be used by Model if not provided.
         // Change to a specific device if needed.
         Device device = Device.defaultDevice();
 

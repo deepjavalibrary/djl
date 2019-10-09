@@ -13,13 +13,11 @@
 package software.amazon.ai.modality.cv;
 
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils;
+import software.amazon.ai.modality.cv.util.NDImageUtils.Flag;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataDesc;
-import software.amazon.ai.ndarray.types.Shape;
 import software.amazon.ai.translate.Translator;
 import software.amazon.ai.translate.TranslatorContext;
 
@@ -30,6 +28,22 @@ import software.amazon.ai.translate.TranslatorContext;
  */
 public abstract class ImageTranslator<T> implements Translator<BufferedImage, T> {
 
+    protected Flag flag;
+    private boolean centerCrop;
+    private int[] centerCropSize;
+    private int[] resize;
+    protected float[] normalizeMeans;
+    protected float[] normalizeStd;
+
+    public ImageTranslator(BaseBuilder<?> builder) {
+        flag = builder.flag;
+        centerCrop = builder.centerCrop;
+        centerCropSize = builder.centerCropSize;
+        resize = builder.resize;
+        normalizeMeans = builder.normalizeMeans;
+        normalizeStd = builder.normalizeStd;
+    }
+
     /**
      * Processes the {@code BufferedImage} input and converts it to NDList.
      *
@@ -39,18 +53,17 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
      */
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-        int w = input.getWidth();
-        int h = input.getHeight();
-        Shape shape = new Shape(3, h, w);
-        DataDesc dataDesc = new DataDesc(shape);
-
-        NDManager manager = ctx.getNDManager();
-
-        FloatBuffer buffer = BufferedImageUtils.toFloatBuffer(manager, input);
-
-        NDArray array = manager.create(dataDesc);
-        array.set(buffer);
-
+        if (centerCrop) {
+            if (centerCropSize != null) {
+                input = BufferedImageUtils.centerCrop(input, centerCropSize[1], centerCropSize[0]);
+            } else {
+                input = BufferedImageUtils.centerCrop(input);
+            }
+        }
+        if (resize != null) {
+            input = BufferedImageUtils.resize(input, resize[1], resize[0]);
+        }
+        NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), input, flag);
         return new NDList(normalize(array.divi(255)));
     }
 
@@ -64,6 +77,49 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
      * @return normalized NDArray
      */
     protected NDArray normalize(NDArray array) {
+        if (normalizeMeans != null && normalizeStd != null) {
+            array = NDImageUtils.normalize(array, normalizeMeans, normalizeStd);
+        }
         return array;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public abstract static class BaseBuilder<T extends BaseBuilder> {
+
+        protected Flag flag = Flag.COLOR;
+        private boolean centerCrop;
+        private int[] centerCropSize;
+        private int[] resize;
+        protected float[] normalizeMeans;
+        protected float[] normalizeStd;
+
+        public T optFlag(Flag flag) {
+            this.flag = flag;
+            return self();
+        }
+
+        public T optCenterCrop() {
+            centerCrop = true;
+            centerCropSize = null;
+            return self();
+        }
+
+        public T optCenterCrop(int height, int width) {
+            centerCropSize = new int[] {height, width};
+            return self();
+        }
+
+        public T optResize(int height, int width) {
+            resize = new int[] {height, width};
+            return self();
+        }
+
+        public T optNormalize(float[] normalizeMeans, float[] normalizeStd) {
+            this.normalizeMeans = normalizeMeans;
+            this.normalizeStd = normalizeStd;
+            return self();
+        }
+
+        protected abstract T self();
     }
 }

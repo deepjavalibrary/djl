@@ -34,6 +34,10 @@ public abstract class ImageNetBaseModelLoader
 
     @Override
     public Translator<BufferedImage, Classification> getTranslator() {
-        return new ImageNetTranslator();
+        return new ImageClassificationTranslator.Builder()
+                .optCenterCrop()
+                .optResize(224, 224)
+                .setSynsetArtifactName("synset.txt")
+                .build();
     }
 }

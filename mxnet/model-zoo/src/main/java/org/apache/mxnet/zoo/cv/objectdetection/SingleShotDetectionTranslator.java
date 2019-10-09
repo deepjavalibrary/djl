@@ -12,7 +12,6 @@
  */
 package org.apache.mxnet.zoo.cv.objectdetection;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,6 @@ import software.amazon.ai.modality.cv.BoundingBox;
 import software.amazon.ai.modality.cv.DetectedObjects;
 import software.amazon.ai.modality.cv.ImageTranslator;
 import software.amazon.ai.modality.cv.Rectangle;
-import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.translate.TranslatorContext;
@@ -29,19 +27,19 @@ import software.amazon.ai.util.Utils;
 
 public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjects> {
 
-    private static final float THRESHOLD = 0.2f;
+    private float threshold;
+    private String synsetArtifactName;
 
-    @Override
-    public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-        // TODO: avoid hard code image size and threshold
-        input = BufferedImageUtils.resize(input, 512, 512);
-        return super.processInput(ctx, input);
+    public SingleShotDetectionTranslator(Builder builder) {
+        super(builder);
+        this.threshold = builder.threshold;
+        this.synsetArtifactName = builder.synsetArtifactName;
     }
 
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
-        List<String> classes = model.getArtifact("classes.txt", Utils::readLines);
+        List<String> classes = model.getArtifact(synsetArtifactName, Utils::readLines);
 
         float[] classIds = list.get(0).toFloatArray();
         float[] probabilities = list.get(1).toFloatArray();
@@ -54,7 +52,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         for (int i = 0; i < classIds.length; ++i) {
             int classId = (int) classIds[i];
             double probability = probabilities[i];
-            if (classId > 0 && probability > THRESHOLD) {
+            if (classId > 0 && probability > threshold) {
                 if (classId >= classes.size()) {
                     throw new AssertionError("Unexpected index: " + classId);
                 }
@@ -73,5 +71,33 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         }
 
         return new DetectedObjects(retNames, retProbs, retBB);
+    }
+
+    public static class Builder extends BaseBuilder<Builder> {
+
+        private float threshold = 0.2f;
+        private String synsetArtifactName;
+
+        public Builder optThreshold(float threshold) {
+            this.threshold = threshold;
+            return this;
+        }
+
+        public Builder setSynsetArtifactName(String synsetArtifactName) {
+            this.synsetArtifactName = synsetArtifactName;
+            return this;
+        }
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        public SingleShotDetectionTranslator build() {
+            if (synsetArtifactName == null) {
+                throw new IllegalArgumentException("You must specify a synset artifact name");
+            }
+            return new SingleShotDetectionTranslator(this);
+        }
     }
 }

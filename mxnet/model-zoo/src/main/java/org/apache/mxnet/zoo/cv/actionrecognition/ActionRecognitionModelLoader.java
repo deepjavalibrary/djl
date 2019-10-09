@@ -15,6 +15,7 @@ package org.apache.mxnet.zoo.cv.actionrecognition;
 import java.awt.image.BufferedImage;
 import org.apache.mxnet.zoo.BaseModelLoader;
 import org.apache.mxnet.zoo.ModelZoo;
+import org.apache.mxnet.zoo.cv.classification.ImageClassificationTranslator;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.repository.Anchor;
 import software.amazon.ai.repository.MRL;
@@ -35,6 +36,10 @@ public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage,
 
     @Override
     public Translator<BufferedImage, Classification> getTranslator() {
-        return new ActionRecognitionTranslator();
+        return new ImageClassificationTranslator.Builder()
+                .optCenterCrop(299, 299) // 299 is the minimum length for inception, 224 for vgg
+                .optNormalize(
+                        new float[] {0.485f, 0.456f, 0.406f}, new float[] {0.229f, 0.224f, 0.225f})
+                .build();
     }
 }

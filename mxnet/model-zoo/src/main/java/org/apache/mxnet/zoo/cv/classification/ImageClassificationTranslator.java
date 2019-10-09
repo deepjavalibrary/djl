@@ -13,29 +13,23 @@
 
 package org.apache.mxnet.zoo.cv.classification;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import software.amazon.ai.Model;
 import software.amazon.ai.modality.Classification;
 import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.translate.TranslatorContext;
 import software.amazon.ai.util.Utils;
 
-public class ImageNetTranslator extends ImageTranslator<Classification> {
+public class ImageClassificationTranslator extends ImageTranslator<Classification> {
 
-    private int imageWidth = 224;
-    private int imageHeight = 224;
+    private String synsetArtifactName;
 
-    @Override
-    public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-        BufferedImage image = BufferedImageUtils.centerCrop(input);
-        image = BufferedImageUtils.resize(image, imageWidth, imageHeight);
-
-        return super.processInput(ctx, image);
+    public ImageClassificationTranslator(Builder builder) {
+        super(builder);
+        this.synsetArtifactName = builder.synsetArtifactName;
     }
 
     @Override
@@ -43,7 +37,29 @@ public class ImageNetTranslator extends ImageTranslator<Classification> {
         Model model = ctx.getModel();
 
         NDArray probabilitiesNd = list.head().get(0);
-        List<String> synset = model.getArtifact("synset.txt", Utils::readLines);
+        List<String> synset = model.getArtifact(synsetArtifactName, Utils::readLines);
         return new Classification(synset, probabilitiesNd);
+    }
+
+    public static class Builder extends BaseBuilder<Builder> {
+
+        private String synsetArtifactName;
+
+        public Builder setSynsetArtifactName(String synsetArtifactName) {
+            this.synsetArtifactName = synsetArtifactName;
+            return this;
+        }
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        public ImageClassificationTranslator build() {
+            if (synsetArtifactName == null) {
+                throw new IllegalArgumentException("You must specify a synset artifact name");
+            }
+            return new ImageClassificationTranslator(this);
+        }
     }
 }

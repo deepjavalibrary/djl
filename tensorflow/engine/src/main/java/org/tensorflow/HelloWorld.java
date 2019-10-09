@@ -14,7 +14,6 @@
 package org.tensorflow;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -24,6 +23,7 @@ import javax.imageio.ImageIO;
 import org.tensorflow.engine.TfModel;
 import org.tensorflow.engine.TfNDArray;
 import software.amazon.ai.inference.Predictor;
+import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -73,30 +73,12 @@ public final class HelloWorld {
         }
     }
 
-    private static void bgr2rgb(byte[] data) {
-        for (int i = 0; i < data.length; i += 3) {
-            byte tmp = data[i];
-            data[i] = data[i + 2];
-            data[i + 2] = tmp;
-        }
-    }
-
     private static final class GenericTranslator implements Translator<BufferedImage, NDList> {
-
-        private static final int BATCH_SIZE = 1;
-        private static final int CHANNELS = 3;
 
         @Override
         public NDList processInput(TranslatorContext ctx, BufferedImage img)
                 throws TranslateException {
-            if (img.getType() != BufferedImage.TYPE_3BYTE_BGR) {
-                throw new TranslateException("");
-            }
-            byte[] data = ((DataBufferByte) img.getData().getDataBuffer()).getData();
-            // ImageIO.read seems to produce BGR-encoded images, but the model expects RGB.
-            bgr2rgb(data);
-            long[] shape = {BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS};
-            NDArray array = ctx.getNDManager().create(data, new Shape(shape));
+            NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), img);
             NDList ndList = new NDList();
             ndList.add("image_tensor", array);
             return ndList;
