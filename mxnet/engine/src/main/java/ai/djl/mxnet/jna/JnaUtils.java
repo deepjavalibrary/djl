@@ -594,10 +594,20 @@ public final class JnaUtils {
         checkCall(LIB.MXAutogradMarkVariables(numVar, varRef, reqsArray, gradRef));
     }
 
+    public static void autogradBackward(NDList array, int retainGraph) {
+
+        checkCall(
+                LIB.MXAutogradBackward(
+                        array.size(),
+                        toPointerArray(array),
+                        new PointerByReference(),
+                        retainGraph));
+    }
+
     public static void autogradBackwardExecute(
             int numOutput,
-            Pointer outputHandle,
-            Pointer outputGradHandle,
+            NDList array,
+            NDArray outgrad,
             int numVariables,
             Pointer varHandles,
             int retainGraph,
@@ -605,16 +615,14 @@ public final class JnaUtils {
             int isTrain,
             Pointer gradHandles,
             Pointer gradSparseFormat) {
-        PointerByReference outRef = new PointerByReference(outputHandle);
-        PointerByReference outGradRef = new PointerByReference(outputGradHandle);
         PointerByReference varRef = new PointerByReference(varHandles);
         PointerByReference gradRef = new PointerByReference(gradHandles);
         PointerByReference gradSparseFormatRef = new PointerByReference(gradSparseFormat);
         checkCall(
                 LIB.MXAutogradBackwardEx(
                         numOutput,
-                        outRef,
-                        outGradRef,
+                        toPointerArray(array),
+                        toPointerArray(new NDList()),
                         numVariables,
                         varRef,
                         retainGraph,
@@ -785,9 +793,6 @@ public final class JnaUtils {
 
 
     int MXAutogradComputeGradient(int num_output, PointerByReference output_handles);
-
-    int MXAutogradBackward(int num_output, PointerByReference output_handles,
-                           PointerByReference ograd_handles, int retain_graph);
 
 
     int MXAutogradGetSymbol(Pointer handle, PointerByReference out);

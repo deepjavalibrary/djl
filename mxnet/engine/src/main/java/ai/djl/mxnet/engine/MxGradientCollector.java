@@ -14,8 +14,8 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.training.GradientCollector;
-import com.sun.jna.Pointer;
 
 public class MxGradientCollector implements GradientCollector {
 
@@ -85,37 +85,17 @@ public class MxGradientCollector implements GradientCollector {
     /** {@inheritDoc} */
     @Override
     public void backward(NDArray array) {
-        backward(array, null, false, true);
+        backward(array, false);
     }
 
     /**
      * Computes the gradients of the NDArray w.r.t variables.
      *
      * @param array target/head array to run backward on.
-     * @param outGrad output gradient NDArray
      * @param retainGraph Whether to retain the computation graph for another backward pass on the
      *     same graph. By default the computation history is cleared.
-     * @param isTraining Whether to compute gradient for training or inference.
      */
-    private void backward(NDArray array, NDArray outGrad, boolean retainGraph, boolean isTraining) {
-        Pointer outGradHandle;
-        if (outGrad != null) {
-            MxNDArray outGradND = (MxNDArray) outGrad;
-            outGradHandle = outGradND.getHandle();
-        } else {
-            outGradHandle = null;
-        }
-
-        JnaUtils.autogradBackwardExecute(
-                1,
-                ((MxNDArray) array).getHandle(),
-                outGradHandle,
-                0,
-                null,
-                retainGraph ? 1 : 0,
-                0,
-                isTraining ? 1 : 0,
-                null,
-                null);
+    private void backward(NDArray array, boolean retainGraph) {
+        JnaUtils.autogradBackward(new NDList(array), retainGraph ? 1 : 0);
     }
 }

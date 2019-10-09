@@ -170,31 +170,12 @@ public class MxNDArray extends NativeResource implements NDArray {
     /**
      * Computes the gradients of the NDArray w.r.t variables.
      *
-     * @param outGrad Gradient with respect to head
      * @param retainGraph Whether to retain the computation graph for another backward pass on the
      *     same graph. By default the computation history is cleared.
-     * @param isTraining Whether to compute gradient for training or inference.
      */
-    public void backward(NDArray outGrad, boolean retainGraph, boolean isTraining) {
-        Pointer outGradHandle;
-        if (outGrad != null) {
-            MxNDArray outGradND = (MxNDArray) outGrad;
-            outGradHandle = outGradND.getHandle();
-        } else {
-            outGradHandle = null;
-        }
+    public void backward(boolean retainGraph) {
 
-        JnaUtils.autogradBackwardExecute(
-                1,
-                getHandle(),
-                outGradHandle,
-                0,
-                null,
-                retainGraph ? 1 : 0,
-                0,
-                isTraining ? 1 : 0,
-                null,
-                null);
+        JnaUtils.autogradBackward(new NDList(this), retainGraph ? 1 : 0);
     }
 
     /** {@inheritDoc} */

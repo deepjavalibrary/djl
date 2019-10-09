@@ -12,6 +12,8 @@
  */
 package ai.djl.util;
 
+import ai.djl.ndarray.NDArray;
+import ai.djl.nn.Parameter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +29,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
 
 /** A class containing utility methods. */
 public final class Utils {
@@ -200,5 +203,53 @@ public final class Utils {
             return -1;
         }
         return checkpoints.get(checkpoints.size() - 1);
+    }
+
+    /**
+     * Utility function to help debug nan values in parameters and their gradients.
+     *
+     * @param parameters list of parameters to check
+     * @param checkGradient whether to check parameter value or its gradient value
+     * @param logger logger to log result
+     */
+    public static void checkParameterValues(
+            PairList<String, Parameter> parameters, boolean checkGradient, Logger logger) {
+        List<Float> values = new ArrayList<>();
+        String valueName = checkGradient ? "gradient" : "value";
+
+        values.addAll(
+                parameters
+                        .values()
+                        .stream()
+                        .filter(Parameter::requireGradient)
+                        .map(
+                                param -> {
+                                    NDArray value =
+                                            checkGradient
+                                                    ? param.getArray().getGradient()
+                                                    : param.getArray();
+                                    float[] sums = value.sum().toFloatArray();
+                                    float sum = 0f;
+                                    for (float num : sums) {
+                                        sum += num;
+                                    }
+                                    if (Float.isNaN(sum)) {
+                                        logger.info(
+                                                "param name: "
+                                                        + param.getName()
+                                                        + ", "
+                                                        + valueName
+                                                        + " is nan :"
+                                                        + sum);
+                                    }
+                                    return sum;
+                                })
+                        .collect(Collectors.toList()));
+
+        logger.debug(
+                "Sum of param's"
+                        + valueName
+                        + "is : "
+                        + values.stream().mapToDouble(f -> f.doubleValue()).sum());
     }
 }

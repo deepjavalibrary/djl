@@ -27,12 +27,14 @@ public class TrainResNetTest {
         int numGpus = Engine.getInstance().getGpuCount();
         // only run this test on gpu
         if (numGpus > 0) {
+            // use 4 gpus at most
+            numGpus = Math.min(numGpus, 4);
             String[] args =
                     new String[] {
                         "-b",
                         String.valueOf(32 * numGpus),
                         "-e",
-                        "5",
+                        "2",
                         "-g",
                         String.valueOf(numGpus),
                         "-s",
@@ -41,8 +43,8 @@ public class TrainResNetTest {
                         "true"
                     };
             TrainResnetWithCifar10.main(args);
-            Assert.assertTrue(TrainResnetWithCifar10.getAccuracy() > 0.7f);
-            Assert.assertTrue(TrainResnetWithCifar10.getLossValue() < 1f);
+            Assert.assertTrue(TrainResnetWithCifar10.getAccuracy() > .7f);
+            Assert.assertTrue(TrainResnetWithCifar10.getLossValue() < .8f);
         }
     }
 }

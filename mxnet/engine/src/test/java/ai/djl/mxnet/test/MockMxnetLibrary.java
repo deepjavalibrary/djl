@@ -1133,7 +1133,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     @Override
     public int MXAutogradBackward(
             int num_output,
-            PointerByReference output_handles,
+            PointerArray output_handles,
             PointerByReference ograd_handles,
             int retain_graph) {
         if (functions.containsKey("MXAutogradBackward")) {
@@ -1147,8 +1147,8 @@ public class MockMxnetLibrary implements MxnetLibrary {
     @Override
     public int MXAutogradBackwardEx(
             int num_output,
-            PointerByReference output_handles,
-            PointerByReference ograd_handles,
+            PointerArray output_handles,
+            PointerArray ograd_handles,
             int num_variables,
             PointerByReference var_handles,
             int retain_graph,
@@ -1159,19 +1159,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         if (functions.containsKey("MXAutogradBackwardEx")) {
             return functions
                     .get("MXAutogradBackwardEx")
-                    .apply(
-                            new Object[] {
-                                num_output,
-                                output_handles,
-                                ograd_handles,
-                                num_variables,
-                                var_handles,
-                                retain_graph,
-                                create_graph,
-                                is_train,
-                                grad_handles,
-                                grad_stypes
-                            });
+                    .apply(new Object[] {num_output, output_handles, ograd_handles, retain_graph});
         }
         return 0;
     }

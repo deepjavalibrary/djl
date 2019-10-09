@@ -34,7 +34,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
-import ai.djl.training.initializer.NormalInitializer;
+import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.metrics.LossMetric;
@@ -114,6 +114,7 @@ public final class TrainResnetWithCifar10 {
                 Optimizer.sgd()
                         .setRescaleGrad(1.0f / batchSize)
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.01f))
+                        .optClipGrad(1f)
                         .build();
         Pipeline pipeline = new Pipeline(new ToTensor());
         Cifar10 cifar10 =
@@ -135,7 +136,7 @@ public final class TrainResnetWithCifar10 {
             devices = new Device[] {Device.defaultDevice()};
         }
         TrainingConfig config =
-                new DefaultTrainingConfig(new NormalInitializer(0.01), optimizer, devices);
+                new DefaultTrainingConfig(new XavierInitializer(), optimizer, devices);
 
         try (Trainer trainer = model.newTrainer(config)) {
             int numEpoch = arguments.getEpoch();
