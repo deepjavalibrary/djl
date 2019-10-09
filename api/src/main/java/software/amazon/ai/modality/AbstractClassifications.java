@@ -14,6 +14,7 @@ package software.amazon.ai.modality;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import software.amazon.ai.modality.AbstractClassifications.Item;
 
@@ -38,8 +39,26 @@ public abstract class AbstractClassifications<I extends Item> {
         return is;
     }
 
+    public List<I> topK(int k) {
+        List<I> items = items();
+        items.sort(Comparator.<I>comparingDouble(Item::getProbability).reversed());
+        int count = Math.min(items.size(), k);
+        return items.subList(0, count);
+    }
+
     public I best() {
         return item(probabilities.indexOf(Collections.max(probabilities)));
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append('[').append(System.lineSeparator());
+        for (I item : topK(5)) {
+            sb.append('\t').append(item).append(System.lineSeparator());
+        }
+        sb.append(']');
+        return sb.toString();
     }
 
     public class Item {
