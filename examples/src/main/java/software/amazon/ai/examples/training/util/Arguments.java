@@ -23,6 +23,7 @@ public class Arguments {
     private int numGpus;
     private boolean isSymbolic;
     private boolean preTrained;
+    private String outputDir;
 
     public Arguments(CommandLine cmd) {
         if (cmd.hasOption("epoch")) {
@@ -49,6 +50,11 @@ public class Arguments {
             preTrained = Boolean.parseBoolean(cmd.getOptionValue("pre-trained"));
         } else {
             preTrained = true;
+        }
+        if (cmd.hasOption("output-dir")) {
+            outputDir = cmd.getOptionValue("output-dir");
+        } else {
+            outputDir = null;
         }
     }
 
@@ -89,6 +95,13 @@ public class Arguments {
                         .argName("PRE-TRAINED")
                         .desc("Use pre-trained weights")
                         .build());
+        options.addOption(
+                Option.builder("o")
+                        .longOpt("output-dir")
+                        .hasArg()
+                        .argName("OUTPUT-DIR")
+                        .desc("Use output to determine directory to save your model parameters")
+                        .build());
         return options;
     }
 
@@ -110,5 +123,9 @@ public class Arguments {
 
     public boolean getPreTrained() {
         return preTrained;
+    }
+
+    public String getOutputDir() {
+        return outputDir;
     }
 }

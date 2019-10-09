@@ -141,8 +141,8 @@ public class MxModel implements Model {
             throw new IllegalStateException("Model has not be trained or loaded yet.");
         }
 
-        int epoch = Utils.getCurrentEpoch(modelDir, modelName) + 1;
-        Path paramFile = modelDir.resolve(String.format("%s-%04d.params", modelName, epoch));
+        int epoch = Utils.getCurrentEpoch(modelPath, modelName) + 1;
+        Path paramFile = modelPath.resolve(String.format("%s-%04d.params", modelName, epoch));
         try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(paramFile))) {
             dos.writeBytes("JOUL");
             dos.writeInt(MODEL_VERSION);

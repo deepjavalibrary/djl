@@ -13,6 +13,7 @@
 package software.amazon.ai.examples.training.transferlearning;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -149,7 +150,9 @@ public final class TrainResnetWithCifar10 {
                 // reset loss and accuracy
                 acc.reset();
                 lossMetric.reset();
+                int batchNum = 0;
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
+                    batchNum++;
                     Batch[] split = DatasetUtils.split(batch, devices, false);
 
                     NDList pred = new NDList();
@@ -177,7 +180,17 @@ public final class TrainResnetWithCifar10 {
                     lossMetric.update(loss);
                     lossValue = lossMetric.getMetric().getValue();
                     accuracy = acc.getMetric().getValue();
-                    logger.info("Loss: " + lossValue + " accuracy: " + accuracy);
+                    logger.info(
+                            "[Epoch "
+                                    + epoch
+                                    + ", Batch "
+                                    + batchNum
+                                    + "/"
+                                    + (cifar10.size() / batchSize)
+                                    + "] - Loss: "
+                                    + lossValue
+                                    + " accuracy: "
+                                    + accuracy);
                     for (Batch b : split) {
                         b.close();
                     }
@@ -189,6 +202,10 @@ public final class TrainResnetWithCifar10 {
                 accuracy = acc.getMetric().getValue();
                 logger.info("Loss: " + lossValue + " accuracy: " + accuracy);
                 logger.info("Epoch " + epoch + " finish");
+            }
+
+            if (arguments.getOutputDir() != null) {
+                model.save(Paths.get(arguments.getOutputDir()), "resnet");
             }
         }
     }
