@@ -47,7 +47,6 @@ import software.amazon.ai.training.initializer.NormalInitializer;
 import software.amazon.ai.training.metrics.Accuracy;
 import software.amazon.ai.training.metrics.LossMetric;
 import software.amazon.ai.training.optimizer.Optimizer;
-import software.amazon.ai.training.optimizer.Sgd;
 import software.amazon.ai.training.optimizer.learningrate.LearningRateTracker;
 import software.amazon.ai.translate.Pipeline;
 import software.amazon.ai.zoo.ModelNotFoundException;
@@ -110,7 +109,7 @@ public final class TrainResnetWithCifar10 {
         int numGpus = arguments.getNumGpus();
 
         Optimizer optimizer =
-                new Sgd.Builder()
+                Optimizer.sgd()
                         .setRescaleGrad(1.0f / batchSize)
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.01f))
                         .build();

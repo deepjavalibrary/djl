@@ -41,6 +41,18 @@ public abstract class Optimizer {
         }
     }
 
+    public static Sgd.Builder sgd() {
+        return new Sgd.Builder();
+    }
+
+    public static Nag.Builder nag() {
+        return new Nag.Builder();
+    }
+
+    public static Adam.Builder adam() {
+        return new Adam.Builder();
+    }
+
     /**
      * Update a {@code PairList} of parameters one step at time. Assumes parameters are on the same
      * device. This will be used when updating parameters locally, not on {@link ParameterServer}.
