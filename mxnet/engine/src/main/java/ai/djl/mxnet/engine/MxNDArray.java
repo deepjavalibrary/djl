@@ -357,7 +357,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray get(NDIndex index) {
         if (index.getRank() == 0 && getShape().isScalar()) {
             // TODO: return a slice once MXNet support it
-            return dup();
+            return duplicate();
         }
 
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
@@ -1147,6 +1147,15 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sort(int axis) {
+        // TODO remove scalar, zero-dim check once MXNet support it
+        if (isEmpty() || isScalar()) {
+            long dim = getShape().dimension();
+            if (axis >= dim) {
+                throw new IllegalArgumentException(
+                        "axis " + axis + "is out of bounds for array of dimension " + dim);
+            }
+            return duplicate();
+        }
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         return manager.invoke("sort", this, params);
@@ -1155,8 +1164,10 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sort() {
-        MxOpParams params = new MxOpParams();
-        return manager.invoke("sort", this, params);
+        if (isEmpty() || isScalar()) {
+            return duplicate();
+        }
+        return manager.invoke("sort", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1261,7 +1272,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray tile(long repeats) {
         // zero-dim
         if (isEmpty()) {
-            return dup();
+            return duplicate();
         }
         // scalar
         int dim = (isScalar()) ? 1 : getShape().dimension();
@@ -1301,7 +1312,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray repeat(long repeats) {
         // zero-dim
         if (isEmpty()) {
-            return dup();
+            return duplicate();
         }
         // scalar
         int dim = (isScalar()) ? 1 : getShape().dimension();
@@ -1410,26 +1421,39 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmax(int axis, boolean keepDims) {
+    public NDArray argmax(int axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
-        params.addParam("keepdims", keepDims);
         return manager.invoke("_npi_argmax", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray argmin() {
-        return manager.invoke("argmin", this, null);
+        // TODO switch to MXNet numpy argmin
+        if (isEmpty()) {
+            throw new IllegalArgumentException("attempt to get argmin of an empty NDArray");
+        }
+        NDArray array = (isScalar()) ? reshape(1) : this;
+        try (NDArray temp = manager.invoke("argmin", array, null)) {
+            return temp.reshape(new Shape());
+        }
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmin(int axis, boolean keepDims) {
+    public NDArray argmin(int axis) {
+        // TODO switch to MXNet numpy argmin
+        NDArray array = (isScalar()) ? reshape(1) : this;
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
-        params.addParam("keepdims", keepDims);
-        return manager.invoke("argmin", this, params);
+        NDArray temp = manager.invoke("argmin", array, params);
+        if (isScalar()) {
+            NDArray res = temp.reshape(new Shape());
+            temp.close();
+            return res;
+        }
+        return temp;
     }
 
     /** {@inheritDoc} */

@@ -169,7 +169,6 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testSort() {
-        // TODO switch to numpy sort
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {2f, 1f, 4f, 3f});
             NDArray actual = manager.create(new float[] {1f, 2f, 3f, 4f});
@@ -204,6 +203,17 @@ public class NDArrayOtherOpTest {
                     manager.create(
                             new float[] {0f, 2f, 4f, 6f, 5f, 7f, 1f, 3f}, new Shape(2, 1, 2, 2));
             Assertions.assertEquals(actual, array.sort(3));
+
+            // scalar
+            array = manager.create(5f);
+            Assertions.assertEquals(array, array.sort());
+
+            // zero-dim
+            array = manager.create(new Shape(1, 0, 1));
+            Assertions.assertEquals(array, array.sort());
+            Assertions.assertEquals(array, array.sort(0));
+            Assertions.assertEquals(array, array.sort(1));
+            Assertions.assertEquals(array, array.sort(2));
         }
     }
 
@@ -480,11 +490,11 @@ public class NDArrayOtherOpTest {
             NDArray actual = manager.create(9f);
             Assertions.assertEquals(actual, argmax, "Argmax: Incorrect value");
 
-            argmax = array.argmax(0, true);
-            actual = manager.create(new float[] {2, 2, 2, 1, 1}, new Shape(1, 5));
+            argmax = array.argmax(0);
+            actual = manager.create(new float[] {2, 2, 2, 1, 1});
             Assertions.assertEquals(actual, argmax, "Argmax: Incorrect value");
 
-            argmax = array.argmax(1, false);
+            argmax = array.argmax(1);
             actual = manager.create(new float[] {3, 4, 0, 2});
             Assertions.assertEquals(actual, argmax, "Argmax: Incorrect value");
 
@@ -494,6 +504,7 @@ public class NDArrayOtherOpTest {
             // Bug in MXNet to fix
             actual = manager.create(0f);
             Assertions.assertEquals(actual, array.argmax());
+            Assertions.assertEquals(actual, array.argmax(0));
             // zero-dim
             array = manager.create(new Shape(2, 0, 1));
             NDArray finalArray = array;
@@ -506,27 +517,36 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testArgmin() {
-        // TODO switch to numpy argmin
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original =
+            NDArray array =
                     manager.create(
                             new float[] {
                                 1, 23, 3, 74, 4, 5, 6, -23, -54, 234, 54, 2, 54, 4, -34, 34, 23,
                                 -54, 4, 3
                             },
                             new Shape(4, 5));
-            NDArray argMax = original.argmin();
-            // TODO this should be manager.create(8f)
-            NDArray actual = manager.create(new float[] {8});
-            Assertions.assertEquals(actual, argMax, "Argmax: Incorrect value");
+            NDArray argmin = array.argmin();
+            NDArray actual = manager.create(8f);
+            Assertions.assertEquals(actual, argmin, "Argmin: Incorrect value");
 
-            argMax = original.argmin(0, false);
+            argmin = array.argmin(0);
             actual = manager.create(new float[] {0, 2, 3, 1, 2});
-            Assertions.assertEquals(actual, argMax, "Argmax: Incorrect value");
+            Assertions.assertEquals(actual, argmin, "Argmin: Incorrect value");
 
-            argMax = original.argmin(1, true);
-            actual = manager.create(new float[] {0, 3, 4, 2}, new Shape(4, 1));
-            Assertions.assertEquals(actual, argMax, "Argmax: Incorrect value");
+            argmin = array.argmin(1);
+            actual = manager.create(new float[] {0, 3, 4, 2});
+            Assertions.assertEquals(actual, argmin, "Argmin: Incorrect value");
+
+            // scalar
+            array = manager.create(1f);
+            actual = manager.create(0f);
+            Assertions.assertEquals(actual, array.argmin(), "Argmin: Incorrect value");
+            Assertions.assertEquals(actual, array.argmin(0), "Argmin: Incorrect value");
+
+            // zero-dim
+            array = manager.create(new Shape(0, 1, 0));
+            actual = manager.create(new Shape(0, 0));
+            Assertions.assertEquals(actual, array.argmin(1), "Argmin: Incorrect value");
         }
     }
 

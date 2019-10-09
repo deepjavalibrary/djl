@@ -843,7 +843,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray argmax(int axis, boolean keepDims) {
+    public NDArray argmax(int axis) {
         return null;
     }
 
@@ -853,7 +853,7 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public NDArray argmin(int axis, boolean keepDims) {
+    public NDArray argmin(int axis) {
         return null;
     }
 

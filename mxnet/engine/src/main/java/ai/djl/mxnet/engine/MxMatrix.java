@@ -1131,8 +1131,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmax(int axis, boolean keepDims) {
-        return array.argmax(axis, keepDims);
+    public NDArray argmax(int axis) {
+        return array.argmax(axis);
     }
 
     /** {@inheritDoc} */
@@ -1143,8 +1143,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmin(int axis, boolean keepDims) {
-        return array.argmin(axis, keepDims);
+    public NDArray argmin(int axis) {
+        return array.argmin(axis);
     }
 
     /** {@inheritDoc} */

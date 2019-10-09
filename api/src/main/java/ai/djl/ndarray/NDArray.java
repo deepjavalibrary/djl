@@ -527,7 +527,7 @@ public interface NDArray extends AutoCloseable {
      */
     default NDArray slice() {
         // TODO: MXNet doesn't support view, return a copy for now
-        return dup();
+        return duplicate();
     }
 
     /**
@@ -535,7 +535,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return a copy of this NDArray
      */
-    default NDArray dup() {
+    default NDArray duplicate() {
         NDArray nd = getManager().create(getShape(), getDataType(), getDevice());
         copyTo(nd);
         return nd;
@@ -2242,11 +2242,9 @@ public interface NDArray extends AutoCloseable {
      * This method returns index of highest value along specified axi(e)s.
      *
      * @param axis the axis along which to find argmax
-     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
-     *     false} to squeeze the values out of the output array
      * @return Array containing indices
      */
-    NDArray argmax(int axis, boolean keepDims);
+    NDArray argmax(int axis);
 
     /**
      * This method returns index of lowest value.
@@ -2259,11 +2257,9 @@ public interface NDArray extends AutoCloseable {
      * This method returns index of lowest value along specified axi(e)s.
      *
      * @param axis the axis along which to find argmax
-     * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
-     *     false} to squeeze the values out of the output array
      * @return Array containing indices
      */
-    NDArray argmin(int axis, boolean keepDims);
+    NDArray argmin(int axis);
 
     /**
      * Returns percentile value for this {@code NDArray}.

@@ -990,7 +990,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmax(int axis, boolean keepDims) {
+    public NDArray argmax(int axis) {
         return null;
     }
 
@@ -1002,7 +1002,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmin(int axis, boolean keepDims) {
+    public NDArray argmin(int axis) {
         return null;
     }
 
