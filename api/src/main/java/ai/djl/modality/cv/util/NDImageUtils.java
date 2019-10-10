@@ -25,12 +25,12 @@ public final class NDImageUtils {
         return image.getNDArrayInternal().resize(new int[] {size, size});
     }
 
-    public static NDArray resize(NDArray image, int[] size) {
-        return image.getNDArrayInternal().resize(size);
+    public static NDArray resize(NDArray image, int height, int width) {
+        return image.getNDArrayInternal().resize(new int[] {width, height});
     }
 
-    public static NDArray resize(NDArray image, int height, int width) {
-        return image.getNDArrayInternal().resize(new int[] {height, width});
+    public static NDArray normalize(NDArray input, float mean, float std) {
+        return normalize(input, new float[] {mean, mean, mean}, new float[] {std, std, std});
     }
 
     /**

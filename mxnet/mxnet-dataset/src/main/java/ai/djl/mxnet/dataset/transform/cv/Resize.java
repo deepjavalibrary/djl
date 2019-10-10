@@ -18,22 +18,21 @@ import ai.djl.translate.Transform;
 
 /** Resize the image. */
 public class Resize implements Transform {
-    private int[] size;
+    private int height;
+    private int width;
 
     public Resize(int size) {
-        this.size = new int[] {size, size};
-    }
-
-    public Resize(int[] size) {
-        this.size = size;
+        height = size;
+        width = size;
     }
 
     public Resize(int height, int width) {
-        this.size = new int[] {height, width};
+        this.height = height;
+        this.width = width;
     }
 
     @Override
     public NDArray transform(NDArray array, boolean close) {
-        return NDImageUtils.resize(array, size);
+        return NDImageUtils.resize(array, height, width);
     }
 }

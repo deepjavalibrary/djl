@@ -600,6 +600,9 @@ class MxNDArrayEx implements NDArrayEx {
 
     @Override
     public NDArray resize(int[] size) {
+        if (array.isEmpty()) {
+            throw new IllegalArgumentException("attempt to resize of an empty NDArray");
+        }
         MxOpParams params = new MxOpParams();
         params.addTupleParam("size", size);
         return manager.invoke("_npx__image_resize", array, params);

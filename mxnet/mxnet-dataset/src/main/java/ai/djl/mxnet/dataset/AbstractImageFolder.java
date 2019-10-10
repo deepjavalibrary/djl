@@ -193,7 +193,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         }
 
         public T setResize(int height, int width) {
-            this.resize = new Resize(new int[] {height, width});
+            this.resize = new Resize(height, width);
             return self();
         }
     }
