@@ -13,8 +13,8 @@
 package ai.djl.mxnet.zoo.cv.objectdetection;
 
 import ai.djl.modality.cv.DetectedObjects;
-import ai.djl.mxnet.zoo.BaseModelLoader;
-import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.mxnet.zoo.BaseSymbolModelLoader;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 public class SingleShotDetectionModelLoader
-        extends BaseModelLoader<BufferedImage, DetectedObjects> {
+        extends BaseSymbolModelLoader<BufferedImage, DetectedObjects> {
 
     private static final Anchor BASE_ANCHOR = CV.OBJECT_DETECTION;
-    private static final String GROUP_ID = ModelZoo.GROUP_ID;
+    private static final String GROUP_ID = MxModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "ssd";
     private static final String VERSION = "0.0.2";
 

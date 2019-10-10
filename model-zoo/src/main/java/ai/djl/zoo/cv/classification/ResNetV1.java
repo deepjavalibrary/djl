@@ -260,7 +260,7 @@ public final class ResNetV1 {
          * @param batchNormMomemtum Number of layers
          * @return Returns this Builder
          */
-        public Builder setBatchNormMomemtum(long batchNormMomemtum) {
+        public Builder setBatchNormMomemtum(float batchNormMomemtum) {
             this.batchNormMomentum = batchNormMomemtum;
             return this;
         }

@@ -19,7 +19,7 @@ import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.translate.TranslateException;
 import ai.djl.zoo.ModelNotFoundException;
 import ai.djl.zoo.ZooModel;
@@ -50,7 +50,7 @@ public class InstanceSegementationExample extends AbstractExample {
         criteria.put("flavor", "v1b");
         criteria.put("backbone", "resnet18");
         criteria.put("dataset", "coco");
-        ZooModel<BufferedImage, DetectedObjects> model = ModelZoo.MASK_RCNN.loadModel(criteria);
+        ZooModel<BufferedImage, DetectedObjects> model = MxModelZoo.MASK_RCNN.loadModel(criteria);
 
         try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics

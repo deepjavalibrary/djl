@@ -14,7 +14,7 @@ package ai.djl;
 
 import ai.djl.mxnet.dataset.Cifar10;
 import ai.djl.mxnet.engine.MxEngine;
-import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Repository;
 import ai.djl.test.CoverageUtils;
 import ai.djl.zoo.cv.classification.ResNetV1;
@@ -41,6 +41,6 @@ public class CoverageTest {
         CoverageUtils.testGetterSetters(MxEngine.class);
 
         // mxnet-model-zoo
-        CoverageUtils.testGetterSetters(ModelZoo.class);
+        CoverageUtils.testGetterSetters(MxModelZoo.class);
     }
 }

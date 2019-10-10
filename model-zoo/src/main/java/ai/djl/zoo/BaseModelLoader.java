@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.zoo;
+package ai.djl.zoo;
 
 import ai.djl.Device;
 import ai.djl.Model;
@@ -20,8 +20,6 @@ import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
 import ai.djl.repository.VersionRange;
 import ai.djl.translate.Translator;
-import ai.djl.zoo.ModelNotFoundException;
-import ai.djl.zoo.ZooModel;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -47,7 +45,7 @@ public abstract class BaseModelLoader<I, O> {
         if (metadata == null) {
             metadata = repository.locate(mrl);
             if (metadata == null) {
-                throw new ModelNotFoundException(mrl.getArtifactId() + "Models not found.");
+                throw new ModelNotFoundException(mrl.getArtifactId() + " Models not found.");
             }
         }
         return metadata;
@@ -68,9 +66,14 @@ public abstract class BaseModelLoader<I, O> {
         Path dir = repository.getCacheDirectory();
         String relativePath = artifact.getResourceUri().getPath();
         Path modelPath = dir.resolve(relativePath);
+        Model model = loadModel(artifact, modelPath, device);
+        return new ZooModel<>(model, getTranslator());
+    }
+
+    protected Model loadModel(Artifact artifact, Path modelPath, Device device) throws IOException {
         Model model = Model.newInstance(device);
         model.load(modelPath, artifact.getName());
-        return new ZooModel<>(model, getTranslator());
+        return model;
     }
 
     public Artifact match(Map<String, String> criteria) throws IOException, ModelNotFoundException {

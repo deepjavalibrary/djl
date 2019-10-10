@@ -316,21 +316,26 @@ public class MxModel implements Model {
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")
     private void loadParameters(String modelName, Map<String, String> options) throws IOException {
-        String epochOption = null;
-        if (options != null) {
-            epochOption = options.get("epoch");
-        }
-        int epoch;
-        if (epochOption == null) {
-            epoch = Utils.getCurrentEpoch(modelDir, modelName);
-            if (epoch == -1) {
-                throw new IOException("Parameter file not found in: " + modelDir);
-            }
+        Path paramFile;
+        if (Files.isRegularFile(modelDir)) {
+            paramFile = modelDir;
         } else {
-            epoch = Integer.parseInt(epochOption);
-        }
+            String epochOption = null;
+            if (options != null) {
+                epochOption = options.get("epoch");
+            }
+            int epoch;
+            if (epochOption == null) {
+                epoch = Utils.getCurrentEpoch(modelDir, modelName);
+                if (epoch == -1) {
+                    throw new IOException("Parameter file not found in: " + modelDir);
+                }
+            } else {
+                epoch = Integer.parseInt(epochOption);
+            }
 
-        Path paramFile = modelDir.resolve(String.format("%s-%04d.params", modelName, epoch));
+            paramFile = modelDir.resolve(String.format("%s-%04d.params", modelName, epoch));
+        }
         if (readParameters(paramFile)) {
             return;
         }

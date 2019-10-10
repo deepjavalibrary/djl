@@ -13,8 +13,8 @@
 package ai.djl.mxnet.zoo.cv.poseestimation;
 
 import ai.djl.modality.cv.Joints;
-import ai.djl.mxnet.zoo.BaseModelLoader;
-import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.mxnet.zoo.BaseSymbolModelLoader;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
 import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
@@ -22,10 +22,10 @@ import ai.djl.repository.Repository;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 
-public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints> {
+public class SimplePoseModelLoader extends BaseSymbolModelLoader<BufferedImage, Joints> {
 
     private static final Anchor BASE_ANCHOR = CV.POSE_ESTIMATION;
-    private static final String GROUP_ID = ModelZoo.GROUP_ID;
+    private static final String GROUP_ID = MxModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "simple_pose";
     private static final String VERSION = "0.0.1";
 

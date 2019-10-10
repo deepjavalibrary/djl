@@ -24,6 +24,7 @@ public class Arguments {
     private boolean isSymbolic;
     private boolean preTrained;
     private String outputDir;
+    private int maxIterations;
 
     public Arguments(CommandLine cmd) {
         if (cmd.hasOption("epoch")) {
@@ -55,6 +56,11 @@ public class Arguments {
             outputDir = cmd.getOptionValue("output-dir");
         } else {
             outputDir = null;
+        }
+        if (cmd.hasOption("max-iterations")) {
+            maxIterations = Integer.parseInt(cmd.getOptionValue("max-iterations"));
+        } else {
+            maxIterations = -1;
         }
     }
 
@@ -102,6 +108,13 @@ public class Arguments {
                         .argName("OUTPUT-DIR")
                         .desc("Use output to determine directory to save your model parameters")
                         .build());
+        options.addOption(
+                Option.builder("m")
+                        .longOpt("max-iterations")
+                        .hasArg()
+                        .argName("max-iterations")
+                        .desc("Limit each epoch to a fixed number of iterations")
+                        .build());
         return options;
     }
 
@@ -127,5 +140,9 @@ public class Arguments {
 
     public String getOutputDir() {
         return outputDir;
+    }
+
+    public int getMaxIterations() {
+        return maxIterations;
     }
 }

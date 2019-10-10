@@ -19,7 +19,7 @@ import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classification;
 import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.translate.TranslateException;
 import ai.djl.zoo.ModelNotFoundException;
 import ai.djl.zoo.ZooModel;
@@ -49,7 +49,8 @@ public final class ClassifyExample extends AbstractExample {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("layers", "18");
         criteria.put("flavor", "v1");
-        ZooModel<BufferedImage, Classification> model = ModelZoo.RESNET.loadModel(criteria, device);
+        ZooModel<BufferedImage, Classification> model =
+                MxModelZoo.RESNET.loadModel(criteria, device);
 
         try (Predictor<BufferedImage, Classification> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics

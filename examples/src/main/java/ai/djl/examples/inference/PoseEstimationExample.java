@@ -21,7 +21,7 @@ import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.Joints;
 import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.translate.TranslateException;
 import ai.djl.zoo.ModelNotFoundException;
 import ai.djl.zoo.ZooModel;
@@ -60,7 +60,7 @@ public class PoseEstimationExample extends AbstractExample {
         criteria.put("size", "512");
         criteria.put("backbone", "resnet50_v1");
         criteria.put("dataset", "voc");
-        ZooModel<BufferedImage, DetectedObjects> ssd = ModelZoo.SSD.loadModel(criteria);
+        ZooModel<BufferedImage, DetectedObjects> ssd = MxModelZoo.SSD.loadModel(criteria);
 
         DetectedObjects ssdResult;
         try (Predictor<BufferedImage, DetectedObjects> predictor = ssd.newPredictor()) {
@@ -95,7 +95,7 @@ public class PoseEstimationExample extends AbstractExample {
         criteria.put("backbone", "resnet18");
         criteria.put("dataset", "imagenet");
 
-        ZooModel<BufferedImage, Joints> pose = ModelZoo.SIMPLE_POSE.loadModel(criteria);
+        ZooModel<BufferedImage, Joints> pose = MxModelZoo.SIMPLE_POSE.loadModel(criteria);
 
         List<Joints> poseResult = new ArrayList<>();
         try (Predictor<BufferedImage, Joints> predictor = pose.newPredictor()) {

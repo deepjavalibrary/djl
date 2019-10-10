@@ -13,20 +13,21 @@
 package ai.djl.mxnet.zoo.cv.classification;
 
 import ai.djl.modality.Classification;
-import ai.djl.mxnet.zoo.BaseModelLoader;
-import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.mxnet.zoo.BaseSymbolModelLoader;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
 import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.translate.Translator;
+import ai.djl.zoo.cv.classification.ImageClassificationTranslator;
 import java.awt.image.BufferedImage;
 
 public abstract class ImageNetBaseModelLoader
-        extends BaseModelLoader<BufferedImage, Classification> {
+        extends BaseSymbolModelLoader<BufferedImage, Classification> {
 
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
-    private static final String GROUP_ID = ModelZoo.GROUP_ID;
+    private static final String GROUP_ID = MxModelZoo.GROUP_ID;
 
     public ImageNetBaseModelLoader(Repository repository, String artifactId, String version) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, artifactId), version);

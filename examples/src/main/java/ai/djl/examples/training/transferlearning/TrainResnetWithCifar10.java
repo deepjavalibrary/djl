@@ -19,7 +19,7 @@ import ai.djl.examples.training.util.Arguments;
 import ai.djl.mxnet.dataset.Cifar10;
 import ai.djl.mxnet.dataset.DatasetUtils;
 import ai.djl.mxnet.dataset.transform.cv.ToTensor;
-import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataDesc;
@@ -80,7 +80,7 @@ public final class TrainResnetWithCifar10 {
             Map<String, String> criteria = new ConcurrentHashMap<>();
             criteria.put("layers", "152");
             criteria.put("flavor", "v1d");
-            Model model = ModelZoo.RESNET.loadModel(criteria);
+            Model model = MxModelZoo.RESNET.loadModel(criteria);
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
             block.removeLastBlock();
@@ -185,6 +185,9 @@ public final class TrainResnetWithCifar10 {
                         b.close();
                     }
                     batch.close();
+                    if (batchNum == arguments.getMaxIterations()) {
+                        break;
+                    }
                 }
                 lossValue = trainer.getLoss();
                 accuracy = trainer.getTrainingMetrics().get(0).getMetric().getValue();

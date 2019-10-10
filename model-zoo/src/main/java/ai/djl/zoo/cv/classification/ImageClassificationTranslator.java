@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.mxnet.zoo.cv.classification;
+package ai.djl.zoo.cv.classification;
 
 import ai.djl.Model;
 import ai.djl.modality.Classification;

@@ -18,7 +18,7 @@ import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classification;
 import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.translate.TranslateException;
 import ai.djl.zoo.ModelNotFoundException;
 import ai.djl.zoo.ZooModel;
@@ -45,7 +45,7 @@ public class ActionRecognition extends AbstractExample {
         criteria.put("backbone", "inceptionv3");
         criteria.put("dataset", "ucf101");
         ZooModel<BufferedImage, Classification> inception =
-                ModelZoo.ACTION_RECOGNITION.loadModel(criteria);
+                MxModelZoo.ACTION_RECOGNITION.loadModel(criteria);
 
         try (Predictor<BufferedImage, Classification> action = inception.newPredictor()) {
             action.setMetrics(metrics); // Let predictor collect metrics

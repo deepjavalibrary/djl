@@ -13,7 +13,6 @@
 package ai.djl.integration.tests;
 
 import ai.djl.Model;
-import ai.djl.integration.util.Assertions;
 import ai.djl.mxnet.engine.MxGradientCollector;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -22,8 +21,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Block;
-import ai.djl.nn.Parameter;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
@@ -33,12 +30,9 @@ import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.optimizer.Nag;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.Sgd;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
-import ai.djl.util.PairList;
-import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -129,53 +123,6 @@ public class GradientCollectorIntegrationTest {
                             "Loss did not improve, loss value: %f, expected "
                                     + "max loss value: %f",
                             lossValue, expectedLoss));
-        }
-    }
-
-    @Test
-    public void testTrainResNet() {
-        Optimizer optimizer =
-                new Nag.Builder()
-                        .setRescaleGrad(1.0f / 100)
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
-                        .setMomentum(0.9f)
-                        .build();
-
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(optimizer);
-
-        Block resNet50 =
-                new ResNetV1.Builder()
-                        .setImageShape(new Shape(1, 28, 28))
-                        .setNumLayers(50)
-                        .setOutSize(10)
-                        .build();
-
-        try (Model model = Model.newInstance()) {
-            model.setBlock(resNet50);
-
-            try (Trainer trainer = model.newTrainer(config)) {
-                Shape inputShape = new Shape(100, 1, 28, 28);
-                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
-
-                NDManager manager = trainer.getManager();
-
-                NDArray input = manager.ones(inputShape);
-                NDArray label = manager.ones(new Shape(100, 1));
-                PairList<String, Parameter> parameters = resNet50.getParameters();
-                try (GradientCollector gradCol = trainer.newGradientCollector()) {
-                    NDArray pred = trainer.forward(new NDList(input)).head();
-                    NDArray loss = Loss.softmaxCrossEntropyLoss().getLoss(label, pred);
-                    gradCol.backward(loss);
-                }
-                trainer.step();
-                NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
-                NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(.8577);
-                NDArray expectedAtIndex87 = manager.ones(new Shape(32, 32, 3, 3));
-                Assert.assertEquals(parameters.get(0).getValue().getArray(), expectedAtIndex0);
-                Assertions.assertAlmostEquals(
-                        parameters.get(1).getValue().getArray(), expectedAtIndex1);
-                Assert.assertEquals(expectedAtIndex87, parameters.get(87).getValue().getArray());
-            }
         }
     }
 }

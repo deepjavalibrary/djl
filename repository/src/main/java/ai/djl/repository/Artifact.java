@@ -14,6 +14,7 @@ package ai.djl.repository;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class Artifact {
     private boolean snapshot;
     private String name;
     private LinkedHashMap<String, String> properties;
+    private LinkedHashMap<String, Object> arguments;
     private Map<String, Item> files;
 
     private transient Metadata metadata;
@@ -91,6 +93,14 @@ public class Artifact {
         this.properties = properties;
     }
 
+    public Map<String, Object> getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(LinkedHashMap<String, Object> arguments) {
+        this.arguments = arguments;
+    }
+
     public Metadata getMetadata() {
         return metadata;
     }
@@ -110,6 +120,9 @@ public class Artifact {
     }
 
     public Map<String, Item> getFiles() {
+        if (files == null) {
+            return Collections.emptyMap();
+        }
         for (Map.Entry<String, Item> file : files.entrySet()) {
             file.getValue().setArtifact(this);
             if (file.getValue().name == null && "dir".equals(file.getValue().getType())) {

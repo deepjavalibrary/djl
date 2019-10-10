@@ -22,7 +22,7 @@ import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
 import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
 import ai.djl.repository.Repository;
 
-public interface ModelZoo {
+public interface MxModelZoo {
 
     String MXNET_REPO_URL = "https://joule.s3.amazonaws.com/mlrepo/";
     Repository REPOSITORY = Repository.newInstance("MxNet", MXNET_REPO_URL);

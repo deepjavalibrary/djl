@@ -1,0 +1,37 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl",
+  "artifactId": "resnetv1",
+  "type": "cv",
+  "name": "Resnet",
+  "description": "Resnet image classification",
+  "website": "http://www.mxnet.io",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "http://aws.amazon.com/apache2.0/"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnetv1",
+      "arguments": {
+        "numLayers": 50,
+        "outSize": 10,
+        "imageShape": [3, 32, 32]
+      },
+      "properties": {
+        "numLayers": "50",
+        "dataset": "cifar10"
+      },
+      "files": {
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/other+resources/resnet-0000.params",
+          "sha1Hash": "603085970a3c4c5028cc7a85e7183ccfb449c853"
+        }
+      }
+    }
+  ]
+}
