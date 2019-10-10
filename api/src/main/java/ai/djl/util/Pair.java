@@ -54,7 +54,6 @@ public class Pair<K, V> {
         return value;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -64,10 +63,9 @@ public class Pair<K, V> {
             return false;
         }
         Pair<?, ?> pair = (Pair<?, ?>) o;
-        return key.equals(pair.key) && value.equals(pair.value);
+        return Objects.equals(key, pair.key) && value.equals(pair.value);
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return Objects.hash(key, value);

@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import java.util.stream.DoubleStream;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class NDArrayNumericOpTest {
@@ -28,24 +29,24 @@ public class NDArrayNumericOpTest {
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(x -> -x).toArray();
             NDArray actual = manager.create(data);
-            Assertions.assertEquals(actual, array.neg());
+            Assert.assertEquals(actual, array.neg());
             Assertions.assertInPlaceEquals(actual, array.negi(), array);
             // test multi-dim
             data = new double[] {-2.2, 2.2, 3, -0.2, 2.76, 0.0002};
             array = manager.create(data, new Shape(2, 3));
             data = DoubleStream.of(data).map(x -> -x).toArray();
             actual = manager.create(data, new Shape(2, 3));
-            Assertions.assertEquals(actual, array.neg());
+            Assert.assertEquals(actual, array.neg());
             Assertions.assertInPlaceEquals(actual, array.negi(), array);
             // test scalar
             array = manager.create(3f);
             actual = manager.create(-3f);
-            Assertions.assertEquals(actual, array.neg());
+            Assert.assertEquals(actual, array.neg());
             Assertions.assertInPlaceEquals(actual, array.negi(), array);
             // test zero-dim
             array = manager.create(new Shape(2, 0, 1));
             actual = manager.create(new Shape(2, 0, 1));
-            Assertions.assertEquals(actual, array.neg());
+            Assert.assertEquals(actual, array.neg());
             Assertions.assertInPlaceEquals(actual, array.negi(), array);
         }
     }
@@ -70,7 +71,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.abs());
             // test zero-dim
             array = manager.create(new Shape(0, 0, 2, 0));
-            Assertions.assertEquals(array, array.abs());
+            Assert.assertEquals(array, array.abs());
         }
     }
 
@@ -94,7 +95,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.abs());
             // test zero-dim
             array = manager.create(new Shape(0, 0, 2, 0));
-            Assertions.assertEquals(array, array.abs());
+            Assert.assertEquals(array, array.abs());
         }
     }
 
@@ -118,7 +119,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.cbrt());
             // test zero-dim
             array = manager.create(new Shape(1, 0, 2));
-            Assertions.assertEquals(array, array.cbrt());
+            Assert.assertEquals(array, array.cbrt());
         }
     }
 
@@ -142,7 +143,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.floor());
             // test zero-dim
             array = manager.create(new Shape(1, 1, 2, 0));
-            Assertions.assertEquals(array, array.floor());
+            Assert.assertEquals(array, array.floor());
         }
     }
 
@@ -166,7 +167,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.ceil());
             // test zero-dim
             array = manager.create(new Shape(1, 2, 3, 0));
-            Assertions.assertEquals(array, array.ceil());
+            Assert.assertEquals(array, array.ceil());
         }
     }
 
@@ -184,14 +185,14 @@ public class NDArrayNumericOpTest {
             // the result of round in Maths is different from Numpy
             data = new double[] {-2.0, -2.0, 0.0, 0.0, 2.0, 2.0, 2.0, 2.0};
             actual = manager.create(data, new Shape(4, 2));
-            Assertions.assertEquals(actual, array.round());
+            Assert.assertEquals(actual, array.round());
             // test scalar
             array = manager.create(1.0001f);
             actual = manager.create(1f);
             Assertions.assertAlmostEquals(actual, array.round());
             // test zero-dim
             array = manager.create(new Shape(1, 2, 3, 0));
-            Assertions.assertEquals(array, array.round());
+            Assert.assertEquals(array, array.round());
         }
     }
 
@@ -215,7 +216,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.trunc());
             // test zero-dim
             array = manager.create(new Shape(1, 2, 3, 0));
-            Assertions.assertEquals(array, array.trunc());
+            Assert.assertEquals(array, array.trunc());
         }
     }
 
@@ -239,7 +240,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.exp());
             // test zero-dim
             array = manager.create(new Shape(0, 3, 3, 2));
-            Assertions.assertEquals(array, array.exp());
+            Assert.assertEquals(array, array.exp());
         }
     }
 
@@ -263,7 +264,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.log());
             // test zero-dim
             array = manager.create(new Shape(1, 0));
-            Assertions.assertEquals(array, array.log());
+            Assert.assertEquals(array, array.log());
         }
     }
 
@@ -328,14 +329,14 @@ public class NDArrayNumericOpTest {
             array = manager.create(data, new Shape(2, 3));
             data = DoubleStream.of(data).map(Math::sin).toArray();
             actual = manager.create(data, new Shape(2, 3));
-            Assertions.assertEquals(actual, array.sin());
+            Assert.assertEquals(actual, array.sin());
             // test scalar
             array = manager.create(0.5 * Math.PI);
             actual = manager.create(1.0);
-            Assertions.assertEquals(actual, array.sin());
+            Assert.assertEquals(actual, array.sin());
             // test zero-dim
             array = manager.create(new Shape(1, 0, 2));
-            Assertions.assertEquals(array, array.sin());
+            Assert.assertEquals(array, array.sin());
         }
     }
 
@@ -356,10 +357,10 @@ public class NDArrayNumericOpTest {
             // test scalar
             array = manager.create(0f);
             actual = manager.create(1.0f);
-            Assertions.assertEquals(actual, array.cos());
+            Assert.assertEquals(actual, array.cos());
             // test zero-dim
             array = manager.create(new Shape(0, 1, 2));
-            Assertions.assertEquals(array, array.cos());
+            Assert.assertEquals(array, array.cos());
         }
     }
 
@@ -380,10 +381,10 @@ public class NDArrayNumericOpTest {
             // test scalar
             array = manager.create(0f);
             actual = manager.create(0f);
-            Assertions.assertEquals(actual, array.tan());
+            Assert.assertEquals(actual, array.tan());
             // test zero-dim
             array = manager.create(new Shape(0, 0, 2));
-            Assertions.assertEquals(array, array.tan());
+            Assert.assertEquals(array, array.tan());
         }
     }
 
@@ -404,10 +405,10 @@ public class NDArrayNumericOpTest {
             // test scalar
             array = manager.create(0f);
             actual = manager.create(0f);
-            Assertions.assertEquals(actual, array.asin());
+            Assert.assertEquals(actual, array.asin());
             // test zero-dim
             array = manager.create(new Shape(2, 0, 2));
-            Assertions.assertEquals(array, array.asin());
+            Assert.assertEquals(array, array.asin());
         }
     }
 
@@ -431,7 +432,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.acos());
             // test zero-dim
             array = manager.create(new Shape(0, 1));
-            Assertions.assertEquals(array, array.acos());
+            Assert.assertEquals(array, array.acos());
         }
     }
 
@@ -455,7 +456,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.atan());
             // test zero-dim
             array = manager.create(new Shape(1, 0));
-            Assertions.assertEquals(array, array.atan());
+            Assert.assertEquals(array, array.atan());
         }
     }
 
@@ -482,7 +483,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.toDegrees());
             // test zero-dim
             array = manager.create(new Shape(0, 1));
-            Assertions.assertEquals(array, array.toDegrees());
+            Assert.assertEquals(array, array.toDegrees());
         }
     }
 
@@ -510,7 +511,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.toRadians());
             // test zero-dim
             array = manager.create(new Shape(1, 1, 0, 1));
-            Assertions.assertEquals(array, array.toRadians());
+            Assert.assertEquals(array, array.toRadians());
         }
     }
 
@@ -534,7 +535,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.sinh());
             // test zero-dim
             array = manager.create(new Shape(1, 0, 0, 1));
-            Assertions.assertEquals(array, array.sinh());
+            Assert.assertEquals(array, array.sinh());
         }
     }
 
@@ -558,7 +559,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.cosh());
             // test zero-dim
             array = manager.create(new Shape(0, 0, 0, 0));
-            Assertions.assertEquals(array, array.cosh());
+            Assert.assertEquals(array, array.cosh());
         }
     }
 
@@ -582,7 +583,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.tanh());
             // test zero-dim
             array = manager.create(new Shape(0, 4, 0, 0));
-            Assertions.assertEquals(array, array.tanh());
+            Assert.assertEquals(array, array.tanh());
         }
     }
 
@@ -610,7 +611,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.asinh());
             // test zero-dim
             array = manager.create(new Shape(0));
-            Assertions.assertEquals(array, array.asinh());
+            Assert.assertEquals(array, array.asinh());
         }
     }
 
@@ -638,7 +639,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.acosh());
             // test zero-dim
             array = manager.create(new Shape(0, 0));
-            Assertions.assertEquals(array, array.acosh());
+            Assert.assertEquals(array, array.acosh());
         }
     }
 
@@ -661,7 +662,7 @@ public class NDArrayNumericOpTest {
             Assertions.assertAlmostEquals(actual, array.atanh());
             // test zero-dim
             array = manager.create(new Shape(0, 0));
-            Assertions.assertEquals(array, array.atanh());
+            Assert.assertEquals(array, array.atanh());
         }
     }
 }

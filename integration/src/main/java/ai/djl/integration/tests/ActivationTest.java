@@ -24,6 +24,7 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ActivationTest {
@@ -39,10 +40,10 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray original = manager.create(new float[] {-1, 0, 2});
                 NDArray expected = manager.create(new float[] {0, 0, 2});
-                Assertions.assertEquals(expected, Activation.relu(original));
+                Assert.assertEquals(expected, Activation.relu(original));
                 NDList expectedList = new NDList(expected);
                 NDList ndList = new NDList(original);
-                Assertions.assertEquals(expectedList, trainer.forward(ndList));
+                Assert.assertEquals(expectedList, trainer.forward(ndList));
             }
         }
     }
@@ -74,10 +75,10 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray original = manager.create(new float[] {0});
                 NDArray expected = manager.create(new float[] {0});
-                Assertions.assertEquals(expected, Activation.tanh(original));
+                Assert.assertEquals(expected, Activation.tanh(original));
                 NDList expectedList = new NDList(expected);
                 NDList ndList = new NDList(original);
-                Assertions.assertEquals(expectedList, trainer.forward(ndList));
+                Assert.assertEquals(expectedList, trainer.forward(ndList));
             }
         }
     }
@@ -110,7 +111,7 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray original = manager.create(new float[] {-1, 0, 2});
                 NDArray expected = manager.create(new float[] {-1, 0, 2});
-                Assertions.assertEquals(expected, Activation.leakyRelu(original, alpha));
+                Assert.assertEquals(expected, Activation.leakyRelu(original, alpha));
 
                 NDList expectedList = new NDList(expected);
                 NDList ndList = new NDList(original);
@@ -129,11 +130,11 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray original = manager.create(new float[] {0, 2});
                 NDArray expected = manager.create(new float[] {0, 2});
-                Assertions.assertEquals(expected, Activation.elu(original, alpha));
+                Assert.assertEquals(expected, Activation.elu(original, alpha));
 
                 NDList expectedList = new NDList(expected);
                 NDList ndList = new NDList(original);
-                Assertions.assertEquals(expectedList, trainer.forward(ndList));
+                Assert.assertEquals(expectedList, trainer.forward(ndList));
             }
         }
     }
@@ -147,11 +148,11 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray original = manager.create(new float[] {0});
                 NDArray expected = manager.create(new float[] {0});
-                Assertions.assertEquals(expected, Activation.selu(original));
+                Assert.assertEquals(expected, Activation.selu(original));
 
                 NDList expectedList = new NDList(expected);
                 NDList ndList = new NDList(original);
-                Assertions.assertEquals(expectedList, trainer.forward(ndList));
+                Assert.assertEquals(expectedList, trainer.forward(ndList));
             }
         }
     }
@@ -165,11 +166,11 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray original = manager.create(new float[] {0});
                 NDArray expected = manager.create(new float[] {0});
-                Assertions.assertEquals(expected, Activation.gelu(original));
+                Assert.assertEquals(expected, Activation.gelu(original));
 
                 NDList expectedList = new NDList(expected);
                 NDList ndList = new NDList(original);
-                Assertions.assertEquals(expectedList, trainer.forward(ndList));
+                Assert.assertEquals(expectedList, trainer.forward(ndList));
             }
         }
     }
@@ -184,11 +185,11 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray original = manager.create(new float[] {0});
                 NDArray expected = manager.create(new float[] {0});
-                Assertions.assertEquals(expected, Activation.swish(original, beta));
+                Assert.assertEquals(expected, Activation.swish(original, beta));
 
                 NDList expectedList = new NDList(expected);
                 NDList ndList = new NDList(original);
-                Assertions.assertEquals(expectedList, trainer.forward(ndList));
+                Assert.assertEquals(expectedList, trainer.forward(ndList));
             }
         }
     }
@@ -204,7 +205,7 @@ public class ActivationTest {
 
                 NDArray original = manager.create(new float[] {-1, 0, 2});
                 NDList expected = new NDList(manager.create(new float[] {-1, 0, 2}));
-                Assertions.assertEquals(expected, trainer.forward(new NDList(original)));
+                Assert.assertEquals(expected, trainer.forward(new NDList(original)));
             }
         }
     }

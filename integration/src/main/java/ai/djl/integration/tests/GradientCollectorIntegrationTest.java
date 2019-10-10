@@ -41,6 +41,7 @@ import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.util.PairList;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class GradientCollectorIntegrationTest {
@@ -53,8 +54,8 @@ public class GradientCollectorIntegrationTest {
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             lhs.attachGradient();
             // autograd automatically set recording and training during initialization
-            Assertions.assertTrue(MxGradientCollector.isRecording());
-            Assertions.assertTrue(MxGradientCollector.isTraining());
+            Assert.assertTrue(MxGradientCollector.isRecording());
+            Assert.assertTrue(MxGradientCollector.isTraining());
 
             NDArray result = NDArrays.dot(lhs, rhs);
             gradCol.backward(result);
@@ -123,7 +124,7 @@ public class GradientCollectorIntegrationTest {
             }
             float lossValue = lossMetric.getMetric().getValue();
             float expectedLoss = 0.001f;
-            Assertions.assertTrue(
+            Assert.assertTrue(
                     lossValue < expectedLoss,
                     String.format(
                             "Loss did not improve, loss value: %f, expected "
@@ -171,11 +172,10 @@ public class GradientCollectorIntegrationTest {
                 NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
                 NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(.8577);
                 NDArray expectedAtIndex87 = manager.ones(new Shape(32, 32, 3, 3));
-                Assertions.assertEquals(parameters.get(0).getValue().getArray(), expectedAtIndex0);
+                Assert.assertEquals(parameters.get(0).getValue().getArray(), expectedAtIndex0);
                 Assertions.assertAlmostEquals(
                         parameters.get(1).getValue().getArray(), expectedAtIndex1);
-                Assertions.assertEquals(
-                        expectedAtIndex87, parameters.get(87).getValue().getArray());
+                Assert.assertEquals(expectedAtIndex87, parameters.get(87).getValue().getArray());
             }
         }
     }

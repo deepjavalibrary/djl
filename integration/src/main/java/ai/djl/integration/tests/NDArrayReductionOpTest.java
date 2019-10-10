@@ -13,65 +13,65 @@
 package ai.djl.integration.tests;
 
 import ai.djl.engine.EngineException;
-import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class NDArrayReductionOpTest {
 
-    @Test
+    @Test(expectedExceptions = EngineException.class)
     public void testMax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 5f, 1f});
-            Assertions.assertEquals(5f, array.max().getFloat());
+            Assert.assertEquals(5f, array.max().getFloat());
 
             array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
             float maxAll = array.max().getFloat();
-            Assertions.assertEquals(8f, maxAll, "Incorrect max all");
+            Assert.assertEquals(8f, maxAll, "Incorrect max all");
 
             NDArray maxAxes = array.max(new int[] {1});
             NDArray maxAxesActual = manager.create(new float[] {4f, 8f});
-            Assertions.assertEquals(maxAxesActual, maxAxes, "Incorrect max axes");
+            Assert.assertEquals(maxAxesActual, maxAxes, "Incorrect max axes");
 
             NDArray maxKeep = array.max(new int[] {0}, true);
             NDArray maxKeepActual = manager.create(new float[] {6f, 8f}, new Shape(1, 2));
-            Assertions.assertEquals(maxKeepActual, maxKeep, "Incorrect max keep");
+            Assert.assertEquals(maxKeepActual, maxKeep, "Incorrect max keep");
 
             // test scalar
             array = manager.create(5f);
-            Assertions.assertEquals(5f, array.max().getFloat());
+            Assert.assertEquals(5f, array.max().getFloat());
             // zero-dim
             array = manager.create(new Shape(1, 0));
-            Assertions.assertThrows(array::max, EngineException.class);
+            array.max();
         }
     }
 
-    @Test
+    @Test(expectedExceptions = EngineException.class)
     public void testMin() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {2f, 1f, 5f, 0f});
-            Assertions.assertEquals(0f, array.min().getFloat());
+            Assert.assertEquals(0f, array.min().getFloat());
 
             array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
             float minAll = array.min().getFloat();
-            Assertions.assertEquals(2f, minAll, "Incorrect min all");
+            Assert.assertEquals(2f, minAll, "Incorrect min all");
 
             NDArray minAxes = array.min(new int[] {1});
             NDArray minAxesActual = manager.create(new float[] {2f, 6f});
-            Assertions.assertEquals(minAxesActual, minAxes, "Incorrect min axes");
+            Assert.assertEquals(minAxesActual, minAxes, "Incorrect min axes");
 
             NDArray minKeep = array.min(new int[] {0}, true);
             NDArray minKeepActual = manager.create(new float[] {2f, 4f}, new Shape(1, 2));
-            Assertions.assertEquals(minKeepActual, minKeep, "Incorrect min keep");
+            Assert.assertEquals(minKeepActual, minKeep, "Incorrect min keep");
 
             // test scalar
             array = manager.create(0f);
-            Assertions.assertEquals(0f, array.min().getFloat());
+            Assert.assertEquals(0f, array.min().getFloat());
             // zero-dim
             array = manager.create(new Shape(0, 2, 0));
-            Assertions.assertThrows(array::min, EngineException.class);
+            array.min();
         }
     }
 
@@ -79,25 +79,25 @@ public class NDArrayReductionOpTest {
     public void testSum() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 5f});
-            Assertions.assertEquals(11f, array.sum().getFloat());
+            Assert.assertEquals(11f, array.sum().getFloat());
 
             array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
             float sumAll = array.sum().getFloat();
-            Assertions.assertEquals(20f, sumAll, "Incorrect sum all");
+            Assert.assertEquals(20f, sumAll, "Incorrect sum all");
             NDArray sumAxes = array.sum(new int[] {1});
             NDArray sumAxesActual = manager.create(new float[] {6f, 14f});
-            Assertions.assertEquals(sumAxesActual, sumAxes, "Incorrect sum axes");
+            Assert.assertEquals(sumAxesActual, sumAxes, "Incorrect sum axes");
 
             NDArray sumKeep = array.sum(new int[] {0}, true);
             NDArray sumKeepActual = manager.create(new float[] {8f, 12f}, new Shape(1, 2));
-            Assertions.assertEquals(sumKeepActual, sumKeep, "Incorrect sum keep");
+            Assert.assertEquals(sumKeepActual, sumKeep, "Incorrect sum keep");
 
             // scalar
             array = manager.create(2f);
-            Assertions.assertEquals(2f, array.sum().getFloat());
+            Assert.assertEquals(2f, array.sum().getFloat());
             // zero-dim
             array = manager.create(new Shape(1, 1, 0));
-            Assertions.assertEquals(0f, array.sum().getFloat());
+            Assert.assertEquals(0f, array.sum().getFloat());
         }
     }
 
@@ -105,28 +105,28 @@ public class NDArrayReductionOpTest {
     public void testProd() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f});
-            Assertions.assertEquals(24f, array.prod().getFloat());
+            Assert.assertEquals(24f, array.prod().getFloat());
 
             array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
 
             float prodAll = array.prod().getFloat();
-            Assertions.assertEquals(384f, prodAll, "Incorrect prod axes");
+            Assert.assertEquals(384f, prodAll, "Incorrect prod axes");
 
             NDArray prodAxes = array.prod(new int[] {1});
             NDArray prodAxesActual = manager.create(new float[] {8f, 48f});
-            Assertions.assertEquals(prodAxesActual, prodAxes, "Incorrect prod axes");
+            Assert.assertEquals(prodAxesActual, prodAxes, "Incorrect prod axes");
 
             NDArray prodKeep = array.prod(new int[] {0}, true);
             NDArray prodKeepActual = manager.create(new float[] {12f, 32f}, new Shape(1, 2));
-            Assertions.assertEquals(prodKeepActual, prodKeep, "Incorrect prod keep");
+            Assert.assertEquals(prodKeepActual, prodKeep, "Incorrect prod keep");
 
             // scalar
             array = manager.create(5f);
-            Assertions.assertEquals(5f, array.prod().getFloat());
+            Assert.assertEquals(5f, array.prod().getFloat());
             // TODO wait for MXNet numpy prod bug fix
             // zero-dim
             // array = manager.create(new Shape(0, 0, 0));
-            // Assertions.assertEquals(1f, array.prod().getFloat());
+            // Assert.assertEquals(1f, array.prod().getFloat());
         }
     }
 
@@ -134,26 +134,26 @@ public class NDArrayReductionOpTest {
     public void testMean() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f});
-            Assertions.assertEquals(2.5f, array.mean().getFloat());
+            Assert.assertEquals(2.5f, array.mean().getFloat());
 
             array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
             float meanAll = array.mean().getFloat();
-            Assertions.assertEquals(5f, meanAll, "Incorrect mean all");
+            Assert.assertEquals(5f, meanAll, "Incorrect mean all");
             NDArray meanAxes = array.mean(new int[] {1});
             NDArray meanAxesActual = manager.create(new float[] {3f, 7f});
-            Assertions.assertEquals(meanAxesActual, meanAxes, "Incorrect mean axes");
+            Assert.assertEquals(meanAxesActual, meanAxes, "Incorrect mean axes");
 
             NDArray meanKeep = array.mean(new int[] {0}, true);
             NDArray meanKeepActaul = manager.create(new float[] {4f, 6f}, new Shape(1, 2));
-            Assertions.assertEquals(meanKeepActaul, meanKeep, "Incorrect mean keep");
+            Assert.assertEquals(meanKeepActaul, meanKeep, "Incorrect mean keep");
 
             // scalar
             array = manager.create(5f);
-            Assertions.assertEquals(5f, array.mean().getFloat());
+            Assert.assertEquals(5f, array.mean().getFloat());
             // TODO disable for now until MXNet np mean bug fix
             // zero-dim
             // array = manager.create(new Shape(0, 0, 0));
-            // Assertions.assertEquals(Float.NaN, array.mean().getFloat());
+            // Assert.assertEquals(Float.NaN, array.mean().getFloat());
         }
     }
     // TODO update libmxnet to get trace op
@@ -162,9 +162,9 @@ public class NDArrayReductionOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.arange(8).reshape(new Shape(2, 2, 2)).trace();
             NDArray expect = manager.create(new float[] {6f, 8f});
-            Assertions.assertEquals(original, expect);
+            Assert.assertEquals(original, expect);
             original = manager.arange(24).reshape(new Shape(2, 2, 2, 3)).trace();
-            Assertions.assertTrue(original.getShape().equals(new Shape(2, 3)));
+            Assert.assertEquals(new Shape(2, 3), original.getShape());
         }
     }
 }

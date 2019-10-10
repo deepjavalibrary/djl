@@ -42,6 +42,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class SymbolBlockTest {
@@ -57,7 +58,7 @@ public class SymbolBlockTest {
             Block block = model.getBlock();
             NDArray arr = manager.ones(new Shape(1, 28, 28));
             Shape shape = block.forward(new NDList(arr)).head().getShape();
-            Assertions.assertTrue(shape.equals(new Shape(1, 10)));
+            Assert.assertEquals(new Shape(1, 10), shape);
         }
     }
 

@@ -13,7 +13,6 @@
 package ai.djl.integration.tests;
 
 import ai.djl.engine.Engine;
-import ai.djl.integration.util.Assertions;
 import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -23,6 +22,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.IntStream;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class NDArrayIOTest {
@@ -37,12 +37,12 @@ public class NDArrayIOTest {
                     Paths.get(NDArrayIOTest.class.getResource("/two_arrays_list").toURI());
             NDList arraysDict = manager.load(arraysDictPath);
             NDList arraysList = manager.load(arraysListPath);
-            Assertions.assertTrue(arraysDict.size() == 2);
-            Assertions.assertTrue(arraysDict.getWithTag(0).getKey().equals("x"));
-            Assertions.assertTrue(arraysDict.getWithTag(1).getKey().equals("y"));
-            Assertions.assertTrue(arraysList.size() == 2);
-            Assertions.assertTrue(arraysList.getWithTag(0).getKey() == null);
-            Assertions.assertTrue(arraysList.getWithTag(1).getKey() == null);
+            Assert.assertEquals(arraysDict.size(), 2);
+            Assert.assertEquals(arraysDict.getWithTag(0).getKey(), "x");
+            Assert.assertEquals(arraysDict.getWithTag(1).getKey(), "y");
+            Assert.assertEquals(arraysList.size(), 2);
+            Assert.assertNull(arraysList.getWithTag(0).getKey());
+            Assert.assertNull(arraysList.getWithTag(1).getKey());
         } catch (URISyntaxException e) {
             throw new AssertionError("URI parsing failed for test resources.", e);
         } finally {
@@ -61,7 +61,7 @@ public class NDArrayIOTest {
                     .forEach((int x) -> ndList.add("array " + x, manager.arange(arangeStop)));
             manager.save(tmpfileNames.toPath(), ndList);
             NDList readNdList = manager.load(tmpfileNames.toPath());
-            Assertions.assertEquals(ndList, readNdList);
+            Assert.assertEquals(ndList, readNdList);
             tmpfileNames.deleteOnExit();
         } catch (IOException e) {
             throw new AssertionError("IOException while creating temporary file.", e);
@@ -69,7 +69,7 @@ public class NDArrayIOTest {
     }
 
     @Test
-    public void testNDArraySaveLoadList() {
+    public void testNDArraySaveLoadList() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             File tmpfileNames = File.createTempFile("ndarray_list", "bin");
             int size = 10;
@@ -78,10 +78,8 @@ public class NDArrayIOTest {
             IntStream.range(0, size).forEach((int x) -> ndList.add(manager.arange(arangeStop)));
             manager.save(tmpfileNames.toPath(), ndList);
             NDList readNdList = manager.load(tmpfileNames.toPath());
-            Assertions.assertEquals(ndList, readNdList);
+            Assert.assertEquals(ndList, readNdList);
             tmpfileNames.deleteOnExit();
-        } catch (IOException e) {
-            throw new AssertionError("IOException while creating temporary file.", e);
         }
     }
 }

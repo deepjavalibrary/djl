@@ -44,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class BlockCoreTest {
@@ -68,7 +69,7 @@ public class BlockCoreTest {
                 NDArray expectedBias =
                         input.dot(manager.ones(new Shape(outSize, 2)).transpose())
                                 .add(manager.zeros(new Shape(2, outSize)));
-                Assertions.assertEquals(outBias, expectedBias);
+                Assert.assertEquals(outBias, expectedBias);
 
                 testEncode(manager, block);
             }
@@ -87,7 +88,7 @@ public class BlockCoreTest {
 
                 NDArray outNoBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
-                Assertions.assertEquals(outNoBias, expectedNoBias);
+                Assert.assertEquals(outNoBias, expectedNoBias);
 
                 testEncode(manager, block);
             }
@@ -117,7 +118,7 @@ public class BlockCoreTest {
                 NDArray expectedBias =
                         input.dot(manager.ones(new Shape(outSize, 2)).transpose())
                                 .add(manager.zeros(new Shape(2, outSize)));
-                Assertions.assertEquals(outBias, expectedBias);
+                Assert.assertEquals(outBias, expectedBias);
 
                 testEncode(manager, block);
             }
@@ -139,7 +140,7 @@ public class BlockCoreTest {
 
                 NDArray outNoBias = trainer.forward(new NDList(input)).head();
                 NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
-                Assertions.assertEquals(outNoBias, expectedNoBias);
+                Assert.assertEquals(outNoBias, expectedNoBias);
 
                 testEncode(manager, block);
             }
@@ -186,7 +187,7 @@ public class BlockCoreTest {
 
                 NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
                 NDArray out = trainer.forward(new NDList(input)).head();
-                Assertions.assertTrue(out.lte(out).all());
+                Assert.assertTrue(out.lte(out).all());
 
                 testEncode(manager, block);
             }
@@ -213,9 +214,8 @@ public class BlockCoreTest {
                 NDManager manager = trainer.getManager();
 
                 // TODO: use trainer.forward
-                Assertions.assertEquals(
-                        block.forward(manager, 'x'), manager.create(new int[] {1, 1}));
-                Assertions.assertEquals(
+                Assert.assertEquals(block.forward(manager, 'x'), manager.create(new int[] {1, 1}));
+                Assert.assertEquals(
                         block.forward(manager, new Character[] {'a', 'b'}),
                         manager.create(new int[] {1, 1, 1, 1}, new Shape(2, 2)));
             }
@@ -247,10 +247,10 @@ public class BlockCoreTest {
                                 inputShape);
                 NDArray expected = manager.create(new float[] {61, 55, 44}, new Shape(1, 1, 3));
                 NDArray out = trainer.forward(new NDList(input)).get(0);
-                Assertions.assertEquals(out, expected);
+                Assert.assertEquals(out, expected);
 
                 Shape[] outputShape = block.getOutputShapes(manager, new Shape[] {inputShape});
-                Assertions.assertEquals(out.getShape(), outputShape[0]);
+                Assert.assertEquals(out.getShape(), outputShape[0]);
 
                 testEncode(manager, block);
             }
@@ -313,11 +313,11 @@ public class BlockCoreTest {
                                 new Shape(1, 1, 2, 2, 2));
 
                 NDArray out = trainer.forward(new NDList(input)).get(0);
-                Assertions.assertEquals(out, expected);
+                Assert.assertEquals(out, expected);
 
                 Shape[] outputShape =
                         block.getOutputShapes(manager, new Shape[] {new Shape(1, 1, 3, 3, 3)});
-                Assertions.assertEquals(out.getShape(), outputShape[0]);
+                Assert.assertEquals(out.getShape(), outputShape[0]);
 
                 testEncode(manager, block);
             }
@@ -377,7 +377,7 @@ public class BlockCoreTest {
                         manager.create(
                                 new float[] {7, 12, 12, 12, 12, 23, 28, 28, 28, 28},
                                 new Shape(1, 2, 5));
-                Assertions.assertEquals(out, expected);
+                Assert.assertEquals(out, expected);
 
                 testEncode(manager, block);
             }
@@ -459,7 +459,7 @@ public class BlockCoreTest {
         PairList<String, Parameter> loaded = block.getParameters();
         int bound = original.size();
         for (int idx = 0; idx < bound; idx++) {
-            Assertions.assertEquals(original.valueAt(idx), loaded.valueAt(idx));
+            Assert.assertEquals(original.valueAt(idx), loaded.valueAt(idx));
         }
     }
 }

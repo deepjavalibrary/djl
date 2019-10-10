@@ -13,12 +13,12 @@
 
 package ai.djl.integration.tests;
 
-import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.metrics.TopKAccuracy;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainingMetricsTest {
@@ -35,7 +35,7 @@ public class TrainingMetricsTest {
             acc.update(labels, predictions);
             float accuracy = acc.getMetric().getValue();
             float expectedAccuracy = 2.f / 3;
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     expectedAccuracy,
                     accuracy,
                     "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);
@@ -56,7 +56,7 @@ public class TrainingMetricsTest {
             topKAccuracy.update(labels, predictions);
             float expectedAccuracy = 1.f / 3;
             float accuracy = topKAccuracy.getMetric().getValue();
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     expectedAccuracy,
                     accuracy,
                     "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);

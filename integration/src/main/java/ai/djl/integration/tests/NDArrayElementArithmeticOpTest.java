@@ -21,6 +21,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.GradientCollector;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class NDArrayElementArithmeticOpTest {
@@ -38,7 +39,7 @@ public class NDArrayElementArithmeticOpTest {
         NDArray result = arrayArithmeticOp.apply(array1, array2);
         Assertions.assertAlmostEquals(arithmeticOp.apply(x1, x2), result.getFloat());
         if (inplace) {
-            Assertions.assertInPlace(array1, result);
+            Assert.assertSame(array1, result);
         } else {
             // other cases only apply to non inplace test
             // test NDArray with scalar
@@ -48,18 +49,18 @@ public class NDArrayElementArithmeticOpTest {
             array1 = manager.create(new float[] {x1, x1});
             array2 = manager.create(x2);
             NDArray actual = manager.create(new float[] {y, y});
-            Assertions.assertEquals(actual, arrayArithmeticOp.apply(array1, array2));
+            Assert.assertEquals(actual, arrayArithmeticOp.apply(array1, array2));
 
             // test zero-dim with zero-dim
             array1 = manager.create(new Shape(4, 0, 1));
             array2 = manager.create(new Shape(1, 0));
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     manager.create(new Shape(4, 0, 0)), arrayArithmeticOp.apply(array1, array2));
 
             // test NDArray with zero-dim
             array1 = manager.create(new float[] {10f});
             array2 = manager.create(new Shape(2, 0, 3));
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     manager.create(new Shape(2, 0, 3)), arrayArithmeticOp.apply(array1, array2));
         }
     }
@@ -75,9 +76,9 @@ public class NDArrayElementArithmeticOpTest {
         float x2 = 2f;
         NDArray ndArray2 = manager.create(x2);
         NDArray result = arrayArithmeticOp.apply(ndArray2);
-        Assertions.assertEquals(arithmeticOp.apply(x1, x2), result.getFloat());
+        Assert.assertEquals(arithmeticOp.apply(x1, x2), result.getFloat());
         if (inplace) {
-            Assertions.assertInPlace(scalarNDArray, result);
+            Assert.assertSame(scalarNDArray, result);
         }
     }
 
@@ -93,11 +94,11 @@ public class NDArrayElementArithmeticOpTest {
         NDArray result = arrayArithmeticOp.apply(ndArray, x2);
         Assertions.assertAlmostEquals(arithmeticOp.apply(x1, x2), result.getFloat());
         if (inplace) {
-            Assertions.assertInPlace(ndArray, result);
+            Assert.assertSame(ndArray, result);
         } else {
             // zero-dim with number
             ndArray = manager.create(new Shape(2, 0));
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     manager.create(new Shape(2, 0)), arrayArithmeticOp.apply(ndArray, x2));
         }
     }
@@ -112,13 +113,13 @@ public class NDArrayElementArithmeticOpTest {
         float x2 = 3f;
         NDArray ndArray = manager.create(x1);
         NDArray result = arrayArithmeticOp.apply(x2, ndArray);
-        Assertions.assertEquals(arithmeticOp.apply(x2, x1), result.getFloat());
+        Assert.assertEquals(arithmeticOp.apply(x2, x1), result.getFloat());
         if (inplace) {
-            Assertions.assertInPlace(ndArray, result);
+            Assert.assertSame(ndArray, result);
         } else {
             // number with zero-dim
             ndArray = manager.create(new Shape(0, 2, 3));
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     manager.create(new Shape(0, 2, 3)), arrayArithmeticOp.apply(x2, ndArray));
         }
     }
@@ -134,16 +135,15 @@ public class NDArrayElementArithmeticOpTest {
                 // check add scalar result
                 gradCol.backward(result);
 
-                Assertions.assertFalse(
+                Assert.assertFalse(
                         NDArrays.equals(lhs, result),
                         "None in-place operator returned in-place result");
                 NDArray actual = manager.create(new float[] {3f, 4f, 5f, 6f});
-                Assertions.assertEquals(
-                        actual, result, "AddScala: Incorrect value in summed array");
+                Assert.assertEquals(actual, result, "AddScala: Incorrect value in summed array");
 
                 // check add backward
                 NDArray expectedGradient = manager.create(new float[] {1f, 1f, 1f, 1f});
-                Assertions.assertEquals(
+                Assert.assertEquals(
                         expectedGradient,
                         lhs.getGradient(),
                         "AddScala backward: Incorrect gradient after backward");
@@ -164,7 +164,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray addend = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray addendum = manager.create(new float[] {2f, 3f, 4f, 5f});
             NDArray result = NDArrays.add(addend, addendum);
-            Assertions.assertFalse(
+            Assert.assertFalse(
                     NDArrays.equals(addend, result),
                     "None in-place operator returned in-place result");
 
@@ -179,14 +179,14 @@ public class NDArrayElementArithmeticOpTest {
             };
 
             NDArray addAll = NDArrays.add(toAddAll);
-            Assertions.assertFalse(
-                    addAll.equals(toAddAll[0]), "None in-place operator returned in-place result");
+            Assert.assertNotEquals(
+                    toAddAll[0], addAll, "None in-place operator returned in-place result");
 
             addAll = NDArrays.addi(toAddAll);
-            Assertions.assertTrue(addAll.equals(toAddAll[0]), "In-place summation failed");
+            Assert.assertEquals(toAddAll[0], addAll, "In-place summation failed");
 
             actual = manager.create(new float[] {7, 7, 7, 7}, new Shape(2, 2));
-            Assertions.assertEquals(actual, addAll, "Incorrect value in summed array");
+            Assert.assertEquals(actual, addAll, "Incorrect value in summed array");
 
             testCornerCase(manager, NDArrays::add, Float::sum, false);
             testCornerCase(manager, NDArrays::addi, Float::sum, true);
@@ -200,7 +200,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.sub(minuend, 3);
             NDArray inPlaceResult = NDArrays.subi(minuend, 3);
             NDArray actual = manager.create(new float[] {3, 6, 9, 8, -3});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, result, "Scalar subtraction: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, minuend);
 
@@ -217,7 +217,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.sub(minuend, subtrahend);
             NDArray inPlaceResult = NDArrays.subi(minuend, subtrahend);
             NDArray actual = manager.create(new float[] {4, 6, 8, 10, -6});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, result, "Element wise subtraction: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, minuend);
 
@@ -233,7 +233,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.sub(180, minuend);
             NDArray inPlaceResult = NDArrays.subi(180, minuend);
             NDArray actual = manager.create(new float[] {174, 89, 168, -35, 0});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual,
                     result,
                     "Scalar reverse subtraction: Incorrect value in result ndarray");
@@ -252,7 +252,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = minuend.getNDArrayInternal().rsub(subtrahend);
             NDArray inPlaceResult = minuend.getNDArrayInternal().rsubi(subtrahend);
             NDArray actual = manager.create(new float[] {18, 54, 84, 0, 45});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual,
                     result,
                     "Reverse Element wise subtraction: Incorrect value in result ndarray");
@@ -274,13 +274,13 @@ public class NDArrayElementArithmeticOpTest {
 
             NDArray ndArray1 = manager.create(new Shape(4, 0, 1));
             NDArray ndArray2 = manager.create(new Shape(1, 0));
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     manager.create(new Shape(4, 0, 0)),
                     ndArray1.getNDArrayInternal().rsub(ndArray2));
 
             ndArray1 = manager.create(new float[] {10f});
             ndArray2 = manager.create(new Shape(2, 0, 3));
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     manager.create(new Shape(2, 0, 3)),
                     ndArray1.getNDArrayInternal().rsub(ndArray2));
         }
@@ -293,7 +293,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.mul(multiplicand, 3);
             NDArray inPlaceResult = NDArrays.muli(multiplicand, 3);
             NDArray actual = manager.create(new float[] {18, 27, -36, 45, 0});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, result, "Scalar multiplication: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, multiplicand);
             testScalarCornerCase(manager, NDArrays::mul, (x, y) -> x * y, false);
@@ -309,7 +309,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.mul(multiplicand, with);
             NDArray inPlaceResult = NDArrays.muli(multiplicand, with);
             NDArray actual = manager.create(new float[] {12, 27, 48, 75, 0});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual,
                     result,
                     "Element wise multiplication: Incorrect value in result ndarray");
@@ -322,12 +322,12 @@ public class NDArrayElementArithmeticOpTest {
             };
             NDArray mulAll = NDArrays.mul(toMulAll);
             NDArray mulAllInPlace = NDArrays.muli(toMulAll);
-            Assertions.assertFalse(
-                    mulAll == toMulAll[0], "None in-place operator returned in-place result");
-            Assertions.assertTrue(mulAllInPlace.equals(toMulAll[0]), "In-place summation failed");
+            Assert.assertNotSame(
+                    mulAll, toMulAll[0], "None in-place operator returned in-place result");
+            Assert.assertEquals(toMulAll[0], mulAllInPlace, "In-place summation failed");
             actual = manager.create(new float[] {8, 12, 12, 8}, new Shape(2, 2));
-            Assertions.assertEquals(actual, mulAll, "Incorrect value in summed array");
-            Assertions.assertEquals(actual, mulAllInPlace, "Incorrect value in summed array");
+            Assert.assertEquals(actual, mulAll, "Incorrect value in summed array");
+            Assert.assertEquals(actual, mulAllInPlace, "Incorrect value in summed array");
 
             testCornerCase(manager, NDArrays::mul, (x, y) -> x * y, false);
             testCornerCase(manager, NDArrays::muli, (x, y) -> x * y, true);
@@ -347,12 +347,12 @@ public class NDArrayElementArithmeticOpTest {
                 result = NDArrays.dot(lhs, rhs);
                 gradCol.backward(result);
                 actual = manager.create(new float[] {33, 14}, new Shape(2, 1));
-                Assertions.assertEquals(
+                Assert.assertEquals(
                         actual, result, "Matrix multiplication: Incorrect value in result ndarray");
 
                 NDArray expectedGradient =
                         manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
-                Assertions.assertEquals(
+                Assert.assertEquals(
                         expectedGradient,
                         lhs.getGradient(),
                         "Matrix multiplication: Incorrect gradient after backward");
@@ -361,40 +361,40 @@ public class NDArrayElementArithmeticOpTest {
             lhs = manager.create(new float[] {1f, 2f});
             rhs = manager.create(new float[] {3f, 4f});
             actual = manager.create(11f);
-            Assertions.assertEquals(actual, lhs.dot(rhs));
-            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            Assert.assertEquals(actual, lhs.dot(rhs));
+            Assert.assertEquals(actual, NDArrays.dot(lhs, rhs));
             // test scalar * ND
             lhs = manager.create(3f);
             rhs = manager.create(new float[] {2f, 3f});
             actual = manager.create(new float[] {6f, 9f});
-            Assertions.assertEquals(actual, lhs.dot(rhs));
-            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            Assert.assertEquals(actual, lhs.dot(rhs));
+            Assert.assertEquals(actual, NDArrays.dot(lhs, rhs));
             // test 1D * ND
             lhs = manager.create(new float[] {1f, 2f});
             rhs = manager.arange(1, 5).reshape(2, 2);
             actual = manager.create(new float[] {7f, 10f});
-            Assertions.assertEquals(actual, lhs.dot(rhs));
-            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            Assert.assertEquals(actual, lhs.dot(rhs));
+            Assert.assertEquals(actual, NDArrays.dot(lhs, rhs));
             // test MD * ND
             lhs = manager.create(new float[] {1f, 2f}, new Shape(2, 1));
             rhs = manager.arange(1, 5).reshape(2, 1, 2);
             actual =
                     manager.create(
                             new float[] {1f, 2f, 3f, 4f, 2f, 4f, 6f, 8f}, new Shape(2, 2, 2));
-            Assertions.assertEquals(actual, lhs.dot(rhs));
-            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            Assert.assertEquals(actual, lhs.dot(rhs));
+            Assert.assertEquals(actual, NDArrays.dot(lhs, rhs));
             // scalar
             lhs = manager.create(4f);
             rhs = manager.create(2f);
             actual = manager.create(8f);
-            Assertions.assertEquals(actual, lhs.dot(rhs));
-            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            Assert.assertEquals(actual, lhs.dot(rhs));
+            Assert.assertEquals(actual, NDArrays.dot(lhs, rhs));
             // zero-dim
             lhs = manager.create(new Shape(2, 0));
             rhs = manager.create(new Shape(0, 2));
             actual = manager.zeros(new Shape(2, 2));
-            Assertions.assertEquals(actual, lhs.dot(rhs));
-            Assertions.assertEquals(actual, NDArrays.dot(lhs, rhs));
+            Assert.assertEquals(actual, lhs.dot(rhs));
+            Assert.assertEquals(actual, NDArrays.dot(lhs, rhs));
         }
     }
 
@@ -405,7 +405,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.div(dividend, 3);
             NDArray inPlaceResult = NDArrays.divi(dividend, 3);
             NDArray actual = manager.create(new float[] {2, 3, 4, 5, 0});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, result, "Scalar division: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
@@ -422,7 +422,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.div(dividend, divisor);
             NDArray inPlaceResult = NDArrays.divi(dividend, divisor);
             NDArray actual = manager.create(new float[] {3, 3, 3, 3, 0});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, result, "Element wise Division: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
@@ -438,7 +438,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.div(180, dividend);
             NDArray inPlaceResult = NDArrays.divi(180, dividend);
             NDArray actual = manager.create(new float[] {30, 20, 15, 12, 4});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, result, "Scalar reverse division: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
@@ -455,7 +455,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = dividend.getNDArrayInternal().rdiv(divisor);
             NDArray inPlaceResult = dividend.getNDArrayInternal().rdivi(divisor);
             NDArray actual = manager.create(new float[] {4, 7, 8, 1, 2});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual,
                     result,
                     "Reverse Element wise Division: Incorrect value in result ndarray");
@@ -484,7 +484,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.mod(dividend, 3);
             NDArray inPlaceResult = NDArrays.modi(dividend, 3);
             NDArray actual = manager.create(new float[] {2, 0, 1, 2, 0});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, result, "Scalar Remainder: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
@@ -501,7 +501,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.mod(dividend, divisor);
             NDArray inPlaceResult = NDArrays.modi(dividend, divisor);
             NDArray actual = manager.create(new float[] {1, 2, 1, 0, 5});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, result, "Element wise Remainder: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
@@ -517,7 +517,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = NDArrays.mod(180, dividend);
             NDArray inPlaceResult = NDArrays.modi(180, dividend);
             NDArray actual = manager.create(new float[] {0, 0, 5, 4, 0});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, result, "Scalar reverse Remainder: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, dividend);
 
@@ -534,7 +534,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = dividend.getNDArrayInternal().rmod(divisor);
             NDArray inPlaceResult = dividend.getNDArrayInternal().rmodi(divisor);
             NDArray actual = manager.create(new float[] {6, 5, 4, 3, 2});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual,
                     result,
                     "Reverse Element wise Remainder: Incorrect value in result ndarray");
@@ -578,8 +578,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = array.pow(power);
             NDArray inPlaceResult = array.powi(power);
             NDArray actual = manager.create(new float[] {216, 1, 12, 0.25f, 0});
-            Assertions.assertEquals(
-                    actual, result, "Scalar power: Incorrect value in result ndarray");
+            Assert.assertEquals(actual, result, "Scalar power: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, array);
 
             testCornerCase(manager, NDArrays::pow, (x, y) -> (float) Math.pow(x, y), false);
@@ -594,7 +593,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray power = NDArrays.pow(2, array);
             NDArray inPlaceResult = NDArrays.powi(2, array);
             NDArray actual = manager.create(new float[] {8, 16, 32, 64, 128});
-            Assertions.assertEquals(
+            Assert.assertEquals(
                     actual, power, "Scalar reverse power: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, array);
 

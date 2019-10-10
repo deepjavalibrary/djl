@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests;
 
-import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -22,6 +21,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import java.nio.FloatBuffer;
 import java.util.stream.IntStream;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class NDArrayCreationOpTest {
@@ -31,24 +31,24 @@ public class NDArrayCreationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             // test scalar
             NDArray array = manager.create(-100f);
-            Assertions.assertEquals(-100f, array.getFloat());
-            Assertions.assertEquals(new Shape(), array.getShape());
+            Assert.assertEquals(-100f, array.getFloat());
+            Assert.assertEquals(new Shape(), array.getShape());
 
             // test zero-dim
             array = manager.create(new float[] {}, new Shape(1, 0));
-            Assertions.assertEquals(new Shape(1, 0), array.getShape());
-            Assertions.assertEquals(0, array.toArray().length);
+            Assert.assertEquals(new Shape(1, 0), array.getShape());
+            Assert.assertEquals(0, array.toArray().length);
 
             double[] data = IntStream.range(0, 100).mapToDouble(i -> i).toArray();
             array = manager.create(data);
             NDArray actual = manager.arange(0, 100, 1, DataType.FLOAT64, array.getDevice());
             // test 1d
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             // test 2d
             double[][] data2D = {data, data};
             array = manager.create(data2D);
             actual = NDArrays.stack(new NDList(manager.create(data), manager.create(data)));
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
         }
     }
 
@@ -61,10 +61,10 @@ public class NDArrayCreationOpTest {
             long[] indices = {0, 2, 1};
             NDArray nd = factory.createCSR(buf, indptr, indices, new Shape(3, 4));
             float[] array = nd.toFloatArray();
-            Assertions.assertEquals(actual[0], array[0]);
-            Assertions.assertEquals(actual[1], array[2]);
-            Assertions.assertEquals(actual[2], array[9]);
-            Assertions.assertTrue(nd.isSparse());
+            Assert.assertEquals(actual[0], array[0]);
+            Assert.assertEquals(actual[1], array[2]);
+            Assert.assertEquals(actual[2], array[9]);
+            Assert.assertTrue(nd.isSparse());
         }
     }
 
@@ -76,13 +76,13 @@ public class NDArrayCreationOpTest {
             long[] indices = {0, 1, 3};
             NDArray nd = factory.createRowSparse(buf, new Shape(3, 2), indices, new Shape(4, 2));
             float[] array = nd.toFloatArray();
-            Assertions.assertEquals(actual[0], array[0]);
-            Assertions.assertEquals(actual[1], array[1]);
-            Assertions.assertEquals(actual[2], array[2]);
-            Assertions.assertEquals(actual[3], array[3]);
-            Assertions.assertEquals(actual[4], array[6]);
-            Assertions.assertEquals(actual[5], array[7]);
-            Assertions.assertTrue(nd.isSparse());
+            Assert.assertEquals(actual[0], array[0]);
+            Assert.assertEquals(actual[1], array[1]);
+            Assert.assertEquals(actual[2], array[2]);
+            Assert.assertEquals(actual[3], array[3]);
+            Assert.assertEquals(actual[4], array[6]);
+            Assert.assertEquals(actual[5], array[7]);
+            Assert.assertTrue(nd.isSparse());
         }
     }
 
@@ -91,7 +91,7 @@ public class NDArrayCreationOpTest {
         try (NDManager factory = NDManager.newBaseManager()) {
             NDArray nd = factory.ones(new Shape(3, 5));
             NDArray sparse = nd.toSparse(SparseFormat.CSR);
-            Assertions.assertTrue(sparse.getSparseFormat() == SparseFormat.CSR);
+            Assert.assertSame(sparse.getSparseFormat(), SparseFormat.CSR);
         }
     }
 
@@ -100,17 +100,17 @@ public class NDArrayCreationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
             NDArray actual = manager.arange(0, 10, 1);
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             actual = manager.arange(0, 10, 1);
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             actual = manager.arange(10);
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             // test 0 dimension
             array = manager.arange(10, 0, 1);
             actual = manager.create(new Shape(0));
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             array = manager.arange(0, -2);
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
         }
     }
     // eye op not yet merge into MXNet master
@@ -119,16 +119,16 @@ public class NDArrayCreationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.eye(2);
             NDArray actual = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             array = manager.eye(2, 3, 0);
             actual = manager.create(new float[] {1f, 0f, 0f, 0f, 1f, 0f}, new Shape(2, 3));
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             array = manager.eye(3, 4, 0);
             actual =
                     manager.create(
                             new float[] {1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f},
                             new Shape(3, 4));
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
         }
     }
 
@@ -137,20 +137,20 @@ public class NDArrayCreationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.linspace(0.0, 9.0, 10, true, manager.getDevice());
             NDArray actual = manager.arange(10);
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             array = manager.linspace(0.0, 10.0, 10, false, manager.getDevice());
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             array = manager.linspace(10, 0, 10, false, manager.getDevice());
             actual = manager.create(new float[] {10f, 9f, 8f, 7f, 6f, 5f, 4f, 3f, 2f, 1f});
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
             array = manager.linspace(10, 10, 10);
             actual = manager.ones(new Shape(10)).mul(10);
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
 
             // test corner case
             array = manager.linspace(0, 10, 0);
             actual = manager.create(new Shape(0));
-            Assertions.assertEquals(actual, array);
+            Assert.assertEquals(actual, array);
         }
     }
 }

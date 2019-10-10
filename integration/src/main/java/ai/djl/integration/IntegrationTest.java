@@ -104,9 +104,11 @@ public class IntegrationTest {
                         method.invoke(testObject);
                         logger.info("Test {}.{} PASSED", testClass, method.getName());
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        logger.error("Test {}.{} FAILED", testClass, method.getName());
-                        logger.error("", e.getCause());
-                        ++failed;
+                        if (notExpected(method, e)) {
+                            logger.error("Test {}.{} FAILED", testClass, method.getName());
+                            logger.error("", e.getCause());
+                            ++failed;
+                        }
                         break;
                     }
                 }
@@ -118,6 +120,20 @@ public class IntegrationTest {
         } else {
             logger.info("Passed all {} tests", totalMethodCount);
         }
+    }
+
+    private static boolean notExpected(Method method, Exception e) {
+        Test test = method.getAnnotation(Test.class);
+        Class<?>[] exceptions = test.expectedExceptions();
+        if (exceptions.length > 0) {
+            Throwable exception = e.getCause();
+            for (Class<?> c : exceptions) {
+                if (c.isInstance(exception)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private static Map<Object, List<Method>> listTests(Arguments arguments) {

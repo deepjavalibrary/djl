@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.loss.Loss;
 import java.util.Arrays;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class LossTest {
@@ -27,7 +28,7 @@ public class LossTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
-            Assertions.assertTrue(
+            Assert.assertTrue(
                     Arrays.equals(
                             new float[] {0, 1, 2, 3, 4},
                             Loss.l1Loss().getLoss(label, pred).toFloatArray()));
@@ -39,7 +40,7 @@ public class LossTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
-            Assertions.assertTrue(
+            Assert.assertTrue(
                     Arrays.equals(
                             new float[] {0f, 0.5f, 2f, 4.5f, 8f},
                             Loss.l2Loss().getLoss(label, pred).toFloatArray()));
@@ -62,7 +63,7 @@ public class LossTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5)).neg();
-            Assertions.assertTrue(
+            Assert.assertTrue(
                     Arrays.equals(
                             new float[] {2, 3, 4, 5, 6},
                             Loss.hingeLoss().getLoss(label, pred).toFloatArray()));
