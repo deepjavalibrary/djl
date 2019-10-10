@@ -11,8 +11,10 @@
  * and limitations under the License.
  */
 
-package org.tensorflow;
+package ai.djl.tensorflow;
 
+import ai.djl.tensorflow.engine.TfModel;
+import ai.djl.tensorflow.engine.TfNDArray;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -20,8 +22,6 @@ import java.nio.FloatBuffer;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
-import org.tensorflow.engine.TfModel;
-import org.tensorflow.engine.TfNDArray;
 import software.amazon.ai.inference.Predictor;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.ndarray.NDArray;
