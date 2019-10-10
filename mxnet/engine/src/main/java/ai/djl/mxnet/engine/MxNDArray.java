@@ -525,10 +525,26 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray where(NDArray condition, NDArray other) {
+        NDArray array1;
+        NDArray array2;
         if (!getShape().equals(other.getShape())) {
-            throw new IllegalArgumentException("Both NDArray must have same shape");
+            Shape res = deriveBroadcastedShape(getShape(), other.getShape());
+            array1 = (!res.equals(getShape())) ? broadcast(res) : this;
+            array2 = (!res.equals(other.getShape())) ? other.broadcast(res) : other;
+        } else {
+            array1 = this;
+            array2 = other;
         }
-        return manager.invoke("where", new NDList(condition, this, other), null).head();
+        try {
+            return manager.invoke("where", new NDList(condition, array1, array2), null).head();
+        } finally {
+            if (array1 != this) {
+                array1.close();
+            }
+            if (array2 != other) {
+                array2.close();
+            }
+        }
     }
 
     /** {@inheritDoc} */
@@ -1541,6 +1557,37 @@ public class MxNDArray extends NativeResource implements NDArray {
             throw new IllegalArgumentException(
                     "array size (" + size + ") do not match NDArray shape: " + shape);
         }
+    }
+
+    // TODO only used to calculate zero-dim numpy shape
+    // remove it once MXNet have all the np op that we support
+    private Shape deriveBroadcastedShape(Shape lhs, Shape rhs) {
+        long[] result = new long[Math.max(lhs.dimension(), rhs.dimension())];
+        long lDiff = result.length - lhs.dimension();
+        long rDiff = result.length - rhs.dimension();
+        for (int i = 0; i < result.length; i++) {
+            long l = 1;
+            long r = 1;
+            if (i >= lDiff) {
+                l = lhs.get(Math.toIntExact(i - lDiff));
+            }
+            if (i >= rDiff) {
+                r = rhs.get(Math.toIntExact(i - rDiff));
+            }
+            if (l != r) {
+                if (l != 1 && r != 1) {
+                    throw new IllegalArgumentException(
+                            "operands could not be broadcast together with shapes "
+                                    + lhs
+                                    + " "
+                                    + rhs);
+                }
+                result[i] = (l == 1) ? r : l;
+            } else {
+                result[i] = l;
+            }
+        }
+        return new Shape(result);
     }
 
     public void waitToRead() {

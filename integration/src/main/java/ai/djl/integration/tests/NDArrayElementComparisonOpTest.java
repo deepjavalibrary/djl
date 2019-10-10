@@ -203,18 +203,31 @@ public class NDArrayElementComparisonOpTest {
             result = NDArrays.where(condition, array1, array2);
             Assertions.assertEquals(result, actual, "where: Incorrect comparison");
 
-            // test with broadcasting
+            // test cond broadcasting
             array1 =
                     manager.create(
                             new float[] {0f, 3f, 5f, 9f, 11f, 12f, -2f, -4f}, new Shape(2, 4));
             array2 =
                     manager.create(
                             new float[] {-2f, 43f, 2f, 7f, 10f, 3f, -234f, 66f}, new Shape(2, 4));
-            condition = manager.create(new float[] {0f, 1f}, new Shape(2));
+            condition = manager.create(new float[] {0f, 1f});
             actual =
                     manager.create(
                             new float[] {-2f, 43f, 2f, 7f, 11f, 12f, -2f, -4f}, new Shape(2, 4));
             result = NDArrays.where(condition, array1, array2);
+            Assertions.assertEquals(result, actual, "where: Incorrect comparison");
+            // test x, y broadcasting
+            array1 = manager.create(new float[] {0f, 1f, 2f}).reshape(3, 1);
+            array2 = manager.create(new float[] {3f, 4f, 5f, 6f}).reshape(1, 4);
+            condition =
+                    manager.create(
+                            new float[] {0f, 1f, 1f, 1f, 0f, 0f, 1f, 1f, 0f, 0f, 0f, 1f},
+                            new Shape(3, 4));
+            result = NDArrays.where(condition, array1, array2);
+            actual =
+                    manager.create(
+                            new float[] {3f, 0f, 0f, 0f, 3f, 4f, 1f, 1f, 3f, 4f, 5f, 2f},
+                            new Shape(3, 4));
             Assertions.assertEquals(result, actual, "where: Incorrect comparison");
 
             // test scalar with scalar
