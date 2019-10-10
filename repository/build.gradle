@@ -5,7 +5,7 @@ plugins {
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
     compile "com.google.code.gson:gson:${gson_version}"
-    compile project(":joule-api")
+    compile project(":api")
 
     testCompile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

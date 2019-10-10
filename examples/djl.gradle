@@ -19,10 +19,10 @@ dependencies {
     compile "commons-cli:commons-cli:${commons_cli_version}"
     compile "org.slf4j:slf4j-simple:${slf4j_version}"
     compile "com.google.code.gson:gson:${gson_version}"
-    compile project(":joule-api")
+    compile project(":api")
     compile project(":mxnet:engine")
-    compile project(":mxnet:dataset")
-    compile project(":mxnet:model-zoo")
+    compile project(":mxnet:mxnet-dataset")
+    compile project(":mxnet:mxnet-model-zoo")
 
     runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
 

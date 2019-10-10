@@ -16,9 +16,9 @@ dependencies {
     compile "org.slf4j:slf4j-simple:${slf4j_version}"
     compile project(":repository")
     compile project(":model-zoo")
-    compile project(":mxnet:dataset")
     compile project(":mxnet:engine")
-    compile project(":mxnet:model-zoo")
+    compile project(":mxnet:mxnet-dataset")
+    compile project(":mxnet:mxnet-model-zoo")
     compile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

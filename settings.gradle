@@ -1,15 +1,14 @@
-rootProject.name = 'joule'
+rootProject.name = 'djl'
 include ':api'
 include ':repository'
 include ':examples'
 include ':integration'
 include ':model-zoo'
-include ':mxnet:dataset'
 include ':mxnet:engine'
 include ':mxnet:jnarator'
-include ':mxnet:model-zoo'
+include ':mxnet:mxnet-dataset'
+include ':mxnet:mxnet-model-zoo'
 include ':mxnet:native'
 include ':tensorflow:engine'
 
-project(":api").name = "joule-api"
-project(":examples").buildFileName = "joule.gradle"
+project(":examples").buildFileName = "djl.gradle"

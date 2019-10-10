@@ -7,7 +7,7 @@ group "org.apache.mxnet"
 dependencies {
     compile "net.java.dev.jna:jna:${jna_version}"
     compile "org.slf4j:slf4j-api:${slf4j_version}"
-    compile project(":joule-api")
+    compile project(":api")
 
     testCompile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
@@ -25,7 +25,7 @@ sourceSets {
     }
 }
 
-compileTestJava.dependsOn tasks.getByPath(':joule-api:testClasses')
+compileTestJava.dependsOn tasks.getByPath(':api:testClasses')
 
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'

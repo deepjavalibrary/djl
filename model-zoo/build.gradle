@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    compile project(":joule-api")
+    compile project(":api")
     compile project(":repository")
 
     testCompile ("org.testng:testng:${testng_version}") {
