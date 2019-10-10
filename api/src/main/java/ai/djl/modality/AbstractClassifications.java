@@ -88,5 +88,11 @@ public abstract class AbstractClassifications<I extends Item> {
         public double getProbability() {
             return probabilities.get(index);
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public String toString() {
+            return "class: \"" + getClassName() + "\", probability: " + getProbability();
+        }
     }
 }

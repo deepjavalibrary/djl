@@ -53,11 +53,5 @@ public final class Classification extends AbstractClassifications<Item> {
         protected Item(int index) {
             super(index);
         }
-
-        /** {@inheritDoc} */
-        @Override
-        public String toString() {
-            return "class: \"" + getClassName() + "\", probability: " + getProbability();
-        }
     }
 }
