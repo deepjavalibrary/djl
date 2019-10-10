@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.examples.inference;
 
+import ai.djl.mxnet.zoo.ModelZoo;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,7 +25,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
-import org.apache.mxnet.zoo.ModelZoo;
 import org.slf4j.Logger;
 import software.amazon.ai.examples.inference.util.AbstractExample;
 import software.amazon.ai.examples.inference.util.Arguments;

@@ -13,7 +13,7 @@
 
 package software.amazon.ai.integration.tests;
 
-import org.apache.mxnet.engine.MxParameterServer;
+import ai.djl.mxnet.engine.MxParameterServer;
 import org.testng.annotations.Test;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;

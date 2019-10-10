@@ -40,7 +40,7 @@ task jnarator(dependsOn: ":mxnet:jnarator:jar") {
                     "-l",
                     "mxnet",
                     "-p",
-                    "org.apache.mxnet.jna",
+                    "ai.djl.mxnet.jna",
                     "-o",
                     "${project.buildDir}/generated-src",
                     "-m",

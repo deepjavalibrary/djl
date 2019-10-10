@@ -12,6 +12,10 @@
  */
 package software.amazon.ai.examples.training.transferlearning;
 
+import ai.djl.mxnet.dataset.Cifar10;
+import ai.djl.mxnet.dataset.DatasetUtils;
+import ai.djl.mxnet.dataset.transform.cv.ToTensor;
+import ai.djl.mxnet.zoo.ModelZoo;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -20,10 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.mxnet.dataset.Cifar10;
-import org.apache.mxnet.dataset.DatasetUtils;
-import org.apache.mxnet.dataset.transform.cv.ToTensor;
-import org.apache.mxnet.zoo.ModelZoo;
 import org.slf4j.Logger;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;

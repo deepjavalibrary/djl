@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.integration;
 
-import org.apache.mxnet.jna.JnaUtils;
+import ai.djl.mxnet.jna.JnaUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

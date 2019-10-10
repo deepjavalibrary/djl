@@ -19,7 +19,7 @@ pmdMain.source = 'src/main/java'
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.apache.mxnet.jnarator.Main'
+        attributes 'Main-Class': 'ai.djl.mxnet.jnarator.Main'
     }
     includeEmptyDirs = false
     from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }

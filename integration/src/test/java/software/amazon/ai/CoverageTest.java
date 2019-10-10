@@ -12,10 +12,10 @@
  */
 package software.amazon.ai;
 
+import ai.djl.mxnet.dataset.Cifar10;
+import ai.djl.mxnet.engine.MxEngine;
+import ai.djl.mxnet.zoo.ModelZoo;
 import java.io.IOException;
-import org.apache.mxnet.dataset.Cifar10;
-import org.apache.mxnet.engine.MxEngine;
-import org.apache.mxnet.zoo.ModelZoo;
 import org.testng.annotations.Test;
 import software.amazon.ai.repository.Repository;
 import software.amazon.ai.test.CoverageUtils;

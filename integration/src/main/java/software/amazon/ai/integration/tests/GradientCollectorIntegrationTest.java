@@ -12,8 +12,8 @@
  */
 package software.amazon.ai.integration.tests;
 
+import ai.djl.mxnet.engine.MxGradientCollector;
 import java.io.IOException;
-import org.apache.mxnet.engine.MxGradientCollector;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.util.Assertions;

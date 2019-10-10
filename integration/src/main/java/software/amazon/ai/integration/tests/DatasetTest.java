@@ -12,6 +12,8 @@
  */
 package software.amazon.ai.integration.tests;
 
+import ai.djl.mxnet.dataset.Cifar10;
+import ai.djl.mxnet.jna.JnaUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,8 +23,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
-import org.apache.mxnet.dataset.Cifar10;
-import org.apache.mxnet.jna.JnaUtils;
 import org.testng.annotations.Test;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;

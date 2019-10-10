@@ -12,7 +12,7 @@
  */
 package software.amazon.ai.integration.tests;
 
-import org.apache.mxnet.engine.MxNDArray;
+import ai.djl.mxnet.engine.MxNDArray;
 import org.testng.annotations.Test;
 import software.amazon.ai.engine.EngineException;
 import software.amazon.ai.integration.util.Assertions;

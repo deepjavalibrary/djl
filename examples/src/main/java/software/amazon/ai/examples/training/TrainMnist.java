@@ -12,13 +12,13 @@
  */
 package software.amazon.ai.examples.training;
 
+import ai.djl.mxnet.dataset.DatasetUtils;
+import ai.djl.mxnet.dataset.Mnist;
+import ai.djl.mxnet.dataset.transform.cv.ToTensor;
 import java.io.IOException;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.mxnet.dataset.DatasetUtils;
-import org.apache.mxnet.dataset.Mnist;
-import org.apache.mxnet.dataset.transform.cv.ToTensor;
 import org.slf4j.Logger;
 import software.amazon.ai.Device;
 import software.amazon.ai.Model;

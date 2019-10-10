@@ -12,13 +12,13 @@
  */
 package software.amazon.ai.integration.tests;
 
+import ai.djl.mxnet.engine.MxEngine;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.IntStream;
-import org.apache.mxnet.engine.MxEngine;
 import org.testng.annotations.Test;
 import software.amazon.ai.engine.Engine;
 import software.amazon.ai.integration.util.Assertions;

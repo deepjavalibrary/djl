@@ -13,7 +13,7 @@
 
     <!-- wildcard suppression -->
     <Match>
-        <Class name="~org\.apache\.mxnet\.jnarator\.parser\..*"/>
+        <Class name="~ai\.djl\.mxnet\.jnarator\.parser\..*"/>
     </Match>
 
 </FindBugsFilter>

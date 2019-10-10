@@ -12,6 +12,7 @@
  */
 package software.amazon.ai.integration.tests;
 
+import ai.djl.mxnet.engine.MxGradientCollector;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -19,7 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.mxnet.engine.MxGradientCollector;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
 import software.amazon.ai.integration.util.Assertions;

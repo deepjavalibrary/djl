@@ -12,9 +12,9 @@
  */
 package software.amazon.ai.integration.tests;
 
+import ai.djl.mxnet.engine.MxGradientCollector;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import org.apache.mxnet.engine.MxGradientCollector;
 import org.testng.annotations.Test;
 import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
