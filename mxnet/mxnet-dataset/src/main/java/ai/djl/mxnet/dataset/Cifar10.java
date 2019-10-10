@@ -12,18 +12,18 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
+import ai.djl.repository.Repository;
+import ai.djl.training.dataset.ArrayDataset;
+import ai.djl.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.repository.MRL;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.dataset.ArrayDataset;
-import software.amazon.ai.util.Utils;
 
 /**
  * CIFAR10 image classification dataset from https://www.cs.toronto.edu/~kriz/cifar.html Each sample

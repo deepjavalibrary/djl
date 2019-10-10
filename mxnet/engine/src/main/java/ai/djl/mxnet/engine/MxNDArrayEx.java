@@ -12,13 +12,13 @@
  */
 package ai.djl.mxnet.engine;
 
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.internal.NDArrayEx;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.pooling.PoolingConvention;
-import software.amazon.ai.util.PairList;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.pooling.PoolingConvention;
+import ai.djl.util.PairList;
 
 class MxNDArrayEx implements NDArrayEx {
 

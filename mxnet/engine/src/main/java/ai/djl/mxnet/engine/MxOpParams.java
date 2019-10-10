@@ -12,11 +12,11 @@
  */
 package ai.djl.mxnet.engine;
 
-import software.amazon.ai.Device;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.ndarray.types.SparseFormat;
-import software.amazon.ai.util.PairList;
+import ai.djl.Device;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.util.PairList;
 
 /** Helper for creating the MXNet operator parameters. */
 public class MxOpParams extends PairList<String, Object> {

@@ -12,7 +12,15 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
 import java.lang.ref.WeakReference;
 import java.nio.Buffer;
@@ -23,14 +31,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import software.amazon.ai.Device;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.ndarray.types.SparseFormat;
-import software.amazon.ai.util.PairList;
 
 public class MxNDManager implements NDManager {
 

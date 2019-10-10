@@ -20,6 +20,12 @@ import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.mxnet.jna.MxnetLibrary;
 import ai.djl.mxnet.jna.PointerArray;
 import ai.djl.mxnet.test.MockMxnetLibrary;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Parameter;
+import ai.djl.nn.ParameterType;
+import ai.djl.nn.SequentialBlock;
+import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,12 +39,6 @@ import org.testng.IObjectFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.Parameter;
-import software.amazon.ai.nn.ParameterType;
-import software.amazon.ai.nn.SequentialBlock;
-import software.amazon.ai.util.PairList;
 
 // CHECKSTYLE:ON:AvoidStaticImport
 

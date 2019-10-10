@@ -18,6 +18,16 @@ import ai.djl.mxnet.engine.MxModel;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.mxnet.engine.Symbol;
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataDesc;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Parameter;
+import ai.djl.nn.ParameterBlock;
+import ai.djl.nn.ParameterType;
+import ai.djl.nn.SymbolBlock;
+import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -29,16 +39,6 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataDesc;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.Parameter;
-import software.amazon.ai.nn.ParameterBlock;
-import software.amazon.ai.nn.ParameterType;
-import software.amazon.ai.nn.SymbolBlock;
-import software.amazon.ai.util.PairList;
 
 // TODO: Need to add Memory management for all params
 public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {

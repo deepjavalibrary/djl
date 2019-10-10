@@ -15,6 +15,7 @@ package ai.djl.mxnet.jna;
 // CHECKSTYLE:OFF:AvoidStaticImport
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+import ai.djl.Device;
 import ai.djl.mxnet.test.MockMxnetLibrary;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -24,7 +25,6 @@ import org.testng.IObjectFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
-import software.amazon.ai.Device;
 
 // CHECKSTYLE:ON:AvoidStaticImport
 

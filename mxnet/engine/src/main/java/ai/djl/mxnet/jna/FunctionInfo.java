@@ -14,13 +14,13 @@ package ai.djl.mxnet.jna;
 
 import ai.djl.mxnet.engine.MxNDArray;
 import ai.djl.mxnet.engine.MxNDManager;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.List;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.SparseFormat;
-import software.amazon.ai.util.PairList;
 
 public class FunctionInfo {
 

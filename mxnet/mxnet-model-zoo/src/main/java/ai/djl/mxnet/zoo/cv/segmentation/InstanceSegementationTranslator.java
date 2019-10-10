@@ -12,21 +12,21 @@
  */
 package ai.djl.mxnet.zoo.cv.segmentation;
 
+import ai.djl.Model;
+import ai.djl.modality.cv.BoundingBox;
+import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.modality.cv.ImageTranslator;
+import ai.djl.modality.cv.Mask;
+import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Utils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import software.amazon.ai.Model;
-import software.amazon.ai.modality.cv.BoundingBox;
-import software.amazon.ai.modality.cv.DetectedObjects;
-import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.modality.cv.Mask;
-import software.amazon.ai.modality.cv.util.BufferedImageUtils;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.translate.TranslatorContext;
-import software.amazon.ai.util.Utils;
 
 public class InstanceSegementationTranslator extends ImageTranslator<DetectedObjects> {
 

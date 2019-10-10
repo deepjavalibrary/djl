@@ -12,22 +12,22 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.Model;
+import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDManager;
+import ai.djl.training.Activation;
+import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.training.dataset.Batch;
+import ai.djl.training.initializer.Initializer;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import software.amazon.ai.Model;
-import software.amazon.ai.modality.cv.util.BufferedImageUtils;
-import software.amazon.ai.modality.cv.util.NDImageUtils;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.training.Activation;
-import software.amazon.ai.training.DefaultTrainingConfig;
-import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.TrainingConfig;
-import software.amazon.ai.training.dataset.Batch;
-import software.amazon.ai.training.initializer.Initializer;
 
 public class ImageFolderTest {
 

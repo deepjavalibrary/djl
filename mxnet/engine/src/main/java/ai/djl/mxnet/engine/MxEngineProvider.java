@@ -12,8 +12,8 @@
  */
 package ai.djl.mxnet.engine;
 
-import software.amazon.ai.engine.Engine;
-import software.amazon.ai.engine.EngineProvider;
+import ai.djl.engine.Engine;
+import ai.djl.engine.EngineProvider;
 
 public class MxEngineProvider implements EngineProvider {
 

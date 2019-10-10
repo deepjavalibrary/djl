@@ -15,12 +15,12 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.MxnetLibrary;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.training.ParameterServer;
+import ai.djl.training.optimizer.Optimizer;
 import com.sun.jna.Pointer;
 import java.util.Arrays;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.training.ParameterServer;
-import software.amazon.ai.training.optimizer.Optimizer;
 
 public class MxParameterServer extends NativeResource implements ParameterServer {
 

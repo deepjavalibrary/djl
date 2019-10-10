@@ -13,8 +13,18 @@
 
 package ai.djl.tensorflow;
 
+import ai.djl.inference.Predictor;
+import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.tensorflow.engine.TfModel;
 import ai.djl.tensorflow.engine.TfNDArray;
+import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Pair;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -22,16 +32,6 @@ import java.nio.FloatBuffer;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
-import software.amazon.ai.inference.Predictor;
-import software.amazon.ai.modality.cv.util.BufferedImageUtils;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.translate.TranslateException;
-import software.amazon.ai.translate.Translator;
-import software.amazon.ai.translate.TranslatorContext;
-import software.amazon.ai.util.Pair;
 
 public final class HelloWorld {
 

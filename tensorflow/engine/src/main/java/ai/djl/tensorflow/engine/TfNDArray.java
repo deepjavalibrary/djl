@@ -12,6 +12,17 @@
  */
 package ai.djl.tensorflow.engine;
 
+import ai.djl.Device;
+import ai.djl.ndarray.Matrix;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.types.DataDesc;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -22,17 +33,6 @@ import org.tensorflow.Operation;
 import org.tensorflow.Output;
 import org.tensorflow.Tensor;
 import org.tensorflow.types.UInt8;
-import software.amazon.ai.Device;
-import software.amazon.ai.ndarray.Matrix;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.index.NDIndex;
-import software.amazon.ai.ndarray.internal.NDArrayEx;
-import software.amazon.ai.ndarray.types.DataDesc;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.ndarray.types.SparseFormat;
 
 public class TfNDArray implements NDArray {
 

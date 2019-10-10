@@ -12,12 +12,12 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.Device;
+import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.ndarray.NDManager;
 import java.lang.management.MemoryUsage;
-import software.amazon.ai.Device;
-import software.amazon.ai.Model;
-import software.amazon.ai.engine.Engine;
-import software.amazon.ai.ndarray.NDManager;
 
 public class MxEngine extends Engine {
 

@@ -12,6 +12,11 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.ndarray.NDList;
+import ai.djl.repository.NakedRepository;
+import ai.djl.repository.Repository;
+import ai.djl.util.PairList;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,11 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import software.amazon.ai.modality.cv.util.BufferedImageUtils;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.repository.NakedRepository;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.util.PairList;
 
 public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 

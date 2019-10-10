@@ -12,12 +12,22 @@
  */
 package ai.djl.mxnet.jna;
 
+import ai.djl.Device;
+import ai.djl.engine.EngineException;
 import ai.djl.mxnet.engine.CachedOp;
 import ai.djl.mxnet.engine.DeviceType;
 import ai.djl.mxnet.engine.MxNDArray;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.mxnet.engine.Symbol;
 import ai.djl.mxnet.nn.MxSymbolBlock;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.nn.Parameter;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
@@ -37,16 +47,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import software.amazon.ai.Device;
-import software.amazon.ai.engine.EngineException;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.ndarray.types.SparseFormat;
-import software.amazon.ai.nn.Parameter;
-import software.amazon.ai.util.Pair;
-import software.amazon.ai.util.PairList;
 
 public final class JnaUtils {
 

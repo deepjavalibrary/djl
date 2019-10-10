@@ -12,7 +12,7 @@
  */
 package ai.djl.mxnet.engine;
 
-import software.amazon.ai.Device;
+import ai.djl.Device;
 
 public final class DeviceType {
 

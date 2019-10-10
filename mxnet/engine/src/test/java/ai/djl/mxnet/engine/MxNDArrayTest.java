@@ -16,10 +16,15 @@ package ai.djl.mxnet.engine;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+import ai.djl.Device;
 import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.mxnet.jna.NativeSize;
 import ai.djl.mxnet.jna.PointerArray;
 import ai.djl.mxnet.test.MockMxnetLibrary;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import com.sun.jna.Pointer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -30,11 +35,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
-import software.amazon.ai.Device;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.ndarray.types.SparseFormat;
 
 // CHECKSTYLE:ON:AvoidStaticImport
 

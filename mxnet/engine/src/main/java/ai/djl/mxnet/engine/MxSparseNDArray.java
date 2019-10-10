@@ -12,12 +12,12 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.types.SparseFormat;
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.index.NDIndex;
-import software.amazon.ai.ndarray.types.SparseFormat;
 
 public class MxSparseNDArray extends MxNDArray {
 

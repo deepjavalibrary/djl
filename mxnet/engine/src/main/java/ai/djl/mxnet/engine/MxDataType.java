@@ -12,9 +12,9 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.ndarray.types.DataType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import software.amazon.ai.ndarray.types.DataType;
 
 public final class MxDataType {
 

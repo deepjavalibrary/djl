@@ -12,7 +12,7 @@
  */
 package ai.djl.mxnet.dataset;
 
-import software.amazon.ai.repository.Repository;
+import ai.djl.repository.Repository;
 
 public interface Datasets {
 

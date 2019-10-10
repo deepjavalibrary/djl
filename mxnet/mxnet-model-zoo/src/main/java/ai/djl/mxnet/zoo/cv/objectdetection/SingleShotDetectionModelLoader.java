@@ -12,20 +12,20 @@
  */
 package ai.djl.mxnet.zoo.cv.objectdetection;
 
+import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.mxnet.zoo.BaseModelLoader;
 import ai.djl.mxnet.zoo.ModelZoo;
+import ai.djl.repository.Anchor;
+import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
+import ai.djl.repository.MRL.Model.CV;
+import ai.djl.repository.Repository;
+import ai.djl.translate.Translator;
+import ai.djl.zoo.ModelNotFoundException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import software.amazon.ai.modality.cv.DetectedObjects;
-import software.amazon.ai.repository.Anchor;
-import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.repository.MRL;
-import software.amazon.ai.repository.MRL.Model.CV;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.translate.Translator;
-import software.amazon.ai.zoo.ModelNotFoundException;
 
 public class SingleShotDetectionModelLoader
         extends BaseModelLoader<BufferedImage, DetectedObjects> {

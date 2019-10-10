@@ -12,6 +12,17 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.modality.cv.Rectangle;
+import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.modality.cv.util.NDImageUtils.Flag;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
+import ai.djl.repository.Repository;
+import ai.djl.training.dataset.RandomAccessDataset;
+import ai.djl.training.dataset.Record;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -19,17 +30,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import software.amazon.ai.modality.cv.Rectangle;
-import software.amazon.ai.modality.cv.util.BufferedImageUtils;
-import software.amazon.ai.modality.cv.util.NDImageUtils;
-import software.amazon.ai.modality.cv.util.NDImageUtils.Flag;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.repository.MRL;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.dataset.RandomAccessDataset;
-import software.amazon.ai.training.dataset.Record;
 
 public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 

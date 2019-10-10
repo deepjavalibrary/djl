@@ -12,8 +12,26 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.Device;
+import ai.djl.Model;
+import ai.djl.engine.Engine;
+import ai.djl.inference.Predictor;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.nn.MxSymbolBlock;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataDesc;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Block;
+import ai.djl.nn.Parameter;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.training.initializer.Initializer;
+import ai.djl.translate.Translator;
+import ai.djl.util.Pair;
+import ai.djl.util.Utils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
@@ -32,24 +50,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Device;
-import software.amazon.ai.Model;
-import software.amazon.ai.engine.Engine;
-import software.amazon.ai.inference.Predictor;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataDesc;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.Block;
-import software.amazon.ai.nn.Parameter;
-import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.TrainingConfig;
-import software.amazon.ai.training.initializer.Initializer;
-import software.amazon.ai.translate.Translator;
-import software.amazon.ai.util.Pair;
-import software.amazon.ai.util.Utils;
 
 /**
  * {@code MxModel} is MXNet implementation of {@link Model}.

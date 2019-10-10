@@ -12,8 +12,19 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.modality.cv.util.NDImageUtils.Flag;
 import ai.djl.mxnet.dataset.transform.cv.Resize;
 import ai.djl.mxnet.utils.ThrowingFunction;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.repository.Artifact;
+import ai.djl.repository.Repository;
+import ai.djl.training.dataset.RandomAccessDataset;
+import ai.djl.training.dataset.Record;
+import ai.djl.translate.Transform;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,17 +34,6 @@ import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.modality.cv.util.NDImageUtils;
-import software.amazon.ai.modality.cv.util.NDImageUtils.Flag;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.dataset.RandomAccessDataset;
-import software.amazon.ai.training.dataset.Record;
-import software.amazon.ai.translate.Transform;
-import software.amazon.ai.util.Pair;
-import software.amazon.ai.util.PairList;
 
 /** A dataset for loading image files stored in a folder structure. */
 public abstract class AbstractImageFolder extends RandomAccessDataset implements PreparedDataset {

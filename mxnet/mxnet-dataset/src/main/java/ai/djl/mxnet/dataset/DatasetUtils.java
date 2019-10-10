@@ -12,13 +12,13 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.Device;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.training.dataset.Batch;
+import ai.djl.util.Pair;
 import java.util.Arrays;
 import java.util.stream.IntStream;
-import software.amazon.ai.Device;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.training.dataset.Batch;
-import software.amazon.ai.util.Pair;
 
 public final class DatasetUtils {
 

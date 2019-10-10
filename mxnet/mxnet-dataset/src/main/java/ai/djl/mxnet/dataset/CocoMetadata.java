@@ -12,6 +12,7 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.modality.cv.Rectangle;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -21,7 +22,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import java.lang.reflect.Type;
 import java.util.List;
-import software.amazon.ai.modality.cv.Rectangle;
 
 public class CocoMetadata {
 

@@ -12,20 +12,20 @@
  */
 package ai.djl.mxnet.zoo;
 
+import ai.djl.Device;
+import ai.djl.Model;
+import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
+import ai.djl.repository.Metadata;
+import ai.djl.repository.Repository;
+import ai.djl.repository.VersionRange;
+import ai.djl.translate.Translator;
+import ai.djl.zoo.ModelNotFoundException;
+import ai.djl.zoo.ZooModel;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import software.amazon.ai.Device;
-import software.amazon.ai.Model;
-import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.repository.MRL;
-import software.amazon.ai.repository.Metadata;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.repository.VersionRange;
-import software.amazon.ai.translate.Translator;
-import software.amazon.ai.zoo.ModelNotFoundException;
-import software.amazon.ai.zoo.ZooModel;
 
 public abstract class BaseModelLoader<I, O> {
 

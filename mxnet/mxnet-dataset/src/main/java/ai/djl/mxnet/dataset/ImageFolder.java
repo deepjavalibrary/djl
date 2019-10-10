@@ -12,11 +12,11 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.ndarray.NDList;
+import ai.djl.training.dataset.Record;
 import java.io.IOException;
 import java.nio.file.Paths;
-import software.amazon.ai.modality.cv.util.BufferedImageUtils;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.training.dataset.Record;
 
 /** A dataset for loading image files stored in a folder structure. */
 public final class ImageFolder extends AbstractImageFolder {

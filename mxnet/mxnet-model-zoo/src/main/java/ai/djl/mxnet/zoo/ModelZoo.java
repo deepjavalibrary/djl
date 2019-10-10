@@ -20,7 +20,7 @@ import ai.djl.mxnet.zoo.cv.classification.Senet;
 import ai.djl.mxnet.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
 import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
 import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
-import software.amazon.ai.repository.Repository;
+import ai.djl.repository.Repository;
 
 public interface ModelZoo {
 

@@ -12,6 +12,16 @@
  */
 package ai.djl.tensorflow.engine;
 
+import ai.djl.Model;
+import ai.djl.inference.Predictor;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataDesc;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Block;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.translate.Translator;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,16 +37,6 @@ import org.tensorflow.framework.MetaGraphDef;
 import org.tensorflow.framework.SignatureDef;
 import org.tensorflow.framework.TensorInfo;
 import org.tensorflow.framework.TensorShapeProto;
-import software.amazon.ai.Model;
-import software.amazon.ai.inference.Predictor;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataDesc;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.Block;
-import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.TrainingConfig;
-import software.amazon.ai.translate.Translator;
 
 public class TfModel implements Model {
 

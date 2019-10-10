@@ -12,21 +12,21 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.Model;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.repository.Repository;
+import ai.djl.training.Activation;
+import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.training.dataset.Batch;
+import ai.djl.training.dataset.Dataset;
+import ai.djl.training.initializer.NormalInitializer;
 import java.io.IOException;
 import java.util.Iterator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import software.amazon.ai.Model;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.Activation;
-import software.amazon.ai.training.DefaultTrainingConfig;
-import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.TrainingConfig;
-import software.amazon.ai.training.dataset.Batch;
-import software.amazon.ai.training.dataset.Dataset;
-import software.amazon.ai.training.initializer.NormalInitializer;
 
 public class PikachuTest {
     @Test

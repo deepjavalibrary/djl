@@ -12,6 +12,13 @@
  */
 package ai.djl.tensorflow.engine;
 
+import ai.djl.Device;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
@@ -22,13 +29,6 @@ import org.tensorflow.Graph;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
 import org.tensorflow.Tensors;
-import software.amazon.ai.Device;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.DataType;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.util.PairList;
 
 public class TfNDManager implements NDManager, AutoCloseable {
 

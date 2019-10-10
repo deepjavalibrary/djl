@@ -12,7 +12,7 @@
  */
 package ai.djl.mxnet.dataset;
 
-import software.amazon.ai.ndarray.NDArray;
+import ai.djl.ndarray.NDArray;
 
 public final class Assertions {
 

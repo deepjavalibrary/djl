@@ -12,12 +12,12 @@
  */
 package ai.djl.tensorflow.engine;
 
+import ai.djl.Device;
+import ai.djl.Model;
+import ai.djl.engine.Engine;
+import ai.djl.ndarray.NDManager;
 import java.lang.management.MemoryUsage;
 import org.tensorflow.TensorFlow;
-import software.amazon.ai.Device;
-import software.amazon.ai.Model;
-import software.amazon.ai.engine.Engine;
-import software.amazon.ai.ndarray.NDManager;
 
 public class TfEngine extends Engine {
 

@@ -12,16 +12,16 @@
  */
 package ai.djl.mxnet.zoo.cv.poseestimation;
 
+import ai.djl.modality.cv.ImageTranslator;
+import ai.djl.modality.cv.Joints;
+import ai.djl.modality.cv.Joints.Joint;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
-import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.modality.cv.Joints;
-import software.amazon.ai.modality.cv.Joints.Joint;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.index.NDIndex;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.translate.TranslatorContext;
 
 public class SimplePoseTranslator extends ImageTranslator<Joints> {
 

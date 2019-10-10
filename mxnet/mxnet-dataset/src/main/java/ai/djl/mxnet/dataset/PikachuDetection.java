@@ -12,6 +12,18 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.modality.cv.util.NDImageUtils.Flag;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
+import ai.djl.repository.Repository;
+import ai.djl.training.dataset.RandomAccessDataset;
+import ai.djl.training.dataset.Record;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -25,18 +37,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import software.amazon.ai.modality.cv.util.BufferedImageUtils;
-import software.amazon.ai.modality.cv.util.NDImageUtils;
-import software.amazon.ai.modality.cv.util.NDImageUtils.Flag;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.NDManager;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.repository.MRL;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.dataset.RandomAccessDataset;
-import software.amazon.ai.training.dataset.Record;
 
 public class PikachuDetection extends RandomAccessDataset implements ZooDataset {
     private static final String ARTIFACT_ID = "pikachu";

@@ -12,11 +12,11 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
+import ai.djl.repository.Repository;
+import ai.djl.training.dataset.Dataset;
 import java.io.IOException;
-import software.amazon.ai.repository.Artifact;
-import software.amazon.ai.repository.MRL;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.dataset.Dataset;
 
 public interface ZooDataset extends Dataset, PreparedDataset {
 

@@ -12,7 +12,7 @@
  */
 package ai.djl.mxnet.zoo.cv.classification;
 
-import software.amazon.ai.repository.Repository;
+import ai.djl.repository.Repository;
 
 public class Senet extends ImageNetBaseModelLoader {
 

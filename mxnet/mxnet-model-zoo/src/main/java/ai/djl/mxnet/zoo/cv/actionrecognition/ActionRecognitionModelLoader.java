@@ -12,16 +12,16 @@
  */
 package ai.djl.mxnet.zoo.cv.actionrecognition;
 
+import ai.djl.modality.Classification;
 import ai.djl.mxnet.zoo.BaseModelLoader;
 import ai.djl.mxnet.zoo.ModelZoo;
 import ai.djl.mxnet.zoo.cv.classification.ImageClassificationTranslator;
+import ai.djl.repository.Anchor;
+import ai.djl.repository.MRL;
+import ai.djl.repository.MRL.Model.CV;
+import ai.djl.repository.Repository;
+import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
-import software.amazon.ai.modality.Classification;
-import software.amazon.ai.repository.Anchor;
-import software.amazon.ai.repository.MRL;
-import software.amazon.ai.repository.MRL.Model.CV;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.translate.Translator;
 
 public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage, Classification> {
 

@@ -12,15 +12,15 @@
  */
 package ai.djl.tensorflow.engine;
 
+import ai.djl.inference.BasePredictor;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataDesc;
+import ai.djl.translate.Translator;
+import ai.djl.util.Pair;
 import java.util.List;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
-import software.amazon.ai.inference.BasePredictor;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.types.DataDesc;
-import software.amazon.ai.translate.Translator;
-import software.amazon.ai.util.Pair;
 
 public class TfPredictor<I, O> extends BasePredictor<I, O> {
 

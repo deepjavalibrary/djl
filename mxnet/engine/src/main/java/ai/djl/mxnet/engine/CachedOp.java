@@ -12,28 +12,29 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.Device;
+import ai.djl.inference.Predictor;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.nn.MxSymbolBlock;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Parameter;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Device;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.nn.Parameter;
-import software.amazon.ai.util.Pair;
-import software.amazon.ai.util.PairList;
 
 /**
  * The {@code CachedOp} class provides the core functionality to execute a graph with MXNet.
  *
- * <p>Users are not recommended to interact with this class directly, use {@link
- * software.amazon.ai.inference.Predictor} instead. CachedOp is an operator that simplify the input
- * by self-analyzing the input shape such as the batch size. It require minimum input to do
- * inference since most of the information can be obtained from the model itself.
+ * <p>Users are not recommended to interact with this class directly, use {@link Predictor} instead.
+ * CachedOp is an operator that simplify the input by self-analyzing the input shape such as the
+ * batch size. It require minimum input to do inference since most of the information can be
+ * obtained from the model itself.
  */
 public class CachedOp extends NativeResource {
 

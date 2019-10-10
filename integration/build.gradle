@@ -32,7 +32,7 @@ task copyDependencies(type: Copy) {
 }
 
 application {
-    mainClassName = System.getProperty("main", "software.amazon.ai.integration.tests.MxNDArrayOperatorsTest")
+    mainClassName = System.getProperty("main", "ai.djl.integration.tests.MxNDArrayOperatorsTest")
 }
 
 jacoco {

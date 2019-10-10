@@ -12,9 +12,9 @@
  */
 package ai.djl.mxnet.dataset.transform.cv;
 
-import software.amazon.ai.modality.cv.util.NDImageUtils;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.translate.Transform;
+import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.ndarray.NDArray;
+import ai.djl.translate.Transform;
 
 /**
  * Converts an image NDArray to tensor NDArray Converts an image NDArray of shape (H x W x C) in the

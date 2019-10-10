@@ -13,9 +13,9 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.ndarray.NDArray;
+import ai.djl.training.GradientCollector;
 import com.sun.jna.Pointer;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.training.GradientCollector;
 
 public class MxGradientCollector implements GradientCollector {
 

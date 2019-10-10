@@ -12,16 +12,16 @@
  */
 package ai.djl.mxnet.dataset;
 
+import ai.djl.Model;
+import ai.djl.repository.Repository;
+import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.training.dataset.Batch;
+import ai.djl.training.dataset.Dataset.Usage;
+import ai.djl.training.initializer.Initializer;
 import java.io.IOException;
 import org.testng.Assert;
-import software.amazon.ai.Model;
-import software.amazon.ai.repository.Repository;
-import software.amazon.ai.training.DefaultTrainingConfig;
-import software.amazon.ai.training.Trainer;
-import software.amazon.ai.training.TrainingConfig;
-import software.amazon.ai.training.dataset.Batch;
-import software.amazon.ai.training.dataset.Dataset.Usage;
-import software.amazon.ai.training.initializer.Initializer;
 
 public class ImageNetTest {
 

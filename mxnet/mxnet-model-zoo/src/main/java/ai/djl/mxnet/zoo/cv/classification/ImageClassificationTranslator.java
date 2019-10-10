@@ -13,15 +13,15 @@
 
 package ai.djl.mxnet.zoo.cv.classification;
 
+import ai.djl.Model;
+import ai.djl.modality.Classification;
+import ai.djl.modality.cv.ImageTranslator;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Utils;
 import java.io.IOException;
 import java.util.List;
-import software.amazon.ai.Model;
-import software.amazon.ai.modality.Classification;
-import software.amazon.ai.modality.cv.ImageTranslator;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.translate.TranslatorContext;
-import software.amazon.ai.util.Utils;
 
 public class ImageClassificationTranslator extends ImageTranslator<Classification> {
 

@@ -12,15 +12,15 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.Device;
+import ai.djl.inference.BasePredictor;
+import ai.djl.inference.Predictor;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.translate.Translator;
+import ai.djl.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.ai.Device;
-import software.amazon.ai.inference.BasePredictor;
-import software.amazon.ai.inference.Predictor;
-import software.amazon.ai.ndarray.NDArray;
-import software.amazon.ai.ndarray.NDList;
-import software.amazon.ai.translate.Translator;
-import software.amazon.ai.util.Pair;
 
 /**
  * {@code MxPredictor} is the MXNet implementation of {@link Predictor}.

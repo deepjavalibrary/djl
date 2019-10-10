@@ -13,6 +13,9 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.util.PairList;
+import ai.djl.util.Utils;
 import com.sun.jna.Pointer;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -21,9 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import software.amazon.ai.ndarray.types.Shape;
-import software.amazon.ai.util.PairList;
-import software.amazon.ai.util.Utils;
 
 public class Symbol extends NativeResource {
 
