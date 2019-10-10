@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public final class JnaUtils {
@@ -1669,35 +1668,27 @@ public final class JnaUtils {
     public static CachedOp createCachedOp(MxSymbolBlock block, MxNDManager manager) {
         Symbol symbol = block.getSymbol();
 
-        List<Parameter> parameters = block.getDirectParameters();
-
-        // All inputs to Cached op consists of input data and parameters
-        // We assume missing parameters are required input data, which must be supplied by user.
-        String[] allInputNames = symbol.getAllNames();
+        List<Parameter> parameters = block.getAllParameters();
 
         // record data index in all inputs
         PairList<String, Integer> dataIndices = new PairList<>();
         // record parameter index in all inputs
-        PairList<String, Integer> paramIndices = new PairList<>();
-        List<String> parameterNames =
-                parameters.stream().map(Parameter::getName).collect(Collectors.toList());
-        for (int i = 0; i < allInputNames.length; ++i) {
-            String inputName = allInputNames[i];
-            if (parameterNames.contains(inputName)) {
-                // if input name is param, record its index
-                paramIndices.add(inputName, i);
+        List<Integer> paramIndices = new ArrayList<>();
+        int index = 0;
+        for (Parameter parameter : parameters) {
+            // We assume uninitialized parameters are data inputs
+            if (parameter.isInitialized()) {
+                paramIndices.add(index);
             } else {
-                // if input name is data, record its index
-                dataIndices.add(inputName, i);
+                dataIndices.add(parameter.getName(), index);
             }
+            ++index;
         }
 
         // Creating CachedOp
         // static_alloc and static_shape are enabled by default
         String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
-        String[] values = {
-            dataIndices.values().toString(), paramIndices.values().toString(), "1", "1"
-        };
+        String[] values = {dataIndices.values().toString(), paramIndices.toString(), "1", "1"};
 
         Pointer symbolHandle = symbol.getHandle();
         PointerByReference ref = new PointerByReference();

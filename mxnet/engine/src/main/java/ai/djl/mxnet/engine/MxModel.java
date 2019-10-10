@@ -42,7 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,7 +116,7 @@ public class MxModel implements Model {
                 }
                 Symbol symbol = Symbol.load(manager, symbolFile.toAbsolutePath().toString());
                 // TODO: change default name "data" to model-specific one
-                block = new MxSymbolBlock(manager, symbol, Collections.singletonList("data"));
+                block = new MxSymbolBlock(manager, symbol);
             }
 
             loadParameters(modelName, options);
@@ -314,6 +314,7 @@ public class MxModel implements Model {
         super.finalize();
     }
 
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     private void loadParameters(String modelName, Map<String, String> options) throws IOException {
         String epochOption = null;
         if (options != null) {
@@ -337,8 +338,10 @@ public class MxModel implements Model {
         NDList paramNDlist = JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath());
         Device device = manager.getDevice();
 
-        List<Parameter> parameters = block.getDirectParameters();
-        Map<String, Parameter> map = new ConcurrentHashMap<>();
+        MxSymbolBlock symbolBlock = (MxSymbolBlock) block;
+
+        List<Parameter> parameters = symbolBlock.getAllParameters();
+        Map<String, Parameter> map = new LinkedHashMap<>();
         parameters.forEach(p -> map.put(p.getName(), p));
 
         for (Pair<String, NDArray> pair : paramNDlist) {
@@ -348,14 +351,15 @@ public class MxModel implements Model {
             }
 
             String paramName = key.split(":", 2)[1];
-            Parameter parameter = map.get(paramName);
+            Parameter parameter = map.remove(paramName);
 
             NDArray array = pair.getValue().asInDevice(device, false);
             parameter.setArray(array);
         }
+        symbolBlock.setInputNames(new ArrayList<>(map.keySet()));
 
         // TODO: Find a better to infer model DataType from SymbolBlock.
-        dataType = parameters.get(0).getArray().getDataType();
+        dataType = paramNDlist.get(0).getDataType();
 
         if (!device.equals(Device.cpu())) {
             // MXNet always load parameters on CPU, we only close parameters if we copied them.

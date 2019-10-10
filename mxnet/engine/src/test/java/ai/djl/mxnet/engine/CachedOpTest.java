@@ -60,6 +60,13 @@ public class CachedOpTest extends PowerMockTestCase {
             List<Parameter> params = new ArrayList<>();
             params.add(
                     new Parameter(
+                            "data0",
+                            new SequentialBlock(),
+                            manager.create(new Shape(2)),
+                            ParameterType.OTHER,
+                            false));
+            params.add(
+                    new Parameter(
                             "array0",
                             new SequentialBlock(),
                             manager.create(new Shape(2)),
@@ -74,6 +81,20 @@ public class CachedOpTest extends PowerMockTestCase {
                             true));
             params.add(
                     new Parameter(
+                            "data1",
+                            new SequentialBlock(),
+                            manager.create(new Shape(2)),
+                            ParameterType.OTHER,
+                            false));
+            params.add(
+                    new Parameter(
+                            "data2",
+                            new SequentialBlock(),
+                            manager.create(new Shape(5)),
+                            ParameterType.OTHER,
+                            false));
+            params.add(
+                    new Parameter(
                             "array2",
                             new SequentialBlock(),
                             manager.create(new Shape(5)),
@@ -86,11 +107,9 @@ public class CachedOpTest extends PowerMockTestCase {
                             manager.create(new Shape(6)),
                             ParameterType.WEIGHT,
                             true));
-            List<String> names = Arrays.asList("array0", "array1", "array2", "array3");
-            List<Integer> locations = Arrays.asList(1, 2, 5, 6);
-            PairList<String, Integer> paramIndices = new PairList<>(names, locations);
-            names = Arrays.asList("data0", "data1", "data2");
-            locations = Arrays.asList(0, 3, 4);
+            List<Integer> paramIndices = Arrays.asList(1, 2, 5, 6);
+            List<String> names = Arrays.asList("data0", "data1", "data2");
+            List<Integer> locations = Arrays.asList(0, 3, 4);
             PairList<String, Integer> dataIndices = new PairList<>(names, locations);
             CachedOp co =
                     new CachedOp(new PointerArray(), manager, params, paramIndices, dataIndices);

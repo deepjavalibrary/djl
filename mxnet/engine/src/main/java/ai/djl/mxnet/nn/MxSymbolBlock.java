@@ -13,6 +13,7 @@
 
 package ai.djl.mxnet.nn;
 
+import ai.djl.Device;
 import ai.djl.mxnet.engine.CachedOp;
 import ai.djl.mxnet.engine.MxModel;
 import ai.djl.mxnet.engine.MxNDManager;
@@ -37,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,35 +47,54 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
-    private static final byte VERSION = 1;
+    private static final byte VERSION = 2;
 
     private NDManager manager;
     private CachedOp op;
     private Symbol symbol;
-    private List<Parameter> params;
+    private List<Parameter> params; // includes input data
     private List<String> inputNames;
     private Map<String, Shape> paramShapes;
     private Shape[] outputShapes;
 
-    public MxSymbolBlock(NDManager manager, Symbol symbol, List<String> names) {
+    public MxSymbolBlock(NDManager manager, Symbol symbol) {
         this.manager = manager;
         this.symbol = symbol;
-        this.inputNames = names;
-        params = new ArrayList<>();
-
-        Set<String> inputNameSet = new HashSet<>(names);
-        Set<String> auxNameSet = new HashSet<>(Arrays.asList(symbol.getAuxNames()));
+        inputNames = new ArrayList<>();
 
         String[] allNames = symbol.getAllNames();
+        params = new ArrayList<>(allNames.length);
+
+        Set<String> auxNameSet = new HashSet<>(Arrays.asList(symbol.getAuxNames()));
         for (String name : allNames) {
-            if (inputNameSet.contains(name)) {
-                continue;
-            }
             ParameterType type = inferType(name);
             boolean requireGrad = !auxNameSet.contains(name);
 
             params.add(new Parameter(name, this, type, requireGrad));
         }
+    }
+
+    public void setInputNames(List<String> inputNames) {
+        this.inputNames = inputNames;
+    }
+
+    public List<Parameter> getAllParameters() {
+        return params;
+    }
+
+    @Override
+    public Shape[] initialize(
+            NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes) {
+        if (!initialized) {
+            beforeInitialize(inputShapes);
+            for (Parameter parameter : params) {
+                if (!inputNames.contains(parameter.getName())) {
+                    parameter.initialize(manager, dataType, inputShapes, devices);
+                }
+            }
+            initialized = true;
+        }
+        return getOutputShapes(manager, inputShapes);
     }
 
     /**
@@ -92,12 +113,6 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
      */
     public Symbol getSymbol() {
         return symbol;
-    }
-
-    private List<String> getParamNames() {
-        List<String> nameList = Arrays.asList(symbol.getAllNames());
-        inputNames.forEach(nameList::remove);
-        return nameList;
     }
 
     @Override
@@ -146,7 +161,9 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
 
     @Override
     public List<Parameter> getDirectParameters() {
-        return params;
+        return params.stream()
+                .filter(p -> !inputNames.contains(p.getName()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -186,8 +203,15 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        int size = inputNames.size();
+        os.writeInt(size);
+        for (String name : inputNames) {
+            os.writeUTF(name);
+        }
         for (Parameter parameter : params) {
-            parameter.save(os);
+            if (!inputNames.contains(parameter.getName())) {
+                parameter.save(os);
+            }
         }
     }
 
@@ -197,8 +221,15 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
+        int size = is.readInt();
+        for (int i = 0; i < size; ++i) {
+            inputNames.add(is.readUTF());
+        }
+
         for (Parameter parameter : params) {
-            parameter.load(this.manager, is);
+            if (!inputNames.contains(parameter.getName())) {
+                parameter.load(this.manager, is);
+            }
         }
     }
 

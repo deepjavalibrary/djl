@@ -44,7 +44,7 @@ public class CachedOp extends NativeResource {
     private MxNDArray[] allInputsNDArray;
     private PairList<String, Integer> dataIndices;
     private Map<String, Integer> dataIndicesMap;
-    private Map<String, Integer> paramIndicesMap;
+    private List<Integer> paramIndices;
 
     private MxNDManager manager;
 
@@ -63,13 +63,13 @@ public class CachedOp extends NativeResource {
             Pointer handle,
             MxNDManager manager,
             List<Parameter> parameters,
-            PairList<String, Integer> paramIndices,
+            List<Integer> paramIndices,
             PairList<String, Integer> dataIndices) {
         super(handle);
         this.parameters = parameters;
         this.dataIndices = dataIndices;
+        this.paramIndices = paramIndices;
         this.dataIndicesMap = dataIndices.toMap();
-        this.paramIndicesMap = paramIndices.toMap();
         // holds all parameter and data NDArray values, final inputs to CachedOp
         this.manager = manager;
         manager.attach(getUid(), this);
@@ -85,25 +85,25 @@ public class CachedOp extends NativeResource {
      */
     public NDList forward(NDList data) {
         // reset the input data index at the beginning
-        allInputsNDArray = new MxNDArray[dataIndices.size() + paramIndicesMap.size()];
+        allInputsNDArray = new MxNDArray[parameters.size()];
         // check device of input
         Device device;
-        if (data != null && data.size() > 0 && data.get(0) != null) {
+        if (data.size() > 0 && data.get(0) != null) {
             device = data.get(0).getDevice();
         } else {
             device = Device.defaultDevice();
         }
+
         // fill allInputsNDArray with parameter values on correct device
-        for (Parameter parameter : parameters) {
-            int index = paramIndicesMap.get(parameter.getName());
-            MxNDArray arrayOnDevice = (MxNDArray) parameter.getArray(device);
-            if (!arrayOnDevice.getDevice().equals(device)) {
+        for (int index : paramIndices) {
+            Parameter parameter = parameters.get(index);
+            allInputsNDArray[index] = (MxNDArray) parameter.getArray();
+            if (!allInputsNDArray[index].getDevice().equals(device)) {
                 throw new IllegalStateException(
                         "Input device and parameter device does not match, if you are "
                                 + "training on multi-gpu, make sure you passed numGpus in TrainingConfig and "
                                 + "called DatasetUtils.split to split data on each GPU.");
             }
-            allInputsNDArray[index] = arrayOnDevice;
         }
 
         // fill allInputsNDArray with data values
@@ -114,6 +114,7 @@ public class CachedOp extends NativeResource {
             int idx = indexOf(inputName, index++);
             allInputsNDArray[idx] = (MxNDArray) pair.getValue();
         }
+
         // check the input, set as Shape(1) by default
         for (Pair<String, Integer> pair : dataIndices) {
             if (allInputsNDArray[pair.getValue()] == null) {
@@ -129,7 +130,12 @@ public class CachedOp extends NativeResource {
         return new NDList(result);
     }
 
-    public MxNDArray[] getInputNDArray() {
+    /**
+     * For unit test only.
+     *
+     * @return array of NDArray
+     */
+    MxNDArray[] getInputNDArray() {
         return allInputsNDArray;
     }
 
