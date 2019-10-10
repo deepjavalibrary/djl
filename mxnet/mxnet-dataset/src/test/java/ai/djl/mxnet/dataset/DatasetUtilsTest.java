@@ -15,7 +15,6 @@ package ai.djl.mxnet.dataset;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.Device;
-import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.ndarray.NDArray;
 import software.amazon.ai.ndarray.NDList;
 import software.amazon.ai.ndarray.NDManager;
@@ -42,7 +41,7 @@ public class DatasetUtilsTest {
                 NDArray array = split[i].getData().head();
                 Assert.assertEquals(array.getDevice(), devices[i]);
 
-                Assertions.assertEquals(
+                Assert.assertEquals(
                         data.get(String.format("%d:%d", i * step, (i + 1) * step))
                                 .asInDevice(devices[i], true),
                         array);
@@ -68,13 +67,13 @@ public class DatasetUtilsTest {
                 NDArray array = split[i].getData().head();
                 Assert.assertEquals(array.getDevice(), devices[i]);
                 if (i == split.length - 1) {
-                    Assertions.assertEquals(
+                    Assert.assertEquals(
                             data.get(String.format("%d:%d", i * step, data.size(0)))
                                     .asInDevice(devices[i], true),
                             array);
                     return;
                 }
-                Assertions.assertEquals(
+                Assert.assertEquals(
                         data.get(String.format("%d:%d", i * step, (i + 1) * step))
                                 .asInDevice(devices[i], true),
                         array);
@@ -100,13 +99,13 @@ public class DatasetUtilsTest {
                 NDArray array = split[i].getData().head();
                 Assert.assertEquals(array.getDevice(), devices[i]);
                 if (i == split.length - 1) {
-                    Assertions.assertEquals(
+                    Assert.assertEquals(
                             data.get(String.format("%d:%d", i * step, data.size(0)))
                                     .asInDevice(devices[i], true),
                             array);
                     return;
                 }
-                Assertions.assertEquals(
+                Assert.assertEquals(
                         data.get(String.format("%d:%d", i * step, (i + 1) * step))
                                 .asInDevice(devices[i], true),
                         array);

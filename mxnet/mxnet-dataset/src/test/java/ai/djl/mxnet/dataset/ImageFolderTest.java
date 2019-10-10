@@ -15,9 +15,9 @@ package ai.djl.mxnet.dataset;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import software.amazon.ai.Model;
-import software.amazon.ai.integration.util.Assertions;
 import software.amazon.ai.modality.cv.util.BufferedImageUtils;
 import software.amazon.ai.modality.cv.util.NDImageUtils;
 import software.amazon.ai.ndarray.NDArray;
@@ -63,14 +63,14 @@ public class ImageFolderTest {
                 Assertions.assertAlmostEquals(
                         NDImageUtils.resize(cat, 100, 100).expandDims(0),
                         catBatch.getData().head());
-                Assertions.assertEquals(manager.create(new int[] {0}), catBatch.getLabels().head());
+                Assert.assertEquals(manager.create(new int[] {0}), catBatch.getLabels().head());
                 catBatch.close();
 
                 Batch dogBatch = ds.next();
                 Assertions.assertAlmostEquals(
                         NDImageUtils.resize(dog, 100, 100).expandDims(0),
                         dogBatch.getData().head());
-                Assertions.assertEquals(manager.create(new int[] {1}), dogBatch.getLabels().head());
+                Assert.assertEquals(manager.create(new int[] {1}), dogBatch.getLabels().head());
                 dogBatch.close();
             }
         }

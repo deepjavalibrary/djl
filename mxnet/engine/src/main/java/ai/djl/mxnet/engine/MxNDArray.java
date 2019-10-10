@@ -1539,6 +1539,19 @@ public class MxNDArray extends NativeResource implements NDArray {
         JnaUtils.waitToRead(getHandle());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MxNDArray) {
+            return contentEquals((MxNDArray) obj);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {

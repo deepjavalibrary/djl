@@ -323,7 +323,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray mulAll = NDArrays.mul(toMulAll);
             NDArray mulAllInPlace = NDArrays.muli(toMulAll);
             Assertions.assertFalse(
-                    mulAll.equals(toMulAll[0]), "None in-place operator returned in-place result");
+                    mulAll == toMulAll[0], "None in-place operator returned in-place result");
             Assertions.assertTrue(mulAllInPlace.equals(toMulAll[0]), "In-place summation failed");
             actual = manager.create(new float[] {8, 12, 12, 8}, new Shape(2, 2));
             Assertions.assertEquals(actual, mulAll, "Incorrect value in summed array");

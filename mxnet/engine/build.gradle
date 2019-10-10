@@ -25,8 +25,6 @@ sourceSets {
     }
 }
 
-compileTestJava.dependsOn tasks.getByPath(':api:testClasses')
-
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'
 
