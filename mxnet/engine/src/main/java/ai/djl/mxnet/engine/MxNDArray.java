@@ -946,8 +946,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray min() {
-        MxOpParams params = new MxOpParams();
-        return manager.invoke("_np_min", this, params);
+        return manager.invoke("_np_min", this, null);
     }
 
     /** {@inheritDoc} */
@@ -962,8 +961,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sum() {
-        MxOpParams params = new MxOpParams();
-        return manager.invoke("_np_sum", this, params);
+        return manager.invoke("_np_sum", this, null);
     }
 
     /** {@inheritDoc} */
@@ -978,8 +976,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray prod() {
-        MxOpParams params = new MxOpParams();
-        return manager.invoke("_np_prod", this, params);
+        return manager.invoke("_np_prod", this, null);
     }
 
     /** {@inheritDoc} */
@@ -994,8 +991,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mean() {
-        MxOpParams params = new MxOpParams();
-        return manager.invoke("_npi_mean", this, params);
+        return manager.invoke("_npi_mean", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1058,10 +1054,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray squeeze() {
-        // MXNet engine handle scalar case with condition of presence of "axis"
-        // so can't rely on default one
-        MxOpParams params = new MxOpParams();
-        return manager.invoke("_np_squeeze", this, params);
+        return manager.invoke("_np_squeeze", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1267,11 +1260,11 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray tile(long repeats) {
         // zero-dim
-        if (getShape().size() == 0) {
-            return this;
+        if (isEmpty()) {
+            return dup();
         }
         // scalar
-        int dim = (getShape().dimension() != 0) ? getShape().dimension() : 1;
+        int dim = (isScalar()) ? 1 : getShape().dimension();
         long[] repeatsArray = new long[dim];
         Arrays.fill(repeatsArray, repeats);
         return tile(repeatsArray);
@@ -1281,7 +1274,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray tile(int axis, long repeats) {
         // scalar
-        if (getShape().dimension() == 0) {
+        if (isScalar()) {
             throw new IllegalArgumentException("scalar didn't support specifying axis");
         }
         long[] repeatsArray = new long[getShape().dimension()];
@@ -1307,11 +1300,11 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray repeat(long repeats) {
         // zero-dim
-        if (getShape().size() == 0) {
-            return this;
+        if (isEmpty()) {
+            return dup();
         }
         // scalar
-        int dim = (getShape().dimension() != 0) ? getShape().dimension() : 1;
+        int dim = (isScalar()) ? 1 : getShape().dimension();
         long[] repeatsArray = new long[dim];
         Arrays.fill(repeatsArray, repeats);
         return repeat(repeatsArray);
@@ -1379,8 +1372,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray transpose() {
-        MxOpParams params = new MxOpParams();
-        return manager.invoke("_np_transpose", this, params);
+        return manager.invoke("_np_transpose", this, null);
     }
 
     /** {@inheritDoc} */
