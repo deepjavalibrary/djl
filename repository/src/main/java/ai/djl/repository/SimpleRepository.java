@@ -49,11 +49,8 @@ public class SimpleRepository extends AbstractRepository {
     @Override
     public Artifact resolve(MRL mrl, String version, Map<String, String> filter) {
         Metadata metadata = new Metadata();
-        metadata.setRepositoryUri(path.toUri());
+        metadata.setRepositoryUri(URI.create(""));
         Artifact artifact = new Artifact();
-        artifact.setGroupId(mrl.getGroupId());
-        artifact.setArtifactId(mrl.getArtifactId());
-        artifact.setVersion(version);
         artifact.setMetadata(metadata);
         return artifact;
     }
@@ -61,5 +58,10 @@ public class SimpleRepository extends AbstractRepository {
     @Override
     public void prepare(Artifact artifact) {
         // Do nothing
+    }
+
+    @Override
+    public Path getCacheDirectory() {
+        return path;
     }
 }

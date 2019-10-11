@@ -26,7 +26,6 @@ import ai.djl.training.dataset.Record;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +41,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     private boolean prepared;
     private Flag flag;
 
-    private Path dataDir;
     private CocoUtils coco;
     private List<Path> imagePaths;
     private List<double[][]> labels;
@@ -54,7 +52,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         artifact = builder.artifact;
         usage = builder.usage;
         flag = builder.flag;
-        dataDir = builder.dataDir;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
     }
@@ -95,21 +92,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     }
 
     @Override
-    public void prepare() throws IOException {
-        if (isPrepared()) {
-            return;
-        }
-        // it uses local files not need to download
-        if (dataDir != null) {
-            prepareData(usage);
-            setPrepared(true);
-            return;
-        }
-        // download the dataset from remote
-        ZooDataset.super.prepare();
-    }
-
-    @Override
     public Record get(long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
@@ -120,19 +102,17 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     @Override
     public void prepareData(Usage usage) throws IOException {
-        if (dataDir == null) {
-            Path cacheDir = getRepository().getCacheDirectory();
-            URI resourceUri = getArtifact().getResourceUri();
-            dataDir = cacheDir.resolve(resourceUri.getPath());
-        }
+        Path cacheDir = repository.getCacheDirectory();
+        URI resourceUri = artifact.getResourceUri();
+        Path root = cacheDir.resolve(resourceUri.getPath());
 
         Path jsonFile;
         switch (usage) {
             case TRAIN:
-                jsonFile = dataDir.resolve("annotations").resolve("instances_train2017.json");
+                jsonFile = root.resolve("annotations").resolve("instances_train2017.json");
                 break;
             case TEST:
-                jsonFile = dataDir.resolve("annotations").resolve("instances_val2017.json");
+                jsonFile = root.resolve("annotations").resolve("instances_val2017.json");
                 break;
             case VALIDATION:
             default:
@@ -142,7 +122,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         coco.prepare();
         List<Long> imageIds = coco.getImageIds();
         for (long id : imageIds) {
-            Path imagePath = dataDir.resolve(coco.getRelativeImagePath(id));
+            Path imagePath = root.resolve(coco.getRelativeImagePath(id));
             List<double[]> labelOfImageId = getLabels(id);
             if (imagePath != null && !labelOfImageId.isEmpty()) {
                 imagePaths.add(imagePath);
@@ -187,7 +167,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     @SuppressWarnings("rawtypes")
     public static final class Builder extends BaseBuilder<Builder> {
         private NDManager manager;
-        private Path dataDir;
         private Flag flag = NDImageUtils.Flag.COLOR;
         private Repository repository = Datasets.REPOSITORY;
         private Artifact artifact;
@@ -220,11 +199,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
         public Builder optFlag(Flag flag) {
             this.flag = flag;
-            return self();
-        }
-
-        public Builder optDataDir(String dataDir) {
-            this.dataDir = Paths.get(dataDir);
             return self();
         }
 

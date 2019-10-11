@@ -53,7 +53,6 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     private boolean prepared;
     private Flag flag = NDImageUtils.Flag.COLOR;
 
-    private Path dataDir;
     private List<Path> imagePaths;
     private List<float[]> labels;
 
@@ -62,7 +61,6 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         manager = builder.manager;
         repository = builder.repository;
         artifact = builder.artifact;
-        dataDir = builder.dataDir;
         usage = builder.usage;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
@@ -104,25 +102,11 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     }
 
     @Override
-    public void prepare() throws IOException {
-        if (isPrepared()) {
-            return;
-        }
-        // it uses local files not need to download
-        if (dataDir != null) {
-            prepareData(usage);
-            setPrepared(true);
-            return;
-        }
-        // download the dataset from remote
-        ZooDataset.super.prepare();
-    }
-
-    @Override
     public void prepareData(Usage usage) throws IOException {
-        if (dataDir == null) {
-            setDataDir();
-        }
+        Path cacheDir = repository.getCacheDirectory();
+        URI resourceUri = artifact.getResourceUri();
+        Path root = cacheDir.resolve(resourceUri.getPath());
+
         Path usagePath;
         switch (usage) {
             case TRAIN:
@@ -135,7 +119,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
             default:
                 throw new UnsupportedOperationException("Validation data not available.");
         }
-        usagePath = dataDir.resolve(usagePath);
+        usagePath = root.resolve(usagePath);
         Path indexFile = usagePath.resolve("index.file");
         try (Reader reader = Files.newBufferedReader(indexFile)) {
             Type mapType = new TypeToken<Map<String, List<Float>>>() {}.getType();
@@ -159,12 +143,6 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         size = imagePaths.size();
     }
 
-    private void setDataDir() throws IOException {
-        Path cacheDir = getRepository().getCacheDirectory();
-        URI resourceUri = getArtifact().getResourceUri();
-        dataDir = cacheDir.resolve(resourceUri.getPath());
-    }
-
     @Override
     public Record get(long index) throws IOException {
         int idx = Math.toIntExact(index);
@@ -177,7 +155,6 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
 
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private Path dataDir;
         private Repository repository = Datasets.REPOSITORY;
         private Artifact artifact;
         private Usage usage;
@@ -205,11 +182,6 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
 
         public Builder optArtifact(Artifact artifact) {
             this.artifact = artifact;
-            return self();
-        }
-
-        public Builder optDataDir(String dataDir) {
-            this.dataDir = Paths.get(dataDir);
             return self();
         }
 
