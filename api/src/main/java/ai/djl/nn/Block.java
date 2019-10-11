@@ -29,16 +29,11 @@ import java.util.List;
 /** An interface defining neural-network layers. */
 public interface Block {
 
-    default Block asInDevice(Device device, boolean copy) {
-        //  TODO: add implementation
-        return this;
+    default NDList forward(NDList inputs) {
+        return forward(inputs, null);
     }
 
     NDList forward(NDList inputs, PairList<String, Object> params);
-
-    NDList forward(NDList inputs);
-
-    void backward();
 
     void setInitializer(Initializer initializer);
 

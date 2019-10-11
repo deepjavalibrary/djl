@@ -118,8 +118,10 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
      * @param other {@code PairList} containing elements to be added to this list
      */
     public void addAll(PairList<K, V> other) {
-        keys.addAll(other.keys());
-        values.addAll(other.values());
+        if (other != null) {
+            keys.addAll(other.keys());
+            values.addAll(other.values());
+        }
     }
 
     /**

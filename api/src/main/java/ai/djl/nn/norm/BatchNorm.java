@@ -12,13 +12,11 @@
  */
 package ai.djl.nn.norm;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
@@ -47,12 +45,6 @@ public class BatchNorm extends ParameterBlock {
         momentum = builder.getMomentum();
         runningMean = new Parameter("runningMean", this, ParameterType.RUNNING_MEAN, false);
         runningVar = new Parameter("runningVar", this, ParameterType.RUNNING_VAR, false);
-    }
-
-    @Override
-    public Block asInDevice(Device device, boolean copy) {
-
-        return null;
     }
 
     @Override

@@ -145,9 +145,6 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     }
 
     @Override
-    public void backward() {}
-
-    @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         if (outputShapes == null) {
             String[] outputNames = symbol.getOutputNames();

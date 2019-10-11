@@ -12,7 +12,6 @@
  */
 package ai.djl.nn;
 
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -26,17 +25,9 @@ public abstract class AbstractBlock implements Block {
     protected boolean initialized;
 
     @Override
-    public NDList forward(NDList inputs) {
-        return forward(inputs, new PairList<>());
-    }
-
-    @Override
     public DataDesc[] describeInput() {
         return new DataDesc[0];
     }
-
-    @Override
-    public void backward() {}
 
     @Override
     public void setInitializer(Initializer initializer) {

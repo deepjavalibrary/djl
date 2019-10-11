@@ -12,7 +12,6 @@
  */
 package ai.djl.inference;
 
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classification;
@@ -110,7 +109,7 @@ public class InferenceTest {
     public void testTranslatException() throws TranslateException {
         EchoTranslator<String> translator = new EchoTranslator<>();
         translator.setInputException(new TranslateException("Some exception"));
-        Model model = new MockModel(Device.defaultDevice());
+        Model model = new MockModel();
         Predictor<String, String> predictor = model.newPredictor(translator);
         String result = predictor.predict("input");
         Assert.assertEquals(result, "input");

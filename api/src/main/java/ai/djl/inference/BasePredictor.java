@@ -12,7 +12,6 @@
  */
 package ai.djl.inference;
 
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
@@ -36,12 +35,11 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     Metrics metrics;
     private Block block;
 
-    public BasePredictor(
-            Model model, NDManager manager, Translator<I, O> translator, Device device) {
+    public BasePredictor(Model model, Translator<I, O> translator) {
         this.model = model;
-        this.manager = manager;
+        this.manager = model.getNDManager().newSubManager();
         this.translator = translator;
-        block = model.getBlock().asInDevice(device, true);
+        block = model.getBlock();
     }
 
     /** {@inheritDoc} */

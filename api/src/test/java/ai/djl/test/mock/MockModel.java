@@ -12,7 +12,6 @@
  */
 package ai.djl.test.mock;
 
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.inference.BasePredictor;
 import ai.djl.inference.Predictor;
@@ -37,11 +36,6 @@ import java.util.function.Function;
 public class MockModel implements Model {
 
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
-    private Device device;
-
-    public MockModel(Device device) {
-        this.device = device;
-    }
 
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
@@ -73,7 +67,7 @@ public class MockModel implements Model {
 
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new BasePredictor<>(this, new MockNDManager(), translator, device);
+        return new BasePredictor<>(this, translator);
     }
 
     @Override

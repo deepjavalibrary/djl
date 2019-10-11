@@ -12,7 +12,6 @@
  */
 package ai.djl.mxnet.engine;
 
-import ai.djl.Device;
 import ai.djl.inference.BasePredictor;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
@@ -34,8 +33,8 @@ public class MxPredictor<I, O> extends BasePredictor<I, O> {
 
     private static final Logger logger = LoggerFactory.getLogger(MxPredictor.class);
 
-    MxPredictor(MxModel model, Translator<I, O> translator, Device device) {
-        super(model, MxNDManager.getSystemManager().newSubManager(device), translator, device);
+    MxPredictor(MxModel model, Translator<I, O> translator) {
+        super(model, translator);
     }
 
     @Override
