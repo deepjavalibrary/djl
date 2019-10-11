@@ -50,7 +50,7 @@ public final class TrainMnist {
 
     private static final Logger logger = LogUtils.getLogger(TrainMnist.class);
 
-    private static float accuracy;
+    private static float trainAccuracy;
     private static float lossValue;
 
     private TrainMnist() {}
@@ -84,13 +84,11 @@ public final class TrainMnist {
             devices = new Device[] {Device.defaultDevice()};
         }
 
-        Accuracy acc = new Accuracy();
-
         TrainingConfig config =
                 new DefaultTrainingConfig(new XavierInitializer())
                         .setOptimizer(optimizer)
                         .setLoss(Loss.softmaxCrossEntropyLoss())
-                        .addTrainingMetrics(Collections.singletonList(acc))
+                        .addTrainingMetrics(Collections.singletonList(new Accuracy()))
                         .setDevices(devices);
         try (Model model = Model.newInstance()) {
             Pipeline pipeline = new Pipeline(new ToTensor());
@@ -104,6 +102,16 @@ public final class TrainMnist {
                             .optPipeline(pipeline)
                             .build();
             mnist.prepare();
+
+            Mnist validateSet =
+                    new Mnist.Builder()
+                            .setManager(model.getNDManager())
+                            .setUsage(Dataset.Usage.TEST)
+                            .setRandomSampling(batchSize)
+                            .optPipeline(pipeline)
+                            .build();
+            validateSet.prepare();
+
             try (Trainer trainer = model.newTrainer(config)) {
                 int numEpoch = arguments.getEpoch();
                 int numOfSlices = devices.length;
@@ -112,8 +120,6 @@ public final class TrainMnist {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 for (int epoch = 0; epoch < numEpoch; epoch++) {
-                    // reset loss and accuracy
-                    trainer.resetTrainingMetrics();
                     for (Batch batch : trainer.iterateDataset(mnist)) {
                         Batch[] split = DatasetUtils.split(batch, devices, false);
 
@@ -132,17 +138,37 @@ public final class TrainMnist {
                         }
                         trainer.step();
                     }
+                    // Validation
+                    for (Batch batch : trainer.iterateDataset(validateSet)) {
+                        Batch[] split = DatasetUtils.split(batch, devices, false);
+                        for (int i = 0; i < numOfSlices; i++) {
+                            NDArray data = split[i].getData().head();
+                            NDList labels = split[i].getLabels();
+                            data = data.reshape(inputShape);
+                            trainer.validate(new NDList(data), labels);
+                        }
+                    }
                     lossValue = trainer.getLoss();
-                    accuracy = acc.getMetric().getValue();
-                    logger.info("Loss: " + lossValue + " accuracy: " + accuracy);
+                    trainAccuracy = trainer.getTrainingMetrics().get(0).getMetric().getValue();
+                    float validateAccuracy =
+                            trainer.getValidateMetrics().get(0).getMetric().getValue();
+                    logger.info(
+                            "Loss: "
+                                    + lossValue
+                                    + " train accuracy: "
+                                    + trainAccuracy
+                                    + " validate accuracy: "
+                                    + validateAccuracy);
                     logger.info("Epoch " + epoch + " finish");
+                    // reset loss and accuracy
+                    trainer.resetTrainingMetrics();
                 }
             }
         }
     }
 
-    public static float getAccuracy() {
-        return accuracy;
+    public static float getTrainAccuracy() {
+        return trainAccuracy;
     }
 
     public static float getLossValue() {

@@ -55,6 +55,9 @@ public class MockTrainer implements Trainer {
     }
 
     @Override
+    public void validate(NDList input, NDList label) {}
+
+    @Override
     public NDArray loss(NDList labels, NDList preds) {
         return null;
     }
@@ -72,6 +75,11 @@ public class MockTrainer implements Trainer {
 
     @Override
     public List<TrainingMetrics> getTrainingMetrics() {
+        return null;
+    }
+
+    @Override
+    public List<TrainingMetrics> getValidateMetrics() {
         return null;
     }
 

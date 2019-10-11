@@ -44,6 +44,8 @@ public interface Trainer extends AutoCloseable {
 
     NDList forward(NDList input);
 
+    void validate(NDList input, NDList label);
+
     NDArray loss(NDList labels, NDList preds);
 
     /** Makes one step of parameter update. */
@@ -61,6 +63,8 @@ public interface Trainer extends AutoCloseable {
     float getLoss();
 
     List<TrainingMetrics> getTrainingMetrics();
+
+    List<TrainingMetrics> getValidateMetrics();
 
     NDManager getManager();
 

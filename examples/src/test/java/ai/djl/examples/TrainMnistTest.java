@@ -24,7 +24,7 @@ public class TrainMnistTest {
     public void testTrainMnist() throws ParseException, IOException {
         String[] args = new String[] {"-e", "2"};
         TrainMnist.main(args);
-        Assert.assertTrue(TrainMnist.getAccuracy() > 0.9f);
+        Assert.assertTrue(TrainMnist.getTrainAccuracy() > 0.9f);
         Assert.assertTrue(TrainMnist.getLossValue() < 0.2f);
     }
 }

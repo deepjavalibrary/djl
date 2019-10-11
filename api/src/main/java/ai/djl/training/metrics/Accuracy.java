@@ -49,6 +49,11 @@ public class Accuracy extends TrainingMetrics {
         this(name, 1);
     }
 
+    @Override
+    public Accuracy duplicate() {
+        return new Accuracy(super.getName(), axis);
+    }
+
     /** {@inheritDoc} */
     @Override
     public void reset() {

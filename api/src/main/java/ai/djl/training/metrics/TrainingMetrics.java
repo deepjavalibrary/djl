@@ -32,6 +32,13 @@ public abstract class TrainingMetrics {
     }
 
     /**
+     * Duplicate the existing metrics.
+     *
+     * @return a copy of the {@link TrainingMetrics}
+     */
+    public abstract TrainingMetrics duplicate();
+
+    /**
      * Update training metrics based on {@link NDList} of labels and predictions.
      *
      * @param labels {@code NDList} of labels

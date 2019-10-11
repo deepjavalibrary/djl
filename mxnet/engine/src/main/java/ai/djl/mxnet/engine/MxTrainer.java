@@ -54,6 +54,7 @@ public class MxTrainer implements Trainer {
     private Loss loss;
 
     private List<TrainingMetrics> trainingMetrics;
+    private List<TrainingMetrics> validateMetrics;
     private boolean gradientsChecked;
 
     MxTrainer(MxModel model, TrainingConfig trainingConfig) {
@@ -64,6 +65,11 @@ public class MxTrainer implements Trainer {
         devices = trainingConfig.getDevices();
         loss = trainingConfig.getLossFunction();
         trainingMetrics = trainingConfig.getTrainingMetrics();
+        validateMetrics =
+                trainingMetrics
+                        .stream()
+                        .map(TrainingMetrics::duplicate)
+                        .collect(Collectors.toList());
         parameters = block.getParameters();
         if (devices.length > 1) {
             parameterStore = new ParameterStore(parameters, devices);
@@ -94,6 +100,12 @@ public class MxTrainer implements Trainer {
     @Override
     public NDList forward(NDList input) {
         return model.getBlock().forward(input);
+    }
+
+    @Override
+    public void validate(NDList inputs, NDList labels) {
+        NDList preds = forward(inputs);
+        validateMetrics.forEach(metrics -> metrics.update(labels, preds));
     }
 
     @Override
@@ -130,6 +142,7 @@ public class MxTrainer implements Trainer {
     public void resetTrainingMetrics() {
         loss.reset();
         trainingMetrics.forEach(TrainingMetrics::reset);
+        validateMetrics.forEach(TrainingMetrics::reset);
     }
 
     @Override
@@ -144,6 +157,11 @@ public class MxTrainer implements Trainer {
     @Override
     public List<TrainingMetrics> getTrainingMetrics() {
         return trainingMetrics;
+    }
+
+    @Override
+    public List<TrainingMetrics> getValidateMetrics() {
+        return validateMetrics;
     }
 
     @Override

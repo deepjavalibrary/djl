@@ -48,6 +48,7 @@ public abstract class Loss extends TrainingMetrics {
      * @return loss value
      */
     public NDArray getTotalLoss(NDList labels, NDList predictions) {
+        // TODO: add weighted loss, used in batch loss calculation
         NDArray loss = getLoss(labels.head(), predictions.head());
         for (int i = 1; i < labels.size(); i++) {
             loss.add(getLoss(labels.get(i), predictions.get(i)));
@@ -109,6 +110,11 @@ public abstract class Loss extends TrainingMetrics {
         return IntStream.range(0, loss.getShape().dimension())
                 .filter(axis -> axis != batchAxis)
                 .toArray();
+    }
+
+    @Override
+    public Loss duplicate() {
+        throw new UnsupportedOperationException("Duplicate is not supported for Loss");
     }
 
     /** {@inheritDoc} */
