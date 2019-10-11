@@ -17,13 +17,13 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Parameter implements AutoCloseable {
 
@@ -31,6 +31,7 @@ public class Parameter implements AutoCloseable {
 
     private static final int BUFFER_SIZE = 81920;
 
+    private String id;
     private String name;
     private Block block;
     private ParameterType type;
@@ -38,33 +39,22 @@ public class Parameter implements AutoCloseable {
     private Initializer initializer;
     private NDArray array;
     private boolean requireGrad;
-    // use ParameterStore to store copies of array on multi devices
-    private ParameterStore parameterStore;
 
     public Parameter(String name, Block block, ParameterType type) {
-        this.name = name;
-        this.block = block;
-        this.type = type;
-        this.initializer = type.getInitializer();
-        requireGrad = true;
+        this(name, block, type, true);
     }
 
     public Parameter(String name, Block block, ParameterType type, boolean requireGrad) {
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.block = block;
         this.type = type;
-        this.initializer = type.getInitializer();
         this.requireGrad = requireGrad;
+        this.initializer = type.getInitializer();
     }
 
-    public Parameter(
-            String name, Block block, NDArray array, ParameterType type, boolean requireGrad) {
-        this.name = name;
-        this.block = block;
-        this.array = array;
-        this.type = type;
-        this.initializer = type.getInitializer();
-        this.requireGrad = requireGrad;
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -84,14 +74,6 @@ public class Parameter implements AutoCloseable {
             throw new IllegalStateException("The array has not been initialized");
         }
         return array;
-    }
-
-    public NDArray getArray(Device device) {
-        if (parameterStore != null) {
-            return parameterStore.getValue(this, device);
-        } else {
-            return getArray();
-        }
     }
 
     public boolean requireGradient() {
@@ -125,17 +107,9 @@ public class Parameter implements AutoCloseable {
                             devices[0]);
         }
 
-        if (parameterStore != null) {
-            parameterStore.initialize(this, array);
-        } else {
-            if (requireGradient()) {
-                array.attachGradient();
-            }
+        if (requireGradient()) {
+            array.attachGradient();
         }
-    }
-
-    public void setParameterStore(ParameterStore parameterStore) {
-        this.parameterStore = parameterStore;
     }
 
     public void save(DataOutputStream dos) throws IOException {
@@ -241,24 +215,5 @@ public class Parameter implements AutoCloseable {
             array.close();
             array = null;
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Parameter parameter = (Parameter) o;
-        return Objects.equals(name, parameter.name)
-                && type == parameter.type
-                && Objects.equals(array, parameter.getArray());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, type, array);
     }
 }

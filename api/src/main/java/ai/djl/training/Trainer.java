@@ -20,7 +20,6 @@ import ai.djl.ndarray.types.DataDesc;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.metrics.TrainingMetrics;
-import ai.djl.training.optimizer.Optimizer;
 import java.io.IOException;
 import java.util.List;
 
@@ -33,14 +32,6 @@ public interface Trainer extends AutoCloseable {
     }
 
     GradientCollector newGradientCollector();
-
-    /**
-     * An internal helper to get the Engine specific implementation for parameter store.
-     *
-     * @param optimizer The optimizer that defines how to update parameters
-     * @return {@link ParameterServer} object
-     */
-    ParameterServer newParameterServer(Optimizer optimizer);
 
     NDList forward(NDList input);
 

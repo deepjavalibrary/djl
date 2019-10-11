@@ -12,6 +12,7 @@
  */
 package ai.djl.nn.norm;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -20,6 +21,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -48,8 +50,9 @@ public class BatchNorm extends ParameterBlock {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
-        inputs = opInputs(inputs);
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
         return ex.batchNorm(inputs, epsilon, momentum, axis, params);
     }
@@ -84,14 +87,17 @@ public class BatchNorm extends ParameterBlock {
         }
     }
 
-    private NDList opInputs(NDList inputs) {
+    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
         }
         NDArray data = inputs.get(0);
+        Device device = data.getDevice();
         NDArray gamma = data.getManager().ones(new Shape(inChannels));
         NDArray beta = data.getManager().zeros(new Shape(inChannels));
-        return new NDList(data, gamma, beta, runningMean.getArray(), runningVar.getArray());
+        NDArray runningMeanValue = parameterStore.getValue(runningMean, device);
+        NDArray runningVarValue = parameterStore.getValue(runningVar, device);
+        return new NDList(data, gamma, beta, runningMeanValue, runningVarValue);
     }
 
     @Override

@@ -106,7 +106,7 @@ public class GradientCollectorIntegrationTest {
 
                             NDList x = batch.getData();
                             NDList y = batch.getLabels();
-                            NDList yHat = block.forward(x);
+                            NDList yHat = trainer.forward(x);
                             NDArray loss = trainer.loss(y, yHat);
                             gradCol.backward(loss);
                         }

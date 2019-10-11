@@ -23,13 +23,13 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.training.GradientCollector;
+import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetrics;
-import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +47,6 @@ public class MxTrainer implements Trainer {
     // this is performance metrics similar to predictor metrics, not training accuracy or loss
     // currently not implemented
     private Metrics metrics;
-    private Optimizer optimizer;
     private Device[] devices;
     private PairList<String, Parameter> parameters;
     private ParameterStore parameterStore;
@@ -61,7 +60,6 @@ public class MxTrainer implements Trainer {
         this.model = model;
         this.manager = (MxNDManager) model.getNDManager().newSubManager();
         Block block = model.getBlock();
-        optimizer = trainingConfig.getOptimizer();
         devices = trainingConfig.getDevices();
         loss = trainingConfig.getLossFunction();
         trainingMetrics = trainingConfig.getTrainingMetrics();
@@ -71,12 +69,12 @@ public class MxTrainer implements Trainer {
                         .map(TrainingMetrics::duplicate)
                         .collect(Collectors.toList());
         parameters = block.getParameters();
-        if (devices.length > 1) {
-            parameterStore = new ParameterStore(parameters, devices);
-            parameters
-                    .stream()
-                    .forEach(param -> param.getValue().setParameterStore(parameterStore));
-        }
+
+        // ParameterServer parameterServer = new MxParameterServer(trainingConfig.getOptimizer());
+        ParameterServer parameterServer = new LocalParameterServer(trainingConfig.getOptimizer());
+
+        parameterStore = new ParameterStore(manager, false);
+        parameterStore.setParameterServer(parameterServer, trainingConfig.getDevices());
     }
 
     @Override
@@ -91,15 +89,9 @@ public class MxTrainer implements Trainer {
         return new MxGradientCollector();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public ParameterServer newParameterServer(Optimizer optimizer) {
-        return new MxParameterServer(optimizer);
-    }
-
     @Override
     public NDList forward(NDList input) {
-        return model.getBlock().forward(input);
+        return model.getBlock().forward(parameterStore, input);
     }
 
     @Override
@@ -118,19 +110,11 @@ public class MxTrainer implements Trainer {
     /** {@inheritDoc} */
     @Override
     public void step() {
-        if (optimizer == null) {
-            throw new IllegalStateException(
-                    "No optimizer is set for trainer, please initialize"
-                            + "your trainer with an Optimizer.");
-        }
         if (!gradientsChecked) {
             checkGradients();
         }
-        if (parameterStore != null) {
-            parameterStore.updateAllParameters();
-        } else {
-            optimizer.updateAllParameters(parameters);
-        }
+
+        parameterStore.updateAllParameters();
     }
 
     @Override
@@ -175,23 +159,12 @@ public class MxTrainer implements Trainer {
      */
     private void checkGradients() {
         List<NDArray> grads = new ArrayList<>();
-        if (parameterStore != null) {
-            parameterStore.setParameterServer(newParameterServer(optimizer));
-            parameters
-                    .values()
-                    .stream()
-                    .filter(Parameter::requireGradient)
-                    .forEach(param -> grads.add(parameterStore.getValue(param, devices[0])));
-        } else {
+        parameters
+                .values()
+                .stream()
+                .filter(Parameter::requireGradient)
+                .forEach(param -> grads.add(parameterStore.getValue(param, devices[0])));
 
-            grads.addAll(
-                    parameters
-                            .values()
-                            .stream()
-                            .filter(Parameter::requireGradient)
-                            .map(param -> param.getArray().getGradient())
-                            .collect(Collectors.toList()));
-        }
         NDArray gradSum =
                 NDArrays.stack(
                         new NDList(grads.stream().map(NDArray::sum).toArray(NDArray[]::new)));
@@ -225,9 +198,6 @@ public class MxTrainer implements Trainer {
 
     @Override
     public void close() {
-        if (parameterStore != null) {
-            parameterStore.close();
-        }
         manager.close();
     }
 }

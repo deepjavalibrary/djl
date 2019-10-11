@@ -34,6 +34,7 @@ import ai.djl.nn.recurrent.GRU;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
@@ -212,11 +213,14 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
+                ParameterStore parameterStore = new ParameterStore(manager, false);
 
                 // TODO: use trainer.forward
-                Assert.assertEquals(block.forward(manager, 'x'), manager.create(new int[] {1, 1}));
                 Assert.assertEquals(
-                        block.forward(manager, new Character[] {'a', 'b'}),
+                        block.forward(parameterStore, manager, 'x'),
+                        manager.create(new int[] {1, 1}));
+                Assert.assertEquals(
+                        block.forward(parameterStore, manager, new Character[] {'a', 'b'}),
                         manager.create(new int[] {1, 1, 1, 1}, new Shape(2, 2)));
             }
         }

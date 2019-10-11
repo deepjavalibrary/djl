@@ -12,7 +12,9 @@
  */
 package ai.djl.nn.recurrent;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -21,6 +23,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterType;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -53,8 +56,9 @@ public class RNN extends RecurrentCell {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
-        inputs = opInputs(inputs);
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
         return ex.rnn(
                 inputs,
@@ -132,7 +136,7 @@ public class RNN extends RecurrentCell {
         state.load(manager, is);
     }
 
-    private NDList opInputs(NDList inputs) {
+    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("RNN requires exactly 1 NDArray");
         }
@@ -141,18 +145,21 @@ public class RNN extends RecurrentCell {
                     "Input must include data, and sequenceLength as useSequenceLength is set to true");
         }
 
-        NDList result = new NDList();
-        NDArray parameters = i2hWeight.getArray().flatten();
-        parameters =
-                parameters.concat(
-                        new NDList(
-                                i2hBias.getArray().flatten(),
-                                h2hWeight.getArray().flatten(),
-                                h2hBias.getArray().flatten()));
+        NDArray head = inputs.head();
+        Device device = head.getDevice();
 
-        result.add(inputs.get(0));
-        result.add(parameters);
-        result.add(state.getArray());
+        NDList result = new NDList();
+        result.add(head);
+        try (NDList parameterList = new NDList(4)) {
+            parameterList.add(parameterStore.getValue(i2hWeight, device).flatten());
+            parameterList.add(parameterStore.getValue(i2hBias, device).flatten());
+            parameterList.add(parameterStore.getValue(h2hWeight, device).flatten());
+            parameterList.add(parameterStore.getValue(h2hBias, device).flatten());
+
+            NDArray array = NDArrays.concat(parameterList);
+            result.add(array);
+        }
+        result.add(parameterStore.getValue(state, device));
         if (useSequenceLength) {
             result.add(inputs.get(1));
         }

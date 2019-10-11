@@ -29,6 +29,7 @@ import ai.djl.nn.core.Linear;
 import ai.djl.repository.ZipUtils;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
+import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
@@ -55,9 +56,11 @@ public class SymbolBlockTest {
 
             NDManager manager = model.getNDManager();
 
+            ParameterStore parameterStore = new ParameterStore(manager, false);
+
             Block block = model.getBlock();
             NDArray arr = manager.ones(new Shape(1, 28, 28));
-            Shape shape = block.forward(new NDList(arr)).head().getShape();
+            Shape shape = block.forward(parameterStore, new NDList(arr)).head().getShape();
             Assert.assertEquals(new Shape(1, 10), shape);
         }
     }

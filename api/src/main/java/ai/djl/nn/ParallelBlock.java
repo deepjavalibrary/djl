@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -72,10 +73,11 @@ public class ParallelBlock extends AbstractBlock {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         return function.apply(
                 blocks.stream()
-                        .map(block -> block.forward(inputs, params))
+                        .map(block -> block.forward(parameterStore, inputs, params))
                         .collect(Collectors.toList()));
     }
 

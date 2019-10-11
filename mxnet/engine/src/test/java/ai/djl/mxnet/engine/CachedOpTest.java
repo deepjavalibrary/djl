@@ -25,6 +25,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterType;
 import ai.djl.nn.SequentialBlock;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,63 +55,45 @@ public class CachedOpTest extends PowerMockTestCase {
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
     }
 
-    @Test
+    @Test(expectedExceptions = NullPointerException.class)
     public void testForward() {
         try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager()) {
             List<Parameter> params = new ArrayList<>();
-            params.add(
-                    new Parameter(
-                            "data0",
-                            new SequentialBlock(),
-                            manager.create(new Shape(2)),
-                            ParameterType.OTHER,
-                            false));
-            params.add(
-                    new Parameter(
-                            "array0",
-                            new SequentialBlock(),
-                            manager.create(new Shape(2)),
-                            ParameterType.WEIGHT,
-                            true));
-            params.add(
-                    new Parameter(
-                            "array1",
-                            new SequentialBlock(),
-                            manager.create(new Shape(3)),
-                            ParameterType.WEIGHT,
-                            true));
-            params.add(
-                    new Parameter(
-                            "data1",
-                            new SequentialBlock(),
-                            manager.create(new Shape(2)),
-                            ParameterType.OTHER,
-                            false));
-            params.add(
-                    new Parameter(
-                            "data2",
-                            new SequentialBlock(),
-                            manager.create(new Shape(5)),
-                            ParameterType.OTHER,
-                            false));
-            params.add(
-                    new Parameter(
-                            "array2",
-                            new SequentialBlock(),
-                            manager.create(new Shape(5)),
-                            ParameterType.WEIGHT,
-                            true));
-            params.add(
-                    new Parameter(
-                            "array3",
-                            new SequentialBlock(),
-                            manager.create(new Shape(6)),
-                            ParameterType.WEIGHT,
-                            true));
+            Parameter parameter =
+                    new Parameter("data0", new SequentialBlock(), ParameterType.OTHER, false);
+            parameter.setArray(manager.create(new Shape(2)));
+            params.add(parameter);
+
+            parameter = new Parameter("array0", new SequentialBlock(), ParameterType.WEIGHT, true);
+            parameter.setArray(manager.create(new Shape(2)));
+            params.add(parameter);
+
+            parameter = new Parameter("array1", new SequentialBlock(), ParameterType.WEIGHT, true);
+            parameter.setArray(manager.create(new Shape(3)));
+            params.add(parameter);
+
+            parameter = new Parameter("data1", new SequentialBlock(), ParameterType.OTHER, false);
+            parameter.setArray(manager.create(new Shape(2)));
+            params.add(parameter);
+
+            parameter = new Parameter("data2", new SequentialBlock(), ParameterType.OTHER, false);
+            parameter.setArray(manager.create(new Shape(5)));
+            params.add(parameter);
+
+            parameter = new Parameter("array2", new SequentialBlock(), ParameterType.WEIGHT, true);
+            parameter.setArray(manager.create(new Shape(5)));
+            params.add(parameter);
+
+            parameter = new Parameter("array3", new SequentialBlock(), ParameterType.WEIGHT, true);
+            parameter.setArray(manager.create(new Shape(6)));
+            params.add(parameter);
+
             List<Integer> paramIndices = Arrays.asList(1, 2, 5, 6);
             List<String> names = Arrays.asList("data0", "data1", "data2");
             List<Integer> locations = Arrays.asList(0, 3, 4);
             PairList<String, Integer> dataIndices = new PairList<>(names, locations);
+
+            ParameterStore parameterStore = new ParameterStore(manager, false);
             CachedOp co =
                     new CachedOp(new PointerArray(), manager, params, paramIndices, dataIndices);
             logger.info("Test: Positioned input");
@@ -119,7 +102,7 @@ public class CachedOpTest extends PowerMockTestCase {
                             manager.create(new Shape(2)),
                             manager.create(new Shape(4)),
                             manager.create(new Shape(5)));
-            co.forward(input);
+            co.forward(parameterStore, input);
             MxNDArray[] inputNDArray = co.getInputNDArray();
             Assert.assertEquals(inputNDArray[0].getShape(), new Shape(2));
             Assert.assertEquals(inputNDArray[3].getShape(), new Shape(4));
@@ -129,27 +112,20 @@ public class CachedOpTest extends PowerMockTestCase {
             input.add("data2", manager.create(new Shape(2)));
             input.add("data1", manager.create(new Shape(4)));
             input.add("data0", manager.create(new Shape(5)));
-            co.forward(input);
+            co.forward(parameterStore, input);
             inputNDArray = co.getInputNDArray();
             Assert.assertEquals(inputNDArray[0].getShape(), new Shape(5));
             Assert.assertEquals(inputNDArray[3].getShape(), new Shape(4));
             Assert.assertEquals(inputNDArray[4].getShape(), new Shape(2));
-            logger.info("Test: No input, expect warnings");
-            input = new NDList();
-            co.forward(input);
-            inputNDArray = co.getInputNDArray();
-            Assert.assertEquals(inputNDArray[0].getShape(), new Shape(1));
-            Assert.assertEquals(inputNDArray[3].getShape(), new Shape(1));
-            Assert.assertEquals(inputNDArray[4].getShape(), new Shape(1));
             logger.info("Test: Check the remaining params");
             Assert.assertEquals(inputNDArray[1].getShape(), new Shape(2));
             Assert.assertEquals(inputNDArray[2].getShape(), new Shape(3));
             Assert.assertEquals(inputNDArray[5].getShape(), new Shape(5));
             Assert.assertEquals(inputNDArray[6].getShape(), new Shape(6));
             logger.info("Test: Illegal inputs");
-            final NDList input2 = new NDList();
+            NDList input2 = new NDList();
             input2.add("data_not_exist", null);
-            Assert.assertThrows(IllegalArgumentException.class, () -> co.forward(input2));
+            co.forward(parameterStore, input2);
         }
     }
 

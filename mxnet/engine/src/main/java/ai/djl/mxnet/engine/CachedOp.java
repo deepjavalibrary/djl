@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
@@ -80,30 +81,20 @@ public class CachedOp extends NativeResource {
      *
      * <p>All inputs will be assigned to the empty locations of the inputNDArray
      *
+     * @param parameterStore ParameterStore
      * @param data input in {@link NDList} format
      * @return result {@link NDList}
      */
-    public NDList forward(NDList data) {
+    public NDList forward(ParameterStore parameterStore, NDList data) {
         // reset the input data index at the beginning
         allInputsNDArray = new MxNDArray[parameters.size()];
         // check device of input
-        Device device;
-        if (data.size() > 0 && data.get(0) != null) {
-            device = data.get(0).getDevice();
-        } else {
-            device = Device.defaultDevice();
-        }
+        Device device = data.head().getDevice();
 
         // fill allInputsNDArray with parameter values on correct device
         for (int index : paramIndices) {
             Parameter parameter = parameters.get(index);
-            allInputsNDArray[index] = (MxNDArray) parameter.getArray();
-            if (!allInputsNDArray[index].getDevice().equals(device)) {
-                throw new IllegalStateException(
-                        "Input device and parameter device does not match, if you are "
-                                + "training on multi-gpu, make sure you passed numGpus in TrainingConfig and "
-                                + "called DatasetUtils.split to split data on each GPU.");
-            }
+            allInputsNDArray[index] = (MxNDArray) parameterStore.getValue(parameter, device);
         }
 
         // fill allInputsNDArray with data values

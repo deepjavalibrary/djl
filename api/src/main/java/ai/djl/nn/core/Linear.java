@@ -23,6 +23,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -67,8 +68,9 @@ public class Linear extends ParameterBlock {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
-        inputs = opInputs(inputs);
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
         return ex.fullyConnected(inputs, outChannels, false, bias == null, params);
     }
@@ -152,18 +154,18 @@ public class Linear extends ParameterBlock {
         }
     }
 
-    private NDList opInputs(NDList inputs) {
+    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
         }
         Device device = inputs.get(0).getDevice();
-        NDList additional =
-                bias != null
-                        ? new NDList(weight.getArray(device), bias.getArray(device))
-                        : new NDList(weight.getArray(device));
+
         NDList result = new NDList();
         result.addAll(inputs);
-        result.addAll(additional);
+        result.add(parameterStore.getValue(weight, device));
+        if (bias != null) {
+            result.add(parameterStore.getValue(bias, device));
+        }
         return result;
     }
 

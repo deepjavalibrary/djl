@@ -17,28 +17,28 @@ import ai.djl.ndarray.NDArray;
 
 public interface ParameterServer extends AutoCloseable {
 
-    void init(int key, NDArray[] value);
+    void init(String parameterId, NDArray[] value);
 
     /**
      * Push values into key in Parameter Server.
      *
-     * @param key key to update
-     * @param values values corresponding to key, values in array will be summed when update key
+     * @param parameterId key to update
+     * @param grads values corresponding to key, values in array will be summed when update key
      * @param priority The priority of the push operation. Higher priority push operations are
      *     likely to be executed before other push actions
      */
-    void push(int key, NDArray[] values, int priority);
+    void push(String parameterId, NDArray[] grads, int priority);
 
     /**
      * Pull value of key from Parameter Server to NDArrays.
      *
-     * @param key key to pull
-     * @param values NDArrays to store the value corresponding to key, value will be copied to the
+     * @param parameterId key to pull
+     * @param weights NDArrays to store the value corresponding to key, value will be copied to the
      *     devices of the NDArrays
      * @param priority The priority of the push operation. Higher priority push operations are
      *     likely to be executed before other push actions
      */
-    void pull(int key, NDArray[] values, int priority);
+    void pull(String parameterId, NDArray[] weights, int priority);
 
     @Override
     void close();

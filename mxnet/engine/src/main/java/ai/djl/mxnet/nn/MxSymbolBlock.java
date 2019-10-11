@@ -28,6 +28,7 @@ import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
 import ai.djl.nn.SymbolBlock;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -137,11 +138,12 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         if (op == null) {
             op = JnaUtils.createCachedOp(this, (MxNDManager) manager);
         }
-        return op.forward(inputs);
+        return op.forward(parameterStore, inputs);
     }
 
     @Override

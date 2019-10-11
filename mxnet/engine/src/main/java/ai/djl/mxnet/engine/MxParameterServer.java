@@ -26,40 +26,35 @@ public class MxParameterServer extends NativeResource implements ParameterServer
 
     public MxParameterServer(Optimizer optimizer) {
         super(createdKVStore());
-        setOptimizer(optimizer);
+        JnaUtils.parameterStoreSetUpdater(
+                getHandle(), null, new OptimizerCallback(optimizer), null);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void init(int key, NDArray[] values) {
-        // We are suppoting a single key on multiple devices right now
-        // Duplicate keys, to length of values, may need to change in future
-        int[] keys = new int[values.length];
-        Arrays.fill(keys, key);
+    public void init(String parameterId, NDArray[] values) {
+        String[] keys = new String[values.length];
+        Arrays.fill(keys, parameterId);
         NDList vals = new NDList(values);
         JnaUtils.parameterStoreInit(getHandle(), values.length, keys, vals);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void push(int key, NDArray[] values, int priority) {
-        int[] keys = new int[values.length];
-        Arrays.fill(keys, key);
-        NDList vals = new NDList(values);
-        JnaUtils.parameterStorePush(getHandle(), values.length, keys, vals, priority);
+    public void push(String parameterId, NDArray[] grads, int priority) {
+        String[] keys = new String[grads.length];
+        Arrays.fill(keys, parameterId);
+        NDList vals = new NDList(grads);
+        JnaUtils.parameterStorePush(getHandle(), grads.length, keys, vals, priority);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void pull(int key, NDArray[] values, int priority) {
-        int[] keys = new int[values.length];
-        Arrays.fill(keys, key);
-        NDList vals = new NDList(values);
-        JnaUtils.parameterStorePull(getHandle(), values.length, keys, vals, priority);
-    }
-
-    final void setOptimizer(Optimizer optimizer) {
-        JnaUtils.parameterStoreSetUpdater(getHandle(), new OptimizerCallback(optimizer), null);
+    public void pull(String parameterId, NDArray[] weights, int priority) {
+        String[] keys = new String[weights.length];
+        Arrays.fill(keys, parameterId);
+        NDList vals = new NDList(weights);
+        JnaUtils.parameterStorePull(getHandle(), weights.length, keys, vals, priority);
     }
 
     private static Pointer createdKVStore() {
@@ -74,7 +69,8 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         }
     }
 
-    private static class OptimizerCallback implements MxnetLibrary.MXKVStoreUpdater {
+    private static final class OptimizerCallback implements MxnetLibrary.MXKVStoreStrUpdater {
+
         private Optimizer optimizer;
 
         OptimizerCallback(Optimizer optimizer) {
@@ -82,13 +78,15 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         }
 
         @Override
-        public void apply(int key, Pointer recv, Pointer local, Pointer handle) {
+        public void apply(String parameterId, Pointer recv, Pointer local, Pointer handle) {
             // updater callback arguments order is: index, gradient, weight.
-            NDArray grad = MxNDManager.getSystemManager().create(local);
-            NDArray weight = MxNDManager.getSystemManager().create(recv);
-            optimizer.update(key, grad, weight);
-            grad.close();
-            weight.close();
+            MxNDManager manager = MxNDManager.getSystemManager();
+            NDArray grad = manager.create(recv);
+            NDArray weight = manager.create(local);
+            optimizer.update(parameterId, weight, grad);
+            // Above NDArrays should not be closed here.
+            // TODO: avoid call JnaUtils.freeNdArray for above NDArrays
+            //      and confirm these handle will be closed by MXNet engine.
         }
     }
 }

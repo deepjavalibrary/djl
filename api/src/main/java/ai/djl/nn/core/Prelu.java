@@ -20,6 +20,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,11 +39,13 @@ public class Prelu extends ParameterBlock {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
-        NDArray head = inputs.head();
-        inputs = new NDList(head, alpha.getArray());
-        NDArrayEx ex = head.getNDArrayInternal();
-        return ex.prelu(inputs, params);
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        NDArray data = inputs.head();
+
+        NDList list = new NDList(data, parameterStore.getValue(alpha, data.getDevice()));
+        NDArrayEx ex = data.getNDArrayInternal();
+        return ex.prelu(list, params);
     }
 
     @Override

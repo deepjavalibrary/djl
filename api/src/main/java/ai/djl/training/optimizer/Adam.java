@@ -15,8 +15,8 @@ package ai.djl.training.optimizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.nn.Parameter;
-import ai.djl.util.PairList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Adam extends Optimizer {
 
@@ -26,8 +26,8 @@ public class Adam extends Optimizer {
     private float epsilon;
     private boolean lazyUpdate;
 
-    private NDList means;
-    private NDList variances;
+    private Map<String, NDArray> means;
+    private Map<String, NDArray> variances;
 
     protected Adam(Builder builder) {
         super(builder);
@@ -36,31 +36,25 @@ public class Adam extends Optimizer {
         beta2 = builder.getBeta2();
         epsilon = builder.getEpsilon();
         lazyUpdate = builder.isLazyUpdate();
-    }
-
-    @Override
-    protected boolean initializeStates(PairList<String, Parameter> parameters) {
-        if (means == null) {
-            means = new NDList(parameters.size());
-            variances = new NDList(parameters.size());
-            for (Parameter param : parameters.values()) {
-                means.add(param.getArray().zerosLike());
-                variances.add(param.getArray().zerosLike());
-            }
-        }
-        return true;
+        means = new ConcurrentHashMap<>();
+        variances = new ConcurrentHashMap<>();
     }
 
     // TODO: make this protected after integrate with PS store
     @Override
-    public void update(int index, NDArray weight, NDArray grad) {
-        double t = updateCount(index);
+    public void update(String parameterId, NDArray weight, NDArray grad) {
+        double t = updateCount(parameterId);
         double coef1 = 1.0 - Math.pow(beta1, t);
         double coef2 = 1.0 - Math.pow(beta2, t);
         float newLearningRate = (float) (learningRate * Math.sqrt(coef2) / coef1);
 
-        float weightDecay = getWeightDecay(index);
-        NDList inputs = new NDList(weight, grad, means.get(index), variances.get(index));
+        float weightDecay = getWeightDecay(parameterId);
+        NDList inputs =
+                new NDList(
+                        weight,
+                        grad,
+                        means.computeIfAbsent(parameterId, k -> weight.zerosLike()),
+                        variances.computeIfAbsent(parameterId, k -> weight.zerosLike()));
         NDList weights = new NDList(weight);
 
         NDArrayEx ex = weight.getNDArrayInternal();

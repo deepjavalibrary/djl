@@ -15,91 +15,99 @@ package ai.djl.training;
 
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Parameter;
 import ai.djl.util.Pair;
-import ai.djl.util.PairList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ParameterStore implements AutoCloseable {
+public class ParameterStore {
 
-    private PairList<String, Parameter> parameters;
+    private NDManager manager;
+    private Map<String, Pair<Boolean, List<NDArray>>> parameterMap;
+    private Map<Device, Integer> deviceMap;
+    private boolean copy;
     private ParameterServer parameterServer;
-    private Map<Pair<Integer, Parameter>, NDArray> parameterValues = new ConcurrentHashMap<>();
-    private Device[] devices;
 
-    public ParameterStore(PairList<String, Parameter> parameters, Device[] devices) {
-        this.parameters = parameters;
-        this.devices = devices;
+    public ParameterStore(NDManager manager, boolean copy) {
+        this.manager = manager;
+        this.copy = copy;
+        parameterMap = new ConcurrentHashMap<>();
+        deviceMap = new ConcurrentHashMap<>();
+        deviceMap.put(manager.getDevice(), 0);
     }
 
-    public void setParameterServer(ParameterServer parameterServer) {
+    public void setParameterServer(ParameterServer parameterServer, Device[] devices) {
         this.parameterServer = parameterServer;
-        // initialize parameter value
-        for (int i = 0; i < parameters.size(); i++) {
-            parameterServer.init(i, new NDArray[] {parameters.get(i).getValue().getArray()});
+        deviceMap.clear();
+        for (int i = 0; i < devices.length; ++i) {
+            deviceMap.put(devices[i], i);
         }
     }
 
     public void updateAllParameters() {
-        for (int i = 0; i < parameters.size(); i++) {
-            Parameter param = parameters.get(i).getValue();
-            if (param.requireGradient()) {
-                NDArray[] grads = getAllGradients(param);
-                parameterServer.push(i, grads, -i);
+        int priority = 0;
+        for (Map.Entry<String, Pair<Boolean, List<NDArray>>> entry : parameterMap.entrySet()) {
+            String parameterId = entry.getKey();
+            Pair<Boolean, List<NDArray>> pair = entry.getValue();
+            if (pair.getKey()) {
+                NDArray[] grads =
+                        pair.getValue().stream().map(NDArray::getGradient).toArray(NDArray[]::new);
+                parameterServer.push(parameterId, grads, -priority);
+                ++priority;
             }
         }
-        for (int i = 0; i < parameters.size(); i++) {
-            Parameter param = parameters.get(i).getValue();
-            if (param.requireGradient()) {
-                NDArray[] paramValues = getAllValues(param);
-                parameterServer.pull(i, paramValues, -i);
+
+        priority = 0;
+        for (Map.Entry<String, Pair<Boolean, List<NDArray>>> entry : parameterMap.entrySet()) {
+            String parameterId = entry.getKey();
+            Pair<Boolean, List<NDArray>> pair = entry.getValue();
+            if (pair.getKey()) {
+                NDArray[] values = pair.getValue().toArray(new NDArray[0]);
+                parameterServer.pull(parameterId, values, -priority);
+                ++priority;
             }
         }
     }
 
-    public void initialize(Parameter parameter, NDArray array) {
-        for (Device device : devices) {
-            NDArray arrayCopy = array.asInDevice(device, true);
-            if (parameter.requireGradient()) {
-                arrayCopy.attachGradient();
+    public synchronized NDArray getValue(Parameter parameter, Device device) {
+        String parameterId = parameter.getId();
+        int index = deviceMap.get(device);
+        Pair<Boolean, List<NDArray>> pair = parameterMap.get(parameterId);
+        if (pair == null) {
+            boolean requireGradient = parameter.requireGradient();
+            pair = new Pair<>(requireGradient, new ArrayList<>());
+            parameterMap.put(parameterId, pair);
+        }
+
+        List<NDArray> list = pair.getValue();
+        if (list.isEmpty()) {
+            NDArray array = parameter.getArray();
+            if (parameterServer != null) {
+                NDArray[] arrays = new NDArray[deviceMap.size()];
+                for (Map.Entry<Device, Integer> entry : deviceMap.entrySet()) {
+                    Device dev = entry.getKey();
+                    int i = entry.getValue();
+                    if (i == index) {
+                        arrays[i] = array;
+                    } else {
+                        arrays[i] = array.asInDevice(dev, true);
+                        arrays[i].attach(manager);
+                    }
+                    parameterServer.init(parameterId, arrays);
+                    list.add(arrays[i]);
+                }
+            } else {
+                if (copy || !array.getDevice().equals(device)) {
+                    array = array.asInDevice(device, true);
+                    array.attach(manager);
+                }
+                list.add(array);
             }
-            parameterValues.put(new Pair<>(device.getDeviceId(), parameter), arrayCopy);
         }
-    }
 
-    public NDArray getValue(Parameter parameter, Device device) {
-        NDArray value = parameterValues.get(new Pair<>(device.getDeviceId(), parameter));
-        if (value == null) {
-            throw new IllegalStateException(
-                    "The parameter has not been initialized on " + device.toString());
-        }
-        return value;
-    }
-
-    public NDArray[] getAllValues(Parameter parameter) {
-        NDArray[] allValues = new NDArray[devices.length];
-        for (int i = 0; i < devices.length; i++) {
-            allValues[i] = parameterValues.get(new Pair<>(devices[i].getDeviceId(), parameter));
-        }
-        return allValues;
-    }
-
-    public NDArray[] getAllGradients(Parameter parameter) {
-        NDArray[] allGradients = new NDArray[devices.length];
-        for (int i = 0; i < devices.length; i++) {
-            allGradients[i] =
-                    parameterValues
-                            .get(new Pair<>(devices[i].getDeviceId(), parameter))
-                            .getGradient();
-        }
-        return allGradients;
-    }
-
-    @Override
-    public void close() {
-        parameterValues.values().forEach(NDArray::close);
-        parameterValues.clear();
-        parameterServer.close();
+        return list.get(index);
     }
 }

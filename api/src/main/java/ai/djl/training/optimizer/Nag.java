@@ -16,45 +16,37 @@ package ai.djl.training.optimizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.nn.Parameter;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
-import ai.djl.util.PairList;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** An NAG optimizer. Build with {@link Nag.Builder}. */
 public class Nag extends Optimizer {
 
     private LearningRateTracker learningRateTracker;
     private float momentum;
-    private List<NDArray> momentumStates;
+    private Map<String, NDArray> momentumStates;
 
     protected Nag(Builder builder) {
         super(builder);
         learningRateTracker = builder.getLearningRateTracker();
         momentum = builder.getMomentum();
-    }
-
-    @Override
-    protected boolean initializeStates(PairList<String, Parameter> parameters) {
-        if (momentum != 0f) {
-            momentumStates = new ArrayList<>(parameters.size());
-            for (Parameter param : parameters.values()) {
-                momentumStates.add(param.getArray().zerosLike());
-            }
-        }
-        return true;
+        momentumStates = new ConcurrentHashMap<>();
     }
 
     // TODO: make this protected after integrate with PS store
     @Override
-    public void update(int index, NDArray weight, NDArray grad) {
+    public void update(String parameterId, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
-        float newLearningRate = learningRateTracker.getNewLearningRate(updateCount(index));
-        float weightDecay = getWeightDecay(index);
+        float newLearningRate = learningRateTracker.getNewLearningRate(updateCount(parameterId));
+        float weightDecay = getWeightDecay(parameterId);
         NDList inputs;
         if (momentum != 0f) {
-            inputs = new NDList(weight, grad, momentumStates.get(index));
+            inputs =
+                    new NDList(
+                            weight,
+                            grad,
+                            momentumStates.computeIfAbsent(parameterId, k -> weight.zerosLike()));
         } else {
             inputs = new NDList(weight, grad);
         }

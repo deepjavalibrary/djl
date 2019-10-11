@@ -18,10 +18,8 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.training.GradientCollector;
-import ai.djl.training.ParameterServer;
 import ai.djl.training.Trainer;
 import ai.djl.training.metrics.TrainingMetrics;
-import ai.djl.training.optimizer.Optimizer;
 import java.util.List;
 
 public class MockTrainer implements Trainer {
@@ -39,11 +37,6 @@ public class MockTrainer implements Trainer {
             @Override
             public void close() {}
         };
-    }
-
-    @Override
-    public ParameterServer newParameterServer(Optimizer optimizer) {
-        return null;
     }
 
     @Override

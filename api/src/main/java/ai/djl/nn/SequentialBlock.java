@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -69,11 +70,12 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         NDList current = inputs;
         for (Block block : blocks) {
             NDList previous = current;
-            current = block.forward(current);
+            current = block.forward(parameterStore, current);
             if (previous != inputs) {
                 previous.close();
             }

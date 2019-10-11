@@ -15,11 +15,9 @@ package ai.djl.training.optimizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.nn.Parameter;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
-import ai.djl.util.PairList;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** An SGD optimizer. Build with {@link Sgd.Builder}. */
 public class Sgd extends Optimizer {
@@ -27,36 +25,30 @@ public class Sgd extends Optimizer {
     private LearningRateTracker learningRateTracker;
     private float momentum;
     private boolean lazyUpdate;
-    private List<NDArray> momentumStates;
+    private Map<String, NDArray> momentumStates;
 
     protected Sgd(Builder builder) {
         super(builder);
         learningRateTracker = builder.getLearningRateTracker();
         momentum = builder.getMomentum();
         lazyUpdate = builder.isLazyUpdate();
-    }
-
-    @Override
-    protected boolean initializeStates(PairList<String, Parameter> parameters) {
-        if (momentum != 0f) {
-            momentumStates = new ArrayList<>(parameters.size());
-            for (Parameter param : parameters.values()) {
-                momentumStates.add(param.getArray().zerosLike());
-            }
-        }
-        return true;
+        momentumStates = new ConcurrentHashMap<>();
     }
 
     // TODO: make this protected after integrate with PS store
     @Override
-    public void update(int index, NDArray weight, NDArray grad) {
+    public void update(String parameterId, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
-        float weightDecay = getWeightDecay(index);
-        float learningRate = learningRateTracker.getNewLearningRate(updateCount(index));
+        float weightDecay = getWeightDecay(parameterId);
+        float learningRate = learningRateTracker.getNewLearningRate(updateCount(parameterId));
         NDList inputs;
         // TODO: check momentum correctness
         if (momentum != 0f) {
-            inputs = new NDList(weight, grad, momentumStates.get(index));
+            inputs =
+                    new NDList(
+                            weight,
+                            grad,
+                            momentumStates.computeIfAbsent(parameterId, k -> weight.zerosLike()));
         } else {
             inputs = new NDList(weight, grad);
         }

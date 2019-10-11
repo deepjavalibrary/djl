@@ -17,6 +17,7 @@ import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Block;
+import ai.djl.training.ParameterStore;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
@@ -34,12 +35,14 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     protected NDManager manager;
     Metrics metrics;
     private Block block;
+    private ParameterStore parameterStore;
 
     public BasePredictor(Model model, Translator<I, O> translator) {
         this.model = model;
         this.manager = model.getNDManager().newSubManager();
         this.translator = translator;
         block = model.getBlock();
+        parameterStore = new ParameterStore(manager, true);
     }
 
     /** {@inheritDoc} */
@@ -99,7 +102,7 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     protected void waitToRead(NDList list) {}
 
     protected NDList forward(NDList ndList) {
-        return block.forward(ndList);
+        return block.forward(parameterStore, ndList);
     }
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")

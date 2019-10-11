@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -29,11 +30,11 @@ import java.util.List;
 /** An interface defining neural-network layers. */
 public interface Block {
 
-    default NDList forward(NDList inputs) {
-        return forward(inputs, null);
+    default NDList forward(ParameterStore parameterStore, NDList inputs) {
+        return forward(parameterStore, inputs, null);
     }
 
-    NDList forward(NDList inputs, PairList<String, Object> params);
+    NDList forward(ParameterStore parameterStore, NDList inputs, PairList<String, Object> params);
 
     void setInitializer(Initializer initializer);
 

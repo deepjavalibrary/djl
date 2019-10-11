@@ -20,11 +20,9 @@ import ai.djl.mxnet.engine.MxParameterServer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Parameter;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
-import ai.djl.util.PairList;
 import org.testng.annotations.Test;
 
 public class ParameterStoreTest {
@@ -50,15 +48,16 @@ public class ParameterStoreTest {
                             .build();
 
             try (ParameterServer ps = new MxParameterServer(optimizer)) {
-                ps.init(0, weights);
-                ps.push(0, grads, 0);
-                ps.pull(0, weights, 0);
+                ps.init("0", weights);
+                ps.push("0", grads, 0);
+                ps.pull("0", weights, 0);
                 Assertions.assertAlmostEquals(weights[0], expectedWeight);
             }
         }
     }
 
     private static class TestOptimizer extends Optimizer {
+
         private LearningRateTracker learningRateTracker;
 
         protected TestOptimizer(TestOptimizer.Builder builder) {
@@ -67,12 +66,7 @@ public class ParameterStoreTest {
         }
 
         @Override
-        protected boolean initializeStates(PairList<String, Parameter> parameters) {
-            return true;
-        }
-
-        @Override
-        public void update(int index, NDArray weight, NDArray grad) {
+        public void update(String parameterId, NDArray weight, NDArray grad) {
             weight.addi(grad.mul(learningRateTracker.getNewLearningRate(0)));
         }
 

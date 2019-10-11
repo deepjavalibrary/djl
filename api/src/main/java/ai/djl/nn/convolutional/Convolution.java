@@ -12,6 +12,7 @@
  */
 package ai.djl.nn.convolutional;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -22,6 +23,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -66,8 +68,9 @@ public abstract class Convolution extends ParameterBlock {
     protected abstract int numDimensions();
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
-        inputs = opInputs(inputs);
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.get(0).getNDArrayInternal();
         return ex.convolution(
                 inputs,
@@ -148,12 +151,16 @@ public abstract class Convolution extends ParameterBlock {
         }
     }
 
-    private NDList opInputs(NDList inputs) {
+    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         NDArray data = inputs.head();
-        if (bias == null) {
-            return new NDList(data, weight.getArray());
+        Device device = data.getDevice();
+        NDList ret = new NDList(3);
+        ret.add(data);
+        ret.add(parameterStore.getValue(weight, device));
+        if (bias != null) {
+            ret.add(parameterStore.getValue(bias, device));
         }
-        return new NDList(data, weight.getArray(), bias.getArray());
+        return ret;
     }
 
     @SuppressWarnings("rawtypes")

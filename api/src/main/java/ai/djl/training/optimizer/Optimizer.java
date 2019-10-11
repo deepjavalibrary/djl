@@ -13,9 +13,6 @@
 package ai.djl.training.optimizer;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.nn.Parameter;
-import ai.djl.training.ParameterServer;
-import ai.djl.util.PairList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,8 +24,7 @@ public abstract class Optimizer {
     private float weightDecays;
     private int beginNumUpdate;
     private int numUpdate;
-    private boolean statesInitialized;
-    private Map<Integer, Integer> updateCounts = new ConcurrentHashMap<>();
+    private Map<String, Integer> updateCounts = new ConcurrentHashMap<>();
 
     public Optimizer(BaseBuilder<?> builder) {
         this.rescaleGrad = builder.getRescaleGrad();
@@ -53,44 +49,21 @@ public abstract class Optimizer {
         return new Adam.Builder();
     }
 
-    /**
-     * Update a {@code PairList} of parameters one step at time. Assumes parameters are on the same
-     * device. This will be used when updating parameters locally, not on {@link ParameterServer}.
-     *
-     * @param parameters a {@code PairList} of parameters from network to update
-     */
-    public void updateAllParameters(PairList<String, Parameter> parameters) {
-        if (!statesInitialized) {
-            // ensure when create state is over ridden, statesCreated is updated
-            statesInitialized = initializeStates(parameters);
-        }
-        for (int i = 0; i < parameters.size(); i++) {
-            Parameter param = parameters.get(i).getValue();
-            if (param.requireGradient()) {
-                NDArray paramArray = param.getArray();
-                NDArray grad = paramArray.getGradient();
-                update(i, paramArray, grad);
-            }
-        }
-    }
-
-    protected float getWeightDecay(int index) {
+    protected float getWeightDecay(String parameterId) {
         return weightDecays;
     }
 
-    protected int updateCount(int index) {
+    protected int updateCount(String parameterId) {
         // if index exists, increment update count, if not, use begin number of update + 1
         int count =
                 updateCounts.compute(
-                        index, (key, val) -> (val == null) ? beginNumUpdate + 1 : val + 1);
+                        parameterId, (key, val) -> (val == null) ? beginNumUpdate + 1 : val + 1);
         numUpdate = Math.max(numUpdate, count);
         return numUpdate;
     }
 
     // TODO: make this protected after integrate with PS store
-    public abstract void update(int index, NDArray weight, NDArray grad);
-
-    protected abstract boolean initializeStates(PairList<String, Parameter> parameters);
+    public abstract void update(String parameterId, NDArray weight, NDArray grad);
 
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {

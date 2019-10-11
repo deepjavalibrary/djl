@@ -18,6 +18,7 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,7 +39,8 @@ public class Dropout extends ParameterBlock {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Dropout requires exactly 1 NDArray");
         }

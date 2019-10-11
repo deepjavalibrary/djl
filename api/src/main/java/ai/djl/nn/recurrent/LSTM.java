@@ -12,6 +12,8 @@
  */
 package ai.djl.nn.recurrent;
 
+import ai.djl.Device;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -21,6 +23,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterType;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -72,8 +75,9 @@ public class LSTM extends RecurrentCell {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
-        inputs = opInputs(inputs);
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
 
         if (clipLstmState) {
@@ -156,20 +160,26 @@ public class LSTM extends RecurrentCell {
         }
     }
 
-    private NDList opInputs(NDList inputs) {
+    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("RNN requires exactly 1 NDArray");
         }
 
+        NDArray head = inputs.head();
+        Device device = head.getDevice();
+
         NDList result = new NDList();
-        NDList parameterList = new NDList();
-        for (Parameter parameter : parameters) {
-            parameterList.add(parameter.getName(), parameter.getArray().flatten());
+        result.add(head);
+        try (NDList parameterList = new NDList()) {
+            for (Parameter parameter : parameters) {
+                NDArray array = parameterStore.getValue(parameter, device);
+                parameterList.add(parameter.getName(), array.flatten());
+            }
+            NDArray array = NDArrays.concat(parameterList);
+            result.add(array);
         }
-        result.add(inputs.get(0));
-        result.add(NDArrays.concat(parameterList));
-        result.add(state.getArray());
-        result.add(stateCell.getArray());
+        result.add(parameterStore.getValue(state, device));
+        result.add(parameterStore.getValue(stateCell, device));
         if (useSequenceLength) {
             result.add(inputs.get(1));
         }

@@ -15,6 +15,7 @@ package ai.djl.nn;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -35,7 +36,8 @@ public class LambdaBlock extends ParameterBlock {
     }
 
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         return lambda.apply(inputs);
     }
 

@@ -12,6 +12,7 @@
  */
 package ai.djl.nn.core;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -22,6 +23,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -86,42 +88,46 @@ public class Embedding<T> extends ParameterBlock {
     /**
      * Finds the embedding of items as a {@link NDArray}.
      *
+     * @param parameterStore the ParameterStore
      * @param manager The manager to create the new NDArray
      * @param items The items to retrieve the embeddings for
      * @return Returns a 3D NDArray where the first two embeddingSize correspond to the items, and
      *     the last dimension is the embedding.
      */
-    public NDArray forward(NDManager manager, T[][] items) {
-        return forward(new NDList(manager.create(embed(items)))).head();
+    public NDArray forward(ParameterStore parameterStore, NDManager manager, T[][] items) {
+        return forward(parameterStore, new NDList(manager.create(embed(items)))).head();
     }
 
     /**
      * Finds the embedding of items as a {@link NDArray}.
      *
+     * @param parameterStore the ParameterStore
      * @param manager The manager to create the new NDArray
      * @param items The items to retrieve the embeddings for
      * @return Returns a 2D NDArray where the first dimension corresponds to the items, and the last
      *     dimension is the embedding.
      */
-    public NDArray forward(NDManager manager, T[] items) {
-        return forward(new NDList(manager.create(embed(items)))).head();
+    public NDArray forward(ParameterStore parameterStore, NDManager manager, T[] items) {
+        return forward(parameterStore, new NDList(manager.create(embed(items)))).head();
     }
 
     /**
      * Finds the embedding of an item as a {@link NDArray}.
      *
+     * @param parameterStore the ParameterStore
      * @param manager The manager to create the new NDArray
      * @param item The item to retrieve the embedding for
      * @return Returns the 1D NDArray of the embedding
      */
-    public NDArray forward(NDManager manager, T item) {
-        return forward(new NDList(manager.create(embed(item)))).head();
+    public NDArray forward(ParameterStore parameterStore, NDManager manager, T item) {
+        return forward(parameterStore, new NDList(manager.create(embed(item)))).head();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(NDList inputs, PairList<String, Object> params) {
-        NDList opInputs = opInputs(inputs);
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        NDList opInputs = opInputs(parameterStore, inputs);
 
         NDArrayEx ex = opInputs.head().getNDArrayInternal();
         NDList result = ex.embedding(opInputs, numItems, embeddingSize, dataType, params);
@@ -146,12 +152,18 @@ public class Embedding<T> extends ParameterBlock {
         embedding.load(manager, is);
     }
 
-    private NDList opInputs(NDList inputs) {
+    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         NDArray items = inputs.get(0);
+        Device device = items.getDevice();
+
+        NDList ret = new NDList(2);
         if (items.getShape().dimension() == 0) {
-            return new NDList(items.reshape(1), embedding.getArray());
+            ret.add(items.reshape(1));
+        } else {
+            ret.add(items);
         }
-        return new NDList(items, embedding.getArray());
+        ret.add(parameterStore.getValue(embedding, device));
+        return ret;
     }
 
     private int[][] embed(T[][] items) {
