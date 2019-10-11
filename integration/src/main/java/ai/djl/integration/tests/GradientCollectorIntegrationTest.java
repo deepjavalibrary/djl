@@ -33,7 +33,6 @@ import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.LossMetric;
 import ai.djl.training.optimizer.Nag;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.Sgd;
@@ -74,7 +73,10 @@ public class GradientCollectorIntegrationTest {
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optimizer);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES)
+                        .setOptimizer(optimizer)
+                        .setLoss(Loss.l2Loss());
 
         try (Model model = Model.newInstance()) {
             Linear block = new Linear.Builder().setOutChannels(1).build();
@@ -92,37 +94,34 @@ public class GradientCollectorIntegrationTest {
                     manager.randomNormal(
                             0, 0.01, label.getShape(), DataType.FLOAT32, manager.getDevice()));
 
-            NDArray loss;
-            LossMetric lossMetric = new LossMetric("l2loss");
-
             ArrayDataset dataset =
                     new ArrayDataset.Builder()
                             .setData(data)
                             .optLabels(label)
                             .setRandomSampling(batchSize)
                             .build();
+            float lossValue;
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(batchSize, weight.size(0));
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 for (int epoch = 0; epoch < epochs; epoch++) {
-                    lossMetric.reset();
+                    trainer.resetTrainingMetrics();
                     for (Batch batch : trainer.iterateDataset(dataset)) {
                         try (GradientCollector gradCol = trainer.newGradientCollector()) {
 
-                            NDArray x = batch.getData().head();
-                            NDArray y = batch.getLabels().head();
-                            NDArray yHat = block.forward(new NDList(x)).head();
-                            loss = Loss.l2Loss().getLoss(y, yHat);
+                            NDList x = batch.getData();
+                            NDList y = batch.getLabels();
+                            NDList yHat = block.forward(x);
+                            NDArray loss = trainer.loss(y, yHat);
                             gradCol.backward(loss);
                         }
                         trainer.step();
-                        lossMetric.update(loss);
                         batch.close();
                     }
                 }
+                lossValue = trainer.getLoss();
             }
-            float lossValue = lossMetric.getMetric().getValue();
             float expectedLoss = 0.001f;
             Assert.assertTrue(
                     lossValue < expectedLoss,
@@ -142,7 +141,7 @@ public class GradientCollectorIntegrationTest {
                         .setMomentum(0.9f)
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optimizer);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(optimizer);
 
         Block resNet50 =
                 new ResNetV1.Builder()

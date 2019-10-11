@@ -20,7 +20,9 @@ import ai.djl.ndarray.types.DataDesc;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.Trainer;
+import ai.djl.training.metrics.TrainingMetrics;
 import ai.djl.training.optimizer.Optimizer;
+import java.util.List;
 
 public class MockTrainer implements Trainer {
 
@@ -53,7 +55,25 @@ public class MockTrainer implements Trainer {
     }
 
     @Override
+    public NDArray loss(NDList labels, NDList preds) {
+        return null;
+    }
+
+    @Override
     public void setMetrics(Metrics metrics) {}
+
+    @Override
+    public void resetTrainingMetrics() {}
+
+    @Override
+    public float getLoss() {
+        return 0;
+    }
+
+    @Override
+    public List<TrainingMetrics> getTrainingMetrics() {
+        return null;
+    }
 
     @Override
     public NDManager getManager() {

@@ -14,7 +14,10 @@ package ai.djl.training;
 
 import ai.djl.Device;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
+import ai.djl.training.metrics.TrainingMetrics;
 import ai.djl.training.optimizer.Optimizer;
+import java.util.List;
 
 public interface TrainingConfig {
 
@@ -23,4 +26,8 @@ public interface TrainingConfig {
     Initializer getInitializer();
 
     Optimizer getOptimizer();
+
+    Loss getLossFunction();
+
+    List<TrainingMetrics> getTrainingMetrics();
 }

@@ -13,13 +13,16 @@
 package ai.djl.training;
 
 import ai.djl.metric.Metrics;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.metrics.TrainingMetrics;
 import ai.djl.training.optimizer.Optimizer;
 import java.io.IOException;
+import java.util.List;
 
 public interface Trainer extends AutoCloseable {
 
@@ -41,6 +44,8 @@ public interface Trainer extends AutoCloseable {
 
     NDList forward(NDList input);
 
+    NDArray loss(NDList labels, NDList preds);
+
     /** Makes one step of parameter update. */
     void step();
 
@@ -50,6 +55,12 @@ public interface Trainer extends AutoCloseable {
      * @param metrics the Metrics class
      */
     void setMetrics(Metrics metrics);
+
+    void resetTrainingMetrics();
+
+    float getLoss();
+
+    List<TrainingMetrics> getTrainingMetrics();
 
     NDManager getManager();
 

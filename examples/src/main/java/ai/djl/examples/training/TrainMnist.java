@@ -36,11 +36,11 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
-import ai.djl.training.metrics.LossMetric;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
+import java.util.Collections;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -84,8 +84,14 @@ public final class TrainMnist {
             devices = new Device[] {Device.defaultDevice()};
         }
 
+        Accuracy acc = new Accuracy();
+
         TrainingConfig config =
-                new DefaultTrainingConfig(new XavierInitializer(), optimizer, devices);
+                new DefaultTrainingConfig(new XavierInitializer())
+                        .setOptimizer(optimizer)
+                        .setLoss(Loss.softmaxCrossEntropyLoss())
+                        .addTrainingMetrics(Collections.singletonList(acc))
+                        .setDevices(devices);
         try (Model model = Model.newInstance()) {
             Pipeline pipeline = new Pipeline(new ToTensor());
             model.setBlock(block);
@@ -105,39 +111,28 @@ public final class TrainMnist {
                 Shape inputShape = new Shape(batchSize / numOfSlices, 28 * 28);
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
-                Accuracy acc = new Accuracy();
-                LossMetric lossMetric = new LossMetric("softmaxCELoss");
                 for (int epoch = 0; epoch < numEpoch; epoch++) {
                     // reset loss and accuracy
-                    acc.reset();
-                    lossMetric.reset();
+                    trainer.resetTrainingMetrics();
                     for (Batch batch : trainer.iterateDataset(mnist)) {
                         Batch[] split = DatasetUtils.split(batch, devices, false);
 
-                        NDArray[] pred = new NDArray[numOfSlices];
-                        NDArray[] loss = new NDArray[numOfSlices];
                         try (GradientCollector gradCol = trainer.newGradientCollector()) {
                             for (int i = 0; i < numOfSlices; i++) {
                                 // MNIST only has one input
                                 NDArray data = split[i].getData().head();
-                                NDArray label = split[i].getLabels().head();
+                                NDList labels = split[i].getLabels();
 
                                 data = data.reshape(inputShape);
 
-                                pred[i] = trainer.forward(new NDList(data)).head();
-                                loss[i] = Loss.softmaxCrossEntropyLoss().getLoss(label, pred[i]);
-                                gradCol.backward(loss[i]);
+                                NDList preds = trainer.forward(new NDList(data));
+                                NDArray loss = trainer.loss(labels, preds);
+                                gradCol.backward(loss);
                             }
                         }
                         trainer.step();
-                        for (int i = 0; i < numOfSlices; i++) {
-                            NDArray label = split[i].getLabels().head();
-                            acc.update(label, pred[i]);
-                            lossMetric.update(loss[i]);
-                        }
-                        batch.close();
                     }
-                    lossValue = lossMetric.getMetric().getValue();
+                    lossValue = trainer.getLoss();
                     accuracy = acc.getMetric().getValue();
                     logger.info("Loss: " + lossValue + " accuracy: " + accuracy);
                     logger.info("Epoch " + epoch + " finish");

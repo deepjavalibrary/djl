@@ -13,10 +13,21 @@
 package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.training.metrics.TrainingMetrics;
+import ai.djl.util.Pair;
 import java.util.stream.IntStream;
 
 /** Loss functions or Cost Functions to evaluate model predictions against true labels. */
-public abstract class Loss {
+public abstract class Loss extends TrainingMetrics {
+
+    private float totalLoss;
+    private int totalInstances;
+
+    /** Base class for metric with abstract update methods. */
+    public Loss() {
+        super("Loss");
+    }
 
     /**
      * Calculate loss between label and prediction.
@@ -26,6 +37,23 @@ public abstract class Loss {
      * @return loss value
      */
     public abstract NDArray getLoss(NDArray label, NDArray prediction);
+
+    /**
+     * Calculate loss between label and prediction.
+     *
+     * <p>the default implementation is simply adding all losses together
+     *
+     * @param labels true labels
+     * @param predictions predicted labels
+     * @return loss value
+     */
+    public NDArray getTotalLoss(NDList labels, NDList predictions) {
+        NDArray loss = getLoss(labels.head(), predictions.head());
+        for (int i = 1; i < labels.size(); i++) {
+            loss.add(getLoss(labels.get(i), predictions.get(i)));
+        }
+        return loss;
+    }
 
     public static L1Loss l1Loss() {
         return new L1Loss();
@@ -81,5 +109,29 @@ public abstract class Loss {
         return IntStream.range(0, loss.getShape().dimension())
                 .filter(axis -> axis != batchAxis)
                 .toArray();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray update(NDList labels, NDList predictions) {
+        NDArray loss = getTotalLoss(labels, predictions);
+        totalLoss += loss.sum().getFloat();
+        totalInstances += loss.size();
+        return loss;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void reset() {
+        totalLoss = 0.f;
+        totalInstances = 0;
+    }
+
+    @Override
+    public Pair<String, Float> getMetric() {
+        if (totalInstances == 0) {
+            return new Pair<>(getName(), Float.NaN);
+        }
+        return new Pair<>(getName(), totalLoss / totalInstances);
     }
 }

@@ -56,8 +56,6 @@ public class Accuracy extends TrainingMetrics {
         totalInstances = 0;
     }
 
-    /** {@inheritDoc} */
-    @Override
     public void update(NDArray labels, NDArray predictions) {
         checkLabelShapes(labels, predictions);
         NDArray predictionReduced;
@@ -78,27 +76,14 @@ public class Accuracy extends TrainingMetrics {
 
     /** {@inheritDoc} */
     @Override
-    public void update(NDList labels, NDList predictions) {
+    public NDArray update(NDList labels, NDList predictions) {
         if (labels.size() != predictions.size()) {
             throw new IllegalArgumentException("labels and prediction length does not match.");
         }
         for (int i = 0; i < labels.size(); i++) {
             update(labels.get(i), predictions.get(i));
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void update(NDArray loss) {
-        throw new UnsupportedOperationException(
-                "Accuracy does not support update based on loss NDArray.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void update(NDList loss) {
-        throw new UnsupportedOperationException(
-                "Accuracy does not support update based on loss NDArray.");
+        return null;
     }
 
     /** {@inheritDoc} */

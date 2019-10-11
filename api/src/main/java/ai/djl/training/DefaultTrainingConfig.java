@@ -15,42 +15,60 @@ package ai.djl.training;
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
+import ai.djl.training.metrics.TrainingMetrics;
 import ai.djl.training.optimizer.Optimizer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DefaultTrainingConfig implements TrainingConfig {
 
     private Initializer initializer;
     private Optimizer optimizer;
     private Device[] devices;
+    private Loss loss;
+    private List<TrainingMetrics> trainingMetrics;
 
     public DefaultTrainingConfig(Initializer initializer) {
-        this(initializer, null);
+        this.initializer = initializer;
+        trainingMetrics = new ArrayList<>();
     }
 
-    public DefaultTrainingConfig(Initializer initializer, Optimizer optimizer) {
-        this.initializer = initializer;
-        this.optimizer = optimizer;
-        int numGpus = Engine.getInstance().getGpuCount();
-        if (numGpus > 0) {
-            // TODO: Use single GPU by default for now.
-            numGpus = 1;
-            devices = new Device[numGpus];
-            for (int i = 0; i < numGpus; i++) {
-                devices[i] = Device.gpu(i);
-            }
-        } else {
-            devices = new Device[] {Device.cpu()};
-        }
-    }
-
-    public DefaultTrainingConfig(Initializer initializer, Optimizer optimizer, Device[] devices) {
-        this.initializer = initializer;
-        this.optimizer = optimizer;
+    public DefaultTrainingConfig setDevices(Device[] devices) {
         this.devices = devices;
+        return this;
+    }
+
+    public DefaultTrainingConfig setOptimizer(Optimizer optimizer) {
+        this.optimizer = optimizer;
+        return this;
+    }
+
+    public DefaultTrainingConfig setLoss(Loss loss) {
+        this.loss = loss;
+        return this;
+    }
+
+    public DefaultTrainingConfig addTrainingMetrics(List<TrainingMetrics> trainingMetrics) {
+        this.trainingMetrics = trainingMetrics;
+        return this;
     }
 
     @Override
     public Device[] getDevices() {
+        if (devices == null) {
+            int numGpus = Engine.getInstance().getGpuCount();
+            if (numGpus > 0) {
+                // TODO: Use single GPU by default for now.
+                numGpus = 1;
+                devices = new Device[numGpus];
+                for (int i = 0; i < numGpus; i++) {
+                    devices[i] = Device.gpu(i);
+                }
+            } else {
+                devices = new Device[] {Device.cpu()};
+            }
+        }
         return devices;
     }
 
@@ -62,5 +80,15 @@ public class DefaultTrainingConfig implements TrainingConfig {
     @Override
     public Optimizer getOptimizer() {
         return optimizer;
+    }
+
+    @Override
+    public Loss getLossFunction() {
+        return loss;
+    }
+
+    @Override
+    public List<TrainingMetrics> getTrainingMetrics() {
+        return trainingMetrics;
     }
 }

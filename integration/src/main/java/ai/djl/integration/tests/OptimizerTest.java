@@ -49,7 +49,7 @@ public class OptimizerTest {
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, sgd);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(sgd);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -77,7 +77,7 @@ public class OptimizerTest {
                         .optMomentum(0.9f)
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optim);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(optim);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -106,7 +106,7 @@ public class OptimizerTest {
                         .setMomentum(0.9f)
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optim);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(optim);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -131,7 +131,7 @@ public class OptimizerTest {
         Optimizer optim =
                 new Adam.Builder().setRescaleGrad(1.0f / BATCH_SIZE).optLearningRate(0.1f).build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, optim);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(optim);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);

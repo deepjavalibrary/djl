@@ -27,6 +27,8 @@ import ai.djl.training.ParameterServer;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.loss.Loss;
+import ai.djl.training.metrics.TrainingMetrics;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.PairList;
 import java.util.ArrayList;
@@ -49,6 +51,9 @@ public class MxTrainer implements Trainer {
     private Device[] devices;
     private PairList<String, Parameter> parameters;
     private ParameterStore parameterStore;
+    private Loss loss;
+
+    private List<TrainingMetrics> trainingMetrics;
     private boolean gradientsChecked;
 
     MxTrainer(MxModel model, TrainingConfig trainingConfig) {
@@ -57,6 +62,8 @@ public class MxTrainer implements Trainer {
         Block block = model.getBlock();
         optimizer = trainingConfig.getOptimizer();
         devices = trainingConfig.getDevices();
+        loss = trainingConfig.getLossFunction();
+        trainingMetrics = trainingConfig.getTrainingMetrics();
         parameters = block.getParameters();
         if (devices.length > 1) {
             parameterStore = new ParameterStore(parameters, devices);
@@ -89,6 +96,13 @@ public class MxTrainer implements Trainer {
         return model.getBlock().forward(input);
     }
 
+    @Override
+    public NDArray loss(NDList labels, NDList preds) {
+        NDArray l = loss.update(labels, preds);
+        trainingMetrics.forEach(metric -> metric.update(labels, preds));
+        return l;
+    }
+
     /** {@inheritDoc} */
     @Override
     public void step() {
@@ -112,8 +126,24 @@ public class MxTrainer implements Trainer {
         this.metrics = metrics;
     }
 
+    @Override
+    public void resetTrainingMetrics() {
+        loss.reset();
+        trainingMetrics.forEach(TrainingMetrics::reset);
+    }
+
+    @Override
+    public float getLoss() {
+        return loss.getMetric().getValue();
+    }
+
     public Metrics getMetrics() {
         return metrics;
+    }
+
+    @Override
+    public List<TrainingMetrics> getTrainingMetrics() {
+        return trainingMetrics;
     }
 
     @Override

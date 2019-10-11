@@ -18,7 +18,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
 
 /** Base class for all training metrics. */
-abstract class TrainingMetrics {
+public abstract class TrainingMetrics {
 
     private String name;
 
@@ -36,25 +36,9 @@ abstract class TrainingMetrics {
      *
      * @param labels {@code NDList} of labels
      * @param predictions {@code NDList} of predictions
+     * @return NDArray came from the update, used for losses
      */
-    protected abstract void update(NDList labels, NDList predictions);
-
-    /**
-     * Update training metrics based on {@link NDArray} of labels and predictions.
-     *
-     * @param labels {@code NDArray} of labels
-     * @param predictions {@code NDArray} of predictions
-     */
-    protected abstract void update(NDArray labels, NDArray predictions);
-
-    /**
-     * Update training metric based on {@code NDArray} of loss.
-     *
-     * @param loss {@code NDArray} of loss
-     */
-    protected abstract void update(NDArray loss);
-
-    protected abstract void update(NDList loss);
+    public abstract NDArray update(NDList labels, NDList predictions);
 
     /** reset metric values. */
     public abstract void reset();

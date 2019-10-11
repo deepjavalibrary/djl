@@ -37,7 +37,6 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
-import ai.djl.training.metrics.LossMetric;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Pipeline;
@@ -45,7 +44,7 @@ import ai.djl.zoo.ModelNotFoundException;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.cli.DefaultParser;
@@ -135,52 +134,41 @@ public final class TrainResnetWithCifar10 {
         } else {
             devices = new Device[] {Device.defaultDevice()};
         }
+        Accuracy acc = new Accuracy();
+
         TrainingConfig config =
-                new DefaultTrainingConfig(new XavierInitializer(), optimizer, devices);
+                new DefaultTrainingConfig(new XavierInitializer())
+                        .setOptimizer(optimizer)
+                        .setDevices(devices)
+                        .setLoss(Loss.softmaxCrossEntropyLoss())
+                        .addTrainingMetrics(Collections.singletonList(acc));
 
         try (Trainer trainer = model.newTrainer(config)) {
             int numEpoch = arguments.getEpoch();
             int numOfSlices = devices.length;
-
-            Accuracy acc = new Accuracy();
-            LossMetric lossMetric = new LossMetric("softmaxCELoss");
 
             Shape inputShape = new Shape(batchSize, 3, 32, 32);
             trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
             for (int epoch = 0; epoch < numEpoch; epoch++) {
                 // reset loss and accuracy
-                acc.reset();
-                lossMetric.reset();
+                trainer.resetTrainingMetrics();
                 int batchNum = 0;
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     batchNum++;
                     Batch[] split = DatasetUtils.split(batch, devices, false);
 
-                    NDList pred = new NDList();
-                    NDList loss = new NDList();
-
                     try (GradientCollector gradCol = trainer.newGradientCollector()) {
                         for (int i = 0; i < numOfSlices; i++) {
-                            NDArray data = split[i].getData().head();
-                            NDArray label = split[i].getLabels().head();
-                            NDArray prediction = trainer.forward(new NDList(data)).head();
-                            NDArray l = Loss.softmaxCrossEntropyLoss().getLoss(label, prediction);
-                            pred.add(prediction);
-                            loss.add(l);
+                            NDList data = split[i].getData();
+                            NDList label = split[i].getLabels();
+                            NDList pred = trainer.forward(data);
+                            NDArray l = trainer.loss(label, pred);
                             gradCol.backward(l);
                         }
                     }
                     trainer.step();
-                    acc.update(
-                            new NDList(
-                                    Arrays.stream(split)
-                                            .map(Batch::getLabels)
-                                            .map(NDList::head)
-                                            .toArray(NDArray[]::new)),
-                            pred);
-                    lossMetric.update(loss);
-                    lossValue = lossMetric.getMetric().getValue();
+                    lossValue = trainer.getLoss();
                     accuracy = acc.getMetric().getValue();
                     logger.info(
                             "[Epoch "
@@ -196,12 +184,10 @@ public final class TrainResnetWithCifar10 {
                     for (Batch b : split) {
                         b.close();
                     }
-                    pred.close();
-                    loss.close();
                     batch.close();
                 }
-                lossValue = lossMetric.getMetric().getValue();
-                accuracy = acc.getMetric().getValue();
+                lossValue = trainer.getLoss();
+                accuracy = trainer.getTrainingMetrics().get(0).getMetric().getValue();
                 logger.info("Loss: " + lossValue + " accuracy: " + accuracy);
                 logger.info("Epoch " + epoch + " finish");
             }
