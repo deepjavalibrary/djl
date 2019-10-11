@@ -14,8 +14,8 @@ package ai.djl.mxnet.dataset;
 
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.ndarray.NDList;
-import ai.djl.repository.NakedRepository;
 import ai.djl.repository.Repository;
+import ai.djl.repository.SimpleRepository;
 import ai.djl.util.PairList;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -116,8 +116,8 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
         private Usage usage;
 
         public Builder optRepository(Repository repository) {
-            if (!(repository instanceof NakedRepository)) {
-                throw new IllegalArgumentException("ImageNet requires a NakedRepository");
+            if (!(repository instanceof SimpleRepository)) {
+                throw new IllegalArgumentException("ImageNet requires a SimpleRepository");
             }
             this.repository = repository;
             return this;

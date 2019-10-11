@@ -16,16 +16,16 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class NakedRepository extends AbstractRepository {
+public class SimpleRepository extends AbstractRepository {
 
     private String name;
     private Path path;
 
-    public NakedRepository(Path path) {
+    public SimpleRepository(Path path) {
         this(path.toFile().getName(), path);
     }
 
-    public NakedRepository(String name, Path path) {
+    public SimpleRepository(String name, Path path) {
         this.name = name;
         this.path = path;
     }

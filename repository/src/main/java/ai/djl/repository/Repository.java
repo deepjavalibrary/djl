@@ -62,7 +62,7 @@ public interface Repository {
             if (isLocal) {
                 return new LocalRepository(name, path);
             } else {
-                return new NakedRepository(name, path);
+                return new SimpleRepository(name, path);
             }
         } else {
             return new RemoteRepository(name, uri);
