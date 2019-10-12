@@ -56,34 +56,32 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     @Override
     @SuppressWarnings("PMD.AvoidRethrowingException")
     public List<O> batchPredict(List<I> inputs) throws TranslateException {
-        try (PredictorContext inputCtx = new PredictorContext();
-                PredictorContext outputCtx = new PredictorContext()) {
-
+        try (PredictorContext context = new PredictorContext()) {
             Batchifier batchifier = translator.getBatchifier();
             if (batchifier == null) {
                 List<O> ret = new ArrayList<>(inputs.size());
                 for (I input : inputs) {
                     timestamp = System.nanoTime();
-                    NDList ndList = translator.processInput(inputCtx, input);
+                    NDList ndList = translator.processInput(context, input);
                     preprocessEnd();
 
                     NDList result = forward(ndList);
                     forwardEnd(result);
 
-                    ret.add(translator.processOutput(outputCtx, result));
+                    ret.add(translator.processOutput(context, result));
                     postProcessEnd();
                 }
                 return ret;
             }
 
             timestamp = System.nanoTime();
-            NDList inputBatch = processInputs(inputCtx, inputs);
+            NDList inputBatch = processInputs(context, inputs);
             preprocessEnd();
 
             NDList result = forward(inputBatch);
             forwardEnd(result);
 
-            return processOutputs(outputCtx, result);
+            return processOutputs(context, result);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
