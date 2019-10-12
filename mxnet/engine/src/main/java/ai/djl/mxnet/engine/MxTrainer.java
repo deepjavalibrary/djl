@@ -81,7 +81,7 @@ public class MxTrainer implements Trainer {
     public void initialize(DataDesc[] inputDescriptor) {
         Shape[] shapes =
                 Arrays.stream(inputDescriptor).map(DataDesc::getShape).toArray(Shape[]::new);
-        model.getBlock().initialize(manager, model.getDataType(), devices, shapes);
+        model.getBlock().initialize(model.getNDManager(), model.getDataType(), devices, shapes);
     }
 
     @Override

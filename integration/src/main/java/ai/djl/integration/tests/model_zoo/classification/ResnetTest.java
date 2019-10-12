@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
@@ -93,8 +94,7 @@ public class ResnetTest {
         }
     }
 
-    // TODO: The model crashes in the Engine (SIGSEGV) on Batch Norm Forward
-    @Test(enabled = false)
+    @Test
     public void testLoad() throws IOException, ModelNotFoundException {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("numLayers", "50");
@@ -108,6 +108,8 @@ public class ResnetTest {
             TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
             try (Trainer trainer = model.newTrainer(config)) {
                 NDList input = new NDList(model.getNDManager().ones(new Shape(16, 3, 32, 32)));
+                trainer.initialize(
+                        new DataDesc[] {new DataDesc(new Shape(16, 3, 32, 32), DataType.FLOAT32)});
                 trainer.forward(input);
             }
         }
