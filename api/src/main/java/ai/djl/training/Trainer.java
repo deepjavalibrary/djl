@@ -28,7 +28,7 @@ public interface Trainer extends AutoCloseable {
     void initialize(DataDesc[] inputDescriptor);
 
     default Iterable<Batch> iterateDataset(Dataset dataset) throws IOException {
-        return dataset.getData();
+        return dataset.getData(getManager());
     }
 
     GradientCollector newGradientCollector();

@@ -13,22 +13,12 @@
 package ai.djl.training.dataset;
 
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 
 /** Record is used to get a single element of data and labels from {@link Dataset}. */
-public class Record implements AutoCloseable {
+public class Record {
 
-    private NDManager manager;
     private NDList data;
     private NDList labels;
-
-    public Record(NDManager baseManager, NDList data, NDList labels) {
-        manager = baseManager.newSubManager();
-        data.attach(manager);
-        labels.attach(manager);
-        this.data = data;
-        this.labels = labels;
-    }
 
     public Record(NDList data, NDList labels) {
         this.data = data;
@@ -36,17 +26,10 @@ public class Record implements AutoCloseable {
     }
 
     public NDList getData() {
-        return this.data;
+        return data;
     }
 
     public NDList getLabels() {
-        return this.labels;
-    }
-
-    @Override
-    public void close() {
-        if (manager != null) {
-            manager.close();
-        }
+        return labels;
     }
 }

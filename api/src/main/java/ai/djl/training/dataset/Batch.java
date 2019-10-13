@@ -30,23 +30,21 @@ public class Batch implements AutoCloseable {
         this.labels = labels;
     }
 
-    public Batch(NDList data, NDList labels) {
-        this.data = data;
-        this.labels = labels;
+    public NDManager getManager() {
+        return manager;
     }
 
     public NDList getData() {
-        return this.data;
+        return data;
     }
 
     public NDList getLabels() {
-        return this.labels;
+        return labels;
     }
 
     @Override
     public void close() {
-        if (manager != null) {
-            manager.close();
-        }
+        manager.close();
+        manager = null;
     }
 }

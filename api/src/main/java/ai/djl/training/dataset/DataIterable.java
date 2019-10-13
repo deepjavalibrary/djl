@@ -14,9 +14,11 @@ package ai.djl.training.dataset;
 
 import ai.djl.Device;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +33,9 @@ import org.slf4j.LoggerFactory;
 // TODO abstract a interface that could be inherited by this and Stream DataIterable
 // where the random reads is expensive
 public class DataIterable implements Iterable<Batch> {
+
     private RandomAccessDataset dataset;
+    private NDManager manager;
     private Sampler sampler;
     private Batchifier batchifier;
     private Pipeline pipeline;
@@ -42,6 +46,7 @@ public class DataIterable implements Iterable<Batch> {
 
     public DataIterable(
             RandomAccessDataset dataset,
+            NDManager manager,
             Sampler sampler,
             Batchifier batchifier,
             Pipeline pipeline,
@@ -50,6 +55,7 @@ public class DataIterable implements Iterable<Batch> {
             int preFetchNumber,
             Device device) {
         this.dataset = dataset;
+        this.manager = manager.newSubManager();
         this.sampler = sampler;
         this.batchifier = batchifier;
         this.pipeline = pipeline;
@@ -63,6 +69,7 @@ public class DataIterable implements Iterable<Batch> {
     public Iterator<Batch> iterator() {
         return new DataIterator(
                 dataset,
+                manager,
                 sampler,
                 batchifier,
                 pipeline,
@@ -73,7 +80,9 @@ public class DataIterable implements Iterable<Batch> {
     }
 
     private static class DataIterator implements Iterator<Batch> {
+
         private RandomAccessDataset dataset;
+        private NDManager manager;
         private Iterator<List<Long>> sample;
         private Batchifier batchifier;
         private Pipeline pipeline;
@@ -86,6 +95,7 @@ public class DataIterable implements Iterable<Batch> {
 
         public DataIterator(
                 RandomAccessDataset dataset,
+                NDManager manager,
                 Sampler sampler,
                 Batchifier batchifier,
                 Pipeline pipeline,
@@ -94,6 +104,7 @@ public class DataIterable implements Iterable<Batch> {
                 int prefetchNumber,
                 Device device) {
             this.dataset = dataset;
+            this.manager = manager;
             this.sample = sampler.sample(dataset);
             this.batchifier = batchifier;
             this.pipeline = pipeline;
@@ -113,9 +124,17 @@ public class DataIterable implements Iterable<Batch> {
         @Override
         public boolean hasNext() {
             if (executor != null) {
-                return !queue.isEmpty();
+                if (queue.isEmpty()) {
+                    manager.close();
+                    return false;
+                }
+                return true;
             }
-            return sample.hasNext();
+            if (!sample.hasNext()) {
+                manager.close();
+                return false;
+            }
+            return true;
         }
 
         @Override
@@ -152,20 +171,24 @@ public class DataIterable implements Iterable<Batch> {
             }
             NDList batchData = batchifier.batchify(data);
             NDList batchLabels = batchifier.batchify(labels);
+
+            Arrays.stream(data).forEach(NDList::close);
+            Arrays.stream(labels).forEach(NDList::close);
+
             // apply transform
             if (pipeline != null) {
-                batchData = pipeline.transform(batchData, false);
+                batchData = pipeline.transform(batchData, true);
             }
             // apply label transform
             if (targetPipeline != null) {
-                batchLabels = targetPipeline.transform(batchLabels, false);
+                batchLabels = targetPipeline.transform(batchLabels, true);
             }
             // pin to a specific device
             if (device != null) {
                 batchData = batchData.asInDevice(device, false);
                 batchLabels = batchLabels.asInDevice(device, false);
             }
-            return new Batch(batchData, batchLabels);
+            return new Batch(manager, batchData, batchLabels);
         }
 
         private void preFetch() {
@@ -180,6 +203,7 @@ public class DataIterable implements Iterable<Batch> {
         }
 
         class PreFetchCallable implements Callable<Batch> {
+
             private List<Long> indices;
 
             public PreFetchCallable(List<Long> indices) {

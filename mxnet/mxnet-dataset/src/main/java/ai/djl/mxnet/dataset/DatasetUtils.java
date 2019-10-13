@@ -15,6 +15,7 @@ package ai.djl.mxnet.dataset;
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Batch;
 import ai.djl.util.Pair;
 import java.util.Arrays;
@@ -25,12 +26,14 @@ public final class DatasetUtils {
     private DatasetUtils() {}
 
     public static Batch[] split(Batch batch, Device[] devices, boolean evenSplit) {
+        NDManager manager = batch.getManager();
+
         int size = devices.length;
         if (size == 1) {
             Batch[] splitted = new Batch[1];
             NDList data = batch.getData().asInDevice(devices[0], true);
             NDList labels = batch.getLabels().asInDevice(devices[0], true);
-            splitted[0] = new Batch(data, labels);
+            splitted[0] = new Batch(manager, data, labels);
             return splitted;
         }
 
@@ -41,7 +44,7 @@ public final class DatasetUtils {
         for (int i = 0; i < splittedData.length; ++i) {
             NDList data = splittedData[i].asInDevice(devices[i], true);
             NDList labels = splittedLabels[i].asInDevice(devices[i], true);
-            splitted[i] = new Batch(data, labels);
+            splitted[i] = new Batch(manager, data, labels);
         }
         return splitted;
     }

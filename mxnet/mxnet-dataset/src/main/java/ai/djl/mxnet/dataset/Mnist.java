@@ -147,7 +147,7 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
         }
 
         public Builder setManager(NDManager manager) {
-            this.manager = manager;
+            this.manager = manager.newSubManager();
             return this;
         }
 

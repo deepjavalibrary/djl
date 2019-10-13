@@ -181,9 +181,7 @@ public final class TrainResnetWithCifar10 {
                                     + lossValue
                                     + " accuracy: "
                                     + accuracy);
-                    for (Batch b : split) {
-                        b.close();
-                    }
+
                     batch.close();
                     if (batchNum == arguments.getMaxIterations()) {
                         break;

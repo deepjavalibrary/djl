@@ -137,6 +137,8 @@ public final class TrainMnist {
                             }
                         }
                         trainer.step();
+
+                        batch.close();
                     }
                     // Validation
                     for (Batch batch : trainer.iterateDataset(validateSet)) {
@@ -147,6 +149,7 @@ public final class TrainMnist {
                             data = data.reshape(inputShape);
                             trainer.validate(new NDList(data), labels);
                         }
+                        batch.close();
                     }
                     lossValue = trainer.getLoss();
                     trainAccuracy = trainer.getTrainingMetrics().get(0).getMetric().getValue();

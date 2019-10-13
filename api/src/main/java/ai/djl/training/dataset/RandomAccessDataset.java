@@ -13,6 +13,7 @@
 package ai.djl.training.dataset;
 
 import ai.djl.Device;
+import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
@@ -47,9 +48,10 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     public abstract Record get(long index) throws IOException;
 
     @Override
-    public Iterable<Batch> getData() {
+    public Iterable<Batch> getData(NDManager manager) {
         return new DataIterable(
                 this,
+                manager,
                 sampler,
                 batchifier,
                 pipeline,
