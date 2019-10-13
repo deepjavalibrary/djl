@@ -209,7 +209,9 @@ public class Symbol extends NativeResource {
     public void close() {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
+            manager.detach(getUid());
             JnaUtils.freeSymbol(pointer);
+            manager = null;
         }
     }
 }

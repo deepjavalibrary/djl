@@ -165,11 +165,17 @@ public class MxTrainer implements Trainer {
                 .filter(Parameter::requireGradient)
                 .forEach(param -> grads.add(parameterStore.getValue(param, devices[0])));
 
-        NDArray gradSum =
-                NDArrays.stack(
-                        new NDList(grads.stream().map(NDArray::sum).toArray(NDArray[]::new)));
-        float[] sums = gradSum.sum().toFloatArray();
+        NDList list = new NDList(grads.stream().map(NDArray::sum).toArray(NDArray[]::new));
+        NDArray gradSum = NDArrays.stack(list);
+        list.close();
+
+        NDArray array = gradSum.sum();
+
+        float[] sums = array.toFloatArray();
+
+        array.close();
         gradSum.close();
+
         float sum = 0f;
         for (float num : sums) {
             sum += num;

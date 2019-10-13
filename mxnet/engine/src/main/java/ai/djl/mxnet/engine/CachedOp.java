@@ -135,7 +135,9 @@ public class CachedOp extends NativeResource {
     public void close() {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
+            manager.detach(getUid());
             JnaUtils.freeCachedOp(pointer);
+            manager = null;
         }
     }
 

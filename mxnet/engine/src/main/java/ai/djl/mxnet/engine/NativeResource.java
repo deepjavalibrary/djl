@@ -22,10 +22,12 @@ public abstract class NativeResource implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(NativeResource.class);
 
     protected final AtomicReference<Pointer> handle;
+    private String uid;
     private Exception exception;
 
     protected NativeResource(Pointer pointer) {
         this.handle = new AtomicReference<>(pointer);
+        uid = String.valueOf(Pointer.nativeValue(pointer));
         if (logger.isTraceEnabled()) {
             exception = new Exception();
         }
@@ -44,7 +46,7 @@ public abstract class NativeResource implements AutoCloseable {
     }
 
     public final String getUid() {
-        return String.valueOf(Pointer.nativeValue(handle.get()));
+        return uid;
     }
 
     /** {@inheritDoc} */
