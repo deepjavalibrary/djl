@@ -61,7 +61,7 @@ public class ParameterStore {
         for (Map.Entry<String, ParameterData> entry : parameterMap.entrySet()) {
             String parameterId = entry.getKey();
             ParameterData data = entry.getValue();
-            if (data.requireGradient) {
+            if (data.requireGradient()) {
                 NDArray[] values = data.toArray(new NDArray[0]);
                 parameterServer.pull(parameterId, values, -priority);
                 ++priority;
@@ -73,8 +73,7 @@ public class ParameterStore {
         String parameterId = parameter.getId();
         int index = deviceMap.get(device);
         ParameterData data =
-                parameterMap.computeIfAbsent(
-                        parameterId, k -> new ParameterData(parameter.requireGradient()));
+                parameterMap.computeIfAbsent(parameterId, k -> new ParameterData(parameter));
 
         if (data.isEmpty()) {
             NDArray array = parameter.getArray();
@@ -104,18 +103,33 @@ public class ParameterStore {
         return data.get(index);
     }
 
-    private static final class ParameterData extends ArrayList<NDArray> {
+    public void sync() {
+        for (ParameterData data : parameterMap.values()) {
+            data.sync();
+        }
+    }
+
+    private final class ParameterData extends ArrayList<NDArray> {
 
         private static final long serialVersionUID = 1L;
 
-        private boolean requireGradient;
+        private Parameter parameter;
 
-        public ParameterData(boolean requireGradient) {
-            this.requireGradient = requireGradient;
+        public ParameterData(Parameter parameter) {
+            this.parameter = parameter;
         }
 
         public boolean requireGradient() {
-            return requireGradient;
+            return parameter.requireGradient();
+        }
+
+        public void sync() {
+            NDArray array = parameter.getArray();
+            Device device = array.getDevice();
+            if (!deviceMap.containsKey(device)) {
+                // model's parameters maybe loaded on different device than any of training devices.
+                get(0).copyTo(array);
+            }
         }
     }
 }

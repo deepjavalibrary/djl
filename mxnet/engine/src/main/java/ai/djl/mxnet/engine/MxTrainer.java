@@ -204,6 +204,7 @@ public class MxTrainer implements Trainer {
 
     @Override
     public void close() {
+        parameterStore.sync();
         manager.close();
     }
 }
