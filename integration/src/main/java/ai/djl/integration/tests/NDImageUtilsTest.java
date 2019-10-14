@@ -121,19 +121,19 @@ public class NDImageUtilsTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             // test 3D H, W, C
             NDArray image = manager.randomUniform(0, 255, new Shape(100, 50, 3));
-            NDArray result = NDImageUtils.crop(image, 10, 20, 30, 40);
+            NDArray result = NDImageUtils.crop(image, 20, 10, 40, 30);
             NDArray actual = image.get("20:60,10:40,:");
             Assertions.assertAlmostEquals(actual, result);
 
             // test 4D N, H, W, C
             NDArray batchImages = manager.randomUniform(0, 255, new Shape(5, 75, 40, 3));
-            result = NDImageUtils.crop(batchImages, 5, 10, 15, 20);
+            result = NDImageUtils.crop(batchImages, 10, 5, 20, 15);
             actual = batchImages.get(":,10:30,5:20,:");
             Assertions.assertAlmostEquals(actual, result);
 
             // test zero-dim
             image = manager.create(new Shape(0, 100, 50, 3));
-            result = NDImageUtils.crop(image, 10, 20, 10, 20);
+            result = NDImageUtils.crop(image, 20, 10, 20, 10);
             actual = manager.create(new Shape(0, 20, 10, 3));
             Assert.assertEquals(actual, result);
         }

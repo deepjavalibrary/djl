@@ -599,17 +599,17 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     @Override
-    public NDArray resize(int[] size) {
+    public NDArray resize(int height, int width) {
         if (array.isEmpty()) {
             throw new IllegalArgumentException("attempt to resize of an empty NDArray");
         }
         MxOpParams params = new MxOpParams();
-        params.addTupleParam("size", size);
+        params.addTupleParam("size", width, height);
         return manager.invoke("_npx__image_resize", array, params);
     }
 
     @Override
-    public NDArray crop(int x, int y, int width, int height) {
+    public NDArray crop(int y, int x, int height, int width) {
         MxOpParams params = new MxOpParams();
         params.add("x", x);
         params.add("y", y);

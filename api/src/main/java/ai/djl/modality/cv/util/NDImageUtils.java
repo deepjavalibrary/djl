@@ -22,11 +22,11 @@ public final class NDImageUtils {
     private NDImageUtils() {}
 
     public static NDArray resize(NDArray image, int size) {
-        return image.getNDArrayInternal().resize(new int[] {size, size});
+        return image.getNDArrayInternal().resize(size, size);
     }
 
     public static NDArray resize(NDArray image, int height, int width) {
-        return image.getNDArrayInternal().resize(new int[] {width, height});
+        return image.getNDArrayInternal().resize(height, width);
     }
 
     public static NDArray normalize(NDArray input, float mean, float std) {
@@ -53,8 +53,8 @@ public final class NDImageUtils {
         return image.getNDArrayInternal().toTensor();
     }
 
-    public static NDArray crop(NDArray image, int x, int y, int width, int height) {
-        return image.getNDArrayInternal().crop(x, y, width, height);
+    public static NDArray crop(NDArray image, int y, int x, int height, int width) {
+        return image.getNDArrayInternal().crop(y, x, height, width);
     }
 
     public enum Flag {

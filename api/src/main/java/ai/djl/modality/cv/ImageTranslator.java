@@ -54,13 +54,13 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
         if (centerCrop) {
             if (centerCropSize != null) {
-                input = BufferedImageUtils.centerCrop(input, centerCropSize[1], centerCropSize[0]);
+                input = BufferedImageUtils.centerCrop(input, centerCropSize[0], centerCropSize[1]);
             } else {
                 input = BufferedImageUtils.centerCrop(input);
             }
         }
         if (resize != null) {
-            input = BufferedImageUtils.resize(input, resize[1], resize[0]);
+            input = BufferedImageUtils.resize(input, resize[0], resize[1]);
         }
         NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), input, flag);
         return new NDList(normalize(array.divi(255)));

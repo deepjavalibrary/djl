@@ -57,11 +57,11 @@ public final class BufferedImageUtils {
      * Resizes the image with new width and height.
      *
      * @param image the input image
-     * @param newWidth the new width of the reshaped image
      * @param newHeight the new height of the reshaped image
+     * @param newWidth the new width of the reshaped image
      * @return reshaped {@link BufferedImage}
      */
-    public static BufferedImage resize(BufferedImage image, int newWidth, int newHeight) {
+    public static BufferedImage resize(BufferedImage image, int newHeight, int newWidth) {
         BufferedImage resizedImage =
                 new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = resizedImage.createGraphics();
@@ -86,7 +86,7 @@ public final class BufferedImageUtils {
         return centerCrop(img, w, w);
     }
 
-    public static BufferedImage centerCrop(BufferedImage img, int width, int height) {
+    public static BufferedImage centerCrop(BufferedImage img, int height, int width) {
         BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
         int w = img.getWidth();

@@ -22,20 +22,20 @@ import java.awt.Graphics2D;
 public class Rectangle implements BoundingBox {
 
     private Point point;
-    private double width;
     private double height;
+    private double width;
 
     /**
      * Constructs a new {@code Rectangle} whose upper-left corner is specified as {@code (x,y)} and
      * whose width and height are specified by the arguments of the same name.
      *
-     * @param x the specified X coordinate
      * @param y the specified Y coordinate
-     * @param width the width of the {@code Rectangle}
+     * @param x the specified X coordinate
      * @param height the height of the {@code Rectangle}
+     * @param width the width of the {@code Rectangle}
      */
-    public Rectangle(double x, double y, double width, double height) {
-        this(new Point(x, y), width, height);
+    public Rectangle(double y, double x, double height, double width) {
+        this(new Point(x, y), height, width);
     }
 
     /**
@@ -43,10 +43,10 @@ public class Rectangle implements BoundingBox {
      * point} and whose width and height are specified by the arguments of the same name.
      *
      * @param point upper-left corner of the coordinate
-     * @param width the width of the {@code Rectangle}
      * @param height the height of the {@code Rectangle}
+     * @param width the width of the {@code Rectangle}
      */
-    public Rectangle(Point point, double width, double height) {
+    public Rectangle(Point point, double height, double width) {
         this.point = point;
         this.width = width;
         this.height = height;
@@ -102,7 +102,7 @@ public class Rectangle implements BoundingBox {
     }
 
     @Override
-    public void draw(Graphics2D g, int imageWidth, int imageHeight) {
+    public void draw(Graphics2D g, int imageHeight, int imageWidth) {
         int x = (int) (getX() * imageWidth);
         int y = (int) (getY() * imageHeight);
         int w = (int) (getWidth() * imageWidth);

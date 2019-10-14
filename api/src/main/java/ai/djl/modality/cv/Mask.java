@@ -18,8 +18,8 @@ public class Mask extends Rectangle {
 
     private float[][] probDist;
 
-    public Mask(double x, double y, double width, double height, float[][] dist) {
-        super(x, y, width, height);
+    public Mask(double y, double x, double height, double width, float[][] dist) {
+        super(y, x, height, width);
         this.probDist = dist;
     }
 
@@ -28,8 +28,8 @@ public class Mask extends Rectangle {
     }
 
     @Override
-    public void draw(Graphics2D g, int imageWidth, int imageHeight) {
-        super.draw(g, imageWidth, imageHeight);
+    public void draw(Graphics2D g, int imageHeight, int imageWidth) {
+        super.draw(g, imageHeight, imageWidth);
         // TODO: implement draw mask method
     }
 }

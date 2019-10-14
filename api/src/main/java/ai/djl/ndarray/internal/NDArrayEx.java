@@ -352,9 +352,9 @@ public interface NDArrayEx {
 
     NDArray toTensor();
 
-    NDArray resize(int[] size);
+    NDArray resize(int height, int width);
 
-    NDArray crop(int x, int y, int width, int height);
+    NDArray crop(int y, int x, int height, int width);
 
     ////////////////////////////////////////
     // Miscellaneous

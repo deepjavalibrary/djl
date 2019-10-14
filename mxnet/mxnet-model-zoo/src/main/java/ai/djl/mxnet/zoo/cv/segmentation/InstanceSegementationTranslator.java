@@ -90,7 +90,7 @@ public class InstanceSegementationTranslator extends ImageTranslator<DetectedObj
                     maskVal[j / maskVal.length][j % maskVal.length] = flattened[j];
                 }
 
-                Mask mask = new Mask(x, y, w, h, maskVal);
+                Mask mask = new Mask(y, x, h, w, maskVal);
 
                 retNames.add(className);
                 retProbs.add(probability);
@@ -107,18 +107,18 @@ public class InstanceSegementationTranslator extends ImageTranslator<DetectedObj
      * @return resized image
      */
     private BufferedImage resizeShort(BufferedImage img) {
-        int width = img.getWidth();
         int height = img.getHeight();
-        int min = Math.min(width, height);
-        int max = Math.max(width, height);
+        int width = img.getWidth();
+        int min = Math.min(height, width);
+        int max = Math.max(height, width);
         float scale = shortEdge / (float) min;
         if (Math.round(scale * max) > maxEdge) {
             scale = maxEdge / (float) max;
         }
-        width = Math.round(width * scale);
         height = Math.round(height * scale);
+        width = Math.round(width * scale);
 
-        return BufferedImageUtils.resize(img, width, height);
+        return BufferedImageUtils.resize(img, height, width);
     }
 
     public static class Builder extends BaseBuilder<Builder> {

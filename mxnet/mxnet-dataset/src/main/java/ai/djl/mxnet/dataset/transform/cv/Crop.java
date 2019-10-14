@@ -23,7 +23,7 @@ public class Crop implements Transform {
     private int width;
     private int height;
 
-    public Crop(int x, int y, int width, int height) {
+    public Crop(int y, int x, int height, int width) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -32,6 +32,6 @@ public class Crop implements Transform {
 
     @Override
     public NDArray transform(NDArray array, boolean close) {
-        return NDImageUtils.crop(array, x, y, width, height);
+        return NDImageUtils.crop(array, y, x, height, width);
     }
 }
