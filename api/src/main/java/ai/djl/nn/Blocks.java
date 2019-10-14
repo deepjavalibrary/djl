@@ -24,7 +24,7 @@ public final class Blocks {
     }
 
     private static NDList flatten(NDList arrays, long batch, long size) {
-        return new NDList(arrays.get(0).reshape(batch, size));
+        return new NDList(arrays.singletonOrThrow().reshape(batch, size));
     }
 
     public static Block flattenBlock() {

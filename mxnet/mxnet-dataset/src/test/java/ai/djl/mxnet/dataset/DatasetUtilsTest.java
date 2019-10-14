@@ -38,7 +38,7 @@ public class DatasetUtilsTest {
 
             int step = 2;
             for (int i = 0; i < split.length; i++) {
-                NDArray array = split[i].getData().head();
+                NDArray array = split[i].getData().singletonOrThrow();
                 Assert.assertEquals(array.getDevice(), devices[i]);
 
                 Assert.assertEquals(
@@ -64,7 +64,7 @@ public class DatasetUtilsTest {
 
             int step = 2;
             for (int i = 0; i < split.length; i++) {
-                NDArray array = split[i].getData().head();
+                NDArray array = split[i].getData().singletonOrThrow();
                 Assert.assertEquals(array.getDevice(), devices[i]);
                 if (i == split.length - 1) {
                     Assert.assertEquals(
@@ -96,7 +96,7 @@ public class DatasetUtilsTest {
 
             int step = 1;
             for (int i = 0; i < split.length; i++) {
-                NDArray array = split[i].getData().head();
+                NDArray array = split[i].getData().singletonOrThrow();
                 Assert.assertEquals(array.getDevice(), devices[i]);
                 if (i == split.length - 1) {
                     Assert.assertEquals(

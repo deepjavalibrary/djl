@@ -28,7 +28,7 @@ public class NDListTest {
         list.add("test1", new MockNDArray());
         Assert.assertTrue(list.contains("test1"));
         Assert.assertNotNull(list.remove("test1"));
-        Assert.assertNotNull(list.get(0));
+        Assert.assertNotNull(list.singletonOrThrow());
         list.addAll(list);
         Assert.assertEquals(list.size(), 2);
         NDArray[] arr = list.toArray();

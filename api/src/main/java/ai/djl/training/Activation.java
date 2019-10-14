@@ -29,7 +29,7 @@ public final class Activation {
     }
 
     public static NDList relu(NDList arrays) {
-        return new NDList(arrays.get(0).getNDArrayInternal().relu());
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().relu());
     }
 
     public static NDArray sigmoid(NDArray array) {
@@ -37,7 +37,7 @@ public final class Activation {
     }
 
     public static NDList sigmoid(NDList arrays) {
-        return new NDList(arrays.get(0).getNDArrayInternal().sigmoid());
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().sigmoid());
     }
 
     public static NDArray tanh(NDArray array) {
@@ -45,7 +45,7 @@ public final class Activation {
     }
 
     public static NDList tanh(NDList arrays) {
-        return new NDList(arrays.get(0).getNDArrayInternal().tanh());
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().tanh());
     }
 
     public static NDArray softrelu(NDArray array) {
@@ -53,7 +53,7 @@ public final class Activation {
     }
 
     public static NDList softrelu(NDList arrays) {
-        return new NDList(arrays.get(0).getNDArrayInternal().softrelu());
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().softrelu());
     }
 
     public static NDArray leakyRelu(NDArray array, float alpha) {
@@ -61,7 +61,7 @@ public final class Activation {
     }
 
     public static NDList leakyRelu(NDList arrays, float alpha) {
-        return new NDList(arrays.get(0).getNDArrayInternal().leakyRelu(alpha));
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().leakyRelu(alpha));
     }
 
     public static NDArray elu(NDArray array, float alpha) {
@@ -69,7 +69,7 @@ public final class Activation {
     }
 
     public static NDList elu(NDList arrays, float alpha) {
-        return new NDList(arrays.get(0).getNDArrayInternal().elu(alpha));
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().elu(alpha));
     }
 
     public static NDArray selu(NDArray array) {
@@ -77,7 +77,7 @@ public final class Activation {
     }
 
     public static NDList selu(NDList arrays) {
-        return new NDList(arrays.get(0).getNDArrayInternal().selu());
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().selu());
     }
 
     public static NDArray gelu(NDArray array) {
@@ -85,7 +85,7 @@ public final class Activation {
     }
 
     public static NDList gelu(NDList arrays) {
-        return new NDList(arrays.get(0).getNDArrayInternal().gelu());
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().gelu());
     }
 
     public static NDArray swish(NDArray array, float beta) {
@@ -93,7 +93,7 @@ public final class Activation {
     }
 
     public static NDList swish(NDList arrays, float beta) {
-        return new NDList(arrays.get(0).getNDArrayInternal().swish(beta));
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().swish(beta));
     }
 
     public static Block reluBlock() {

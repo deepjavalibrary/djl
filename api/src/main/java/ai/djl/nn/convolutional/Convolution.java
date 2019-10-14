@@ -71,7 +71,7 @@ public abstract class Convolution extends ParameterBlock {
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         inputs = opInputs(parameterStore, inputs);
-        NDArrayEx ex = inputs.get(0).getNDArrayInternal();
+        NDArrayEx ex = inputs.head().getNDArrayInternal();
         return ex.convolution(
                 inputs,
                 kernel,
@@ -152,7 +152,7 @@ public abstract class Convolution extends ParameterBlock {
     }
 
     private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
-        NDArray data = inputs.head();
+        NDArray data = inputs.singletonOrThrow();
         Device device = data.getDevice();
         NDList ret = new NDList(3);
         ret.add(data);

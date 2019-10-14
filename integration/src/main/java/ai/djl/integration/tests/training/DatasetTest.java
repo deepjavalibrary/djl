@@ -65,7 +65,9 @@ public class DatasetTest {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
-                                record -> original.add(record.getData().get(0).getLong()));
+                                record ->
+                                        original.add(
+                                                record.getData().singletonOrThrow().getLong()));
                 List<Long> expected = LongStream.range(0, 100).boxed().collect(Collectors.toList());
                 Assert.assertEquals(expected, original, "SequentialSampler test failed");
             }
@@ -91,7 +93,9 @@ public class DatasetTest {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
-                                record -> original.add(record.getData().get(0).getLong()));
+                                record ->
+                                        original.add(
+                                                record.getData().singletonOrThrow().getLong()));
                 Assert.assertEquals(original.size(), 10, "RandomSampler test failed");
             }
         }
@@ -116,7 +120,9 @@ public class DatasetTest {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
-                                record -> originalList.add(record.getData().get(0).toLongArray()));
+                                record ->
+                                        originalList.add(
+                                                record.getData().singletonOrThrow().toLongArray()));
                 Assert.assertEquals(originalList.size(), 4, "size of BatchSampler is not correct");
                 long[] expected = LongStream.range(0, 27).toArray();
                 Assert.assertTrue(
@@ -134,7 +140,9 @@ public class DatasetTest {
                 trainer.iterateDataset(dataset2)
                         .iterator()
                         .forEachRemaining(
-                                record -> originalList2.add(record.getData().get(0).toLongArray()));
+                                record ->
+                                        originalList2.add(
+                                                record.getData().singletonOrThrow().toLongArray()));
                 Assert.assertEquals(originalList2.size(), 3, "size of BatchSampler is not correct");
             }
 
@@ -149,7 +157,9 @@ public class DatasetTest {
                 trainer.iterateDataset(dataset3)
                         .iterator()
                         .forEachRemaining(
-                                record -> originalList3.add(record.getData().get(0).toLongArray()));
+                                record ->
+                                        originalList3.add(
+                                                record.getData().singletonOrThrow().toLongArray()));
                 Assert.assertTrue(originalList3.isEmpty(), "size of BatchSampler is not correct");
             }
 
@@ -164,7 +174,9 @@ public class DatasetTest {
                 trainer.iterateDataset(dataset4)
                         .iterator()
                         .forEachRemaining(
-                                record -> originalList4.add(record.getData().get(0).toLongArray()));
+                                record ->
+                                        originalList4.add(
+                                                record.getData().singletonOrThrow().toLongArray()));
                 Assert.assertTrue(
                         originalList4.size() == 1 && originalList4.get(0).length == 100,
                         "size of BatchSampler is not correct");
@@ -192,10 +204,10 @@ public class DatasetTest {
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(dataset)) {
                     Assert.assertEquals(
-                            batch.getData().get(0),
+                            batch.getData().singletonOrThrow(),
                             manager.arange(2 * index, 2 * index + 40).reshape(20, 2));
                     Assert.assertEquals(
-                            batch.getLabels().get(0),
+                            batch.getLabels().singletonOrThrow(),
                             manager.arange(index, index + 20).reshape(20));
                     index += 20;
                 }
@@ -210,18 +222,18 @@ public class DatasetTest {
                 for (Batch batch : trainer.iterateDataset(dataset)) {
                     if (index != 90) {
                         Assert.assertEquals(
-                                batch.getData().get(0),
+                                batch.getData().singletonOrThrow(),
                                 manager.arange(2 * index, 2 * index + 30).reshape(15, 2));
                         Assert.assertEquals(
-                                batch.getLabels().get(0),
+                                batch.getLabels().singletonOrThrow(),
                                 manager.arange(index, index + 15).reshape(15));
                     } else {
                         // last batch
                         Assert.assertEquals(
-                                batch.getData().get(0),
+                                batch.getData().singletonOrThrow(),
                                 manager.arange(2 * index, 2 * index + 20).reshape(10, 2));
                         Assert.assertEquals(
-                                batch.getLabels().get(0),
+                                batch.getLabels().singletonOrThrow(),
                                 manager.arange(index, index + 10).reshape(10));
                     }
                     index += 15;

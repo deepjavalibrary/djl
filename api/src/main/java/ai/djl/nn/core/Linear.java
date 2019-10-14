@@ -158,7 +158,7 @@ public class Linear extends ParameterBlock {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
         }
-        Device device = inputs.get(0).getDevice();
+        Device device = inputs.head().getDevice();
 
         NDList result = new NDList();
         result.addAll(inputs);

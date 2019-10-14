@@ -28,10 +28,10 @@ public class NDArrayShapesManipulationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDList result = array.split(2);
-            Assert.assertEquals(manager.create(new float[] {1f, 2f}), result.head());
+            Assert.assertEquals(manager.create(new float[] {1f, 2f}), result.get(0));
             Assert.assertEquals(manager.create(new float[] {3f, 4f}), result.get(1));
             result = array.split(new int[] {2});
-            Assert.assertEquals(manager.create(new float[] {1f, 2f}), result.head());
+            Assert.assertEquals(manager.create(new float[] {1f, 2f}), result.get(0));
             Assert.assertEquals(manager.create(new float[] {3f, 4f}), result.get(1));
         }
     }

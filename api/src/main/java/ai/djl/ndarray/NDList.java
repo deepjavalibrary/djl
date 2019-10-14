@@ -180,6 +180,22 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     }
 
     /**
+     * Returns the only element if this is a singleton NDList or throws an exception if multiple
+     * elements.
+     *
+     * @return the head NDArray
+     * @throws IndexOutOfBoundsException if the list does not contain exactly one element
+     */
+    public NDArray singletonOrThrow() {
+        if (size() != 1) {
+            throw new IndexOutOfBoundsException(
+                    "Incorrect number of elements in NDList.singletonOrThrow: Expected 1 and was "
+                            + size());
+        }
+        return list.valueAt(0);
+    }
+
+    /**
      * Appends the specified NDArray to the end of this NDList.
      *
      * @param array NDArray to be appended to this list

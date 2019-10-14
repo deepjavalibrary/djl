@@ -145,7 +145,7 @@ public class RNN extends RecurrentCell {
                     "Input must include data, and sequenceLength as useSequenceLength is set to true");
         }
 
-        NDArray head = inputs.head();
+        NDArray head = inputs.singletonOrThrow();
         Device device = head.getDevice();
 
         NDList result = new NDList();

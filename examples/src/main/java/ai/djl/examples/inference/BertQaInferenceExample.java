@@ -162,7 +162,7 @@ public final class BertQaInferenceExample extends AbstractExample {
 
         @Override
         public String processOutput(TranslatorContext ctx, NDList list) {
-            NDArray array = list.get(0);
+            NDArray array = list.singletonOrThrow();
             NDList output = array.split(2, 2);
             // Get the formatted logits result
             NDArray startLogits = output.get(0).reshape(new Shape(1, -1));

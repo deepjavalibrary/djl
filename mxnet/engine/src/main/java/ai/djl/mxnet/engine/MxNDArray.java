@@ -432,7 +432,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
-        return manager.invoke("_npi_equal", new NDList(this, other), null).head();
+        return manager.invoke("_npi_equal", new NDList(this, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -446,7 +446,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
-        return manager.invoke("_npi_not_equal", new NDList(this, other), null).head();
+        return manager.invoke("_npi_not_equal", new NDList(this, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -460,7 +460,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
-        return manager.invoke("_npi_greater", new NDList(this, other), null).head();
+        return manager.invoke("_npi_greater", new NDList(this, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -474,7 +474,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
-        return manager.invoke("_npi_greater_equal", new NDList(this, other), null).head();
+        return manager.invoke("_npi_greater_equal", new NDList(this, other), null)
+                .singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -488,7 +489,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
-        return manager.invoke("_npi_less", new NDList(this, other), null).head();
+        return manager.invoke("_npi_less", new NDList(this, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -502,7 +503,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lte(NDArray other) {
-        return manager.invoke("_npi_less_equal", new NDList(this, other), null).head();
+        return manager.invoke("_npi_less_equal", new NDList(this, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -519,7 +520,8 @@ public class MxNDArray extends NativeResource implements NDArray {
             array2 = other;
         }
         try {
-            return manager.invoke("where", new NDList(condition, array1, array2), null).head();
+            return manager.invoke("where", new NDList(condition, array1, array2), null)
+                    .singletonOrThrow();
         } finally {
             if (array1 != this) {
                 array1.close();
@@ -546,9 +548,9 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (others.length == 0) {
             throw new IllegalArgumentException("Passed in arrays must have at least one element");
         } else if (others.length == 1) {
-            return manager.invoke("_npi_add", toAdd, null).head();
+            return manager.invoke("_npi_add", toAdd, null).singletonOrThrow();
         } else {
-            return manager.invoke("add_n", toAdd, null).head();
+            return manager.invoke("add_n", toAdd, null).singletonOrThrow();
         }
     }
 
@@ -563,7 +565,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
-        return manager.invoke("_npi_subtract", new NDList(this, other), null).head();
+        return manager.invoke("_npi_subtract", new NDList(this, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -582,7 +584,9 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
         NDArray current = this;
         for (NDArray other : others) {
-            NDArray next = manager.invoke("_npi_multiply", new NDList(current, other), null).head();
+            NDArray next =
+                    manager.invoke("_npi_multiply", new NDList(current, other), null)
+                            .singletonOrThrow();
             if (current != this) {
                 current.close();
             }
@@ -620,7 +624,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray div(NDArray other) {
-        return manager.invoke("_npi_true_divide", new NDList(this, other), null).head();
+        return manager.invoke("_npi_true_divide", new NDList(this, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -634,7 +638,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mod(NDArray other) {
-        return manager.invoke("_npi_mod", new NDList(this, other), null).head();
+        return manager.invoke("_npi_mod", new NDList(this, other), null).singletonOrThrow();
     }
 
     @Override
@@ -646,7 +650,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray pow(NDArray other) {
-        return manager.invoke("_npi_power", new NDList(this, other), null).head();
+        return manager.invoke("_npi_power", new NDList(this, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -1072,7 +1076,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         NDArray[] srcArray = new NDArray[arrays.size() + 1];
         srcArray[0] = this;
         System.arraycopy(arrays.toArray(), 0, srcArray, 1, arrays.size());
-        return manager.invoke("_npi_stack", new NDList(srcArray), params).head();
+        return manager.invoke("_npi_stack", new NDList(srcArray), params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -1102,28 +1106,31 @@ public class MxNDArray extends NativeResource implements NDArray {
         NDArray[] srcArray = new NDArray[arrays.length + 1];
         srcArray[0] = this;
         System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
-        return manager.invoke("_npi_concatenate", new NDList(srcArray), params).head();
+        return manager.invoke("_npi_concatenate", new NDList(srcArray), params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalAnd(NDArray other) {
         // TODO switch to numpy op, although current op support zero-dim, scalar
-        return manager.invoke("broadcast_logical_and", new NDList(this, other), null).head();
+        return manager.invoke("broadcast_logical_and", new NDList(this, other), null)
+                .singletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalOr(NDArray other) {
         // TODO switch to numpy op, although current op support zero-dim, scalar
-        return manager.invoke("broadcast_logical_or", new NDList(this, other), null).head();
+        return manager.invoke("broadcast_logical_or", new NDList(this, other), null)
+                .singletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalXor(NDArray other) {
         // TODO switch to numpy op, although current op support zero-dim, scalar
-        return manager.invoke("broadcast_logical_xor", new NDList(this, other), null).head();
+        return manager.invoke("broadcast_logical_xor", new NDList(this, other), null)
+                .singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -1358,7 +1365,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray dot(NDArray other) {
-        return manager.invoke("_np_dot", new NDList(this, other), null).head();
+        return manager.invoke("_np_dot", new NDList(this, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */

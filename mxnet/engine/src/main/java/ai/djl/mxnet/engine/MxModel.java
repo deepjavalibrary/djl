@@ -364,7 +364,7 @@ public class MxModel implements Model {
         symbolBlock.setInputNames(new ArrayList<>(map.keySet()));
 
         // TODO: Find a better to infer model DataType from SymbolBlock.
-        dataType = paramNDlist.get(0).getDataType();
+        dataType = paramNDlist.head().getDataType();
 
         if (!device.equals(Device.cpu())) {
             // MXNet always load parameters on CPU, we only close parameters if we copied them.

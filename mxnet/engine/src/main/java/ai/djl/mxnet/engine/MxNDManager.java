@@ -166,7 +166,7 @@ public class MxNDManager implements NDManager {
         params.addParam("step", step);
         params.setDataType(dataType);
         params.setDevice(Device.defaultIfNull(dev, device));
-        return invoke("_npi_arange", EMPTY, params).head();
+        return invoke("_npi_arange", EMPTY, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -178,7 +178,7 @@ public class MxNDManager implements NDManager {
         params.addParam("k", k);
         params.setDataType(dataType);
         params.setDevice(Device.defaultIfNull(dev, device));
-        return invoke("_npi_eye", EMPTY, params).head();
+        return invoke("_npi_eye", EMPTY, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -194,7 +194,7 @@ public class MxNDManager implements NDManager {
         params.addParam("endpoint", endpoint);
         params.setDataType(DataType.FLOAT32);
         params.setDevice(Device.defaultIfNull(dev, device));
-        return invoke("_npi_linspace", EMPTY, params).head();
+        return invoke("_npi_linspace", EMPTY, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -207,7 +207,7 @@ public class MxNDManager implements NDManager {
         params.addParam("shape", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
         params.setDataType(dataType);
-        return invoke("_npi_random_uniform", EMPTY, params).head();
+        return invoke("_npi_random_uniform", EMPTY, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -220,7 +220,7 @@ public class MxNDManager implements NDManager {
         params.addParam("shape", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
         params.setDataType(dataType);
-        return invoke("_npi_random_normal", EMPTY, params).head();
+        return invoke("_npi_random_normal", EMPTY, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */

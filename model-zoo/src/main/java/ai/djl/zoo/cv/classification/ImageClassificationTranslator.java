@@ -36,7 +36,7 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
     public Classification processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
 
-        NDArray probabilitiesNd = list.head().get(0).softmax(0);
+        NDArray probabilitiesNd = list.singletonOrThrow().get(0).softmax(0);
         List<String> synset = model.getArtifact(synsetArtifactName, Utils::readLines);
         return new Classification(synset, probabilitiesNd);
     }

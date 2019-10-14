@@ -152,7 +152,7 @@ public class GRU extends RecurrentCell {
             throw new IllegalArgumentException("RNN requires exactly 1 NDArray");
         }
 
-        NDArray head = inputs.head();
+        NDArray head = inputs.singletonOrThrow();
         Device device = head.getDevice();
 
         NDList result = new NDList();

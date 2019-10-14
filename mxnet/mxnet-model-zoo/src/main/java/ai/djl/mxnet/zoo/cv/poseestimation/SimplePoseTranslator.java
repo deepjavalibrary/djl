@@ -31,7 +31,7 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
 
     @Override
     public Joints processOutput(TranslatorContext ctx, NDList list) {
-        NDArray pred = list.head();
+        NDArray pred = list.singletonOrThrow();
         int numJoints = (int) pred.getShape().get(1);
         int height = (int) pred.getShape().get(2);
         int width = (int) pred.getShape().get(3);

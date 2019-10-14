@@ -45,8 +45,10 @@ public class PikachuTest {
             try (Trainer trainer = model.newTrainer(config)) {
                 Iterator<Batch> ds = trainer.iterateDataset(pikachu).iterator();
                 Batch batch = ds.next();
-                Assert.assertEquals(batch.getData().head().getShape(), new Shape(1, 3, 512, 512));
-                Assert.assertEquals(batch.getLabels().head().getShape(), new Shape(1, 1, 5));
+                Assert.assertEquals(
+                        batch.getData().singletonOrThrow().getShape(), new Shape(1, 3, 512, 512));
+                Assert.assertEquals(
+                        batch.getLabels().singletonOrThrow().getShape(), new Shape(1, 1, 5));
             }
         }
     }

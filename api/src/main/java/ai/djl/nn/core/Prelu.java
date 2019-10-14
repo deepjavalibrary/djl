@@ -41,7 +41,7 @@ public class Prelu extends ParameterBlock {
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        NDArray data = inputs.head();
+        NDArray data = inputs.singletonOrThrow();
 
         NDList list = new NDList(data, parameterStore.getValue(alpha, data.getDevice()));
         NDArrayEx ex = data.getNDArrayInternal();

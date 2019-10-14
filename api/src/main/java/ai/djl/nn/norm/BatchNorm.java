@@ -91,7 +91,7 @@ public class BatchNorm extends ParameterBlock {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
         }
-        NDArray data = inputs.get(0);
+        NDArray data = inputs.singletonOrThrow();
         Device device = data.getDevice();
         NDArray gamma = data.getManager().ones(new Shape(inChannels));
         NDArray beta = data.getManager().zeros(new Shape(inChannels));

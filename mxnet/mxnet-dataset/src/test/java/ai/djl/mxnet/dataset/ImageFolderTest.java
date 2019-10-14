@@ -61,15 +61,17 @@ public class ImageFolderTest {
                 Batch catBatch = ds.next();
                 Assertions.assertAlmostEquals(
                         NDImageUtils.resize(cat, 100, 100).expandDims(0),
-                        catBatch.getData().head());
-                Assert.assertEquals(manager.create(new int[] {0}), catBatch.getLabels().head());
+                        catBatch.getData().singletonOrThrow());
+                Assert.assertEquals(
+                        manager.create(new int[] {0}), catBatch.getLabels().singletonOrThrow());
                 catBatch.close();
 
                 Batch dogBatch = ds.next();
                 Assertions.assertAlmostEquals(
                         NDImageUtils.resize(dog, 100, 100).expandDims(0),
-                        dogBatch.getData().head());
-                Assert.assertEquals(manager.create(new int[] {1}), dogBatch.getLabels().head());
+                        dogBatch.getData().singletonOrThrow());
+                Assert.assertEquals(
+                        manager.create(new int[] {1}), dogBatch.getLabels().singletonOrThrow());
                 dogBatch.close();
             }
         }

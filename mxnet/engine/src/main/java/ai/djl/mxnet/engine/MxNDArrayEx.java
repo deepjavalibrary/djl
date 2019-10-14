@@ -146,13 +146,13 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray max(NDArray other) {
-        return manager.invoke("_npi_maximum", new NDList(array, other), null).head();
+        return manager.invoke("_npi_maximum", new NDList(array, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray min(NDArray other) {
-        return manager.invoke("_npi_minimum", new NDList(array, other), null).head();
+        return manager.invoke("_npi_minimum", new NDList(array, other), null).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -629,7 +629,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("axis", axis);
         params.addParam("keepdims", keepDims);
         params.add("mode", mode);
-        return manager.invoke("pick", new NDList(array, index), params).head();
+        return manager.invoke("pick", new NDList(array, index), params).singletonOrThrow();
     }
     /** {@inheritDoc} */
     @Override

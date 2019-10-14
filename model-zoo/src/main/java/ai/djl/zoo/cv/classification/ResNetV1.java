@@ -141,7 +141,7 @@ public final class ResNetV1 {
                 list -> {
                     NDList unit = list.get(0);
                     NDList parallel = list.get(1);
-                    return new NDList(unit.head().add(parallel.head()));
+                    return new NDList(unit.singletonOrThrow().add(parallel.singletonOrThrow()));
                 },
                 Arrays.asList(resUnit, shortcut));
     }
@@ -184,7 +184,7 @@ public final class ResNetV1 {
                                     arrays ->
                                             new NDList(
                                                     Pool.maxPool(
-                                                            arrays.head(),
+                                                            arrays.singletonOrThrow(),
                                                             new Shape(3, 3),
                                                             new Shape(2, 2),
                                                             new Shape(1, 1)))));
@@ -214,7 +214,7 @@ public final class ResNetV1 {
         return resNet.add(new LambdaBlock(arrays -> new NDList(Pool.globalAvgPool(arrays.head()))))
                 .add(Blocks.flattenBlock())
                 .add(new Linear.Builder().setOutChannels(builder.outSize).build())
-                .add(new LambdaBlock(arrays -> new NDList(arrays.head().softmax(0))));
+                .add(new LambdaBlock(arrays -> new NDList(arrays.singletonOrThrow().softmax(0))));
     }
 
     public static final class Builder {

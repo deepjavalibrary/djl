@@ -60,7 +60,8 @@ public class SymbolBlockTest {
 
             Block block = model.getBlock();
             NDArray arr = manager.ones(new Shape(1, 28, 28));
-            Shape shape = block.forward(parameterStore, new NDList(arr)).head().getShape();
+            Shape shape =
+                    block.forward(parameterStore, new NDList(arr)).singletonOrThrow().getShape();
             Assert.assertEquals(new Shape(1, 10), shape);
         }
     }
@@ -170,7 +171,7 @@ public class SymbolBlockTest {
         NDArray label = manager.arange(0, 10);
         NDArray pred;
         try (GradientCollector gradCol = new MxGradientCollector()) {
-            pred = trainer.forward(new NDList(data)).head();
+            pred = trainer.forward(new NDList(data)).singletonOrThrow();
             NDArray loss = Loss.softmaxCrossEntropyLoss().getLoss(label, pred);
             gradCol.backward(loss);
         }

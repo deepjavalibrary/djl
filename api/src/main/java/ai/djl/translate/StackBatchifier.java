@@ -47,7 +47,7 @@ public class StackBatchifier implements Batchifier {
         NDList result = new NDList(size);
         for (NDList list : dataList) {
             NDArray stacked = NDArrays.stack(list);
-            stacked.getDataDescriptor().setName(list.get(0).getDataDescriptor().getName());
+            stacked.getDataDescriptor().setName(list.head().getDataDescriptor().getName());
             result.add(stacked);
             // close the intermediate NDArray
             list.close();
@@ -61,7 +61,7 @@ public class StackBatchifier implements Batchifier {
         if (inputs.size() == 0) {
             return new NDList[0];
         }
-        int size = Math.toIntExact(inputs.get(0).size(0));
+        int size = Math.toIntExact(inputs.head().size(0));
         if (size == 0) {
             return new NDList[0];
         }
