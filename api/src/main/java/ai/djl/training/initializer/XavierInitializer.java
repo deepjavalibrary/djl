@@ -13,7 +13,6 @@
 
 package ai.djl.training.initializer;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -73,7 +72,7 @@ public class XavierInitializer implements Initializer {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray initialize(NDManager manager, Shape shape, DataType dataType, Device device) {
+    public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
 
         double hwScale;
         long dimension = shape.dimension();
@@ -110,9 +109,9 @@ public class XavierInitializer implements Initializer {
 
         switch (randomType) {
             case UNIFORM:
-                return manager.randomUniform(-scale, scale, shape, dataType, device);
+                return manager.randomUniform(-scale, scale, shape, dataType, manager.getDevice());
             case GAUSSIAN:
-                return manager.randomNormal(0, scale, shape, dataType, device);
+                return manager.randomNormal(0, scale, shape, dataType, manager.getDevice());
             default:
                 throw new IllegalArgumentException("Invalid randomType");
         }

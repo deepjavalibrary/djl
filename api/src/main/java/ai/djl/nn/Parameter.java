@@ -12,7 +12,6 @@
  */
 package ai.djl.nn;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -94,8 +93,7 @@ public class Parameter implements AutoCloseable {
         }
     }
 
-    public void initialize(
-            NDManager manager, DataType dataType, Shape[] inputShapes, Device[] devices) {
+    public void initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
         Objects.requireNonNull(initializer, "No initializer has been set");
         if (!isInitialized()) {
             Shape shape = block.getParameterShape(name, inputShapes);
@@ -103,8 +101,7 @@ public class Parameter implements AutoCloseable {
                     initializer.initialize(
                             manager,
                             shape,
-                            mandatoryDataType == null ? dataType : mandatoryDataType,
-                            devices[0]);
+                            mandatoryDataType == null ? dataType : mandatoryDataType);
         }
 
         if (requireGradient()) {

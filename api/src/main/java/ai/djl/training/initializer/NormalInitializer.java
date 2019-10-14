@@ -13,7 +13,6 @@
 
 package ai.djl.training.initializer;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -42,7 +41,7 @@ public class NormalInitializer implements Initializer {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray initialize(NDManager manager, Shape shape, DataType dataType, Device device) {
-        return manager.randomNormal(0.0, sigma, shape, dataType, device);
+    public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
+        return manager.randomNormal(0.0, sigma, shape, dataType, manager.getDevice());
     }
 }

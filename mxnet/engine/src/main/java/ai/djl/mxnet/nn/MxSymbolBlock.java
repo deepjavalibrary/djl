@@ -90,7 +90,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
             beforeInitialize(inputShapes);
             for (Parameter parameter : params) {
                 if (!inputNames.contains(parameter.getName())) {
-                    parameter.initialize(manager, dataType, inputShapes, devices);
+                    parameter.initialize(manager, dataType, inputShapes);
                 }
             }
             initialized = true;

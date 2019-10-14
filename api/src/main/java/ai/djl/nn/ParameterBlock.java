@@ -19,13 +19,14 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 
 public abstract class ParameterBlock extends AbstractBlock {
+
     @Override
     public Shape[] initialize(
             NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes) {
         if (!initialized) {
             beforeInitialize(inputShapes);
             for (Parameter parameter : getDirectParameters()) {
-                parameter.initialize(manager, dataType, inputShapes, devices);
+                parameter.initialize(manager, dataType, inputShapes);
             }
             initialized = true;
         }
