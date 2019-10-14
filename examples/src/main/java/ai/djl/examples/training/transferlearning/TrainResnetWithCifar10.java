@@ -39,6 +39,7 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
 import ai.djl.translate.Pipeline;
 import ai.djl.zoo.ModelNotFoundException;
 import ai.djl.zoo.cv.classification.ResNetV1;
@@ -108,11 +109,20 @@ public final class TrainResnetWithCifar10 {
     public static void trainResNetV1(Model model, Arguments arguments) throws IOException {
         int batchSize = arguments.getBatchSize();
         int numGpus = arguments.getNumGpus();
-
+        MultiFactorTracker lrTracker =
+                LearningRateTracker.multiFactorTracker()
+                        .setSteps(new int[] {1000, 3000, 8000})
+                        .optBaseLearningRate(0.01f)
+                        .optFactor(0.1f)
+                        .optWarmUpBeginLearningRate(1e-3f)
+                        .optWarmUpSteps(300)
+                        .build();
         Optimizer optimizer =
                 Optimizer.sgd()
                         .setRescaleGrad(1.0f / batchSize)
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.01f))
+                        .setLearningRateTracker(lrTracker)
+                        .optMomentum(0.9f)
+                        .optWeightDecays(0.001f)
                         .optClipGrad(1f)
                         .build();
         Pipeline pipeline = new Pipeline(new ToTensor());
@@ -137,7 +147,11 @@ public final class TrainResnetWithCifar10 {
         Accuracy acc = new Accuracy();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(new XavierInitializer())
+                new DefaultTrainingConfig(
+                                new XavierInitializer(
+                                        XavierInitializer.RandomType.UNIFORM,
+                                        XavierInitializer.FactorType.AVG,
+                                        2))
                         .setOptimizer(optimizer)
                         .setDevices(devices)
                         .setLoss(Loss.softmaxCrossEntropyLoss())

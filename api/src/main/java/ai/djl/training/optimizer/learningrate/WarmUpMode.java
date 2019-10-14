@@ -12,7 +12,7 @@
  */
 package ai.djl.training.optimizer.learningrate;
 
-public enum WarmupMode {
+public enum WarmUpMode {
     LINEAR,
     CONSTANT
 }

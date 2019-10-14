@@ -49,6 +49,9 @@ public class Adam extends Optimizer {
         float newLearningRate = (float) (learningRate * Math.sqrt(coef2) / coef1);
 
         float weightDecay = getWeightDecay(parameterId);
+        if (Float.isNaN(newLearningRate) || Float.isNaN(weightDecay)) {
+            throw new IllegalStateException("learning rate or weight decay is nan");
+        }
         NDList inputs =
                 new NDList(
                         weight,

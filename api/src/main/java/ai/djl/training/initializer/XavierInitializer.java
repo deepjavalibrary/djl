@@ -37,13 +37,13 @@ import ai.djl.ndarray.types.Shape;
  */
 public class XavierInitializer implements Initializer {
     /** Enum for different types of random distributions. */
-    enum RandomType {
+    public enum RandomType {
         UNIFORM,
         GAUSSIAN
     }
 
     /** Enum for different types of factor type. */
-    enum FactorType {
+    public enum FactorType {
         AVG,
         IN,
         OUT
@@ -104,7 +104,10 @@ public class XavierInitializer implements Initializer {
                 throw new IllegalArgumentException(
                         "Invalid factor type, valid types are: avg, in, out");
         }
-
+        if (factor == 0f) {
+            throw new IllegalStateException(
+                    "Xavier initializer factor is 0, please check your input shape.");
+        }
         double scale = StrictMath.sqrt(magnitude / factor);
 
         switch (randomType) {

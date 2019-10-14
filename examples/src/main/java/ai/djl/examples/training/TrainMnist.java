@@ -37,6 +37,7 @@ import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.training.optimizer.learningrate.FactorTracker;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
@@ -68,10 +69,21 @@ public final class TrainMnist {
         int batchSize = arguments.getBatchSize();
         int numGpus = arguments.getNumGpus();
         Block block = constructBlock();
+        FactorTracker factorTracker =
+                LearningRateTracker.factorTracker()
+                        .optBaseLearningRate(0.01f)
+                        .setStep(1000)
+                        .optFactor(0.1f)
+                        .optWarmUpBeginLearningRate(0.001f)
+                        .optWarmUpSteps(200)
+                        .optStopFactorLearningRate(1e-4f)
+                        .build();
         Optimizer optimizer =
                 Optimizer.sgd()
                         .setRescaleGrad(1.0f / batchSize)
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
+                        .setLearningRateTracker(factorTracker)
+                        .optWeightDecays(0.001f)
+                        .optMomentum(0.9f)
                         .build();
 
         Device[] devices;

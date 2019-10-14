@@ -14,12 +14,24 @@ package ai.djl.training.optimizer.learningrate;
 
 class FixedLearningRate extends LearningRateTracker {
 
-    public FixedLearningRate(float baseLearningRate) {
-        super(baseLearningRate, 0, baseLearningRate, WarmupMode.CONSTANT);
+    public FixedLearningRate(Builder builder) {
+        super(builder);
     }
 
     @Override
     public float getNewLearningRate(int numUpdate) {
         return baseLearningRate;
+    }
+
+    public static final class Builder extends LrBaseBuilder<Builder> {
+
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        public FixedLearningRate build() {
+            return new FixedLearningRate(this);
+        }
     }
 }

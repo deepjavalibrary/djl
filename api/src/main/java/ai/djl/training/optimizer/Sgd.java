@@ -42,7 +42,6 @@ public class Sgd extends Optimizer {
         float weightDecay = getWeightDecay(parameterId);
         float learningRate = learningRateTracker.getNewLearningRate(updateCount(parameterId));
         NDList inputs;
-        // TODO: check momentum correctness
         if (momentum != 0f) {
             inputs =
                     new NDList(

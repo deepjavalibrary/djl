@@ -174,7 +174,6 @@ public class MxNDArray extends NativeResource implements NDArray {
      *     same graph. By default the computation history is cleared.
      */
     public void backward(boolean retainGraph) {
-
         JnaUtils.autogradBackward(new NDList(this), retainGraph ? 1 : 0);
     }
 

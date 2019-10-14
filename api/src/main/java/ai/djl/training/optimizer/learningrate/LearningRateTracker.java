@@ -14,48 +14,103 @@ package ai.djl.training.optimizer.learningrate;
 
 public abstract class LearningRateTracker {
 
-    // TODO: Add abstraction on Joule level
     float baseLearningRate;
-    int warmupSteps;
-    float warmupBeginLearningRate;
-    float warmupFinalLearningRate;
-    WarmupMode warmupMode;
+    int warmUpSteps;
+    float warmUpBeginLearningRate;
+    float warmUpFinalLearningRate;
+    WarmUpMode warmUpMode;
 
     /**
      * A tracker returns a new learning rate based on the number of updates that have been
      * performed.
      *
-     * @param baseLearningRate The initial learning rate
-     * @param warmupSteps number of warmup steps used before this scheduler starts decay
-     * @param warmupBeginLearningRate if using warmup, the learning rate from which it starts
-     *     warming up
-     * @param warmupMode warmup can be done in two modes. 'linear' mode gradually increases lr with
-     *     each step in equal increments 'constant' mode keeps lr at warmup_begin_lr for
-     *     warmup_steps
+     * @param builder Builder thant configure learning rate options
      */
-    LearningRateTracker(
-            float baseLearningRate,
-            int warmupSteps,
-            float warmupBeginLearningRate,
-            WarmupMode warmupMode) {
-        this.baseLearningRate = baseLearningRate;
-        this.warmupSteps = warmupSteps;
-        this.warmupBeginLearningRate = warmupBeginLearningRate;
-        this.warmupMode = warmupMode;
-        this.warmupFinalLearningRate = baseLearningRate;
+    LearningRateTracker(LrBaseBuilder<?> builder) {
+        this.baseLearningRate = builder.getBaseLearningRate();
+        this.warmUpSteps = builder.getWarmUpSteps();
+        this.warmUpBeginLearningRate = builder.getWarmUpBeginLearningRate();
+        this.warmUpMode = builder.getWarmUpMode();
+        this.warmUpFinalLearningRate = baseLearningRate;
     }
 
-    float getWarmupLearningRate(int numUpdate) {
-        if (warmupMode == WarmupMode.LINEAR) {
-            return warmupBeginLearningRate
-                    + (warmupFinalLearningRate - warmupBeginLearningRate) * numUpdate / warmupSteps;
+    float getWarmUpLearningRate(int numUpdate) {
+        float learningRate = warmUpBeginLearningRate;
+        if (warmUpMode == WarmUpMode.LINEAR) {
+            learningRate =
+                    warmUpBeginLearningRate
+                            + (warmUpFinalLearningRate - warmUpBeginLearningRate)
+                                    * numUpdate
+                                    / warmUpSteps;
         }
-        return warmupBeginLearningRate;
+        checkLearningRate(learningRate);
+        return learningRate;
     }
 
     public abstract float getNewLearningRate(int numUpdate);
 
-    public static LearningRateTracker fixedLearningRate(float learningRate) {
-        return new FixedLearningRate(learningRate);
+    void checkLearningRate(float learningRate) {
+        if (Float.isNaN(learningRate)) {
+            throw new IllegalStateException("Warm up learning rate is Nan.");
+        }
+    }
+
+    public static FactorTracker.Builder factorTracker() {
+        return new FactorTracker.Builder();
+    }
+
+    public static MultiFactorTracker.Builder multiFactorTracker() {
+        return new MultiFactorTracker.Builder();
+    }
+
+    public static FixedLearningRate fixedLearningRate(float learningRate) {
+        return new FixedLearningRate.Builder().optBaseLearningRate(learningRate).build();
+    }
+
+    @SuppressWarnings("rawtypes")
+    public abstract static class LrBaseBuilder<T extends LrBaseBuilder> {
+
+        float baseLearningRate = 0.01f;
+        int warmUpSteps;
+        float warmUpBeginLearningRate;
+        WarmUpMode warmUpMode = WarmUpMode.LINEAR;
+
+        public T optBaseLearningRate(float baseLearningRate) {
+            this.baseLearningRate = baseLearningRate;
+            return self();
+        }
+
+        public T optWarmUpSteps(int warmUpSteps) {
+            this.warmUpSteps = warmUpSteps;
+            return self();
+        }
+
+        public T optWarmUpBeginLearningRate(float warmUpBeginLearningRate) {
+            this.warmUpBeginLearningRate = warmUpBeginLearningRate;
+            return self();
+        }
+
+        public T optWarmUpMode(WarmUpMode warmUpMode) {
+            this.warmUpMode = warmUpMode;
+            return self();
+        }
+
+        public float getBaseLearningRate() {
+            return baseLearningRate;
+        }
+
+        public int getWarmUpSteps() {
+            return warmUpSteps;
+        }
+
+        public float getWarmUpBeginLearningRate() {
+            return warmUpBeginLearningRate;
+        }
+
+        public WarmUpMode getWarmUpMode() {
+            return warmUpMode;
+        }
+
+        protected abstract T self();
     }
 }

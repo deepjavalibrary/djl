@@ -89,10 +89,16 @@ public class OptimizerTest {
 
                 NDArray result = runOptimizer(manager, trainer, block);
                 NDArray result2 = runOptimizer(manager, trainer, block);
+                NDArray result3 = runOptimizer(manager, trainer, block);
+                for (int i = 0; i < 9; i++) {
+                    result3 = runOptimizer(manager, trainer, block);
+                }
                 // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(result, manager.create(new float[] {0.68f, -0.16f}));
                 Assertions.assertAlmostEquals(
                         result2, manager.create(new float[] {0.2032f, -0.3984f}));
+                Assertions.assertAlmostEquals(
+                        result3, manager.create(new float[] {0.04637566f, -0.4768118f}));
             }
         }
     }
