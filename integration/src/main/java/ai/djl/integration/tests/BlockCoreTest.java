@@ -22,7 +22,10 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.LambdaBlock;
+import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.Parameter;
+import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv1D;
 import ai.djl.nn.convolutional.Conv2D;
 import ai.djl.nn.convolutional.Conv3D;
@@ -447,6 +450,84 @@ public class BlockCoreTest {
                 NDList outputs = trainer.forward(new NDList(input));
                 NDArray out = outputs.get(0);
                 Assertions.assertAlmostEquals(out, manager.ones(new Shape(1, 2, 4)));
+
+                testEncode(manager, block);
+            }
+        }
+    }
+
+    @Test
+    public void testSequentialBlock() throws IOException {
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        SequentialBlock block = new SequentialBlock();
+        block.add(x -> new NDList(x.head().mul(6.5f)));
+        block.add(new Linear.Builder().setOutChannels(10).build());
+        block.add(new Linear.Builder().setOutChannels(5).build());
+
+        Assert.assertEquals(block.getChildren().size(), 3);
+        Assert.assertEquals(block.getDirectParameters().size(), 0);
+        Assert.assertEquals(block.getParameters().size(), 4);
+
+        block.addAll(
+                Arrays.asList(
+                        new Linear.Builder().setOutChannels(3).build(),
+                        new LambdaBlock(x -> new NDList(x.head().div(2f)))));
+        Assert.assertEquals(block.getChildren().size(), 5);
+        Assert.assertEquals(block.getParameters().size(), 6);
+
+        block.removeLastBlock();
+        Assert.assertEquals(block.getChildren().size(), 4);
+
+        try (Model model = Model.newInstance()) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 3);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+                NDManager manager = trainer.getManager();
+                NDArray input = manager.ones(new Shape(1, 3));
+                NDArray result = trainer.forward(new NDList(input)).head();
+                Assertions.assertAlmostEquals(
+                        result, manager.create(new float[] {975, 975, 975}, new Shape(1, 3)));
+
+                testEncode(manager, block);
+            }
+        }
+    }
+
+    @Test
+    public void testParallelBlock() throws IOException {
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        ParallelBlock block =
+                new ParallelBlock(
+                        list ->
+                                new NDList(
+                                        list.get(0).head(),
+                                        list.get(1).head(),
+                                        list.get(2).head()));
+        block.add(new Linear.Builder().setOutChannels(3).build());
+        block.add(x -> new NDList(x.head().sum()));
+        block.add(new Linear.Builder().setOutChannels(2).build());
+
+        Assert.assertEquals(block.getChildren().size(), 3);
+        Assert.assertEquals(block.getDirectParameters().size(), 0);
+        Assert.assertEquals(block.getParameters().size(), 4);
+
+        try (Model model = Model.newInstance()) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 3);
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+                NDManager manager = trainer.getManager();
+                NDArray input = manager.ones(new Shape(1, 3));
+
+                NDList result = trainer.forward(new NDList(input));
+                Assertions.assertAlmostEquals(
+                        result.head(), manager.create(new float[] {3, 3, 3}, new Shape(1, 3)));
+                Assertions.assertAlmostEquals(result.get(1), manager.create(3));
+                Assertions.assertAlmostEquals(
+                        result.get(2), manager.create(new float[] {3, 3}, new Shape(1, 2)));
 
                 testEncode(manager, block);
             }
