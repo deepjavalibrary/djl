@@ -17,16 +17,14 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Parameter;
-import ai.djl.util.Pair;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ParameterStore {
 
     private NDManager manager;
-    private Map<String, Pair<Boolean, List<NDArray>>> parameterMap;
+    private Map<String, ParameterData> parameterMap;
     private Map<Device, Integer> deviceMap;
     private boolean copy;
     private ParameterServer parameterServer;
@@ -49,23 +47,22 @@ public class ParameterStore {
 
     public void updateAllParameters() {
         int priority = 0;
-        for (Map.Entry<String, Pair<Boolean, List<NDArray>>> entry : parameterMap.entrySet()) {
+        for (Map.Entry<String, ParameterData> entry : parameterMap.entrySet()) {
             String parameterId = entry.getKey();
-            Pair<Boolean, List<NDArray>> pair = entry.getValue();
-            if (pair.getKey()) {
-                NDArray[] grads =
-                        pair.getValue().stream().map(NDArray::getGradient).toArray(NDArray[]::new);
+            ParameterData data = entry.getValue();
+            if (data.requireGradient()) {
+                NDArray[] grads = data.stream().map(NDArray::getGradient).toArray(NDArray[]::new);
                 parameterServer.push(parameterId, grads, -priority);
                 ++priority;
             }
         }
 
         priority = 0;
-        for (Map.Entry<String, Pair<Boolean, List<NDArray>>> entry : parameterMap.entrySet()) {
+        for (Map.Entry<String, ParameterData> entry : parameterMap.entrySet()) {
             String parameterId = entry.getKey();
-            Pair<Boolean, List<NDArray>> pair = entry.getValue();
-            if (pair.getKey()) {
-                NDArray[] values = pair.getValue().toArray(new NDArray[0]);
+            ParameterData data = entry.getValue();
+            if (data.requireGradient) {
+                NDArray[] values = data.toArray(new NDArray[0]);
                 parameterServer.pull(parameterId, values, -priority);
                 ++priority;
             }
@@ -75,15 +72,11 @@ public class ParameterStore {
     public synchronized NDArray getValue(Parameter parameter, Device device) {
         String parameterId = parameter.getId();
         int index = deviceMap.get(device);
-        Pair<Boolean, List<NDArray>> pair = parameterMap.get(parameterId);
-        if (pair == null) {
-            boolean requireGradient = parameter.requireGradient();
-            pair = new Pair<>(requireGradient, new ArrayList<>());
-            parameterMap.put(parameterId, pair);
-        }
+        ParameterData data =
+                parameterMap.computeIfAbsent(
+                        parameterId, k -> new ParameterData(parameter.requireGradient()));
 
-        List<NDArray> list = pair.getValue();
-        if (list.isEmpty()) {
+        if (data.isEmpty()) {
             NDArray array = parameter.getArray();
             if (parameterServer != null) {
                 NDArray[] arrays = new NDArray[deviceMap.size()];
@@ -97,17 +90,32 @@ public class ParameterStore {
                         arrays[i].attach(manager);
                     }
                     parameterServer.init(parameterId, arrays);
-                    list.add(arrays[i]);
+                    data.add(arrays[i]);
                 }
             } else {
                 if (copy || !array.getDevice().equals(device)) {
                     array = array.asInDevice(device, true);
                     array.attach(manager);
                 }
-                list.add(array);
+                data.add(array);
             }
         }
 
-        return list.get(index);
+        return data.get(index);
+    }
+
+    private static final class ParameterData extends ArrayList<NDArray> {
+
+        private static final long serialVersionUID = 1L;
+
+        private boolean requireGradient;
+
+        public ParameterData(boolean requireGradient) {
+            this.requireGradient = requireGradient;
+        }
+
+        public boolean requireGradient() {
+            return requireGradient;
+        }
     }
 }
