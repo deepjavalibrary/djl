@@ -21,7 +21,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -123,16 +122,6 @@ public class TfNDManager implements NDManager, AutoCloseable {
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
         return null;
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList load(Path path) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void save(Path path, NDList ndList) {}
 
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {

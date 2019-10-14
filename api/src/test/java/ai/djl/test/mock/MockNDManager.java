@@ -21,7 +21,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
 
 public class MockNDManager implements NDManager {
 
@@ -46,14 +45,6 @@ public class MockNDManager implements NDManager {
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
         return null;
     }
-
-    @Override
-    public NDList load(Path path) {
-        return null;
-    }
-
-    @Override
-    public void save(Path path, NDList ndList) {}
 
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {

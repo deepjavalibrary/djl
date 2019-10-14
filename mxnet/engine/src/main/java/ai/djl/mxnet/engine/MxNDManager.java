@@ -26,7 +26,6 @@ import java.lang.ref.WeakReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -144,18 +143,6 @@ public class MxNDManager implements NDManager {
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, indicesNd, 0);
         return sparse;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList load(Path path) {
-        return JnaUtils.loadNdArray(this, path);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void save(Path path, NDList ndList) {
-        JnaUtils.saveNdArray(path, ndList);
     }
 
     /** {@inheritDoc} */

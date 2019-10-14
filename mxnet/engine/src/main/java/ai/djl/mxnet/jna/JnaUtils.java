@@ -26,7 +26,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.Parameter;
-import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -42,10 +41,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.StreamSupport;
 
 public final class JnaUtils {
 
@@ -386,23 +383,6 @@ public final class JnaUtils {
         return ndList;
     }
 
-    public static void saveNdArray(Path path, NDList ndList) {
-
-        boolean namesProvided =
-                StreamSupport.stream(ndList.spliterator(), false)
-                        .map(Pair::getKey)
-                        .allMatch(Objects::nonNull);
-
-        String[] names =
-                StreamSupport.stream(ndList.spliterator(), false)
-                        .map(Pair::getKey)
-                        .toArray(String[]::new);
-        if (!namesProvided) {
-            names = null;
-        }
-        checkCall(LIB.MXNDArraySave(path.toString(), ndList.size(), toPointerArray(ndList), names));
-    }
-
     /* Need tests
     public static ByteBuffer readBytes(Pointer ndArray) {
         NativeSizeByReference size = new NativeSizeByReference();
@@ -429,7 +409,7 @@ public final class JnaUtils {
     public static void waitAll() {
         checkCall(LIB.MXNDArrayWaitAll());
     }
-     */
+    */
 
     public static void syncCopyToCPU(Pointer ndArray, Pointer data, int len) {
         NativeSize size = new NativeSize(len);
@@ -536,21 +516,8 @@ public final class JnaUtils {
         checkCall(LIB.MXNDArrayGetGrad(ndArray, ref));
         return ref.getValue();
     }
-     */
 
-    public static Pointer ndArrayAt(Pointer ndArray, int index) {
-        PointerByReference ref = new PointerByReference();
-        checkCall(LIB.MXNDArrayAt(ndArray, index, ref));
-        return ref.getValue();
-    }
-
-    public static Pointer slice(Pointer ndArray, int begin, int end) {
-        PointerByReference ref = new PointerByReference();
-        checkCall(LIB.MXNDArraySlice(ndArray, begin, end, ref));
-        return ref.getValue();
-    }
-
-    /* public static Pointer reshape(Pointer ndArray, long[] dims, boolean reverse) {
+    public static Pointer reshape(Pointer ndArray, long[] dims, boolean reverse) {
         PointerByReference ref = new PointerByReference();
         byte reverseByte = reverse ? (byte) 1 : 0;
         checkCall(
@@ -594,7 +561,6 @@ public final class JnaUtils {
     }
 
     public static void autogradBackward(NDList array, int retainGraph) {
-
         checkCall(
                 LIB.MXAutogradBackward(
                         array.size(),
@@ -658,17 +624,8 @@ public final class JnaUtils {
         checkCall(LIB.MXKVStoreFree(handle));
     }
 
-    public static void parameterStoreInit(Pointer handle, int num, int[] keys, NDList vals) {
-        checkCall((LIB.MXKVStoreInit(handle, num, keys, toPointerArray(vals))));
-    }
-
     public static void parameterStoreInit(Pointer handle, int num, String[] keys, NDList vals) {
         checkCall(LIB.MXKVStoreInitEx(handle, num, keys, toPointerArray(vals)));
-    }
-
-    public static void parameterStorePush(
-            Pointer handle, int num, int[] keys, NDList vals, int priority) {
-        checkCall(LIB.MXKVStorePush(handle, num, keys, toPointerArray(vals), priority));
     }
 
     public static void parameterStorePush(
@@ -1058,7 +1015,6 @@ public final class JnaUtils {
     }
 
     public static List<List<Shape>> inferShape(Symbol symbol, PairList<String, Shape> args) {
-
         Pointer handler = symbol.getHandle();
         int numArgs = args.size();
         String[] keys = args.keys().toArray(new String[0]);
