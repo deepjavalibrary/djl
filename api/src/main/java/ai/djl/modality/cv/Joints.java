@@ -26,6 +26,11 @@ public class Joints {
         return joints;
     }
 
+    @Override
+    public String toString() {
+        return joints.toString();
+    }
+
     public static class Joint extends Point {
         private double confidence;
 
