@@ -38,9 +38,10 @@ public class ActionRecognitionModelLoader
     @Override
     public Translator<BufferedImage, Classification> getTranslator() {
         return new ImageClassificationTranslator.Builder()
-                .optCenterCrop(299, 299) // 299 is the minimum length for inception, 224 for vgg
+                .optResize(299, 299) // 299 is the minimum length for inception, 224 for vgg
                 .optNormalize(
                         new float[] {0.485f, 0.456f, 0.406f}, new float[] {0.229f, 0.224f, 0.225f})
+                .setSynsetArtifactName("classes.txt")
                 .build();
     }
 }
