@@ -13,6 +13,7 @@
 package ai.djl.integration.tests.model_zoo.classification;
 
 import ai.djl.Model;
+import ai.djl.inference.Predictor;
 import ai.djl.integration.util.Assertions;
 import ai.djl.modality.Classification;
 import ai.djl.ndarray.NDArray;
@@ -33,6 +34,9 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Nag;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorContext;
 import ai.djl.util.PairList;
 import ai.djl.zoo.ModelNotFoundException;
 import ai.djl.zoo.ZooModel;
@@ -40,6 +44,8 @@ import ai.djl.zoo.cv.classification.ResNetModelLoader;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
@@ -95,16 +101,19 @@ public class ResnetTest {
     }
 
     @Test
-    public void testLoad() throws IOException, ModelNotFoundException {
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("numLayers", "50");
-        criteria.put("dataset", "cifar10");
-        // TODO: Train real model zoo models and convert this test to use instead of sample model
-        //        try (ZooModel<BufferedImage, List<Classification>> model =
-        //                ModelZoo.RESNET.loadModel(criteria)) {
-        try (ZooModel<BufferedImage, Classification> model =
-                new ResNetModelLoader(Repository.newInstance("test", "src/main/resources/repo"))
-                        .loadModel(criteria)) {
+    public void testLoadPredict() throws IOException, ModelNotFoundException, TranslateException {
+        try (ZooModel<BufferedImage, Classification> model = getModel()) {
+            try (Predictor<NDList, NDList> predictor = model.newPredictor(new TestTranslator())) {
+                NDList input = new NDList(model.getNDManager().ones(new Shape(3, 32, 32)));
+                List<NDList> inputs = Collections.nCopies(16, input);
+                predictor.batchPredict(inputs);
+            }
+        }
+    }
+
+    @Test
+    public void testLoadTrain() throws IOException, ModelNotFoundException {
+        try (ZooModel<BufferedImage, Classification> model = getModel()) {
             TrainingConfig config =
                     new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.l1Loss());
             try (Trainer trainer = model.newTrainer(config)) {
@@ -121,6 +130,31 @@ public class ResnetTest {
                 Batch batch = new Batch(manager, new NDList(data), new NDList(label));
                 trainer.train(batch);
             }
+        }
+    }
+
+    private ZooModel<BufferedImage, Classification> getModel()
+            throws IOException, ModelNotFoundException {
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        criteria.put("numLayers", "50");
+        criteria.put("dataset", "cifar10");
+        // TODO: Train real model zoo models and convert this test to use instead of sample model
+        //        try (ZooModel<BufferedImage, List<Classification>> model =
+        //                ModelZoo.RESNET.loadModel(criteria)) {
+        return new ResNetModelLoader(Repository.newInstance("test", "src/main/resources/repo"))
+                .loadModel(criteria);
+    }
+
+    private static class TestTranslator implements Translator<NDList, NDList> {
+
+        @Override
+        public NDList processOutput(TranslatorContext ctx, NDList list) throws Exception {
+            return list;
+        }
+
+        @Override
+        public NDList processInput(TranslatorContext ctx, NDList input) throws Exception {
+            return input;
         }
     }
 }

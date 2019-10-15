@@ -136,6 +136,8 @@ public class Linear extends ParameterBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        os.write(inChannels.getEncoded());
+        os.write(inputShape.getEncoded());
         weight.save(os);
         if (bias != null) {
             bias.save(os);
@@ -148,6 +150,8 @@ public class Linear extends ParameterBlock {
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
+        inChannels = Shape.decode(is);
+        inputShape = Shape.decode(is);
         weight.load(manager, is);
         if (bias != null) {
             bias.load(manager, is);

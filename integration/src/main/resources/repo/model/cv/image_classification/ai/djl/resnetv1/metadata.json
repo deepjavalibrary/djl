@@ -14,7 +14,7 @@
   },
   "artifacts": [
     {
-      "version": "0.0.1",
+      "version": "0.0.2",
       "snapshot": false,
       "name": "resnetv1",
       "arguments": {
@@ -28,8 +28,8 @@
       },
       "files": {
         "parameters": {
-          "uri": "https://djl-ai.s3.amazonaws.com/other+resources/resnet-0000.params",
-          "sha1Hash": "603085970a3c4c5028cc7a85e7183ccfb449c853"
+          "uri": "https://djl-ai.s3.amazonaws.com/other+resources/2/resnet-0000.params",
+          "sha1Hash": "8ff0a042028632eb9d4541198ac96d70b381b32d"
         }
       }
     }

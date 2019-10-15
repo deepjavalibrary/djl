@@ -103,6 +103,7 @@ public class BatchNorm extends ParameterBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        os.writeLong(inChannels);
         runningMean.save(os);
         runningVar.save(os);
     }
@@ -113,6 +114,7 @@ public class BatchNorm extends ParameterBlock {
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
+        inChannels = is.readLong();
         runningMean.load(manager, is);
         runningVar.load(manager, is);
     }

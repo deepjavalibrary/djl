@@ -37,7 +37,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = ModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "resnetv1";
-    private static final String VERSION = "0.0.1";
+    private static final String VERSION = "0.0.2";
 
     public ResNetModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
