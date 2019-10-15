@@ -41,7 +41,9 @@ public class ParameterStore {
         this.parameterServer = parameterServer;
         deviceMap.clear();
         for (int i = 0; i < devices.length; ++i) {
-            deviceMap.put(devices[i], i);
+            if (deviceMap.put(devices[i], i) != null) {
+                throw new IllegalArgumentException("Duplicated devices are not allowed.");
+            }
         }
     }
 
