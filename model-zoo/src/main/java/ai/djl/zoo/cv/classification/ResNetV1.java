@@ -15,6 +15,7 @@ package ai.djl.zoo.cv.classification;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Blocks;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.SequentialBlock;
@@ -211,12 +212,7 @@ public final class ResNetV1 {
             }
         }
         return resNet.add(new LambdaBlock(arrays -> new NDList(Pool.globalAvgPool(arrays.head()))))
-                .add(
-                        new LambdaBlock(
-                                arrays -> {
-                                    long batch = arrays.head().getShape().get(0);
-                                    return new NDList(arrays.head().reshape(batch, -1));
-                                }))
+                .add(Blocks.flattenBlock())
                 .add(new Linear.Builder().setOutChannels(builder.outSize).build())
                 .add(new LambdaBlock(arrays -> new NDList(arrays.head().softmax(0))));
     }

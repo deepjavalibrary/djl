@@ -24,6 +24,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Blocks;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.Activation;
@@ -40,7 +41,6 @@ import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.FactorTracker;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Pipeline;
-import ai.djl.translate.Reshape;
 import java.io.IOException;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -105,7 +105,7 @@ public final class TrainMnist {
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
-            Pipeline pipeline = new Pipeline(new ToTensor()).add(new Reshape(batchSize, 28 * 28));
+            Pipeline pipeline = new Pipeline(new ToTensor());
 
             Mnist mnist =
                     new Mnist.Builder()
@@ -157,7 +157,6 @@ public final class TrainMnist {
                         for (int i = 0; i < numOfSlices; i++) {
                             NDArray data = split[i].getData().head();
                             NDList labels = split[i].getLabels();
-                            data = data.reshape(inputShape);
                             trainer.validate(new NDList(data), labels);
                         }
                         batch.close();
@@ -194,6 +193,7 @@ public final class TrainMnist {
 
     private static Block constructBlock() {
         return new SequentialBlock()
+                .add(Blocks.flattenBlock(28 * 28))
                 .add(new Linear.Builder().setOutChannels(128).build())
                 .add(Activation.reluBlock())
                 .add(new Linear.Builder().setOutChannels(64).build())
