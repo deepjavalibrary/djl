@@ -162,10 +162,11 @@ public class DataIterable implements Iterable<Batch> {
         }
 
         private Batch fetch(List<Long> indices) throws IOException {
+            NDManager subManager = manager.newSubManager();
             NDList[] data = new NDList[indices.size()];
             NDList[] labels = new NDList[indices.size()];
             for (int i = 0; i < indices.size(); i++) {
-                Record record = dataset.get(indices.get(i));
+                Record record = dataset.get(subManager, indices.get(i));
                 data[i] = record.getData();
                 labels[i] = record.getLabels();
             }
@@ -188,7 +189,7 @@ public class DataIterable implements Iterable<Batch> {
                 batchData = batchData.asInDevice(device, false);
                 batchLabels = batchLabels.asInDevice(device, false);
             }
-            return new Batch(manager, batchData, batchLabels);
+            return new Batch(subManager, batchData, batchLabels);
         }
 
         private void preFetch() {

@@ -34,7 +34,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     private static final String ARTIFACT_ID = "coco";
 
-    private NDManager manager;
     private Repository repository;
     private Artifact artifact;
     private Usage usage;
@@ -47,7 +46,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     public CocoDetection(Builder builder) {
         super(builder);
-        manager = builder.manager;
         repository = builder.repository;
         artifact = builder.artifact;
         usage = builder.usage;
@@ -92,7 +90,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     }
 
     @Override
-    public Record get(long index) throws IOException {
+    public Record get(NDManager manager, long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
                 new NDList(BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag));
@@ -124,7 +122,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         for (long id : imageIds) {
             Path imagePath = root.resolve(coco.getRelativeImagePath(id));
             List<double[]> labelOfImageId = getLabels(id);
-            if (imagePath != null && !labelOfImageId.isEmpty()) {
+            if (!labelOfImageId.isEmpty()) {
                 imagePaths.add(imagePath);
                 labels.add(labelOfImageId.toArray(new double[0][]));
             }
@@ -166,7 +164,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     @SuppressWarnings("rawtypes")
     public static final class Builder extends BaseBuilder<Builder> {
-        private NDManager manager;
+
         private Flag flag = NDImageUtils.Flag.COLOR;
         private Repository repository = Datasets.REPOSITORY;
         private Artifact artifact;
@@ -174,11 +172,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
         @Override
         public Builder self() {
-            return this;
-        }
-
-        public Builder setManager(NDManager manager) {
-            this.manager = manager;
             return this;
         }
 

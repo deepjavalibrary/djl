@@ -45,7 +45,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         this.device = builder.getDevice();
     }
 
-    public abstract Record get(long index) throws IOException;
+    public abstract Record get(NDManager manager, long index) throws IOException;
 
     @Override
     public Iterable<Batch> getData(NDManager manager) {

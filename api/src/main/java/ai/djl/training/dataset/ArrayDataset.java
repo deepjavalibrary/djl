@@ -14,6 +14,7 @@ package ai.djl.training.dataset;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import java.util.stream.Stream;
 
 /**
@@ -63,7 +64,7 @@ public class ArrayDataset extends RandomAccessDataset {
     }
 
     @Override
-    public Record get(long index) {
+    public Record get(NDManager manager, long index) {
         NDList datum = new NDList();
         NDList label = new NDList();
         for (NDArray array : data) {
@@ -74,6 +75,8 @@ public class ArrayDataset extends RandomAccessDataset {
                 label.add(array.get(index));
             }
         }
+        datum.attach(manager);
+        label.attach(manager);
         return new Record(datum, label);
     }
 

@@ -14,6 +14,7 @@ package ai.djl.mxnet.dataset;
 
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Record;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -29,7 +30,7 @@ public final class ImageFolder extends AbstractImageFolder {
     }
 
     @Override
-    public Record get(long index) throws IOException {
+    public Record get(NDManager manager, long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
                 new NDList(
@@ -37,11 +38,12 @@ public final class ImageFolder extends AbstractImageFolder {
                                 BufferedImageUtils.readFileToArray(
                                         manager, Paths.get(items.get(idx).getKey()), flag)));
         NDList l = new NDList(manager.create(items.get(idx).getValue()));
+        d.attach(manager);
         return new Record(d, l);
     }
 
     @Override
-    protected NDList readImage(String image) throws IOException {
+    protected NDList readImage(NDManager manager, String image) throws IOException {
         return new NDList(BufferedImageUtils.readFileToArray(manager, Paths.get(image), flag));
     }
 

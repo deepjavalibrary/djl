@@ -13,7 +13,6 @@
 package ai.djl.mxnet.dataset;
 
 import ai.djl.Model;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Repository;
 import ai.djl.training.Activation;
@@ -29,13 +28,13 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PikachuTest {
+
     @Test
     public void testPikachuLocal() throws IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/repo");
         PikachuDetection pikachu =
                 new PikachuDetection.Builder()
                         .setUsage(Dataset.Usage.TEST)
-                        .setManager(NDManager.newBaseManager())
                         .optRepository(repository)
                         .setRandomSampling(1)
                         .build();

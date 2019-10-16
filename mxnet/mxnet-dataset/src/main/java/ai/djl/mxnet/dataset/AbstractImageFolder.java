@@ -42,7 +42,6 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
             new HashSet<>(Arrays.asList(".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"));
     private static final Logger logger = LoggerFactory.getLogger(AbstractImageFolder.class);
 
-    protected NDManager manager;
     protected Flag flag;
     protected Transform resize;
     protected List<String> synsets;
@@ -50,7 +49,6 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
 
     public AbstractImageFolder(BaseBuilder<?> builder) {
         super(builder);
-        this.manager = builder.getManager();
         this.flag = builder.getFlag();
         this.resize = builder.getResize();
         this.synsets = new ArrayList<>();
@@ -58,9 +56,9 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     }
 
     @Override
-    public Record get(long index) throws IOException {
+    public Record get(NDManager manager, long index) throws IOException {
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
-        NDList d = resize.transform(readImage(item.getKey()));
+        NDList d = resize.transform(readImage(manager, item.getKey()));
         NDList l = new NDList(manager.create(item.getValue()));
         return new Record(d, l);
     }
@@ -144,7 +142,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         }
     }
 
-    protected abstract NDList readImage(String image) throws IOException;
+    protected abstract NDList readImage(NDManager manager, String image) throws IOException;
 
     private boolean isImage(String path) {
         int extensionIndex = path.lastIndexOf('.');
@@ -158,7 +156,6 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     public abstract static class BaseBuilder<T extends BaseBuilder>
             extends RandomAccessDataset.BaseBuilder<T> {
 
-        private NDManager manager;
         private Flag flag = NDImageUtils.Flag.COLOR;
         private Transform resize;
 
@@ -168,15 +165,6 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
 
         public T optFlag(Flag flag) {
             this.flag = flag;
-            return self();
-        }
-
-        public NDManager getManager() {
-            return manager;
-        }
-
-        public T setManager(NDManager manager) {
-            this.manager = manager;
             return self();
         }
 

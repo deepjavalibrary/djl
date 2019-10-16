@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PikachuDetection extends RandomAccessDataset implements ZooDataset {
+
     private static final String ARTIFACT_ID = "pikachu";
     private static final Gson GSON =
             new GsonBuilder()
@@ -46,7 +47,6 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
                     .setPrettyPrinting()
                     .create();
 
-    private NDManager manager;
     private Repository repository;
     private Artifact artifact;
     private Usage usage;
@@ -58,7 +58,6 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
 
     public PikachuDetection(Builder builder) {
         super(builder);
-        manager = builder.manager;
         repository = builder.repository;
         artifact = builder.artifact;
         usage = builder.usage;
@@ -144,7 +143,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     }
 
     @Override
-    public Record get(long index) throws IOException {
+    public Record get(NDManager manager, long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
                 new NDList(BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag));
@@ -158,16 +157,10 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         private Repository repository = Datasets.REPOSITORY;
         private Artifact artifact;
         private Usage usage;
-        private NDManager manager;
 
         @Override
         public Builder self() {
             return this;
-        }
-
-        public Builder setManager(NDManager manager) {
-            this.manager = manager;
-            return self();
         }
 
         public Builder setUsage(Usage usage) {

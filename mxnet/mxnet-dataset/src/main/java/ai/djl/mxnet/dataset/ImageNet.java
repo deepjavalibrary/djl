@@ -14,6 +14,7 @@ package ai.djl.mxnet.dataset;
 
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Repository;
 import ai.djl.repository.SimpleRepository;
 import ai.djl.util.PairList;
@@ -105,7 +106,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
     }
 
     @Override
-    protected NDList readImage(String image) throws IOException {
+    protected NDList readImage(NDManager manager, String image) throws IOException {
         Path imagePath = root.resolve(image);
         return new NDList(BufferedImageUtils.readFileToArray(manager, imagePath, flag));
     }

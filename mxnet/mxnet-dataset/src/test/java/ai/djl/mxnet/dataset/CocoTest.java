@@ -38,7 +38,6 @@ public class CocoTest {
             Repository repository = Repository.newInstance("test", "src/test/resources/repo");
             CocoDetection coco =
                     new CocoDetection.Builder()
-                            .setManager(model.getNDManager())
                             .setUsage(Dataset.Usage.TEST)
                             .optRepository(repository)
                             .setRandomSampling(1)

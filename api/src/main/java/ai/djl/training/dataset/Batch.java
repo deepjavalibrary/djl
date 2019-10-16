@@ -22,8 +22,8 @@ public class Batch implements AutoCloseable {
     private NDList data;
     private NDList labels;
 
-    public Batch(NDManager baseManager, NDList data, NDList labels) {
-        manager = baseManager.newSubManager();
+    public Batch(NDManager manager, NDList data, NDList labels) {
+        this.manager = manager;
         data.attach(manager);
         labels.attach(manager);
         this.data = data;
