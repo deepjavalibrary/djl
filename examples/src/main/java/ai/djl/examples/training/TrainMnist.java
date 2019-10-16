@@ -18,8 +18,6 @@ import ai.djl.examples.inference.util.LogUtils;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.mxnet.dataset.Mnist;
 import ai.djl.mxnet.dataset.transform.cv.ToTensor;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -28,7 +26,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.Activation;
 import ai.djl.training.DefaultTrainingConfig;
-import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
@@ -41,6 +38,7 @@ import ai.djl.training.optimizer.learningrate.FactorTracker;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
+import java.nio.file.Paths;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -133,33 +131,17 @@ public final class TrainMnist {
 
                 for (int epoch = 0; epoch < numEpoch; epoch++) {
                     for (Batch batch : trainer.iterateDataset(mnist)) {
-                        Batch[] split = batch.split(devices, false);
-
-                        try (GradientCollector gradCol = trainer.newGradientCollector()) {
-                            for (int i = 0; i < numOfSlices; i++) {
-                                // MNIST only has one input
-                                NDArray data = split[i].getData().head();
-                                NDList labels = split[i].getLabels();
-
-                                NDList preds = trainer.forward(new NDList(data));
-                                NDArray loss = trainer.loss(labels, preds);
-                                gradCol.backward(loss);
-                            }
-                        }
+                        trainer.train(batch);
                         trainer.step();
-
                         batch.close();
                     }
+
                     // Validation
                     for (Batch batch : trainer.iterateDataset(validateSet)) {
-                        Batch[] split = batch.split(devices, false);
-                        for (int i = 0; i < numOfSlices; i++) {
-                            NDArray data = split[i].getData().head();
-                            NDList labels = split[i].getLabels();
-                            trainer.validate(new NDList(data), labels);
-                        }
+                        trainer.validate(batch);
                         batch.close();
                     }
+
                     lossValue = trainer.getLoss();
                     float validationLoss = trainer.getValidationLoss();
                     trainAccuracy = trainer.getTrainingMetrics().get(0).getMetric().getValue();
@@ -178,6 +160,10 @@ public final class TrainMnist {
                     // reset loss and accuracy
                     trainer.resetTrainingMetrics();
                 }
+            }
+
+            if (arguments.getOutputDir() != null) {
+                model.save(Paths.get(arguments.getOutputDir()), "mnist");
             }
         }
     }

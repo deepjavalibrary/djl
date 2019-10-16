@@ -68,7 +68,8 @@ public class SymbolBlockTest {
     @Test
     public void trainWithNewParam() throws IOException {
         Path modelDir = prepareModel();
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
             model.getBlock().clear();
@@ -96,7 +97,8 @@ public class SymbolBlockTest {
     public void trainWithExistParam() throws IOException {
         Path modelDir = prepareModel();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
 
@@ -124,7 +126,8 @@ public class SymbolBlockTest {
     public void trainWithCustomLayer() throws IOException {
         Path modelDir = prepareModel();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
 
@@ -165,7 +168,6 @@ public class SymbolBlockTest {
 
         NDArray data = manager.ones(inputShape);
         NDArray label = manager.arange(0, 10);
-        NDArray gradMean;
         NDArray pred;
         try (GradientCollector gradCol = new MxGradientCollector()) {
             pred = trainer.forward(new NDList(data)).head();
@@ -179,7 +181,7 @@ public class SymbolBlockTest {
                                 stringParameterPair ->
                                         stringParameterPair.getValue().getArray().getGradient())
                         .collect(Collectors.toList());
-        gradMean =
+        NDArray gradMean =
                 NDArrays.stack(
                         new NDList(grads.stream().map(NDArray::mean).toArray(NDArray[]::new)));
         return new Pair<>(pred.mean(), gradMean);

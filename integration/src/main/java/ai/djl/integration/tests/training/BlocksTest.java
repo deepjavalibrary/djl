@@ -13,11 +13,13 @@
 package ai.djl.integration.tests.training;
 
 import ai.djl.Model;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
@@ -25,6 +27,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class BlocksTest {
+
     private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
     @Test
@@ -34,9 +37,12 @@ public class BlocksTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
-                NDList original = new NDList(manager.randomUniform(0, 255, new Shape(10, 28, 28)));
-                NDList actual = new NDList(original.head().reshape(10, 28 * 28));
-                Assert.assertEquals(actual, trainer.forward(original));
+                ParameterStore parameterStore = new ParameterStore(manager, false);
+
+                NDArray data = manager.randomUniform(0, 255, new Shape(10, 28, 28));
+                NDArray expected = data.reshape(10, 28 * 28);
+                NDArray result = model.getBlock().forward(parameterStore, new NDList(data)).head();
+                Assert.assertEquals(result, expected);
             }
         }
     }

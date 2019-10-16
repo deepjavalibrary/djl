@@ -25,9 +25,9 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.repository.Repository;
 import ai.djl.training.DefaultTrainingConfig;
-import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Nag;
@@ -56,7 +56,10 @@ public class ResnetTest {
                         .setMomentum(0.9f)
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(optimizer);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES)
+                        .setOptimizer(optimizer)
+                        .setLoss(Loss.softmaxCrossEntropyLoss());
 
         Block resNet50 =
                 new ResNetV1.Builder()
@@ -76,12 +79,9 @@ public class ResnetTest {
 
                 NDArray input = manager.ones(inputShape);
                 NDArray label = manager.ones(new Shape(100, 1));
+                Batch batch = new Batch(manager, new NDList(input), new NDList(label));
                 PairList<String, Parameter> parameters = resNet50.getParameters();
-                try (GradientCollector gradCol = trainer.newGradientCollector()) {
-                    NDArray pred = trainer.forward(new NDList(input)).head();
-                    NDArray loss = Loss.softmaxCrossEntropyLoss().getLoss(label, pred);
-                    gradCol.backward(loss);
-                }
+                trainer.train(batch);
                 trainer.step();
                 NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
                 NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(.8577);
@@ -105,12 +105,21 @@ public class ResnetTest {
         try (ZooModel<BufferedImage, Classification> model =
                 new ResNetModelLoader(Repository.newInstance("test", "src/main/resources/repo"))
                         .loadModel(criteria)) {
-            TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+            TrainingConfig config =
+                    new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.l1Loss());
             try (Trainer trainer = model.newTrainer(config)) {
-                NDList input = new NDList(model.getNDManager().ones(new Shape(16, 3, 32, 32)));
-                trainer.initialize(
-                        new DataDesc[] {new DataDesc(new Shape(16, 3, 32, 32), DataType.FLOAT32)});
-                trainer.forward(input);
+                Shape inputShape = new Shape(16, 3, 32, 32);
+
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape, DataType.FLOAT32)});
+
+                NDManager manager = trainer.getManager();
+                Shape[] outputShape =
+                        model.getBlock().getOutputShapes(manager, new Shape[] {inputShape});
+
+                NDArray data = manager.ones(new Shape(16, 3, 32, 32));
+                NDArray label = manager.ones(outputShape[0]);
+                Batch batch = new Batch(manager, new NDList(data), new NDList(label));
+                trainer.train(batch);
             }
         }
     }

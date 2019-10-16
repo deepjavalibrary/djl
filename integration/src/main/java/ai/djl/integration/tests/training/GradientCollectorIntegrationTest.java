@@ -16,14 +16,12 @@ import ai.djl.Model;
 import ai.djl.mxnet.engine.MxGradientCollector;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.DefaultTrainingConfig;
-import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.ArrayDataset;
@@ -102,14 +100,7 @@ public class GradientCollectorIntegrationTest {
                 for (int epoch = 0; epoch < epochs; epoch++) {
                     trainer.resetTrainingMetrics();
                     for (Batch batch : trainer.iterateDataset(dataset)) {
-                        try (GradientCollector gradCol = trainer.newGradientCollector()) {
-
-                            NDList x = batch.getData();
-                            NDList y = batch.getLabels();
-                            NDList yHat = trainer.forward(x);
-                            NDArray loss = trainer.loss(y, yHat);
-                            gradCol.backward(loss);
-                        }
+                        trainer.train(batch);
                         trainer.step();
                         batch.close();
                     }

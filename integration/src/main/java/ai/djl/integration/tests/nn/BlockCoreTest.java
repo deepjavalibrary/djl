@@ -67,13 +67,12 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
-
-                NDArray outBias = trainer.forward(new NDList(input)).head();
-                NDArray expectedBias =
-                        input.dot(manager.ones(new Shape(outSize, 2)).transpose())
+                NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
+                NDArray result = trainer.forward(new NDList(data)).head();
+                NDArray expected =
+                        data.dot(manager.ones(new Shape(outSize, 2)).transpose())
                                 .add(manager.zeros(new Shape(2, outSize)));
-                Assert.assertEquals(outBias, expectedBias);
+                Assert.assertEquals(result, expected);
 
                 testEncode(manager, block);
             }
@@ -88,11 +87,10 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
-
-                NDArray outNoBias = trainer.forward(new NDList(input)).head();
-                NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
-                Assert.assertEquals(outNoBias, expectedNoBias);
+                NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
+                NDArray result = trainer.forward(new NDList(data)).head();
+                NDArray expected = data.dot(manager.ones(new Shape(outSize, 2)).transpose());
+                Assert.assertEquals(result, expected);
 
                 testEncode(manager, block);
             }
@@ -116,13 +114,12 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
-
-                NDArray outBias = trainer.forward(new NDList(input)).head();
-                NDArray expectedBias =
-                        input.dot(manager.ones(new Shape(outSize, 2)).transpose())
+                NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
+                NDArray result = trainer.forward(new NDList(data)).head();
+                NDArray expected =
+                        data.dot(manager.ones(new Shape(outSize, 2)).transpose())
                                 .add(manager.zeros(new Shape(2, outSize)));
-                Assert.assertEquals(outBias, expectedBias);
+                Assert.assertEquals(result, expected);
 
                 testEncode(manager, block);
             }
@@ -140,11 +137,10 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
-
-                NDArray outNoBias = trainer.forward(new NDList(input)).head();
-                NDArray expectedNoBias = input.dot(manager.ones(new Shape(outSize, 2)).transpose());
-                Assert.assertEquals(outNoBias, expectedNoBias);
+                NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
+                NDArray result = trainer.forward(new NDList(data)).head();
+                NDArray expected = data.dot(manager.ones(new Shape(outSize, 2)).transpose());
+                Assert.assertEquals(result, expected);
 
                 testEncode(manager, block);
             }
@@ -164,11 +160,10 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
+                NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
                 NDArray expected = manager.create(new float[] {1, 2, 3, 4}, inputShape);
-
-                NDArray out = trainer.forward(new NDList(input)).head();
-                Assertions.assertAlmostEquals(out, expected);
+                NDArray result = trainer.forward(new NDList(data)).head();
+                Assertions.assertAlmostEquals(result, expected);
 
                 testEncode(manager, block);
             }
@@ -188,10 +183,9 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-
-                NDArray input = manager.create(new float[] {1, 2, 3, 4}, inputShape);
-                NDArray out = trainer.forward(new NDList(input)).head();
-                Assert.assertTrue(out.lte(out).all());
+                NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
+                NDArray result = trainer.forward(new NDList(data)).head();
+                Assert.assertTrue(result.lte(result).all());
 
                 testEncode(manager, block);
             }
@@ -248,12 +242,12 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input =
+                NDArray data =
                         manager.create(
                                 new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
                                 inputShape);
                 NDArray expected = manager.create(new float[] {61, 55, 44}, new Shape(1, 1, 3));
-                NDArray out = trainer.forward(new NDList(input)).get(0);
+                NDArray out = trainer.forward(new NDList(data)).get(0);
                 Assert.assertEquals(out, expected);
 
                 Shape[] outputShape = block.getOutputShapes(manager, new Shape[] {inputShape});
@@ -277,7 +271,7 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input =
+                NDArray data =
                         manager.create(
                                 new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
                                 inputShape);
@@ -286,8 +280,8 @@ public class BlockCoreTest {
                                 new float[] {22, 24, 25, 21, 26, 23, 39, 31, 19},
                                 new Shape(1, 1, 3, 3));
 
-                NDArray out = trainer.forward(new NDList(input)).get(0);
-                Assertions.assertAlmostEquals(out, expected);
+                NDArray result = trainer.forward(new NDList(data)).get(0);
+                Assertions.assertAlmostEquals(result, expected);
 
                 testEncode(manager, block);
             }
@@ -307,7 +301,7 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input =
+                NDArray data =
                         manager.create(
                                 new float[] {
                                     9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4, 4, 9, 7, 5,
@@ -319,12 +313,12 @@ public class BlockCoreTest {
                                 new float[] {60, 41, 54, 48, 55, 59, 56, 61},
                                 new Shape(1, 1, 2, 2, 2));
 
-                NDArray out = trainer.forward(new NDList(input)).get(0);
-                Assert.assertEquals(out, expected);
+                NDArray result = trainer.forward(new NDList(data)).get(0);
+                Assert.assertEquals(result, expected);
 
                 Shape[] outputShape =
                         block.getOutputShapes(manager, new Shape[] {new Shape(1, 1, 3, 3, 3)});
-                Assert.assertEquals(out.getShape(), outputShape[0]);
+                Assert.assertEquals(result.getShape(), outputShape[0]);
 
                 testEncode(manager, block);
             }
@@ -349,10 +343,9 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.arange(0, 48, 1).reshape(inputShape);
-                NDList outputs = trainer.forward(new NDList(input));
-                NDArray out = outputs.get(0);
-                Assertions.assertAlmostEquals(out, manager.ones(new Shape(3, 4, 5)));
+                NDArray data = manager.arange(0, 48, 1).reshape(inputShape);
+                NDArray result = trainer.forward(new NDList(data)).head();
+                Assertions.assertAlmostEquals(result, manager.ones(new Shape(3, 4, 5)));
 
                 testEncode(manager, block);
             }
@@ -377,14 +370,13 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.arange(0, 8, 1).reshape(inputShape);
-                NDList outputs = trainer.forward(new NDList(input));
-                NDArray out = outputs.get(0);
+                NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
+                NDArray result = trainer.forward(new NDList(data)).head();
                 NDArray expected =
                         manager.create(
                                 new float[] {7, 12, 12, 12, 12, 23, 28, 28, 28, 28},
                                 new Shape(1, 2, 5));
-                Assert.assertEquals(out, expected);
+                Assert.assertEquals(result, expected);
 
                 testEncode(manager, block);
             }
@@ -409,9 +401,8 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.arange(0, 8, 1).reshape(inputShape);
-                NDList outputs = trainer.forward(new NDList(input));
-                NDArray out = outputs.get(0);
+                NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
+                NDArray result = trainer.forward(new NDList(data)).head();
                 NDArray expected =
                         manager.create(
                                 new float[] {
@@ -419,7 +410,7 @@ public class BlockCoreTest {
                                     0.964f
                                 },
                                 new Shape(1, 2, 4));
-                Assertions.assertAlmostEquals(out, expected);
+                Assertions.assertAlmostEquals(result, expected);
 
                 testEncode(manager, block);
             }
@@ -444,12 +435,9 @@ public class BlockCoreTest {
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
                 NDManager manager = trainer.getManager();
-
-                NDArray input = manager.arange(0, 8, 1).reshape(inputShape);
-
-                NDList outputs = trainer.forward(new NDList(input));
-                NDArray out = outputs.get(0);
-                Assertions.assertAlmostEquals(out, manager.ones(new Shape(1, 2, 4)));
+                NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
+                NDArray result = trainer.forward(new NDList(data)).head();
+                Assertions.assertAlmostEquals(result, manager.ones(new Shape(1, 2, 4)));
 
                 testEncode(manager, block);
             }
@@ -485,8 +473,8 @@ public class BlockCoreTest {
                 Shape inputShape = new Shape(1, 3);
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.ones(new Shape(1, 3));
-                NDArray result = trainer.forward(new NDList(input)).head();
+                NDArray data = manager.ones(new Shape(1, 3));
+                NDArray result = trainer.forward(new NDList(data)).head();
                 Assertions.assertAlmostEquals(
                         result, manager.create(new float[] {975, 975, 975}, new Shape(1, 3)));
 
@@ -520,14 +508,13 @@ public class BlockCoreTest {
                 Shape inputShape = new Shape(1, 3);
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
                 NDManager manager = trainer.getManager();
-                NDArray input = manager.ones(new Shape(1, 3));
-
-                NDList result = trainer.forward(new NDList(input));
+                NDArray data = manager.ones(new Shape(1, 3));
+                NDList results = trainer.forward(new NDList(data));
                 Assertions.assertAlmostEquals(
-                        result.head(), manager.create(new float[] {3, 3, 3}, new Shape(1, 3)));
-                Assertions.assertAlmostEquals(result.get(1), manager.create(3));
+                        results.head(), manager.create(new float[] {3, 3, 3}, new Shape(1, 3)));
+                Assertions.assertAlmostEquals(results.get(1), manager.create(3));
                 Assertions.assertAlmostEquals(
-                        result.get(2), manager.create(new float[] {3, 3}, new Shape(1, 2)));
+                        results.get(2), manager.create(new float[] {3, 3}, new Shape(1, 2)));
 
                 testEncode(manager, block);
             }

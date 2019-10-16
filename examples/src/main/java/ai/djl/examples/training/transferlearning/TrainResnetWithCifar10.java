@@ -19,7 +19,6 @@ import ai.djl.examples.training.util.Arguments;
 import ai.djl.mxnet.dataset.Cifar10;
 import ai.djl.mxnet.dataset.transform.cv.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
@@ -28,7 +27,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.DefaultTrainingConfig;
-import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
@@ -157,8 +155,6 @@ public final class TrainResnetWithCifar10 {
 
         try (Trainer trainer = model.newTrainer(config)) {
             int numEpoch = arguments.getEpoch();
-            int numOfSlices = devices.length;
-
             Shape inputShape = new Shape(batchSize, 3, 32, 32);
             trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
@@ -168,17 +164,7 @@ public final class TrainResnetWithCifar10 {
                 int batchNum = 0;
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     batchNum++;
-                    Batch[] split = batch.split(devices, false);
-
-                    try (GradientCollector gradCol = trainer.newGradientCollector()) {
-                        for (int i = 0; i < numOfSlices; i++) {
-                            NDList data = split[i].getData();
-                            NDList label = split[i].getLabels();
-                            NDList pred = trainer.forward(data);
-                            NDArray l = trainer.loss(label, pred);
-                            gradCol.backward(l);
-                        }
-                    }
+                    trainer.train(batch);
                     trainer.step();
                     lossValue = trainer.getLoss();
                     accuracy = acc.getMetric().getValue();

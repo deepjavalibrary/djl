@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
+import ai.djl.training.dataset.Batch;
 import ai.djl.training.metrics.TrainingMetrics;
 import java.util.List;
 
@@ -43,12 +44,15 @@ public class MockTrainer implements Trainer {
     public void step() {}
 
     @Override
-    public NDList forward(NDList intput) {
+    public void train(Batch batch) {}
+
+    @Override
+    public NDList forward(NDList input) {
         return null;
     }
 
     @Override
-    public void validate(NDList input, NDList label) {}
+    public void validate(Batch batch) {}
 
     @Override
     public NDArray loss(NDList labels, NDList preds) {

@@ -14,7 +14,6 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
-import ai.djl.mxnet.engine.MxGradientCollector;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -24,9 +23,9 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.DefaultTrainingConfig;
-import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Adam;
@@ -49,7 +48,10 @@ public class OptimizerTest {
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(sgd);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES)
+                        .setOptimizer(sgd)
+                        .setLoss(Loss.l2Loss());
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -77,7 +79,10 @@ public class OptimizerTest {
                         .optMomentum(0.9f)
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(optim);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES)
+                        .setOptimizer(optim)
+                        .setLoss(Loss.l2Loss());
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -112,7 +117,10 @@ public class OptimizerTest {
                         .setMomentum(0.9f)
                         .build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(optim);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES)
+                        .setOptimizer(optim)
+                        .setLoss(Loss.l2Loss());
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -137,7 +145,10 @@ public class OptimizerTest {
         Optimizer optim =
                 new Adam.Builder().setRescaleGrad(1.0f / BATCH_SIZE).optLearningRate(0.1f).build();
 
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES).setOptimizer(optim);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES)
+                        .setOptimizer(optim)
+                        .setLoss(Loss.l2Loss());
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -159,11 +170,8 @@ public class OptimizerTest {
     private NDArray runOptimizer(NDManager manager, Trainer trainer, Block block) {
         NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS)).mul(2);
         NDArray label = data.mul(2);
-        try (GradientCollector gradCol = new MxGradientCollector()) {
-            NDArray pred = trainer.forward(new NDList(data)).head();
-            NDArray loss = Loss.l2Loss().getLoss(label, pred);
-            gradCol.backward(loss);
-        }
+        Batch batch = new Batch(manager, new NDList(data), new NDList(label));
+        trainer.train(batch);
         trainer.step();
         return NDArrays.stack(
                 new NDList(

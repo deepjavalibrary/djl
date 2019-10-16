@@ -28,6 +28,7 @@ import ai.djl.training.ParameterServer;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.dataset.Batch;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetrics;
 import ai.djl.util.PairList;
@@ -93,19 +94,41 @@ public class MxTrainer implements Trainer {
     }
 
     @Override
+    public void train(Batch batch) {
+        Batch[] splits = batch.split(devices, false);
+        try (GradientCollector collector = new MxGradientCollector()) {
+            for (Batch split : splits) {
+                NDList data = split.getData();
+                NDList labels = split.getLabels();
+
+                NDList preds = forward(data);
+                collector.backward(loss(labels, preds));
+            }
+        }
+    }
+
+    @Override
     public NDList forward(NDList input) {
         return model.getBlock().forward(parameterStore, input);
     }
 
     @Override
-    public void validate(NDList inputs, NDList labels) {
-        NDList preds = forward(inputs);
-        validationLoss.update(labels, preds);
-        validateMetrics.forEach(metrics -> metrics.update(labels, preds));
+    public void validate(Batch batch) {
+        Batch[] splits = batch.split(devices, false);
+        for (Batch split : splits) {
+            NDList data = split.getData();
+            NDList labels = split.getLabels();
+
+            NDList preds = model.getBlock().forward(parameterStore, data);
+            validateMetrics.forEach(metrics -> metrics.update(labels, preds));
+        }
     }
 
     @Override
     public NDArray loss(NDList labels, NDList preds) {
+        if (loss == null) {
+            throw new IllegalStateException("Loss function has not been configured.");
+        }
         NDArray l = loss.update(labels, preds);
         trainingMetrics.forEach(metric -> metric.update(labels, preds));
         return l;

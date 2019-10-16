@@ -33,9 +33,11 @@ public interface Trainer extends AutoCloseable {
 
     GradientCollector newGradientCollector();
 
+    void train(Batch batch);
+
     NDList forward(NDList input);
 
-    void validate(NDList input, NDList label);
+    void validate(Batch batch);
 
     NDArray loss(NDList labels, NDList preds);
 
