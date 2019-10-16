@@ -183,18 +183,21 @@ public class MxNDArray extends NativeResource implements NDArray {
         attachGradient(GradReq.WRITE, null);
     }
 
-    void attachGradient(GradReq gradReq, SparseFormat sparseFormat) {
+    private void attachGradient(GradReq gradReq, SparseFormat format) {
         // Does zerosLike support sparse?
-        MxNDArray grad;
-        if (sparseFormat == null || sparseFormat == SparseFormat.UNDEFINED) {
-            grad = (MxNDArray) zerosLike();
-        } else {
-            grad = (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice());
+        try (MxNDArray grad = createGradient(format)) {
+            int gradReqValue = gradReq.getValue();
+            IntBuffer gradReqBuffer = IntBuffer.allocate(1);
+            gradReqBuffer.put(0, gradReqValue);
+            JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
         }
-        int gradReqValue = gradReq.getValue();
-        IntBuffer gradReqBuffer = IntBuffer.allocate(1);
-        gradReqBuffer.put(0, gradReqValue);
-        JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
+    }
+
+    private MxNDArray createGradient(SparseFormat format) {
+        if (format == null || format == SparseFormat.UNDEFINED) {
+            return (MxNDArray) zerosLike();
+        }
+        return (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice());
     }
 
     /** {@inheritDoc} */
