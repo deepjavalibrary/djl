@@ -38,24 +38,6 @@ public abstract class Loss extends TrainingMetrics {
      */
     public abstract NDArray getLoss(NDArray label, NDArray prediction);
 
-    /**
-     * Calculate loss between label and prediction.
-     *
-     * <p>the default implementation is simply adding all losses together
-     *
-     * @param labels true labels
-     * @param predictions predicted labels
-     * @return loss value
-     */
-    public NDArray getTotalLoss(NDList labels, NDList predictions) {
-        // TODO: add weighted loss, used in batch loss calculation
-        NDArray loss = getLoss(labels.head(), predictions.head());
-        for (int i = 1; i < labels.size(); i++) {
-            loss.add(getLoss(labels.get(i), predictions.get(i)));
-        }
-        return loss;
-    }
-
     public static L1Loss l1Loss() {
         return new L1Loss();
     }
@@ -114,7 +96,30 @@ public abstract class Loss extends TrainingMetrics {
 
     @Override
     public Loss duplicate() {
-        throw new UnsupportedOperationException("Duplicate is not supported for Loss");
+        try {
+            return (Loss) clone();
+        } catch (CloneNotSupportedException e) {
+            // ignore
+            throw new AssertionError("Clone is not supported", e);
+        }
+    }
+
+    /**
+     * Calculate loss between label and prediction.
+     *
+     * <p>the default implementation is simply adding all losses together
+     *
+     * @param labels true labels
+     * @param predictions predicted labels
+     * @return loss value
+     */
+    public NDArray getTotalLoss(NDList labels, NDList predictions) {
+        // TODO: add weighted loss, used in batch loss calculation
+        NDArray loss = getLoss(labels.head(), predictions.head());
+        for (int i = 1; i < labels.size(); i++) {
+            loss.add(getLoss(labels.get(i), predictions.get(i)));
+        }
+        return loss;
     }
 
     /** {@inheritDoc} */

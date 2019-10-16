@@ -67,6 +67,11 @@ public class MockTrainer implements Trainer {
     }
 
     @Override
+    public float getValidationLoss() {
+        return 0;
+    }
+
+    @Override
     public List<TrainingMetrics> getTrainingMetrics() {
         return null;
     }

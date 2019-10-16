@@ -163,12 +163,15 @@ public final class TrainMnist {
                         batch.close();
                     }
                     lossValue = trainer.getLoss();
+                    float validationLoss = trainer.getValidationLoss();
                     trainAccuracy = trainer.getTrainingMetrics().get(0).getMetric().getValue();
                     float validateAccuracy =
                             trainer.getValidateMetrics().get(0).getMetric().getValue();
                     logger.info(
-                            "Loss: "
+                            "train loss: "
                                     + lossValue
+                                    + " validate loss: "
+                                    + validationLoss
                                     + " train accuracy: "
                                     + trainAccuracy
                                     + " validate accuracy: "

@@ -51,7 +51,7 @@ public class MxTrainer implements Trainer {
     private PairList<String, Parameter> parameters;
     private ParameterStore parameterStore;
     private Loss loss;
-
+    private Loss validationLoss;
     private List<TrainingMetrics> trainingMetrics;
     private List<TrainingMetrics> validateMetrics;
     private boolean gradientsChecked;
@@ -62,6 +62,9 @@ public class MxTrainer implements Trainer {
         Block block = model.getBlock();
         devices = trainingConfig.getDevices();
         loss = trainingConfig.getLossFunction();
+        if (loss != null) {
+            validationLoss = loss.duplicate();
+        }
         trainingMetrics = trainingConfig.getTrainingMetrics();
         validateMetrics =
                 trainingMetrics
@@ -97,6 +100,7 @@ public class MxTrainer implements Trainer {
     @Override
     public void validate(NDList inputs, NDList labels) {
         NDList preds = forward(inputs);
+        validationLoss.update(labels, preds);
         validateMetrics.forEach(metrics -> metrics.update(labels, preds));
     }
 
@@ -124,7 +128,10 @@ public class MxTrainer implements Trainer {
 
     @Override
     public void resetTrainingMetrics() {
-        loss.reset();
+        if (loss != null) {
+            loss.reset();
+            validationLoss.reset();
+        }
         trainingMetrics.forEach(TrainingMetrics::reset);
         validateMetrics.forEach(TrainingMetrics::reset);
     }
@@ -132,6 +139,11 @@ public class MxTrainer implements Trainer {
     @Override
     public float getLoss() {
         return loss.getMetric().getValue();
+    }
+
+    @Override
+    public float getValidationLoss() {
+        return validationLoss.getMetric().getValue();
     }
 
     public Metrics getMetrics() {

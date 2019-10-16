@@ -18,7 +18,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
 
 /** Base class for all training metrics. */
-public abstract class TrainingMetrics {
+public abstract class TrainingMetrics implements Cloneable {
 
     private String name;
 
@@ -31,12 +31,14 @@ public abstract class TrainingMetrics {
         this.name = name;
     }
 
-    /**
-     * Duplicate the existing metrics.
-     *
-     * @return a copy of the {@link TrainingMetrics}
-     */
-    public abstract TrainingMetrics duplicate();
+    public TrainingMetrics duplicate() {
+        try {
+            return (TrainingMetrics) clone();
+        } catch (CloneNotSupportedException e) {
+            // ignore
+            throw new AssertionError("Clone is not supported", e);
+        }
+    }
 
     /**
      * Update training metrics based on {@link NDList} of labels and predictions.

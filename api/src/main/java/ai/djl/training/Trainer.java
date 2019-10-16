@@ -53,6 +53,8 @@ public interface Trainer extends AutoCloseable {
 
     float getLoss();
 
+    float getValidationLoss();
+
     List<TrainingMetrics> getTrainingMetrics();
 
     List<TrainingMetrics> getValidateMetrics();
