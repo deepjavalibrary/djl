@@ -40,6 +40,7 @@ import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.FactorTracker;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Pipeline;
+import ai.djl.translate.Reshape;
 import java.io.IOException;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -102,8 +103,9 @@ public final class TrainMnist {
                         .addTrainingMetrics(new Accuracy())
                         .setDevices(devices);
         try (Model model = Model.newInstance()) {
-            Pipeline pipeline = new Pipeline(new ToTensor());
             model.setBlock(block);
+
+            Pipeline pipeline = new Pipeline(new ToTensor()).add(new Reshape(batchSize, 28 * 28));
 
             Mnist mnist =
                     new Mnist.Builder()
@@ -139,8 +141,6 @@ public final class TrainMnist {
                                 // MNIST only has one input
                                 NDArray data = split[i].getData().head();
                                 NDList labels = split[i].getLabels();
-
-                                data = data.reshape(inputShape);
 
                                 NDList preds = trainer.forward(new NDList(data));
                                 NDArray loss = trainer.loss(labels, preds);
