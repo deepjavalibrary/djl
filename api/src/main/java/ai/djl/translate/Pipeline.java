@@ -45,7 +45,7 @@ public class Pipeline {
         return this;
     }
 
-    public NDList transform(NDList input, boolean close) {
+    public NDList transform(NDList input) {
         if (transforms.isEmpty() || input.isEmpty()) {
             return input;
         }
@@ -69,7 +69,7 @@ public class Pipeline {
                 throw new IllegalArgumentException(
                         transform.getKey() + " can't be found in input NDList");
             }
-            arrays[index] = transform.getValue().transform(arrays[index], close);
+            arrays[index] = transform.getValue().transform(arrays[index]);
         }
         // restore the NDList
         NDList res = new NDList(input.size());

@@ -178,11 +178,11 @@ public class DataIterable implements Iterable<Batch> {
 
             // apply transform
             if (pipeline != null) {
-                batchData = pipeline.transform(batchData, true);
+                batchData = pipeline.transform(batchData);
             }
             // apply label transform
             if (targetPipeline != null) {
-                batchLabels = targetPipeline.transform(batchLabels, true);
+                batchLabels = targetPipeline.transform(batchLabels);
             }
             // pin to a specific device
             if (device != null) {

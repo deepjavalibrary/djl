@@ -31,7 +31,7 @@ public class Crop implements Transform {
     }
 
     @Override
-    public NDArray transform(NDArray array, boolean close) {
+    public NDArray transform(NDArray array) {
         return NDImageUtils.crop(array, y, x, height, width);
     }
 }

@@ -23,7 +23,7 @@ import ai.djl.translate.Transform;
 public class ToTensor implements Transform {
 
     @Override
-    public NDArray transform(NDArray array, boolean close) {
+    public NDArray transform(NDArray array) {
         return NDImageUtils.toTensor(array);
     }
 }

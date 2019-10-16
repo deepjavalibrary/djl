@@ -27,7 +27,7 @@ public class Normalize implements Transform {
     }
 
     @Override
-    public NDArray transform(NDArray array, boolean close) {
+    public NDArray transform(NDArray array) {
         return NDImageUtils.normalize(array, mean, std);
     }
 }

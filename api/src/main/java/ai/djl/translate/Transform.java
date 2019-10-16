@@ -18,20 +18,12 @@ import ai.djl.util.Pair;
 
 public interface Transform {
 
-    default NDArray transform(NDArray array) {
-        return transform(array, false);
-    }
-
-    NDArray transform(NDArray array, boolean close);
+    NDArray transform(NDArray array);
 
     default NDList transform(NDList list) {
-        return transform(list, false);
-    }
-
-    default NDList transform(NDList list, boolean close) {
         NDList result = new NDList(list.size());
         for (Pair<String, NDArray> pair : list) {
-            result.add(pair.getKey(), transform(pair.getValue(), close));
+            result.add(pair.getKey(), transform(pair.getValue()));
         }
         return result;
     }

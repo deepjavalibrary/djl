@@ -32,7 +32,7 @@ public class Resize implements Transform {
     }
 
     @Override
-    public NDArray transform(NDArray array, boolean close) {
+    public NDArray transform(NDArray array) {
         return NDImageUtils.resize(array, height, width);
     }
 }
