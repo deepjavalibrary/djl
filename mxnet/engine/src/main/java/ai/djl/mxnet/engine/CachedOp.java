@@ -106,15 +106,22 @@ public class CachedOp extends NativeResource {
             allInputsNDArray[idx] = (MxNDArray) pair.getValue();
         }
 
-        // check the input, set as Shape(1) by default
+        // check the input, set as Shape(batchSize) by default
         for (Pair<String, Integer> pair : dataIndices) {
             if (allInputsNDArray[pair.getValue()] == null) {
                 // TODO: Do we need to set default to the input?
+                long batchSize = data.head().getShape().get(0);
                 String key = pair.getKey();
                 if (!"prob_label".equals(key) && !"softmax_label".equals(key)) {
-                    logger.warn("Input " + key + " not found, set NDArray to Shape(1) by default");
+                    logger.warn(
+                            "Input "
+                                    + key
+                                    + " not found, set NDArray to Shape("
+                                    + batchSize
+                                    + ") by default");
                 }
-                allInputsNDArray[pair.getValue()] = (MxNDArray) manager.create(new Shape(1));
+                allInputsNDArray[pair.getValue()] =
+                        (MxNDArray) manager.create(new Shape(batchSize));
             }
         }
         MxNDArray[] result = JnaUtils.cachedOpInvoke(manager, getHandle(), allInputsNDArray);
