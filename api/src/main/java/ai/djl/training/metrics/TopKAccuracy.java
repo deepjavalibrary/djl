@@ -29,10 +29,11 @@ public class TopKAccuracy extends Accuracy {
      * Create TopKAccuracy.
      *
      * @param name Accuracy name, default "Top_K_Accuracy"
+     * @param index index of the NDArray in labels to compute topK accuracy for
      * @param topK whether labels are in top K predictions
      */
-    public TopKAccuracy(String name, int topK) {
-        super(name);
+    public TopKAccuracy(String name, int index, int topK) {
+        super(name, index);
         if (topK > 1) {
             this.topK = topK;
         } else {
@@ -40,8 +41,12 @@ public class TopKAccuracy extends Accuracy {
         }
     }
 
+    public TopKAccuracy(int index, int topK) {
+        this("Top_" + topK + "_Accuracy", index, topK);
+    }
+
     public TopKAccuracy(int topK) {
-        this("Top_" + topK + "_Accuracy", topK);
+        this("Top_" + topK + "_Accuracy", 0, topK);
     }
 
     /** {@inheritDoc} */

@@ -29,24 +29,27 @@ public class Accuracy extends TrainingMetrics {
     private int correctInstances;
     private int totalInstances;
     protected int axis;
+    protected int index;
 
     /**
      * Creates Accuracy metric.
      *
      * @param name name of the metric, default is "Accuracy"
+     * @param index index of the NDArray in labels to compute accuracy for
      * @param axis axis the axis that represent classes in prediction, default 1
      */
-    public Accuracy(String name, int axis) {
+    public Accuracy(String name, int index, int axis) {
         super(name);
         this.axis = axis;
+        this.index = index;
     }
 
     public Accuracy() {
-        this("Accuracy", 1);
+        this("Accuracy", 0, 1);
     }
 
-    public Accuracy(String name) {
-        this(name, 1);
+    public Accuracy(String name, int index) {
+        this(name, index, 1);
     }
 
     /** {@inheritDoc} */
@@ -80,9 +83,7 @@ public class Accuracy extends TrainingMetrics {
         if (labels.size() != predictions.size()) {
             throw new IllegalArgumentException("labels and prediction length does not match.");
         }
-        for (int i = 0; i < labels.size(); i++) {
-            update(labels.get(i), predictions.get(i));
-        }
+        update(labels.get(index), predictions.get(index));
         return null;
     }
 
