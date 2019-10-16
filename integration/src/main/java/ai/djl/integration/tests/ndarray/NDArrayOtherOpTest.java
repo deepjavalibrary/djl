@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.integration.tests;
+package ai.djl.integration.tests.ndarray;
 
 import ai.djl.engine.EngineException;
 import ai.djl.integration.util.Assertions;

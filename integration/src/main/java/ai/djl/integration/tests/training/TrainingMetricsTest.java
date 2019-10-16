@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.integration.tests;
+package ai.djl.integration.tests.training;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
