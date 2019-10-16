@@ -49,8 +49,8 @@ public class DefaultTrainingConfig implements TrainingConfig {
         return this;
     }
 
-    public DefaultTrainingConfig addTrainingMetrics(List<TrainingMetrics> trainingMetrics) {
-        this.trainingMetrics = trainingMetrics;
+    public DefaultTrainingConfig addTrainingMetrics(TrainingMetrics trainingMetrics) {
+        this.trainingMetrics.add(trainingMetrics);
         return this;
     }
 

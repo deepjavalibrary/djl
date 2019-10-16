@@ -45,7 +45,6 @@ import ai.djl.zoo.ModelNotFoundException;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.cli.DefaultParser;
@@ -155,7 +154,7 @@ public final class TrainResnetWithCifar10 {
                         .setOptimizer(optimizer)
                         .setDevices(devices)
                         .setLoss(Loss.softmaxCrossEntropyLoss())
-                        .addTrainingMetrics(Collections.singletonList(acc));
+                        .addTrainingMetrics(acc);
 
         try (Trainer trainer = model.newTrainer(config)) {
             int numEpoch = arguments.getEpoch();

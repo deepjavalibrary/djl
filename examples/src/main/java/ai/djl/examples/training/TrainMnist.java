@@ -41,7 +41,6 @@ import ai.djl.training.optimizer.learningrate.FactorTracker;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
-import java.util.Collections;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -100,7 +99,7 @@ public final class TrainMnist {
                 new DefaultTrainingConfig(new XavierInitializer())
                         .setOptimizer(optimizer)
                         .setLoss(Loss.softmaxCrossEntropyLoss())
-                        .addTrainingMetrics(Collections.singletonList(new Accuracy()))
+                        .addTrainingMetrics(new Accuracy())
                         .setDevices(devices);
         try (Model model = Model.newInstance()) {
             Pipeline pipeline = new Pipeline(new ToTensor());
