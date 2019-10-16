@@ -18,119 +18,121 @@ import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.core.Prelu;
 
-public interface Activation {
+public final class Activation {
 
-    Block IDENTITY_BLOCK = new LambdaBlock(x -> x);
+    public static final Block IDENTITY_BLOCK = new LambdaBlock(x -> x);
 
-    static NDArray relu(NDArray array) {
+    private Activation() {}
+
+    public static NDArray relu(NDArray array) {
         return array.getNDArrayInternal().relu();
     }
 
-    static NDList relu(NDList arrays) {
+    public static NDList relu(NDList arrays) {
         return new NDList(arrays.get(0).getNDArrayInternal().relu());
     }
 
-    static NDArray sigmoid(NDArray array) {
+    public static NDArray sigmoid(NDArray array) {
         return array.getNDArrayInternal().sigmoid();
     }
 
-    static NDList sigmoid(NDList arrays) {
+    public static NDList sigmoid(NDList arrays) {
         return new NDList(arrays.get(0).getNDArrayInternal().sigmoid());
     }
 
-    static NDArray tanh(NDArray array) {
+    public static NDArray tanh(NDArray array) {
         return array.getNDArrayInternal().tanh();
     }
 
-    static NDList tanh(NDList arrays) {
+    public static NDList tanh(NDList arrays) {
         return new NDList(arrays.get(0).getNDArrayInternal().tanh());
     }
 
-    static NDArray softrelu(NDArray array) {
+    public static NDArray softrelu(NDArray array) {
         return array.getNDArrayInternal().softrelu();
     }
 
-    static NDList softrelu(NDList arrays) {
+    public static NDList softrelu(NDList arrays) {
         return new NDList(arrays.get(0).getNDArrayInternal().softrelu());
     }
 
-    static NDArray leakyRelu(NDArray array, float alpha) {
+    public static NDArray leakyRelu(NDArray array, float alpha) {
         return array.getNDArrayInternal().leakyRelu(alpha);
     }
 
-    static NDList leakyRelu(NDList arrays, float alpha) {
+    public static NDList leakyRelu(NDList arrays, float alpha) {
         return new NDList(arrays.get(0).getNDArrayInternal().leakyRelu(alpha));
     }
 
-    static NDArray elu(NDArray array, float alpha) {
+    public static NDArray elu(NDArray array, float alpha) {
         return array.getNDArrayInternal().elu(alpha);
     }
 
-    static NDList elu(NDList arrays, float alpha) {
+    public static NDList elu(NDList arrays, float alpha) {
         return new NDList(arrays.get(0).getNDArrayInternal().elu(alpha));
     }
 
-    static NDArray selu(NDArray array) {
+    public static NDArray selu(NDArray array) {
         return array.getNDArrayInternal().selu();
     }
 
-    static NDList selu(NDList arrays) {
+    public static NDList selu(NDList arrays) {
         return new NDList(arrays.get(0).getNDArrayInternal().selu());
     }
 
-    static NDArray gelu(NDArray array) {
+    public static NDArray gelu(NDArray array) {
         return array.getNDArrayInternal().gelu();
     }
 
-    static NDList gelu(NDList arrays) {
+    public static NDList gelu(NDList arrays) {
         return new NDList(arrays.get(0).getNDArrayInternal().gelu());
     }
 
-    static NDArray swish(NDArray array, float beta) {
+    public static NDArray swish(NDArray array, float beta) {
         return array.getNDArrayInternal().swish(beta);
     }
 
-    static NDList swish(NDList arrays, float beta) {
+    public static NDList swish(NDList arrays, float beta) {
         return new NDList(arrays.get(0).getNDArrayInternal().swish(beta));
     }
 
-    static Block reluBlock() {
+    public static Block reluBlock() {
         return new LambdaBlock(Activation::relu);
     }
 
-    static Block sigmoidBlock() {
+    public static Block sigmoidBlock() {
         return new LambdaBlock(Activation::sigmoid);
     }
 
-    static Block tanhBlock() {
+    public static Block tanhBlock() {
         return new LambdaBlock(Activation::tanh);
     }
 
-    static Block softreluBlock() {
+    public static Block softreluBlock() {
         return new LambdaBlock(Activation::softrelu);
     }
 
-    static Block leakyReluBlock(float alpha) {
+    public static Block leakyReluBlock(float alpha) {
         return new LambdaBlock(arrays -> Activation.leakyRelu(arrays, alpha));
     }
 
-    static Block eluBlock(float alpha) {
+    public static Block eluBlock(float alpha) {
         return new LambdaBlock(arrays -> Activation.elu(arrays, alpha));
     }
 
-    static Block seluBlock() {
+    public static Block seluBlock() {
         return new LambdaBlock(Activation::selu);
     }
 
-    static Block geluBlock() {
+    public static Block geluBlock() {
         return new LambdaBlock(Activation::gelu);
     }
 
-    static Block swishBlock(float beta) {
+    public static Block swishBlock(float beta) {
         return new LambdaBlock(arrays -> Activation.swish(arrays, beta));
     }
 
-    static Block preluBlock() {
+    public static Block preluBlock() {
         return new Prelu();
     }
 }
