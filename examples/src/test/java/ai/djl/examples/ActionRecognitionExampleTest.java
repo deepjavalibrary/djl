@@ -12,21 +12,23 @@
  */
 package ai.djl.examples;
 
-import ai.djl.examples.inference.SsdExample;
+import ai.djl.examples.inference.ActionRecognition;
 import ai.djl.examples.inference.util.AbstractExample;
-import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.modality.Classification;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class SsdExampleTest {
+public class ActionRecognitionExampleTest {
 
     @Test
-    public void testSsdExample() {
-        String[] args = {"-i", "src/test/resources/3dogs.jpg", "-c", "1", "-l", "build/logs"};
-        Assert.assertTrue(new SsdExample().runExample(args));
-        DetectedObjects result = (DetectedObjects) AbstractExample.getPredictResult();
-        DetectedObjects.Item best = result.best();
-        Assert.assertEquals(best.getClassName(), "dog");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.8) > 0);
+    public void testActionRecognition() {
+        String[] args = {
+            "-i", "src/test/resources/action_discus_throw.png", "-c", "1", "-l", "build/logs"
+        };
+        Assert.assertTrue(new ActionRecognition().runExample(args));
+        Classification result = (Classification) AbstractExample.getPredictResult();
+        Classification.Item best = result.best();
+        Assert.assertEquals(best.getClassName(), "ThrowDiscus");
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }
 }

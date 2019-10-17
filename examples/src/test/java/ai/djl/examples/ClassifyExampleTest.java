@@ -20,13 +20,9 @@ import org.testng.annotations.Test;
 
 public class ClassifyExampleTest {
 
-    private static final String MODEL_NAME = "resnet18_v1";
-
     @Test
     public void testClassifyExample() {
-        String[] args = {
-            "-n", MODEL_NAME, "-i", "src/test/resources/kitten.jpg", "-c", "1", "-l", "build/logs"
-        };
+        String[] args = {"-i", "src/test/resources/kitten.jpg", "-c", "1", "-l", "build/logs"};
         Assert.assertTrue(new ClassifyExample().runExample(args));
         Classification result = (Classification) AbstractExample.getPredictResult();
         Classification.Item best = result.best();
