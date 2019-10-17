@@ -1,8 +1,10 @@
 @startuml
 (*) --> "Load your pre-trained Model"
---> "Create your Translator(pre-process/post-process)"
---> "Create a Predictor with Translator"
+--> "Create Translator(pre-process/post-process)"
+--> "Create Predictor with Translator"
 --> "Inference: predictor.predict(input)"
+(*) --> "Prepare input"
+"Prepare input" --> "Inference: predictor.predict(input)"
 --> "Get prediction result"
 --> (*)
 @enduml

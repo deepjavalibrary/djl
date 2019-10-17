@@ -1,9 +1,11 @@
 @startuml
 (*) --> "Build neural network"
 --> "Create Model with neural network"
---> "Get Dataset"
+--> "Determined training configuration"
 --> "Create Trainer with TrainingConfig"
 --> "Train model: trainer.fit(dataset)"
+(*) --> "Prepare training dataset"
+"Prepare training dataset" --> "Train model: trainer.fit(dataset)"
 --> "Save Model"
 --> (*)
 @enduml
