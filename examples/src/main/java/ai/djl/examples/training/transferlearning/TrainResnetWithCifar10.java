@@ -17,7 +17,6 @@ import ai.djl.Model;
 import ai.djl.examples.inference.util.LogUtils;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.mxnet.dataset.Cifar10;
-import ai.djl.mxnet.dataset.DatasetUtils;
 import ai.djl.mxnet.dataset.transform.cv.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDArray;
@@ -169,7 +168,7 @@ public final class TrainResnetWithCifar10 {
                 int batchNum = 0;
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     batchNum++;
-                    Batch[] split = DatasetUtils.split(batch, devices, false);
+                    Batch[] split = batch.split(devices, false);
 
                     try (GradientCollector gradCol = trainer.newGradientCollector()) {
                         for (int i = 0; i < numOfSlices; i++) {

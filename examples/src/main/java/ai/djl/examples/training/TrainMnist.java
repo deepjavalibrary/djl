@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.examples.inference.util.LogUtils;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.mxnet.dataset.DatasetUtils;
 import ai.djl.mxnet.dataset.Mnist;
 import ai.djl.mxnet.dataset.transform.cv.ToTensor;
 import ai.djl.ndarray.NDArray;
@@ -134,7 +133,7 @@ public final class TrainMnist {
 
                 for (int epoch = 0; epoch < numEpoch; epoch++) {
                     for (Batch batch : trainer.iterateDataset(mnist)) {
-                        Batch[] split = DatasetUtils.split(batch, devices, false);
+                        Batch[] split = batch.split(devices, false);
 
                         try (GradientCollector gradCol = trainer.newGradientCollector()) {
                             for (int i = 0; i < numOfSlices; i++) {
@@ -153,7 +152,7 @@ public final class TrainMnist {
                     }
                     // Validation
                     for (Batch batch : trainer.iterateDataset(validateSet)) {
-                        Batch[] split = DatasetUtils.split(batch, devices, false);
+                        Batch[] split = batch.split(devices, false);
                         for (int i = 0; i < numOfSlices; i++) {
                             NDArray data = split[i].getData().head();
                             NDList labels = split[i].getLabels();
