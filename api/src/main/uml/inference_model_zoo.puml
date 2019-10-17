@@ -1,0 +1,7 @@
+@startuml
+(*) --> "Load a pre-trained Model form model zoo"
+--> "Create a Predictor"
+--> "Inference: predictor.predict(input)"
+--> "Get prediction result"
+--> (*)
+@enduml
