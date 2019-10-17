@@ -336,10 +336,11 @@ public class MxModel implements Model {
 
             paramFile = modelDir.resolve(String.format("%s-%04d.params", modelName, epoch));
         }
+        logger.debug("Try to load model from {}", paramFile);
         if (readParameters(paramFile)) {
             return;
         }
-
+        logger.debug("DJL formatted model not found, try to find MXNet model");
         NDList paramNDlist = JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath());
         Device device = manager.getDevice();
 
@@ -365,11 +366,12 @@ public class MxModel implements Model {
 
         // TODO: Find a better to infer model DataType from SymbolBlock.
         dataType = paramNDlist.head().getDataType();
-
+        logger.debug("Model data type is: {}", dataType);
         if (!device.equals(Device.cpu())) {
             // MXNet always load parameters on CPU, we only close parameters if we copied them.
             paramNDlist.close();
         }
+        logger.debug("MXNet Model loaded successfully");
     }
 
     private boolean readParameters(Path paramFile) throws IOException {
@@ -399,6 +401,7 @@ public class MxModel implements Model {
             }
 
             block.loadParameters(manager, dis);
+            logger.debug("DJL model loaded successfully");
         }
         return true;
     }

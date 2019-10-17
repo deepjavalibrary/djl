@@ -25,9 +25,12 @@ import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BasePredictor<I, O> implements Predictor<I, O> {
 
+    private static final Logger logger = LoggerFactory.getLogger(BasePredictor.class);
     private Translator<I, O> translator;
     private long timestamp;
 
@@ -100,6 +103,7 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     protected void waitToRead(NDList list) {}
 
     protected NDList forward(NDList ndList) {
+        logger.trace("Predictor input data: {}", ndList);
         return block.forward(parameterStore, ndList);
     }
 

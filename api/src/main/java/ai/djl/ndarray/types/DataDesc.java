@@ -131,4 +131,9 @@ public class DataDesc {
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
+
+    @Override
+    public String toString() {
+        return name + " shape: " + shape + " dataType: " + dataType;
+    }
 }

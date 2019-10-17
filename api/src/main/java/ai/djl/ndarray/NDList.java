@@ -286,4 +286,19 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
             array.close();
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder(20);
+        builder.append("NDList size: ").append(size()).append('\n');
+        for (int i = 0; i < list.size(); i++) {
+            Pair<String, NDArray> pair = list.get(i);
+            builder.append(i).append(' ');
+            if (pair.getKey() != null) {
+                builder.append(pair.getKey());
+            }
+            builder.append(": ").append(pair.getValue().getDataDescriptor()).append('\n');
+        }
+        return builder.toString();
+    }
 }
