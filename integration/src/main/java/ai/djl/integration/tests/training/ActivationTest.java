@@ -131,10 +131,9 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {0, 2});
                 NDArray expected = manager.create(new float[] {0, 2});
-                Assert.assertEquals(expected, Activation.elu(data, alpha));
-
+                Assertions.assertAlmostEquals(expected, Activation.elu(data, alpha));
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                Assert.assertEquals(result, expected);
+                Assertions.assertAlmostEquals(result, expected);
             }
         }
     }

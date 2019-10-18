@@ -27,14 +27,14 @@ publishing {
     publications {
         maven(MavenPublication) {
             groupId project.getGroup()
-            artifactId 'joule-repository'
+            artifactId 'djl-repository'
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
             pom {
-                name = "Joule Repository API"
+                name = "DJL.ai Repository API"
                 description = "A respository specification for Deep Learning resources"
-                url = "http://aws.amazon.com/Joule"
+                url = "http://www.djl.ai/repository"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'

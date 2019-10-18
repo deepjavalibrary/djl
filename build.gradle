@@ -8,8 +8,8 @@ ext.SpotBugsTask = com.github.spotbugs.SpotBugsTask
 defaultTasks 'build'
 
 allprojects {
-    group 'software.amazon.ai'
-    version = '0.3.0-SNAPSHOT'
+    group 'ai.djl'
+    version = '0.1.0-SNAPSHOT'
 
     repositories {
         jcenter()

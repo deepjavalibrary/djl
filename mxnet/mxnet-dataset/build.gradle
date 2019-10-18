@@ -2,11 +2,11 @@ plugins {
     id 'maven-publish'
 }
 
-group 'org.apache.mxnet'
+group 'ai.djl.mxnet'
 
 repositories {
     maven {
-        url 'https://joule.s3.amazonaws.com/repo'
+        url 'https://djl-ai.s3.amazonaws.com/repo'
     }
 }
 
@@ -22,7 +22,7 @@ dependencies {
     }
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
 
-    testRuntime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
+    testRuntime "ai.djl.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
 }
 
 task sourcesJar(type: Jar) {
@@ -44,9 +44,9 @@ publishing {
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
             pom {
-                name = "MXNet dataset for Joule"
-                description = "MXNet dataset for Joule API"
-                url = "http://aws.amazon.com/Joule"
+                name = "MXNet dataset for DJL"
+                description = "MXNet dataset for DJL API"
+                url = "http://aws.amazon.com/DJL"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'

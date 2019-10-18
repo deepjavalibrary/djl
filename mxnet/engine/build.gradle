@@ -2,7 +2,7 @@ plugins {
     id 'maven-publish'
 }
 
-group "org.apache.mxnet"
+group "ai.djl.mxnet"
 
 dependencies {
     compile "net.java.dev.jna:jna:${jna_version}"
@@ -107,7 +107,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             groupId project.getGroup()
-            artifactId "mxnet-joule"
+            artifactId "mxnet-engine"
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]

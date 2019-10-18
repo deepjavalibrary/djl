@@ -9,7 +9,7 @@ plugins {
 repositories {
     mavenLocal()
     maven {
-        url 'https://joule.s3.amazonaws.com/repo'
+        url 'https://djl-ai.s3.amazonaws.com/repo'
     }
 }
 
@@ -24,7 +24,7 @@ dependencies {
     compile project(":mxnet:mxnet-dataset")
     compile project(":mxnet:mxnet-model-zoo")
 
-    runtime "org.apache.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
+    runtime "ai.djl.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
 
     testCompile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

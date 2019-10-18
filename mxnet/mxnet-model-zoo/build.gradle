@@ -2,7 +2,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'org.apache.mxnet'
+group 'ai.djl.mxnet'
 
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
@@ -34,8 +34,8 @@ publishing {
             artifacts = [jar, javadocJar, sourcesJar]
             pom {
                 name = "MXNet model zoo"
-                description = "MXNet model zoo for Joule"
-                url = "http://aws.amazon.com/Joule"
+                description = "MXNet model zoo for DJL"
+                url = "http://aws.amazon.com/DJL"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'

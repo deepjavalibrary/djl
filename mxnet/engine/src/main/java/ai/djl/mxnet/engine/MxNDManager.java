@@ -204,10 +204,10 @@ public class MxNDManager implements NDManager {
         MxOpParams params = new MxOpParams();
         params.addParam("low", low);
         params.addParam("high", high);
-        params.addParam("shape", shape);
+        params.addParam("size", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
         params.setDataType(dataType);
-        return invoke("_npi_random_uniform", EMPTY, params).singletonOrThrow();
+        return invoke("_npi_uniform", EMPTY, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -217,10 +217,10 @@ public class MxNDManager implements NDManager {
         MxOpParams params = new MxOpParams();
         params.addParam("loc", loc);
         params.addParam("scale", scale);
-        params.addParam("shape", shape);
+        params.addParam("size", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
         params.setDataType(dataType);
-        return invoke("_npi_random_normal", EMPTY, params).singletonOrThrow();
+        return invoke("_npi_normal", EMPTY, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
