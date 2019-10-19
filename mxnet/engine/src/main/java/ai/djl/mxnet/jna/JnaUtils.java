@@ -405,11 +405,9 @@ public final class JnaUtils {
         checkCall(LIB.MXNDArrayWaitToWrite(ndArray));
     }
 
-    /* Need tests
     public static void waitAll() {
         checkCall(LIB.MXNDArrayWaitAll());
     }
-    */
 
     public static void syncCopyToCPU(Pointer ndArray, Pointer data, int len) {
         NativeSize size = new NativeSize(len);
