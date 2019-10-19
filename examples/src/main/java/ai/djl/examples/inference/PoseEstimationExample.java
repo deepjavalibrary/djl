@@ -14,7 +14,6 @@ package ai.djl.examples.inference;
 
 import ai.djl.examples.inference.util.AbstractExample;
 import ai.djl.examples.inference.util.Arguments;
-import ai.djl.examples.inference.util.LogUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.DetectedObjects;
@@ -38,10 +37,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PoseEstimationExample extends AbstractExample {
 
-    private static final Logger logger = LogUtils.getLogger(PoseEstimationExample.class);
+    private static final Logger logger = LoggerFactory.getLogger(PoseEstimationExample.class);
 
     public static void main(String[] args) {
         new PoseEstimationExample().runExample(args);

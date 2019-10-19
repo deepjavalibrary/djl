@@ -15,6 +15,7 @@ package ai.djl.examples.inference;
 import ai.djl.Device;
 import ai.djl.examples.inference.util.AbstractExample;
 import ai.djl.examples.inference.util.Arguments;
+import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classification;
@@ -57,8 +58,9 @@ public final class ClassifyExample extends AbstractExample {
 
             for (int i = 0; i < iteration; ++i) {
                 predictResult = predictor.predict(img);
+
                 printProgress(iteration, i);
-                collectMemoryInfo(metrics);
+                MemoryUtils.collectMemoryInfo(metrics);
             }
         }
 

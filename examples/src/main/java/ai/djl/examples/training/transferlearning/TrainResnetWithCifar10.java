@@ -14,7 +14,6 @@ package ai.djl.examples.training.transferlearning;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.examples.inference.util.LogUtils;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.mxnet.dataset.Cifar10;
 import ai.djl.mxnet.dataset.transform.cv.ToTensor;
@@ -48,10 +47,11 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class TrainResnetWithCifar10 {
 
-    private static final Logger logger = LogUtils.getLogger(TrainResnetWithCifar10.class);
+    private static final Logger logger = LoggerFactory.getLogger(TrainResnetWithCifar10.class);
 
     private static float accuracy;
     private static float lossValue;

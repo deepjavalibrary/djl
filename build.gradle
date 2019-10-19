@@ -50,7 +50,7 @@ configure(javaProjects()) {
         }
 
         doFirst {
-            systemProperty "org.slf4j.simpleLogger.defaultLogLevel", "debug"
+            systemProperty "ai.djl.logging.level", "debug"
             if (gradle.startParameter.offline) {
                 systemProperty "offline", "true"
             }

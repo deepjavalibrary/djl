@@ -13,7 +13,6 @@
 package ai.djl.integration;
 
 import ai.djl.integration.util.Arguments;
-import ai.djl.integration.util.LogUtils;
 import ai.djl.mxnet.jna.JnaUtils;
 import java.io.File;
 import java.io.IOException;
@@ -42,11 +41,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 public class IntegrationTest {
 
-    private static final Logger logger = LogUtils.getLogger(IntegrationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(IntegrationTest.class);
 
     private static final String PACKAGE_NAME = "ai.djl.integration.tests.";
 

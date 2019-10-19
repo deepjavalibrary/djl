@@ -15,7 +15,7 @@ def classifier = getClassifier()
 
 dependencies {
     compile "commons-cli:commons-cli:1.4"
-    compile "org.slf4j:slf4j-simple:1.7.26"
+    compile "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
     compile "com.google.code.gson:gson:2.8.5"
     compile "ai.djl:api:0.1.0-SNAPSHOT"
     compile "ai.djl.mxnet:mxnet-model-zoo:0.1.0-SNAPSHOT"

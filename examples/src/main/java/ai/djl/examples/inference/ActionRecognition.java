@@ -14,6 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.examples.inference.util.AbstractExample;
 import ai.djl.examples.inference.util.Arguments;
+import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classification;
@@ -50,7 +51,8 @@ public class ActionRecognition extends AbstractExample {
         try (Predictor<BufferedImage, Classification> action = inception.newPredictor()) {
             action.setMetrics(metrics); // Let predictor collect metrics
             result = action.predict(img);
-            collectMemoryInfo(metrics);
+
+            MemoryUtils.collectMemoryInfo(metrics);
         }
 
         inception.close();

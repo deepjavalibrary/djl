@@ -18,7 +18,7 @@ import ai.djl.Model;
 import ai.djl.examples.inference.util.AbstractExample;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.examples.inference.util.BertDataParser;
-import ai.djl.examples.inference.util.LogUtils;
+import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
@@ -37,10 +37,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class BertQaInferenceExample extends AbstractExample {
 
-    private static final Logger logger = LogUtils.getLogger(BertQaInferenceExample.class);
+    private static final Logger logger = LoggerFactory.getLogger(BertQaInferenceExample.class);
 
     public static void main(String[] args) {
         new BertQaInferenceExample().runExample(args);
@@ -75,8 +76,9 @@ public final class BertQaInferenceExample extends AbstractExample {
 
             for (int i = 0; i < iteration; ++i) {
                 predictResult = predictor.predict(input);
+
                 printProgress(iteration, i);
-                collectMemoryInfo(metrics);
+                MemoryUtils.collectMemoryInfo(metrics);
             }
         }
 

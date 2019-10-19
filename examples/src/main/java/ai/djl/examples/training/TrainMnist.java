@@ -14,7 +14,6 @@ package ai.djl.examples.training;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.examples.inference.util.LogUtils;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.mxnet.dataset.Mnist;
 import ai.djl.mxnet.dataset.transform.cv.ToTensor;
@@ -43,10 +42,11 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class TrainMnist {
 
-    private static final Logger logger = LogUtils.getLogger(TrainMnist.class);
+    private static final Logger logger = LoggerFactory.getLogger(TrainMnist.class);
 
     private static float trainAccuracy;
     private static float lossValue;
