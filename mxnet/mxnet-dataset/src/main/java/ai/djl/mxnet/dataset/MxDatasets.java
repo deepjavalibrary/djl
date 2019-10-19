@@ -14,7 +14,7 @@ package ai.djl.mxnet.dataset;
 
 import ai.djl.repository.Repository;
 
-public interface Datasets {
+public interface MxDatasets {
 
     String MXNET_REPO_URL = "https://joule.s3.amazonaws.com/mlrepo/";
 

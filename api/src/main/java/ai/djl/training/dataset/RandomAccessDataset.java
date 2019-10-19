@@ -33,16 +33,18 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     protected Pipeline targetPipeline;
     protected ExecutorService executor;
     protected int prefetchNumber;
+    private long maxIteration;
     protected Device device;
 
     public RandomAccessDataset(BaseBuilder<?> builder) {
-        this.sampler = builder.getSampler();
-        this.batchifier = builder.getBatchifier();
-        this.pipeline = builder.getPipeline();
-        this.targetPipeline = builder.getTargetPipeline();
-        this.executor = builder.getExecutor();
-        this.prefetchNumber = builder.getPrefetchNumber();
-        this.device = builder.getDevice();
+        this.sampler = builder.sampler;
+        this.batchifier = builder.batchifier;
+        this.pipeline = builder.pipeline;
+        this.targetPipeline = builder.targetPipeline;
+        this.executor = builder.executor;
+        this.prefetchNumber = builder.prefetchNumber;
+        this.maxIteration = builder.maxIteration;
+        this.device = builder.device;
     }
 
     public abstract Record get(NDManager manager, long index) throws IOException;
@@ -58,6 +60,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
                 targetPipeline,
                 executor,
                 prefetchNumber,
+                maxIteration,
                 device);
     }
 
@@ -68,13 +71,14 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
-        private Sampler sampler;
-        private Batchifier batchifier;
-        private Pipeline pipeline;
-        private Pipeline targetPipeline;
-        private ExecutorService executor;
-        private int prefetchNumber;
-        private Device device;
+        Sampler sampler;
+        Batchifier batchifier = Batchifier.STACK;
+        Pipeline pipeline;
+        Pipeline targetPipeline;
+        ExecutorService executor;
+        int prefetchNumber;
+        long maxIteration = Long.MAX_VALUE;
+        Device device;
 
         public Sampler getSampler() {
             if (sampler == null) {
@@ -102,20 +106,9 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
             return self();
         }
 
-        public Batchifier getBatchifier() {
-            if (batchifier == null) {
-                batchifier = Batchifier.STACK;
-            }
-            return batchifier;
-        }
-
         public T optBatchier(Batchifier batchier) {
             this.batchifier = batchier;
             return self();
-        }
-
-        public Pipeline getPipeline() {
-            return pipeline;
         }
 
         public T optPipeline(Pipeline pipeline) {
@@ -123,21 +116,9 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
             return self();
         }
 
-        public Pipeline getTargetPipeline() {
-            return targetPipeline;
-        }
-
         public T optTargetPipeline(Pipeline targetPipeline) {
             this.targetPipeline = targetPipeline;
             return self();
-        }
-
-        public ExecutorService getExecutor() {
-            return executor;
-        }
-
-        public int getPrefetchNumber() {
-            return prefetchNumber;
         }
 
         public T optExcutor(ExecutorService executor, int prefetchNumber) {
@@ -146,12 +127,13 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
             return self();
         }
 
-        public Device getDevice() {
-            return device;
-        }
-
         public T optDevice(Device device) {
             this.device = device;
+            return self();
+        }
+
+        public T optMaxIteration(long maxIteration) {
+            this.maxIteration = maxIteration;
             return self();
         }
 

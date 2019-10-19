@@ -113,7 +113,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 
     public static class Builder extends AbstractImageFolder.BaseBuilder<Builder> {
 
-        private Repository repository = Datasets.REPOSITORY;
+        private Repository repository = MxDatasets.REPOSITORY;
         private Usage usage;
 
         public Builder optRepository(Repository repository) {

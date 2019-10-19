@@ -94,6 +94,10 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
                                             !f.isDirectory()
                                                     && !f.isHidden()
                                                     && !f.getName().startsWith("."));
+                    if (files == null) {
+                        return new String[0];
+                    }
+
                     String[] images = new String[files.length];
                     for (int i = 0; i < files.length; i++) {
                         images[i] = files[i].getAbsolutePath();

@@ -32,17 +32,23 @@ import org.slf4j.LoggerFactory;
 
 // TODO abstract a interface that could be inherited by this and Stream DataIterable
 // where the random reads is expensive
-public class DataIterable implements Iterable<Batch> {
+public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataIterable.class);
 
     private RandomAccessDataset dataset;
     private NDManager manager;
-    private Sampler sampler;
     private Batchifier batchifier;
     private Pipeline pipeline;
     private Pipeline targetPipeline;
     private ExecutorService executor;
-    private int preFetchNumber;
+    private long maxIteration;
     private Device device;
+
+    private Iterator<List<Long>> sample;
+    // for multithreading
+    private Queue<Future<Batch>> queue;
+    private long count;
 
     public DataIterable(
             RandomAccessDataset dataset,
@@ -53,168 +59,129 @@ public class DataIterable implements Iterable<Batch> {
             Pipeline targetPipeline,
             ExecutorService executor,
             int preFetchNumber,
+            long maxIteration,
             Device device) {
         this.dataset = dataset;
         this.manager = manager.newSubManager();
-        this.sampler = sampler;
         this.batchifier = batchifier;
         this.pipeline = pipeline;
         this.targetPipeline = targetPipeline;
         this.executor = executor;
-        this.preFetchNumber = preFetchNumber;
+        this.maxIteration = maxIteration;
         this.device = device;
+
+        sample = sampler.sample(dataset);
+        if (executor != null) {
+            queue = new LinkedList<>();
+            // prefetch
+            for (int i = 0; i < preFetchNumber; i++) {
+                preFetch();
+            }
+        }
     }
 
     @Override
     public Iterator<Batch> iterator() {
-        return new DataIterator(
-                dataset,
-                manager,
-                sampler,
-                batchifier,
-                pipeline,
-                targetPipeline,
-                executor,
-                preFetchNumber,
-                device);
+        return this;
     }
 
-    private static class DataIterator implements Iterator<Batch> {
-
-        private RandomAccessDataset dataset;
-        private NDManager manager;
-        private Iterator<List<Long>> sample;
-        private Batchifier batchifier;
-        private Pipeline pipeline;
-        private Pipeline targetPipeline;
-        private ExecutorService executor;
-        private Device device;
-        // for multithreading
-        private Queue<Future<Batch>> queue;
-        private static final Logger logger = LoggerFactory.getLogger(DataIterable.class);
-
-        public DataIterator(
-                RandomAccessDataset dataset,
-                NDManager manager,
-                Sampler sampler,
-                Batchifier batchifier,
-                Pipeline pipeline,
-                Pipeline targetPipeline,
-                ExecutorService executor,
-                int prefetchNumber,
-                Device device) {
-            this.dataset = dataset;
-            this.manager = manager;
-            this.sample = sampler.sample(dataset);
-            this.batchifier = batchifier;
-            this.pipeline = pipeline;
-            this.targetPipeline = targetPipeline;
-            this.executor = executor;
-            this.device = device;
-
-            if (executor != null) {
-                queue = new LinkedList<>();
-                // prefetch
-                for (int i = 0; i < prefetchNumber; i++) {
-                    preFetch();
-                }
-            }
+    @Override
+    public boolean hasNext() {
+        if (++count > maxIteration) {
+            return false;
         }
 
-        @Override
-        public boolean hasNext() {
-            if (executor != null) {
-                if (queue.isEmpty()) {
-                    manager.close();
-                    return false;
-                }
-                return true;
-            }
-            if (!sample.hasNext()) {
+        if (executor != null) {
+            if (queue.isEmpty()) {
                 manager.close();
                 return false;
             }
             return true;
         }
+        if (!sample.hasNext()) {
+            manager.close();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public Batch next() {
+        if (executor == null) {
+            // single thread data loading with blocking fetch
+            List<Long> indices = sample.next();
+            try {
+                return fetch(indices);
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+                throw new IllegalStateException("Data loading failed", e);
+            }
+        } else {
+            // multithreading data loading with async fetch
+            preFetch();
+            Future<Batch> future = queue.poll();
+            try {
+                return future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error(e.getMessage());
+                throw new IllegalStateException("Data loading failed", e);
+            }
+        }
+    }
+
+    private Batch fetch(List<Long> indices) throws IOException {
+        NDManager subManager = manager.newSubManager();
+        NDList[] data = new NDList[indices.size()];
+        NDList[] labels = new NDList[indices.size()];
+        for (int i = 0; i < indices.size(); i++) {
+            Record record = dataset.get(subManager, indices.get(i));
+            data[i] = record.getData();
+            labels[i] = record.getLabels();
+        }
+        NDList batchData = batchifier.batchify(data);
+        NDList batchLabels = batchifier.batchify(labels);
+
+        Arrays.stream(data).forEach(NDList::close);
+        Arrays.stream(labels).forEach(NDList::close);
+
+        // apply transform
+        if (pipeline != null) {
+            batchData = pipeline.transform(batchData);
+        }
+        // apply label transform
+        if (targetPipeline != null) {
+            batchLabels = targetPipeline.transform(batchLabels);
+        }
+        // pin to a specific device
+        if (device != null) {
+            batchData = batchData.asInDevice(device, false);
+            batchLabels = batchLabels.asInDevice(device, false);
+        }
+        return new Batch(subManager, batchData, batchLabels);
+    }
+
+    private void preFetch() {
+        List<Long> indices;
+        if (!sample.hasNext()) {
+            return;
+        }
+        indices = sample.next();
+        Callable<Batch> task = new PreFetchCallable(indices);
+        Future<Batch> result = executor.submit(task);
+        queue.offer(result);
+    }
+
+    class PreFetchCallable implements Callable<Batch> {
+
+        private List<Long> indices;
+
+        public PreFetchCallable(List<Long> indices) {
+            this.indices = indices;
+        }
 
         @Override
-        public Batch next() {
-            if (executor == null) {
-                // single thread data loading with blocking fetch
-                List<Long> indices = sample.next();
-                try {
-                    return fetch(indices);
-                } catch (IOException e) {
-                    logger.error(e.getMessage());
-                    throw new IllegalStateException("Data loading failed", e);
-                }
-            } else {
-                // multithreading data loading with async fetch
-                preFetch();
-                Future<Batch> future = queue.poll();
-                try {
-                    return future.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    logger.error(e.getMessage());
-                    throw new IllegalStateException("Data loading failed", e);
-                }
-            }
-        }
-
-        private Batch fetch(List<Long> indices) throws IOException {
-            NDManager subManager = manager.newSubManager();
-            NDList[] data = new NDList[indices.size()];
-            NDList[] labels = new NDList[indices.size()];
-            for (int i = 0; i < indices.size(); i++) {
-                Record record = dataset.get(subManager, indices.get(i));
-                data[i] = record.getData();
-                labels[i] = record.getLabels();
-            }
-            NDList batchData = batchifier.batchify(data);
-            NDList batchLabels = batchifier.batchify(labels);
-
-            Arrays.stream(data).forEach(NDList::close);
-            Arrays.stream(labels).forEach(NDList::close);
-
-            // apply transform
-            if (pipeline != null) {
-                batchData = pipeline.transform(batchData);
-            }
-            // apply label transform
-            if (targetPipeline != null) {
-                batchLabels = targetPipeline.transform(batchLabels);
-            }
-            // pin to a specific device
-            if (device != null) {
-                batchData = batchData.asInDevice(device, false);
-                batchLabels = batchLabels.asInDevice(device, false);
-            }
-            return new Batch(subManager, batchData, batchLabels);
-        }
-
-        private void preFetch() {
-            List<Long> indices;
-            if (!sample.hasNext()) {
-                return;
-            }
-            indices = sample.next();
-            Callable<Batch> task = new PreFetchCallable(indices);
-            Future<Batch> result = executor.submit(task);
-            queue.offer(result);
-        }
-
-        class PreFetchCallable implements Callable<Batch> {
-
-            private List<Long> indices;
-
-            public PreFetchCallable(List<Long> indices) {
-                this.indices = indices;
-            }
-
-            @Override
-            public Batch call() throws IOException {
-                return fetch(indices);
-            }
+        public Batch call() throws IOException {
+            return fetch(indices);
         }
     }
 }

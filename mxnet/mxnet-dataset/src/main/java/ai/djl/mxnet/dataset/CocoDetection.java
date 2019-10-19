@@ -56,7 +56,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     @Override
     public MRL getMrl() {
-        return new MRL(MRL.Dataset.CV, Datasets.GROUP_ID, ARTIFACT_ID);
+        return new MRL(MRL.Dataset.CV, MxDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     public static final class Builder extends BaseBuilder<Builder> {
 
         private Flag flag = NDImageUtils.Flag.COLOR;
-        private Repository repository = Datasets.REPOSITORY;
+        private Repository repository = MxDatasets.REPOSITORY;
         private Artifact artifact;
         private Usage usage;
 
