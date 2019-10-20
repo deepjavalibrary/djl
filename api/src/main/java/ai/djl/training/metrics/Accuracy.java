@@ -16,7 +16,6 @@ package ai.djl.training.metrics;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.util.Pair;
 
 /**
  * Computes accuracy classification score.
@@ -24,7 +23,7 @@ import ai.djl.util.Pair;
  * <p>The accuracy score is defined as .. math:: \\text{accuracy}(y, \\hat{y}) = \\frac{1}{n}
  * \\sum_{i=0}^{n-1} \\text{1}(\\hat{y_i} == y_i)
  */
-public class Accuracy extends TrainingMetrics {
+public class Accuracy extends TrainingMetric {
 
     private int correctInstances;
     private int totalInstances;
@@ -79,21 +78,20 @@ public class Accuracy extends TrainingMetrics {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray update(NDList labels, NDList predictions) {
+    public void update(NDList labels, NDList predictions) {
         if (labels.size() != predictions.size()) {
             throw new IllegalArgumentException("labels and prediction length does not match.");
         }
         update(labels.get(index), predictions.get(index));
-        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Pair<String, Float> getMetric() {
+    public float getValue() {
         if (totalInstances == 0) {
-            return new Pair<>(getName(), Float.NaN);
+            return Float.NaN;
         }
-        return new Pair<>(getName(), (float) correctInstances / totalInstances);
+        return (float) correctInstances / totalInstances;
     }
 
     /**

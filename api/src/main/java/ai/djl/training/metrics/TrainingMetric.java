@@ -17,7 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
 
 /** Base class for all training metrics. */
-public abstract class TrainingMetrics implements Cloneable {
+public abstract class TrainingMetric implements Cloneable {
 
     private String name;
 
@@ -26,13 +26,13 @@ public abstract class TrainingMetrics implements Cloneable {
      *
      * @param name String, name of the metric
      */
-    public TrainingMetrics(String name) {
+    public TrainingMetric(String name) {
         this.name = name;
     }
 
-    public TrainingMetrics duplicate() {
+    public TrainingMetric duplicate() {
         try {
-            return (TrainingMetrics) clone();
+            return (TrainingMetric) clone();
         } catch (CloneNotSupportedException e) {
             // ignore
             throw new AssertionError("Clone is not supported", e);
@@ -44,23 +44,22 @@ public abstract class TrainingMetrics implements Cloneable {
      *
      * @param labels {@code NDList} of labels
      * @param predictions {@code NDList} of predictions
-     * @return NDArray came from the update, used for losses
      */
-    public abstract NDArray update(NDList labels, NDList predictions);
+    public abstract void update(NDList labels, NDList predictions);
 
     /** reset metric values. */
     public abstract void reset();
+
+    public String getName() {
+        return name;
+    }
 
     /**
      * calculate metric values.
      *
      * @return {@link Pair} of metric name and value
      */
-    public abstract Pair<String, Float> getMetric();
-
-    public String getName() {
-        return name;
-    }
+    public abstract float getValue();
 
     /**
      * Check if the two input {@code NDArray} have the same length or shape.

@@ -121,6 +121,7 @@ public final class TrainResnetWithCifar10 {
                         .optWeightDecays(0.001f)
                         .optClipGrad(1f)
                         .build();
+
         Pipeline pipeline = new Pipeline(new ToTensor());
         Cifar10 cifar10 =
                 new Cifar10.Builder()
@@ -150,8 +151,8 @@ public final class TrainResnetWithCifar10 {
                                         2))
                         .setOptimizer(optimizer)
                         .setDevices(devices)
-                        .setLoss(Loss.softmaxCrossEntropyLoss())
-                        .addTrainingMetrics(acc);
+                        .addTrainingMetric(Loss.softmaxCrossEntropyLoss())
+                        .addTrainingMetric(acc);
 
         try (Trainer trainer = model.newTrainer(config)) {
             int numEpoch = arguments.getEpoch();
@@ -166,8 +167,8 @@ public final class TrainResnetWithCifar10 {
                     batchNum++;
                     trainer.train(batch);
                     trainer.step();
-                    lossValue = trainer.getLoss();
-                    accuracy = acc.getMetric().getValue();
+                    lossValue = trainer.getTrainingMetric(Loss.class).getValue();
+                    accuracy = trainer.getTrainingMetric(Accuracy.class).getValue();
                     logger.info(
                             "[Epoch "
                                     + epoch
@@ -185,8 +186,8 @@ public final class TrainResnetWithCifar10 {
                         break;
                     }
                 }
-                lossValue = trainer.getLoss();
-                accuracy = trainer.getTrainingMetrics().get(0).getMetric().getValue();
+                lossValue = trainer.getTrainingMetric(Loss.class).getValue();
+                accuracy = trainer.getTrainingMetric(Accuracy.class).getValue();
                 logger.info("Loss: " + lossValue + " accuracy: " + accuracy);
                 logger.info("Epoch " + epoch + " finish");
             }

@@ -12,23 +12,11 @@
  */
 package ai.djl.training;
 
-import ai.djl.Device;
-import ai.djl.training.initializer.Initializer;
-import ai.djl.training.metrics.TrainingMetric;
-import ai.djl.training.optimizer.Optimizer;
-import java.util.List;
+public interface TrainingListener {
 
-public interface TrainingConfig {
+    void onEpoch();
 
-    Device[] getDevices();
+    void onTrainingBatch();
 
-    Initializer getInitializer();
-
-    Optimizer getOptimizer();
-
-    List<TrainingMetric> getTrainingMetrics();
-
-    int getEpoch();
-
-    int getBatchSize();
+    void onValidationBatch();
 }

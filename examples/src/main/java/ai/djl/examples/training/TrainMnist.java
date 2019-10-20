@@ -96,8 +96,8 @@ public final class TrainMnist {
         TrainingConfig config =
                 new DefaultTrainingConfig(new XavierInitializer())
                         .setOptimizer(optimizer)
-                        .setLoss(Loss.softmaxCrossEntropyLoss())
-                        .addTrainingMetrics(new Accuracy())
+                        .addTrainingMetric(Loss.softmaxCrossEntropyLoss())
+                        .addTrainingMetric(new Accuracy())
                         .setDevices(devices);
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -142,11 +142,11 @@ public final class TrainMnist {
                         batch.close();
                     }
 
-                    lossValue = trainer.getLoss();
-                    float validationLoss = trainer.getValidationLoss();
-                    trainAccuracy = trainer.getTrainingMetrics().get(0).getMetric().getValue();
-                    float validateAccuracy =
-                            trainer.getValidateMetrics().get(0).getMetric().getValue();
+                    lossValue = trainer.getTrainingMetric(Loss.class).getValue();
+                    trainAccuracy = trainer.getTrainingMetric(Accuracy.class).getValue();
+                    float validationLoss = trainer.getValidationMetric(Loss.class).getValue();
+                    float validationAccuracy =
+                            trainer.getValidationMetric(Accuracy.class).getValue();
                     logger.info(
                             "train loss: "
                                     + lossValue
@@ -155,7 +155,7 @@ public final class TrainMnist {
                                     + " train accuracy: "
                                     + trainAccuracy
                                     + " validate accuracy: "
-                                    + validateAccuracy);
+                                    + validationAccuracy);
                     logger.info("Epoch " + epoch + " finish");
                     // reset loss and accuracy
                     trainer.resetTrainingMetrics();

@@ -14,15 +14,15 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.training.metrics.TrainingMetrics;
-import ai.djl.util.Pair;
+import ai.djl.training.metrics.TrainingMetric;
 import java.util.stream.IntStream;
 
 /** Loss functions or Cost Functions to evaluate model predictions against true labels. */
-public abstract class Loss extends TrainingMetrics {
+public abstract class Loss extends TrainingMetric {
 
     private float totalLoss;
     private int totalInstances;
+    private NDArray lastUpdate;
 
     /** Base class for metric with abstract update methods. */
     public Loss() {
@@ -80,20 +80,6 @@ public abstract class Loss extends TrainingMetrics {
         return new HingeLoss(margin, weight, batchAxis);
     }
 
-    /**
-     * Helper function to get all axes except batch axis, loss functions requires reduction on all
-     * axes except batch axis.
-     *
-     * @param loss loss {@code NDArray}
-     * @param batchAxis axis that represents mini-batch
-     * @return all axes except batch axis
-     */
-    int[] excludeBatchAxis(NDArray loss, int batchAxis) {
-        return IntStream.range(0, loss.getShape().dimension())
-                .filter(axis -> axis != batchAxis)
-                .toArray();
-    }
-
     @Override
     public Loss duplicate() {
         try {
@@ -102,6 +88,47 @@ public abstract class Loss extends TrainingMetrics {
             // ignore
             throw new AssertionError("Clone is not supported", e);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void update(NDList labels, NDList predictions) {
+        lastUpdate = getTotalLoss(labels, predictions);
+        totalLoss += lastUpdate.sum().getFloat();
+        totalInstances += lastUpdate.size();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void reset() {
+        totalLoss = 0.f;
+        totalInstances = 0;
+    }
+
+    @Override
+    public float getValue() {
+        if (totalInstances == 0) {
+            return Float.NaN;
+        }
+        return totalLoss / totalInstances;
+    }
+
+    public NDArray getLastUpdate() {
+        return lastUpdate;
+    }
+
+    /**
+     * Helper function to get all axes except batch axis, loss functions requires reduction on all
+     * axes except batch axis.
+     *
+     * @param loss loss {@code NDArray}
+     * @param batchAxis axis that represents mini-batch
+     * @return all axes except batch axis
+     */
+    protected int[] excludeBatchAxis(NDArray loss, int batchAxis) {
+        return IntStream.range(0, loss.getShape().dimension())
+                .filter(axis -> axis != batchAxis)
+                .toArray();
     }
 
     /**
@@ -113,36 +140,12 @@ public abstract class Loss extends TrainingMetrics {
      * @param predictions predicted labels
      * @return loss value
      */
-    public NDArray getTotalLoss(NDList labels, NDList predictions) {
+    private NDArray getTotalLoss(NDList labels, NDList predictions) {
         // TODO: add weighted loss, used in batch loss calculation
         NDArray loss = getLoss(labels.head(), predictions.head());
         for (int i = 1; i < labels.size(); i++) {
             loss.add(getLoss(labels.get(i), predictions.get(i)));
         }
         return loss;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray update(NDList labels, NDList predictions) {
-        NDArray loss = getTotalLoss(labels, predictions);
-        totalLoss += loss.sum().getFloat();
-        totalInstances += loss.size();
-        return loss;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void reset() {
-        totalLoss = 0.f;
-        totalInstances = 0;
-    }
-
-    @Override
-    public Pair<String, Float> getMetric() {
-        if (totalInstances == 0) {
-            return new Pair<>(getName(), Float.NaN);
-        }
-        return new Pair<>(getName(), totalLoss / totalInstances);
     }
 }

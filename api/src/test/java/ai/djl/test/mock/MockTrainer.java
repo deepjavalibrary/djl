@@ -20,8 +20,7 @@ import ai.djl.ndarray.types.DataDesc;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.dataset.Batch;
-import ai.djl.training.metrics.TrainingMetrics;
-import java.util.List;
+import ai.djl.training.metrics.TrainingMetric;
 
 public class MockTrainer implements Trainer {
 
@@ -55,33 +54,18 @@ public class MockTrainer implements Trainer {
     public void validate(Batch batch) {}
 
     @Override
-    public NDArray loss(NDList labels, NDList preds) {
-        return null;
-    }
-
-    @Override
     public void setMetrics(Metrics metrics) {}
 
     @Override
     public void resetTrainingMetrics() {}
 
     @Override
-    public float getLoss() {
-        return 0;
-    }
-
-    @Override
-    public float getValidationLoss() {
-        return 0;
-    }
-
-    @Override
-    public List<TrainingMetrics> getTrainingMetrics() {
+    public <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz) {
         return null;
     }
 
     @Override
-    public List<TrainingMetrics> getValidateMetrics() {
+    public <T extends TrainingMetric> T getValidationMetric(Class<T> clazz) {
         return null;
     }
 

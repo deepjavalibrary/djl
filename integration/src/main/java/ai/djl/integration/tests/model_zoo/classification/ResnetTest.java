@@ -65,7 +65,7 @@ public class ResnetTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .setOptimizer(optimizer)
-                        .setLoss(Loss.softmaxCrossEntropyLoss());
+                        .addTrainingMetric(Loss.softmaxCrossEntropyLoss());
 
         Block resNet50 =
                 new ResNetV1.Builder()
@@ -115,7 +115,7 @@ public class ResnetTest {
     public void testLoadTrain() throws IOException, ModelNotFoundException {
         try (ZooModel<BufferedImage, Classification> model = getModel()) {
             TrainingConfig config =
-                    new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.l1Loss());
+                    new DefaultTrainingConfig(Initializer.ONES).addTrainingMetric(Loss.l1Loss());
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(16, 3, 32, 32);
 
@@ -148,12 +148,12 @@ public class ResnetTest {
     private static class TestTranslator implements Translator<NDList, NDList> {
 
         @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) throws Exception {
+        public NDList processOutput(TranslatorContext ctx, NDList list) {
             return list;
         }
 
         @Override
-        public NDList processInput(TranslatorContext ctx, NDList input) throws Exception {
+        public NDList processInput(TranslatorContext ctx, NDList input) {
             return input;
         }
     }

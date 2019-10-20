@@ -15,8 +15,7 @@ package ai.djl.training;
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.training.initializer.Initializer;
-import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.TrainingMetrics;
+import ai.djl.training.metrics.TrainingMetric;
 import ai.djl.training.optimizer.Optimizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,9 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private Initializer initializer;
     private Optimizer optimizer;
     private Device[] devices;
-    private Loss loss;
-    private List<TrainingMetrics> trainingMetrics;
+    private List<TrainingMetric> trainingMetrics;
+    private int epoch;
+    private int batchSize;
 
     public DefaultTrainingConfig(Initializer initializer) {
         this.initializer = initializer;
@@ -44,13 +44,18 @@ public class DefaultTrainingConfig implements TrainingConfig {
         return this;
     }
 
-    public DefaultTrainingConfig setLoss(Loss loss) {
-        this.loss = loss;
+    public DefaultTrainingConfig addTrainingMetric(TrainingMetric trainingMetric) {
+        trainingMetrics.add(trainingMetric);
         return this;
     }
 
-    public DefaultTrainingConfig addTrainingMetrics(TrainingMetrics trainingMetrics) {
-        this.trainingMetrics.add(trainingMetrics);
+    public DefaultTrainingConfig setEpoch(int epoch) {
+        this.epoch = epoch;
+        return this;
+    }
+
+    public DefaultTrainingConfig setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
         return this;
     }
 
@@ -83,12 +88,17 @@ public class DefaultTrainingConfig implements TrainingConfig {
     }
 
     @Override
-    public Loss getLossFunction() {
-        return loss;
+    public List<TrainingMetric> getTrainingMetrics() {
+        return trainingMetrics;
     }
 
     @Override
-    public List<TrainingMetrics> getTrainingMetrics() {
-        return trainingMetrics;
+    public int getEpoch() {
+        return epoch;
+    }
+
+    @Override
+    public int getBatchSize() {
+        return batchSize;
     }
 }

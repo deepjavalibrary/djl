@@ -14,9 +14,9 @@ package ai.djl.training.metrics;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.util.Pair;
 
-public class SsdBoxPredictionError extends TrainingMetrics {
+public class SsdBoxPredictionError extends TrainingMetric {
+
     private float ssdBoxPredictionError;
 
     /**
@@ -35,17 +35,15 @@ public class SsdBoxPredictionError extends TrainingMetrics {
      *
      * @param targets {@code NDList} of targets
      * @param predictions {@code NDList} of predictions
-     * @return NDArray came from the update, used for losses
      */
     @Override
-    public NDArray update(NDList targets, NDList predictions) {
+    public void update(NDList targets, NDList predictions) {
         NDArray boundingBoxLabels = targets.get(0);
         NDArray boundingBoxMasks = targets.get(1);
         NDArray boundingBoxPredictions = predictions.head();
         NDArray boundingBoxError =
                 boundingBoxLabels.sub(boundingBoxPredictions).mul(boundingBoxMasks).abs().sum();
-        ssdBoxPredictionError = ssdBoxPredictionError + boundingBoxError.toFloatArray()[0];
-        return boundingBoxError;
+        ssdBoxPredictionError += boundingBoxError.toFloatArray()[0];
     }
 
     @Override
@@ -54,7 +52,7 @@ public class SsdBoxPredictionError extends TrainingMetrics {
     }
 
     @Override
-    public Pair<String, Float> getMetric() {
-        return new Pair<>(getName(), ssdBoxPredictionError);
+    public float getValue() {
+        return ssdBoxPredictionError;
     }
 }

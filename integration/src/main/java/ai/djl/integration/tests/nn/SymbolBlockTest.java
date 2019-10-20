@@ -70,7 +70,8 @@ public class SymbolBlockTest {
     public void trainWithNewParam() throws IOException {
         Path modelDir = prepareModel();
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Initializer.ONES)
+                        .addTrainingMetric(Loss.softmaxCrossEntropyLoss());
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
             model.getBlock().clear();
@@ -99,7 +100,8 @@ public class SymbolBlockTest {
         Path modelDir = prepareModel();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Initializer.ONES)
+                        .addTrainingMetric(Loss.softmaxCrossEntropyLoss());
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
 
@@ -128,7 +130,8 @@ public class SymbolBlockTest {
         Path modelDir = prepareModel();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Initializer.ONES)
+                        .addTrainingMetric(Loss.softmaxCrossEntropyLoss());
         try (Model model = Model.newInstance()) {
             model.load(modelDir);
 

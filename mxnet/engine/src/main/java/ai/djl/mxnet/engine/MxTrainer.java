@@ -20,7 +20,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
@@ -28,14 +27,14 @@ import ai.djl.training.ParameterServer;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.TrainingListener;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.TrainingMetrics;
-import ai.djl.util.PairList;
+import ai.djl.training.metrics.Accuracy;
+import ai.djl.training.metrics.TrainingMetric;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,37 +47,35 @@ public class MxTrainer implements Trainer {
     // this is performance metrics similar to predictor metrics, not training accuracy or loss
     // currently not implemented
     private Metrics metrics;
+    private TrainingListener listener;
     private Device[] devices;
-    private PairList<String, Parameter> parameters;
     private ParameterStore parameterStore;
-    private Loss loss;
+    private List<TrainingMetric> trainingMetrics;
+    private List<TrainingMetric> validateMetrics;
+    private Loss trainingLoss;
     private Loss validationLoss;
-    private List<TrainingMetrics> trainingMetrics;
-    private List<TrainingMetrics> validateMetrics;
+    private Accuracy trainingAccuracy;
+    private Accuracy validationAccuracy;
+
     private boolean gradientsChecked;
 
     MxTrainer(MxModel model, TrainingConfig trainingConfig) {
         this.model = model;
-        this.manager = (MxNDManager) model.getNDManager().newSubManager();
-        Block block = model.getBlock();
+        manager = (MxNDManager) model.getNDManager().newSubManager();
         devices = trainingConfig.getDevices();
-        loss = trainingConfig.getLossFunction();
-        if (loss != null) {
-            validationLoss = loss.duplicate();
-        }
-        trainingMetrics = trainingConfig.getTrainingMetrics();
-        validateMetrics =
-                trainingMetrics
-                        .stream()
-                        .map(TrainingMetrics::duplicate)
-                        .collect(Collectors.toList());
-        parameters = block.getParameters();
+        trainingMetrics = new ArrayList<>(trainingConfig.getTrainingMetrics());
+        validateMetrics = new ArrayList<>();
+        trainingMetrics.forEach(i -> validateMetrics.add(i.duplicate()));
+        trainingLoss = getTrainingMetric(Loss.class);
+        trainingAccuracy = getTrainingMetric(Accuracy.class);
+        validationLoss = getValidationMetric(Loss.class);
+        validationAccuracy = getValidationMetric(Accuracy.class);
 
         // ParameterServer parameterServer = new MxParameterServer(trainingConfig.getOptimizer());
         ParameterServer parameterServer = new LocalParameterServer(trainingConfig.getOptimizer());
 
         parameterStore = new ParameterStore(manager, false);
-        parameterStore.setParameterServer(parameterServer, trainingConfig.getDevices());
+        parameterStore.setParameterServer(parameterServer, devices);
     }
 
     @Override
@@ -95,6 +92,7 @@ public class MxTrainer implements Trainer {
 
     @Override
     public void train(Batch batch) {
+        long begin = System.nanoTime();
         Batch[] splits = batch.split(devices, false);
         try (GradientCollector collector = new MxGradientCollector()) {
             for (Batch split : splits) {
@@ -102,36 +100,44 @@ public class MxTrainer implements Trainer {
                 NDList labels = split.getLabels();
 
                 NDList preds = forward(data);
-                collector.backward(loss(labels, preds));
+                trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
+
+                collector.backward(trainingLoss.getLastUpdate());
             }
+        }
+        addMetric("train", begin);
+
+        if (listener != null) {
+            listener.onTrainingBatch();
         }
     }
 
     @Override
     public NDList forward(NDList input) {
-        return model.getBlock().forward(parameterStore, input);
+        long begin = System.nanoTime();
+        try {
+            return model.getBlock().forward(parameterStore, input);
+        } finally {
+            addMetric("forward", begin);
+        }
     }
 
     @Override
     public void validate(Batch batch) {
+        long begin = System.nanoTime();
         Batch[] splits = batch.split(devices, false);
         for (Batch split : splits) {
             NDList data = split.getData();
             NDList labels = split.getLabels();
 
-            NDList preds = model.getBlock().forward(parameterStore, data);
+            NDList preds = forward(data);
             validateMetrics.forEach(metrics -> metrics.update(labels, preds));
         }
-    }
+        addMetric("validate", begin);
 
-    @Override
-    public NDArray loss(NDList labels, NDList preds) {
-        if (loss == null) {
-            throw new IllegalStateException("Loss function has not been configured.");
+        if (listener != null) {
+            listener.onValidationBatch();
         }
-        NDArray l = loss.update(labels, preds);
-        trainingMetrics.forEach(metric -> metric.update(labels, preds));
-        return l;
     }
 
     /** {@inheritDoc} */
@@ -141,7 +147,9 @@ public class MxTrainer implements Trainer {
             checkGradients();
         }
 
+        long begin = System.nanoTime();
         parameterStore.updateAllParameters();
+        addMetric("step", begin);
     }
 
     @Override
@@ -149,24 +157,31 @@ public class MxTrainer implements Trainer {
         this.metrics = metrics;
     }
 
+    public void setListener(TrainingListener listener) {
+        this.listener = listener;
+    }
+
     @Override
     public void resetTrainingMetrics() {
-        if (loss != null) {
-            loss.reset();
-            validationLoss.reset();
+        trainingMetrics.forEach(TrainingMetric::reset);
+        validateMetrics.forEach(TrainingMetric::reset);
+
+        if (trainingLoss != null) {
+            addMetric("train", trainingLoss);
         }
-        trainingMetrics.forEach(TrainingMetrics::reset);
-        validateMetrics.forEach(TrainingMetrics::reset);
-    }
+        if (trainingAccuracy != null) {
+            addMetric("train", trainingAccuracy);
+        }
+        if (validationLoss != null) {
+            addMetric("validate", validationLoss);
+        }
+        if (validationAccuracy != null) {
+            addMetric("validate", validationAccuracy);
+        }
 
-    @Override
-    public float getLoss() {
-        return loss.getMetric().getValue();
-    }
-
-    @Override
-    public float getValidationLoss() {
-        return validationLoss.getMetric().getValue();
+        if (listener != null) {
+            listener.onEpoch();
+        }
     }
 
     public Metrics getMetrics() {
@@ -174,13 +189,25 @@ public class MxTrainer implements Trainer {
     }
 
     @Override
-    public List<TrainingMetrics> getTrainingMetrics() {
-        return trainingMetrics;
+    @SuppressWarnings("unchecked")
+    public final <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz) {
+        for (TrainingMetric metric : trainingMetrics) {
+            if (clazz.isInstance(metric)) {
+                return (T) metric;
+            }
+        }
+        return null;
     }
 
     @Override
-    public List<TrainingMetrics> getValidateMetrics() {
-        return validateMetrics;
+    @SuppressWarnings("unchecked")
+    public <T extends TrainingMetric> T getValidationMetric(Class<T> clazz) {
+        for (TrainingMetric metric : validateMetrics) {
+            if (clazz.isInstance(metric)) {
+                return (T) metric;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -194,7 +221,8 @@ public class MxTrainer implements Trainer {
      */
     private void checkGradients() {
         List<NDArray> grads = new ArrayList<>();
-        parameters
+        model.getBlock()
+                .getParameters()
                 .values()
                 .stream()
                 .filter(Parameter::requireGradient)
@@ -241,5 +269,17 @@ public class MxTrainer implements Trainer {
     public void close() {
         parameterStore.sync();
         manager.close();
+    }
+
+    private void addMetric(String metricName, long begin) {
+        if (metrics != null) {
+            metrics.addMetric(metricName, System.nanoTime() - begin);
+        }
+    }
+
+    private void addMetric(String stage, TrainingMetric metric) {
+        if (metrics != null) {
+            metrics.addMetric(stage + '_' + metric.getName(), metric.getValue());
+        }
     }
 }

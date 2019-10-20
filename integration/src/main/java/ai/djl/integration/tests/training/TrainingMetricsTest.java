@@ -33,7 +33,7 @@ public class TrainingMetricsTest {
 
             Accuracy acc = new Accuracy();
             acc.update(labels, predictions);
-            float accuracy = acc.getMetric().getValue();
+            float accuracy = acc.getValue();
             float expectedAccuracy = 2.f / 3;
             Assert.assertEquals(
                     expectedAccuracy,
@@ -55,7 +55,7 @@ public class TrainingMetricsTest {
             TopKAccuracy topKAccuracy = new TopKAccuracy(2);
             topKAccuracy.update(labels, predictions);
             float expectedAccuracy = 1.f / 3;
-            float accuracy = topKAccuracy.getMetric().getValue();
+            float accuracy = topKAccuracy.getValue();
             Assert.assertEquals(
                     expectedAccuracy,
                     accuracy,
