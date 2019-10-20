@@ -13,7 +13,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.Device;
-import ai.djl.examples.inference.util.AbstractExample;
+import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
@@ -30,7 +30,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class ClassifyExample extends AbstractExample {
+public final class ClassifyExample extends AbstractInference<Classification> {
 
     public static void main(String[] args) {
         new ClassifyExample().runExample(args);
@@ -39,7 +39,6 @@ public final class ClassifyExample extends AbstractExample {
     @Override
     public Classification predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
-        Classification predictResult = null;
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
@@ -53,13 +52,14 @@ public final class ClassifyExample extends AbstractExample {
         ZooModel<BufferedImage, Classification> model =
                 MxModelZoo.RESNET.loadModel(criteria, device);
 
+        Classification predictResult = null;
         try (Predictor<BufferedImage, Classification> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
                 predictResult = predictor.predict(img);
 
-                printProgress(iteration, i);
+                progressBar.printProgress(i);
                 MemoryUtils.collectMemoryInfo(metrics);
             }
         }

@@ -51,6 +51,7 @@ configure(javaProjects()) {
 
         doFirst {
             systemProperty "ai.djl.logging.level", "debug"
+            systemProperty "disableProgressBar", "true"
             if (gradle.startParameter.offline) {
                 systemProperty "offline", "true"
             }

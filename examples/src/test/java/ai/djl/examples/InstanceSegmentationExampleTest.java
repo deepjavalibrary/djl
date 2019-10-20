@@ -13,19 +13,21 @@
 package ai.djl.examples;
 
 import ai.djl.examples.inference.InstanceSegementationExample;
-import ai.djl.examples.inference.util.AbstractExample;
 import ai.djl.modality.cv.DetectedObjects;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class InstanceSegmentationExampleTest {
+
     @Test
     public void testInstanceSegmentation() {
         String[] args = {
             "-i", "src/test/resources/segmentation.jpg", "-c", "1", "-l", "build/logs"
         };
-        Assert.assertTrue(new InstanceSegementationExample().runExample(args));
-        DetectedObjects result = (DetectedObjects) AbstractExample.getPredictResult();
+
+        InstanceSegementationExample test = new InstanceSegementationExample();
+        Assert.assertTrue(test.runExample(args));
+        DetectedObjects result = test.getPredictResult();
         DetectedObjects.Item best = result.best();
         Assert.assertEquals(best.getClassName(), "person");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);

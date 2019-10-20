@@ -13,18 +13,18 @@
 package ai.djl.examples;
 
 import ai.djl.examples.training.TrainMnist;
-import java.io.IOException;
-import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainMnistTest {
 
     @Test
-    public void testTrainMnist() throws ParseException, IOException {
-        String[] args = new String[] {"-e", "2"};
-        TrainMnist.main(args);
-        Assert.assertTrue(TrainMnist.getTrainAccuracy() > 0.9f);
-        Assert.assertTrue(TrainMnist.getLossValue() < 0.2f);
+    public void testTrainMnist() {
+        String[] args = new String[] {"-e", "2", "-o", "build/logs"};
+
+        TrainMnist test = new TrainMnist();
+        Assert.assertTrue(test.runExample(args));
+        Assert.assertTrue(test.getTrainingAccuracy() > 0.9f);
+        Assert.assertTrue(test.getTrainingLoss() < 0.2f);
     }
 }

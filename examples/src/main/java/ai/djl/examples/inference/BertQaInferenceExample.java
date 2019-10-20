@@ -15,7 +15,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.examples.inference.util.AbstractExample;
+import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.examples.inference.util.BertDataParser;
 import ai.djl.examples.util.MemoryUtils;
@@ -39,7 +39,7 @@ import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class BertQaInferenceExample extends AbstractExample {
+public final class BertQaInferenceExample extends AbstractInference<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(BertQaInferenceExample.class);
 
@@ -50,8 +50,6 @@ public final class BertQaInferenceExample extends AbstractExample {
     @Override
     public String predict(Arguments args, Metrics metrics, int iteration)
             throws IOException, TranslateException {
-        String predictResult = null;
-
         BertArguments arguments = (BertArguments) args;
         Path modelDir = arguments.getModelDir();
         String modelName = arguments.getModelName();
@@ -71,13 +69,14 @@ public final class BertQaInferenceExample extends AbstractExample {
 
         BertTranslator translator = new BertTranslator(parser);
 
+        String predictResult = null;
         try (Predictor<QAInput, String> predictor = model.newPredictor(translator)) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
                 predictResult = predictor.predict(input);
 
-                printProgress(iteration, i);
+                progressBar.printProgress(i);
                 MemoryUtils.collectMemoryInfo(metrics);
             }
         }

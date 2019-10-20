@@ -12,7 +12,7 @@
  */
 package ai.djl.examples.inference;
 
-import ai.djl.examples.inference.util.AbstractExample;
+import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
 
-public class InstanceSegementationExample extends AbstractExample {
+public class InstanceSegementationExample extends AbstractInference<DetectedObjects> {
 
     public static void main(String[] args) {
         new InstanceSegementationExample().runExample(args);
@@ -42,8 +42,6 @@ public class InstanceSegementationExample extends AbstractExample {
     @Override
     protected DetectedObjects predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
-
-        DetectedObjects result;
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
@@ -53,6 +51,7 @@ public class InstanceSegementationExample extends AbstractExample {
         criteria.put("dataset", "coco");
         ZooModel<BufferedImage, DetectedObjects> model = MxModelZoo.MASK_RCNN.loadModel(criteria);
 
+        DetectedObjects result;
         try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
             result = predictor.predict(img);

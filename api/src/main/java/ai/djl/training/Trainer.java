@@ -47,6 +47,8 @@ public interface Trainer extends AutoCloseable {
      */
     void setMetrics(Metrics metrics);
 
+    void setTrainingListener(TrainingListener listener);
+
     void resetTrainingMetrics();
 
     <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz);

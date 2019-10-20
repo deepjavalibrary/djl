@@ -13,19 +13,20 @@
 package ai.djl.examples;
 
 import ai.djl.examples.inference.PoseEstimationExample;
-import ai.djl.examples.inference.util.AbstractExample;
 import ai.djl.modality.cv.Joints;
 import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PoseEstimationExampleTest {
+
     @Test
-    @SuppressWarnings("unchecked")
     public void testPoseEstimation() {
         String[] args = {"-i", "src/test/resources/pose_soccer.png", "-c", "1", "-l", "build/logs"};
-        Assert.assertTrue(new PoseEstimationExample().runExample(args));
-        List<Joints> result = (List<Joints>) AbstractExample.getPredictResult();
+
+        PoseEstimationExample test = new PoseEstimationExample();
+        Assert.assertTrue(test.runExample(args));
+        List<Joints> result = test.getPredictResult();
         Joints current = result.get(0);
         Assert.assertEquals(result.size(), 3);
         Assert.assertTrue(Double.compare(current.getJoints().get(0).getConfidence(), 0.7) > 0);

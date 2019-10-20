@@ -13,7 +13,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.Device;
-import ai.djl.examples.inference.util.AbstractExample;
+import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
 
-public final class SsdExample extends AbstractExample {
+public final class SsdExample extends AbstractInference<DetectedObjects> {
 
     public static void main(String[] args) {
         new SsdExample().runExample(args);
@@ -43,7 +43,6 @@ public final class SsdExample extends AbstractExample {
     @Override
     public DetectedObjects predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
-        DetectedObjects predictResult = null;
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
@@ -57,13 +56,14 @@ public final class SsdExample extends AbstractExample {
         criteria.put("dataset", "voc");
         ZooModel<BufferedImage, DetectedObjects> model = MxModelZoo.SSD.loadModel(criteria, device);
 
+        DetectedObjects predictResult = null;
         try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
                 predictResult = predictor.predict(img);
 
-                printProgress(iteration, i);
+                progressBar.printProgress(i);
                 MemoryUtils.collectMemoryInfo(metrics);
             }
         }

@@ -24,7 +24,7 @@ public class Arguments {
     private boolean isSymbolic;
     private boolean preTrained;
     private String outputDir;
-    private int maxIterations;
+    private long maxIterations;
 
     public Arguments(CommandLine cmd) {
         if (cmd.hasOption("epoch")) {
@@ -58,9 +58,9 @@ public class Arguments {
             outputDir = null;
         }
         if (cmd.hasOption("max-iterations")) {
-            maxIterations = Integer.parseInt(cmd.getOptionValue("max-iterations"));
+            maxIterations = Long.parseLong(cmd.getOptionValue("max-iterations"));
         } else {
-            maxIterations = -1;
+            maxIterations = Long.MAX_VALUE;
         }
     }
 
@@ -142,7 +142,7 @@ public class Arguments {
         return outputDir;
     }
 
-    public int getMaxIterations() {
+    public long getMaxIterations() {
         return maxIterations;
     }
 }

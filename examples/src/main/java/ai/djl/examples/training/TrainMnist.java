@@ -12,11 +12,13 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
+import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.mxnet.dataset.Mnist;
 import ai.djl.mxnet.dataset.transform.cv.ToTensor;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -27,7 +29,6 @@ import ai.djl.training.Activation;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
-import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
@@ -38,34 +39,64 @@ import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
 import java.nio.file.Paths;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public final class TrainMnist {
+public final class TrainMnist extends AbstractTraining {
 
-    private static final Logger logger = LoggerFactory.getLogger(TrainMnist.class);
-
-    private static float trainAccuracy;
-    private static float lossValue;
-
-    private TrainMnist() {}
-
-    public static void main(String[] args) throws IOException, ParseException {
-        Options options = Arguments.getOptions();
-        DefaultParser parser = new DefaultParser();
-        org.apache.commons.cli.CommandLine cmd = parser.parse(options, args, null, false);
-        Arguments arguments = new Arguments(cmd);
-        // load the model
-        trainMnist(arguments);
+    public static void main(String[] args) {
+        new TrainMnist().runExample(args);
     }
 
-    public static void trainMnist(Arguments arguments) throws IOException {
-        int batchSize = arguments.getBatchSize();
-        int numGpus = arguments.getNumGpus();
+    @Override
+    protected void train(Arguments arguments) throws IOException {
+        // Construct neural network
         Block block = constructBlock();
+
+        // setup training configuration
+        TrainingConfig config = setupTrainingConfig(arguments);
+
+        // configure input data shape based on batch size
+        int batchSize = arguments.getBatchSize();
+        int numOfSlices = config.getDevices().length;
+        Shape inputShape = new Shape(batchSize / numOfSlices, 28 * 28);
+
+        try (Model model = Model.newInstance()) {
+            model.setBlock(block);
+
+            // get training and validation dataset
+            Dataset trainingSet = getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
+            Dataset validateSet = getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.setMetrics(metrics);
+                trainer.setTrainingListener(this);
+
+                // initialize trainer
+                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+
+                TrainingUtils.fit(trainer, config, trainingSet, validateSet);
+            }
+
+            // save model
+            if (arguments.getOutputDir() != null) {
+                model.save(Paths.get(arguments.getOutputDir()), "mnist");
+            }
+        }
+    }
+
+    private Block constructBlock() {
+        return new SequentialBlock()
+                .add(Blocks.flattenBlock(28 * 28))
+                .add(new Linear.Builder().setOutChannels(128).build())
+                .add(Activation.reluBlock())
+                .add(new Linear.Builder().setOutChannels(64).build())
+                .add(Activation.reluBlock())
+                .add(new Linear.Builder().setOutChannels(10).build());
+    }
+
+    private TrainingConfig setupTrainingConfig(Arguments arguments) {
+        int batchSize = arguments.getBatchSize();
+        int numEpoch = arguments.getEpoch();
+
         FactorTracker factorTracker =
                 LearningRateTracker.factorTracker()
                         .optBaseLearningRate(0.01f)
@@ -83,106 +114,35 @@ public final class TrainMnist {
                         .optMomentum(0.9f)
                         .build();
 
-        Device[] devices;
-        if (numGpus > 1) {
-            devices = new Device[numGpus];
-            for (int i = 0; i < numGpus; i++) {
-                devices[i] = Device.gpu(i);
-            }
+        return new DefaultTrainingConfig(new XavierInitializer())
+                .setOptimizer(optimizer)
+                .addTrainingMetric(Loss.softmaxCrossEntropyLoss())
+                .addTrainingMetric(new Accuracy())
+                .setEpoch(numEpoch)
+                .setBatchSize(batchSize);
+    }
+
+    private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)
+            throws IOException {
+        Pipeline pipeline = new Pipeline(new ToTensor());
+
+        int batchSize = arguments.getBatchSize();
+        long maxIterations = arguments.getMaxIterations();
+
+        Mnist mnist =
+                new Mnist.Builder()
+                        .setManager(manager)
+                        .setUsage(usage)
+                        .setRandomSampling(batchSize)
+                        .optPipeline(pipeline)
+                        .optMaxIteration(maxIterations)
+                        .build();
+        mnist.prepare();
+        if (usage == Dataset.Usage.TRAIN) {
+            trainDataSize = (int) Math.min(mnist.size() / batchSize, maxIterations);
         } else {
-            devices = new Device[] {Device.defaultDevice()};
+            validateDataSize = (int) Math.min(mnist.size() / batchSize, maxIterations);
         }
-
-        TrainingConfig config =
-                new DefaultTrainingConfig(new XavierInitializer())
-                        .setOptimizer(optimizer)
-                        .addTrainingMetric(Loss.softmaxCrossEntropyLoss())
-                        .addTrainingMetric(new Accuracy())
-                        .setDevices(devices);
-        try (Model model = Model.newInstance()) {
-            model.setBlock(block);
-
-            Pipeline pipeline = new Pipeline(new ToTensor());
-
-            Mnist mnist =
-                    new Mnist.Builder()
-                            .setManager(model.getNDManager())
-                            .setUsage(Dataset.Usage.TRAIN)
-                            .setRandomSampling(batchSize)
-                            .optPipeline(pipeline)
-                            .build();
-            mnist.prepare();
-
-            Mnist validateSet =
-                    new Mnist.Builder()
-                            .setManager(model.getNDManager())
-                            .setUsage(Dataset.Usage.TEST)
-                            .setRandomSampling(batchSize)
-                            .optPipeline(pipeline)
-                            .build();
-            validateSet.prepare();
-
-            try (Trainer trainer = model.newTrainer(config)) {
-                int numEpoch = arguments.getEpoch();
-                int numOfSlices = devices.length;
-
-                Shape inputShape = new Shape(batchSize / numOfSlices, 28 * 28);
-                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
-
-                for (int epoch = 0; epoch < numEpoch; epoch++) {
-                    for (Batch batch : trainer.iterateDataset(mnist)) {
-                        trainer.train(batch);
-                        trainer.step();
-                        batch.close();
-                    }
-
-                    // Validation
-                    for (Batch batch : trainer.iterateDataset(validateSet)) {
-                        trainer.validate(batch);
-                        batch.close();
-                    }
-
-                    lossValue = trainer.getTrainingMetric(Loss.class).getValue();
-                    trainAccuracy = trainer.getTrainingMetric(Accuracy.class).getValue();
-                    float validationLoss = trainer.getValidationMetric(Loss.class).getValue();
-                    float validationAccuracy =
-                            trainer.getValidationMetric(Accuracy.class).getValue();
-                    logger.info(
-                            "train loss: "
-                                    + lossValue
-                                    + " validate loss: "
-                                    + validationLoss
-                                    + " train accuracy: "
-                                    + trainAccuracy
-                                    + " validate accuracy: "
-                                    + validationAccuracy);
-                    logger.info("Epoch " + epoch + " finish");
-                    // reset loss and accuracy
-                    trainer.resetTrainingMetrics();
-                }
-            }
-
-            if (arguments.getOutputDir() != null) {
-                model.save(Paths.get(arguments.getOutputDir()), "mnist");
-            }
-        }
-    }
-
-    public static float getTrainAccuracy() {
-        return trainAccuracy;
-    }
-
-    public static float getLossValue() {
-        return lossValue;
-    }
-
-    private static Block constructBlock() {
-        return new SequentialBlock()
-                .add(Blocks.flattenBlock(28 * 28))
-                .add(new Linear.Builder().setOutChannels(128).build())
-                .add(Activation.reluBlock())
-                .add(new Linear.Builder().setOutChannels(64).build())
-                .add(Activation.reluBlock())
-                .add(new Linear.Builder().setOutChannels(10).build());
+        return mnist;
     }
 }

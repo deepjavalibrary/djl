@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
+import ai.djl.training.TrainingListener;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.metrics.TrainingMetric;
 
@@ -55,6 +56,9 @@ public class MockTrainer implements Trainer {
 
     @Override
     public void setMetrics(Metrics metrics) {}
+
+    @Override
+    public void setTrainingListener(TrainingListener listener) {}
 
     @Override
     public void resetTrainingMetrics() {}

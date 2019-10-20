@@ -12,9 +12,8 @@
  */
 package ai.djl.examples.inference;
 
-import ai.djl.examples.inference.util.AbstractExample;
+import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
-import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classification;
@@ -29,7 +28,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ActionRecognition extends AbstractExample {
+public class ActionRecognition extends AbstractInference<Classification> {
 
     public static void main(String[] args) {
         new ActionRecognition().runExample(args);
@@ -38,8 +37,6 @@ public class ActionRecognition extends AbstractExample {
     @Override
     protected Classification predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException {
-
-        Classification result;
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -48,11 +45,10 @@ public class ActionRecognition extends AbstractExample {
         ZooModel<BufferedImage, Classification> inception =
                 MxModelZoo.ACTION_RECOGNITION.loadModel(criteria);
 
+        Classification result;
         try (Predictor<BufferedImage, Classification> action = inception.newPredictor()) {
             action.setMetrics(metrics); // Let predictor collect metrics
             result = action.predict(img);
-
-            MemoryUtils.collectMemoryInfo(metrics);
         }
 
         inception.close();

@@ -15,6 +15,7 @@ package ai.djl.examples.inference.util;
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.examples.util.MemoryUtils;
+import ai.djl.examples.util.ProgressBar;
 import ai.djl.metric.Metrics;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Utils;
@@ -33,11 +34,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Abstract class that encapsulate command line options for example project. */
-public abstract class AbstractExample {
+public abstract class AbstractInference<T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractExample.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractInference.class);
 
-    private static Object lastResult;
+    private T lastResult;
+
+    protected ProgressBar progressBar;
 
     /**
      * Abstract predict method that must be implemented by sub class.
@@ -50,7 +53,7 @@ public abstract class AbstractExample {
      * @throws ModelNotFoundException if specified model not found
      * @throws TranslateException if error occurs when processing input or output
      */
-    protected abstract Object predict(Arguments arguments, Metrics metrics, int iteration)
+    protected abstract T predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelNotFoundException, TranslateException;
 
     /**
@@ -91,6 +94,7 @@ public abstract class AbstractExample {
 
             Duration duration = Duration.ofMinutes(arguments.getDuration());
             int iteration = arguments.getIteration();
+            progressBar = new ProgressBar("Iteration", iteration);
 
             logger.info(
                     "Running {} on: {}, iteration: {}, duration: {} minutes.",
@@ -110,7 +114,7 @@ public abstract class AbstractExample {
                 Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
 
                 long begin = System.currentTimeMillis();
-                setLastResult(predict(arguments, metrics, iteration));
+                lastResult = predict(arguments, metrics, iteration);
 
                 logger.info("Inference result: {}", lastResult);
 
@@ -140,42 +144,6 @@ public abstract class AbstractExample {
     }
 
     /**
-     * Set predict result.
-     *
-     * <p>This method is used for unit test only.
-     *
-     * @param lastResult last predict result
-     */
-    private static void setLastResult(Object lastResult) {
-        AbstractExample.lastResult = lastResult;
-    }
-
-    /**
-     * Returns last predict result.
-     *
-     * <p>This method is used for unit test only.
-     *
-     * @return last predict result
-     */
-    public static Object getPredictResult() {
-        return lastResult;
-    }
-
-    /**
-     * Print inference iteration progress.
-     *
-     * @param iteration total number of iteration
-     * @param index index of iteration
-     */
-    @SuppressWarnings("PMD.SystemPrintln")
-    protected static void printProgress(int iteration, int index) {
-        System.out.print(".");
-        if (index % 80 == 79 || index == iteration - 1) {
-            System.out.println();
-        }
-    }
-
-    /**
      * Load MXNet synset.txt file into array of string.
      *
      * @param inputStream sysnet.txt input
@@ -189,5 +157,16 @@ public abstract class AbstractExample {
             it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
         }
         return output.toArray(new String[0]);
+    }
+
+    /**
+     * Returns last predict result.
+     *
+     * <p>This method is used for unit test only.
+     *
+     * @return last predict result
+     */
+    public T getPredictResult() {
+        return lastResult;
     }
 }

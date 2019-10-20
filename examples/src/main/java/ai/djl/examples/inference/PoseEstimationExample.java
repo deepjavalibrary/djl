@@ -12,7 +12,7 @@
  */
 package ai.djl.examples.inference;
 
-import ai.djl.examples.inference.util.AbstractExample;
+import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -39,7 +39,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PoseEstimationExample extends AbstractExample {
+public class PoseEstimationExample extends AbstractInference<List<Joints>> {
 
     private static final Logger logger = LoggerFactory.getLogger(PoseEstimationExample.class);
 

@@ -157,15 +157,13 @@ public class MxTrainer implements Trainer {
         this.metrics = metrics;
     }
 
-    public void setListener(TrainingListener listener) {
+    @Override
+    public void setTrainingListener(TrainingListener listener) {
         this.listener = listener;
     }
 
     @Override
     public void resetTrainingMetrics() {
-        trainingMetrics.forEach(TrainingMetric::reset);
-        validateMetrics.forEach(TrainingMetric::reset);
-
         if (trainingLoss != null) {
             addMetric("train", trainingLoss);
         }
@@ -178,6 +176,9 @@ public class MxTrainer implements Trainer {
         if (validationAccuracy != null) {
             addMetric("validate", validationAccuracy);
         }
+
+        trainingMetrics.forEach(TrainingMetric::reset);
+        validateMetrics.forEach(TrainingMetric::reset);
 
         if (listener != null) {
             listener.onEpoch();

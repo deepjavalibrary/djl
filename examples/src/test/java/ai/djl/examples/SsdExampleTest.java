@@ -13,7 +13,6 @@
 package ai.djl.examples;
 
 import ai.djl.examples.inference.SsdExample;
-import ai.djl.examples.inference.util.AbstractExample;
 import ai.djl.modality.cv.DetectedObjects;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -23,8 +22,10 @@ public class SsdExampleTest {
     @Test
     public void testSsdExample() {
         String[] args = {"-i", "src/test/resources/3dogs.jpg", "-c", "1", "-l", "build/logs"};
-        Assert.assertTrue(new SsdExample().runExample(args));
-        DetectedObjects result = (DetectedObjects) AbstractExample.getPredictResult();
+
+        SsdExample test = new SsdExample();
+        Assert.assertTrue(test.runExample(args));
+        DetectedObjects result = test.getPredictResult();
         DetectedObjects.Item best = result.best();
         Assert.assertEquals(best.getClassName(), "dog");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.8) > 0);

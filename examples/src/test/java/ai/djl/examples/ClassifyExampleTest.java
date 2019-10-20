@@ -13,7 +13,6 @@
 package ai.djl.examples;
 
 import ai.djl.examples.inference.ClassifyExample;
-import ai.djl.examples.inference.util.AbstractExample;
 import ai.djl.modality.Classification;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -23,8 +22,10 @@ public class ClassifyExampleTest {
     @Test
     public void testClassifyExample() {
         String[] args = {"-i", "src/test/resources/kitten.jpg", "-c", "1", "-l", "build/logs"};
-        Assert.assertTrue(new ClassifyExample().runExample(args));
-        Classification result = (Classification) AbstractExample.getPredictResult();
+
+        ClassifyExample test = new ClassifyExample();
+        Assert.assertTrue(test.runExample(args));
+        Classification result = test.getPredictResult();
         Classification.Item best = result.best();
         Assert.assertEquals(best.getClassName(), "n02123045 tabby, tabby cat");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.4) > 0);

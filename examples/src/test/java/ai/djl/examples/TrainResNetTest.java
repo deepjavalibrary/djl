@@ -15,15 +15,12 @@ package ai.djl.examples;
 
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
-import ai.djl.zoo.ModelNotFoundException;
-import java.io.IOException;
-import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainResNetTest {
     @Test
-    public void testTrainResNet() throws ParseException, IOException, ModelNotFoundException {
+    public void testTrainResNet() {
         int numGpus = Engine.getInstance().getGpuCount();
         // only run this test on gpu
         if (numGpus > 0) {
@@ -42,9 +39,11 @@ public class TrainResNetTest {
                         "-p",
                         "true"
                     };
-            TrainResnetWithCifar10.main(args);
-            Assert.assertTrue(TrainResnetWithCifar10.getAccuracy() > .7f);
-            Assert.assertTrue(TrainResnetWithCifar10.getLossValue() < .8f);
+
+            TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
+            Assert.assertTrue(test.runExample(args));
+            Assert.assertTrue(test.getTrainingAccuracy() > .7f);
+            Assert.assertTrue(test.getTrainingLoss() < .8f);
         }
     }
 }
