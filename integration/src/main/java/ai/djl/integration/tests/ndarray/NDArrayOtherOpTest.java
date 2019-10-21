@@ -46,6 +46,12 @@ public class NDArrayOtherOpTest {
 
             NDArray getStepSlice = original.get("1::2");
             Assert.assertEquals(actual, getStepSlice);
+
+            // get from boolean array
+            original = manager.arange(10).reshape(2, 5);
+            NDArray bool = manager.create(new boolean[] {true, false});
+            actual = manager.arange(5).reshape(1, 5);
+            Assert.assertEquals(actual, original.get(bool));
         }
     }
 
@@ -118,26 +124,74 @@ public class NDArrayOtherOpTest {
     @Test
     public void testNonZero() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray ndArray1 = manager.create(new float[] {1f, 2f, 3f, 4f});
-            NDArray ndArray2 = manager.create(new float[] {1f, 2f, 0f, 4f});
-            NDArray ndArray3 = manager.create(new float[] {0f, 0f, 0f, 4f});
-            NDArray ndArray4 = manager.create(new float[] {0f, 0f, 0f, 0f});
-            Assert.assertTrue(
-                    ndArray1.nonzero() == 4
-                            && ndArray2.nonzero() == 3
-                            && ndArray3.nonzero() == 1
-                            && ndArray4.nonzero() == 0,
-                    "nonzero function returned incorrect value");
+            NDArray array = manager.ones(new Shape(3, 3));
+            NDArray actual =
+                    manager.create(
+                            new long[] {0, 0, 0, 1, 0, 2, 1, 0, 1, 1, 1, 2, 2, 0, 2, 1, 2, 2},
+                            new Shape(9, 2));
+            Assert.assertEquals(actual, array.nonzero());
             // test multi-dim
-            ndArray1 = manager.create(new float[] {0f, 1f, 2f, 0f, 0f, -4f}, new Shape(2, 1, 3));
-            Assert.assertEquals(ndArray1.nonzero(), 3);
+            array = manager.create(new float[] {0f, 1f, 2f, 0f, 0f, -4f}, new Shape(2, 1, 3));
+            actual = manager.create(new long[] {0, 0, 1, 0, 0, 2, 1, 0, 2}, new Shape(3, 3));
+            Assert.assertEquals(actual, array.nonzero());
             // test scalar
-            ndArray1 = manager.create(0f);
-            ndArray2 = manager.create(10f);
-            Assert.assertTrue(ndArray1.nonzero() == 0 && ndArray2.nonzero() == 1);
+            array = manager.create(1f);
+            actual = manager.create(new long[] {0}, new Shape(1, 1));
+            Assert.assertEquals(actual, array.nonzero());
             // test zero-dim
-            ndArray1 = manager.create(new Shape(4, 0));
-            Assert.assertEquals(ndArray1.nonzero(), 0);
+            // TODO confirm this behavior is right
+            array = manager.create(new Shape(4, 0));
+            actual = manager.create(new Shape(0, 2), DataType.INT64);
+            Assert.assertEquals(actual, array.nonzero());
+        }
+    }
+
+    @Test
+    public void testCountNonzero() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.arange(4);
+            Assert.assertEquals(3, array.countNonzero());
+
+            // multi-dim
+            array = manager.create(new float[] {-1f, 0f, 2f, 100f, 2340f, -200f}, new Shape(2, 3));
+            Assert.assertEquals(5, array.countNonzero());
+
+            // scalar
+            array = manager.create(5f);
+            Assert.assertEquals(1, array.countNonzero());
+            // zero-dim
+            array = manager.create(new Shape(2, 0));
+            Assert.assertEquals(0, array.countNonzero());
+        }
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testBooleanMask() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.arange(4);
+            NDArray index = manager.create(new boolean[] {true, false, true, false});
+            NDArray actual = manager.create(new float[] {0f, 2f});
+            Assert.assertEquals(actual, array.booleanMask(index));
+            Assert.assertEquals(actual, NDArrays.booleanMask(array, index));
+
+            // test multi-dim
+            array = manager.arange(10).reshape(2, 1, 5);
+            index = manager.create(new boolean[] {true, false});
+            actual = manager.arange(5).reshape(1, 1, 5);
+            Assert.assertEquals(actual, array.booleanMask(index));
+            Assert.assertEquals(actual, NDArrays.booleanMask(array, index));
+
+            // test scalar
+            array = manager.create(5f);
+            index = manager.create(true);
+            array.booleanMask(index);
+
+            // test zero-dim
+            array = manager.create(new Shape(1, 0));
+            index = manager.create(new boolean[] {false});
+            actual = manager.create(new Shape(0, 0));
+            Assert.assertEquals(actual, array.booleanMask(index));
+            Assert.assertEquals(actual, NDArrays.booleanMask(array, index));
         }
     }
 

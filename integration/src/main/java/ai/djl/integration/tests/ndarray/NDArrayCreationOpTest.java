@@ -49,6 +49,12 @@ public class NDArrayCreationOpTest {
             array = manager.create(data2D);
             actual = NDArrays.stack(new NDList(manager.create(data), manager.create(data)));
             Assert.assertEquals(actual, array);
+
+            // test boolean
+            array = manager.create(new boolean[] {true, false, true, false}, new Shape(2, 2));
+            actual = manager.create(new int[] {1, 0, 1, 0}, new Shape(2, 2));
+            Assert.assertEquals(actual, array.asType(DataType.INT32, false));
+            Assert.assertEquals(actual.asType(DataType.BOOLEAN, false), array);
         }
     }
 

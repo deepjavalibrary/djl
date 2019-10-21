@@ -127,6 +127,15 @@ public class NDIndex {
     }
 
     /**
+     * Returns the indices.
+     *
+     * @return Returns the indices
+     */
+    public List<NDIndexElement> getIndices() {
+        return indices;
+    }
+
+    /**
      * Updates the NDIndex by appending indices to the array.
      *
      * @param indices the indices to add similar to {@link #NDIndex(String)}

@@ -34,6 +34,8 @@ public abstract class NDFormat {
 
         if (dataType == DataType.UINT8) {
             format = new HexFormat();
+        } else if (dataType == DataType.BOOLEAN) {
+            format = new BooleanFormat();
         } else if (dataType.isInteger()) {
             format = new IntFormat(array);
         } else {
@@ -297,6 +299,14 @@ public abstract class NDFormat {
                 return String.format("% ." + precision + "e", value.floatValue());
             }
             return String.format("%" + totalLength + "d", value.longValue());
+        }
+    }
+
+    private static final class BooleanFormat extends NDFormat {
+
+        @Override
+        public CharSequence format(Number value) {
+            return value.byteValue() != 0 ? " true" : "false";
         }
     }
 }

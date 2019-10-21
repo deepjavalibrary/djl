@@ -125,6 +125,7 @@ public class MockNDArray implements NDArray {
     @Override
     public void set(Buffer data) {
         int size = data.remaining();
+        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
         DataType inputType = DataType.fromBuffer(data);
 
         int numOfBytes = inputType.getNumOfBytes();
@@ -179,6 +180,11 @@ public class MockNDArray implements NDArray {
 
     @Override
     public void copyTo(NDArray array) {}
+
+    @Override
+    public NDArray booleanMask(NDArray index, int axis) {
+        return null;
+    }
 
     @Override
     public NDArray zerosLike() {
@@ -872,8 +878,8 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public long nonzero() {
-        return 0;
+    public NDArray nonzero() {
+        return null;
     }
 
     @Override

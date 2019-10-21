@@ -189,6 +189,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray booleanMask(NDArray index, int axis) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray zerosLike() {
         Operation op =
                 manager.getGraph()
@@ -1029,10 +1035,9 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public long nonzero() {
-        return 0;
+    public NDArray nonzero() {
+        return null;
     }
 
     /** {@inheritDoc} */

@@ -18,6 +18,7 @@ import ai.djl.modality.cv.Joints.Joint;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
@@ -43,9 +44,16 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
 
         result.set(new NDIndex(":, :, 0"), result.get(":, :, 0").mod(width));
         result.set(new NDIndex(":, :, 1"), result.get(":, :, 1").div(width).floor());
-
-        NDArray predMask = maxValues.gt(0.0).tile(2, 2);
-        float[] flattened = result.mul(predMask).toFloatArray();
+        // TODO remove asType
+        NDArray predMask =
+                maxValues
+                        .gt(0.0)
+                        // current boolean NDArray operator didn't support majority of ops
+                        // need to cast to int
+                        .asType(DataType.UINT8, false)
+                        .tile(2, 2)
+                        .asType(DataType.BOOLEAN, false);
+        float[] flattened = result.get(predMask).toFloatArray();
         float[] flattenedConfidence = maxValues.toFloatArray();
         List<Joint> joints = new ArrayList<>(numJoints);
         for (int i = 0; i < numJoints; i++) {

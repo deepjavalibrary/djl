@@ -274,6 +274,19 @@ public interface NDArray extends AutoCloseable {
         return buf;
     }
 
+    default boolean[] toBoolArray() {
+        if (getDataType() != DataType.BOOLEAN) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required boolean" + " Actual " + getDataType());
+        }
+        ByteBuffer bb = toByteBuffer();
+        boolean[] ret = new boolean[bb.remaining()];
+        for (int i = 0; i < ret.length; ++i) {
+            ret[i] = bb.get() != 0;
+        }
+        return ret;
+    }
+
     /**
      * Converts this NDArray to a Number array based on its data type.
      *
@@ -292,6 +305,7 @@ public interface NDArray extends AutoCloseable {
                 return Arrays.stream(toIntArray()).boxed().toArray(Integer[]::new);
             case INT64:
                 return Arrays.stream(toLongArray()).boxed().toArray(Long[]::new);
+            case BOOLEAN:
             case INT8:
                 ByteBuffer bb = toByteBuffer();
                 Byte[] ret = new Byte[bb.remaining()];
@@ -422,6 +436,16 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
+     * Returns a partial {@code NDArray}.
+     *
+     * @param index the boolean NDArray that shows where to return
+     * @return the partial NDArray
+     */
+    default NDArray get(NDArray index) {
+        return get(new NDIndex().addBooleanIndex(index));
+    }
+
+    /**
      * Returns a scalar NDArray corresponding to a single element.
      *
      * @param indices The index of the scalar to return. Must return only a single item.
@@ -529,6 +553,25 @@ public interface NDArray extends AutoCloseable {
         copyTo(nd);
         return nd;
     }
+
+    /**
+     * Returns partial of {@code NDArray} based on boolean index {@code NDArray} from axis 0.
+     *
+     * @param index boolean {@code NDArray} mask
+     * @return the new {@code NDArray}
+     */
+    default NDArray booleanMask(NDArray index) {
+        return booleanMask(index, 0);
+    }
+
+    /**
+     * Returns partial of {@code NDArray} based on boolean index {@code NDArray} and axis.
+     *
+     * @param index boolean {@code NDArray} mask
+     * @param axis an integer that represents the axis in {@code NDArray} to mask from
+     * @return the new {@code NDArray}
+     */
+    NDArray booleanMask(NDArray index, int axis);
 
     /**
      * Returns an array of zeros with the same {@link Shape}, {@link DataType} and {@link
@@ -2292,11 +2335,15 @@ public interface NDArray extends AutoCloseable {
     NDArray toDense();
 
     /**
-     * Returns the number of non-null element.
+     * Returns the indices of elements that are non-zero.
      *
-     * @return nnz
+     * <p>Note that the behavior is slightly different from numpy.nonzero. Numpy returns a tuple of
+     * NDArray, one for each dimension of NDArray. DJL nonzero returns only one NDArray with last
+     * dimension containing all dimension of indices
+     *
+     * @return indices of the elements that are non-zero
      */
-    long nonzero();
+    NDArray nonzero();
 
     /**
      * Returns {@code true} if this NDArray is special case: no-value {@code NDArray}.
@@ -2311,25 +2358,44 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if all elements within this array are non-zero or {@code true}
      */
     default boolean all() {
-        return nonzero() == size();
+        return asType(DataType.BOOLEAN, false).sum().getInt() == size();
     }
 
     /**
-     * Returns {@code true} if any of the elements within this array are non-zero or {@code true }.
+     * Returns {@code tr ue} if any of the elements within this array are non-zero or {@code true}.
      *
-     * @return {@code true} if any of the elements within this array are non-zero or {@code true }
+     * @return {@code true} if any of the elements within this array are non-zero or {@code true}
      */
     default boolean any() {
-        return nonzero() > 0;
+        return asType(DataType.BOOLEAN, false).sum().getInt() > 0;
     }
 
     /**
-     * Returns {@code true} if none of the elements within this array are non-zero or {@code true }.
+     * Returns {@code true} if none of the elements within this array are non-zero or {@code true}.
      *
-     * @return {@code true} if none of the elements within this array are non-zero or {@code true }
+     * @return {@code true} if none of the elements within this array are non-zero or {@code true}
      */
     default boolean none() {
-        return nonzero() == 0;
+        return asType(DataType.BOOLEAN, false).sum().getInt() == 0;
+    }
+
+    /**
+     * Counts the number of non-zero values in the {@code NDArray}.
+     *
+     * @return Number of non-zero values in the {@code NDArray}
+     */
+    default int countNonzero() {
+        return asType(DataType.BOOLEAN, false).sum().getInt();
+    }
+
+    /**
+     * Counts the number of non-zero values in the {@code NDArray} along a given axis.
+     *
+     * @param axis axis to operate on
+     * @return Number of non-zero values in the {@code NDArray} along a given axis
+     */
+    default int countNonzero(int axis) {
+        return asType(DataType.BOOLEAN, false).sum(new int[] {axis}).getInt();
     }
 
     /**

@@ -29,12 +29,14 @@ public enum DataType {
     INT32(Format.INT, 4),
     INT8(Format.INT, 1),
     INT64(Format.INT, 8),
+    BOOLEAN(Format.BOOLEAN, 1),
     UNKNOWN(Format.UNKNOWN, 0);
 
     public enum Format {
         FLOATING,
         UINT,
         INT,
+        BOOLEAN,
         UNKNOWN
     }
 

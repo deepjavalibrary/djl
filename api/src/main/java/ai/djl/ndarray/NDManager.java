@@ -184,6 +184,16 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Creates and initializes a scalar {@link NDArray}.
+     *
+     * @param data the boolean data that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(boolean data) {
+        return create(new boolean[] {data}, new Shape());
+    }
+
+    /**
      * Creates and initializes a 1D {@link NDArray}.
      *
      * @param data the float array that needs to be set
@@ -230,6 +240,16 @@ public interface NDManager extends AutoCloseable {
      * @return new instance of {@link NDArray}
      */
     default NDArray create(byte[] data) {
+        return create(data, new Shape(data.length));
+    }
+
+    /**
+     * Creates and initializes a 1D {@link NDArray}.
+     *
+     * @param data the bool array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(boolean[] data) {
         return create(data, new Shape(data.length));
     }
 
@@ -310,6 +330,23 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Creates and initializes a 2D {@link NDArray}.
+     *
+     * @param data the boolean array that needs to be set
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(boolean[][] data) {
+        ByteBuffer buffer = ByteBuffer.allocate(data.length * data[0].length);
+        for (boolean[] d : data) {
+            for (boolean b : d) {
+                buffer.put((byte) (b ? 1 : 0));
+            }
+        }
+        buffer.rewind();
+        return create(buffer, new Shape(data.length, data[0].length), DataType.BOOLEAN);
+    }
+
+    /**
      * Creates and initializes a {@link NDArray} with specified {@link Shape}.
      *
      * <p>{@link DataType} of the NDArray will determined by type of Buffer.
@@ -320,9 +357,7 @@ public interface NDManager extends AutoCloseable {
      */
     default NDArray create(Buffer data, Shape shape) {
         DataType dataType = DataType.fromBuffer(data);
-        NDArray array = create(shape, dataType, getDevice());
-        array.set(data);
-        return array;
+        return create(data, shape, dataType);
     }
 
     /**
@@ -410,6 +445,22 @@ public interface NDManager extends AutoCloseable {
      */
     default NDArray create(byte[] data, Shape shape) {
         return create(ByteBuffer.wrap(data), shape);
+    }
+
+    /**
+     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and
+     * boolean array.
+     *
+     * @param data the boolean array that needs to be set
+     * @param shape the {@link Shape} of the {@link NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray create(boolean[] data, Shape shape) {
+        byte[] byteData = new byte[data.length];
+        for (int i = 0; i < data.length; i++) {
+            byteData[i] = (byte) (data[i] ? 1 : 0);
+        }
+        return create(ByteBuffer.wrap(byteData), shape, DataType.BOOLEAN);
     }
 
     /**

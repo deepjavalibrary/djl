@@ -302,6 +302,29 @@ public final class NDArrays {
         return a.where(condition, b);
     }
 
+    /**
+     * Returns partial of {@code NDArray} based on boolean index {@code NDArray} from axis 0.
+     *
+     * @param data data to operator on
+     * @param index boolean {@code NDArray} mask
+     * @return the new {@code NDArray}
+     */
+    public static NDArray booleanMask(NDArray data, NDArray index) {
+        return booleanMask(data, index, 0);
+    }
+
+    /**
+     * Returns partial of {@code NDArray} based on boolean index {@code NDArray} and axis.
+     *
+     * @param data data to operator on
+     * @param index boolean {@code NDArray} mask
+     * @param axis an integer that represents the axis in {@code NDArray} to mask from
+     * @return the new {@code NDArray}
+     */
+    public static NDArray booleanMask(NDArray data, NDArray index, int axis) {
+        return data.booleanMask(index, axis);
+    }
+
     ////////////////////////////////////////
     // Operators: Element Arithmetic
     ////////////////////////////////////////

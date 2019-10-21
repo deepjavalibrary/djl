@@ -383,8 +383,20 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray get(NDArray index) {
+        return array.get(index);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void copyTo(NDArray arr) {
         array.copyTo(arr);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray booleanMask(NDArray index, int axis) {
+        return array.booleanMask(index, axis);
     }
 
     /** {@inheritDoc} */
@@ -1166,7 +1178,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public long nonzero() {
+    public NDArray nonzero() {
         return array.nonzero();
     }
 
