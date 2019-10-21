@@ -75,6 +75,9 @@ public abstract class AbstractTraining implements TrainingListener {
 
             train(arguments);
 
+            logger.info("Training: {} batches", trainDataSize);
+            logger.info("Validation: {} batches", validateDataSize);
+
             float p50 = metrics.percentile("train", 50).getValue().longValue() / 1_000_000f;
             float p90 = metrics.percentile("train", 90).getValue().longValue() / 1_000_000f;
             logger.info(String.format("train P50: %.3f ms, P90: %.3f ms", p50, p90));
@@ -83,13 +86,21 @@ public abstract class AbstractTraining implements TrainingListener {
             p90 = metrics.percentile("forward", 90).getValue().longValue() / 1_000_000f;
             logger.info(String.format("forward P50: %.3f ms, P90: %.3f ms", p50, p90));
 
+            p50 = metrics.percentile("training-metrics", 50).getValue().longValue() / 1_000_000f;
+            p90 = metrics.percentile("training-metrics", 90).getValue().longValue() / 1_000_000f;
+            logger.info(String.format("training-metrics P50: %.3f ms, P90: %.3f ms", p50, p90));
+
+            p50 = metrics.percentile("backward", 50).getValue().longValue() / 1_000_000f;
+            p90 = metrics.percentile("backward", 90).getValue().longValue() / 1_000_000f;
+            logger.info(String.format("backward P50: %.3f ms, P90: %.3f ms", p50, p90));
+
             p50 = metrics.percentile("step", 50).getValue().longValue() / 1_000_000f;
             p90 = metrics.percentile("step", 90).getValue().longValue() / 1_000_000f;
             logger.info(String.format("step P50: %.3f ms, P90: %.3f ms", p50, p90));
 
-            p50 = metrics.percentile("epoch", 50).getValue().longValue() / 1_000_000f;
-            p90 = metrics.percentile("epoch", 90).getValue().longValue() / 1_000_000f;
-            logger.info(String.format("epoch P50: %.3f ms, P90: %.3f ms", p50, p90));
+            p50 = metrics.percentile("epoch", 50).getValue().longValue() / 1_000_000_000f;
+            p90 = metrics.percentile("epoch", 90).getValue().longValue() / 1_000_000_000f;
+            logger.info(String.format("epoch P50: %.3f s, P90: %.3f s", p50, p90));
 
             if (arguments.getOutputDir() != null) {
                 MemoryUtils.dumpMemoryInfo(metrics, arguments.getOutputDir());
@@ -161,7 +172,7 @@ public abstract class AbstractTraining implements TrainingListener {
         list = metrics.getMetric("validate_Accuracy");
         float validateAccuracy = list.get(list.size() - 1).getValue().floatValue();
 
-        logger.info("train accuracy: {}, train loss:: {}", trainingAccuracy, trainingLoss);
+        logger.info("train accuracy: {}, train loss: {}", trainingAccuracy, trainingLoss);
         logger.info("validate accuracy: {}, validate loss: {}", validateAccuracy, validateLoss);
     }
 }

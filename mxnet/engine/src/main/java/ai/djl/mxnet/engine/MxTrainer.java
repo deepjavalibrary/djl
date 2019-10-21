@@ -100,9 +100,14 @@ public class MxTrainer implements Trainer {
                 NDList labels = split.getLabels();
 
                 NDList preds = forward(data);
-                trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
 
+                long time = System.nanoTime();
+                trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
+                addMetric("training-metrics", time);
+
+                time = System.nanoTime();
                 collector.backward(trainingLoss.getLastUpdate());
+                addMetric("backward", time);
             }
         }
         addMetric("train", begin);
