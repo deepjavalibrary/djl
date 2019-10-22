@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.utils;
+package ai.djl.mxnet.dataset.utils;
 
 /**
  * Represents a function that accepts one argument and produces a result and throwing an Exception.

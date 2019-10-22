@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.zoo;
+package ai.djl.repository.zoo;
 
 /** /** Thrown when an application tries to load a model from repository search path. */
 public class ModelNotFoundException extends Exception {

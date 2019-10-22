@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
+import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.util.Utils;
 import java.io.IOException;

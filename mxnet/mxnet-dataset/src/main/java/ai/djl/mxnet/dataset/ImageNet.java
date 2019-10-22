@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Repository;
 import ai.djl.repository.SimpleRepository;
+import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.util.PairList;
 import com.google.gson.Gson;
 import java.io.IOException;

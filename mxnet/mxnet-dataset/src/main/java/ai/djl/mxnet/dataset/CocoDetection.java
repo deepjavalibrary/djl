@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
+import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import java.io.IOException;
