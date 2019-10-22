@@ -202,8 +202,7 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public void cast(DataType dataType) {
-        this.dataType = dataType;
-        block.cast(dataType);
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */

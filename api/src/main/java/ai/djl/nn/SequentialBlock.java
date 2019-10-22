@@ -115,11 +115,6 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     @Override
-    public void cast(DataType dataType) {
-        blocks.forEach(ele -> ele.cast(dataType));
-    }
-
-    @Override
     public DataDesc[] describeInput() {
         if (blocks.isEmpty()) {
             throw new IllegalArgumentException("The sequential block is empty");

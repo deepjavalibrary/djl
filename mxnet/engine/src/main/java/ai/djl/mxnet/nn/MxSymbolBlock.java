@@ -15,7 +15,6 @@ package ai.djl.mxnet.nn;
 
 import ai.djl.Device;
 import ai.djl.mxnet.engine.CachedOp;
-import ai.djl.mxnet.engine.MxModel;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.mxnet.engine.Symbol;
 import ai.djl.mxnet.jna.JnaUtils;
@@ -40,14 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // TODO: Need to add Memory management for all params
 public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
-
-    private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
-
     private static final byte VERSION = 2;
 
     private NDManager manager;
@@ -124,17 +118,6 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
             inputData[index++] = new DataDesc(new Shape(), name);
         }
         return inputData;
-    }
-
-    @Override
-    public void cast(DataType dataType) {
-        if (params.get(0).getArray().getDataType() == dataType) {
-            logger.debug("You are casting the model to its original type!");
-            return;
-        }
-
-        // TODO: Not all parameters can be casted.
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @Override

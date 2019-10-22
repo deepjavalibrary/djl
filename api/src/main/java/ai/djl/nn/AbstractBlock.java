@@ -71,13 +71,13 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("Unimplemented method cast");
+    public void clear() {
+        getParameters().forEach(param -> param.getValue().close());
     }
 
     @Override
-    public void clear() {
-        getParameters().forEach(param -> param.getValue().close());
+    public void cast(DataType dataType) {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     private ParameterList getChildrenParameters() {
