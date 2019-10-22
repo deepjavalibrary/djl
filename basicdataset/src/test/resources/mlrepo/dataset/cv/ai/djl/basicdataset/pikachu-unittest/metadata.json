@@ -1,0 +1,32 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "pikachu-unittest",
+  "type": "cv",
+  "name": "PIKACHU",
+  "description": "Pikachu detection dataset for unit test",
+  "website": "http://www.djl.ai/basicdataset",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "files": {
+        "train": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/dataset/cv/ai/djl/basicdataset/pikachu-unittest/train.zip",
+          "sha1Hash": "9f5b61a3ca560e1913fca2bcf98079471e2eaa3d"
+        },
+        "test": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/dataset/cv/ai/djl/basicdataset/pikachu-unittest/test.zip",
+          "sha1Hash": "43ade34fccbfaa93009bcd739db8f7560f6ac02b"
+        }
+      }
+    }
+  ],
+  "snapshot": true
+}

@@ -12,7 +12,7 @@
  */
 package ai.djl;
 
-import ai.djl.mxnet.dataset.Cifar10;
+import ai.djl.basicdataset.Cifar10;
 import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Repository;
@@ -34,7 +34,7 @@ public class CoverageTest {
         // repository
         CoverageUtils.testGetterSetters(Repository.class);
 
-        // mxnet-dataset
+        // basicdataset
         CoverageUtils.testGetterSetters(Cifar10.class);
 
         // mxnet-engine

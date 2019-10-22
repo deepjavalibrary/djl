@@ -1,0 +1,32 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "cifar10",
+  "type": "cv",
+  "name": "CIFAR10",
+  "description": "CIFAR10",
+  "website": "http://www.djl.ai/basicdataset",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "files": {
+        "data_batch.bin": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/dataset/cv/ai/djl/basicdataset/cifar10/data_batch.bin.gz",
+          "sha1Hash": "7d419c355d2267b1f8e949af07cef073d26c590e"
+        },
+        "test_batch.bin": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/dataset/cv/ai/djl/basicdataset/cifar10/test_batch.bin.gz",
+          "sha1Hash": "e3211925febe953b7bce86a8cb3cca98724aceee"
+        }
+      }
+    }
+  ],
+  "snapshot": true
+}

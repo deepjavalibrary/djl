@@ -13,11 +13,11 @@
 package ai.djl.examples.training;
 
 import ai.djl.Model;
+import ai.djl.basicdataset.Mnist;
 import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.TrainingUtils;
-import ai.djl.mxnet.dataset.Mnist;
-import ai.djl.mxnet.dataset.transform.cv.ToTensor;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;

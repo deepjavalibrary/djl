@@ -13,11 +13,11 @@
 package ai.djl.examples.training.transferlearning;
 
 import ai.djl.Model;
+import ai.djl.basicdataset.Cifar10;
 import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.TrainingUtils;
-import ai.djl.mxnet.dataset.Cifar10;
-import ai.djl.mxnet.dataset.transform.cv.ToTensor;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;

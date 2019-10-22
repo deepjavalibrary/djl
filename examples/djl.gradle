@@ -20,8 +20,8 @@ dependencies {
     compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
     compile "com.google.code.gson:gson:${gson_version}"
     compile project(":api")
+    compile project(":basicdataset")
     compile project(":mxnet:engine")
-    compile project(":mxnet:mxnet-dataset")
     compile project(":mxnet:mxnet-model-zoo")
 
     runtime "ai.djl.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"

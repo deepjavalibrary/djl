@@ -14,10 +14,9 @@ def classifier = getClassifier()
 dependencies {
     compile "commons-cli:commons-cli:${commons_cli_version}"
     compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
-    compile project(":repository")
+    compile project(":basicdataset")
     compile project(":model-zoo")
     compile project(":mxnet:engine")
-    compile project(":mxnet:mxnet-dataset")
     compile project(":mxnet:mxnet-model-zoo")
     compile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

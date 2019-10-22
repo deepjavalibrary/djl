@@ -1,0 +1,36 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "coco",
+  "type": "cv",
+  "name": "COCO",
+  "description": "COCO",
+  "website": "http://www.djl.ai/basicdataset",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "files": {
+        "train2017": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/dataset/cv/ai/djl/basicdataset/coco/train2017.zip",
+          "sha1Hash": "923de950e12bb22c6373fdd53e6a8ef1cb0b01af"
+        },
+        "val2017": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/dataset/cv/ai/djl/basicdataset/coco/val2017.zip",
+          "sha1Hash": "5643a1b4c5344fd9bdc9b0f7665e575edeff444a"
+        },
+        "annotations": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/dataset/cv/ai/djl/basicdataset/coco/annotations_trainval2017.zip",
+          "sha1Hash": "08bb4fb5394aa37ce8362f21689cbcb42f14b1e8"
+        }
+      }
+    }
+  ],
+  "snapshot": true
+}
