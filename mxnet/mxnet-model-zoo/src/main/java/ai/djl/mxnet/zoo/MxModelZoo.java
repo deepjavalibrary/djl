@@ -24,9 +24,9 @@ import ai.djl.repository.Repository;
 
 public interface MxModelZoo {
 
-    String MXNET_REPO_URL = "https://joule.s3.amazonaws.com/mlrepo/";
+    String MXNET_REPO_URL = "https://djl-ai.s3.amazonaws.com/mlrepo/";
     Repository REPOSITORY = Repository.newInstance("MxNet", MXNET_REPO_URL);
-    String GROUP_ID = "org.apache.mxnet";
+    String GROUP_ID = "ai.djl.mxnet";
 
     SingleShotDetectionModelLoader SSD = new SingleShotDetectionModelLoader(REPOSITORY);
     Resnet RESNET = new Resnet(REPOSITORY);

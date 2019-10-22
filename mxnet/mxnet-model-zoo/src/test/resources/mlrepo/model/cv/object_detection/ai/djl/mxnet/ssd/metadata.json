@@ -1,0 +1,71 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "ssd",
+  "type": "cv",
+  "name": "SSD",
+  "description": "Single-shot object detection",
+  "website": "http://www.djl.ai/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.2",
+      "snapshot": false,
+      "name": "ssd_512_resnet50_v1_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "resnet50_v1",
+        "flavor": "none",
+        "dataset": "voc"
+      },
+      "files": {
+        "classes": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_resnet50_v1-symbol.json",
+          "sha1Hash": "470d2cce5abec637163daa50a4fd262943caf2c5",
+          "name": "ssd_512_resnet50_v1_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/object_detection/ai/djl/mxnet/ssd/0.0.1/ssd_512_resnet50_v1_voc-0000.params.gz",
+          "sha1Hash": "d830eb4d786776577eaf0b0198125a932f055262"
+        }
+      }
+    },
+    {
+      "version": "0.0.2",
+      "snapshot": false,
+      "name": "ssd_512_vgg16_atrous_coco",
+      "properties": {
+        "size": "512",
+        "backbone": "vgg16",
+        "flavor": "atrous",
+        "dataset": "coco"
+      },
+      "files": {
+        "classes": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/object_detection/ai/djl/mxnet/classes_coco.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_vgg16_atrous-symbol.json",
+          "sha1Hash": "e7b5f8f000fed56cbeb8d8d0f0d4a8d35094600a",
+          "name": "ssd_512_vgg16_atrous_coco-symbol.json"
+        },
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/object_detection/ai/djl/mxnet/ssd/0.0.1/ssd_512_vgg16_atrous_coco-0000.params.gz",
+          "sha1Hash": "491ed6ac57d252bee0721744176cdab93b6f8296"
+        }
+      }
+    }
+  ]
+}

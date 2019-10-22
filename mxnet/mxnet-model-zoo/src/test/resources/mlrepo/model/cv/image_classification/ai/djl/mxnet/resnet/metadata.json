@@ -1,0 +1,65 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "resnet",
+  "type": "cv",
+  "name": "Resnet",
+  "description": "Resnet image classification",
+  "website": "http://www.djl.ai/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "http://aws.amazon.com/apache2.0/"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet18_v1",
+      "properties": {
+        "layers": "18",
+        "flavor": "v1",
+        "dataset": "imagenet"
+      },
+      "files": {
+        "synset": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2"
+        },
+        "symbol": {
+          "uri": "0.0.1/resnet18_v1-symbol.json",
+          "sha1Hash": "c642e3b97eb59ca580a4ae4098c3d93658b4178a"
+        },
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet18_v1-0000.params.gz",
+          "sha1Hash": "b669e1475b7a9368e9b3bc9869cc65a560387820"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet152_v1d",
+      "properties": {
+        "layers": "152",
+        "flavor": "v1d",
+        "dataset": "imagenet"
+      },
+      "files": {
+        "synset": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2"
+        },
+        "symbol": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet152_v1d-symbol.json",
+          "sha1Hash": "83186e6c79b5c46d37236867caf2fd35132ce903"
+        },
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet152_v1d-0000.params.gz",
+          "sha1Hash": "5fb89642f5c3d7764c68811f85b0feabb656f9f9"
+        }
+      }
+    }
+  ]
+}

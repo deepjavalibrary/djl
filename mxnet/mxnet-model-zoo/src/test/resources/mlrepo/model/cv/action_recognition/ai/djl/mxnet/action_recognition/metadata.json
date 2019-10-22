@@ -1,0 +1,63 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "action_recognition",
+  "type": "cv",
+  "name": "Action Recognition",
+  "description": "Action Recognition models",
+  "website": "http://www.djl.ai/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "vgg16_ucf101",
+      "properties": {
+        "backbone": "vgg16",
+        "dataset": "ucf101"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes.txt",
+          "sha1Hash": "d00d4f576ff529b0cc9e017be62b6b7b60908680"
+        },
+        "symbol": {
+          "uri": "0.0.1/vgg16_ucf101-symbol.json",
+          "sha1Hash": "6cd91c2e0192cbe069be250137564749fffa15a4"
+        },
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/action_recognition/ai/djl/mxnet/action_recognition/0.0.1/vgg16_ucf101-0000.params.gz",
+          "sha1Hash": "abcc2647be253bc6baefc52813b5dd9e1a1ef60f"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "inceptionv3_ucf101",
+      "properties": {
+        "backbone": "inceptionv3",
+        "dataset": "ucf101"
+      },
+      "files": {
+        "classes": {
+          "uri": "classes.txt",
+          "sha1Hash": "d00d4f576ff529b0cc9e017be62b6b7b60908680"
+        },
+        "symbol": {
+          "uri": "0.0.1/inceptionv3_ucf101-symbol.json",
+          "sha1Hash": "6c32d3c8415662327eb62c75fa9d5c26c95b0546"
+        },
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/action_recognition/ai/djl/mxnet/action_recognition/0.0.1/inceptionv3_ucf101-0000.params.gz",
+          "sha1Hash": "3f54c30fc86112bda6ad58e6c9bdc4a4b62db2b5"
+        }
+      }
+    }
+  ]
+}

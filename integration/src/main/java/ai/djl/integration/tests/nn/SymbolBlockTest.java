@@ -192,7 +192,7 @@ public class SymbolBlockTest {
     }
 
     public static Path prepareModel() throws IOException {
-        String source = "https://joule.s3.amazonaws.com/other+resources/mnistmlp.zip";
+        String source = "https://djl-ai.s3.amazonaws.com/other+resources/mnistmlp.zip";
 
         Path dataDir = Paths.get(System.getProperty("user.home")).resolve(".joule_data");
         Path downloadDestination = dataDir.resolve("mnistmlp.zip");
