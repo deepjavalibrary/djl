@@ -14,8 +14,8 @@ package ai.djl.integration.tests.nn;
 
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
-import ai.djl.integration.util.FileUtils;
 import ai.djl.mxnet.engine.MxGradientCollector;
+import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -26,7 +26,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
-import ai.djl.repository.ZipUtils;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.ParameterStore;
@@ -35,13 +35,10 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.util.Pair;
-import ai.djl.util.Utils;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -49,11 +46,9 @@ import org.testng.annotations.Test;
 public class SymbolBlockTest {
 
     @Test
-    public void testForward() throws IOException {
-        Path modelDir = prepareModel();
-        try (Model model = Model.newInstance()) {
-            model.load(modelDir);
-
+    public void testForward() throws IOException, ModelNotFoundException {
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
             NDManager manager = model.getNDManager();
 
             ParameterStore parameterStore = new ParameterStore(manager, false);
@@ -67,13 +62,13 @@ public class SymbolBlockTest {
     }
 
     @Test
-    public void trainWithNewParam() throws IOException {
-        Path modelDir = prepareModel();
+    public void trainWithNewParam() throws IOException, ModelNotFoundException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .addTrainingMetric(Loss.softmaxCrossEntropyLoss());
-        try (Model model = Model.newInstance()) {
-            model.load(modelDir);
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
+
             model.getBlock().clear();
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
@@ -96,14 +91,12 @@ public class SymbolBlockTest {
     }
 
     @Test
-    public void trainWithExistParam() throws IOException {
-        Path modelDir = prepareModel();
-
+    public void trainWithExistParam() throws IOException, ModelNotFoundException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .addTrainingMetric(Loss.softmaxCrossEntropyLoss());
-        try (Model model = Model.newInstance()) {
-            model.load(modelDir);
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
@@ -126,15 +119,12 @@ public class SymbolBlockTest {
     }
 
     @Test
-    public void trainWithCustomLayer() throws IOException {
-        Path modelDir = prepareModel();
-
+    public void trainWithCustomLayer() throws IOException, ModelNotFoundException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .addTrainingMetric(Loss.softmaxCrossEntropyLoss());
-        try (Model model = Model.newInstance()) {
-            model.load(modelDir);
-
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
             NDManager manager = model.getNDManager();
 
             SymbolBlock mlp = (SymbolBlock) model.getBlock();
@@ -189,27 +179,5 @@ public class SymbolBlockTest {
                 NDArrays.stack(
                         new NDList(grads.stream().map(NDArray::mean).toArray(NDArray[]::new)));
         return new Pair<>(pred.mean(), gradMean);
-    }
-
-    public static Path prepareModel() throws IOException {
-        String source = "https://djl-ai.s3.amazonaws.com/other+resources/mnistmlp.zip";
-
-        Path dataDir = Paths.get(System.getProperty("user.home")).resolve(".joule_data");
-        Path downloadDestination = dataDir.resolve("mnistmlp.zip");
-        Path extractDestination = dataDir.resolve("mnist");
-        Path params = extractDestination.resolve("mnist-0000.params");
-        Path symbol = extractDestination.resolve("mnist-symbol.json");
-
-        // download and unzip data if not exist
-        if (!Files.exists(params) || !Files.exists(symbol)) {
-            if (!Files.exists(downloadDestination)) {
-                FileUtils.download(source, dataDir, "mnistmlp.zip");
-            }
-            try (InputStream is = Files.newInputStream(downloadDestination)) {
-                ZipUtils.unzip(is, extractDestination);
-            }
-            Utils.deleteQuietly(downloadDestination);
-        }
-        return extractDestination;
     }
 }

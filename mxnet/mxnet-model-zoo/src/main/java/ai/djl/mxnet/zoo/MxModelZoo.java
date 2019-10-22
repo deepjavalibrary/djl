@@ -13,6 +13,7 @@
 package ai.djl.mxnet.zoo;
 
 import ai.djl.mxnet.zoo.cv.actionrecognition.ActionRecognitionModelLoader;
+import ai.djl.mxnet.zoo.cv.classification.Mlp;
 import ai.djl.mxnet.zoo.cv.classification.Resnet;
 import ai.djl.mxnet.zoo.cv.classification.Resnext;
 import ai.djl.mxnet.zoo.cv.classification.SeResnext;
@@ -28,6 +29,7 @@ public interface MxModelZoo {
     Repository REPOSITORY = Repository.newInstance("MxNet", MXNET_REPO_URL);
     String GROUP_ID = "ai.djl.mxnet";
 
+    Mlp MLP = new Mlp(REPOSITORY);
     SingleShotDetectionModelLoader SSD = new SingleShotDetectionModelLoader(REPOSITORY);
     Resnet RESNET = new Resnet(REPOSITORY);
     Resnext RESNEXT = new Resnext(REPOSITORY);

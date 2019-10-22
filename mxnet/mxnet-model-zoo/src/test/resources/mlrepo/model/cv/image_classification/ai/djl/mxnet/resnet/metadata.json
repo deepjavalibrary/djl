@@ -9,7 +9,7 @@
   "licenses": {
     "license": {
       "name": "The Apache License, Version 2.0",
-      "url": "http://aws.amazon.com/apache2.0/"
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
     }
   },
   "artifacts": [
