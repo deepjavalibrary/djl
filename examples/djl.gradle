@@ -1,5 +1,5 @@
 /**
- * This build file is used by joule project internally.
+ * This build file is used by djl.ai project internally.
  */
 
 plugins {

@@ -31,13 +31,13 @@ publishing {
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
             pom {
-                name = "DJL.ai Repository API"
-                description = "A respository specification for Deep Learning resources"
-                url = "http://aws.amazon.com/DJL"
+                name = "Deeplearning Java Library - Model Zoo"
+                description = "A built-in model zoo gallary for djl.ai"
+                url = "http://www.djl.ai/model-zoo"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
-                        url = 'http://www.djl.ai/model-zoo'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
                     }
                 }
             }

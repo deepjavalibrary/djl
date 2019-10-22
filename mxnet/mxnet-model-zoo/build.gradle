@@ -33,9 +33,9 @@ publishing {
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
             pom {
-                name = "MXNet model zoo"
-                description = "MXNet model zoo for DJL"
-                url = "http://aws.amazon.com/DJL"
+                name = "Deeplearning Java Library - MXNet model zoo"
+                description = "MXNet model zoo for djl.ai"
+                url = "http://www.djl.ai/mxnet/model-zoo"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'

@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "ai.djl.mxnet"
-version = "1.5.0-SNAPSHOT"
+version = "1.6.0" + (project.hasProperty("release") ? "" : "-SNAPSHOT")
 
 def flavor = project.findProperty("flavor") ?: "mkl"
 
@@ -49,7 +49,7 @@ publishing {
             pom {
                 name = "MXNet native library"
                 description = "MXNet Engine native library binary distribution"
-                url = "http://mxnet.apache.org"
+                url = "http://www.djl.ai/mxnet/native"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'

@@ -27,18 +27,18 @@ publishing {
     publications {
         maven(MavenPublication) {
             groupId project.getGroup()
-            artifactId 'djl-repository'
+            artifactId 'repository'
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
             pom {
-                name = "DJL.ai Repository API"
-                description = "A respository specification for Deep Learning resources"
+                name = "Deeplearning Java Library - Repository API"
+                description = "A respository specification for Deeplearning resources"
                 url = "http://www.djl.ai/repository"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
-                        url = 'http://aws.amazon.com/apache2.0/'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
                     }
                 }
             }

@@ -15,13 +15,13 @@ def classifier = getClassifier()
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
     compile project(":repository")
-    compile project(":mxnet:engine")
 
     testCompile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
 
+    testCompile project(":mxnet:engine")
     testRuntime "ai.djl.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
 }
 
@@ -44,13 +44,13 @@ publishing {
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
             pom {
-                name = "MXNet dataset for DJL"
-                description = "MXNet dataset for DJL API"
-                url = "http://aws.amazon.com/DJL"
+                name = "MXNet dataset for Joule"
+                description = "MXNet dataset for Joule API"
+                url = "http://www.djl.ai/mxnet/dataset"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
-                        url = 'http://aws.amazon.com/apache2.0/'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
                     }
                 }
             }

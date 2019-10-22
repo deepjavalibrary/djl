@@ -14,7 +14,7 @@ dependencies {
 }
 
 javadoc {
-    title "DJL.ai ${project.version} API specification"
+    title "Deeplearning Java Library ${project.version} API specification"
     exclude "ai/djl/util/**"
     exclude "ai/djl/ndarray/internal/**"
     options.overview "src/main/javadoc/overview.html"
@@ -41,13 +41,13 @@ publishing {
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
             pom {
-                name = "DJL.ai API"
-                description = "A Deep Learning API in Java"
-                url = "http://www.djl.ai/"
+                name = "Deeplearning Java Library - core API"
+                description = "A Deeplearning API in Java"
+                url = "http://www.djl.ai/api"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
-                        url = 'http://aws.amazon.com/apache2.0/'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
                     }
                 }
             }

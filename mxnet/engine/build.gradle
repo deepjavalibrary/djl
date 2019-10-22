@@ -112,9 +112,9 @@ publishing {
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
             pom {
-                name = "MXNet Java API"
-                description = "Java API for MXNet"
-                url = "http://mxnet.apache.org"
+                name = "Deeplearning Java Library - MXNet Engine Adapter"
+                description = "MXNet Engine Adapter for djl.ai"
+                url = "http://www.djl.ai/mxnet/engine"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
