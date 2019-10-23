@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>software.amazon.ai</groupId>
-    <artifactId>joule-examples</artifactId>
+    <groupId>ai.djl</groupId>
+    <artifactId>examples</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -14,8 +14,8 @@
 
     <repositories>
         <repository>
-            <id>joule</id>
-            <url>https://joule.s3.amazonaws.com/repo</url>
+            <id>djl.ai</id>
+            <url>https://djl-ai.s3.amazonaws.com/repo</url>
         </repository>
     </repositories>
 
@@ -36,23 +36,23 @@
             <version>2.8.5</version>
         </dependency>
         <dependency>
-            <groupId>software.amazon.ai</groupId>
-            <artifactId>joule-api</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <groupId>ai.djl</groupId>
+            <artifactId>api</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.mxnet</groupId>
+            <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-model-zoo</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.mxnet</groupId>
-            <artifactId>mxnet-joule</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <groupId>ai.djl.mxnet</groupId>
+            <artifactId>mxnet-engine</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.mxnet</groupId>
+            <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-native-mkl</artifactId>
             <version>1.5.0-SNAPSHOT</version>
             <classifier>linux-x86_64</classifier>

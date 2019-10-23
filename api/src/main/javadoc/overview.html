@@ -3,9 +3,9 @@
   <meta charset="UTF-8">
 </head>
 <body>
-<p>This document is the API specification for Joule.</p>
+<p>This document is the API specification for djl.ai.</p>
 
-<p>The key design goal for the Joule API is to simplify the use of deep learning frameworks for Java
+<p>The key design goal for the djl.ai API is to simplify the use of deep learning frameworks for Java
   developers. Developers don't need to be Machine Learning/Deep Learning experts to get started.
   They can start with their existing Java expertise as a foundation to learn and use ML/DL.
   Developers can
@@ -14,13 +14,13 @@
   Java applications. They don't have to compromise on model performance, scale, or choice of GPU vs.
   CPUs.
 
-<p>Joule API is deep learning framework agnostic. Developers don't have to make a choice
+<p>djl.ai API is deep learning framework agnostic. Developers don't have to make a choice
   between frameworks when they start their project. They can switch to a different framework at any
   time.
 
-<p>Joule API provides a native Java development experience and functions as any other regular Java
+<p>djl.ai API provides a native Java development experience and functions as any other regular Java
   library would.
-  Joule's ergonomic API interface is designed to guide developers with best practices to accomplish
+  djl.ai's ergonomic API interface is designed to guide developers with best practices to accomplish
   deep learning tasks.
 
 <p>The following is an example of how to write inference code:
@@ -29,19 +29,19 @@
     // Assume user has a pre-trained already, they just need load it
     Model model = <b>Model.load</b>(modelDir, modelName);
 
-    // User must implement <a href="software/amazon/ai/Translator.html"><b>Translator</b></a> interface, read <a
-    href="software/amazon/ai/Translator.html"><b>Translator</b></a> for detail.
+    // User must implement <a href="ai/djl/translate/Translator.html"><b>Translator</b></a> interface, read <a
+    href="ai/djl/translate/Translator.html"><b>Translator</b></a> for detail.
     Translator translator = new <b>MyTranslator</b>();
 
-    // User can specify GPU/CPU <a href="software/amazon/ai/Device.html"><b>Device</b></a> to run inference session.
+    // User can specify GPU/CPU <a href="ai/djl/Device.html"><b>Device</b></a> to run inference session.
     // This device is optional, <a
-    href="software/amazon/ai/inference/Predictor.html"><b>Predictor</b></a> can pick up default Device if not specified.
+    href="ai/djl/inference/Predictor.html"><b>Predictor</b></a> can pick up default Device if not specified.
     // See <a
-    href="software/amazon/ai/Device.html#defaultDevice--"><b>Device.defaultDevice()</b></a>
+    href="ai/djl/Device.html#defaultDevice--"><b>Device.defaultDevice()</b></a>
     Device device = Device.defaultDevice();
 
     // Next user need create a <b>Predictor</b>, and use <a
-    href="software/amazon/ai/inference/Predictor.html#predict-I-"><b>Predictor.predict()</b></a>
+    href="ai/djl/inference/Predictor.html#predict-I-"><b>Predictor.predict()</b></a>
     // to get prediction.
     try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor = <b>model.newPredictor</b>(translator, device)) {
         List&lt;DetectedObject&gt; result = predictor.<b>predict</b>(img);
@@ -50,21 +50,21 @@
 
 <p>The following is an example of how to write training code.
 
-<p>Joule API contains following packages:
+<p>djl.ai API contains following packages:
 <ul>
-  <li>software.amazon.ai - This package contains common top level classes shared by both inference
+  <li>ai.djl - This package contains common top level classes shared by both inference
     and training.
-  <li>software.amazon.ai.engine - This package contains classes responsible for loading deep
+  <li>ai.djl.engine - This package contains classes responsible for loading deep
     learning frameworks.
-  <li>software.amazon.ai.image - This package contains utility classes for image processing.
-  <li>software.amazon.ai.inference - This package contains classes to implement inference tasks.
-  <li>software.amazon.ai.metric - This package contains classes to collect metrics information.
-  <li>software.amazon.ai.modality.* - These packages contain utility classes for each predefined
+  <li>ai.djl.image - This package contains utility classes for image processing.
+  <li>ai.djl.inference - This package contains classes to implement inference tasks.
+  <li>ai.djl.metric - This package contains classes to collect metrics information.
+  <li>ai.djl.modality.* - These packages contain utility classes for each predefined
     modalities.
-  <li>software.amazon.ai.ndarray.* _ These packages contain classes and interfaces that define
+  <li>ai.djl.ndarray.* _ These packages contain classes and interfaces that define
     n-dimensional arrays.
-  <li>software.amazon.ai.nn.* - These packages contain classes define neural network operators.
-  <li>software.amazon.ai.training.* - These packages contain classes to implement training tasks.
+  <li>ai.djl.nn.* - These packages contain classes define neural network operators.
+  <li>ai.djl.training.* - These packages contain classes to implement training tasks.
 </ul>
 </body>
 </html>
