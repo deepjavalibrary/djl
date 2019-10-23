@@ -105,12 +105,12 @@ public abstract class AbstractRepository implements Repository {
 
     @Override
     public Path getCacheDirectory() throws IOException {
-        String cacheDir = System.getProperty("JOULE_CACHE_DIR");
+        String cacheDir = System.getProperty("DJL_CACHE_DIR");
         if (cacheDir == null) {
-            cacheDir = System.getenv("JOULE_CACHE_DIR");
+            cacheDir = System.getenv("DJL_CACHE_DIR");
             if (cacheDir == null) {
                 String userHome = System.getProperty("user.home");
-                cacheDir = userHome + "/.joule/cache";
+                cacheDir = userHome + "/.djl.ai/cache";
             }
         }
 

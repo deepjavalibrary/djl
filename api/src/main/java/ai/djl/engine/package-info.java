@@ -14,7 +14,7 @@
 /**
  * Contains classes responsible for loading deep learning framework.
  *
- * <p>Joule API is deep learning framework agnostic. This package defines abstraction to hide the
+ * <p>djl.ai API is deep learning framework agnostic. This package defines abstraction to hide the
  * difference between each framework.
  *
  * <p>Each deep learning framework is implemented as a service provider and supply an implementation
