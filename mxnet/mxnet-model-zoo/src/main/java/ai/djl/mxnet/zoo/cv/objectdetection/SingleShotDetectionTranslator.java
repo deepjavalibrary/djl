@@ -57,7 +57,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
                     throw new AssertionError("Unexpected index: " + classId);
                 }
                 String className = classes.get(classId);
-                float[] box = boundingBoxes.get(0, i).toFloatArray();
+                float[] box = boundingBoxes.get(i).toFloatArray();
                 double x = box[0] / 512;
                 double y = box[1] / 512;
                 double w = box[2] / 512 - x;

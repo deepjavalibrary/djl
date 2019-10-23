@@ -13,6 +13,8 @@
 package ai.djl.translate;
 
 import ai.djl.ndarray.NDList;
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 public interface Batchifier {
 
@@ -21,4 +23,34 @@ public interface Batchifier {
     NDList batchify(NDList[] inputs);
 
     NDList[] unbatchify(NDList inputs);
+
+    default NDList[] split(NDList list, int numOfSlices, boolean evenSplit) {
+        NDList[] unbatched = unbatchify(list);
+        int batchSize = unbatched.length;
+        numOfSlices = Math.min(numOfSlices, batchSize);
+        if (evenSplit && batchSize % numOfSlices != 0) {
+            throw new IllegalArgumentException(
+                    "data with shape "
+                            + batchSize
+                            + " cannot be evenly split into "
+                            + numOfSlices
+                            + ". Use a batch size that's multiple of "
+                            + numOfSlices
+                            + " or set even_split=true to allow"
+                            + " uneven partitioning of data.");
+        }
+
+        NDList[] splitted = new NDList[numOfSlices];
+        Arrays.setAll(splitted, i -> new NDList());
+
+        int step = (int) Math.ceil((double) batchSize / numOfSlices);
+        for (int i = 0; i < numOfSlices; i++) {
+            NDList[] currentUnbatched =
+                    IntStream.range(i * step, Math.min((i + 1) * step, batchSize))
+                            .mapToObj(j -> unbatched[j])
+                            .toArray(NDList[]::new);
+            splitted[i] = batchify(currentUnbatched);
+        }
+        return splitted;
+    }
 }

@@ -33,9 +33,9 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
     @Override
     public Joints processOutput(TranslatorContext ctx, NDList list) {
         NDArray pred = list.singletonOrThrow();
-        int numJoints = (int) pred.getShape().get(1);
-        int height = (int) pred.getShape().get(2);
-        int width = (int) pred.getShape().get(3);
+        int numJoints = (int) pred.getShape().get(0);
+        int height = (int) pred.getShape().get(1);
+        int width = (int) pred.getShape().get(2);
         NDArray predReshaped = pred.reshape(new Shape(1, numJoints, -1));
         NDArray maxIndices = predReshaped.argmax(2).reshape(new Shape(1, numJoints, -1));
         NDArray maxValues = predReshaped.max(new int[] {2}, true);

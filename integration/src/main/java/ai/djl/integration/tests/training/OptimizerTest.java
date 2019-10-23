@@ -32,6 +32,7 @@ import ai.djl.training.optimizer.Nag;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.Sgd;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.translate.Batchifier;
 import org.testng.annotations.Test;
 
 public class OptimizerTest {
@@ -169,7 +170,7 @@ public class OptimizerTest {
     private NDArray runOptimizer(NDManager manager, Trainer trainer, Block block) {
         NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS)).mul(2);
         NDArray label = data.mul(2);
-        Batch batch = new Batch(manager, new NDList(data), new NDList(label));
+        Batch batch = new Batch(manager, new NDList(data), new NDList(label), Batchifier.STACK);
         trainer.trainBatch(batch);
         trainer.step();
         return NDArrays.stack(

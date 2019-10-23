@@ -34,6 +34,7 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Nag;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
@@ -83,7 +84,8 @@ public class ResnetTest {
 
                 NDArray input = manager.ones(inputShape);
                 NDArray label = manager.ones(new Shape(100, 1));
-                Batch batch = new Batch(manager, new NDList(input), new NDList(label));
+                Batch batch =
+                        new Batch(manager, new NDList(input), new NDList(label), Batchifier.STACK);
                 PairList<String, Parameter> parameters = resNet50.getParameters();
                 trainer.trainBatch(batch);
                 trainer.step();
@@ -125,7 +127,8 @@ public class ResnetTest {
 
                 NDArray data = manager.ones(new Shape(16, 3, 32, 32));
                 NDArray label = manager.ones(outputShape[0]);
-                Batch batch = new Batch(manager, new NDList(data), new NDList(label));
+                Batch batch =
+                        new Batch(manager, new NDList(data), new NDList(label), Batchifier.STACK);
                 trainer.trainBatch(batch);
             }
         }

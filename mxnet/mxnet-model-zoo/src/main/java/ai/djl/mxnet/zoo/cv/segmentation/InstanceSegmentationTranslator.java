@@ -83,15 +83,15 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
                     throw new AssertionError("Unexpected index: " + classId);
                 }
                 String className = classes.get(classId);
-                float[] box = boundingBoxes.get(0, i).toFloatArray();
+                float[] box = boundingBoxes.get(i).toFloatArray();
                 double x = box[0] / rescaledWidth;
                 double y = box[1] / rescaledHeight;
                 double w = box[2] / rescaledWidth - x;
                 double h = box[3] / rescaledHeight - y;
 
-                Shape maskShape = masks.get(0, i).getShape();
+                Shape maskShape = masks.get(i).getShape();
                 float[][] maskVal = new float[(int) maskShape.get(0)][(int) maskShape.get(1)];
-                float[] flattened = masks.get(0, i).toFloatArray();
+                float[] flattened = masks.get(i).toFloatArray();
 
                 for (int j = 0; j < flattened.length; j++) {
                     maskVal[j / maskVal.length][j % maskVal.length] = flattened[j];

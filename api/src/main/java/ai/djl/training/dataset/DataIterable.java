@@ -157,7 +157,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             batchData = batchData.asInDevice(device, false);
             batchLabels = batchLabels.asInDevice(device, false);
         }
-        return new Batch(subManager, batchData, batchLabels);
+        return new Batch(subManager, batchData, batchLabels, batchifier);
     }
 
     private void preFetch() {

@@ -16,6 +16,8 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * StackBatchifier is used to merge a list of samples to form a mini-batch of NDArray(s). The is
@@ -73,9 +75,67 @@ public class StackBatchifier implements Batchifier {
         for (Pair<String, NDArray> input : inputs) {
             NDList splitList = input.getValue().split(size);
             for (int i = 0; i < size; i++) {
-                dataList[i].add(input.getKey(), splitList.get(i));
+                dataList[i].add(input.getKey(), splitList.get(i).squeeze(0));
             }
         }
         return dataList;
+    }
+
+    @Override
+    public NDList[] split(NDList list, int numOfSlices, boolean evenSplit) {
+        int batchSize = Math.toIntExact(list.head().size(0));
+        numOfSlices = Math.min(numOfSlices, batchSize);
+
+        NDList[] splitted = new NDList[numOfSlices];
+        Arrays.setAll(splitted, i -> new NDList());
+
+        for (Pair<String, NDArray> pair : list) {
+            String name = pair.getKey();
+            NDArray nd = pair.getValue();
+            NDList rows = split(nd, numOfSlices, evenSplit);
+
+            for (int i = 0; i < numOfSlices; ++i) {
+                splitted[i].add(name, rows.get(i));
+            }
+        }
+        return splitted;
+    }
+
+    /**
+     * Splits an {@code NDArray} into `numOfSlice` slices along `batchAxis`.
+     *
+     * <p>Usually used for data parallelism where each slices is sent to one device (i.e. GPU).
+     *
+     * @param array a batch of {@code NDArray}.
+     * @param numOfSlices number of desired slices.
+     * @param evenSplit whether to force all slices to have the same number of elements.
+     * @return return value is a NDList even if `numOfSlice` is 1.
+     */
+    private NDList split(NDArray array, int numOfSlices, boolean evenSplit) {
+        int size = Math.toIntExact(array.size(0));
+        if (size < numOfSlices) {
+            throw new IllegalArgumentException(
+                    "Batch size(" + size + ") is less then slice number(" + numOfSlices + ").");
+        }
+
+        if (evenSplit && size % numOfSlices != 0) {
+            throw new IllegalArgumentException(
+                    "data with shape "
+                            + size
+                            + " cannot be evenly split into "
+                            + numOfSlices
+                            + ". Use a batch size that's multiple of "
+                            + numOfSlices
+                            + " or set even_split=true to allow"
+                            + " uneven partitioning of data.");
+        }
+
+        if (evenSplit) {
+            return array.split(numOfSlices);
+        }
+
+        int step = (int) Math.ceil((double) size / numOfSlices);
+        int[] indices = IntStream.range(1, numOfSlices).map(i -> i * step).toArray();
+        return array.split(indices);
     }
 }
