@@ -123,6 +123,26 @@ public class Device {
     }
 
     /**
+     * Returns an array of devices.
+     *
+     * @param maxGpus max number of gpus to use
+     * @return an array of devices
+     */
+    public static Device[] getDevices(int maxGpus) {
+        int count = Engine.getInstance().getGpuCount();
+        if (maxGpus <= 0 || count <= 0) {
+            return new Device[] {CPU};
+        }
+        count = Math.min(maxGpus, count);
+
+        Device[] devices = new Device[count];
+        for (int i = 0; i < count; ++i) {
+            devices[i] = new Device("gpu", i);
+        }
+        return devices;
+    }
+
+    /**
      * Returns the default context used in Engine
      *
      * <p>default type is defined by whether the Deep Learning framework is recognizing GPUs

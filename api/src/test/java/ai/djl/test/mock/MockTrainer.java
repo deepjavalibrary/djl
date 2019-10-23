@@ -45,7 +45,7 @@ public class MockTrainer implements Trainer {
     public void step() {}
 
     @Override
-    public void train(Batch batch) {}
+    public void trainBatch(Batch batch) {}
 
     @Override
     public NDList forward(NDList input) {
@@ -53,7 +53,7 @@ public class MockTrainer implements Trainer {
     }
 
     @Override
-    public void validate(Batch batch) {}
+    public void validateBatch(Batch batch) {}
 
     @Override
     public void setMetrics(Metrics metrics) {}

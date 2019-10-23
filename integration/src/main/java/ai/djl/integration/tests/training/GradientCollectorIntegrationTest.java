@@ -13,6 +13,7 @@
 package ai.djl.integration.tests.training;
 
 import ai.djl.Model;
+import ai.djl.integration.util.Assertions;
 import ai.djl.mxnet.engine.MxGradientCollector;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -42,6 +43,7 @@ public class GradientCollectorIntegrationTest {
                 MxGradientCollector gradCol = new MxGradientCollector()) {
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
+            NDArray expected = manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
             lhs.attachGradient();
             // autograd automatically set recording and training during initialization
             Assert.assertTrue(MxGradientCollector.isRecording());
@@ -49,6 +51,12 @@ public class GradientCollectorIntegrationTest {
 
             NDArray result = NDArrays.dot(lhs, rhs);
             gradCol.backward(result);
+            NDArray grad = lhs.getGradient();
+            Assertions.assertAlmostEquals(grad, expected);
+            // test close and get again
+            grad.close();
+            NDArray grad2 = lhs.getGradient();
+            Assertions.assertAlmostEquals(grad2, expected);
         }
     }
 
@@ -99,7 +107,7 @@ public class GradientCollectorIntegrationTest {
                 for (int epoch = 0; epoch < epochs; epoch++) {
                     trainer.resetTrainingMetrics();
                     for (Batch batch : trainer.iterateDataset(dataset)) {
-                        trainer.train(batch);
+                        trainer.trainBatch(batch);
                         trainer.step();
                         batch.close();
                     }

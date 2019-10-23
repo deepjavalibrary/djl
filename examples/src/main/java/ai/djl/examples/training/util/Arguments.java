@@ -106,6 +106,13 @@ public class Arguments {
                         .argName("max-iterations")
                         .desc("Limit each epoch to a fixed number of iterations")
                         .build());
+        options.addOption(
+                Option.builder("l")
+                        .longOpt("log-interval")
+                        .hasArg()
+                        .argName("LOG-INTERVAL")
+                        .desc("log training status every n batches")
+                        .build());
         return options;
     }
 

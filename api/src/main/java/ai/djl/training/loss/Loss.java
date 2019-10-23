@@ -93,7 +93,12 @@ public abstract class Loss extends TrainingMetric {
     /** {@inheritDoc} */
     @Override
     public void update(NDList labels, NDList predictions) {
-        lastUpdate = getTotalLoss(labels, predictions);
+        // this is a synchronized operation, only call it at end of batch or epoch
+        if (lastUpdate == null) {
+            throw new IllegalStateException(
+                    "You have not calculate loss yet, please "
+                            + "call calculateLoss(labels, preds) before calling update().");
+        }
         totalLoss += lastUpdate.sum().getFloat();
         totalInstances += lastUpdate.size();
     }
@@ -111,10 +116,6 @@ public abstract class Loss extends TrainingMetric {
             return Float.NaN;
         }
         return totalLoss / totalInstances;
-    }
-
-    public NDArray getLastUpdate() {
-        return lastUpdate;
     }
 
     /**
@@ -140,12 +141,9 @@ public abstract class Loss extends TrainingMetric {
      * @param predictions predicted labels
      * @return loss value
      */
-    private NDArray getTotalLoss(NDList labels, NDList predictions) {
-        // TODO: add weighted loss, used in batch loss calculation
-        NDArray loss = getLoss(labels.head(), predictions.head());
-        for (int i = 1; i < labels.size(); i++) {
-            loss.add(getLoss(labels.get(i), predictions.get(i)));
-        }
-        return loss;
+    public NDArray calculateLoss(NDList labels, NDList predictions) {
+        // TODO: support composite loss for ssd (multi output)
+        lastUpdate = getLoss(labels.head(), predictions.head());
+        return lastUpdate;
     }
 }

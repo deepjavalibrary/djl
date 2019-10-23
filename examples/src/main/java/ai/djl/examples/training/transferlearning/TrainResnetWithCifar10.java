@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training.transferlearning;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.Cifar10;
 import ai.djl.examples.training.util.AbstractTraining;
@@ -63,7 +64,9 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         try (Model model = getModel(arguments.getIsSymbolic(), arguments.getPreTrained())) {
 
             // get training dataset
-            Dataset dataset = getDataset(model.getNDManager(), arguments);
+            Dataset trainDataset = getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
+            Dataset validationDataset =
+                    getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(metrics);
@@ -72,7 +75,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 // initialize trainer
                 trainer.initialize(new Shape[] {inputShape});
 
-                TrainingUtils.fit(trainer, arguments.getEpoch(), dataset, null);
+                TrainingUtils.fit(trainer, arguments.getEpoch(), trainDataset, validationDataset);
             }
 
             // save model
@@ -135,29 +138,34 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                         .optWeightDecays(0.001f)
                         .optClipGrad(1f)
                         .build();
-
         return new DefaultTrainingConfig(initializer)
                 .setOptimizer(optimizer)
                 .setLoss(Loss.softmaxCrossEntropyLoss())
                 .addTrainingMetric(new Accuracy())
-                .setBatchSize(arguments.getBatchSize());
+                .setBatchSize(arguments.getBatchSize())
+                .setDevices(Device.getDevices(arguments.getNumGpus()));
     }
 
-    private Dataset getDataset(NDManager manager, Arguments arguments) throws IOException {
+    private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)
+            throws IOException {
         Pipeline pipeline = new Pipeline(new ToTensor());
         int batchSize = arguments.getBatchSize();
         long maxIterations = arguments.getMaxIterations();
-
         Cifar10 cifar10 =
                 new Cifar10.Builder()
                         .setManager(manager)
-                        .setUsage(Dataset.Usage.TRAIN)
+                        .setUsage(usage)
                         .setRandomSampling(batchSize)
                         .optMaxIteration(maxIterations)
                         .optPipeline(pipeline)
                         .build();
         cifar10.prepare();
-        trainDataSize = (int) Math.min(cifar10.size() / batchSize, maxIterations);
+        int dataSize = (int) Math.min(cifar10.size() / batchSize, maxIterations);
+        if (usage == Dataset.Usage.TRAIN) {
+            trainDataSize = dataSize;
+        } else if (usage == Dataset.Usage.TEST) {
+            validateDataSize = dataSize;
+        }
         return cifar10;
     }
 }

@@ -89,6 +89,7 @@ public class ParameterStore {
                     } else {
                         arrays[i] = array.asInDevice(dev, true);
                         arrays[i].attach(manager);
+                        arrays[i].attachGradient();
                     }
                     parameterServer.init(parameterId, arrays);
                     data.add(arrays[i]);
@@ -97,6 +98,7 @@ public class ParameterStore {
                 if (copy || !array.getDevice().equals(device)) {
                     array = array.asInDevice(device, true);
                     array.attach(manager);
+                    array.attachGradient();
                 }
                 data.add(array);
             }

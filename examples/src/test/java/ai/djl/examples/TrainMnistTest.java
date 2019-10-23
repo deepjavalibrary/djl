@@ -25,6 +25,8 @@ public class TrainMnistTest {
         TrainMnist test = new TrainMnist();
         Assert.assertTrue(test.runExample(args));
         Assert.assertTrue(test.getTrainingAccuracy() > 0.9f);
-        Assert.assertTrue(test.getTrainingLoss() < 0.2f);
+        Assert.assertTrue(test.getTrainingLoss() < 0.35f);
+        Assert.assertTrue(test.getValidationAccuracy() > 0.9f);
+        Assert.assertTrue(test.getValidationLoss() < 0.35f);
     }
 }

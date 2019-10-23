@@ -36,6 +36,8 @@ public abstract class AbstractTraining implements TrainingListener {
 
     private float trainingAccuracy;
     private float trainingLoss;
+    private float validationAccuracy;
+    private float validationLoss;
 
     protected int trainDataSize;
     protected int validateDataSize;
@@ -59,11 +61,17 @@ public abstract class AbstractTraining implements TrainingListener {
             DefaultParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args, null, false);
             Arguments arguments = new Arguments(cmd);
-
+            int numGpus = arguments.getNumGpus();
+            String devices;
+            if (numGpus > 0) {
+                devices = numGpus + " GPUs";
+            } else {
+                devices = Device.defaultDevice().toString();
+            }
             logger.info(
                     "Running {} on: {}, epoch: {}.",
                     getClass().getSimpleName(),
-                    Device.defaultDevice(),
+                    devices,
                     arguments.getEpoch());
 
             long init = System.nanoTime();
@@ -127,7 +135,7 @@ public abstract class AbstractTraining implements TrainingListener {
         if (trainingProgressBar == null) {
             trainingProgressBar = new ProgressBar("Training", trainDataSize);
         }
-        trainingProgressBar.printProgress(trainingProgress++);
+        trainingProgressBar.printProgress(trainingProgress++, getTrainingStatus(metrics));
     }
 
     @Override
@@ -143,8 +151,8 @@ public abstract class AbstractTraining implements TrainingListener {
     public void onEpoch() {
         if (epochTime > 0L) {
             metrics.addMetric("epoch", System.nanoTime() - epochTime);
-            printTrainingStatus(metrics);
         }
+        printTrainingStatus(metrics);
 
         epochTime = System.nanoTime();
 
@@ -160,6 +168,26 @@ public abstract class AbstractTraining implements TrainingListener {
         return trainingLoss;
     }
 
+    public float getValidationAccuracy() {
+        return validationAccuracy;
+    }
+
+    public float getValidationLoss() {
+        return validationLoss;
+    }
+
+    private String getTrainingStatus(Metrics metrics) {
+        String trainStatus;
+        List<Metric> list = metrics.getMetric("train_Loss");
+        trainingLoss = list.get(list.size() - 1).getValue().floatValue();
+
+        list = metrics.getMetric("train_Accuracy");
+        trainingAccuracy = list.get(list.size() - 1).getValue().floatValue();
+        // use .2 precision to avoid new line in progress bar
+        trainStatus = String.format("accuracy: %.2f loss: %.2f", trainingAccuracy, trainingLoss);
+        return trainStatus;
+    }
+
     private void printTrainingStatus(Metrics metrics) {
         List<Metric> list = metrics.getMetric("train_Loss");
         trainingLoss = list.get(list.size() - 1).getValue().floatValue();
@@ -167,13 +195,17 @@ public abstract class AbstractTraining implements TrainingListener {
         list = metrics.getMetric("train_Accuracy");
         trainingAccuracy = list.get(list.size() - 1).getValue().floatValue();
 
-        list = metrics.getMetric("validate_Loss");
-        float validateLoss = list.get(list.size() - 1).getValue().floatValue();
-
-        list = metrics.getMetric("validate_Accuracy");
-        float validateAccuracy = list.get(list.size() - 1).getValue().floatValue();
-
         logger.info("train accuracy: {}, train loss: {}", trainingAccuracy, trainingLoss);
-        logger.info("validate accuracy: {}, validate loss: {}", validateAccuracy, validateLoss);
+        list = metrics.getMetric("validate_Loss");
+        if (!list.isEmpty()) {
+            validationLoss = list.get(list.size() - 1).getValue().floatValue();
+            list = metrics.getMetric("validate_Accuracy");
+            validationAccuracy = list.get(list.size() - 1).getValue().floatValue();
+
+            logger.info(
+                    "validate accuracy: {}, validate loss: {}", validationAccuracy, validationLoss);
+        } else {
+            logger.info("validation has not been run.");
+        }
     }
 }

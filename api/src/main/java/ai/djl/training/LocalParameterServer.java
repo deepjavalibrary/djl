@@ -12,6 +12,7 @@
  */
 package ai.djl.training;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.training.optimizer.Optimizer;
 import java.util.Arrays;
@@ -42,8 +43,17 @@ public class LocalParameterServer implements ParameterServer {
     @Override
     public void pull(String parameterId, NDArray[] weights, int priority) {
         NDArray[] grads = gradMap.get(parameterId);
-        for (int i = 0; i < grads.length; ++i) {
-            optimizer.update(parameterId, weights[i], grads[i]);
+        // reduce gradient on all devices
+        try (NDArray gradSum = grads[0].asInDevice(Device.cpu(), true)) {
+            for (int i = 1; i < grads.length; i++) {
+                gradSum.addi(grads[i].asInDevice(Device.cpu(), true));
+            }
+            // update weights on different devices with reduced gradient
+            for (NDArray weight : weights) {
+                try (NDArray gradSumCopy = gradSum.asInDevice(weight.getDevice(), true)) {
+                    optimizer.update(parameterId, weight, gradSumCopy);
+                }
+            }
         }
     }
 

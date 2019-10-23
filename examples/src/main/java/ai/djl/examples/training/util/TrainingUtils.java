@@ -38,22 +38,21 @@ public final class TrainingUtils {
             throws IOException {
 
         for (int epoch = 0; epoch < numEpoch; epoch++) {
-            trainer.resetTrainingMetrics();
-
             for (Batch batch : trainer.iterateDataset(trainingDataset)) {
-                trainer.train(batch);
+                trainer.trainBatch(batch);
                 trainer.step();
                 batch.close();
             }
 
             if (validateDataset != null) {
                 for (Batch batch : trainer.iterateDataset(validateDataset)) {
-                    trainer.validate(batch);
+                    trainer.validateBatch(batch);
                     batch.close();
                 }
             }
+            // reset training and validation metric at end of epoch
+            trainer.resetTrainingMetrics();
         }
-        trainer.resetTrainingMetrics();
     }
 
     public static void dumpTrainingTimeInfo(Metrics metrics, String logDir) {

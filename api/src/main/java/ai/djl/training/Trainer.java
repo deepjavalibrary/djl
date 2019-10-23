@@ -32,11 +32,11 @@ public interface Trainer extends AutoCloseable {
 
     GradientCollector newGradientCollector();
 
-    void train(Batch batch);
+    void trainBatch(Batch batch);
 
     NDList forward(NDList input);
 
-    void validate(Batch batch);
+    void validateBatch(Batch batch);
 
     /** Makes one step of parameter update. */
     void step();

@@ -85,7 +85,7 @@ public class ResnetTest {
                 NDArray label = manager.ones(new Shape(100, 1));
                 Batch batch = new Batch(manager, new NDList(input), new NDList(label));
                 PairList<String, Parameter> parameters = resNet50.getParameters();
-                trainer.train(batch);
+                trainer.trainBatch(batch);
                 trainer.step();
                 NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
                 NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(.8577);
@@ -126,7 +126,7 @@ public class ResnetTest {
                 NDArray data = manager.ones(new Shape(16, 3, 32, 32));
                 NDArray label = manager.ones(outputShape[0]);
                 Batch batch = new Batch(manager, new NDList(data), new NDList(label));
-                trainer.train(batch);
+                trainer.trainBatch(batch);
             }
         }
     }

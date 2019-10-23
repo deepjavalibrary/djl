@@ -17,6 +17,7 @@ public final class ProgressBar {
     private String message;
     private int max;
     private int current;
+    private int totalBarLength = 40;
 
     public ProgressBar(String message, int max) {
         this.message = message;
@@ -25,6 +26,11 @@ public final class ProgressBar {
 
     @SuppressWarnings("PMD.SystemPrintln")
     public void printProgress(int index) {
+        printProgress(index, null);
+    }
+
+    @SuppressWarnings("PMD.SystemPrintln")
+    public void printProgress(int index, String additionalMessage) {
         if (Boolean.getBoolean("disableProgressBar")) {
             return;
         }
@@ -41,14 +47,17 @@ public final class ProgressBar {
             sb.append(' ');
         }
         sb.append(String.format("%3d", percent)).append("% |");
-        for (int i = 0; i < 60; ++i) {
-            if (i <= percent * 60 / 100) {
+        for (int i = 0; i < totalBarLength; ++i) {
+            if (i <= percent * totalBarLength / 100) {
                 sb.append('█');
             } else {
                 sb.append(' ');
             }
         }
         sb.append('|');
+        if (additionalMessage != null) {
+            sb.append(" " + additionalMessage);
+        }
         if (index == max - 1) {
             System.out.println(sb);
         } else {

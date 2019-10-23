@@ -49,6 +49,7 @@ public class MxTrainer implements Trainer {
     private List<TrainingMetric> validateMetrics;
     private Loss trainingLoss;
     private Loss validationLoss;
+    long batchBeginTime;
 
     private boolean gradientsChecked;
 
@@ -63,6 +64,12 @@ public class MxTrainer implements Trainer {
         trainingMetrics = new ArrayList<>(trainingConfig.getTrainingMetrics());
         validateMetrics = new ArrayList<>();
         trainingMetrics.forEach(i -> validateMetrics.add(i.duplicate()));
+
+        // track loss as training metric by default
+        trainingMetrics.add(trainingLoss);
+        // add from duplication of trainingLoss
+        // do not mess up with duplication of training metrics
+        validateMetrics.add(validationLoss);
 
         // ParameterServer parameterServer = new MxParameterServer(trainingConfig.getOptimizer());
         ParameterServer parameterServer = new LocalParameterServer(trainingConfig.getOptimizer());
@@ -82,12 +89,7 @@ public class MxTrainer implements Trainer {
     }
 
     @Override
-    public void train(Batch batch) {
-        if (listener != null) {
-            listener.onTrainingBatch();
-        }
-
-        long begin = System.nanoTime();
+    public void trainBatch(Batch batch) {
         Batch[] splits = batch.split(devices, false);
         try (GradientCollector collector = new MxGradientCollector()) {
             for (Batch split : splits) {
@@ -97,16 +99,25 @@ public class MxTrainer implements Trainer {
                 NDList preds = forward(data);
 
                 long time = System.nanoTime();
-                trainingLoss.update(labels, preds);
-                trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
-                addMetric("training-metrics", time);
+                NDArray loss = trainingLoss.calculateLoss(labels, preds);
 
-                time = System.nanoTime();
-                collector.backward(trainingLoss.getLastUpdate());
+                collector.backward(loss);
                 addMetric("backward", time);
+                time = System.nanoTime();
+                // this step is synchronized, should be done at end of batch
+                trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
+                updateTrainingMetrics();
+                addMetric("training-metrics", time);
             }
         }
-        addMetric("train", begin);
+
+        addMetric("train", batchBeginTime);
+        // count batch begin time at end of batch to include batch loading time
+        batchBeginTime = System.nanoTime();
+
+        if (listener != null) {
+            listener.onTrainingBatch();
+        }
     }
 
     @Override
@@ -120,7 +131,7 @@ public class MxTrainer implements Trainer {
     }
 
     @Override
-    public void validate(Batch batch) {
+    public void validateBatch(Batch batch) {
         long begin = System.nanoTime();
         Batch[] splits = batch.split(devices, false);
         for (Batch split : splits) {
@@ -128,8 +139,9 @@ public class MxTrainer implements Trainer {
             NDList labels = split.getLabels();
 
             NDList preds = forward(data);
-            validationLoss.update(labels, preds);
+            validationLoss.calculateLoss(labels, preds);
             validateMetrics.forEach(metrics -> metrics.update(labels, preds));
+            updateValidationMetrics();
         }
         addMetric("validate", begin);
 
@@ -160,17 +172,24 @@ public class MxTrainer implements Trainer {
         this.listener = listener;
     }
 
-    @Override
-    public void resetTrainingMetrics() {
+    private void updateTrainingMetrics() {
+        // TODO: this can be done during onBatch listener
         if (trainingLoss != null) {
             addMetric("train", trainingLoss);
         }
         trainingMetrics.forEach(metric -> addMetric("train", metric));
+    }
+
+    private void updateValidationMetrics() {
+        // TODO: this can be done during onBatch listener
         if (validationLoss != null) {
             addMetric("validate", validationLoss);
         }
         validateMetrics.forEach(metric -> addMetric("validate", metric));
+    }
 
+    @Override
+    public void resetTrainingMetrics() {
         trainingMetrics.forEach(TrainingMetric::reset);
         validateMetrics.forEach(TrainingMetric::reset);
         if (trainingLoss != null) {
@@ -281,7 +300,7 @@ public class MxTrainer implements Trainer {
     }
 
     private void addMetric(String metricName, long begin) {
-        if (metrics != null) {
+        if (metrics != null && begin > 0L) {
             metrics.addMetric(metricName, System.nanoTime() - begin);
         }
     }
