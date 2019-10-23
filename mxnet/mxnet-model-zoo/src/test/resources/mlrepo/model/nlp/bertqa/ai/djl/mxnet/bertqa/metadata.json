@@ -1,0 +1,40 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "bertqa",
+  "type": "nlp",
+  "name": "Question and Answer model",
+  "description": "BERT QA model",
+  "website": "http://www.djl.ai/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "static_bert_qa",
+      "properties": {
+        "backbone": "bert",
+        "dataset": "book_corpus_wiki_en_uncased"
+      },
+      "files": {
+        "vocabulary": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/nlp/bertqa/ai/djl/mxnet/bertqa/vocab.json",
+          "sha1Hash": "a66073971aa0b1a262453fe51342e57166a8abcf"
+        },
+        "symbol": {
+          "uri": "0.0.1/static_bert_qa-symbol.json",
+          "sha1Hash": "0507f21bd3f73361dfcff72c20147cf25ce3623f"
+        },
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/nlp/bertqa/ai/djl/mxnet/bertqa/0.0.1/static_bert_qa-0002.params.gz",
+          "sha1Hash": "967db47d92fe7ef1b80d7dd89975effb1dbef1ef"
+        }
+      }
+    }
+  ]
+}

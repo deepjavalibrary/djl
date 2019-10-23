@@ -93,7 +93,7 @@ public class MRL {
             Anchor PARSING = new Anchor("model/nlp/parsing");
             Anchor NATURAL_LANGUAGE_INFERENCE = new Anchor("model/nlp/natural_language_inference");
             Anchor TEXT_GENERATION = new Anchor("model/nlp/TEXT_GENERATION");
-            Anchor BERT = new Anchor("model/nlp/bert");
+            Anchor BERTQA = new Anchor("model/nlp/bertqa");
         }
     }
 }

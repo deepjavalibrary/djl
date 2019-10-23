@@ -13,26 +13,19 @@
 
 package ai.djl.examples.inference;
 
-import ai.djl.Device;
-import ai.djl.Model;
 import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
-import ai.djl.examples.inference.util.BertDataParser;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
-import ai.djl.translate.Batchifier;
+import ai.djl.mxnet.zoo.MxModelZoo;
+import ai.djl.mxnet.zoo.nlp.bertqa.QAInput;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
-import ai.djl.translate.TranslatorContext;
-import ai.djl.util.Utils;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -49,28 +42,21 @@ public final class BertQaInferenceExample extends AbstractInference<String> {
 
     @Override
     public String predict(Arguments args, Metrics metrics, int iteration)
-            throws IOException, TranslateException {
+            throws IOException, TranslateException, ModelNotFoundException {
         BertArguments arguments = (BertArguments) args;
-        Path modelDir = arguments.getModelDir();
-        String modelName = arguments.getModelName();
 
-        // Device is not not required, default device will be used by Model if not provided.
-        // Change to a specific device if needed.
-        Device device = Device.defaultDevice();
-        Model model = Model.newInstance(device);
-        model.load(modelDir, modelName);
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        criteria.put("backbone", "bert");
+        criteria.put("dataset", "book_corpus_wiki_en_uncased");
+        ZooModel<QAInput, String> model = MxModelZoo.BERT_QA.loadModel(criteria);
 
-        QAInput input = new QAInput(arguments);
-
-        BertDataParser parser = model.getArtifact("vocab.json", BertDataParser::parse);
+        QAInput input = new QAInput(arguments.question, arguments.answer, arguments.seqLength);
 
         logger.info("Question: {}", input.getQuestion());
         logger.info("Paragraph: {}", input.getAnswer());
 
-        BertTranslator translator = new BertTranslator(parser);
-
         String predictResult = null;
-        try (Predictor<QAInput, String> predictor = model.newPredictor(translator)) {
+        try (Predictor<QAInput, String> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
@@ -93,88 +79,6 @@ public final class BertQaInferenceExample extends AbstractInference<String> {
     @Override
     protected BertArguments parseArguments(CommandLine cmd) {
         return new BertArguments(cmd);
-    }
-
-    private static final class QAInput {
-
-        private String question;
-        private String answer;
-        private int seqLength;
-
-        QAInput(BertArguments arguments) {
-            question = arguments.getQuestion();
-            answer = arguments.getAnswer();
-            seqLength = arguments.getSeqLength();
-        }
-
-        public String getQuestion() {
-            return question;
-        }
-
-        public String getAnswer() {
-            return answer;
-        }
-
-        public int getSeqLength() {
-            return seqLength;
-        }
-    }
-
-    private static final class BertTranslator implements Translator<QAInput, String> {
-
-        private BertDataParser parser;
-        private List<String> tokens;
-
-        BertTranslator(BertDataParser parser) {
-            this.parser = parser;
-        }
-
-        @Override
-        public Batchifier getBatchifier() {
-            return null;
-        }
-
-        @Override
-        public NDList processInput(TranslatorContext ctx, QAInput input) {
-            // pre-processing - tokenize sentence
-            List<String> tokenQ = BertDataParser.tokenizer(input.getQuestion().toLowerCase());
-            List<String> tokenA = BertDataParser.tokenizer(input.getAnswer().toLowerCase());
-            int validLength = tokenQ.size() + tokenA.size();
-            List<Float> tokenTypes =
-                    BertDataParser.getTokenTypes(tokenQ, tokenA, input.getSeqLength());
-            tokens = BertDataParser.formTokens(tokenQ, tokenA, input.getSeqLength());
-            List<Integer> indexes = parser.token2idx(tokens);
-            float[] types = Utils.toFloatArray(tokenTypes);
-            float[] indexesFloat = Utils.toFloatArray(indexes);
-
-            int seqLength = input.getSeqLength();
-            NDManager manager = ctx.getNDManager();
-            NDArray data0 = manager.create(indexesFloat, new Shape(1, seqLength));
-            NDArray data1 = manager.create(types, new Shape(1, seqLength));
-            NDArray data2 = manager.create(new float[] {validLength});
-
-            NDList list = new NDList(3);
-            list.add("data0", data0);
-            list.add("data1", data1);
-            list.add("data2", data2);
-
-            return list;
-        }
-
-        @Override
-        public String processOutput(TranslatorContext ctx, NDList list) {
-            NDArray array = list.singletonOrThrow();
-            NDList output = array.split(2, 2);
-            // Get the formatted logits result
-            NDArray startLogits = output.get(0).reshape(new Shape(1, -1));
-            NDArray endLogits = output.get(1).reshape(new Shape(1, -1));
-            // Get Probability distribution
-            NDArray startProb = startLogits.softmax(-1);
-            NDArray endProb = endLogits.softmax(-1);
-            int startIdx = (int) startProb.argmax(1).getFloat();
-            int endIdx = (int) endProb.argmax(1).getFloat();
-            return tokens.subList(startIdx, endIdx + 1).toString();
-        }
     }
 
     public static final class BertArguments extends Arguments {

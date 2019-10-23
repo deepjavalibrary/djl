@@ -21,6 +21,7 @@ import ai.djl.mxnet.zoo.cv.classification.Senet;
 import ai.djl.mxnet.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
 import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
 import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
+import ai.djl.mxnet.zoo.nlp.bertqa.BertQAModelLoader;
 import ai.djl.repository.Repository;
 
 public interface MxModelZoo {
@@ -38,4 +39,5 @@ public interface MxModelZoo {
     SimplePoseModelLoader SIMPLE_POSE = new SimplePoseModelLoader(REPOSITORY);
     InstanceSegmentationModelLoader MASK_RCNN = new InstanceSegmentationModelLoader(REPOSITORY);
     ActionRecognitionModelLoader ACTION_RECOGNITION = new ActionRecognitionModelLoader(REPOSITORY);
+    BertQAModelLoader BERT_QA = new BertQAModelLoader(REPOSITORY);
 }
