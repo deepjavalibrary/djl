@@ -40,6 +40,30 @@
     {
       "version": "0.0.1",
       "snapshot": false,
+      "name": "resnet50_v2",
+      "properties": {
+        "layers": "50",
+        "flavor": "v2",
+        "dataset": "imagenet"
+      },
+      "files": {
+        "synset": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2"
+        },
+        "symbol": {
+          "uri": "0.0.1/resnet50_v2-symbol.json",
+          "sha1Hash": "5ee57cae8950388e88feceb853924dd0b1f1cb9e"
+        },
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet50_v2-0000.params.gz",
+          "sha1Hash": "158ce9eefe23ccf02c36320a540d99d3028c60e1"
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
       "name": "resnet152_v1d",
       "properties": {
         "layers": "152",
