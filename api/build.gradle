@@ -32,6 +32,15 @@ task javadocJar(type: Jar) {
     archiveClassifier = 'javadoc'
 }
 
+task uploadJavadoc(type:Exec) {
+    commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync build/docs/javadoc s3://djl-ai/java-api/${version} --acl public-read"
+
+    standardOutput = new ByteArrayOutputStream()
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
