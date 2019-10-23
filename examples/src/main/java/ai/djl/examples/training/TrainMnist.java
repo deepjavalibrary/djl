@@ -73,7 +73,7 @@ public final class TrainMnist extends AbstractTraining {
                 // initialize trainer
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
-                TrainingUtils.fit(trainer, config, trainingSet, validateSet);
+                TrainingUtils.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);
             }
 
             // save model
@@ -95,7 +95,6 @@ public final class TrainMnist extends AbstractTraining {
 
     private TrainingConfig setupTrainingConfig(Arguments arguments) {
         int batchSize = arguments.getBatchSize();
-        int numEpoch = arguments.getEpoch();
 
         FactorTracker factorTracker =
                 LearningRateTracker.factorTracker()
@@ -116,9 +115,8 @@ public final class TrainMnist extends AbstractTraining {
 
         return new DefaultTrainingConfig(new XavierInitializer())
                 .setOptimizer(optimizer)
-                .addTrainingMetric(Loss.softmaxCrossEntropyLoss())
+                .setLoss(Loss.softmaxCrossEntropyLoss())
                 .addTrainingMetric(new Accuracy())
-                .setEpoch(numEpoch)
                 .setBatchSize(batchSize);
     }
 

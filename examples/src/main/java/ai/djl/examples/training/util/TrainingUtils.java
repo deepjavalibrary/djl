@@ -13,7 +13,6 @@
 package ai.djl.examples.training.util;
 
 import ai.djl.training.Trainer;
-import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import java.io.IOException;
@@ -23,12 +22,8 @@ public final class TrainingUtils {
     private TrainingUtils() {}
 
     public static void fit(
-            Trainer trainer,
-            TrainingConfig config,
-            Dataset trainingDataset,
-            Dataset validateDataset)
+            Trainer trainer, int numEpoch, Dataset trainingDataset, Dataset validateDataset)
             throws IOException {
-        int numEpoch = config.getEpoch();
 
         for (int epoch = 0; epoch < numEpoch; epoch++) {
             trainer.resetTrainingMetrics();

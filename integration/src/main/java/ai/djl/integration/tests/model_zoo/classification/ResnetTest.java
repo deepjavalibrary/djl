@@ -65,7 +65,7 @@ public class ResnetTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .setOptimizer(optimizer)
-                        .addTrainingMetric(Loss.softmaxCrossEntropyLoss());
+                        .setLoss(Loss.softmaxCrossEntropyLoss());
 
         Block resNet50 =
                 new ResNetV1.Builder()
@@ -115,7 +115,7 @@ public class ResnetTest {
     public void testLoadTrain() throws IOException, ModelNotFoundException {
         try (ZooModel<BufferedImage, Classification> model = getModel()) {
             TrainingConfig config =
-                    new DefaultTrainingConfig(Initializer.ONES).addTrainingMetric(Loss.l1Loss());
+                    new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.l1Loss());
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(16, 3, 32, 32);
 

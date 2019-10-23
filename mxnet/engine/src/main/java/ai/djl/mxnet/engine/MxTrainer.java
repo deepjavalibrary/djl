@@ -30,7 +30,6 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.TrainingListener;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.metrics.TrainingMetric;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,8 +43,6 @@ public class MxTrainer implements Trainer {
 
     private MxModel model;
     private MxNDManager manager;
-    // this is performance metrics similar to predictor metrics, not training accuracy or loss
-    // currently not implemented
     private Metrics metrics;
     private TrainingListener listener;
     private Device[] devices;
@@ -54,8 +51,6 @@ public class MxTrainer implements Trainer {
     private List<TrainingMetric> validateMetrics;
     private Loss trainingLoss;
     private Loss validationLoss;
-    private Accuracy trainingAccuracy;
-    private Accuracy validationAccuracy;
 
     private boolean gradientsChecked;
 
@@ -63,13 +58,13 @@ public class MxTrainer implements Trainer {
         this.model = model;
         manager = (MxNDManager) model.getNDManager().newSubManager();
         devices = trainingConfig.getDevices();
+        trainingLoss = trainingConfig.getLossFunction();
+        if (trainingLoss != null) {
+            validationLoss = trainingLoss.duplicate();
+        }
         trainingMetrics = new ArrayList<>(trainingConfig.getTrainingMetrics());
         validateMetrics = new ArrayList<>();
         trainingMetrics.forEach(i -> validateMetrics.add(i.duplicate()));
-        trainingLoss = getTrainingMetric(Loss.class);
-        trainingAccuracy = getTrainingMetric(Accuracy.class);
-        validationLoss = getValidationMetric(Loss.class);
-        validationAccuracy = getValidationMetric(Accuracy.class);
 
         // ParameterServer parameterServer = new MxParameterServer(trainingConfig.getOptimizer());
         ParameterServer parameterServer = new LocalParameterServer(trainingConfig.getOptimizer());
@@ -102,6 +97,7 @@ public class MxTrainer implements Trainer {
                 NDList preds = forward(data);
 
                 long time = System.nanoTime();
+                trainingLoss.update(labels, preds);
                 trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
                 addMetric("training-metrics", time);
 
@@ -136,6 +132,7 @@ public class MxTrainer implements Trainer {
             NDList labels = split.getLabels();
 
             NDList preds = forward(data);
+            validationLoss.update(labels, preds);
             validateMetrics.forEach(metrics -> metrics.update(labels, preds));
         }
         addMetric("validate", begin);
@@ -172,22 +169,32 @@ public class MxTrainer implements Trainer {
         if (trainingLoss != null) {
             addMetric("train", trainingLoss);
         }
-        if (trainingAccuracy != null) {
-            addMetric("train", trainingAccuracy);
-        }
+        trainingMetrics.forEach(metric -> addMetric("train", metric));
         if (validationLoss != null) {
             addMetric("validate", validationLoss);
         }
-        if (validationAccuracy != null) {
-            addMetric("validate", validationAccuracy);
-        }
+        validateMetrics.forEach(metric -> addMetric("validate", metric));
 
         trainingMetrics.forEach(TrainingMetric::reset);
         validateMetrics.forEach(TrainingMetric::reset);
+        if (trainingLoss != null) {
+            trainingLoss.reset();
+            validationLoss.reset();
+        }
 
         if (listener != null) {
             listener.onEpoch();
         }
+    }
+
+    @Override
+    public Loss getLoss() {
+        return trainingLoss;
+    }
+
+    @Override
+    public Loss getValidationLoss() {
+        return validationLoss;
     }
 
     public Metrics getMetrics() {

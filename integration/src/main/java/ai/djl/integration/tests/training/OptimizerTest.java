@@ -51,7 +51,7 @@ public class OptimizerTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .setOptimizer(sgd)
-                        .addTrainingMetric(Loss.l2Loss());
+                        .setLoss(Loss.l2Loss());
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -82,7 +82,7 @@ public class OptimizerTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .setOptimizer(optim)
-                        .addTrainingMetric(Loss.l2Loss());
+                        .setLoss(Loss.l2Loss());
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -120,7 +120,7 @@ public class OptimizerTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .setOptimizer(optim)
-                        .addTrainingMetric(Loss.l2Loss());
+                        .setLoss(Loss.l2Loss());
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -148,7 +148,7 @@ public class OptimizerTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .setOptimizer(optim)
-                        .addTrainingMetric(Loss.l2Loss());
+                        .setLoss(Loss.l2Loss());
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);

@@ -15,6 +15,7 @@ package ai.djl.training;
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetric;
 import ai.djl.training.optimizer.Optimizer;
 import java.util.ArrayList;
@@ -25,8 +26,8 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private Initializer initializer;
     private Optimizer optimizer;
     private Device[] devices;
+    private Loss loss;
     private List<TrainingMetric> trainingMetrics;
-    private int epoch;
     private int batchSize;
 
     public DefaultTrainingConfig(Initializer initializer) {
@@ -44,13 +45,13 @@ public class DefaultTrainingConfig implements TrainingConfig {
         return this;
     }
 
-    public DefaultTrainingConfig addTrainingMetric(TrainingMetric trainingMetric) {
-        trainingMetrics.add(trainingMetric);
+    public DefaultTrainingConfig setLoss(Loss loss) {
+        this.loss = loss;
         return this;
     }
 
-    public DefaultTrainingConfig setEpoch(int epoch) {
-        this.epoch = epoch;
+    public DefaultTrainingConfig addTrainingMetric(TrainingMetric trainingMetric) {
+        trainingMetrics.add(trainingMetric);
         return this;
     }
 
@@ -88,13 +89,13 @@ public class DefaultTrainingConfig implements TrainingConfig {
     }
 
     @Override
-    public List<TrainingMetric> getTrainingMetrics() {
-        return trainingMetrics;
+    public Loss getLossFunction() {
+        return loss;
     }
 
     @Override
-    public int getEpoch() {
-        return epoch;
+    public List<TrainingMetric> getTrainingMetrics() {
+        return trainingMetrics;
     }
 
     @Override

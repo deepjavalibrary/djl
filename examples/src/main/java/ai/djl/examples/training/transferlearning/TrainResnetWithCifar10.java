@@ -73,7 +73,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 // initialize trainer
                 trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
 
-                TrainingUtils.fit(trainer, config, dataset, null);
+                TrainingUtils.fit(trainer, arguments.getEpoch(), dataset, null);
             }
 
             // save model
@@ -139,9 +139,8 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
 
         return new DefaultTrainingConfig(initializer)
                 .setOptimizer(optimizer)
-                .addTrainingMetric(Loss.softmaxCrossEntropyLoss())
+                .setLoss(Loss.softmaxCrossEntropyLoss())
                 .addTrainingMetric(new Accuracy())
-                .setEpoch(arguments.getEpoch())
                 .setBatchSize(arguments.getBatchSize());
     }
 

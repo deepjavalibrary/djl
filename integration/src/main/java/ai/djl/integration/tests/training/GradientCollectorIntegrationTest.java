@@ -68,7 +68,7 @@ public class GradientCollectorIntegrationTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)
                         .setOptimizer(optimizer)
-                        .addTrainingMetric(Loss.l2Loss());
+                        .setLoss(Loss.l2Loss());
 
         try (Model model = Model.newInstance()) {
             Linear block = new Linear.Builder().setOutChannels(1).build();
@@ -105,7 +105,7 @@ public class GradientCollectorIntegrationTest {
                         batch.close();
                     }
                 }
-                lossValue = trainer.getTrainingMetric(Loss.class).getValue();
+                lossValue = trainer.getLoss().getValue();
             }
             float expectedLoss = 0.001f;
             Assert.assertTrue(

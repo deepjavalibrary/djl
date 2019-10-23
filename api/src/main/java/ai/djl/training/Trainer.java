@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataDesc;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetric;
 import java.io.IOException;
 
@@ -50,6 +51,10 @@ public interface Trainer extends AutoCloseable {
     void setTrainingListener(TrainingListener listener);
 
     void resetTrainingMetrics();
+
+    Loss getLoss();
+
+    Loss getValidationLoss();
 
     <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz);
 

@@ -43,7 +43,7 @@ public class SsdBoxPredictionError extends TrainingMetric {
         NDArray boundingBoxPredictions = predictions.head();
         NDArray boundingBoxError =
                 boundingBoxLabels.sub(boundingBoxPredictions).mul(boundingBoxMasks).abs().sum();
-        ssdBoxPredictionError += boundingBoxError.toFloatArray()[0];
+        ssdBoxPredictionError += boundingBoxError.getFloat();
     }
 
     @Override
