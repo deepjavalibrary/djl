@@ -18,6 +18,7 @@ import ai.djl.examples.util.MemoryUtils;
 import ai.djl.examples.util.ProgressBar;
 import ai.djl.metric.Metric;
 import ai.djl.metric.Metrics;
+import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.TrainingListener;
 import java.io.IOException;
@@ -105,6 +106,9 @@ public abstract class AbstractTraining implements TrainingListener {
             if (arguments.getOutputDir() != null) {
                 MemoryUtils.dumpMemoryInfo(metrics, arguments.getOutputDir());
             }
+
+            // FIXME: remove once crash issue is fixed in MXNet
+            JnaUtils.waitAll();
 
             return true;
         } catch (ParseException e) {

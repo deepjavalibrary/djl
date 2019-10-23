@@ -12,9 +12,6 @@
  */
 package ai.djl.examples.training.util;
 
-import ai.djl.Device;
-import ai.djl.ndarray.types.DataDesc;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
@@ -31,16 +28,11 @@ public final class TrainingUtils {
             Dataset trainingDataset,
             Dataset validateDataset)
             throws IOException {
-        Device[] devices = config.getDevices();
         int numEpoch = config.getEpoch();
-        int batchSize = config.getBatchSize();
-        int numOfSlices = devices.length;
 
-        Shape inputShape = new Shape(batchSize / numOfSlices, 28 * 28);
-        trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
-
-        trainer.resetTrainingMetrics();
         for (int epoch = 0; epoch < numEpoch; epoch++) {
+            trainer.resetTrainingMetrics();
+
             for (Batch batch : trainer.iterateDataset(trainingDataset)) {
                 trainer.train(batch);
                 trainer.step();
@@ -53,7 +45,7 @@ public final class TrainingUtils {
                     batch.close();
                 }
             }
-            trainer.resetTrainingMetrics();
         }
+        trainer.resetTrainingMetrics();
     }
 }

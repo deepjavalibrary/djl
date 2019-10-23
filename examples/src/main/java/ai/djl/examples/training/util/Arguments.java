@@ -18,6 +18,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 public class Arguments {
+
     private int epoch;
     private int batchSize;
     private int numGpus;
@@ -32,26 +33,18 @@ public class Arguments {
         } else {
             epoch = 10;
         }
+        numGpus = Engine.getInstance().getGpuCount();
+        if (cmd.hasOption("num-gpus")) {
+            numGpus = Math.min(Integer.parseInt(cmd.getOptionValue("num-gpus")), numGpus);
+        }
         if (cmd.hasOption("batch-size")) {
             batchSize = Integer.parseInt(cmd.getOptionValue("batch-size"));
         } else {
-            batchSize = 32;
+            batchSize = numGpus > 0 ? 32 * numGpus : 32;
         }
-        if (cmd.hasOption("num-gpus")) {
-            numGpus = Integer.parseInt(cmd.getOptionValue("num-gpus"));
-        } else {
-            numGpus = Engine.getInstance().getGpuCount() > 0 ? 1 : 0;
-        }
-        if (cmd.hasOption("symbolic-model")) {
-            isSymbolic = Boolean.parseBoolean(cmd.getOptionValue("symbolic-model"));
-        } else {
-            isSymbolic = true;
-        }
-        if (cmd.hasOption("pre-trained")) {
-            preTrained = Boolean.parseBoolean(cmd.getOptionValue("pre-trained"));
-        } else {
-            preTrained = true;
-        }
+        isSymbolic = cmd.hasOption("symbolic-model");
+        preTrained = cmd.hasOption("pre-trained");
+
         if (cmd.hasOption("output-dir")) {
             outputDir = cmd.getOptionValue("output-dir");
         } else {
@@ -90,14 +83,12 @@ public class Arguments {
         options.addOption(
                 Option.builder("s")
                         .longOpt("symbolic-model")
-                        .hasArg()
                         .argName("SYMBOLIC")
                         .desc("Use symbolic model, use imperative model if false")
                         .build());
         options.addOption(
                 Option.builder("p")
                         .longOpt("pre-trained")
-                        .hasArg()
                         .argName("PRE-TRAINED")
                         .desc("Use pre-trained weights")
                         .build());

@@ -140,20 +140,26 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         return new DefaultTrainingConfig(initializer)
                 .setOptimizer(optimizer)
                 .addTrainingMetric(Loss.softmaxCrossEntropyLoss())
-                .addTrainingMetric(new Accuracy());
+                .addTrainingMetric(new Accuracy())
+                .setEpoch(arguments.getEpoch())
+                .setBatchSize(arguments.getBatchSize());
     }
 
     private Dataset getDataset(NDManager manager, Arguments arguments) throws IOException {
         Pipeline pipeline = new Pipeline(new ToTensor());
+        int batchSize = arguments.getBatchSize();
+        long maxIterations = arguments.getMaxIterations();
+
         Cifar10 cifar10 =
                 new Cifar10.Builder()
                         .setManager(manager)
                         .setUsage(Dataset.Usage.TRAIN)
-                        .setRandomSampling(arguments.getBatchSize())
-                        .optMaxIteration(arguments.getMaxIterations())
+                        .setRandomSampling(batchSize)
+                        .optMaxIteration(maxIterations)
                         .optPipeline(pipeline)
                         .build();
         cifar10.prepare();
+        trainDataSize = (int) Math.min(cifar10.size() / batchSize, maxIterations);
         return cifar10;
     }
 }
