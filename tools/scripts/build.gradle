@@ -1,0 +1,22 @@
+plugins {
+    id "java"
+    id 'application'
+}
+
+repositories {
+    jcenter()
+    // mavenLocal()
+    maven {
+        url 'https://djl-ai.s3.amazonaws.com/benchmark-repo'
+    }
+}
+
+dependencies {
+    compile "ai.djl:examples:0.1.0-SNAPSHOT"
+}
+
+application {
+    mainClassName = System.getProperty("main", "ai.djl.examples.inference.ClassifyExample")
+}
+
+tasks.distTar.enabled = false

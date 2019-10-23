@@ -46,9 +46,12 @@ public final class ClassifyExample extends AbstractInference<Classification> {
         // Change to a specific device if needed.
         Device device = Device.defaultDevice();
 
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("layers", "18");
-        criteria.put("flavor", "v1");
+        Map<String, String> criteria = arguments.getCriteria();
+        if (criteria == null) {
+            criteria = new ConcurrentHashMap<>();
+            criteria.put("layers", "18");
+            criteria.put("flavor", "v1");
+        }
         ZooModel<BufferedImage, Classification> model =
                 MxModelZoo.RESNET.loadModel(criteria, device);
 

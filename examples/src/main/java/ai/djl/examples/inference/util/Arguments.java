@@ -12,11 +12,15 @@
  */
 package ai.djl.examples.inference.util;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -28,6 +32,7 @@ public class Arguments {
     private String modelName;
     private String imageFile;
     private String logDir;
+    private Map<String, String> criteria;
     private int duration;
     private int iteration = 1;
 
@@ -41,6 +46,10 @@ public class Arguments {
         }
         if (cmd.hasOption("iteration")) {
             iteration = Integer.parseInt(cmd.getOptionValue("iteration"));
+        }
+        if (cmd.hasOption("criteria")) {
+            Type type = new TypeToken<Map<String, String>>() {}.getType();
+            criteria = new Gson().fromJson(cmd.getOptionValue("criteria"), type);
         }
     }
 
@@ -87,6 +96,13 @@ public class Arguments {
                         .hasArg()
                         .argName("LOG-DIR")
                         .desc("Directory for output logs.")
+                        .build());
+        options.addOption(
+                Option.builder("r")
+                        .longOpt("criteria")
+                        .hasArg()
+                        .argName("CRITERIA")
+                        .desc("The criteria used for the model.")
                         .build());
         return options;
     }
@@ -135,5 +151,9 @@ public class Arguments {
 
     public String getLogDir() {
         return logDir;
+    }
+
+    public Map<String, String> getCriteria() {
+        return criteria;
     }
 }

@@ -1,0 +1,6 @@
+FROM nvidia/cuda:10.1-runtime-ubuntu16.04
+RUN apt-get update || true
+RUN apt-get install -y wget unzip openjdk-8-jdk-headless
+RUN apt-get install -y python3-pip
+RUN pip3 install mxnet-cu101mkl==1.6.0b20191007
+ENV export LD_LIBRARY_PATH=/usr/local/lib/python3.5/dist-packages/mxnet/:$LD_LIBRARY_PATH

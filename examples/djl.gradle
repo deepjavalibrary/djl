@@ -4,6 +4,7 @@
 
 plugins {
     id 'application'
+    id 'maven-publish'
 }
 
 repositories {
@@ -28,6 +29,54 @@ dependencies {
 
     testCompile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
+    }
+}
+
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId project.getGroup()
+            artifactId project.getName()
+            version rootProject.getVersion()
+            from components.java
+            artifacts = [jar, sourcesJar, javadocJar]
+            pom {
+                name = "Deeplearning Java Library - Examples"
+                description = "Examples for djl.ai"
+                url = "http://www.djl.ai/examples"
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+            }
+            pom.withXml {
+                Node pomNode = asNode()
+                pomNode.dependencies.'*'.findAll() {
+                    it.artifactId.text() == 'mxnet-native-mkl'
+                }.each() {
+                    it.parent().remove(it)
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "local"
+            url = project.buildDir.absolutePath + '/repo'
+        }
     }
 }
 

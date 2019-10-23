@@ -50,10 +50,13 @@ public final class SsdExample extends AbstractInference<DetectedObjects> {
         // Change to a specific device if needed.
         Device device = Device.defaultDevice();
 
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("size", "512");
-        criteria.put("backbone", "resnet50_v1");
-        criteria.put("dataset", "voc");
+        Map<String, String> criteria = arguments.getCriteria();
+        if (criteria == null) {
+            criteria = new ConcurrentHashMap<>();
+            criteria.put("size", "512");
+            criteria.put("backbone", "resnet50_v1");
+            criteria.put("dataset", "voc");
+        }
         ZooModel<BufferedImage, DetectedObjects> model = MxModelZoo.SSD.loadModel(criteria, device);
 
         DetectedObjects predictResult = null;

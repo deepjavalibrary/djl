@@ -18,9 +18,8 @@ dependencies {
     compile "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
     compile "com.google.code.gson:gson:2.8.5"
     compile "ai.djl:api:0.1.0-SNAPSHOT"
+    compile "ai.djl:basicdataset:0.1.0-SNAPSHOT"
     compile "ai.djl.mxnet:mxnet-model-zoo:0.1.0-SNAPSHOT"
-    compile "ai.djl:badicdataset:0.1.0-SNAPSHOT"
-
     runtime "ai.djl.mxnet:mxnet-engine:0.1.0-SNAPSHOT"
     runtime "ai.djl.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
 

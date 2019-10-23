@@ -123,11 +123,41 @@ public abstract class AbstractInference<T> {
                             metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
                     float p90 =
                             metrics.percentile("Inference", 90).getValue().longValue() / 1_000_000f;
-                    logger.info(String.format("inference P50: %.3f ms, P90: %.3f ms", p50, p90));
+                    float p99 =
+                            metrics.percentile("Inference", 99).getValue().longValue() / 1_000_000f;
+                    float preP50 =
+                            metrics.percentile("Preprocess", 50).getValue().longValue()
+                                    / 1_000_000f;
+                    float preP90 =
+                            metrics.percentile("Preprocess", 90).getValue().longValue()
+                                    / 1_000_000f;
+                    float preP99 =
+                            metrics.percentile("Preprocess", 99).getValue().longValue()
+                                    / 1_000_000f;
+                    float postP50 =
+                            metrics.percentile("Postprocess", 50).getValue().longValue()
+                                    / 1_000_000f;
+                    float postP90 =
+                            metrics.percentile("Postprocess", 90).getValue().longValue()
+                                    / 1_000_000f;
+                    float postP99 =
+                            metrics.percentile("Postprocess", 99).getValue().longValue()
+                                    / 1_000_000f;
+                    logger.info(
+                            String.format(
+                                    "inference P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
+                                    p50, p90, p99));
+                    logger.info(
+                            String.format(
+                                    "preprocess P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
+                                    preP50, preP90, preP99));
+                    logger.info(
+                            String.format(
+                                    "postprocess P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
+                                    postP50, postP90, postP99));
                 }
 
                 MemoryUtils.dumpMemoryInfo(metrics, arguments.getLogDir());
-
                 long delta = System.currentTimeMillis() - begin;
                 duration = duration.minus(Duration.ofMillis(delta));
             }
