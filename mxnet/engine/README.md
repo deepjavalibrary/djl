@@ -1,9 +1,9 @@
-Joule - MXNet engine implementation
-===================================
+djl.ai - MXNet engine implementation
+====================================
 
 ## Overview
 
-This module contains MXNet implementation of Joule EngineProvider. It's not recommended for developer
+This module contains MXNet implementation of djl.ai EngineProvider. It's not recommended for developer
 to use classes in this module directly.
 
 ## Publish the package

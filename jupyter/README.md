@@ -3,7 +3,7 @@ Jupyter notebook examples
 
 ## Overview
 
-This folder contains jupyter notebooks that demonstrate how to use Joule API in real world examples. 
+This folder contains jupyter notebooks that demonstrate how to use djl.ai API in real world examples. 
 
 ## Setup
 
@@ -48,13 +48,13 @@ You may use Jupyter docker to have the same experience
 ### Create docker image
 
 ```
-docker build -t joule .
+docker build -t djl.ai .
 ```
 
 ### Run docker image
 
 ```
-docker run -p 8888:8888 -it joule
+docker run -p 8888:8888 -it djl.ai
 ```
 
 You can open the `http://localhost:8888` to see the hosted instance on docker. 

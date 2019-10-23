@@ -1,20 +1,20 @@
-Joule - Deep learning for Java
-==============================
+djl.ai - Deeplearning Java Library
+==================================
 
 ## Overview
 
-Joule API is designed to be extremely easy to get started and simple to
-use deep learning framework for Java developers. Joule does not required user to be ML/DL experts to get started
+djl.ai API is designed to be extremely easy to get started and simple to
+use deep learning framework for Java developers. djl.ai does not required user to be ML/DL experts to get started
 and can start from their existing Java expertise as an on-ramp to learn and use ML/DL. They can
 use their favorite IDE to build/train/deploy their models and integrate these models with their
-Java applications. 
+Java applications.
 
-Joule API is deep learning framework agnostic, developer does not have to make a choice
+djl.ai API is deep learning framework agnostic, developer does not have to make a choice
 between framework while they started their project. They can switch to different framework at any
-time they want. Joule also provides automatic CPU/GPU chosen based on the hardware configuration to ensure the best performance.
+time they want. djl.ai also provides automatic CPU/GPU chosen based on the hardware configuration to ensure the best performance.
 
-Joule API provide native Java development experience, just another regular java library.
-Joule's ergonomic API interface is designed to guide developer with best practice to accomplish
+djl.ai API provide native Java development experience, just another regular java library.
+djl.ai's ergonomic API interface is designed to guide developer with best practice to accomplish
 deep learning task.
 
 The following is pseudo code of how to write inference code:

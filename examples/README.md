@@ -1,45 +1,46 @@
-Joule - examples
-================
+djl.ai - examples
+=================
 
 ## Overview
 
-The Joule API is designed to be an extremely easy to use deep learning framework for Java developers. Joule does not require you to be a Machine Learning/Deep Learning expert to get started. You can use your existing Java expertise as an on-ramp to learn and use ML/DL. You can
+The djl.ai API is designed to be an extremely easy to use deep learning framework for Java
+developers. djl.ai does not require you to be a Machine Learning/Deep Learning expert to get
+started. You can use your existing Java expertise as an on-ramp to learn and use ML/DL. You can
 use your favorite IDE to build/train/deploy your models and integrate these models with your
-Java applications. 
+Java applications.
 
-Joule API is deep learning framework agnostic, so you don't have to make a choice
+djl.ai API is deep learning framework agnostic, so you don't have to make a choice
 between frameworks when starting your project. You can switch to a different framework at any
-time you want. Joule also provides automatic CPU/GPU choice based on the hardware configuration to ensure the best performance.
+time you want. djl.ai also provides automatic CPU/GPU choice based on the hardware configuration
+to ensure the best performance.
 
-Joule API provides native Java development experience. It functions similarly to any other Java library.
-Joule's ergonomic API interface is designed to guide you with best practices to accomplish your
+djl.ai API provides native Java development experience. It functions similarly to any other Java library.
+djl.ai's ergonomic API interface is designed to guide you with best practices to accomplish your
 deep learning task.
 
 The following is an example of how to write inference code:
 
 ```java
-    // Assume user has a pre-trained already, they just need load it
-    Model model = Model.load(modelDir, modelName);
+    // Assume user uses a pre-trained model from model zoo, they just need to load it
+    Map<String, String> criteria = new HashMap<>();
+    criteria.put("layers", "18");
+    criteria.put("flavor", "v1");
 
-    // User must implement Translator interface, read Translator document for detail.
-    Translator translator = new MyTranslator();
+    // Load pre-trained model from model zoo
+    try (Model<BufferedImage, Classifications> model = MxModelZoo.RESNET.loadModel(criteria)) {
+        try (Predictor<BufferedImage, Classifications> predictor = model.newPredictor()) {
+            BufferedImage img = readImage(); // read image
+            Classifications result = predictor.predict(img);
 
-    // User can specify GPU/CPU Device to run inference session.
-    // This device is optional, Predictor can pick up default Device if not specified.
-    // See Device.defaultDevice()
-    Device device = Device.defaultDevice();
-
-    // Next user need create a Predictor, and use Predictor.predict()
-    // to get prediction.
-    try (Predictor<BufferedImage, List<DetectedObject>> predictor =
-            model.newPredictor(translator, device)) {
-        List<DetectedObject> result = predictor.predict(img);
+            // get the classification and probability
+            ...
+        }
     }
 ```
 
-## Joule API reference
+## djl.ai API reference
 
-You can find more information here: [Javadoc](https://joule.s3.amazonaws.com/java-api/index.html)
+You can find more information here: [Javadoc](https://djl-ai.s3.amazonaws.com/java-api/0.1.0/index.html)
 
 ## Examples project
 

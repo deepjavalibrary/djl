@@ -1,9 +1,9 @@
-Joule - core API
-================
+djl.ai - core API
+=================
 
 ## Overview
 
-This module is core API of the Joule project. It include the following packages:
+This module is core API of the djl.ai project. It include the following packages:
 
 - engine - An interface to interact with backend Deep Learning framework
 - inference - The module used for inference

@@ -17,7 +17,7 @@ Then create the corresponding folder to store your model. For example, `image_cl
 Please create a folder with the version number (e.g `0.0.1`) and upload the model files.
 
 - symbol
-- params.zip
+- params.gz
 
 Note, please zip the params to save the space.
 
@@ -44,11 +44,13 @@ Please make all necessary changes to load and use your model.
 Double check if you have the files
 
 - <version>/<model_name>-symbol.json
-- <version>/<model_name>-00xx.params.zip
+- <version>/<model_name>-00xx.params.gz
 - metadata.json
 - ...
 
-do `aws s3 sync repo/ s3://joule/mlrepo/  --acl public-read` under `model-zoo/test/resources` folder to upload your model.
+```shell script
+$ ./gradlew syncS3
+```
 
 ### Step 7:
 Please avoid checking in binary files to git. Binary files should only be uploaded to S3 bucket.

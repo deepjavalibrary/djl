@@ -3,7 +3,7 @@ Setup
 
 ## Install jdk
 
-Joule requires JDK 8 (or later). We recommend use JDK8 since there are some known glitches with JDK 11+.
+djl.ai requires JDK 8 (or later). We recommend use JDK8 since there are some known glitches with JDK 11+.
 
 Verify Java is available in your $PATH environment variable. If you have multiple versions of Java installed,
 you can use $JAVA_HOME environment variable to control which version of Java to use.
