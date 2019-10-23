@@ -24,11 +24,20 @@ task javadocJar(type: Jar) {
     archiveClassifier = 'javadoc'
 }
 
+task syncS3(type:Exec) {
+    commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync src/test/resources/mlrepo s3://djl-ai/mlrepo --acl public-read"
+
+    standardOutput = new ByteArrayOutputStream()
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
             groupId project.getGroup()
-            artifactId 'mxnet-model-zoo'
+            artifactId project.getName()
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
