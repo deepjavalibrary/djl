@@ -142,14 +142,16 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
                 float[] labelArray = new float[5];
                 String imgName = entry.getKey();
                 List<Float> label = entry.getValue();
-                // Offset labels
-                labelArray[0] = label.get(5);
-                labelArray[1] = label.get(6);
-                labelArray[2] = label.get(7);
-                labelArray[3] = label.get(8);
-
                 // Class label
-                labelArray[4] = label.get(4);
+                labelArray[0] = label.get(4);
+
+                // Bounding box labels
+                // Labels contain in format (Xmin, Ymin, Xmax, Ymax). We need it in (Xmin, Ymax,
+                // Xmax, Ymin)
+                labelArray[1] = label.get(5);
+                labelArray[2] = label.get(6);
+                labelArray[3] = label.get(7);
+                labelArray[4] = label.get(8);
                 imagePaths.add(usagePath.resolve(imgName));
                 labels.add(labelArray);
             }

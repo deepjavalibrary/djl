@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
 import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.util.PairList;
+import java.util.List;
 
 /** An internal interface that encapsulates engine specific operator methods. */
 public interface NDArrayEx {
@@ -506,6 +507,23 @@ public interface NDArrayEx {
             float negativeMiningRatio,
             float negativeMiningThreshold,
             int minNegativeSamples);
+
+    /**
+     * Generate prior(anchor) boxes from data, sizes and ratios.
+     *
+     * @param sizes List of sizes of generated MultiBoxPriores
+     * @param ratios List of aspect ratios of generated MultiBoxPriores
+     * @param steps Priorbox step across y and x, -1 for auto calculation
+     * @param offsets Priorbox center offsets, y and x respectively
+     * @param clip Whether to clip out-of-boundary boxes
+     * @return an NDList of anchor boxes
+     */
+    NDList multiBoxPrior(
+            List<Float> sizes,
+            List<Float> ratios,
+            List<Float> steps,
+            List<Float> offsets,
+            boolean clip);
 
     /**
      * Converts multibox detection predictions.

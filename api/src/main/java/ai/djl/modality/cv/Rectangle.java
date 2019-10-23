@@ -39,6 +39,21 @@ public class Rectangle implements BoundingBox {
     }
 
     /**
+     * Constructs a new {@code Rectangle} given two of the vertices of the rectange - top left, and
+     * bottom right vertices.
+     *
+     * @param topLeft the specified X coordinate
+     * @param bottomRight the specified Y coordinate
+     */
+    public Rectangle(Point topLeft, Point bottomRight) {
+        this(
+                topLeft.getX(),
+                topLeft.getX(),
+                bottomRight.getX() - topLeft.getX(),
+                topLeft.getY() - bottomRight.getY());
+    }
+
+    /**
      * Constructs a new {@code Rectangle} whose upper-left corner is specified as coordinate {@code
      * point} and whose width and height are specified by the arguments of the same name.
      *

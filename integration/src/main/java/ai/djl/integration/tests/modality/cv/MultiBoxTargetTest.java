@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.modality.cv;
 
+import ai.djl.integration.util.Assertions;
 import ai.djl.modality.cv.MultiBoxTarget;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -24,16 +25,79 @@ public class MultiBoxTargetTest {
     @Test
     public void testTargets() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray anchorBoxes = manager.ones(new Shape(1, 4096, 4));
-            NDArray label = manager.zeros(new Shape(1, 1, 5));
-            NDArray classPreds = manager.ones(new Shape(1, 2, 4096));
+            NDArray anchorBoxes = manager.arange(22840 * 4).reshape(new Shape(1, 22840, 4));
+            NDArray label = manager.arange(160).reshape(new Shape(32, 1, 5));
+            NDArray classPreds = manager.arange(32 * 22840 * 2).reshape(new Shape(32, 2, 22840));
 
             MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
             NDList targets = multiBoxTarget.target(new NDList(anchorBoxes, label, classPreds));
 
-            Assert.assertEquals(new Shape(1, 16384), targets.get(0).getShape());
-            Assert.assertEquals(new Shape(1, 16384), targets.get(1).getShape());
-            Assert.assertEquals(new Shape(1, 4096), targets.get(2).getShape());
+            Assert.assertEquals(targets.get(0).getShape(), new Shape(32, 91360));
+            Assert.assertEquals(targets.get(1).getShape(), new Shape(32, 91360));
+            Assert.assertEquals(targets.get(2).getShape(), new Shape(32, 22840));
+        }
+    }
+
+    @Test(enabled = false)
+    public void testMultiBoxTargetValues() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray groundTruth =
+                    manager.create(
+                                    new float[] {
+                                        0f, 0.1f, 0.08f, 0.52f, 0.92f, 1f, 0.55f, 0.2f, 0.9f, 0.88f
+                                    })
+                            .reshape(new Shape(1, 2, 5));
+            NDArray anchorBoxes =
+                    manager.create(
+                                    new float[] {
+                                        0f, 0.1f, 0.2f, 0.3f, 0.15f, 0.2f, 0.4f, 0.4f, 0.63f, 0.05f,
+                                        0.88f, 0.98f, 0.66f, 0.45f, 0.8f, 0.8f, 0.57f, 0.3f, 0.92f,
+                                        0.9f
+                                    })
+                            .reshape(1, 5, 4);
+
+            MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
+            NDList targets =
+                    multiBoxTarget.target(
+                            new NDList(
+                                    anchorBoxes, groundTruth, manager.zeros(new Shape(1, 3, 5))));
+
+            Assertions.assertAlmostEquals(
+                    targets.get(2),
+                    manager.create(new float[] {0, 1, 2, 0, 2}).reshape(new Shape(1, 5)));
+            Assertions.assertAlmostEquals(
+                    targets.get(1),
+                    manager.create(
+                                    new float[] {
+                                        0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1
+                                    })
+                            .reshape(new Shape(1, 20)));
+            Assertions.assertAlmostEquals(
+                    targets.get(0),
+                    manager.create(
+                                    new float[] {
+                                        0.00e+00f,
+                                        0.00e+00f,
+                                        0.00e+00f,
+                                        0.00e+00f,
+                                        1.40e+00f,
+                                        1.00e+01f,
+                                        2.59e+00f,
+                                        7.18e+00f,
+                                        -1.20e+00f,
+                                        2.69e-01f,
+                                        1.68e+00f,
+                                        -1.57e+00f,
+                                        0.00e+00f,
+                                        0.00e+00f,
+                                        0.00e+00f,
+                                        0.00e+00f,
+                                        -5.71e-01f,
+                                        -1.00e+00f,
+                                        -8.94e-07f,
+                                        6.26e-01f
+                                    })
+                            .reshape(new Shape(1, 20)));
         }
     }
 }

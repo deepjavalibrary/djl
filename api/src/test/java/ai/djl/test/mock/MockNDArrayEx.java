@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.util.PairList;
+import java.util.List;
 
 public class MockNDArrayEx implements NDArrayEx {
 
@@ -427,6 +428,16 @@ public class MockNDArrayEx implements NDArrayEx {
             float nmsThreashold,
             boolean forceSuppress,
             int nmsTopK) {
+        return null;
+    }
+
+    @Override
+    public NDList multiBoxPrior(
+            List<Float> sizes,
+            List<Float> ratios,
+            List<Float> steps,
+            List<Float> offsets,
+            boolean clip) {
         return null;
     }
 

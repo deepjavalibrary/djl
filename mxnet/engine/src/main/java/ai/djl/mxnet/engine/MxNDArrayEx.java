@@ -20,6 +20,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.util.PairList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 class MxNDArrayEx implements NDArrayEx {
@@ -749,6 +750,23 @@ class MxNDArrayEx implements NDArrayEx {
         parameters.add("negative_mining_ratio", negativeMiningRatio);
         parameters.add("negative_mining_thresh", negativeMiningThreshold);
         return getManager().invoke("MultiBoxTarget", inputs, parameters);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList multiBoxPrior(
+            List<Float> sizes,
+            List<Float> ratios,
+            List<Float> steps,
+            List<Float> offsets,
+            boolean clip) {
+        MxOpParams parameters = new MxOpParams();
+        parameters.add("sizes", sizes);
+        parameters.add("ratios", ratios);
+        parameters.add("steps", steps);
+        parameters.add("offsets", offsets);
+        parameters.add("clip", clip);
+        return getManager().invoke("MultiBoxPrior", new NDList(array), parameters);
     }
 
     /** {@inheritDoc} */
