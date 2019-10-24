@@ -105,6 +105,7 @@ public abstract class AbstractTraining implements TrainingListener {
 
             if (arguments.getOutputDir() != null) {
                 MemoryUtils.dumpMemoryInfo(metrics, arguments.getOutputDir());
+                TrainingUtils.dumpTrainingTimeInfo(metrics, arguments.getOutputDir());
             }
 
             // FIXME: remove once crash issue is fixed in MXNet

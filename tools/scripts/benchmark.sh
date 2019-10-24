@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 curl -o dogs.jpg https://raw.githubusercontent.com/awslabs/mxnet-model-server/master/docs/images/3dogs.jpg
 curl -o soccer.png https://github.com/dmlc/web-data/blob/master/gluoncv/pose/soccer.png?raw=true
 ./gradlew run -Dmain=ai.djl.examples.inference.ClassifyExample --args="-i dogs.jpg -c 1000 -r {'layers':'18','flavor':'v1'}" &> res18.log

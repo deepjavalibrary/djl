@@ -12,12 +12,24 @@
  */
 package ai.djl.examples.training.util;
 
+import ai.djl.metric.Metric;
+import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class TrainingUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(TrainingUtils.class);
 
     private TrainingUtils() {}
 
@@ -42,5 +54,27 @@ public final class TrainingUtils {
             }
         }
         trainer.resetTrainingMetrics();
+    }
+
+    public static void dumpTrainingTimeInfo(Metrics metrics, String logDir) {
+        if (logDir == null) {
+            return;
+        }
+        try {
+            Path dir = Paths.get(logDir);
+            Files.createDirectories(dir);
+            Path file = dir.resolve("training.log");
+            try (BufferedWriter writer =
+                    Files.newBufferedWriter(
+                            file, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+                List<Metric> list = metrics.getMetric("train");
+                for (Metric metric : list) {
+                    writer.append(metric.toString());
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Failed dump training log", e);
+        }
     }
 }
