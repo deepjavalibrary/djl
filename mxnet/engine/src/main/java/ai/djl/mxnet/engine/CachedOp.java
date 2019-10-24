@@ -42,7 +42,7 @@ public class CachedOp extends NativeResource {
     private static final Logger logger = LoggerFactory.getLogger(CachedOp.class);
 
     private List<Parameter> parameters;
-    private MxNDArray[] allInputsNDArray;
+    private MxNDArray[] debugInputs;
     private PairList<String, Integer> dataIndices;
     private Map<String, Integer> dataIndicesMap;
     private List<Integer> paramIndices;
@@ -87,7 +87,9 @@ public class CachedOp extends NativeResource {
      */
     public NDList forward(ParameterStore parameterStore, NDList data) {
         // reset the input data index at the beginning
-        allInputsNDArray = new MxNDArray[parameters.size()];
+        MxNDArray[] allInputsNDArray = new MxNDArray[parameters.size()];
+        // for unit test purpose, we export the current one to global
+        this.debugInputs = allInputsNDArray;
         // check device of input
         Device device = data.head().getDevice();
 
@@ -134,7 +136,7 @@ public class CachedOp extends NativeResource {
      * @return array of NDArray
      */
     MxNDArray[] getInputNDArray() {
-        return allInputsNDArray;
+        return debugInputs;
     }
 
     /** {@inheritDoc} */
