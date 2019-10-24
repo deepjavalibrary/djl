@@ -4,7 +4,7 @@ plugins {
 
 repositories {
     maven {
-        url 'https://djl-ai.s3.amazonaws.com/repo'
+        url 'https://djl-ai.s3.amazonaws.com/dev'
     }
 }
 
@@ -20,7 +20,7 @@ dependencies {
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
 
     testCompile project(":mxnet:engine")
-    testRuntime "ai.djl.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
+    testRuntime "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
 }
 
 task sourcesJar(type: Jar) {
@@ -65,8 +65,11 @@ publishing {
     }
     repositories {
         maven {
-            name = "local"
-            url = project.buildDir.absolutePath + '/repo'
+            name = "s3"
+            url = "s3://djl-ai/dev"
+            authentication {
+                awsIm(AwsImAuthentication)
+            }
         }
     }
 }

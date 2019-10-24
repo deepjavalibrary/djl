@@ -3,7 +3,9 @@ plugins {
 }
 
 group = "ai.djl.mxnet"
-version = "1.6.0" + (project.hasProperty("release") ? "" : "-SNAPSHOT")
+
+def VERSION = "1.6.0"
+version = VERSION + (project.hasProperty("release") ? "" : "-SNAPSHOT")
 
 def flavor = project.findProperty("flavor") ?: "mkl"
 
@@ -19,7 +21,7 @@ platformNames.each { osName ->
             def dsStore = file("src/main/resources/${osName}/native/lib/.DS_Store")
             dsStore.delete()
 
-            def versionName = String.format("1.5.0-%s", new Date().format('yyyyMMdd'))
+            def versionName = String.format("${VERSION}-%s", new Date().format('yyyyMMdd'))
             def dir = file("src/main/resources/${osName}/native/lib")
             def sb = new StringBuilder()
             sb.append("version=${versionName}\nlibraries=")
@@ -61,8 +63,11 @@ publishing {
     }
     repositories {
         maven {
-            name = "local"
-            url = project.buildDir.absolutePath + '/repo'
+            name = "s3"
+            url = "s3://djl-ai/dev"
+            authentication {
+                awsIm(AwsImAuthentication)
+            }
         }
     }
 }

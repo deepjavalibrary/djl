@@ -8,9 +8,8 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     maven {
-        url 'https://djl-ai.s3.amazonaws.com/repo'
+        url 'https://djl-ai.s3.amazonaws.com/dev'
     }
 }
 
@@ -25,7 +24,7 @@ dependencies {
     compile project(":mxnet:engine")
     compile project(":mxnet:mxnet-model-zoo")
 
-    runtime "ai.djl.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
+    runtime "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
 
     testCompile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
@@ -74,8 +73,11 @@ publishing {
     }
     repositories {
         maven {
-            name = "local"
-            url = project.buildDir.absolutePath + '/repo'
+            name = "s3"
+            url = "s3://djl-ai/dev"
+            authentication {
+                awsIm(AwsImAuthentication)
+            }
         }
     }
 }

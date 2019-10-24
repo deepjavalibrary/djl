@@ -5,9 +5,8 @@ plugins {
 
 repositories {
     jcenter()
-    // mavenLocal()
     maven {
-        url 'https://djl-ai.s3.amazonaws.com/repo'
+        url 'https://djl-ai.s3.amazonaws.com/dev'
     }
 }
 
@@ -21,7 +20,7 @@ dependencies {
     compile "ai.djl:basicdataset:0.1.0-SNAPSHOT"
     compile "ai.djl.mxnet:mxnet-model-zoo:0.1.0-SNAPSHOT"
     runtime "ai.djl.mxnet:mxnet-engine:0.1.0-SNAPSHOT"
-    runtime "ai.djl.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
+    runtime "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
 
     testImplementation 'org.testng:testng:6.14.3'
 }

@@ -5,7 +5,7 @@ plugins {
 
 repositories {
     maven {
-        url 'https://djl-ai.s3.amazonaws.com/repo'
+        url 'https://djl-ai.s3.amazonaws.com/dev'
     }
 }
 
@@ -22,7 +22,7 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
 
-    runtime "ai.djl.mxnet:mxnet-native-mkl:1.5.0-SNAPSHOT:${classifier}"
+    runtime "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
 }
 
 task copyDependencies(type: Copy) {
