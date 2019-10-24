@@ -11,11 +11,10 @@
  * and limitations under the License.
  */
 
-package ai.djl.zoo.cv.classification;
+package ai.djl.modality.cv;
 
 import ai.djl.Model;
 import ai.djl.modality.Classification;
-import ai.djl.modality.cv.ImageTranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.TranslatorContext;

@@ -21,7 +21,7 @@ dependencies {
     compile "com.google.code.gson:gson:${gson_version}"
     compile project(":api")
     compile project(":basicdataset")
-    compile project(":mxnet:engine")
+    compile project(":model-zoo")
     compile project(":mxnet:mxnet-model-zoo")
 
     runtime "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"

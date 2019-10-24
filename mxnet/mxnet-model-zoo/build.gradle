@@ -6,7 +6,8 @@ group 'ai.djl.mxnet'
 
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4j_version}"
-    compile project(":model-zoo")
+    compile project(":repository")
+    compile project(":mxnet:engine")
 
     testCompile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

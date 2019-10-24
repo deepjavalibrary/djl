@@ -13,6 +13,7 @@
 package ai.djl.mxnet.zoo.cv.actionrecognition;
 
 import ai.djl.modality.Classification;
+import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.mxnet.zoo.BaseSymbolModelLoader;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
@@ -20,7 +21,6 @@ import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.translate.Translator;
-import ai.djl.zoo.cv.classification.ImageClassificationTranslator;
 import java.awt.image.BufferedImage;
 
 public class ActionRecognitionModelLoader

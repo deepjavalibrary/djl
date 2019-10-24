@@ -15,6 +15,7 @@ package ai.djl.zoo.cv.classification;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.modality.Classification;
+import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.repository.Anchor;
