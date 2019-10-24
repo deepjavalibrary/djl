@@ -40,12 +40,12 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     private Block block;
     private ParameterStore parameterStore;
 
-    public BasePredictor(Model model, Translator<I, O> translator) {
+    public BasePredictor(Model model, Translator<I, O> translator, boolean first) {
         this.model = model;
         this.manager = model.getNDManager().newSubManager();
         this.translator = translator;
         block = model.getBlock();
-        parameterStore = new ParameterStore(manager, true);
+        parameterStore = new ParameterStore(manager, !first);
     }
 
     /** {@inheritDoc} */

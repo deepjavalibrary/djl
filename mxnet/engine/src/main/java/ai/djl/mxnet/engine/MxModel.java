@@ -46,6 +46,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -70,11 +71,14 @@ public class MxModel implements Model {
     private DataType dataType;
     private DataDesc[] inputData;
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
+    // the variable is used to avoid ParameterStore copy for the first time
+    private AtomicBoolean first;
 
     MxModel(Device device) {
         device = Device.defaultIfNull(device);
         dataType = DataType.FLOAT32;
         manager = MxNDManager.getSystemManager().newSubManager(device);
+        first = new AtomicBoolean(true);
     }
 
     /**
@@ -184,7 +188,7 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new MxPredictor<>(this, translator);
+        return new MxPredictor<>(this, translator, first.getAndSet(false));
     }
 
     /** {@inheritDoc} */

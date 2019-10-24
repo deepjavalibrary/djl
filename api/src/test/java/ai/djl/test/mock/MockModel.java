@@ -31,11 +31,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 public class MockModel implements Model {
 
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
+    private AtomicBoolean first = new AtomicBoolean(true);
 
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
@@ -67,7 +69,7 @@ public class MockModel implements Model {
 
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new BasePredictor<>(this, translator);
+        return new BasePredictor<>(this, translator, first.getAndSet(false));
     }
 
     @Override

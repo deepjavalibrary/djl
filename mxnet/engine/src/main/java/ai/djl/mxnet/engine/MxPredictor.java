@@ -33,8 +33,8 @@ public class MxPredictor<I, O> extends BasePredictor<I, O> {
 
     private static final Logger logger = LoggerFactory.getLogger(MxPredictor.class);
 
-    MxPredictor(MxModel model, Translator<I, O> translator) {
-        super(model, translator);
+    MxPredictor(MxModel model, Translator<I, O> translator, boolean first) {
+        super(model, translator, first);
     }
 
     @Override

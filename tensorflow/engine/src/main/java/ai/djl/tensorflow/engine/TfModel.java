@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Session;
@@ -44,6 +45,7 @@ public class TfModel implements Model {
     private SavedModelBundle bundle;
     private DataDesc[] inputDesc;
     private DataDesc[] outputDesc;
+    private AtomicBoolean first = new AtomicBoolean(true);
 
     private DataDesc[] constructDataDescFromModel(Map<String, TensorInfo> info) {
         DataDesc[] descs = new DataDesc[info.size()];
@@ -129,7 +131,7 @@ public class TfModel implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new TfPredictor<>(this, translator);
+        return new TfPredictor<>(this, translator, first.getAndSet(false));
     }
 
     /** {@inheritDoc} */
