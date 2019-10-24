@@ -15,7 +15,6 @@ package ai.djl.ndarray;
 import ai.djl.Device;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -75,16 +74,6 @@ public interface NDArray extends AutoCloseable {
      * @return the {@link Shape} of the {@code NDArray}.
      */
     Shape getShape();
-
-    /**
-     * Returns the {@link DataDesc} of the {@code NDArray}.
-     *
-     * <p>{@link DataDesc} contains all information about NDArray, including {@link Device}, {@link
-     * DataType}, {@link Shape}, and {@link SparseFormat}.
-     *
-     * @return {@link DataDesc}
-     */
-    DataDesc getDataDescriptor();
 
     /**
      * Returns the {@link SparseFormat} of the {@code NDArray}.

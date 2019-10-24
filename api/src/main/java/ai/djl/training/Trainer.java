@@ -15,7 +15,7 @@ package ai.djl.training;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.loss.Loss;
@@ -24,7 +24,7 @@ import java.io.IOException;
 
 public interface Trainer extends AutoCloseable {
 
-    void initialize(DataDesc[] inputDescriptor);
+    void initialize(Shape[] shapes);
 
     default Iterable<Batch> iterateDataset(Dataset dataset) throws IOException {
         return dataset.getData(getManager());

@@ -15,12 +15,13 @@ package ai.djl;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
+import ai.djl.util.PairList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -160,18 +161,18 @@ public interface Model extends AutoCloseable {
      * <p>It contains the information that can be extracted from the model, usually name, shape,
      * layout and DataType.
      *
-     * @return Array of {@link DataDesc}
+     * @return PairList of String and Shape
      */
-    DataDesc[] describeInput();
+    PairList<String, Shape> describeInput();
 
     /**
      * Returns the output descriptor of the model.
      *
      * <p>It contains the output information that can be obtained from the model
      *
-     * @return Array of {@link DataDesc}
+     * @return PairList of String and Shape
      */
-    DataDesc[] describeOutput();
+    PairList<String, Shape> describeOutput();
 
     /**
      * Returns artifact names associated with the model.

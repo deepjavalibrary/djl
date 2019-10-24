@@ -86,6 +86,7 @@ public abstract class Convolution extends ParameterBlock {
 
     @Override
     protected void beforeInitialize(Shape[] inputs) {
+        this.inputShapes = inputs;
         Shape inputShape = inputs[0];
         Block.validateLayout(getExpectedLayout(), inputShape.getLayout());
     }
@@ -219,7 +220,7 @@ public abstract class Convolution extends ParameterBlock {
          * @param stride Shape of the stride
          * @return Returns this Builder
          */
-        public T setStride(Shape stride) {
+        public T optStride(Shape stride) {
             this.stride = stride;
             return self();
         }
@@ -230,7 +231,7 @@ public abstract class Convolution extends ParameterBlock {
          * @param pad Padding along each dimension
          * @return Returns this Builder
          */
-        public T setPad(Shape pad) {
+        public T optPad(Shape pad) {
             this.pad = pad;
             return self();
         }
@@ -241,7 +242,7 @@ public abstract class Convolution extends ParameterBlock {
          * @param dilate Padding along each dimension
          * @return Returns this Builder
          */
-        public T setDilate(Shape dilate) {
+        public T optDilate(Shape dilate) {
             this.dilate = dilate;
             return self();
         }
@@ -263,7 +264,7 @@ public abstract class Convolution extends ParameterBlock {
          * @param numGroups Number of group partitions
          * @return Returns this Builder
          */
-        public T setNumGroups(int numGroups) {
+        public T optNumGroups(int numGroups) {
             this.numGroups = numGroups;
             return self();
         }
@@ -275,7 +276,7 @@ public abstract class Convolution extends ParameterBlock {
          * @param includeBias Whether to use a bias vector parameter
          * @return Returns this Builder
          */
-        public T setBias(boolean includeBias) {
+        public T optBias(boolean includeBias) {
             this.includeBias = includeBias;
             return self();
         }

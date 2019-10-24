@@ -88,6 +88,7 @@ public class RNN extends RecurrentCell {
     /** {@inheritDoc} */
     @Override
     public void beforeInitialize(Shape[] inputs) {
+        this.inputShapes = inputs;
         Shape inputShape = inputs[0];
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }

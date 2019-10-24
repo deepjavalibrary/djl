@@ -19,7 +19,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -98,12 +97,6 @@ public class TfNDArray implements NDArray {
             shape = new Shape(tensor.shape());
         }
         return shape;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public DataDesc getDataDescriptor() {
-        return new DataDesc(getShape(), getDataType(), null);
     }
 
     private void runToTensor() {

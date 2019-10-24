@@ -16,13 +16,14 @@ import ai.djl.Model;
 import ai.djl.inference.BasePredictor;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
+import ai.djl.util.PairList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,13 +74,13 @@ public class MockModel implements Model {
     }
 
     @Override
-    public DataDesc[] describeInput() {
-        return new DataDesc[0];
+    public PairList<String, Shape> describeInput() {
+        return new PairList<>();
     }
 
     @Override
-    public DataDesc[] describeOutput() {
-        return new DataDesc[0];
+    public PairList<String, Shape> describeOutput() {
+        return new PairList<>();
     }
 
     @Override

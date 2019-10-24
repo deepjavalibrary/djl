@@ -16,7 +16,7 @@ import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingListener;
@@ -27,7 +27,7 @@ import ai.djl.training.metrics.TrainingMetric;
 public class MockTrainer implements Trainer {
 
     @Override
-    public void initialize(DataDesc[] inputDescriptor) {}
+    public void initialize(Shape[] shapes) {}
 
     @Override
     public GradientCollector newGradientCollector() {

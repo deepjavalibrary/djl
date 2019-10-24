@@ -32,7 +32,6 @@ public class LambdaBlock extends ParameterBlock {
 
     public LambdaBlock(Function<NDList, NDList> lambda) {
         this.lambda = lambda;
-        initialized = true;
     }
 
     @Override

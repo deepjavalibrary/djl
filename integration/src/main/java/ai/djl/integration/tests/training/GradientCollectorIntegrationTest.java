@@ -17,7 +17,6 @@ import ai.djl.mxnet.engine.MxGradientCollector;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.core.Linear;
@@ -95,7 +94,7 @@ public class GradientCollectorIntegrationTest {
             float lossValue;
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(batchSize, weight.size(0));
-                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+                trainer.initialize(new Shape[] {inputShape});
 
                 for (int epoch = 0; epoch < epochs; epoch++) {
                     trainer.resetTrainingMetrics();

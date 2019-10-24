@@ -15,9 +15,10 @@ package ai.djl.tensorflow.engine;
 import ai.djl.inference.BasePredictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.types.DataDesc;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Translator;
 import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 import java.util.List;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
@@ -37,15 +38,15 @@ public class TfPredictor<I, O> extends BasePredictor<I, O> {
             runner.feed(pair.getKey(), ((TfNDArray) pair.getValue()).getTensor());
         }
         // TODO We can extract input name from decribeInput in Model if NDList doesn't have names
-        DataDesc[] dataDescs = model.describeOutput();
-        for (DataDesc desc : dataDescs) {
-            runner.fetch(desc.getName());
+        PairList<String, Shape> dataDescs = model.describeOutput();
+        for (Pair<String, Shape> pair : dataDescs) {
+            runner.fetch(pair.getKey());
         }
         List<Tensor<?>> result = runner.run();
 
         NDList resultNDList = new NDList();
         for (int i = 0; i < result.size(); i++) {
-            resultNDList.add(dataDescs[i].getName(), tfNDManager.create(result.get(i)));
+            resultNDList.add(dataDescs.get(i).getKey(), tfNDManager.create(result.get(i)));
         }
 
         return resultNDList;

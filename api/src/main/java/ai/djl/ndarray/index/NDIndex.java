@@ -59,7 +59,7 @@ public class NDIndex {
      * <p>Here are some examples of the indices format.
      *
      * <pre>
-     *     NDArray a = manager.ones(new DataDesc(new Shape(5, 4, 3)));
+     *     NDArray a = manager.ones(new Shape(5, 4, 3));
      *
      *     // Get a subsection of the NDArray in the first axis
      *     assertEquals(a.get(new NDIndex("2")).getShape(), new Shape(4, 3));

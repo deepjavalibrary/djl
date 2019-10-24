@@ -20,7 +20,6 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import org.testng.Assert;
@@ -154,13 +153,13 @@ public class NDArrayOtherOpTest {
                     manager.create(
                             new float[] {-1.000f, -0.009f, -0.0001f, 0.0001f, 0.12f, 0.1201f},
                             new Shape(2, 1, 1, 3, 1));
-            actual = manager.zeros(new DataDesc(new Shape(2, 1, 1, 3, 1), DataType.INT32));
+            actual = manager.zeros(new Shape(2, 1, 1, 3, 1), DataType.INT32);
             Assert.assertEquals(actual, array.argsort());
             // test axis
             array = manager.arange(10).reshape(2, 1, 5);
             actual = manager.create(new int[] {0, 0, 0, 0, 0, 1, 1, 1, 1, 1}, new Shape(2, 1, 5));
             Assert.assertEquals(actual, array.argsort(0));
-            actual = manager.zeros(new DataDesc(new Shape(2, 1, 5), DataType.INT32));
+            actual = manager.zeros(new Shape(2, 1, 5), DataType.INT32);
             Assert.assertEquals(actual, array.argsort(1));
             actual = manager.create(new int[] {0, 1, 2, 3, 4, 0, 1, 2, 3, 4}, new Shape(2, 1, 5));
             Assert.assertEquals(actual, array.argsort(2));

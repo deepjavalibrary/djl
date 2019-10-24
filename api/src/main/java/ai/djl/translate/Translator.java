@@ -23,14 +23,14 @@ import ai.djl.inference.Predictor;
  * <pre>
  * private static final class MyTranslator implements Translator&lt;BufferedImage, Classification&gt; {
  *
- *     private DataDesc dataDesc;
  *     private int imageWidth;
  *     private int imageHeight;
+ *     private Shape shape;
  *
  *     public MyTranslator(int imageWidth, int imageHeight) {
  *         this.imageWidth = imageWidth;
  *         this.imageHeight = imageHeight;
- *         dataDesc = new DataDesc(new Shape(1, 3, imageWidth, imageHeight), "data");
+ *         shape = new Shape(1, 3, imageWidth, imageHeight);
  *     }
  *
  *     &#064;Override
@@ -38,7 +38,7 @@ import ai.djl.inference.Predictor;
  *         BufferedImage image = Images.resize(input, imageWidth, imageHeight);
  *         FloatBuffer buffer = Images.toFloatBuffer(image);
  *
- *         return new NDList(ctx.getNDManager().create(dataDesc, buffer));
+ *         return new NDList(ctx.getNDManager().create(buffer, shape));
  *     }
  *
  *     &#064;Override

@@ -12,21 +12,27 @@
  */
 package ai.djl.nn;
 
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractBlock implements Block {
 
     protected boolean initialized;
+    protected Shape[] inputShapes;
+    protected List<String> inputNames = Collections.singletonList("data");
 
     @Override
-    public DataDesc[] describeInput() {
-        return new DataDesc[0];
+    public PairList<String, Shape> describeInput() {
+        if (!initialized) {
+            throw new IllegalStateException("Parameter of this block are not initialised");
+        }
+        return new PairList<>(inputNames, Arrays.asList(inputShapes));
     }
 
     @Override
@@ -63,7 +69,9 @@ public abstract class AbstractBlock implements Block {
         return parameters;
     }
 
-    protected void beforeInitialize(Shape[] inputShapes) {}
+    protected void beforeInitialize(Shape[] inputShapes) {
+        this.inputShapes = inputShapes;
+    }
 
     @Override
     public boolean isInitialized() {

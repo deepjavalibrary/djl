@@ -20,7 +20,6 @@ import ai.djl.mxnet.engine.Symbol;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
@@ -48,7 +47,6 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     private CachedOp op;
     private Symbol symbol;
     private List<Parameter> params; // includes input data
-    private List<String> inputNames;
     private Map<String, Shape> paramShapes;
     private Shape[] outputShapes;
 
@@ -111,11 +109,10 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     }
 
     @Override
-    public DataDesc[] describeInput() {
-        DataDesc[] inputData = new DataDesc[inputNames.size()];
-        int index = 0;
+    public PairList<String, Shape> describeInput() {
+        PairList<String, Shape> inputData = new PairList<>();
         for (String name : inputNames) {
-            inputData[index++] = new DataDesc(new Shape(), name);
+            inputData.add(name, new Shape());
         }
         return inputData;
     }

@@ -72,6 +72,7 @@ public class BatchNorm extends ParameterBlock {
     /** {@inheritDoc} */
     @Override
     public void beforeInitialize(Shape[] inputShapes) {
+        this.inputShapes = inputShapes;
         inChannels = inputShapes[0].size(axis);
     }
 

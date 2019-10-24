@@ -15,12 +15,13 @@ package ai.djl.repository.zoo;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
+import ai.djl.util.PairList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -79,18 +80,18 @@ public class ZooModel<I, O> implements Model {
     }
 
     public void quantize() {
-        model.cast(DataType.UINT8);
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /** {@inheritDoc} */
     @Override
-    public DataDesc[] describeInput() {
+    public PairList<String, Shape> describeInput() {
         return model.describeInput();
     }
 
     /** {@inheritDoc} */
     @Override
-    public DataDesc[] describeOutput() {
+    public PairList<String, Shape> describeOutput() {
         return model.describeOutput();
     }
 

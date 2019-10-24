@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.util.PairList;
 
 public abstract class ParameterBlock extends AbstractBlock {
 
@@ -34,7 +33,7 @@ public abstract class ParameterBlock extends AbstractBlock {
     }
 
     @Override
-    public PairList<String, Block> getChildren() {
+    public BlockList getChildren() {
         return new BlockList();
     }
 }

@@ -20,7 +20,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.NDIndexFixed;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -82,11 +81,6 @@ public class MockNDArray implements NDArray {
     @Override
     public Shape getShape() {
         return shape;
-    }
-
-    @Override
-    public DataDesc getDataDescriptor() {
-        return new DataDesc(shape, dataType);
     }
 
     @Override

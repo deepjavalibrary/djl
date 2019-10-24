@@ -22,7 +22,6 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.NDIndexFullSlice;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.internal.NDFormat;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -113,12 +112,6 @@ public class MxNDArray extends NativeResource implements NDArray {
             sparseFormat = JnaUtils.getStorageType(getHandle());
         }
         return sparseFormat;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public DataDesc getDataDescriptor() {
-        return new DataDesc(getShape(), getDataType(), null);
     }
 
     /** {@inheritDoc} */

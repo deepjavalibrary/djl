@@ -19,8 +19,6 @@ import ai.djl.modality.Classification;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
@@ -79,7 +77,7 @@ public class ResnetTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(100, 1, 28, 28);
-                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+                trainer.initialize(new Shape[] {inputShape});
 
                 NDManager manager = trainer.getManager();
 
@@ -119,7 +117,7 @@ public class ResnetTest {
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(16, 3, 32, 32);
 
-                trainer.initialize(new DataDesc[] {new DataDesc(inputShape, DataType.FLOAT32)});
+                trainer.initialize(new Shape[] {inputShape});
 
                 NDManager manager = trainer.getManager();
                 Shape[] outputShape =

@@ -15,13 +15,13 @@ package ai.djl.tensorflow.engine;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
+import ai.djl.util.PairList;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,13 +43,10 @@ public class TfModel implements Model {
 
     private Path modelDir;
     private SavedModelBundle bundle;
-    private DataDesc[] inputDesc;
-    private DataDesc[] outputDesc;
     private AtomicBoolean first = new AtomicBoolean(true);
 
-    private DataDesc[] constructDataDescFromModel(Map<String, TensorInfo> info) {
-        DataDesc[] descs = new DataDesc[info.size()];
-        int dataDescIter = 0;
+    private PairList<String, Shape> constructDataDescFromModel(Map<String, TensorInfo> info) {
+        PairList<String, Shape> descs = new PairList<>();
         for (Map.Entry<String, TensorInfo> entry : info.entrySet()) {
             TensorInfo t = entry.getValue();
             // StringBuilder layout = new StringBuilder();
@@ -62,8 +59,7 @@ public class TfModel implements Model {
             }
             // TODO: Add DataType mapping from framework.DataType
             // TODO: Add Layout mapping for the layout
-            descs[dataDescIter] = new DataDesc(new Shape(shape), null, t.getName());
-            dataDescIter++;
+            descs.add(t.getName(), new Shape(shape));
         }
         return descs;
     }
@@ -76,8 +72,8 @@ public class TfModel implements Model {
         SignatureDef sig =
                 MetaGraphDef.parseFrom(bundle.metaGraphDef())
                         .getSignatureDefOrThrow("serving_default");
-        inputDesc = constructDataDescFromModel(sig.getInputsMap());
-        outputDesc = constructDataDescFromModel(sig.getOutputsMap());
+        constructDataDescFromModel(sig.getInputsMap());
+        constructDataDescFromModel(sig.getOutputsMap());
     }
 
     @Override
@@ -136,14 +132,14 @@ public class TfModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public DataDesc[] describeInput() {
-        return inputDesc;
+    public PairList<String, Shape> describeInput() {
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public DataDesc[] describeOutput() {
-        return outputDesc;
+    public PairList<String, Shape> describeOutput() {
+        return null;
     }
 
     /** {@inheritDoc} */

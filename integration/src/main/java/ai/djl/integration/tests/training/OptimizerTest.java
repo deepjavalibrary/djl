@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.core.Linear;
@@ -57,7 +56,7 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(BATCH_SIZE, CHANNELS))});
+                trainer.initialize(new Shape[] {new Shape(BATCH_SIZE, CHANNELS)});
 
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);
@@ -88,7 +87,7 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(BATCH_SIZE, CHANNELS))});
+                trainer.initialize(new Shape[] {new Shape(BATCH_SIZE, CHANNELS)});
 
                 NDManager manager = trainer.getManager();
 
@@ -126,7 +125,7 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(BATCH_SIZE, CHANNELS))});
+                trainer.initialize(new Shape[] {new Shape(BATCH_SIZE, CHANNELS)});
 
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);
@@ -154,7 +153,7 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(BATCH_SIZE, CHANNELS))});
+                trainer.initialize(new Shape[] {new Shape(BATCH_SIZE, CHANNELS)});
 
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);

@@ -17,7 +17,6 @@ import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.Activation;
 import ai.djl.training.DefaultTrainingConfig;
@@ -39,7 +38,7 @@ public class ActivationTest {
             model.setBlock(Activation.reluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(3))});
+                trainer.initialize(new Shape[] {new Shape(3)});
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {-1, 0, 2});
@@ -196,7 +195,7 @@ public class ActivationTest {
             model.setBlock(Activation.preluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new DataDesc[] {new DataDesc(new Shape(3))});
+                trainer.initialize(new Shape[] {new Shape(3)});
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {-1, 0, 2});
                 NDArray expected = manager.create(new float[] {-1, 0, 2});

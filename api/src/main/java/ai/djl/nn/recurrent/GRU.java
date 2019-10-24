@@ -94,6 +94,7 @@ public class GRU extends RecurrentCell {
 
     @Override
     public void beforeInitialize(Shape[] inputShapes) {
+        this.inputShapes = inputShapes;
         Shape inputShape = inputShapes[0];
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }

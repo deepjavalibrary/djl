@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -91,13 +90,15 @@ public class Linear extends ParameterBlock {
     }
 
     @Override
-    public DataDesc[] describeInput() {
-        return new DataDesc[] {new DataDesc(inputShape)};
+    public PairList<String, Shape> describeInput() {
+        return new PairList<>(
+                Collections.singletonList("linearInput"), Collections.singletonList(inputShape));
     }
 
     /** {@inheritDoc} */
     @Override
     public void beforeInitialize(Shape[] inputShapes) {
+        this.inputShapes = inputShapes;
         Shape input = inputShapes[0];
         if (input.isLayoutKnown()) {
             inChannels = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));

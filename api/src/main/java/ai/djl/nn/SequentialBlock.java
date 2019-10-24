@@ -15,7 +15,6 @@ package ai.djl.nn;
 import ai.djl.Device;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.ParameterStore;
@@ -112,14 +111,6 @@ public class SequentialBlock extends AbstractBlock {
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.emptyList();
-    }
-
-    @Override
-    public DataDesc[] describeInput() {
-        if (blocks.isEmpty()) {
-            throw new IllegalArgumentException("The sequential block is empty");
-        }
-        return blocks.get(0).describeInput();
     }
 
     @Override

@@ -20,7 +20,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
@@ -155,7 +154,7 @@ public class SymbolBlockTest {
 
     private Pair<NDArray, NDArray> train(NDManager manager, Trainer trainer, Block block) {
         Shape inputShape = new Shape(10, 28 * 28);
-        trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+        trainer.initialize(new Shape[] {inputShape});
 
         NDArray data = manager.ones(inputShape);
         NDArray label = manager.arange(0, 10);

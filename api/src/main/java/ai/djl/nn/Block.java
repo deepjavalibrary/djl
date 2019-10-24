@@ -15,7 +15,6 @@ package ai.djl.nn;
 import ai.djl.Device;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
@@ -48,13 +47,13 @@ public interface Block {
 
     void clear();
 
-    DataDesc[] describeInput();
+    PairList<String, Shape> describeInput();
 
-    PairList<String, Block> getChildren();
+    BlockList getChildren();
 
     List<Parameter> getDirectParameters();
 
-    PairList<String, Parameter> getParameters();
+    ParameterList getParameters();
 
     Shape getParameterShape(String name, Shape[] inputShapes);
 

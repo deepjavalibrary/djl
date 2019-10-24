@@ -21,7 +21,6 @@ import ai.djl.mxnet.nn.MxSymbolBlock;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -31,6 +30,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.translate.Translator;
 import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 import ai.djl.util.Utils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -42,6 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class MxModel implements Model {
     private MxNDManager manager;
     private Block block;
     private DataType dataType;
-    private DataDesc[] inputData;
+    private PairList<String, Shape> inputData;
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
     // the variable is used to avoid ParameterStore copy for the first time
     private AtomicBoolean first;
@@ -131,6 +132,7 @@ public class MxModel implements Model {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void save(Path modelPath, String modelName) throws IOException {
         if (Files.notExists(modelPath)) {
@@ -148,18 +150,16 @@ public class MxModel implements Model {
             dos.writeInt(MODEL_VERSION);
             dos.writeUTF(modelName);
             dos.writeUTF(dataType.name());
-            DataDesc[] descs = block.describeInput();
-            dos.writeInt(descs.length);
-            for (DataDesc desc : descs) {
-                String name = desc.getName();
+            inputData = block.describeInput();
+            dos.writeInt(inputData.size());
+            for (Pair<String, Shape> desc : inputData) {
+                String name = desc.getKey();
                 if (name == null) {
                     dos.writeUTF("");
                 } else {
                     dos.writeUTF(name);
                 }
-
-                dos.writeUTF(desc.getDataType().name());
-                dos.write(desc.getShape().getEncoded());
+                dos.write(desc.getValue().getEncoded());
             }
 
             block.saveParameters(dos);
@@ -211,7 +211,7 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public DataDesc[] describeInput() {
+    public PairList<String, Shape> describeInput() {
         if (inputData == null) {
             inputData = block.describeInput();
         }
@@ -220,8 +220,12 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public DataDesc[] describeOutput() {
-        return null;
+    public PairList<String, Shape> describeOutput() {
+        List<String> names = inputData.keys();
+        Shape[] outputShapes =
+                block.getOutputShapes(
+                        manager, inputData.values().toArray(new Shape[inputData.size()]));
+        return new PairList<>(names, Arrays.asList(outputShapes));
     }
 
     /** {@inheritDoc} */
@@ -396,11 +400,12 @@ public class MxModel implements Model {
             dataType = DataType.valueOf(dis.readUTF());
 
             int numberOfInputs = dis.readInt();
+            inputData = new PairList<>();
             for (int i = 0; i < numberOfInputs; ++i) {
                 // TODO: store header information in model
-                dis.readUTF(); // input name
-                dis.readUTF(); // DataType
-                Shape.decode(dis);
+                String inputName = dis.readUTF(); // input name
+                Shape shape = Shape.decode(dis);
+                inputData.add(inputName, shape);
             }
 
             block.loadParameters(manager, dis);

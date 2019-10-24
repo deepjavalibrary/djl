@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.training.GradientCollector;
@@ -32,7 +31,6 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetric;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,9 +72,7 @@ public class MxTrainer implements Trainer {
     }
 
     @Override
-    public void initialize(DataDesc[] inputDescriptor) {
-        Shape[] shapes =
-                Arrays.stream(inputDescriptor).map(DataDesc::getShape).toArray(Shape[]::new);
+    public void initialize(Shape[] shapes) {
         model.getBlock().initialize(model.getNDManager(), model.getDataType(), devices, shapes);
     }
 

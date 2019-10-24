@@ -297,7 +297,11 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
             if (pair.getKey() != null) {
                 builder.append(pair.getKey());
             }
-            builder.append(": ").append(pair.getValue().getDataDescriptor()).append('\n');
+            builder.append(": ")
+                    .append(pair.getValue().getShape())
+                    .append(' ')
+                    .append(pair.getValue().getDataType())
+                    .append('\n');
         }
         return builder.toString();
     }

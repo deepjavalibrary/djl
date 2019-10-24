@@ -15,7 +15,6 @@ package ai.djl.ndarray;
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Translator;
@@ -50,7 +49,7 @@ import java.nio.LongBuffer;
  *     &#064;Override
  *     public NDList processInput(TranslatorContext ctx, FloatBuffer input) {
  *         <b>NDManager manager = ctx.getNDManager();</b>
- *         NDArray array = <b>manager</b>.create(dataDesc);
+ *         NDArray array = <b>manager</b>.create(shape);
  *         array.set(input);
  *         return new NDList(array);
  *     } // NDArrays created in this method will be closed after method return.
@@ -72,10 +71,10 @@ import java.nio.LongBuffer;
  *     &#064;Override
  *     public NDList processInput(TranslatorContext ctx, List&lt;FloatBuffer&gt; input) {
  *         NDManager manager = ctx.getNDManager();
- *         NDArray array = manager.create(dataDesc);
+ *         NDArray array = manager.create(shape, dataType);
  *         for (int i = 0; i &lt; input.size(); ++i) {
  *             try (<b>NDManager childManager = manager.newSubManager()</b>) {
- *                  NDArray tmp = <b>childManager</b>.create(itemDataDesc);
+ *                  NDArray tmp = <b>childManager</b>.create(itemShape);
  *                  tmp.put(input.get(i);
  *                  array.put(i, tmp);
  *             } // NDArray <i>tmp</i> will be closed here
@@ -339,24 +338,16 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc}.
-     *
-     * @param dataDesc the {@link DataDesc} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
-     */
-    default NDArray create(DataDesc dataDesc) {
-        return create(dataDesc.getShape(), dataDesc.getDataType(), getDevice());
-    }
-
-    /**
-     * Creates and initialize an instance of {@link NDArray} with specified {@link DataDesc}.
+     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and {@link
+     * DataType}.
      *
      * @param data data to initialize the {@code NDArray}
-     * @param dataDesc the {@link DataDesc} of the {@link NDArray}
+     * @param shape the {@link Shape} of the {@link NDArray}
+     * @param dataType the {@link DataType} of the {@link NDArray}
      * @return new instance of {@link NDArray}
      */
-    default NDArray create(Buffer data, DataDesc dataDesc) {
-        NDArray array = create(dataDesc);
+    default NDArray create(Buffer data, Shape shape, DataType dataType) {
+        NDArray array = create(shape, dataType);
         array.set(data);
         return array;
     }
@@ -495,13 +486,15 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} filled with zeros.
+     * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
      *
-     * @param dataDesc the {@link DataDesc} of the {@link NDArray}
+     * @param shape the {@link Shape} of the {@link NDArray}
+     * @param dataType the {@link DataType} of the {@link NDArray}
      * @return new instance of {@link NDArray}
+     * @see #zeros(Shape, DataType, Device)
      */
-    default NDArray zeros(DataDesc dataDesc) {
-        return zeros(dataDesc.getShape(), dataDesc.getDataType(), getDevice());
+    default NDArray zeros(Shape shape, DataType dataType) {
+        return zeros(shape, dataType, getDevice());
     }
 
     /**
@@ -519,20 +512,21 @@ public interface NDManager extends AutoCloseable {
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with ones.
      *
      * @param shape the {@link Shape} of the {@link NDArray}
+     * @param dataType the {@link DataType} of the {@link NDArray}
+     * @return new instance of {@link NDArray}
+     */
+    default NDArray ones(Shape shape, DataType dataType) {
+        return ones(shape, dataType, getDevice());
+    }
+
+    /**
+     * Creates an instance of {@link NDArray} with specified {@link Shape} filled with ones.
+     *
+     * @param shape the {@link Shape} of the {@link NDArray}
      * @return new instance of {@link NDArray}
      */
     default NDArray ones(Shape shape) {
         return ones(shape, DataType.FLOAT32, getDevice());
-    }
-
-    /**
-     * Creates an instance of {@link NDArray} with specified {@link DataDesc} filled with ones.
-     *
-     * @param dataDesc the {@link DataDesc} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
-     */
-    default NDArray ones(DataDesc dataDesc) {
-        return ones(dataDesc.getShape(), dataDesc.getDataType(), getDevice());
     }
 
     /**

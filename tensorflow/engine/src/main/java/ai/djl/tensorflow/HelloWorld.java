@@ -58,8 +58,8 @@ public final class HelloWorld {
 
             TfModel model = new TfModel();
             model.load(Paths.get("ModelPath/TF-resnet_ssd"));
-            System.out.println(model.describeInput()[0].getShape());
-            System.out.println(model.describeInput()[0].getName());
+            System.out.println(model.describeInput().get(0).getValue());
+            System.out.println(model.describeInput().get(0).getKey());
 
             String filename = "ModelPath/TF-resnet_ssd/mfc.jpg";
             BufferedImage img = ImageIO.read(new File(filename));

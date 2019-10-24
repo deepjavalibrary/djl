@@ -19,7 +19,6 @@ import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataDesc;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
@@ -71,7 +70,7 @@ public final class TrainMnist extends AbstractTraining {
                 trainer.setTrainingListener(this);
 
                 // initialize trainer
-                trainer.initialize(new DataDesc[] {new DataDesc(inputShape)});
+                trainer.initialize(new Shape[] {inputShape});
 
                 TrainingUtils.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);
             }
