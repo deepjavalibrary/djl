@@ -126,6 +126,10 @@ publishing {
     }
     repositories {
         maven {
+            name = "local"
+            url = project.parent.parent.buildDir.absolutePath + '/repo'
+        }
+        maven {
             name = "s3"
             url = "s3://djl-ai/dev"
             authentication {
