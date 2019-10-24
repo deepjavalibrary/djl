@@ -62,9 +62,8 @@ public class ResnetTest {
                         .build();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES)
-                        .setOptimizer(optimizer)
-                        .setLoss(Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss())
+                        .setOptimizer(optimizer);
 
         Block resNet50 =
                 new ResNetV1.Builder()
@@ -117,8 +116,7 @@ public class ResnetTest {
     public void testLoadTrain()
             throws IOException, ModelNotFoundException, MalformedModelException {
         try (ZooModel<BufferedImage, Classification> model = getModel()) {
-            TrainingConfig config =
-                    new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.l1Loss());
+            TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l1Loss());
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(16, 3, 32, 32);
 

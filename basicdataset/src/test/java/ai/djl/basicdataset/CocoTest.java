@@ -22,6 +22,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
 import java.io.IOException;
 import java.util.Iterator;
 import org.testng.Assert;
@@ -37,7 +38,7 @@ public class CocoTest {
                                 .optUsage(Dataset.Usage.TEST)
                                 .setRandomSampling(1));
         coco.prepare();
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
             try (Trainer trainer = model.newTrainer(config)) {

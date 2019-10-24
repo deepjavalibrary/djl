@@ -19,6 +19,7 @@ import ai.djl.metric.Metric;
 import ai.djl.metric.Metrics;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.TrainingListener;
+import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import java.io.IOException;
 import java.util.List;
@@ -52,6 +53,7 @@ public abstract class AbstractTraining implements TrainingListener {
     private ProgressBar validateProgressBar;
 
     protected Metrics metrics;
+    protected Loss loss;
 
     public AbstractTraining() {
         metrics = new Metrics();
@@ -184,7 +186,7 @@ public abstract class AbstractTraining implements TrainingListener {
 
     private String getTrainingStatus(Metrics metrics) {
         StringBuilder sb = new StringBuilder();
-        List<Metric> list = metrics.getMetric("train_Loss");
+        List<Metric> list = metrics.getMetric("train_" + loss.getName());
         trainingLoss = list.get(list.size() - 1).getValue().floatValue();
 
         list = metrics.getMetric("train_Accuracy");
@@ -201,14 +203,14 @@ public abstract class AbstractTraining implements TrainingListener {
     }
 
     private void printTrainingStatus(Metrics metrics) {
-        List<Metric> list = metrics.getMetric("train_Loss");
+        List<Metric> list = metrics.getMetric("train_" + loss.getName());
         trainingLoss = list.get(list.size() - 1).getValue().floatValue();
 
         list = metrics.getMetric("train_Accuracy");
         trainingAccuracy = list.get(list.size() - 1).getValue().floatValue();
 
         logger.info("train accuracy: {}, train loss: {}", trainingAccuracy, trainingLoss);
-        list = metrics.getMetric("validate_Loss");
+        list = metrics.getMetric("validate_" + loss.getName());
         if (!list.isEmpty()) {
             validationLoss = list.get(list.size() - 1).getValue().floatValue();
             list = metrics.getMetric("validate_Accuracy");

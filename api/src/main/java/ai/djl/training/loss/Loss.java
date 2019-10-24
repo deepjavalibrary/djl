@@ -22,11 +22,14 @@ public abstract class Loss extends TrainingMetric {
 
     private float totalLoss;
     private int totalInstances;
-    private NDArray lastUpdate;
 
-    /** Base class for metric with abstract update methods. */
-    public Loss() {
-        super("Loss");
+    /**
+     * Base class for metric with abstract update methods.
+     *
+     * @param name The display name of the Loss
+     */
+    public Loss(String name) {
+        super(name);
     }
 
     /**
@@ -36,7 +39,7 @@ public abstract class Loss extends TrainingMetric {
      * @param prediction the predicted label
      * @return the loss value
      */
-    public abstract NDArray getLoss(NDArray label, NDArray prediction);
+    public abstract NDArray getLoss(NDList label, NDList prediction);
 
     /**
      * Returns a new instance of {@link L1Loss} with default weight and batch axis.
@@ -166,13 +169,10 @@ public abstract class Loss extends TrainingMetric {
      */
     @Override
     public void update(NDList labels, NDList predictions) {
-        if (lastUpdate == null) {
-            throw new IllegalStateException(
-                    "You have not calculate loss yet, please "
-                            + "call calculateLoss(labels, preds) before calling update().");
-        }
-        totalLoss += lastUpdate.sum().getFloat();
-        totalInstances += lastUpdate.size();
+        // this is a synchronized operation, only call it at end of batch or epoch
+        NDArray update = getLoss(labels, predictions);
+        totalLoss += update.sum().getFloat();
+        totalInstances += update.size();
     }
 
     /** {@inheritDoc} */
@@ -191,10 +191,6 @@ public abstract class Loss extends TrainingMetric {
         return totalLoss / totalInstances;
     }
 
-    public NDArray getLastUpdate() {
-        return lastUpdate;
-    }
-
     /**
      * Gets all axes except the batch axis because loss functions require reduction on all axes
      * except the batch axis.
@@ -207,18 +203,5 @@ public abstract class Loss extends TrainingMetric {
         return IntStream.range(0, loss.getShape().dimension())
                 .filter(axis -> axis != batchAxis)
                 .toArray();
-    }
-
-    /**
-     * Calculates the loss between the label and prediction.
-     *
-     * @param labels the true labels
-     * @param predictions the predicted labels
-     * @return the loss value
-     */
-    public NDArray calculateLoss(NDList labels, NDList predictions) {
-        // TODO: support composite loss for ssd (multi output)
-        lastUpdate = getLoss(labels.head(), predictions.head());
-        return lastUpdate;
     }
 }

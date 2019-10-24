@@ -22,6 +22,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -30,7 +31,8 @@ public class MnistTest {
 
     @Test
     public void testMnistLocal() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
@@ -58,7 +60,8 @@ public class MnistTest {
 
     @Test
     public void testMnistRemote() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);

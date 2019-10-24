@@ -14,6 +14,7 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
+import ai.djl.ndarray.NDList;
 import ai.djl.nn.Activation;
 
 /**
@@ -35,6 +36,7 @@ public class HingeLoss extends Loss {
      * @param batchAxis the axis that represents mini-batch, default 0
      */
     public HingeLoss(int margin, float weight, int batchAxis) {
+        super("HingeLoss");
         this.margin = margin;
         this.weight = weight;
         this.batchAxis = batchAxis;
@@ -42,16 +44,15 @@ public class HingeLoss extends Loss {
 
     /** Calculates Hinge loss. */
     public HingeLoss() {
-        margin = 1;
-        weight = 1;
-        batchAxis = 0;
+        this(1, 1, 0);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getLoss(NDArray label, NDArray prediction) {
-        label = label.reshape(prediction.getShape());
-        NDArray loss = Activation.relu(NDArrays.sub(margin, label.mul(prediction)));
+    public NDArray getLoss(NDList label, NDList prediction) {
+        NDArray pred = prediction.singletonOrThrow();
+        NDArray labelReshaped = label.singletonOrThrow().reshape(pred.getShape());
+        NDArray loss = Activation.relu(NDArrays.sub(margin, labelReshaped.mul(pred)));
         if (weight != 1) {
             loss = loss.mul(weight);
         }

@@ -14,6 +14,7 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.loss.Loss;
@@ -31,7 +32,9 @@ public class LossTest {
             Assert.assertTrue(
                     Arrays.equals(
                             new float[] {0, 1, 2, 3, 4},
-                            Loss.l1Loss().getLoss(label, pred).toFloatArray()));
+                            Loss.l1Loss()
+                                    .getLoss(new NDList(label), new NDList(pred))
+                                    .toFloatArray()));
         }
     }
 
@@ -43,7 +46,9 @@ public class LossTest {
             Assert.assertTrue(
                     Arrays.equals(
                             new float[] {0f, 0.5f, 2f, 4.5f, 8f},
-                            Loss.l2Loss().getLoss(label, pred).toFloatArray()));
+                            Loss.l2Loss()
+                                    .getLoss(new NDList(label), new NDList(pred))
+                                    .toFloatArray()));
         }
     }
 
@@ -54,7 +59,7 @@ public class LossTest {
             NDArray label = manager.ones(new Shape(1));
             Assertions.assertAlmostEquals(
                     manager.create(new float[] {3.45191431f}),
-                    Loss.softmaxCrossEntropyLoss().getLoss(label, pred));
+                    Loss.softmaxCrossEntropyLoss().getLoss(new NDList(label), new NDList(pred)));
         }
     }
 
@@ -66,7 +71,9 @@ public class LossTest {
             Assert.assertTrue(
                     Arrays.equals(
                             new float[] {2, 3, 4, 5, 6},
-                            Loss.hingeLoss().getLoss(label, pred).toFloatArray()));
+                            Loss.hingeLoss()
+                                    .getLoss(new NDList(label), new NDList(pred))
+                                    .toFloatArray()));
         }
     }
 
@@ -80,7 +87,8 @@ public class LossTest {
                             new float[] {
                                 0.31326175f, 0.12692809f, 0.04858732f, 0.01814985f, 0.0067153f
                             }),
-                    Loss.sigmoidBinaryCrossEntropyLoss().getLoss(label, pred));
+                    Loss.sigmoidBinaryCrossEntropyLoss()
+                            .getLoss(new NDList(label), new NDList(pred)));
         }
     }
 }

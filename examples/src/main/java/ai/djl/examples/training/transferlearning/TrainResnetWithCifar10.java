@@ -177,9 +177,9 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                         .optWeightDecays(0.001f)
                         .optClipGrad(5f)
                         .build();
-        return new DefaultTrainingConfig(initializer)
+        loss = Loss.softmaxCrossEntropyLoss();
+        return new DefaultTrainingConfig(initializer, loss)
                 .setOptimizer(optimizer)
-                .setLoss(Loss.softmaxCrossEntropyLoss())
                 .addTrainingMetric(new Accuracy())
                 .setBatchSize(batchSize)
                 .setDevices(Device.getDevices(arguments.getMaxGpus()));

@@ -72,9 +72,7 @@ public class GradientCollectorIntegrationTest {
                         .build();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES)
-                        .setOptimizer(optimizer)
-                        .setLoss(Loss.l2Loss());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(optimizer);
 
         try (Model model = Model.newInstance()) {
             Linear block = new Linear.Builder().setOutChannels(1).build();

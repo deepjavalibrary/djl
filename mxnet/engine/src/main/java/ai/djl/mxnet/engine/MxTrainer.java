@@ -68,9 +68,10 @@ public class MxTrainer implements Trainer {
         manager = (MxNDManager) model.getNDManager().newSubManager();
         devices = trainingConfig.getDevices();
         trainingLoss = trainingConfig.getLossFunction();
-        if (trainingLoss != null) {
-            validationLoss = trainingLoss.duplicate();
+        if (trainingLoss == null) {
+            throw new IllegalArgumentException("You must specify a loss for the trainer");
         }
+        validationLoss = trainingLoss.duplicate();
         trainingMetrics = new ArrayList<>(trainingConfig.getTrainingMetrics());
         validateMetrics = new ArrayList<>();
         trainingMetrics.forEach(i -> validateMetrics.add(i.duplicate()));
@@ -120,11 +121,19 @@ public class MxTrainer implements Trainer {
                 NDList preds = forward(data);
 
                 long time = System.nanoTime();
-                NDArray loss = trainingLoss.calculateLoss(labels, preds);
+                NDArray loss = trainingLoss.getLoss(labels, preds);
 
                 collector.backward(loss);
                 addMetric("backward", time);
                 time = System.nanoTime();
+
+                if (loss != null) {
+                    NDArray result = loss.isNaN();
+                    if (result.any()) {
+                        throw new TrainingDivergedException("The Loss NDArray has NaNs");
+                    }
+                }
+
                 updateTrainingMetrics(labels, preds);
                 addMetric("training-metrics", time);
             }
@@ -160,9 +169,7 @@ public class MxTrainer implements Trainer {
             NDList labels = split.getLabels();
 
             NDList preds = forward(data);
-            validationLoss.calculateLoss(labels, preds);
-            validateMetrics.forEach(metrics -> metrics.update(labels, preds));
-            updateValidationMetrics();
+            updateValidationMetrics(labels, preds);
         }
         addMetric("validate", begin);
 
@@ -203,27 +210,15 @@ public class MxTrainer implements Trainer {
         // this step is synchronized, should be done at end of batch
         trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
         // TODO: this can be done during onBatch listener
-        if (trainingLoss != null) {
-            addMetric("train", trainingLoss);
-            NDArray loss = trainingLoss.getLastUpdate();
-            if (loss != null) {
-                NDArray result = loss.isNaN();
-                if (result.any()) {
-                    throw new TrainingDivergedException("The Loss NDArray has NaNs");
-                }
-            }
-        }
+        addMetric("train", trainingLoss);
         trainingMetrics.forEach(metric -> addMetric("train", metric));
         // turn gradient recording back on
         MxGradientCollector.setRecording(true);
         MxGradientCollector.setTraining(true);
     }
 
-    private void updateValidationMetrics() {
-        // TODO: this can be done during onBatch listener
-        if (validationLoss != null) {
-            addMetric("validate", validationLoss);
-        }
+    private void updateValidationMetrics(NDList labels, NDList preds) {
+        validateMetrics.forEach(metrics -> metrics.update(labels, preds));
         validateMetrics.forEach(metric -> addMetric("validate", metric));
     }
 
@@ -232,10 +227,6 @@ public class MxTrainer implements Trainer {
     public void resetTrainingMetrics() {
         trainingMetrics.forEach(TrainingMetric::reset);
         validateMetrics.forEach(TrainingMetric::reset);
-        if (trainingLoss != null) {
-            trainingLoss.reset();
-            validationLoss.reset();
-        }
 
         if (listener != null) {
             listener.onEpoch();

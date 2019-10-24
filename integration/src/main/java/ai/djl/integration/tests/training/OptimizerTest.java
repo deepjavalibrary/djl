@@ -49,9 +49,7 @@ public class OptimizerTest {
                         .build();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES)
-                        .setOptimizer(sgd)
-                        .setLoss(Loss.l2Loss());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(sgd);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -80,9 +78,7 @@ public class OptimizerTest {
                         .build();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES)
-                        .setOptimizer(optim)
-                        .setLoss(Loss.l2Loss());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(optim);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -118,9 +114,7 @@ public class OptimizerTest {
                         .build();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES)
-                        .setOptimizer(optim)
-                        .setLoss(Loss.l2Loss());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(optim);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -149,9 +143,7 @@ public class OptimizerTest {
                         .build();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES)
-                        .setOptimizer(optim)
-                        .setLoss(Loss.l2Loss());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(optim);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);

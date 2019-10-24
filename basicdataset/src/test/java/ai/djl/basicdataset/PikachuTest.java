@@ -22,6 +22,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.NormalInitializer;
+import ai.djl.training.loss.Loss;
 import java.io.IOException;
 import java.util.Iterator;
 import org.testng.Assert;
@@ -37,7 +38,9 @@ public class PikachuTest {
                                 .optUsage(Dataset.Usage.TEST)
                                 .setRandomSampling(1));
         pikachu.prepare();
-        TrainingConfig config = new DefaultTrainingConfig(new NormalInitializer(0.01));
+        TrainingConfig config =
+                new DefaultTrainingConfig(
+                        new NormalInitializer(0.01), Loss.softmaxCrossEntropyLoss());
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
             try (Trainer trainer = model.newTrainer(config)) {

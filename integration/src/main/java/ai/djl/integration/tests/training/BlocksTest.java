@@ -23,12 +23,13 @@ import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class BlocksTest {
 
-    private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+    private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
     @Test
     public void testFlattenBlock() {

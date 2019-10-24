@@ -27,6 +27,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -40,7 +41,8 @@ public class ImageFolderTest {
     public void testImageFolder() throws IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/imagefolder");
         if (Engine.getInstance().getGpuCount() == 0) {
-            TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+            TrainingConfig config =
+                    new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
             try (Model model = Model.newInstance()) {
                 model.setBlock(Activation.IDENTITY_BLOCK);

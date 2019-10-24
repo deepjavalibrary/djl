@@ -41,6 +41,7 @@ import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -55,7 +56,7 @@ public class BlockCoreTest {
 
     @Test
     public void testLinear() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         long outSize = 3;
         Block block = new Linear.Builder().setOutChannels(outSize).build();
@@ -99,7 +100,7 @@ public class BlockCoreTest {
 
     @Test
     public void testLinearWithDefinedLayout() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         long outSize = 3;
         Block block = new Linear.Builder().setOutChannels(outSize).build();
@@ -149,7 +150,7 @@ public class BlockCoreTest {
 
     @Test
     public void testBatchNorm() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         Block block = new BatchNorm.Builder().optAxis(1).build();
         try (Model model = Model.newInstance()) {
@@ -172,7 +173,7 @@ public class BlockCoreTest {
 
     @Test
     public void testDropout() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         Block block = new Dropout.Builder().optProbability(.5f).build();
         try (Model model = Model.newInstance()) {
@@ -194,7 +195,7 @@ public class BlockCoreTest {
 
     @Test
     public void testEmbedding() {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         Embedding<Character> block =
                 new Embedding.Builder<Character>()
@@ -225,7 +226,7 @@ public class BlockCoreTest {
 
     @Test
     public void testConv1D() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         Block block =
                 new Conv1D.Builder()
@@ -260,7 +261,7 @@ public class BlockCoreTest {
 
     @Test
     public void testConv2D() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         Block block = new Conv2D.Builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
         try (Model model = Model.newInstance()) {
@@ -290,7 +291,7 @@ public class BlockCoreTest {
 
     @Test
     public void testConv3D() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         Block block = new Conv3D.Builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
         try (Model model = Model.newInstance()) {
@@ -327,7 +328,7 @@ public class BlockCoreTest {
 
     @Test
     public void testRNNTanh() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         Block block =
                 new RNN.Builder()
@@ -354,7 +355,7 @@ public class BlockCoreTest {
 
     @Test
     public void testRNNRelu() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         Block block =
                 new RNN.Builder()
@@ -385,7 +386,7 @@ public class BlockCoreTest {
 
     @Test
     public void testLstm() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         Block block =
                 new LSTM.Builder()
@@ -419,7 +420,7 @@ public class BlockCoreTest {
 
     @Test
     public void testGRU() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
         GRU block =
                 new GRU.Builder()
@@ -446,7 +447,7 @@ public class BlockCoreTest {
 
     @Test
     public void testSequentialBlock() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
         SequentialBlock block = new SequentialBlock();
         block.add(x -> new NDList(x.singletonOrThrow().mul(6.5f)));
         block.add(new Linear.Builder().setOutChannels(10).build());
@@ -485,7 +486,7 @@ public class BlockCoreTest {
 
     @Test
     public void testParallelBlock() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
         ParallelBlock block =
                 new ParallelBlock(
                         list ->

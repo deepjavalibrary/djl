@@ -14,6 +14,7 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
+import ai.djl.ndarray.NDList;
 import ai.djl.nn.Activation;
 
 /**
@@ -36,6 +37,7 @@ public class SigmoidBinaryCrossEntropyLoss extends Loss {
      * @param fromSigmoid whether the input is from the output of sigmoid, default false
      */
     public SigmoidBinaryCrossEntropyLoss(float weight, int batchAxis, boolean fromSigmoid) {
+        super("SigmoidBinaryCrossEntropyLoss");
         this.weight = weight;
         this.batchAxis = batchAxis;
         this.fromSigmoid = fromSigmoid;
@@ -43,33 +45,29 @@ public class SigmoidBinaryCrossEntropyLoss extends Loss {
 
     /** Performs Sigmoid cross-entropy loss for binary classification. */
     public SigmoidBinaryCrossEntropyLoss() {
-        weight = 1;
-        batchAxis = 0;
-        fromSigmoid = false;
+        this(1, 0, false);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getLoss(NDArray label, NDArray prediction) {
-        label = label.reshape(prediction.getShape());
+    public NDArray getLoss(NDList label, NDList prediction) {
+        NDArray pred = prediction.singletonOrThrow();
+        NDArray lab = label.singletonOrThrow();
+        lab = lab.reshape(pred.getShape());
         NDArray loss;
         if (!fromSigmoid) {
             // TODO: Add Position weight option
             loss =
-                    Activation.relu(prediction)
-                            .sub(prediction.mul(label))
-                            .add(Activation.softrelu(prediction.abs().neg()));
+                    Activation.relu(pred)
+                            .sub(pred.mul(lab))
+                            .add(Activation.softrelu(pred.abs().neg()));
         } else {
             double eps = 1e-12;
             loss =
-                    prediction
-                            .add(eps)
+                    pred.add(eps)
                             .log()
-                            .mul(label)
-                            .add(
-                                    NDArrays.sub(1., prediction)
-                                            .add(eps)
-                                            .mul(NDArrays.sub(1., label)));
+                            .mul(lab)
+                            .add(NDArrays.sub(1., pred).add(eps).mul(NDArrays.sub(1., lab)));
         }
         if (weight != 1f) {
             loss = loss.mul(weight);

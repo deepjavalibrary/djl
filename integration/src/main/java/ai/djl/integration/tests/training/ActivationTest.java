@@ -29,8 +29,7 @@ import org.testng.annotations.Test;
 
 public class ActivationTest {
 
-    private TrainingConfig config =
-            new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.l2Loss());
+    private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
 
     @Test
     public void testRelu() {

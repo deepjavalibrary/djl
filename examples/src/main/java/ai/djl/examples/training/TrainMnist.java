@@ -110,9 +110,9 @@ public final class TrainMnist extends AbstractTraining {
                         .optClipGrad(1f)
                         .build();
 
-        return new DefaultTrainingConfig(new XavierInitializer())
+        loss = Loss.softmaxCrossEntropyLoss();
+        return new DefaultTrainingConfig(new XavierInitializer(), loss)
                 .setOptimizer(optimizer)
-                .setLoss(Loss.softmaxCrossEntropyLoss())
                 .addTrainingMetric(new Accuracy())
                 .setBatchSize(batchSize)
                 .setDevices(Device.getDevices(arguments.getMaxGpus()));

@@ -35,10 +35,12 @@ public class DefaultTrainingConfig implements TrainingConfig {
      * Creates an instance of {@code DefaultTrainingConfig} with the given {@link Initializer}.
      *
      * @param initializer the initializer to initialize the parameters with
+     * @param loss the loss to use for training
      */
-    public DefaultTrainingConfig(Initializer initializer) {
+    public DefaultTrainingConfig(Initializer initializer, Loss loss) {
         this.initializer = initializer;
         trainingMetrics = new ArrayList<>();
+        this.loss = loss;
     }
 
     /**
@@ -60,17 +62,6 @@ public class DefaultTrainingConfig implements TrainingConfig {
      */
     public DefaultTrainingConfig setOptimizer(Optimizer optimizer) {
         this.optimizer = optimizer;
-        return this;
-    }
-
-    /**
-     * Sets the {@link Loss} function for training.
-     *
-     * @param loss the loss function to be set
-     * @return this {@code DefaultTrainingConfig}
-     */
-    public DefaultTrainingConfig setLoss(Loss loss) {
-        this.loss = loss;
         return this;
     }
 

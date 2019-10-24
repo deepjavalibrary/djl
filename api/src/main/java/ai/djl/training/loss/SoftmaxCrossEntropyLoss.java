@@ -13,6 +13,7 @@
 package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 
 /**
  * {@code SoftmaxCrossEntropyLoss} is a type of {@link Loss} that calculates the softmax cross
@@ -42,6 +43,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
      */
     public SoftmaxCrossEntropyLoss(
             float weight, int batchAxis, int classAxis, boolean sparseLabel, boolean fromLogit) {
+        super("SoftmaxCrossEntropyLoss");
         this.weight = weight;
         this.batchAxis = batchAxis;
         this.classAxis = classAxis;
@@ -51,26 +53,24 @@ public class SoftmaxCrossEntropyLoss extends Loss {
 
     /** Creates a new instance of {@code SoftmaxCrossEntropyLoss} with default parameters. */
     public SoftmaxCrossEntropyLoss() {
-        weight = 1;
-        batchAxis = 0;
-        classAxis = -1;
-        sparseLabel = true;
-        fromLogit = false;
+        this(1, 0, -1, true, false);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getLoss(NDArray label, NDArray prediction) {
+    public NDArray getLoss(NDList label, NDList prediction) {
+        NDArray pred = prediction.singletonOrThrow();
         if (!fromLogit) {
             // TODO: use numpy log softmax
-            prediction = prediction.softmax(classAxis).log();
+            pred = pred.softmax(classAxis).log();
         }
         NDArray loss;
+        NDArray lab = label.singletonOrThrow();
         if (sparseLabel) {
-            loss = prediction.getNDArrayInternal().pick(label, classAxis, true).neg();
+            loss = pred.getNDArrayInternal().pick(lab, classAxis, true).neg();
         } else {
-            label = label.reshape(prediction.getShape());
-            loss = prediction.mul(label).sum(new int[] {classAxis});
+            lab = lab.reshape(pred.getShape());
+            loss = pred.mul(lab).sum(new int[] {classAxis});
         }
         if (weight != 1) {
             loss = loss.mul(weight);

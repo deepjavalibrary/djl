@@ -65,7 +65,7 @@ public class SymbolBlockTest {
     public void trainWithNewParam()
             throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
         Map<String, String> criteria = new ConcurrentHashMap<>();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
 
@@ -94,7 +94,7 @@ public class SymbolBlockTest {
     public void trainWithExistParam()
             throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
         Map<String, String> criteria = new ConcurrentHashMap<>();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
 
@@ -122,7 +122,7 @@ public class SymbolBlockTest {
     public void trainWithCustomLayer()
             throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
         Map<String, String> criteria = new ConcurrentHashMap<>();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
             NDManager manager = model.getNDManager();
@@ -165,7 +165,8 @@ public class SymbolBlockTest {
         NDArray pred;
         try (GradientCollector gradCol = new MxGradientCollector()) {
             pred = trainer.forward(new NDList(data)).singletonOrThrow();
-            NDArray loss = Loss.softmaxCrossEntropyLoss().getLoss(label, pred);
+            NDArray loss =
+                    Loss.softmaxCrossEntropyLoss().getLoss(new NDList(label), new NDList(pred));
             gradCol.backward(loss);
         }
         List<NDArray> grads =
