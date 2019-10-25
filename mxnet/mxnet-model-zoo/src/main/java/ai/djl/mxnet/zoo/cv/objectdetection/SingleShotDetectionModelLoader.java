@@ -33,7 +33,7 @@ public class SingleShotDetectionModelLoader
     private static final Anchor BASE_ANCHOR = CV.OBJECT_DETECTION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "ssd";
-    private static final String VERSION = "0.0.2";
+    private static final String VERSION = "0.0.1";
 
     public SingleShotDetectionModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);

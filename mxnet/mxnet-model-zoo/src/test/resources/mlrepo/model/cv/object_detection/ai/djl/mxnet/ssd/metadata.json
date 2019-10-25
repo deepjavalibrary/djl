@@ -14,7 +14,7 @@
   },
   "artifacts": [
     {
-      "version": "0.0.2",
+      "version": "0.0.1",
       "snapshot": false,
       "name": "ssd_512_resnet50_v1_voc",
       "properties": {
@@ -41,7 +41,7 @@
       }
     },
     {
-      "version": "0.0.2",
+      "version": "0.0.1",
       "snapshot": false,
       "name": "ssd_512_vgg16_atrous_coco",
       "properties": {
