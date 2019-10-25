@@ -13,6 +13,7 @@
 
 package ai.djl.examples.inference;
 
+import ai.djl.ModelException;
 import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.examples.util.MemoryUtils;
@@ -20,7 +21,6 @@ import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.mxnet.zoo.nlp.bertqa.QAInput;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public final class BertQaInferenceExample extends AbstractInference<String> {
 
     @Override
     public String predict(Arguments args, Metrics metrics, int iteration)
-            throws IOException, TranslateException, ModelNotFoundException {
+            throws IOException, TranslateException, ModelException {
         BertArguments arguments = (BertArguments) args;
 
         Map<String, String> criteria = new ConcurrentHashMap<>();

@@ -12,6 +12,7 @@
  */
 package ai.djl.tensorflow.engine;
 
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
@@ -78,7 +79,7 @@ public class TfModel implements Model {
 
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
-            throws IOException {
+            throws IOException, MalformedModelException {
         try {
             load(modelPath);
         } catch (InvalidProtocolBufferException e) {

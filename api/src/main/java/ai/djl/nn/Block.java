@@ -13,6 +13,7 @@
 package ai.djl.nn;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -61,7 +62,8 @@ public interface Block {
 
     void saveParameters(DataOutputStream os) throws IOException;
 
-    void loadParameters(NDManager manager, DataInputStream is) throws IOException;
+    void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException;
 
     static void validateLayout(LayoutType[] expectedLayout, LayoutType[] actualLayout) {
         if (actualLayout.length != expectedLayout.length) {

@@ -10,12 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.repository.zoo;
+package ai.djl;
 
-import ai.djl.ModelException;
-
-/** /** Thrown when an application tries to load a model from repository search path. */
-public class ModelNotFoundException extends ModelException {
+/** Thrown to indicate Model parameter or load exceptions parent to Model Exceptions. */
+public class ModelException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,7 +24,7 @@ public class ModelNotFoundException extends ModelException {
      * @param message the detail message. The detail message is saved for later retrieval by the
      *     {@link #getMessage()} method.
      */
-    public ModelNotFoundException(String message) {
+    public ModelException(String message) {
         super(message);
     }
 
@@ -42,7 +40,7 @@ public class ModelNotFoundException extends ModelException {
      *     method). (A {@code null} value is permitted, and indicates that the cause is nonexistent
      *     or unknown.)
      */
-    public ModelNotFoundException(String message, Throwable cause) {
+    public ModelException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -57,7 +55,7 @@ public class ModelNotFoundException extends ModelException {
      *     method). (A {@code null} value is permitted, and indicates that the cause is nonexistent
      *     or unknown.)
      */
-    public ModelNotFoundException(Throwable cause) {
+    public ModelException(Throwable cause) {
         super(cause);
     }
 }

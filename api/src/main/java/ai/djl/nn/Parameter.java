@@ -12,6 +12,7 @@
  */
 package ai.djl.nn;
 
+import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -157,24 +158,27 @@ public class Parameter implements AutoCloseable {
      * @param manager NDManager
      * @param dis InputStream
      * @throws IOException if failed to write
+     * @throws MalformedModelException Exception thrown when model is not in expected format
+     *     (parameters).
      */
-    public void load(NDManager manager, DataInputStream dis) throws IOException {
+    public void load(NDManager manager, DataInputStream dis)
+            throws IOException, MalformedModelException {
         char magic = dis.readChar();
         if (magic == 'N') {
             return;
         } else if (magic != 'P') {
-            throw new IllegalArgumentException("Invalid input data.");
+            throw new MalformedModelException("Invalid input data.");
         }
 
         // Version
         byte version = dis.readByte();
         if (version != VERSION) {
-            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+            throw new MalformedModelException("Unsupported encoding version: " + version);
         }
 
         String parameterName = dis.readUTF();
         if (!parameterName.equals(getName())) {
-            throw new IllegalArgumentException(
+            throw new MalformedModelException(
                     "Unexpected parameter name: " + parameterName + ", expected: " + name);
         }
 

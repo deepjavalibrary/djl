@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference;
 
+import ai.djl.ModelException;
 import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.inference.Predictor;
@@ -19,7 +20,6 @@ import ai.djl.metric.Metrics;
 import ai.djl.modality.Classification;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
@@ -36,7 +36,7 @@ public class ActionRecognition extends AbstractInference<Classification> {
 
     @Override
     protected Classification predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelNotFoundException, TranslateException {
+            throws IOException, ModelException, TranslateException {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
         Map<String, String> criteria = new ConcurrentHashMap<>();

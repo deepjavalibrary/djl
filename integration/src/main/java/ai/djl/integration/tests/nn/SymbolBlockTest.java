@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.nn;
 
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
 import ai.djl.mxnet.engine.MxGradientCollector;
@@ -45,7 +46,7 @@ import org.testng.annotations.Test;
 public class SymbolBlockTest {
 
     @Test
-    public void testForward() throws IOException, ModelNotFoundException {
+    public void testForward() throws IOException, ModelNotFoundException, MalformedModelException {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
             NDManager manager = model.getNDManager();
@@ -61,7 +62,8 @@ public class SymbolBlockTest {
     }
 
     @Test
-    public void trainWithNewParam() throws IOException, ModelNotFoundException {
+    public void trainWithNewParam()
+            throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -89,7 +91,8 @@ public class SymbolBlockTest {
     }
 
     @Test
-    public void trainWithExistParam() throws IOException, ModelNotFoundException {
+    public void trainWithExistParam()
+            throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -116,7 +119,8 @@ public class SymbolBlockTest {
     }
 
     @Test
-    public void trainWithCustomLayer() throws IOException, ModelNotFoundException {
+    public void trainWithCustomLayer()
+            throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.softmaxCrossEntropyLoss());
         Map<String, String> criteria = new ConcurrentHashMap<>();

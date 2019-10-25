@@ -13,6 +13,7 @@
 package ai.djl.repository.zoo;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
@@ -52,12 +53,12 @@ public abstract class BaseModelLoader<I, O> {
     }
 
     public ZooModel<I, O> loadModel(Map<String, String> criteria)
-            throws IOException, ModelNotFoundException {
+            throws IOException, ModelNotFoundException, MalformedModelException {
         return loadModel(criteria, Device.defaultDevice());
     }
 
     public ZooModel<I, O> loadModel(Map<String, String> criteria, Device device)
-            throws IOException, ModelNotFoundException {
+            throws IOException, ModelNotFoundException, MalformedModelException {
         Artifact artifact = match(criteria);
         if (artifact == null) {
             throw new ModelNotFoundException("Model not found.");
@@ -70,7 +71,8 @@ public abstract class BaseModelLoader<I, O> {
         return new ZooModel<>(model, getTranslator(artifact));
     }
 
-    protected Model loadModel(Artifact artifact, Path modelPath, Device device) throws IOException {
+    protected Model loadModel(Artifact artifact, Path modelPath, Device device)
+            throws IOException, MalformedModelException {
         Model model = Model.newInstance(device);
         model.load(modelPath, artifact.getName());
         return model;

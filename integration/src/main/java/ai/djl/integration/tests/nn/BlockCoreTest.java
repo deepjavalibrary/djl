@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.nn;
 
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
@@ -53,7 +54,7 @@ import org.testng.annotations.Test;
 public class BlockCoreTest {
 
     @Test
-    public void testLinear() throws IOException {
+    public void testLinear() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         long outSize = 3;
@@ -97,7 +98,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testLinearWithDefinedLayout() throws IOException {
+    public void testLinearWithDefinedLayout() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         long outSize = 3;
@@ -147,7 +148,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testBatchNorm() throws IOException {
+    public void testBatchNorm() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block = new BatchNorm.Builder().optAxis(1).build();
@@ -170,7 +171,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testDropout() throws IOException {
+    public void testDropout() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block = new Dropout.Builder().optProbability(.5f).build();
@@ -223,7 +224,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConv1D() throws IOException {
+    public void testConv1D() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block =
@@ -258,7 +259,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConv2D() throws IOException {
+    public void testConv2D() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block = new Conv2D.Builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
@@ -288,7 +289,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConv3D() throws IOException {
+    public void testConv3D() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block = new Conv3D.Builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
@@ -325,7 +326,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testRNNTanh() throws IOException {
+    public void testRNNTanh() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block =
@@ -352,7 +353,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testRNNRelu() throws IOException {
+    public void testRNNRelu() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block =
@@ -383,7 +384,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testLstm() throws IOException {
+    public void testLstm() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         Block block =
@@ -417,7 +418,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testGRU() throws IOException {
+    public void testGRU() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
         GRU block =
@@ -444,7 +445,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testSequentialBlock() throws IOException {
+    public void testSequentialBlock() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
         SequentialBlock block = new SequentialBlock();
         block.add(x -> new NDList(x.singletonOrThrow().mul(6.5f)));
@@ -483,7 +484,7 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testParallelBlock() throws IOException {
+    public void testParallelBlock() throws IOException, MalformedModelException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
         ParallelBlock block =
                 new ParallelBlock(
@@ -520,7 +521,8 @@ public class BlockCoreTest {
         }
     }
 
-    private void testEncode(NDManager manager, Block block) throws IOException {
+    private void testEncode(NDManager manager, Block block)
+            throws IOException, MalformedModelException {
         PairList<String, Parameter> original = block.getParameters();
         File temp = File.createTempFile("block", ".param");
         DataOutputStream os = new DataOutputStream(Files.newOutputStream(temp.toPath()));

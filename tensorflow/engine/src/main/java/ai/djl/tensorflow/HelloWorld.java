@@ -13,6 +13,7 @@
 
 package ai.djl.tensorflow;
 
+import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.ndarray.NDArray;
@@ -38,7 +39,8 @@ public final class HelloWorld {
     private HelloWorld() {}
 
     @SuppressWarnings("PMD.SystemPrintln")
-    public static void main(String[] args) throws IOException, TranslateException {
+    public static void main(String[] args)
+            throws IOException, TranslateException, MalformedModelException {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray a =
                     new TfNDArray(

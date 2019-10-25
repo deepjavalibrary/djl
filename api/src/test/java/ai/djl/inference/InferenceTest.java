@@ -13,6 +13,7 @@
 package ai.djl.inference;
 
 import ai.djl.Model;
+import ai.djl.ModelException;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classification;
 import ai.djl.modality.cv.DetectedObjects;
@@ -48,7 +49,7 @@ public class InferenceTest {
     }
 
     @Test
-    public void testObjectDetection() throws IOException, TranslateException {
+    public void testObjectDection() throws IOException, TranslateException, ModelException {
         Path modelDir = Paths.get("build/model");
         String modelName = "mockModel";
 
@@ -69,7 +70,7 @@ public class InferenceTest {
     }
 
     @Test
-    public void testClassifier() throws IOException, TranslateException {
+    public void testClassifier() throws IOException, TranslateException, ModelException {
         Path modelDir = Paths.get("build/model");
         Model model = Model.newInstance();
         model.load(modelDir);
@@ -116,7 +117,7 @@ public class InferenceTest {
     }
 
     @Test(expectedExceptions = IOException.class)
-    public void loadModelException() throws IOException {
+    public void loadModelException() throws IOException, ModelException {
         Path modelDir = Paths.get("build/non-exist-model");
         String modelName = "mockModel";
 

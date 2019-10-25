@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.model_zoo.classification;
 
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.integration.util.Assertions;
@@ -101,7 +102,9 @@ public class ResnetTest {
     }
 
     @Test
-    public void testLoadPredict() throws IOException, ModelNotFoundException, TranslateException {
+    public void testLoadPredict()
+            throws IOException, ModelNotFoundException, TranslateException,
+                    MalformedModelException {
         try (ZooModel<BufferedImage, Classification> model = getModel()) {
             try (Predictor<NDList, NDList> predictor = model.newPredictor(new TestTranslator())) {
                 NDList input = new NDList(model.getNDManager().ones(new Shape(3, 32, 32)));
@@ -112,7 +115,8 @@ public class ResnetTest {
     }
 
     @Test
-    public void testLoadTrain() throws IOException, ModelNotFoundException {
+    public void testLoadTrain()
+            throws IOException, ModelNotFoundException, MalformedModelException {
         try (ZooModel<BufferedImage, Classification> model = getModel()) {
             TrainingConfig config =
                     new DefaultTrainingConfig(Initializer.ONES).setLoss(Loss.l1Loss());
@@ -135,7 +139,7 @@ public class ResnetTest {
     }
 
     private ZooModel<BufferedImage, Classification> getModel()
-            throws IOException, ModelNotFoundException {
+            throws IOException, ModelNotFoundException, MalformedModelException {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("numLayers", "50");
         criteria.put("dataset", "cifar10");

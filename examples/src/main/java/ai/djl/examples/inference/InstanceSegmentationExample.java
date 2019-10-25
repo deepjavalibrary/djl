@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference;
 
+import ai.djl.ModelException;
 import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.examples.util.MemoryUtils;
@@ -21,7 +22,6 @@ import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
@@ -41,7 +41,7 @@ public class InstanceSegmentationExample extends AbstractInference<DetectedObjec
 
     @Override
     protected DetectedObjects predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelNotFoundException, TranslateException {
+            throws IOException, ModelException, TranslateException {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 

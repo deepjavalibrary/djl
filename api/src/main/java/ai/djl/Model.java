@@ -86,8 +86,10 @@ public interface Model extends AutoCloseable {
      *
      * @param modelPath the directory or file path of the model location
      * @throws IOException IO exception happened in loading
+     * @throws MalformedModelException Exception thrown when model is not in expected format
+     *     (parameters).
      */
-    default void load(Path modelPath) throws IOException {
+    default void load(Path modelPath) throws IOException, MalformedModelException {
         load(modelPath, modelPath.toFile().getName(), null);
     }
 
@@ -97,8 +99,11 @@ public interface Model extends AutoCloseable {
      * @param modelPath the directory or file path of the model location
      * @param modelName model file name or assigned name
      * @throws IOException IO exception happened in loading
+     * @throws MalformedModelException Exception thrown when model is not in expected format
+     *     (parameters).
      */
-    default void load(Path modelPath, String modelName) throws IOException {
+    default void load(Path modelPath, String modelName)
+            throws IOException, MalformedModelException {
         load(modelPath, modelName, null);
     }
 
@@ -109,8 +114,11 @@ public interface Model extends AutoCloseable {
      * @param modelName model file name or assigned name
      * @param options engine specific load model options, see document for each engine
      * @throws IOException IO exception happened in loading
+     * @throws MalformedModelException Exception thrown when model is not in expected format
+     *     (parameters).
      */
-    void load(Path modelPath, String modelName, Map<String, String> options) throws IOException;
+    void load(Path modelPath, String modelName, Map<String, String> options)
+            throws IOException, MalformedModelException;
 
     /**
      * Saves the model to specified {@code modelPath} with the name provided.

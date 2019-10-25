@@ -13,6 +13,7 @@
 package ai.djl.nn;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -141,10 +142,11 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException {
         byte version = is.readByte();
         if (version != VERSION) {
-            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+            throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         for (Block block : blocks) {
             block.loadParameters(manager, is);

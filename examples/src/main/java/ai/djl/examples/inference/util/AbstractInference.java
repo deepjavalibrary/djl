@@ -13,11 +13,11 @@
 package ai.djl.examples.inference.util;
 
 import ai.djl.Device;
+import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.examples.util.ProgressBar;
 import ai.djl.metric.Metrics;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Utils;
 import java.io.IOException;
@@ -50,11 +50,11 @@ public abstract class AbstractInference<T> {
      * @param iteration number of prediction iteration to run
      * @return prediction result
      * @throws IOException if io error occurs when loading model.
-     * @throws ModelNotFoundException if specified model not found
+     * @throws ModelException if specified model not found or there is a parameter error
      * @throws TranslateException if error occurs when processing input or output
      */
     protected abstract T predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelNotFoundException, TranslateException;
+            throws IOException, ModelException, TranslateException;
 
     /**
      * Returns command line options.

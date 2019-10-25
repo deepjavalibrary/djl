@@ -13,6 +13,7 @@
 package ai.djl.examples.training.transferlearning;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.Cifar10;
 import ai.djl.examples.training.util.AbstractTraining;
@@ -82,11 +83,13 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
             if (arguments.getOutputDir() != null) {
                 model.save(Paths.get(arguments.getOutputDir()), "resnet");
             }
+        } catch (MalformedModelException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
     private Model getModel(boolean isSymbolic, boolean preTrained)
-            throws IOException, ModelNotFoundException {
+            throws IOException, ModelNotFoundException, MalformedModelException {
         if (isSymbolic) {
             // load the model
             Map<String, String> criteria = new ConcurrentHashMap<>();

@@ -13,6 +13,7 @@
 package ai.djl.nn.recurrent;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -125,10 +126,11 @@ public class RNN extends RecurrentCell {
     }
 
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException {
         byte version = is.readByte();
         if (version != VERSION) {
-            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+            throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         i2hWeight.load(manager, is);
         h2hWeight.load(manager, is);

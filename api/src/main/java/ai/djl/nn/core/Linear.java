@@ -13,6 +13,7 @@
 package ai.djl.nn.core;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -146,10 +147,11 @@ public class Linear extends ParameterBlock {
     }
 
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException {
         byte version = is.readByte();
         if (version != VERSION) {
-            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+            throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         inChannels = Shape.decode(is);
         inputShape = Shape.decode(is);

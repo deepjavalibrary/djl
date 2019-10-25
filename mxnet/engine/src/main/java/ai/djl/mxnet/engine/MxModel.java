@@ -13,6 +13,7 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
@@ -102,7 +103,7 @@ public class MxModel implements Model {
      */
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
-            throws IOException {
+            throws IOException, MalformedModelException {
         MxEngine engine = ((MxEngine) Engine.getEngine(MxEngine.ENGINE_NAME));
         // TODO: currently, most of the models are saved into non-numpy model
         // loading that way may cause problems. Wait MXNet 1.6fixes
@@ -324,7 +325,8 @@ public class MxModel implements Model {
     }
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")
-    private void loadParameters(String modelName, Map<String, String> options) throws IOException {
+    private void loadParameters(String modelName, Map<String, String> options)
+            throws IOException, MalformedModelException {
         Path paramFile;
         if (Files.isRegularFile(modelDir)) {
             paramFile = modelDir;
@@ -383,7 +385,7 @@ public class MxModel implements Model {
         logger.debug("MXNet Model loaded successfully");
     }
 
-    private boolean readParameters(Path paramFile) throws IOException {
+    private boolean readParameters(Path paramFile) throws IOException, MalformedModelException {
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(paramFile))) {
             byte[] buf = new byte[4];
             dis.readFully(buf);

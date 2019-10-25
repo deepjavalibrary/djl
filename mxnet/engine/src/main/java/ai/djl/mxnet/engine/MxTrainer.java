@@ -13,6 +13,7 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
+import ai.djl.TrainingDivergedException;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -176,6 +177,13 @@ public class MxTrainer implements Trainer {
         // TODO: this can be done during onBatch listener
         if (trainingLoss != null) {
             addMetric("train", trainingLoss);
+            NDArray loss = trainingLoss.getLastUpdate();
+            if (loss != null) {
+                NDArray result = loss.isNaN();
+                if (!result.all()) {
+                    throw new TrainingDivergedException("The Loss NDArray has NaNs");
+                }
+            }
         }
         trainingMetrics.forEach(metric -> addMetric("train", metric));
     }

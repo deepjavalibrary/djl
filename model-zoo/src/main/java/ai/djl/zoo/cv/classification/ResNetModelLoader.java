@@ -13,6 +13,7 @@
 package ai.djl.zoo.cv.classification;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.modality.Classification;
 import ai.djl.modality.cv.ImageClassificationTranslator;
@@ -64,7 +65,8 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Model loadModel(Artifact artifact, Path modelPath, Device device) throws IOException {
+    protected Model loadModel(Artifact artifact, Path modelPath, Device device)
+            throws IOException, MalformedModelException {
         Model model = Model.newInstance(device);
         Map<String, Object> arguments = artifact.getArguments();
         Builder blockBuilder =

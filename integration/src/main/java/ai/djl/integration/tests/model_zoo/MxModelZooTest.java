@@ -13,8 +13,8 @@
 package ai.djl.integration.tests.model_zoo;
 
 import ai.djl.Model;
+import ai.djl.ModelException;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,7 +36,7 @@ public class MxModelZooTest {
     }
 
     @Test
-    public void downloadActionRecognitionModels() throws IOException, ModelNotFoundException {
+    public void downloadActionRecognitionModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
             return;
         }
@@ -55,7 +55,7 @@ public class MxModelZooTest {
     }
 
     @Test
-    public void downloadMlpModels() throws IOException, ModelNotFoundException {
+    public void downloadMlpModels() throws IOException, ModelException {
         if (Boolean.getBoolean("offline")) {
             return;
         }
@@ -67,7 +67,7 @@ public class MxModelZooTest {
     }
 
     @Test
-    public void downloadResnetModels() throws IOException, ModelNotFoundException {
+    public void downloadResnetModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
             return;
         }
@@ -95,7 +95,7 @@ public class MxModelZooTest {
     }
 
     @Test
-    public void downloadResnextModels() throws IOException, ModelNotFoundException {
+    public void downloadResnextModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
             return;
         }
@@ -109,7 +109,7 @@ public class MxModelZooTest {
     }
 
     @Test
-    public void downloadSeResnextModels() throws IOException, ModelNotFoundException {
+    public void downloadSeResnextModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
             return;
         }
@@ -130,7 +130,7 @@ public class MxModelZooTest {
     }
 
     @Test
-    public void downloadSenetModels() throws IOException, ModelNotFoundException {
+    public void downloadSenetModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
             return;
         }
@@ -143,7 +143,7 @@ public class MxModelZooTest {
     }
 
     @Test
-    public void downloadMaskRcnnModels() throws IOException, ModelNotFoundException {
+    public void downloadMaskRcnnModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
             return;
         }
@@ -164,7 +164,7 @@ public class MxModelZooTest {
     }
 
     @Test
-    public void downloadSsdModels() throws IOException, ModelNotFoundException {
+    public void downloadSsdModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
             return;
         }
@@ -187,7 +187,7 @@ public class MxModelZooTest {
     }
 
     @Test
-    public void downloadSimplePoseModels() throws IOException, ModelNotFoundException {
+    public void downloadSimplePoseModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
             return;
         }

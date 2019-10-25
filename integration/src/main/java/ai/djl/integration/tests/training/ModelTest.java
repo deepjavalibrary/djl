@@ -13,6 +13,7 @@
 package ai.djl.integration.tests.training;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.types.DataType;
@@ -30,7 +31,7 @@ import org.testng.annotations.Test;
 public class ModelTest {
 
     @Test
-    public void testModelSaveAndLoad() throws IOException {
+    public void testModelSaveAndLoad() throws IOException, MalformedModelException {
         SequentialBlock block = new SequentialBlock();
         block.add(new Conv2D.Builder().setKernel(new Shape(1, 1)).setNumFilters(10).build());
         block.add(new BatchNorm.Builder().build());
