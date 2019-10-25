@@ -53,7 +53,7 @@
         },
         "symbol": {
           "uri": "0.0.1/resnet50_v2-symbol.json",
-          "sha1Hash": "5ee57cae8950388e88feceb853924dd0b1f1cb9e"
+          "sha1Hash": "ec0b80c19146a86b3f356ce051654832edfbe734"
         },
         "parameters": {
           "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet50_v2-0000.params.gz",
