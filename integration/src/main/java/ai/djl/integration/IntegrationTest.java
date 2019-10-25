@@ -25,13 +25,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -42,6 +39,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 public class IntegrationTest {
@@ -64,14 +65,12 @@ public class IntegrationTest {
             Arguments arguments = new Arguments(cmd);
 
             Duration duration = Duration.ofMinutes(arguments.getDuration());
-            int iteration = arguments.getIteration();
-
-            Map<Object, List<Method>> tests = listTests(arguments);
+            List<TestClass> tests = listTests(arguments);
 
             while (!duration.isNegative()) {
                 long begin = System.currentTimeMillis();
 
-                runTests(tests, iteration);
+                runTests(tests);
 
                 long delta = System.currentTimeMillis() - begin;
                 duration = duration.minus(Duration.ofMillis(delta));
@@ -90,34 +89,27 @@ public class IntegrationTest {
         return totalFailed == 0;
     }
 
-    private void runTests(Map<Object, List<Method>> tests, int iteration) {
+    private void runTests(List<TestClass> tests) {
         long totalMethodCount = 0;
-        for (Map.Entry<Object, List<Method>> entry : tests.entrySet()) {
-            Object testObject = entry.getKey();
-            String testClass = testObject.getClass().getName();
-            List<Method> methods = entry.getValue();
+        for (TestClass testClass : tests) {
+            logger.info("Running test {} ...", testClass.getName());
+            int testCount = testClass.getTestCount();
+            totalMethodCount += testCount;
 
-            logger.info("Running test {}, iteration: {}", testClass, iteration);
+            try {
+                if (!testClass.beforeClass()) {
+                    totalFailed += totalMethodCount;
+                    continue;
+                }
 
-            int failed = 0;
-            for (Method method : methods) {
-                // TODO: collect performance data
-                for (int i = 0; i < iteration; i++) {
-                    try {
-                        totalMethodCount++;
-                        method.invoke(testObject);
-                        logger.info("Test {}.{} PASSED", testClass, method.getName());
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        if (notExpected(method, e)) {
-                            logger.error("Test {}.{} FAILED", testClass, method.getName());
-                            logger.error("", e.getCause());
-                            ++failed;
-                        }
-                        break;
+                for (int i = 0; i < testCount; ++i) {
+                    if (!testClass.runTest(i)) {
+                        ++totalFailed;
                     }
                 }
+            } finally {
+                testClass.afterClass();
             }
-            totalFailed += failed;
         }
         if (totalFailed > 0) {
             logger.error("Failed {} out of {} tests", totalFailed, totalMethodCount);
@@ -126,66 +118,68 @@ public class IntegrationTest {
         }
     }
 
-    private static boolean notExpected(Method method, Exception e) {
-        Test test = method.getAnnotation(Test.class);
-        Class<?>[] exceptions = test.expectedExceptions();
-        if (exceptions.length > 0) {
-            Throwable exception = e.getCause();
-            for (Class<?> c : exceptions) {
-                if (c.isInstance(exception)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private static Map<Object, List<Method>> listTests(Arguments arguments) {
+    private static List<TestClass> listTests(Arguments arguments) {
         String className = arguments.getClassName();
         String methodName = arguments.getMethodName();
-        Map<Object, List<Method>> map = new LinkedHashMap<>(); // NOPMD
+        List<TestClass> tests = new ArrayList<>();
         try {
             if (className != null) {
-                if (!className.startsWith(PACKAGE_NAME)) {
-                    className = PACKAGE_NAME + className; // NOPMD
-                }
-                Class<?> clazz = Class.forName(className);
-                Constructor<?> ctor = clazz.getConstructor();
-                Object obj = ctor.newInstance();
-                if (methodName != null) {
-                    Method method = clazz.getDeclaredMethod(methodName);
-                    Test testMethod = method.getAnnotation(Test.class);
-                    if (testMethod != null && testMethod.enabled()) {
-                        map.put(obj, Collections.singletonList(method));
-                    } else {
-                        logger.error("Invalid method name: {}. Not a test.", methodName);
-                    }
+                Class<?> clazz;
+                if (className.startsWith(PACKAGE_NAME)) {
+                    clazz = Class.forName(className);
                 } else {
-                    map.put(obj, getTestsInClass(clazz));
+                    clazz = Class.forName(PACKAGE_NAME + className);
                 }
+                tests.add(getTestsInClass(clazz, methodName));
             } else {
                 List<Class<?>> classes = listTestClasses(IntegrationTest.class);
                 for (Class<?> clazz : classes) {
-                    Constructor<?> ctor = clazz.getConstructor();
-                    Object obj = ctor.newInstance();
-                    map.put(obj, getTestsInClass(clazz));
+                    tests.add(getTestsInClass(clazz, methodName));
                 }
             }
         } catch (ReflectiveOperationException | IOException e) {
             logger.error("Failed to resolve test class.", e);
         }
-        return map;
+        return tests;
     }
 
-    private static List<Method> getTestsInClass(Class<?> clazz) {
-        Method[] methods = clazz.getDeclaredMethods();
-        return Arrays.stream(methods)
-                .filter(
-                        o -> {
-                            Test testMethod = o.getAnnotation(Test.class);
-                            return testMethod != null && testMethod.enabled();
-                        })
-                .collect(Collectors.toList());
+    private static TestClass getTestsInClass(Class<?> clazz, String methodName)
+            throws ReflectiveOperationException {
+        Constructor<?> ctor = clazz.getConstructor();
+        Object obj = ctor.newInstance();
+        TestClass testClass = new TestClass(obj);
+
+        for (Method method : clazz.getDeclaredMethods()) {
+            Test testMethod = method.getAnnotation(Test.class);
+            if (testMethod != null) {
+                if (testMethod.enabled()
+                        && (methodName == null || methodName.equals(method.getName()))) {
+                    testClass.addTestMethod(method);
+                }
+                continue;
+            }
+            BeforeClass beforeClass = method.getAnnotation(BeforeClass.class);
+            if (beforeClass != null) {
+                testClass.addBeforeClass(method);
+                continue;
+            }
+            AfterClass afterClass = method.getAnnotation(AfterClass.class);
+            if (afterClass != null) {
+                testClass.addAfterClass(method);
+                continue;
+            }
+            BeforeTest beforeTest = method.getAnnotation(BeforeTest.class);
+            if (beforeTest != null) {
+                testClass.addBeforeTest(method);
+                continue;
+            }
+            AfterTest afterTest = method.getAnnotation(AfterTest.class);
+            if (afterTest != null) {
+                testClass.addAfterTest(method);
+            }
+        }
+
+        return testClass;
     }
 
     private static List<Class<?>> listTestClasses(Class<?> clazz)
@@ -240,5 +234,131 @@ public class IntegrationTest {
         }
 
         return classList;
+    }
+
+    private static final class TestClass {
+
+        private Object object;
+        private List<Method> testMethods;
+        private List<Method> beforeClass;
+        private List<Method> afterClass;
+        private List<Method> beforeTest;
+        private List<Method> afterTest;
+
+        public TestClass(Object object) {
+            this.object = object;
+            testMethods = new ArrayList<>();
+            beforeClass = new ArrayList<>();
+            afterClass = new ArrayList<>();
+            beforeTest = new ArrayList<>();
+            afterTest = new ArrayList<>();
+        }
+
+        public void addTestMethod(Method method) {
+            testMethods.add(method);
+        }
+
+        public void addBeforeClass(Method method) {
+            beforeClass.add(method);
+        }
+
+        public void addAfterClass(Method method) {
+            afterClass.add(method);
+        }
+
+        public void addBeforeTest(Method method) {
+            beforeTest.add(method);
+        }
+
+        public void addAfterTest(Method method) {
+            afterTest.add(method);
+        }
+
+        public boolean beforeClass() {
+            try {
+                for (Method method : beforeClass) {
+                    method.invoke(object);
+                }
+                return true;
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                logger.error("", e.getCause());
+            }
+            return false;
+        }
+
+        public void afterClass() {
+            try {
+                for (Method method : afterClass) {
+                    method.invoke(object);
+                }
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                logger.error("", e.getCause());
+            }
+        }
+
+        public boolean beforeTest() {
+            try {
+                for (Method method : beforeTest) {
+                    method.invoke(object);
+                }
+                return true;
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                logger.error("", e.getCause());
+            }
+            return false;
+        }
+
+        public void afterTest() {
+            try {
+                for (Method method : afterTest) {
+                    method.invoke(object);
+                }
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                logger.error("", e.getCause());
+            }
+        }
+
+        public boolean runTest(int index) {
+            if (!beforeTest()) {
+                return false;
+            }
+
+            Method method = testMethods.get(index);
+            try {
+                method.invoke(object);
+                logger.info("Test {}.{} PASSED", getName(), method.getName());
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                if (notExpected(method, e)) {
+                    logger.error("Test {}.{} FAILED", getName(), method.getName());
+                    logger.error("", e.getCause());
+                    return false;
+                }
+            } finally {
+                afterTest();
+            }
+            return true;
+        }
+
+        public int getTestCount() {
+            return testMethods.size();
+        }
+
+        public String getName() {
+            return object.getClass().getName();
+        }
+
+        private static boolean notExpected(Method method, Exception e) {
+            Test test = method.getAnnotation(Test.class);
+            Class<?>[] exceptions = test.expectedExceptions();
+            if (exceptions.length > 0) {
+                Throwable exception = e.getCause();
+                for (Class<?> c : exceptions) {
+                    if (c.isInstance(exception)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 }
