@@ -40,8 +40,18 @@ public class Pipeline {
         return this;
     }
 
+    public Pipeline add(int index, Transform transform) {
+        transforms.add(index, null, transform);
+        return this;
+    }
+
     public Pipeline add(String name, Transform transform) {
         transforms.add(name, transform);
+        return this;
+    }
+
+    public Pipeline add(int index, String name, Transform transform) {
+        transforms.add(index, name, transform);
         return this;
     }
 

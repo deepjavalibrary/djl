@@ -16,6 +16,7 @@ import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.awt.image.BufferedImage;
@@ -27,20 +28,17 @@ import java.awt.image.BufferedImage;
  */
 public abstract class ImageTranslator<T> implements Translator<BufferedImage, T> {
 
-    protected NDImageUtils.Flag flag;
-    private boolean centerCrop;
-    private int[] centerCropSize;
-    private int[] resize;
-    protected float[] normalizeMeans;
-    protected float[] normalizeStd;
+    private NDImageUtils.Flag flag;
+    private Pipeline pipeline;
 
     public ImageTranslator(BaseBuilder<?> builder) {
         flag = builder.flag;
-        centerCrop = builder.centerCrop;
-        centerCropSize = builder.centerCropSize;
-        resize = builder.resize;
-        normalizeMeans = builder.normalizeMeans;
-        normalizeStd = builder.normalizeStd;
+        pipeline = builder.pipeline;
+    }
+
+    @Override
+    public Pipeline getPipeline() {
+        return pipeline;
     }
 
     /**
@@ -52,70 +50,23 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
      */
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-        if (centerCrop) {
-            if (centerCropSize != null) {
-                input = BufferedImageUtils.centerCrop(input, centerCropSize[0], centerCropSize[1]);
-            } else {
-                input = BufferedImageUtils.centerCrop(input);
-            }
-        }
-        if (resize != null) {
-            input = BufferedImageUtils.resize(input, resize[0], resize[1]);
-        }
         NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), input, flag);
-        return new NDList(normalize(array.divi(255)));
-    }
-
-    /**
-     * Normalizes a pre-processed {@link NDArray}.
-     *
-     * <p>It's expected that the developer overrides this method to provide customized
-     * normalization.
-     *
-     * @param array pre-processed {@link NDArray}
-     * @return normalized NDArray
-     */
-    protected NDArray normalize(NDArray array) {
-        if (normalizeMeans != null && normalizeStd != null) {
-            array = NDImageUtils.normalize(array, normalizeMeans, normalizeStd);
-        }
-        return array;
+        return pipeline.transform(new NDList(array));
     }
 
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
         protected NDImageUtils.Flag flag = NDImageUtils.Flag.COLOR;
-        private boolean centerCrop;
-        private int[] centerCropSize;
-        private int[] resize;
-        protected float[] normalizeMeans;
-        protected float[] normalizeStd;
+        protected Pipeline pipeline;
 
         public T optFlag(NDImageUtils.Flag flag) {
             this.flag = flag;
             return self();
         }
 
-        public T optCenterCrop() {
-            centerCrop = true;
-            centerCropSize = null;
-            return self();
-        }
-
-        public T optCenterCrop(int height, int width) {
-            centerCropSize = new int[] {height, width};
-            return self();
-        }
-
-        public T optResize(int height, int width) {
-            resize = new int[] {height, width};
-            return self();
-        }
-
-        public T optNormalize(float[] normalizeMeans, float[] normalizeStd) {
-            this.normalizeMeans = normalizeMeans;
-            this.normalizeStd = normalizeStd;
+        public T setPipeline(Pipeline pipeline) {
+            this.pipeline = pipeline;
             return self();
         }
 

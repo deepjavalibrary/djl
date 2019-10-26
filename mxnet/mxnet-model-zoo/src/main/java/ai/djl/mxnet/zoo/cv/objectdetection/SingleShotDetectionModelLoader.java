@@ -13,6 +13,8 @@
 package ai.djl.mxnet.zoo.cv.objectdetection;
 
 import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
 import ai.djl.repository.Artifact;
@@ -21,6 +23,7 @@ import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -46,8 +49,11 @@ public class SingleShotDetectionModelLoader
         int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
         double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
 
+        Pipeline pipeline = new Pipeline();
+        pipeline.add(new Resize(height, width)).add(new ToTensor());
+
         return new SingleShotDetectionTranslator.Builder()
-                .optResize(height, width)
+                .setPipeline(pipeline)
                 .optThreshold((float) threshold)
                 .setSynsetArtifactName("classes.txt")
                 .build();

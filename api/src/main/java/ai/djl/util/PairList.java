@@ -92,6 +92,20 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
+     * Inserts the specified element at the specified position in this list (optional operation).
+     * Shifts the element currently at that position (if any) and any subsequent elements to the
+     * right (adds one to their indices).
+     *
+     * @param index index at which the specified element is to be inserted
+     * @param key the key
+     * @param value the value
+     */
+    public void add(int index, K key, V value) {
+        keys.add(index, key);
+        values.add(index, value);
+    }
+
+    /**
      * Adds key and value to the list.
      *
      * @param key the key

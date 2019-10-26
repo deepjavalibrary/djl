@@ -29,6 +29,6 @@ public class PoseEstimationExampleTest {
         List<Joints> result = test.getPredictResult();
         Joints current = result.get(0);
         Assert.assertEquals(result.size(), 3);
-        Assert.assertTrue(Double.compare(current.getJoints().get(0).getConfidence(), 0.7) > 0);
+        Assert.assertTrue(current.getJoints().get(0).getConfidence() > 0.6d);
     }
 }

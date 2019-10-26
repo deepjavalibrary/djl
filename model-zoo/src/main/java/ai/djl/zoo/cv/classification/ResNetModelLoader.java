@@ -16,6 +16,9 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.modality.Classification;
 import ai.djl.modality.cv.ImageClassificationTranslator;
+import ai.djl.modality.cv.transform.CenterCrop;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.repository.Anchor;
@@ -24,6 +27,7 @@ import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
+import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.zoo.ModelZoo;
 import ai.djl.zoo.cv.classification.ResNetV1.Builder;
@@ -46,9 +50,14 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
 
     @Override
     public Translator<BufferedImage, Classification> getTranslator(Artifact artifact) {
+        Map<String, Object> arguments = artifact.getArguments();
+        int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
+        int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
+
+        Pipeline pipeline = new Pipeline();
+        pipeline.add(new CenterCrop()).add(new Resize(height, width)).add(new ToTensor());
         return new ImageClassificationTranslator.Builder()
-                .optCenterCrop()
-                .optResize(224, 224)
+                .setPipeline(pipeline)
                 .setSynsetArtifactName("synset.txt")
                 .build();
     }

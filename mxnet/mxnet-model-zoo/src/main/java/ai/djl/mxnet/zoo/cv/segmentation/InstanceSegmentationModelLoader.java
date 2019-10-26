@@ -13,6 +13,8 @@
 package ai.djl.mxnet.zoo.cv.segmentation;
 
 import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
 import ai.djl.repository.Artifact;
@@ -20,6 +22,7 @@ import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
+import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 
@@ -37,10 +40,16 @@ public class InstanceSegmentationModelLoader
 
     @Override
     public Translator<BufferedImage, DetectedObjects> getTranslator(Artifact artifact) {
+        Pipeline pipeline = new Pipeline();
+        pipeline.add(new ToTensor())
+                .add(
+                        new Normalize(
+                                new float[] {0.485f, 0.456f, 0.406f},
+                                new float[] {0.229f, 0.224f, 0.225f}));
+
         return new InstanceSegmentationTranslator.Builder()
+                .setPipeline(pipeline)
                 .setSynsetArtifactName("classes.txt")
-                .optNormalize(
-                        new float[] {0.485f, 0.456f, 0.406f}, new float[] {0.229f, 0.224f, 0.225f})
                 .build();
     }
 }

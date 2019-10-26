@@ -14,10 +14,10 @@ package ai.djl.modality.cv.util;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.RandomUtils;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -53,85 +53,6 @@ public final class BufferedImageUtils {
         return ImageIO.read(path.toFile());
     }
 
-    /**
-     * Resizes the image with new width and height.
-     *
-     * @param image the input image
-     * @param newHeight the new height of the reshaped image
-     * @param newWidth the new width of the reshaped image
-     * @return reshaped {@link BufferedImage}
-     */
-    public static BufferedImage resize(BufferedImage image, int newHeight, int newWidth) {
-        BufferedImage resizedImage =
-                new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = resizedImage.createGraphics();
-        g.drawImage(image, 0, 0, newWidth, newHeight, null);
-        g.dispose();
-
-        return resizedImage;
-    }
-
-    public static BufferedImage centerCrop(BufferedImage img) {
-        int w = img.getWidth();
-        int h = img.getHeight();
-
-        if (w == h) {
-            return img;
-        }
-
-        if (w > h) {
-            return centerCrop(img, h, h);
-        }
-
-        return centerCrop(img, w, w);
-    }
-
-    public static BufferedImage centerCrop(BufferedImage img, int height, int width) {
-        BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-        int w = img.getWidth();
-        int h = img.getHeight();
-
-        int sx1;
-        int sx2;
-        int sy1;
-        int sy2;
-        int dx1;
-        int dx2;
-        int dy1;
-        int dy2;
-        int dw = (w - width) / 2;
-        if (dw > 0) {
-            sx1 = dw;
-            sx2 = sx1 + width;
-            dx1 = 0;
-            dx2 = width;
-        } else {
-            sx1 = 0;
-            sx2 = w;
-            dx1 = -dw;
-            dx2 = dx1 + w;
-        }
-        int dh = (h - height) / 2;
-        if (dh > 0) {
-            sy1 = dh;
-            sy2 = sy1 + height;
-            dy1 = 0;
-            dy2 = height;
-        } else {
-            sy1 = 0;
-            sy2 = h;
-            dy1 = -dh;
-            dy2 = dy1 + w;
-        }
-
-        Graphics2D g = ret.createGraphics();
-        g.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
-        g.dispose();
-
-        return ret;
-    }
-
     public static Color randomColor() {
         return new Color(RandomUtils.nextInt(255));
     }
@@ -143,7 +64,7 @@ public final class BufferedImageUtils {
      * @param image the buffered image to be converted
      * @return {@link FloatBuffer}
      */
-    public static FloatBuffer toFloatBuffer(NDManager manager, BufferedImage image) {
+    private static ByteBuffer toByteBuffer(NDManager manager, BufferedImage image) {
         // Get height and width of the image
         int width = image.getWidth();
         int height = image.getHeight();
@@ -152,21 +73,17 @@ public final class BufferedImageUtils {
         int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
 
         // 3 times height and width for R,G,B channels
-        ByteBuffer bb = manager.allocateDirect(4 * 3 * height * width);
-        FloatBuffer buf = bb.asFloatBuffer();
-        for (int row = 0; row < height; ++row) {
-            for (int col = 0; col < width; ++col) {
-                int rgb = pixels[row * width + col];
-
-                // getting red color
-                buf.put(row * width + col, (rgb >> 16) & 0xFF);
-                // getting green color
-                buf.put(height * width + row * width + col, (rgb >> 8) & 0xFF);
-                // getting blue color
-                buf.put(2 * height * width + row * width + col, rgb & 0xFF);
-            }
+        ByteBuffer bb = manager.allocateDirect(3 * height * width);
+        for (int rgb : pixels) {
+            // getting red color
+            bb.put((byte) (rgb >> 16));
+            // getting green color
+            bb.put((byte) (rgb >> 8));
+            // getting blue color
+            bb.put((byte) rgb);
         }
-        return buf;
+        bb.rewind();
+        return bb;
     }
 
     /**
@@ -192,7 +109,8 @@ public final class BufferedImageUtils {
             NDManager manager, BufferedImage image, NDImageUtils.Flag flag) {
         int width = image.getWidth();
         int height = image.getHeight();
-        NDArray rgb = manager.create(toFloatBuffer(manager, image), new Shape(3, height, width));
+        NDArray rgb = manager.create(new Shape(height, width, 3), DataType.UINT8);
+        rgb.set(toByteBuffer(manager, image));
         if (flag == NDImageUtils.Flag.COLOR) {
             return rgb;
         } else if (flag == NDImageUtils.Flag.GRAYSCALE) {
@@ -209,6 +127,6 @@ public final class BufferedImageUtils {
     public static NDArray readFileToArray(NDManager manager, Path path, NDImageUtils.Flag flag)
             throws IOException {
         BufferedImage image = fromFile(path);
-        return toNDArray(manager, image, flag);
+        return NDImageUtils.toTensor(toNDArray(manager, image, flag));
     }
 }

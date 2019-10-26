@@ -13,12 +13,14 @@
 package ai.djl.modality.cv.util;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.types.Shape;
 
 /**
  * {@code NDImageUtils} is an image processing utility that can load, reshape and convert images
  * using {@link NDArray} images.
  */
 public final class NDImageUtils {
+
     private NDImageUtils() {}
 
     public static NDArray resize(NDArray image, int size) {
@@ -51,6 +53,47 @@ public final class NDImageUtils {
 
     public static NDArray toTensor(NDArray image) {
         return image.getNDArrayInternal().toTensor();
+    }
+
+    public static NDArray centerCrop(NDArray image) {
+        Shape shape = image.getShape();
+        int w = (int) shape.get(1);
+        int h = (int) shape.get(0);
+
+        if (w == h) {
+            return image;
+        }
+
+        if (w > h) {
+            return centerCrop(image, h, h);
+        }
+
+        return centerCrop(image, w, w);
+    }
+
+    public static NDArray centerCrop(NDArray image, int height, int width) {
+        Shape shape = image.getShape();
+        int w = (int) shape.get(1);
+        int h = (int) shape.get(0);
+
+        int x;
+        int y;
+        int dw = (w - width) / 2;
+        int dh = (h - height) / 2;
+        if (dw > 0) {
+            x = dw;
+            w = width;
+        } else {
+            x = 0;
+        }
+        if (dh > 0) {
+            y = dh;
+            h = height;
+        } else {
+            y = 0;
+        }
+
+        return crop(image, y, x, h, w);
     }
 
     public static NDArray crop(NDArray image, int y, int x, int height, int width) {

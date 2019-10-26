@@ -13,6 +13,9 @@
 package ai.djl.mxnet.zoo.cv.poseestimation;
 
 import ai.djl.modality.cv.Joints;
+import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
 import ai.djl.repository.Artifact;
@@ -20,6 +23,7 @@ import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
+import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 import java.util.Map;
@@ -41,10 +45,14 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
         int width = ((Double) arguments.getOrDefault("width", 192d)).intValue();
         int height = ((Double) arguments.getOrDefault("height", 256d)).intValue();
 
-        return new SimplePoseTranslator.Builder()
-                .optResize(height, width)
-                .optNormalize(
-                        new float[] {0.485f, 0.456f, 0.406f}, new float[] {0.229f, 0.224f, 0.225f})
-                .build();
+        Pipeline pipeline = new Pipeline();
+        pipeline.add(new Resize(height, width))
+                .add(new ToTensor())
+                .add(
+                        new Normalize(
+                                new float[] {0.485f, 0.456f, 0.406f},
+                                new float[] {0.229f, 0.224f, 0.225f}));
+
+        return new SimplePoseTranslator.Builder().setPipeline(pipeline).build();
     }
 }

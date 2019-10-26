@@ -16,6 +16,10 @@ import ai.djl.ndarray.NDList;
 
 public interface PreProcessor<I> {
 
+    default Pipeline getPipeline() {
+        throw new UnsupportedOperationException("Not implemented.");
+    }
+
     /**
      * Processes the input and converts it to NDList.
      *

@@ -17,10 +17,12 @@ import ai.djl.modality.cv.BoundingBox;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.ImageTranslator;
 import ai.djl.modality.cv.Mask;
-import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.Pipeline;
+import ai.djl.translate.Transform;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
 import java.awt.image.BufferedImage;
@@ -28,7 +30,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObjects> {
+public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObjects>
+        implements Transform {
 
     private String synsetArtifactName;
     private float threshold;
@@ -47,10 +50,14 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
     }
 
     @Override
+    public NDArray transform(NDArray array) {
+        return resizeShort(array);
+    }
+
+    @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage image) {
-        image = resizeShort(image);
-        rescaledWidth = image.getWidth();
-        rescaledHeight = image.getHeight();
+        Pipeline pipeline = getPipeline();
+        pipeline.add(0, null, this);
         return super.processInput(ctx, image);
     }
 
@@ -103,22 +110,23 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
     /**
      * resize the image based on the shorter edge or maximum edge length.
      *
-     * @param img the input image
+     * @param image the input image
      * @return resized image
      */
-    private BufferedImage resizeShort(BufferedImage img) {
-        int height = img.getHeight();
-        int width = img.getWidth();
+    private NDArray resizeShort(NDArray image) {
+        Shape shape = image.getShape();
+        int width = (int) shape.get(1);
+        int height = (int) shape.get(0);
         int min = Math.min(height, width);
         int max = Math.max(height, width);
         float scale = shortEdge / (float) min;
         if (Math.round(scale * max) > maxEdge) {
             scale = maxEdge / (float) max;
         }
-        height = Math.round(height * scale);
-        width = Math.round(width * scale);
+        rescaledHeight = Math.round(height * scale);
+        rescaledWidth = Math.round(width * scale);
 
-        return BufferedImageUtils.resize(img, height, width);
+        return NDImageUtils.resize(image, rescaledHeight, rescaledWidth);
     }
 
     public static class Builder extends BaseBuilder<Builder> {
