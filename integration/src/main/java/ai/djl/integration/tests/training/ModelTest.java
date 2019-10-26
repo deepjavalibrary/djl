@@ -44,11 +44,11 @@ public class ModelTest {
                     new Shape[] {new Shape(1, 3, 32, 32)});
             ParameterList savedParameters = block.getParameters();
             saveModel.setBlock(block);
-            saveModel.save(Paths.get("src/test/resources/models"), "saveAndLoad");
+            saveModel.save(Paths.get("build/tmp/test/models"), "saveAndLoad");
             block.clear();
 
             loadModel.setBlock(block);
-            loadModel.load(Paths.get("src/test/resources/models"), "saveAndLoad");
+            loadModel.load(Paths.get("build/tmp/test/models"), "saveAndLoad");
             ParameterList loadedParameters = loadModel.getBlock().getParameters();
             compareParameters(savedParameters, loadedParameters);
         }
