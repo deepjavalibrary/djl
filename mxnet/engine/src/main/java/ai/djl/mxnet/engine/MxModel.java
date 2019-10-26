@@ -146,7 +146,7 @@ public class MxModel implements Model {
         int epoch = Utils.getCurrentEpoch(modelPath, modelName) + 1;
         Path paramFile = modelPath.resolve(String.format("%s-%04d.params", modelName, epoch));
         try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(paramFile))) {
-            dos.writeBytes("JOUL");
+            dos.writeBytes("DJL@");
             dos.writeInt(MODEL_VERSION);
             dos.writeUTF(modelName);
             dos.writeUTF(dataType.name());
@@ -387,7 +387,7 @@ public class MxModel implements Model {
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(paramFile))) {
             byte[] buf = new byte[4];
             dis.readFully(buf);
-            if (!"JOUL".equals(new String(buf, StandardCharsets.US_ASCII))) {
+            if (!"DJL@".equals(new String(buf, StandardCharsets.US_ASCII))) {
                 return false;
             }
 
