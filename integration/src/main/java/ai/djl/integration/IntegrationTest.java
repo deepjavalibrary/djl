@@ -13,7 +13,6 @@
 package ai.djl.integration;
 
 import ai.djl.integration.util.Arguments;
-import ai.djl.mxnet.jna.JnaUtils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -83,8 +82,6 @@ public class IntegrationTest {
         } catch (Throwable t) {
             logger.error("Unexpected error", t);
         }
-
-        JnaUtils.waitAll(); // workaround MXNet crash
 
         return totalFailed == 0;
     }

@@ -307,6 +307,8 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public void close() {
+        // TODO workaround for MXNet Engine crash issue
+        JnaUtils.waitAll();
         manager.close();
     }
 

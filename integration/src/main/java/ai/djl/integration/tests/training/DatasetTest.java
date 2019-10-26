@@ -26,6 +26,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.BatchSampler;
+import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomSampler;
 import ai.djl.training.dataset.SequenceSampler;
 import ai.djl.training.initializer.Initializer;
@@ -242,8 +243,7 @@ public class DatasetTest {
         }
     }
 
-    // this is just to demonstrate how multithreading dataloader will look like
-    @Test(enabled = false)
+    @Test
     public void testMultithreading() throws IOException, InterruptedException {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
@@ -251,7 +251,7 @@ public class DatasetTest {
 
             ExecutorService executor =
                     Executors.newFixedThreadPool(
-                            2,
+                            10,
                             r ->
                                     new Thread( // NOPMD
                                             () -> {
@@ -264,6 +264,7 @@ public class DatasetTest {
                     new Cifar10.Builder()
                             .setManager(manager)
                             .setRandomSampling(100)
+                            .setUsage(Dataset.Usage.TEST)
                             // you could start trying prefetchNumber with 2 * number of threads.
                             // This number should be adjusted based on your machines and data.
                             .optExcutor(executor, 4)
