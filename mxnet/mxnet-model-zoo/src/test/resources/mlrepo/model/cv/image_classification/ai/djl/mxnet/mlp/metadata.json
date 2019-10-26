@@ -20,7 +20,15 @@
       "properties": {
         "dataset": "mnist"
       },
+      "arguments": {
+        "width": 28,
+        "height": 28
+      },
       "files": {
+        "synset": {
+          "uri": "synset.txt",
+          "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1"
+        },
         "symbol": {
           "uri": "0.0.1/mlp-symbol.json",
           "sha1Hash": "1660b18b452226e4f550f3de7164b51d1f798ab6"

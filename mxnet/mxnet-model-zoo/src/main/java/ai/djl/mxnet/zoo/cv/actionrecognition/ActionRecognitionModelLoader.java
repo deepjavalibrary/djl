@@ -14,17 +14,18 @@ package ai.djl.mxnet.zoo.cv.actionrecognition;
 
 import ai.djl.modality.Classification;
 import ai.djl.modality.cv.ImageClassificationTranslator;
-import ai.djl.mxnet.zoo.BaseSymbolModelLoader;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
-public class ActionRecognitionModelLoader
-        extends BaseSymbolModelLoader<BufferedImage, Classification> {
+public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage, Classification> {
 
     private static final Anchor BASE_ANCHOR = CV.ACTION_RECOGNITION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -36,9 +37,14 @@ public class ActionRecognitionModelLoader
     }
 
     @Override
-    public Translator<BufferedImage, Classification> getTranslator() {
+    public Translator<BufferedImage, Classification> getTranslator(Artifact artifact) {
+        Map<String, Object> arguments = artifact.getArguments();
+        // 299 is the minimum length for inception, 224 for vgg
+        int width = ((Double) arguments.getOrDefault("width", 299d)).intValue();
+        int height = ((Double) arguments.getOrDefault("height", 299d)).intValue();
+
         return new ImageClassificationTranslator.Builder()
-                .optResize(299, 299) // 299 is the minimum length for inception, 224 for vgg
+                .optResize(height, width)
                 .optNormalize(
                         new float[] {0.485f, 0.456f, 0.406f}, new float[] {0.229f, 0.224f, 0.225f})
                 .setSynsetArtifactName("classes.txt")

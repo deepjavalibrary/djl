@@ -14,7 +14,7 @@ package ai.djl.mxnet.zoo.cv.classification;
 
 import ai.djl.repository.Repository;
 
-public class Mlp extends ImageNetBaseModelLoader {
+public class Mlp extends ImageClassificationModelLoader {
 
     private static final String ARTIFACT_ID = "mlp";
     private static final String VERSION = "0.0.1";

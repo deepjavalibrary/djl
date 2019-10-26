@@ -39,7 +39,7 @@ public abstract class BaseModelLoader<I, O> {
         this.version = version;
     }
 
-    public abstract Translator<I, O> getTranslator();
+    public abstract Translator<I, O> getTranslator(Artifact artifact);
 
     private Metadata getMetadata() throws IOException, ModelNotFoundException {
         if (metadata == null) {
@@ -67,7 +67,7 @@ public abstract class BaseModelLoader<I, O> {
         String relativePath = artifact.getResourceUri().getPath();
         Path modelPath = dir.resolve(relativePath);
         Model model = loadModel(artifact, modelPath, device);
-        return new ZooModel<>(model, getTranslator());
+        return new ZooModel<>(model, getTranslator(artifact));
     }
 
     protected Model loadModel(Artifact artifact, Path modelPath, Device device) throws IOException {

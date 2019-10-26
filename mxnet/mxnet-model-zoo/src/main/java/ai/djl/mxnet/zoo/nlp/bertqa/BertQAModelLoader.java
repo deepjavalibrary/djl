@@ -12,15 +12,16 @@
  */
 package ai.djl.mxnet.zoo.nlp.bertqa;
 
-import ai.djl.mxnet.zoo.BaseSymbolModelLoader;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.NLP;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Translator;
 
-public class BertQAModelLoader extends BaseSymbolModelLoader<QAInput, String> {
+public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
 
     private static final Anchor BASE_ANCHOR = NLP.BERTQA;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -32,7 +33,7 @@ public class BertQAModelLoader extends BaseSymbolModelLoader<QAInput, String> {
     }
 
     @Override
-    public Translator<QAInput, String> getTranslator() {
+    public Translator<QAInput, String> getTranslator(Artifact artifact) {
         return new BertQATranslator();
     }
 }

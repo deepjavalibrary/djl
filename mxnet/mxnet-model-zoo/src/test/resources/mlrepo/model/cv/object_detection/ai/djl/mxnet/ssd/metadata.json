@@ -23,6 +23,11 @@
         "flavor": "none",
         "dataset": "voc"
       },
+      "arguments": {
+        "width": 512,
+        "height": 512,
+        "threshold": 0.2
+      },
       "files": {
         "classes": {
           "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
@@ -49,6 +54,11 @@
         "backbone": "vgg16",
         "flavor": "atrous",
         "dataset": "coco"
+      },
+      "arguments": {
+        "width": 512,
+        "height": 512,
+        "threshold": 0.2
       },
       "files": {
         "classes": {

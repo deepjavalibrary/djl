@@ -13,16 +13,18 @@
 package ai.djl.mxnet.zoo.cv.poseestimation;
 
 import ai.djl.modality.cv.Joints;
-import ai.djl.mxnet.zoo.BaseSymbolModelLoader;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
-public class SimplePoseModelLoader extends BaseSymbolModelLoader<BufferedImage, Joints> {
+public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints> {
 
     private static final Anchor BASE_ANCHOR = CV.POSE_ESTIMATION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -34,9 +36,13 @@ public class SimplePoseModelLoader extends BaseSymbolModelLoader<BufferedImage, 
     }
 
     @Override
-    public Translator<BufferedImage, Joints> getTranslator() {
+    public Translator<BufferedImage, Joints> getTranslator(Artifact artifact) {
+        Map<String, Object> arguments = artifact.getArguments();
+        int width = ((Double) arguments.getOrDefault("width", 192d)).intValue();
+        int height = ((Double) arguments.getOrDefault("height", 256d)).intValue();
+
         return new SimplePoseTranslator.Builder()
-                .optResize(256, 192)
+                .optResize(height, width)
                 .optNormalize(
                         new float[] {0.485f, 0.456f, 0.406f}, new float[] {0.229f, 0.224f, 0.225f})
                 .build();

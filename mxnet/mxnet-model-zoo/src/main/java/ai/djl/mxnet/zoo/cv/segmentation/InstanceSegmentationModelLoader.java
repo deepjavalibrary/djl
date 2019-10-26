@@ -13,17 +13,18 @@
 package ai.djl.mxnet.zoo.cv.segmentation;
 
 import ai.djl.modality.cv.DetectedObjects;
-import ai.djl.mxnet.zoo.BaseSymbolModelLoader;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 
 public class InstanceSegmentationModelLoader
-        extends BaseSymbolModelLoader<BufferedImage, DetectedObjects> {
+        extends BaseModelLoader<BufferedImage, DetectedObjects> {
 
     private static final Anchor BASE_ANCHOR = CV.INSTANCE_SEGMENTATION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -35,7 +36,7 @@ public class InstanceSegmentationModelLoader
     }
 
     @Override
-    public Translator<BufferedImage, DetectedObjects> getTranslator() {
+    public Translator<BufferedImage, DetectedObjects> getTranslator(Artifact artifact) {
         return new InstanceSegmentationTranslator.Builder()
                 .setSynsetArtifactName("classes.txt")
                 .optNormalize(

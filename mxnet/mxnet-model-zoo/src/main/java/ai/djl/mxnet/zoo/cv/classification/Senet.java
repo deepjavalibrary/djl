@@ -14,7 +14,7 @@ package ai.djl.mxnet.zoo.cv.classification;
 
 import ai.djl.repository.Repository;
 
-public class Senet extends ImageNetBaseModelLoader {
+public class Senet extends ImageClassificationModelLoader {
 
     private static final String ARTIFACT_ID = "senet";
     private static final String VERSION = "0.0.1";

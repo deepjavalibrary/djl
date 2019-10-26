@@ -22,6 +22,10 @@
         "flavor": "v1b",
         "dataset": "imagenet"
       },
+      "arguments": {
+        "width": 192,
+        "height": 256
+      },
       "files": {
         "symbol": {
           "uri": "0.0.1/simple_pose_resnet18_v1b-symbol.json",
@@ -41,6 +45,10 @@
         "backbone": "resnet50",
         "flavor": "v1b",
         "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 192,
+        "height": 256
       },
       "files": {
         "symbol": {
@@ -62,6 +70,10 @@
         "flavor": "v1d",
         "dataset": "imagenet"
       },
+      "arguments": {
+        "width": 192,
+        "height": 256
+      },
       "files": {
         "symbol": {
           "uri": "0.0.1/simple_pose_resnet101_v1d-symbol.json",
@@ -82,6 +94,10 @@
         "flavor": "v1b",
         "dataset": "imagenet"
       },
+      "arguments": {
+        "width": 192,
+        "height": 256
+      },
       "files": {
         "symbol": {
           "uri": "0.0.1/simple_pose_resnet152_v1b-symbol.json",
@@ -101,6 +117,10 @@
         "backbone": "resnet152",
         "flavor": "v1d",
         "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 192,
+        "height": 256
       },
       "files": {
         "symbol": {

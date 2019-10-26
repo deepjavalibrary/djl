@@ -14,7 +14,7 @@ package ai.djl.mxnet.zoo.cv.classification;
 
 import ai.djl.repository.Repository;
 
-public class Resnext extends ImageNetBaseModelLoader {
+public class Resnext extends ImageClassificationModelLoader {
 
     private static final String ARTIFACT_ID = "resnext";
     private static final String VERSION = "0.0.1";

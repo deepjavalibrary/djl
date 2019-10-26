@@ -86,6 +86,9 @@ public class Artifact {
     }
 
     public Map<String, String> getProperties() {
+        if (properties == null) {
+            return Collections.emptyMap();
+        }
         return properties;
     }
 
@@ -94,6 +97,9 @@ public class Artifact {
     }
 
     public Map<String, Object> getArguments() {
+        if (arguments == null) {
+            return Collections.emptyMap();
+        }
         return arguments;
     }
 

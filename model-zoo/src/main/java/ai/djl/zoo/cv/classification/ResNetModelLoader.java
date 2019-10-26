@@ -45,7 +45,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
     }
 
     @Override
-    public Translator<BufferedImage, Classification> getTranslator() {
+    public Translator<BufferedImage, Classification> getTranslator(Artifact artifact) {
         return new ImageClassificationTranslator.Builder()
                 .optCenterCrop()
                 .optResize(224, 224)

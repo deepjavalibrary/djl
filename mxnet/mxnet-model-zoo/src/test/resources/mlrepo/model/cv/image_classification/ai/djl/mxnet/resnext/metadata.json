@@ -22,6 +22,10 @@
         "flavor": "64x4d",
         "dataset": "imagenet"
       },
+      "arguments": {
+        "width": 224,
+        "height": 224
+      },
       "files": {
         "synset": {
           "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/synset.txt",

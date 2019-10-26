@@ -21,6 +21,10 @@
         "backbone": "vgg16",
         "dataset": "ucf101"
       },
+      "arguments": {
+        "width": 224,
+        "height": 224
+      },
       "files": {
         "classes": {
           "uri": "classes.txt",
@@ -43,6 +47,10 @@
       "properties": {
         "backbone": "inceptionv3",
         "dataset": "ucf101"
+      },
+      "arguments": {
+        "width": 299,
+        "height": 299
       },
       "files": {
         "classes": {

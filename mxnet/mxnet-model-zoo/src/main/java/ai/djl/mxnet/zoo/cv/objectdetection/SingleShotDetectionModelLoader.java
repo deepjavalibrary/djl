@@ -13,13 +13,13 @@
 package ai.djl.mxnet.zoo.cv.objectdetection;
 
 import ai.djl.modality.cv.DetectedObjects;
-import ai.djl.mxnet.zoo.BaseSymbolModelLoader;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SingleShotDetectionModelLoader
-        extends BaseSymbolModelLoader<BufferedImage, DetectedObjects> {
+        extends BaseModelLoader<BufferedImage, DetectedObjects> {
 
     private static final Anchor BASE_ANCHOR = CV.OBJECT_DETECTION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -40,9 +40,15 @@ public class SingleShotDetectionModelLoader
     }
 
     @Override
-    public Translator<BufferedImage, DetectedObjects> getTranslator() {
+    public Translator<BufferedImage, DetectedObjects> getTranslator(Artifact artifact) {
+        Map<String, Object> arguments = artifact.getArguments();
+        int width = ((Double) arguments.getOrDefault("width", 512d)).intValue();
+        int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
+        double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
+
         return new SingleShotDetectionTranslator.Builder()
-                .optResize(512, 512)
+                .optResize(height, width)
+                .optThreshold((float) threshold)
                 .setSynsetArtifactName("classes.txt")
                 .build();
     }
