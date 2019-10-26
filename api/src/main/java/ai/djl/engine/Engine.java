@@ -47,7 +47,7 @@ public abstract class Engine {
         }
 
         if (list.isEmpty()) {
-            throw new EngineException("No deep learning engine found in class path.");
+            return null;
         }
 
         if (list.size() > 1) {
@@ -72,6 +72,9 @@ public abstract class Engine {
      * @return instance of {@code Engine}
      */
     public static Engine getInstance() {
+        if (ENGINE == null) {
+            throw new EngineException("No deep learning engine found in class path.");
+        }
         return ENGINE;
     }
 
