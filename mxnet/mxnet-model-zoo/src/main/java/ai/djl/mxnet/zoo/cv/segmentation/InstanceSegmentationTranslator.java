@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InstanceSegementationTranslator extends ImageTranslator<DetectedObjects> {
+public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObjects> {
 
     private String synsetArtifactName;
     private float threshold;
@@ -38,7 +38,7 @@ public class InstanceSegementationTranslator extends ImageTranslator<DetectedObj
     private int rescaledWidth;
     private int rescaledHeight;
 
-    public InstanceSegementationTranslator(Builder builder) {
+    public InstanceSegmentationTranslator(Builder builder) {
         super(builder);
         synsetArtifactName = builder.synsetArtifactName;
         this.threshold = builder.threshold;
@@ -153,11 +153,11 @@ public class InstanceSegementationTranslator extends ImageTranslator<DetectedObj
             return this;
         }
 
-        public InstanceSegementationTranslator build() {
+        public InstanceSegmentationTranslator build() {
             if (synsetArtifactName == null) {
                 throw new IllegalArgumentException("You must specify a synset artifact name");
             }
-            return new InstanceSegementationTranslator(this);
+            return new InstanceSegmentationTranslator(this);
         }
     }
 }

@@ -36,7 +36,7 @@ public class InstanceSegmentationModelLoader
 
     @Override
     public Translator<BufferedImage, DetectedObjects> getTranslator() {
-        return new InstanceSegementationTranslator.Builder()
+        return new InstanceSegmentationTranslator.Builder()
                 .setSynsetArtifactName("classes.txt")
                 .optNormalize(
                         new float[] {0.485f, 0.456f, 0.406f}, new float[] {0.229f, 0.224f, 0.225f})

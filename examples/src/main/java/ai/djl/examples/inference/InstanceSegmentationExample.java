@@ -33,10 +33,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
 
-public class InstanceSegementationExample extends AbstractInference<DetectedObjects> {
+public class InstanceSegmentationExample extends AbstractInference<DetectedObjects> {
 
     public static void main(String[] args) {
-        new InstanceSegementationExample().runExample(args);
+        new InstanceSegmentationExample().runExample(args);
     }
 
     @Override

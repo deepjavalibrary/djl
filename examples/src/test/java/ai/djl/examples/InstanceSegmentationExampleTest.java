@@ -12,7 +12,7 @@
  */
 package ai.djl.examples;
 
-import ai.djl.examples.inference.InstanceSegementationExample;
+import ai.djl.examples.inference.InstanceSegmentationExample;
 import ai.djl.modality.cv.DetectedObjects;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -25,7 +25,7 @@ public class InstanceSegmentationExampleTest {
             "-i", "src/test/resources/segmentation.jpg", "-c", "1", "-l", "build/logs"
         };
 
-        InstanceSegementationExample test = new InstanceSegementationExample();
+        InstanceSegmentationExample test = new InstanceSegmentationExample();
         Assert.assertTrue(test.runExample(args));
         DetectedObjects result = test.getPredictResult();
         DetectedObjects.Item best = result.best();
