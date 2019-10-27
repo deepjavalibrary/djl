@@ -68,7 +68,7 @@ public class LocalRepository extends AbstractRepository {
         if (artifacts.isEmpty()) {
             return null;
         }
-        // TODO: find hightest version.
+        // TODO: find highest version.
         return artifacts.get(0);
     }
 }

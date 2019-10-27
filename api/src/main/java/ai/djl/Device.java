@@ -44,7 +44,7 @@ public class Device {
     /**
      * Returns device type of the Device.
      *
-     * @return device type of the Devicejk
+     * @return device type of the Device
      */
     public String getDeviceType() {
         return deviceType;

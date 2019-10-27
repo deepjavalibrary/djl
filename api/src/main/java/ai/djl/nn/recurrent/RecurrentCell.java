@@ -164,7 +164,7 @@ public abstract class RecurrentCell extends ParameterBlock {
          * @param useBidirectional Whether to use bidirectional recurrent layers
          * @return Returns this Builder
          */
-        public T setBirectional(boolean useBidirectional) {
+        public T setBidrectional(boolean useBidirectional) {
             this.useBidirectional = useBidirectional;
             return self();
         }

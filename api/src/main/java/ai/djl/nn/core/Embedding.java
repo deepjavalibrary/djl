@@ -217,8 +217,7 @@ public class Embedding<T> extends ParameterBlock {
         /**
          * Sets the collection of items that should feature embeddings.
          *
-         * @param items A collection containing all the items that embedddings should be created
-         *     for.
+         * @param items A collection containing all the items that embeddings should be created for.
          * @return Returns this Builder
          */
         public Builder<T> setItems(Collection<T> items) {

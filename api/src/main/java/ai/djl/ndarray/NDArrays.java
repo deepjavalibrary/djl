@@ -329,7 +329,7 @@ public final class NDArrays {
     }
 
     /**
-     * Adds {@link NDArray}s elementwise with broadcasting.
+     * Adds {@link NDArray}s element-wise with broadcasting.
      *
      * @param arrays the arrays to add together
      * @return the result of the addition
@@ -398,7 +398,7 @@ public final class NDArrays {
     }
 
     /**
-     * Multiplies {@link NDArray}s elementwise with broadcasting.
+     * Multiplies {@link NDArray}s element-wise with broadcasting.
      *
      * @param arrays the arrays to multiply together
      * @return the result of the multiplication
@@ -534,7 +534,7 @@ public final class NDArrays {
     }
 
     /**
-     * Adds {@link NDArray}s elementwise with broadcasting.
+     * Adds {@link NDArray}s element-wise with broadcasting.
      *
      * @param arrays the arrays to add together
      * @return the result of the addition
@@ -603,7 +603,7 @@ public final class NDArrays {
     }
 
     /**
-     * Multiplies {@link NDArray}s in place elementwise with broadcasting.
+     * Multiplies {@link NDArray}s in place element-wise with broadcasting.
      *
      * @param arrays the arrays to multiply together
      * @return the result of the multiplication

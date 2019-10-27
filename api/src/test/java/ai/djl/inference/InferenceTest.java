@@ -48,7 +48,7 @@ public class InferenceTest {
     }
 
     @Test
-    public void testObjectDection() throws IOException, TranslateException {
+    public void testObjectDetection() throws IOException, TranslateException {
         Path modelDir = Paths.get("build/model");
         String modelName = "mockModel";
 
@@ -106,7 +106,7 @@ public class InferenceTest {
     }
 
     @Test(expectedExceptions = TranslateException.class)
-    public void testTranslatException() throws TranslateException {
+    public void testTranslateException() throws TranslateException {
         EchoTranslator<String> translator = new EchoTranslator<>();
         translator.setInputException(new TranslateException("Some exception"));
         Model model = new MockModel();

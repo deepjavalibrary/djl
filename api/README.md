@@ -10,7 +10,7 @@ This module is core API of the djl.ai project. It include the following packages
 - metric - Metrics toolkit for benchmark purpose
 - modality - Contains CV and NLP toolkit
 - ndarray - NDArray data structure and tools
-- nn - Blocks containing common Nerual Network functions
+- nn - Blocks containing common Neural Network functions
 - training - The module used for training
 
 

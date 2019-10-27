@@ -21,7 +21,7 @@ public class TrainResNetTest {
 
     @Test
     public void testTrainResNet() {
-        // Limit max 4 gpu for cinfar10 training to make it converge faster.
+        // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
         String[] args = {"-e", "2", "-g", "4", "-m", "10", "-s", "-p"};
 

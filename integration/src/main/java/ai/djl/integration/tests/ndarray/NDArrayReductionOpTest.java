@@ -148,8 +148,8 @@ public class NDArrayReductionOpTest {
             Assert.assertEquals(meanAxesActual, meanAxes, "Incorrect mean axes");
 
             NDArray meanKeep = array.mean(new int[] {0}, true);
-            NDArray meanKeepActaul = manager.create(new float[] {4f, 6f}, new Shape(1, 2));
-            Assert.assertEquals(meanKeepActaul, meanKeep, "Incorrect mean keep");
+            NDArray meanKeepActual = manager.create(new float[] {4f, 6f}, new Shape(1, 2));
+            Assert.assertEquals(meanKeepActual, meanKeep, "Incorrect mean keep");
 
             // scalar
             array = manager.create(5f);
