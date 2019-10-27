@@ -112,6 +112,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     public PairList<String, Shape> describeInput() {
         PairList<String, Shape> inputData = new PairList<>();
         for (String name : inputNames) {
+            // TODO: Save pre-trained input data shape
             inputData.add(name, new Shape());
         }
         return inputData;
