@@ -56,8 +56,8 @@ public class Adam extends Optimizer {
                 new NDList(
                         weight,
                         grad,
-                        means.computeIfAbsent(parameterId, k -> weight.zerosLike()),
-                        variances.computeIfAbsent(parameterId, k -> weight.zerosLike()));
+                        withDefaultState(means, parameterId, k -> weight.zerosLike()),
+                        withDefaultState(variances, parameterId, k -> weight.zerosLike()));
         NDList weights = new NDList(weight);
 
         NDArrayEx ex = weight.getNDArrayInternal();

@@ -15,6 +15,7 @@ package ai.djl.training.optimizer;
 import ai.djl.ndarray.NDArray;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /** MXNet helper containing base implementations for optimizers. */
 public abstract class Optimizer {
@@ -64,6 +65,21 @@ public abstract class Optimizer {
 
     // TODO: make this protected after integrate with PS store
     public abstract void update(String parameterId, NDArray weight, NDArray grad);
+
+    protected NDArray withDefaultState(
+            Map<String, NDArray> state, String key, Function<String, NDArray> defaultFunction) {
+        return state.computeIfAbsent(
+                key,
+                k -> {
+                    NDArray s = defaultFunction.apply(k);
+                    s.detach(); // s is detached because it would be put into the optimizer
+                    // callback manager and closed after the optimizer callback
+                    // when using the MxParameterServer. For now, this will let it be closed by the
+                    // GC when the optimizer is out of scope. Ideally, it should be put into the
+                    // trainer manager instead.
+                    return s;
+                });
+    }
 
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {

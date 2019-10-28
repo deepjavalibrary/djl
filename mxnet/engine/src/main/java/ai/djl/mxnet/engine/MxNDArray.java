@@ -53,6 +53,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     private MxNDManager manager;
     private MxNDArrayEx mxNDArrayEx;
 
+    // Whether the NDArray should be freed on closing. Used for callbacks like kvstore update
+    private boolean shouldFree = true;
+
     MxNDArray(MxNDManager manager, Pointer handle, Device device, Shape shape, DataType dataType) {
         this(manager, handle);
         this.device = device;
@@ -161,6 +164,18 @@ public class MxNDArray extends NativeResource implements NDArray {
             throw new IllegalStateException("NDArray is not a matrix");
         }
         return new MxMatrix(this);
+    }
+
+    /**
+     * Sets whether to free the MxNDArray when it is closed.
+     *
+     * <p>It should not be freed in cases such as MxParameterServer optimizer callback where the
+     * NDArray is merely intended to be read, not freed.
+     *
+     * @param shouldFree True if the MxNDArray should be freed on close
+     */
+    public void setShouldFree(boolean shouldFree) {
+        this.shouldFree = shouldFree;
     }
 
     /**
@@ -1684,6 +1699,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void close() {
+        if (!shouldFree) {
+            return;
+        }
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
             // TODO: remove after fixing multi-thread data loading issue

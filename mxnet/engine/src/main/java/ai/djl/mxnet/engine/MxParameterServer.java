@@ -80,13 +80,13 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         @Override
         public void apply(String parameterId, Pointer recv, Pointer local, Pointer handle) {
             // updater callback arguments order is: index, gradient, weight.
-            MxNDManager manager = MxNDManager.getSystemManager();
-            NDArray grad = manager.create(recv);
-            NDArray weight = manager.create(local);
-            optimizer.update(parameterId, weight, grad);
-            // Above NDArrays should not be closed here.
-            // TODO: avoid call JnaUtils.freeNdArray for above NDArrays
-            //      and confirm these handle will be closed by MXNet engine.
+            try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager()) {
+                MxNDArray grad = manager.create(recv);
+                MxNDArray weight = manager.create(local);
+                grad.setShouldFree(false);
+                weight.setShouldFree(false);
+                optimizer.update(parameterId, weight, grad);
+            }
         }
     }
 }

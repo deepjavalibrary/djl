@@ -47,7 +47,7 @@ public class Sgd extends Optimizer {
                     new NDList(
                             weight,
                             grad,
-                            momentumStates.computeIfAbsent(parameterId, k -> weight.zerosLike()));
+                            withDefaultState(momentumStates, parameterId, k -> weight.zerosLike()));
         } else {
             inputs = new NDList(weight, grad);
         }
