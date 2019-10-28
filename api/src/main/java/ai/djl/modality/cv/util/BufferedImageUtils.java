@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.RandomUtils;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -69,11 +70,22 @@ public final class BufferedImageUtils {
         int width = image.getWidth();
         int height = image.getHeight();
 
+        // 3 times height and width for R,G,B channels
+        ByteBuffer bb = manager.allocateDirect(3 * height * width);
+        if (image.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+            byte[] data = ((DataBufferByte) image.getData().getDataBuffer()).getData();
+            for (byte gray : data) {
+                bb.put(gray);
+                bb.put(gray);
+                bb.put(gray);
+            }
+            bb.rewind();
+            return bb;
+        }
+
         // get an array of integer pixels in the default RGB color mode
         int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
 
-        // 3 times height and width for R,G,B channels
-        ByteBuffer bb = manager.allocateDirect(3 * height * width);
         for (int rgb : pixels) {
             // getting red color
             bb.put((byte) (rgb >> 16));
@@ -114,7 +126,7 @@ public final class BufferedImageUtils {
         if (flag == NDImageUtils.Flag.COLOR) {
             return rgb;
         } else if (flag == NDImageUtils.Flag.GRAYSCALE) {
-            return rgb.mean(new int[] {0});
+            return rgb.mean(new int[] {-1}, true);
         } else {
             throw new IllegalArgumentException("Cannot convert to NDArray with flag: " + flag);
         }
