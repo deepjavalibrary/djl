@@ -67,25 +67,25 @@ public class MultithreadedInferenceExample extends AbstractInference<Classificat
                 MxModelZoo.RESNET.loadModel(criteria, device);
 
         try {
-            return predictImpl2(img, iteration, model, metrics);
+            return multiPredictorPredict(img, iteration, model, metrics);
         } catch (InterruptedException | ExecutionException e) {
             logger.error(e.getMessage());
         }
         return null;
     }
 
-    public Classification predictImpl1(
+    public Classification singlePredictorPredict(
             BufferedImage img,
-            int iteration,
+            int iterationPerThread,
             ZooModel<BufferedImage, Classification> model,
             Metrics metrics)
             throws ExecutionException, InterruptedException {
         int numOfThreads = Runtime.getRuntime().availableProcessors();
         Predictor<BufferedImage, Classification> predictor = model.newPredictor();
-        List<PredictCallable> callables =
+        List<PredictorCallable> callables =
                 Collections.nCopies(
                         numOfThreads,
-                        new PredictCallable(predictor, img, metrics, iteration / numOfThreads));
+                        new PredictorCallable(predictor, img, metrics, iterationPerThread));
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         List<Future<Classification>> futures = executorService.invokeAll(callables);
         Classification classification = null;
@@ -95,9 +95,9 @@ public class MultithreadedInferenceExample extends AbstractInference<Classificat
         return classification;
     }
 
-    public Classification predictImpl2(
+    public Classification multiPredictorPredict(
             BufferedImage img,
-            int iteration,
+            int iterationPerThread,
             ZooModel<BufferedImage, Classification> model,
             Metrics metrics)
             throws ExecutionException, InterruptedException {
@@ -105,7 +105,7 @@ public class MultithreadedInferenceExample extends AbstractInference<Classificat
         List<PredictorCallable> callables =
                 Collections.nCopies(
                         numOfThreads,
-                        new PredictorCallable(model, img, metrics, iteration / numOfThreads));
+                        new PredictorCallable(model, img, metrics, iterationPerThread));
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         List<Future<Classification>> futures = executorService.invokeAll(callables);
         Classification classification = null;
@@ -115,14 +115,14 @@ public class MultithreadedInferenceExample extends AbstractInference<Classificat
         return classification;
     }
 
-    static class PredictCallable implements Callable<Classification> {
+    static class PredictorCallable implements Callable<Classification> {
 
         private Predictor<BufferedImage, Classification> predictor;
         private BufferedImage img;
         private Metrics metrics;
         private int iteration;
 
-        public PredictCallable(
+        public PredictorCallable(
                 Predictor<BufferedImage, Classification> predictor,
                 BufferedImage img,
                 Metrics metrics,
@@ -132,24 +132,6 @@ public class MultithreadedInferenceExample extends AbstractInference<Classificat
             this.metrics = metrics;
             this.iteration = iteration;
         }
-
-        @Override
-        public Classification call() throws TranslateException {
-            predictor.setMetrics(metrics);
-            Classification result = null;
-            for (int i = 0; i < iteration; i++) {
-                result = predictor.predict(img);
-            }
-            return result;
-        }
-    }
-
-    static class PredictorCallable implements Callable<Classification> {
-
-        private Predictor<BufferedImage, Classification> predictor;
-        private BufferedImage img;
-        private Metrics metrics;
-        private int iteration;
 
         public PredictorCallable(
                 ZooModel<BufferedImage, Classification> model,
