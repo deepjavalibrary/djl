@@ -23,7 +23,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
@@ -40,7 +39,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.PairList;
-import ai.djl.zoo.cv.classification.ResNetModelLoader;
+import ai.djl.zoo.ModelZoo;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -143,11 +142,7 @@ public class ResnetTest {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("numLayers", "50");
         criteria.put("dataset", "cifar10");
-        // TODO: Train real model zoo models and convert this test to use instead of sample model
-        //        try (ZooModel<BufferedImage, List<Classification>> model =
-        //                ModelZoo.RESNET.loadModel(criteria)) {
-        return new ResNetModelLoader(Repository.newInstance("test", "src/main/resources/repo"))
-                .loadModel(criteria);
+        return ModelZoo.RESNET.loadModel(criteria);
     }
 
     private static class TestTranslator implements Translator<NDList, NDList> {

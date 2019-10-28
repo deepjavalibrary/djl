@@ -42,8 +42,8 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
 
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = ModelZoo.GROUP_ID;
-    private static final String ARTIFACT_ID = "resnetv1";
-    private static final String VERSION = "0.0.3";
+    private static final String ARTIFACT_ID = "resnet";
+    private static final String VERSION = "0.0.1";
 
     public ResNetModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
@@ -51,10 +51,12 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings("unchecked")
     public Translator<BufferedImage, Classification> getTranslator(Artifact artifact) {
         Map<String, Object> arguments = artifact.getArguments();
-        int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
-        int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
+        List<Double> shape = (List<Double>) arguments.get("imageShape");
+        int width = shape.get(2).intValue();
+        int height = shape.get(1).intValue();
 
         Pipeline pipeline = new Pipeline();
         pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
@@ -69,24 +71,27 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
     @SuppressWarnings("unchecked")
     protected Model loadModel(Artifact artifact, Path modelPath, Device device)
             throws IOException, MalformedModelException {
-        Model model = Model.newInstance(device);
         Map<String, Object> arguments = artifact.getArguments();
+        Shape shape =
+                new Shape(
+                        ((List<Double>) arguments.get("imageShape"))
+                                .stream()
+                                .mapToLong(Double::longValue)
+                                .toArray());
         Builder blockBuilder =
                 new ResNetV1.Builder()
                         .setNumLayers((int) ((double) arguments.get("numLayers")))
                         .setOutSize((long) ((double) arguments.get("outSize")))
-                        .setImageShape(
-                                new Shape(
-                                        ((List<Double>) arguments.get("imageShape"))
-                                                .stream()
-                                                .mapToLong(Double::longValue)
-                                                .toArray()));
+                        .setImageShape(shape);
         if (arguments.containsKey("batchNormMomentum")) {
-            blockBuilder.optBatchNormMomemtum((float) arguments.get("batchNormMomentum"));
+            float batchNormMomentum = (float) ((double) arguments.get("batchNormMomentum"));
+            blockBuilder.optBatchNormMomemtum(batchNormMomentum);
         }
         Block block = blockBuilder.build();
+
+        Model model = Model.newInstance(device);
         model.setBlock(block);
-        model.load(repository.getFile(artifact.getFiles().get("parameters"), ""), "resnet");
+        model.load(modelPath, artifact.getName());
         return model;
     }
 }
