@@ -83,6 +83,10 @@ public class MxTrainer implements Trainer {
 
     @Override
     public void train(Batch batch) {
+        if (listener != null) {
+            listener.onTrainingBatch();
+        }
+
         long begin = System.nanoTime();
         Batch[] splits = batch.split(devices, false);
         try (GradientCollector collector = new MxGradientCollector()) {
@@ -103,10 +107,6 @@ public class MxTrainer implements Trainer {
             }
         }
         addMetric("train", begin);
-
-        if (listener != null) {
-            listener.onTrainingBatch();
-        }
     }
 
     @Override

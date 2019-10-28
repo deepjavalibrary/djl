@@ -30,13 +30,13 @@ public final class ProgressBar {
         }
 
         int percent = (index + 1) * 100 / max;
-        if (percent == current) {
+        if (percent == current && percent > 0) {
             return;
         }
 
         current = percent;
-        StringBuilder sb = new StringBuilder(message);
-        sb.append(':');
+        StringBuilder sb = new StringBuilder(100);
+        sb.append('\r').append(message).append(':');
         for (int i = 0; i < 12 - message.length(); ++i) {
             sb.append(' ');
         }
@@ -48,7 +48,7 @@ public final class ProgressBar {
                 sb.append(' ');
             }
         }
-        sb.append("|\r");
+        sb.append('|');
         if (index == max - 1) {
             System.out.println(sb);
         } else {
