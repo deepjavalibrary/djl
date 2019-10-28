@@ -58,8 +58,8 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setEpsilon(2E-5f)
-                                    .setMomentum(batchNormMomentum)
+                                    .optEpsilon(2E-5f)
+                                    .optMomentum(batchNormMomentum)
                                     .build())
                     .add(Activation.reluBlock())
                     .add(
@@ -72,8 +72,8 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setEpsilon(2E-5f)
-                                    .setMomentum(batchNormMomentum)
+                                    .optEpsilon(2E-5f)
+                                    .optMomentum(batchNormMomentum)
                                     .build())
                     .add(Activation.reluBlock())
                     .add(
@@ -86,8 +86,8 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setEpsilon(2E-5f)
-                                    .setMomentum(batchNormMomentum)
+                                    .optEpsilon(2E-5f)
+                                    .optMomentum(batchNormMomentum)
                                     .build());
 
         } else {
@@ -101,8 +101,8 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setEpsilon(2E-5f)
-                                    .setMomentum(batchNormMomentum)
+                                    .optEpsilon(2E-5f)
+                                    .optMomentum(batchNormMomentum)
                                     .build())
                     .add(Activation.reluBlock())
                     .add(
@@ -115,8 +115,8 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setEpsilon(2E-5f)
-                                    .setMomentum(batchNormMomentum)
+                                    .optEpsilon(2E-5f)
+                                    .optMomentum(batchNormMomentum)
                                     .build());
         }
         SequentialBlock shortcut = new SequentialBlock();
@@ -133,8 +133,8 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setEpsilon(2E-5f)
-                                    .setMomentum(batchNormMomentum)
+                                    .optEpsilon(2E-5f)
+                                    .optMomentum(batchNormMomentum)
                                     .build());
         }
         return new ParallelBlock(
@@ -161,8 +161,8 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setEpsilon(2E-5f)
-                                    .setMomentum(builder.batchNormMomentum)
+                                    .optEpsilon(2E-5f)
+                                    .optMomentum(builder.batchNormMomentum)
                                     .build());
         } else {
             resNet.add(
@@ -175,8 +175,8 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .setEpsilon(2E-5f)
-                                    .setMomentum(builder.batchNormMomentum)
+                                    .optEpsilon(2E-5f)
+                                    .optMomentum(builder.batchNormMomentum)
                                     .build())
                     .add(Activation.reluBlock())
                     .add(
@@ -256,7 +256,7 @@ public final class ResNetV1 {
          * @param batchNormMomemtum Number of layers
          * @return Returns this Builder
          */
-        public Builder setBatchNormMomemtum(float batchNormMomemtum) {
+        public Builder optBatchNormMomemtum(float batchNormMomemtum) {
             this.batchNormMomentum = batchNormMomemtum;
             return this;
         }
@@ -269,6 +269,11 @@ public final class ResNetV1 {
          */
         public Builder setImageShape(Shape imageShape) {
             this.imageShape = imageShape;
+            return this;
+        }
+
+        public Builder optBottleneck(boolean bottleneck) {
+            this.bottleneck = bottleneck;
             return this;
         }
 

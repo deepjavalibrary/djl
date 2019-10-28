@@ -77,7 +77,7 @@ public class BlockCoreTest {
             }
         }
 
-        block = new Linear.Builder().setOutChannels(outSize).setBias(false).build();
+        block = new Linear.Builder().setOutChannels(outSize).optBias(false).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -124,7 +124,7 @@ public class BlockCoreTest {
             }
         }
 
-        block = new Linear.Builder().setOutChannels(outSize).setBias(false).build();
+        block = new Linear.Builder().setOutChannels(outSize).optBias(false).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -150,7 +150,7 @@ public class BlockCoreTest {
     public void testBatchNorm() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
-        Block block = new BatchNorm.Builder().setAxis(1).build();
+        Block block = new BatchNorm.Builder().optAxis(1).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -173,7 +173,7 @@ public class BlockCoreTest {
     public void testDropout() throws IOException {
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
-        Block block = new Dropout.Builder().setProbability(.5f).build();
+        Block block = new Dropout.Builder().optProbability(.5f).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 

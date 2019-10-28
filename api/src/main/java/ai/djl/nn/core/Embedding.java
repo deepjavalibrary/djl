@@ -243,7 +243,7 @@ public class Embedding<T> extends ParameterBlock {
          *     IllegalArgumentException} when the item can not be found
          * @return Returns this Builder
          */
-        public Builder<T> setUseDefault(boolean useDefault) {
+        public Builder<T> optUseDefault(boolean useDefault) {
             this.useDefault = useDefault;
             return this;
         }
@@ -254,7 +254,7 @@ public class Embedding<T> extends ParameterBlock {
          * @param dataType The dataType to use for the embedding
          * @return Returns this Builder
          */
-        public Builder<T> setDataType(DataType dataType) {
+        public Builder<T> optDataType(DataType dataType) {
             this.dataType = dataType;
             return this;
         }

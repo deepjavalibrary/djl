@@ -89,12 +89,12 @@ public class Dropout extends ParameterBlock {
             return sharedAxes;
         }
 
-        public Builder setProbability(float probability) {
+        public Builder optProbability(float probability) {
             this.probability = probability;
             return this;
         }
 
-        public Builder setSharedAxes(int[] sharedAxes) {
+        public Builder optSharedAxes(int[] sharedAxes) {
             this.sharedAxes = sharedAxes;
             return this;
         }

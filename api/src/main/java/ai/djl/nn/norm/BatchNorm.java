@@ -138,17 +138,17 @@ public class BatchNorm extends ParameterBlock {
             return momentum;
         }
 
-        public Builder setAxis(int val) {
+        public Builder optAxis(int val) {
             axis = val;
             return this;
         }
 
-        public Builder setEpsilon(float val) {
+        public Builder optEpsilon(float val) {
             epsilon = val;
             return this;
         }
 
-        public Builder setMomentum(float val) {
+        public Builder optMomentum(float val) {
             momentum = val;
             return this;
         }

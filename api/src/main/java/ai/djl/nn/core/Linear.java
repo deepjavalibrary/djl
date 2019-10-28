@@ -205,7 +205,7 @@ public class Linear extends ParameterBlock {
          * @param bias Whether to use a bias vector parameter
          * @return Returns this Builder
          */
-        public Builder setBias(boolean bias) {
+        public Builder optBias(boolean bias) {
             this.bias = bias;
             return this;
         }

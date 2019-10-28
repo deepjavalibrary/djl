@@ -94,7 +94,7 @@ public abstract class RecurrentCell extends ParameterBlock {
          * @param dropRate drop rate of the dropout
          * @return Returns this Builder
          */
-        public T setDropRate(float dropRate) {
+        public T optDropRate(float dropRate) {
             this.dropRate = dropRate;
             return self();
         }
@@ -106,7 +106,7 @@ public abstract class RecurrentCell extends ParameterBlock {
          * @param lstmStateClipMax Maximum clip value of LSTM states
          * @return Returns this Builder
          */
-        public T setLstmStateClipMin(float lstmStateClipMin, float lstmStateClipMax) {
+        public T optLstmStateClipMin(float lstmStateClipMin, float lstmStateClipMax) {
             this.lstmStateClipMin = lstmStateClipMin;
             this.lstmStateClipMax = lstmStateClipMax;
             this.clipLstmState = true;
@@ -164,7 +164,7 @@ public abstract class RecurrentCell extends ParameterBlock {
          * @param useBidirectional Whether to use bidirectional recurrent layers
          * @return Returns this Builder
          */
-        public T setBidrectional(boolean useBidirectional) {
+        public T optBidrectional(boolean useBidirectional) {
             this.useBidirectional = useBidirectional;
             return self();
         }
@@ -175,7 +175,7 @@ public abstract class RecurrentCell extends ParameterBlock {
          * @param stateOutputs Whether to have the states as symbol output
          * @return Returns this Builder
          */
-        public T setStateOutput(boolean stateOutputs) {
+        public T optStateOutput(boolean stateOutputs) {
             this.stateOutputs = stateOutputs;
             return self();
         }
