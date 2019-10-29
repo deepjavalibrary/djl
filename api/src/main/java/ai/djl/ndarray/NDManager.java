@@ -31,8 +31,8 @@ import java.nio.LongBuffer;
  * NDArray managers are used to create <I>NDArrays</I> (n-dimensional array on native engine).
  *
  * <p>NDManager is implemented in each deep learning framework {@link Engine}. {@link NDArray}s are
- * resources that allocated in each deep learning framework's native memory space. NDManager is the
- * key class that manages those native resources.
+ * resources that are allocated in each deep learning framework's native memory space. NDManager is
+ * the key class that manages these native resources.
  *
  * <p>NDArray can only be created through NDManager. By default, NDArray's lifecycle is attached to
  * the creator NDManager. NDManager itself implements {@link AutoCloseable}. When NDManager is
@@ -59,9 +59,10 @@ import java.nio.LongBuffer;
  * <p>NDManager has a hierarchical structure; it has a single parent NDManager and has child
  * NDManagers. When the parent NDManager is closed, all children will be closed as well.
  *
- * <p>The djl.ai framework manage NDManager's lifecycle by default. You only need to manage the user
- * created child NDManager. Child NDManager becomes useful when you create a large amount of
- * temporary NDArrays and want to free the resources earlier than parent NDManager's lifecycle.
+ * <p>The djl.ai framework manages NDManager's lifecycle by default. You only need to manage the
+ * user created child NDManager. The child NDManager becomes useful when you create a large number
+ * of temporary NDArrays and want to free the resources earlier than the parent NDManager's
+ * lifecycle.
  *
  * <p>The following is an example of such a use case:
  *
@@ -84,8 +85,8 @@ import java.nio.LongBuffer;
  * }
  * </pre>
  *
- * <p>You can also close an individual NDArray. NDManager won't double close them. In certain use
- * cases, you might want to return an NDArray outside of NDManager's scope.
+ * <p>You can also close an individual NDArray. NDManager won't close an NDArray that's already been
+ * closed. In certain use cases, you might want to return an NDArray outside of NDManager's scope.
  *
  * @see NDArray
  * @see Translator
@@ -373,8 +374,8 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and {@link
-     * DataType}.
+     * Creates and initializes an instance of {@link NDArray} with specified {@link Shape} and
+     * {@link DataType}.
      *
      * @param data data to initialize the {@code NDArray}
      * @param shape the {@link Shape} of the {@link NDArray}
@@ -388,7 +389,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and float
+     * Creates and initializes an instance of {@link NDArray} with specified {@link Shape} and float
      * array.
      *
      * @param data the float array that needs to be set
@@ -400,7 +401,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and int
+     * Creates and initializes an instance of {@link NDArray} with specified {@link Shape} and int
      * array.
      *
      * @param data the float array that needs to be set
@@ -412,8 +413,8 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and double
-     * array.
+     * Creates and initializes an instance of {@link NDArray} with specified {@link Shape} and
+     * double array.
      *
      * @param data the float array that needs to be set
      * @param shape the {@link Shape} of the {@link NDArray}
@@ -424,7 +425,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and long
+     * Creates and initializes an instance of {@link NDArray} with specified {@link Shape} and long
      * array.
      *
      * @param data the float array that needs to be set
@@ -436,7 +437,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and byte
+     * Creates and initializes an instance of {@link NDArray} with specified {@link Shape} and byte
      * array.
      *
      * @param data the float array that needs to be set
@@ -448,7 +449,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Creates and initialize an instance of {@link NDArray} with specified {@link Shape} and
+     * Creates and initializes an instance of {@link NDArray} with specified {@link Shape} and
      * boolean array.
      *
      * @param data the boolean array that needs to be set
@@ -475,7 +476,7 @@ public interface NDManager extends AutoCloseable {
     NDArray create(Shape shape, DataType dataType, Device device);
 
     /**
-     * Create a Compressed Sparse Row Storage (CSR) Format Matrix.
+     * Creates a Compressed Sparse Row Storage (CSR) Format Matrix.
      *
      * @param data the data to set for the CSR Matrix
      * @param indptr The indptr array is what will help identify the rows where the data appears
@@ -487,7 +488,7 @@ public interface NDManager extends AutoCloseable {
     NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape, Device device);
 
     /**
-     * Create a Compressed Sparse Row Storage (CSR) Format Matrix.
+     * Creates a Compressed Sparse Row Storage (CSR) Format Matrix.
      *
      * @param data the data to set for the CSR Matrix
      * @param indptr The indptr array is what will help identify the rows where the data appears
@@ -500,7 +501,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * RowSparseNDArray stores the matrix in row sparse format.
+     * Stores the matrix in row sparse format.
      *
      * @param data the data to set for the Row Sparse NDArray
      * @param dataShape the {@link Shape} of the data {@link NDArray}
@@ -513,7 +514,7 @@ public interface NDManager extends AutoCloseable {
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device);
 
     /**
-     * RowSparseNDArray stores the matrix in row sparse format.
+     * Stores the matrix in row sparse format.
      *
      * @param data the data to set for the Row Sparse NDArray
      * @param dataShape the {@link Shape} of the data {@link NDArray}
@@ -595,7 +596,7 @@ public interface NDManager extends AutoCloseable {
      * Returns evenly spaced values starting from 0 on current device.
      *
      * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
-     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * interval including `start` but excluding `stop`). For integer arguments, the function is
      * equivalent to the Python built-in `range` function, but returns an instance of {@link
      * NDArray} rather than a list.
      *
@@ -610,7 +611,7 @@ public interface NDManager extends AutoCloseable {
      * Returns evenly spaced values within a given interval on current device with step 1.
      *
      * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
-     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * interval including `start` but excluding `stop`). For integer arguments, the function is
      * equivalent to the Python built-in `range` function, but returns an instance of {@link
      * NDArray} rather than a list.
      *
@@ -626,7 +627,7 @@ public interface NDManager extends AutoCloseable {
      * Returns evenly spaced values within a given interval on current device.
      *
      * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
-     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * interval including `start` but excluding `stop`). For integer arguments, the function is
      * equivalent to the Python built-in `range` function, but returns an instance of {@link
      * NDArray} rather than a list.
      *
@@ -643,7 +644,7 @@ public interface NDManager extends AutoCloseable {
      * Returns evenly spaced values within a given interval.
      *
      * <p>Values are generated within the half-open interval ``[start, stop)`` (in other words, the
-     * interval including `start` but excluding `stop`). For integer arguments the function is
+     * interval including `start` but excluding `stop`). For integer arguments, the function is
      * equivalent to the Python built-in `range` function, but returns an instance of {@link
      * NDArray} rather than a list.
      *
@@ -657,7 +658,7 @@ public interface NDManager extends AutoCloseable {
     NDArray arange(int start, int stop, int step, DataType dataType, Device device);
 
     /**
-     * Return a 2-D array with ones on the diagonal and zeros elsewhere on current device.
+     * Returns a 2-D array with ones on the diagonal and zeros elsewhere on the current device.
      *
      * @param rows number of rows and cols in the output
      * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
@@ -668,7 +669,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Return a 2-D array with ones on the diagonal and zeros elsewhere on current device.
+     * Returns a 2-D array with ones on the diagonal and zeros elsewhere on the current device.
      *
      * @param rows number of rows and cols in the output
      * @param k index of the diagonal: 0 (the default) refers to the main diagonal, a positive value
@@ -681,7 +682,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Return a 2-D array with ones on the diagonal and zeros elsewhere on current device.
+     * Returns a 2-D array with ones on the diagonal and zeros elsewhere on current device.
      *
      * @param rows number of rows in the output
      * @param cols number of columns in the output
@@ -695,7 +696,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Return a 2-D array with ones on the diagonal and zeros elsewhere.
+     * Returns a 2-D array with ones on the diagonal and zeros elsewhere.
      *
      * @param rows number of rows int the output
      * @param cols number of columns in the output
@@ -709,7 +710,7 @@ public interface NDManager extends AutoCloseable {
     NDArray eye(int rows, int cols, int k, DataType dataType, Device device);
 
     /**
-     * Return evenly spaced numbers over a specified interval on current device.
+     * Returns evenly spaced numbers over a specified interval on current device.
      *
      * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].
      *
@@ -723,7 +724,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Return evenly spaced numbers over a specified interval.
+     * Returns evenly spaced numbers over a specified interval.
      *
      * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].The endpoint
      * of the interval can optionally be excluded.
@@ -738,11 +739,11 @@ public interface NDManager extends AutoCloseable {
     NDArray linspace(double start, double stop, int num, boolean endpoint, Device device);
 
     /**
-     * Draw random samples from a normal (Gaussian) distribution on current device.
+     * Draws random samples from a normal (Gaussian) distribution on the current device.
      *
      * <p>Samples are uniformly distributed over the half-open interval ``[low, high)`` (includes
      * low, but excludes high). In other words, any value within the given interval is equally
-     * likely to be drawn by `uniform`
+     * likely to be drawn by `uniform`.
      *
      * @param low Lower boundary of the output interval. All values generated will be greater than
      *     or equal to low.
@@ -756,11 +757,11 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Draw random samples from a normal (Gaussian) distribution.
+     * Draws random samples from a normal (Gaussian) distribution.
      *
      * <p>Samples are uniformly distributed over the half-open interval ``[low, high)`` (includes
      * low, but excludes high). In other words, any value within the given interval is equally
-     * likely to be drawn by `uniform`
+     * likely to be drawn by `uniform`.
      *
      * @param low Lower boundary of the output interval. All values generated will be greater than
      *     or equal to low.
@@ -774,7 +775,7 @@ public interface NDManager extends AutoCloseable {
     NDArray randomUniform(double low, double high, Shape shape, DataType dataType, Device device);
 
     /**
-     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
+     * Draws random samples from a normal (Gaussian) distribution. Samples are distributed according
      * to a normal distribution parametrized by mean = 0 and standard deviation = 1 on current
      * device.
      *
@@ -786,7 +787,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
+     * Draws random samples from a normal (Gaussian) distribution. Samples are distributed according
      * to a normal distribution parametrized by mean = 0 and standard deviation = 1.
      *
      * @param shape Output shape.
@@ -799,7 +800,7 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
-     * Draw random samples from a normal (Gaussian) distribution. Samples are distributed according
+     * Draws random samples from a normal (Gaussian) distribution. Samples are distributed according
      * to a normal distribution parametrized by {@code *loc*} (mean) and *scale* (standard
      * deviation).
      *
@@ -813,7 +814,7 @@ public interface NDManager extends AutoCloseable {
     NDArray randomNormal(double loc, double scale, Shape shape, DataType dataType, Device device);
 
     /**
-     * Return a single sample from a multinomial distribution. The multinomial distribution is a
+     * Returns a single sample from a multinomial distribution. The multinomial distribution is a
      * multivariate generalisation of the binomial distribution. Take an experiment with one of
      * ``p`` possible outcomes. An example of such an experiment is throwing a dice, where the
      * outcome can be 1 through 6. Each sample drawn from the distribution represents n such
@@ -821,24 +822,24 @@ public interface NDManager extends AutoCloseable {
      * outcome was ``i``.
      *
      * @param n Number of experiments.
-     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1
-     *     (however, the last element is always assumed to account for the remaining probability, as
-     *     long as ``sum(pvals[:-1]) &lt;= 1)``
+     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1 The
+     *     last element is always assumed to account for the remaining probability, as long as
+     *     ``sum(pvals[:-1]) &lt;= 1)``
      * @return Returns the random NDArray
      */
     NDArray randomMultinomial(int n, NDArray pValues);
 
     /**
-     * Draw samples from a multinomial distribution. The multinomial distribution is a multivariate
+     * Draws samples from a multinomial distribution. The multinomial distribution is a multivariate
      * generalisation of the binomial distribution. Take an experiment with one of ``p`` possible
      * outcomes. An example of such an experiment is throwing a dice, where the outcome can be 1
      * through 6. Each sample drawn from the distribution represents n such experiments. Its values,
      * ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the outcome was ``i``.
      *
      * @param n Number of experiments.
-     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1
-     *     (however, the last element is always assumed to account for the remaining probability, as
-     *     long as ``sum(pvals[:-1]) &lt;= 1)``
+     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1 The
+     *     last element is always assumed to account for the remaining probability, as long as
+     *     ``sum(pvals[:-1]) &lt;= 1)``
      * @param shape Output shape
      * @return Returns the random NDArray
      */
@@ -900,8 +901,8 @@ public interface NDManager extends AutoCloseable {
      * An engine specific generic invocation to native operator.
      *
      * <p>You should avoid using this function if possible. Since this function is engine specific,
-     * using this API may cause portability issue. And user must be aware that native operation may
-     * not compatible between each versions.
+     * using this API may cause a portability issue. Native operation may not be compatible between
+     * each version.
      *
      * @param operation native operation to performance
      * @param src array of source NDArray
@@ -916,8 +917,8 @@ public interface NDManager extends AutoCloseable {
      * An engine specific generic invocation to native operator.
      *
      * <p>You should avoid using this function if possible. Since this function is engine specific,
-     * using this API may cause portability issue. And user must be aware that native operation may
-     * not compatible between each versions.
+     * using this API may cause a portability issue. Native operation may not compatible between
+     * each version.
      *
      * @param operation native operation to performance
      * @param src array of source NDArray

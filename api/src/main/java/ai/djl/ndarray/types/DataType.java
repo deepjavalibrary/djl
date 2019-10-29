@@ -49,9 +49,9 @@ public enum DataType {
     }
 
     /**
-     * Returns number of bytes for each element.
+     * Returns the number of bytes for each element.
      *
-     * @return number of bytes for each element
+     * @return the number of bytes for each element
      */
     public int getNumOfBytes() {
         return numOfBytes;
@@ -60,7 +60,7 @@ public enum DataType {
     /**
      * Returns the format of the data type.
      *
-     * @return Returns the format of the data type
+     * @return the format of the data type
      */
     public Format getFormat() {
         return format;
@@ -69,7 +69,7 @@ public enum DataType {
     /**
      * Checks whether it is a floating data type.
      *
-     * @return {@code true} if it is a floating data type
+     * @return whether it is a floating data type
      */
     public boolean isFloating() {
         return format == Format.FLOATING;
@@ -78,7 +78,7 @@ public enum DataType {
     /**
      * Checks whether it is an integer data type.
      *
-     * @return {@code true} if it is an integer type
+     * @return whether it is an integer type
      */
     public boolean isInteger() {
         return format == Format.UINT || format == Format.INT;

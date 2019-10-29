@@ -21,7 +21,7 @@ import java.util.Iterator;
  * An {@code NDList} represents a sequence of {@link NDArray}s with names.
  *
  * <p>Each {@link NDArray} in this list can optionally have a name. You can use the name to look up
- * NDArray in the NDList.
+ * an NDArray in the NDList.
  */
 public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
 
@@ -112,8 +112,8 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     }
 
     /**
-     * Returns a view of the portion of this NDList between the specified <tt>fromIndex</tt>.
-     * inclusive, and <tt>toIndex</tt>, exclusive.
+     * Returns a view of the portion of this NDList between the specified fromIndex. inclusive, and
+     * toIndex, exclusive.
      *
      * @param fromIndex the start index (inclusive)
      * @param toIndex the end index (exclusive)
@@ -126,8 +126,8 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     }
 
     /**
-     * Returns a view of the portion of this NDList between the specified <tt>fromIndex</tt>.
-     * inclusive, and to the end
+     * Returns a view of the portion of this NDList between the specified fromIndex. inclusive, and
+     * to the end
      *
      * @param fromIndex the start index (inclusive)
      * @return a view of the portion of this NDList
@@ -137,7 +137,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     }
 
     /**
-     * Returns {@code true} if this NDList contains NDArray with the specified name.
+     * Returns {@code true} if this NDList contains an NDArray with the specified name.
      *
      * @param name name of the NDArray to be removed from this NDList, if present
      * @return {@code true} if this list contains the specified element
@@ -159,7 +159,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     }
 
     /**
-     * Get NDArray with Tag.
+     * Gets NDArray with Tag.
      *
      * @param index numeric index to get
      * @return tag and ndarray
@@ -219,7 +219,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
 
     /**
      * Appends all of the NDArrays in the specified NDList to the end of this NDList, in the order
-     * that they are returned by the specified DNList's iterator.
+     * that they are returned by the specified NDList's iterator.
      *
      * @param other NDList containing NDArray to be added to this list
      * @throws UnsupportedOperationException if this NDList is read only

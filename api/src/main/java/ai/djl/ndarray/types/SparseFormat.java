@@ -13,7 +13,7 @@
 package ai.djl.ndarray.types;
 
 /**
- * An enum represents Sparse matrix storage formats.
+ * An enum representing Sparse matrix storage formats.
  *
  * <ul>
  *   <li>DENSE: No sparse format

@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  * The {@code NDIndex} allows you to specify a subset of an NDArray that can be used for fetching or
  * updating.
  *
- * <p>It accepts different index option for each dimension, given in the order of the dimensions.
+ * <p>It accepts different a index option for each dimension, given in the order of the dimensions.
  * Each dimension has options corresponding to:
  *
  * <ul>
@@ -110,7 +110,7 @@ public class NDIndex {
     /**
      * Returns the number of dimensions specified in the Index.
      *
-     * @return Returns the number of dimensions specified in the Index.
+     * @return the number of dimensions specified in the Index.
      */
     public int getRank() {
         return rank;
@@ -120,7 +120,7 @@ public class NDIndex {
      * Returns the index affecting the given dimension.
      *
      * @param dimension The affected dimension
-     * @return Returns the index affecting the given dimension
+     * @return the index affecting the given dimension
      */
     public NDIndexElement get(int dimension) {
         return indices.get(dimension);
@@ -129,7 +129,7 @@ public class NDIndex {
     /**
      * Returns the indices.
      *
-     * @return Returns the indices
+     * @return the indices
      */
     public List<NDIndexElement> getIndices() {
         return indices;
@@ -156,7 +156,7 @@ public class NDIndex {
      *
      * @param indices with each index corresponding to the dimensions and negative indices tarting
      *     from the end
-     * @return Returns the updated {@link NDIndex}
+     * @return the updated {@link NDIndex}
      */
     public final NDIndex addIndices(long... indices) {
         rank += indices.length;
@@ -173,7 +173,7 @@ public class NDIndex {
      * where the values in NDIndex do not equal zero
      *
      * @param index a boolean NDArray where all nonzero elements correspond to elements to return
-     * @return Returns the updated {@link NDIndex}
+     * @return the updated {@link NDIndex}
      */
     public NDIndex addBooleanIndex(NDArray index) {
         rank += index.getShape().dimension();
@@ -182,11 +182,11 @@ public class NDIndex {
     }
 
     /**
-     * Appends a new index to slice the dimension and return a range of values.
+     * Appends a new index to slice the dimension and returns a range of values.
      *
      * @param min The minimum of the range
      * @param max The maximum of the range
-     * @return Returns the updated {@link NDIndex}
+     * @return the updated {@link NDIndex}
      */
     public NDIndex addSliceDim(long min, long max) {
         rank++;
@@ -195,12 +195,12 @@ public class NDIndex {
     }
 
     /**
-     * Appends a new index to slice the dimension and return a range of values.
+     * Appends a new index to slice the dimension and returns a range of values.
      *
      * @param min The minimum of the range
      * @param max The maximum of the range
      * @param step The step of the slice
-     * @return Returns the updated {@link NDIndex}
+     * @return the updated {@link NDIndex}
      */
     public NDIndex addSliceDim(long min, long max, long step) {
         rank++;
@@ -211,7 +211,7 @@ public class NDIndex {
     /**
      * Returns a stream of the NDIndexElements.
      *
-     * @return Returns a stream of the NDIndexElements
+     * @return a stream of the NDIndexElements
      */
     public Stream<NDIndexElement> stream() {
         return indices.stream();

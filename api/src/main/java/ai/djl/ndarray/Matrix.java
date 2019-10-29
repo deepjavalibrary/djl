@@ -12,14 +12,14 @@
  */
 package ai.djl.ndarray;
 
-/** An interface representing an 2-dimensional matrix. */
+/** An interface representing a 2-dimensional matrix. */
 public interface Matrix extends NDArray {
 
     /**
      * Inserts a row into this matrix.
      *
-     * @param row the row to insert into
-     * @param toPut the row to insert
+     * @param row the row to insert
+     * @param toPut the array to insert into
      * @return this
      */
     NDArray putRow(long row, NDArray toPut);
@@ -214,7 +214,7 @@ public interface Matrix extends NDArray {
      * Assigns a column vector in place.
      *
      * @param columnVector the column vector to add
-     * @return the result of the addition
+     * @return the result of the assignment
      */
     NDArray putiColumnVector(NDArray columnVector);
 
@@ -293,7 +293,7 @@ public interface Matrix extends NDArray {
     NDArray put(int i, int j, Number element);
 
     /**
-     * Reshapes the NDArray (can't change the length of the NDArray).
+     * Reshapes the NDArray (it can't change the length of the NDArray).
      *
      * @param order the order of the new array
      * @param rows the rows of the matrix

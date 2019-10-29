@@ -24,7 +24,7 @@ public final class NDArrays {
     ////////////////////////////////////////
 
     /**
-     * Returns the boolean {@code true} iff all elements in the NDArray is equal to the Number.
+     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the Number.
      *
      * @param a the ndarray to compare.
      * @param n the number to compare.
@@ -318,7 +318,7 @@ public final class NDArrays {
     }
 
     /**
-     * Return the elements, either from this NDArray or other, depending on the condition.
+     * Returns the elements, either from this NDArray or other, depending on the condition.
      *
      * @param condition Condition array
      * @param a first NDArray
@@ -332,7 +332,7 @@ public final class NDArrays {
     /**
      * Returns partial of {@code NDArray} based on boolean index {@code NDArray} from axis 0.
      *
-     * @param data data to operator on
+     * @param data data to operate on
      * @param index boolean {@code NDArray} mask
      * @return the new {@code NDArray}
      */
@@ -343,7 +343,7 @@ public final class NDArrays {
     /**
      * Returns partial of {@code NDArray} based on boolean index {@code NDArray} and axis.
      *
-     * @param data data to operator on
+     * @param data data to operate on
      * @param index boolean {@code NDArray} mask
      * @param axis an integer that represents the axis in {@code NDArray} to mask from
      * @return the new {@code NDArray}
@@ -506,7 +506,7 @@ public final class NDArrays {
     }
 
     /**
-     * Copy scalar remainder of division.
+     * Copies scalar remainder of division.
      *
      * @param n the number to multiply by
      * @param a ndarray to be operated on
@@ -528,7 +528,7 @@ public final class NDArrays {
     }
 
     /**
-     * HEAD Raises the power of each element in the ndarray.
+     * Raises the power of each element in the ndarray.
      *
      * @param a ndarray to be operated on
      * @param n the number to raise the power to
@@ -767,7 +767,7 @@ public final class NDArrays {
     }
 
     /**
-     * copy matrix multiplication of two NDArrays.
+     * Copies matrix multiplication of two NDArrays.
      *
      * @param a ndarray to be operated on
      * @param b the second NDArray to multiply
@@ -826,7 +826,7 @@ public final class NDArrays {
     }
 
     /**
-     * Compute the truth value of {@code NDArray} a AND {@code NDArray} b element-wise.
+     * Computes the truth value of {@code NDArray} a AND {@code NDArray} b element-wise.
      *
      * @param a input {@code NDArray}
      * @param b the other input {@code NDArray}
@@ -838,7 +838,7 @@ public final class NDArrays {
     }
 
     /**
-     * Compute the truth value of {@code NDArray} a OR {@code NDArray} b element-wise.
+     * Computes the truth value of {@code NDArray} a OR {@code NDArray} b element-wise.
      *
      * @param a input {@code NDArray}
      * @param b the other input {@code NDArray}
@@ -850,7 +850,7 @@ public final class NDArrays {
     }
 
     /**
-     * Compute the truth value of {@code NDArray} a XOR {@code NDArray} b element-wise.
+     * Computes the truth value of {@code NDArray} a XOR {@code NDArray} b element-wise.
      *
      * @param a input {@code NDArray}
      * @param b the other input {@code NDArray}

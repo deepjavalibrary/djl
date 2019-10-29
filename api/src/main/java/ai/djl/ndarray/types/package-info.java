@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains classes that defines n-dimensional array data types. */
+/** Contains classes that define n-dimensional array data types. */
 package ai.djl.ndarray.types;

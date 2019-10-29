@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-/** A class the presents the {@link NDArray}'s shape information. */
+/** A class that presents the {@link NDArray}'s shape information. */
 public class Shape {
 
     private long[] shape;
@@ -117,7 +117,7 @@ public class Shape {
      * Returns the shape in the given dimension.
      *
      * @param dimension the dimension to get the shape in
-     * @return Returns the shape in the given dimension
+     * @return the shape in the given dimension
      */
     public long get(int dimension) {
         return shape[dimension];
@@ -127,7 +127,7 @@ public class Shape {
      * Returns the layout type in the given dimension.
      *
      * @param dimension the dimension to get the layout type in
-     * @return Returns the layout type in the given dimension
+     * @return the layout type in the given dimension
      */
     public LayoutType getLayoutType(int dimension) {
         return layout[dimension];
@@ -222,7 +222,7 @@ public class Shape {
      * Returns only the axes of the Shape whose layout types match the predicate.
      *
      * @param predicate Predicate returning true to Shape axis to be part of the filtered Shape
-     * @return Returns a new filtered Shape
+     * @return a new filtered Shape
      */
     public Shape filterByLayoutType(Predicate<LayoutType> predicate) {
         return new Shape(
@@ -236,7 +236,7 @@ public class Shape {
      * Returns a mapped shape.
      *
      * @param mapper The function to map each element of the Shape by
-     * @return Returns a new filtered Shape
+     * @return a new mapped Shape
      */
     public Shape map(Function<Pair<Long, LayoutType>, Pair<Long, LayoutType>> mapper) {
         return new Shape(new PairList<>(stream().map(mapper).collect(Collectors.toList())));
@@ -245,7 +245,7 @@ public class Shape {
     /**
      * Returns a stream of the Shape.
      *
-     * @return Returns the stream
+     * @return the stream
      */
     public Stream<Pair<Long, LayoutType>> stream() {
         return new PairList<>(
@@ -340,7 +340,7 @@ public class Shape {
     /**
      * Returns {@code true} if this NDArray is a matrix and the number of columns is 1.
      *
-     * @return {@code true} if NDArray is a matrix and the number of columns is 1
+     * @return whether the NDArray is a matrix and the number of columns is 1
      */
     public boolean isColumnVector() {
         return isMatrix() && columns() == 1 && size() > 1;
@@ -349,7 +349,7 @@ public class Shape {
     /**
      * Returns {@code true} if this NDArray is a matrix and the number of rows is 1.
      *
-     * @return {@code true} if this NDArray is a matrix and the number of rows is 1
+     * @return whether the NDArray is a matrix and the number of rows is 1
      */
     public boolean isRowVector() {
         return isMatrix() && rows() == 1 && size() > 1;
@@ -367,7 +367,7 @@ public class Shape {
     /**
      * Returns whether the matrix has the same rows and columns.
      *
-     * @return {@code true} if the matrix has the same rows and columns {@code false} otherwise
+     * @return whether the matrix has the same rows and columns
      */
     public boolean isSquare() {
         return isMatrix() && columns() == rows();

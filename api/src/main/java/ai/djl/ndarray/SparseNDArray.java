@@ -15,7 +15,7 @@ package ai.djl.ndarray;
 import ai.djl.ndarray.types.SparseFormat;
 
 /**
- * A interface representing a Sparse NDArray.
+ * An interface representing a Sparse NDArray.
  *
  * @see SparseFormat
  * @see <a href="https://software.intel.com/en-us/node/471374">Sparse Matrix Storage Formats</a>

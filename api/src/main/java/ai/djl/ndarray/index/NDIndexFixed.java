@@ -27,9 +27,9 @@ public class NDIndexFixed implements NDIndexElement {
     }
 
     /**
-     * Returns dimension of the index.
+     * Returns the dimension of the index.
      *
-     * @return dimension of the index
+     * @return the dimension of the index
      */
     public long getIndex() {
         return index;
