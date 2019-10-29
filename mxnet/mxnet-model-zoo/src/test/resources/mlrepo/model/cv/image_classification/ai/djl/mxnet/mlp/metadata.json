@@ -21,6 +21,7 @@
         "dataset": "mnist"
       },
       "arguments": {
+        "flag": "GRAYSCALE",
         "width": 28,
         "height": 28
       },

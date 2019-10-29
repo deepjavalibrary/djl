@@ -17,6 +17,7 @@ import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Anchor;
 import ai.djl.repository.Artifact;
@@ -45,11 +46,13 @@ public abstract class ImageClassificationModelLoader
         Map<String, Object> arguments = artifact.getArguments();
         int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
         int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
+        String flag = (String) arguments.getOrDefault("flag", NDImageUtils.Flag.COLOR.name());
 
         Pipeline pipeline = new Pipeline();
         pipeline.add(new CenterCrop()).add(new Resize(height, width)).add(new ToTensor());
 
         return new ImageClassificationTranslator.Builder()
+                .optFlag(NDImageUtils.Flag.valueOf(flag))
                 .setPipeline(pipeline)
                 .setSynsetArtifactName("synset.txt")
                 .build();
