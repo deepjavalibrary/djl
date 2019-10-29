@@ -2358,7 +2358,9 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if all elements within this array are non-zero or {@code true}
      */
     default boolean all() {
-        return asType(DataType.BOOLEAN, false).sum().getInt() == size();
+        // TODO remove second cast when MXNet numpy sum support it
+        return asType(DataType.BOOLEAN, false).asType(DataType.INT32, false).sum().getInt()
+                == size();
     }
 
     /**
@@ -2367,7 +2369,8 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if any of the elements within this array are non-zero or {@code true}
      */
     default boolean any() {
-        return asType(DataType.BOOLEAN, false).sum().getInt() > 0;
+        // TODO remove second cast when MXNet numpy sum support it
+        return asType(DataType.BOOLEAN, false).asType(DataType.INT32, false).sum().getInt() > 0;
     }
 
     /**
@@ -2376,7 +2379,8 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if none of the elements within this array are non-zero or {@code true}
      */
     default boolean none() {
-        return asType(DataType.BOOLEAN, false).sum().getInt() == 0;
+        // TODO remove second cast when MXNet numpy sum support it
+        return asType(DataType.BOOLEAN, false).asType(DataType.INT32, false).sum().getInt() == 0;
     }
 
     /**
@@ -2385,7 +2389,8 @@ public interface NDArray extends AutoCloseable {
      * @return Number of non-zero values in the {@code NDArray}
      */
     default int countNonzero() {
-        return asType(DataType.BOOLEAN, false).sum().getInt();
+        // TODO remove second cast when MXNet numpy sum support it
+        return asType(DataType.BOOLEAN, false).asType(DataType.INT32, false).sum().getInt();
     }
 
     /**
@@ -2395,7 +2400,11 @@ public interface NDArray extends AutoCloseable {
      * @return Number of non-zero values in the {@code NDArray} along a given axis
      */
     default int countNonzero(int axis) {
-        return asType(DataType.BOOLEAN, false).sum(new int[] {axis}).getInt();
+        // TODO remove second cast when MXNet numpy sum support it
+        return asType(DataType.BOOLEAN, false)
+                .asType(DataType.INT32, false)
+                .sum(new int[] {axis})
+                .getInt();
     }
 
     /**
