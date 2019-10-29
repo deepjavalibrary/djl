@@ -13,6 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.modality.cv.Rectangle;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils.Flag;
@@ -24,6 +25,7 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
+import ai.djl.translate.Pipeline;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -53,6 +55,10 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         flag = builder.flag;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
+        if (pipeline == null) {
+            pipeline = new Pipeline();
+            pipeline.add(new ToTensor());
+        }
     }
 
     @Override

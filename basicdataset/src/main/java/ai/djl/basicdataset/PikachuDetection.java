@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils.Flag;
@@ -25,6 +26,7 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
+import ai.djl.translate.Pipeline;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -64,6 +66,10 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         usage = builder.usage;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
+        if (pipeline == null) {
+            pipeline = new Pipeline();
+            pipeline.add(new ToTensor());
+        }
     }
 
     @Override

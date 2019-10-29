@@ -13,6 +13,8 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
@@ -23,6 +25,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.translate.Pipeline;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Iterator;
@@ -41,7 +44,8 @@ public class ImageFolderTest {
             ImageFolder dataset =
                     new ImageFolder.Builder()
                             .setRoot("src/test/resources/imagefolder")
-                            .setResize(100, 100)
+                            .optPipeline(
+                                    new Pipeline().add(new Resize(100, 100)).add(new ToTensor()))
                             .setSequenceSampling(1, false)
                             .build();
             dataset.prepare();
@@ -60,7 +64,7 @@ public class ImageFolderTest {
 
                 Batch catBatch = ds.next();
                 Assertions.assertAlmostEquals(
-                        NDImageUtils.resize(cat, 100, 100).expandDims(0),
+                        NDImageUtils.toTensor(NDImageUtils.resize(cat, 100, 100)).expandDims(0),
                         catBatch.getData().singletonOrThrow());
                 Assert.assertEquals(
                         manager.create(new int[] {0}), catBatch.getLabels().singletonOrThrow());
@@ -68,7 +72,7 @@ public class ImageFolderTest {
 
                 Batch dogBatch = ds.next();
                 Assertions.assertAlmostEquals(
-                        NDImageUtils.resize(dog, 100, 100).expandDims(0),
+                        NDImageUtils.toTensor(NDImageUtils.resize(dog, 100, 100)).expandDims(0),
                         dogBatch.getData().singletonOrThrow());
                 Assert.assertEquals(
                         manager.create(new int[] {1}), dogBatch.getLabels().singletonOrThrow());

@@ -12,9 +12,6 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Repository;
 import ai.djl.repository.SimpleRepository;
 import ai.djl.repository.dataset.PreparedDataset;
@@ -73,6 +70,9 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
                 Thread.currentThread()
                         .getContextClassLoader()
                         .getResourceAsStream("imagenet/classes.json");
+        if (classStream == null) {
+            throw new AssertionError("Missing imagenet/classes.json in jar resource");
+        }
         String[][] classes =
                 new Gson()
                         .fromJson(
@@ -107,9 +107,8 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
     }
 
     @Override
-    protected NDList readImage(NDManager manager, String image) throws IOException {
-        Path imagePath = root.resolve(image);
-        return new NDList(BufferedImageUtils.readFileToArray(manager, imagePath, flag));
+    protected Path getImagePath(String key) {
+        return root.resolve(key);
     }
 
     public static class Builder extends AbstractImageFolder.BaseBuilder<Builder> {

@@ -12,17 +12,14 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.training.dataset.Record;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /** A dataset for loading image files stored in a folder structure. */
 public final class ImageFolder extends AbstractImageFolder {
 
-    String root;
+    private String root;
 
     ImageFolder(Builder builder) {
         super(builder);
@@ -30,21 +27,8 @@ public final class ImageFolder extends AbstractImageFolder {
     }
 
     @Override
-    public Record get(NDManager manager, long index) throws IOException {
-        int idx = Math.toIntExact(index);
-        NDList d =
-                new NDList(
-                        resize.transform(
-                                BufferedImageUtils.readFileToArray(
-                                        manager, Paths.get(items.get(idx).getKey()), flag)));
-        NDList l = new NDList(manager.create(items.get(idx).getValue()));
-        d.attach(manager);
-        return new Record(d, l);
-    }
-
-    @Override
-    protected NDList readImage(NDManager manager, String image) throws IOException {
-        return new NDList(BufferedImageUtils.readFileToArray(manager, Paths.get(image), flag));
+    protected Path getImagePath(String key) {
+        return Paths.get(key);
     }
 
     @Override

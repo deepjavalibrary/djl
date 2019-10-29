@@ -136,6 +136,11 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         for (int i = 0; i < indices.size(); i++) {
             Record record = dataset.get(subManager, indices.get(i));
             data[i] = record.getData();
+            // apply transform
+            if (pipeline != null) {
+                data[i] = pipeline.transform(data[i]);
+            }
+
             labels[i] = record.getLabels();
         }
         NDList batchData = batchifier.batchify(data);
@@ -144,10 +149,6 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         Arrays.stream(data).forEach(NDList::close);
         Arrays.stream(labels).forEach(NDList::close);
 
-        // apply transform
-        if (pipeline != null) {
-            batchData = pipeline.transform(batchData);
-        }
         // apply label transform
         if (targetPipeline != null) {
             batchLabels = targetPipeline.transform(batchLabels);

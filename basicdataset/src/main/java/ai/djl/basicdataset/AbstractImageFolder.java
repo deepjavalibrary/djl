@@ -13,9 +13,11 @@
 package ai.djl.basicdataset;
 
 import ai.djl.basicdataset.utils.ThrowingFunction;
-import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils.Flag;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
@@ -23,11 +25,12 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
-import ai.djl.translate.Transform;
+import ai.djl.translate.Pipeline;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,14 +47,16 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     private static final Logger logger = LoggerFactory.getLogger(AbstractImageFolder.class);
 
     protected Flag flag;
-    protected Transform resize;
     protected List<String> synsets;
     protected PairList<String, Integer> items;
 
     public AbstractImageFolder(BaseBuilder<?> builder) {
         super(builder);
-        this.flag = builder.getFlag();
-        this.resize = builder.getResize();
+        this.flag = builder.flag;
+        if (pipeline == null) {
+            pipeline = new Pipeline();
+            pipeline.add(new ToTensor());
+        }
         this.synsets = new ArrayList<>();
         this.items = new PairList<>();
     }
@@ -59,7 +64,10 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     @Override
     public Record get(NDManager manager, long index) throws IOException {
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
-        NDList d = resize.transform(readImage(manager, item.getKey()));
+
+        Path imagePath = getImagePath(item.getKey());
+        NDArray array = BufferedImageUtils.readFileToArray(manager, imagePath);
+        NDList d = new NDList(array);
         NDList l = new NDList(manager.create(item.getValue()));
         return new Record(d, l);
     }
@@ -147,7 +155,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         }
     }
 
-    protected abstract NDList readImage(NDManager manager, String image) throws IOException;
+    protected abstract Path getImagePath(String key);
 
     private boolean isImage(String path) {
         int extensionIndex = path.lastIndexOf('.');
@@ -161,32 +169,10 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     public abstract static class BaseBuilder<T extends BaseBuilder>
             extends RandomAccessDataset.BaseBuilder<T> {
 
-        private Flag flag = NDImageUtils.Flag.COLOR;
-        private Transform resize;
-
-        public Flag getFlag() {
-            return flag;
-        }
+        Flag flag = NDImageUtils.Flag.COLOR;
 
         public T optFlag(Flag flag) {
             this.flag = flag;
-            return self();
-        }
-
-        public Transform getResize() {
-            if (resize == null) {
-                throw new IllegalArgumentException("setResize is required.");
-            }
-            return resize;
-        }
-
-        public T setResize(Transform resize) {
-            this.resize = resize;
-            return self();
-        }
-
-        public T setResize(int height, int width) {
-            this.resize = new Resize(height, width);
             return self();
         }
     }

@@ -106,7 +106,7 @@ public final class BufferedImageUtils {
      * @return {@link NDArray}
      */
     public static NDArray toNDArray(NDManager manager, BufferedImage image) {
-        return toNDArray(manager, image, DEFAULT_FLAG);
+        return toNDArray(manager, image, null);
     }
 
     /**
@@ -119,6 +119,9 @@ public final class BufferedImageUtils {
      */
     public static NDArray toNDArray(
             NDManager manager, BufferedImage image, NDImageUtils.Flag flag) {
+        if (flag == null) {
+            flag = DEFAULT_FLAG;
+        }
         int width = image.getWidth();
         int height = image.getHeight();
         NDArray rgb = manager.create(new Shape(height, width, 3), DataType.UINT8);
@@ -133,12 +136,11 @@ public final class BufferedImageUtils {
     }
 
     public static NDArray readFileToArray(NDManager manager, Path path) throws IOException {
-        return readFileToArray(manager, path, DEFAULT_FLAG);
+        return readFileToArray(manager, path, null);
     }
 
     public static NDArray readFileToArray(NDManager manager, Path path, NDImageUtils.Flag flag)
             throws IOException {
-        BufferedImage image = fromFile(path);
-        return NDImageUtils.toTensor(toNDArray(manager, image, flag));
+        return toNDArray(manager, fromFile(path), flag);
     }
 }
