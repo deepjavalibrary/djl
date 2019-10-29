@@ -200,7 +200,9 @@ public class MxModel implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new MxPredictor<>(this, translator, first.getAndSet(false));
+        boolean firstPredictor = first.getAndSet(false);
+        boolean shouldCopyParameters = !JnaUtils.isThreadSafePredictor() && !firstPredictor;
+        return new MxPredictor<>(this, translator, shouldCopyParameters);
     }
 
     /** {@inheritDoc} */

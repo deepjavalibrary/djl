@@ -33,7 +33,6 @@ public class Arguments {
     private String imageFile;
     private String outputDir;
     private Map<String, String> criteria;
-    private int duration;
     private int iteration = 1;
 
     private boolean isImperative;
@@ -43,9 +42,6 @@ public class Arguments {
         modelName = cmd.getOptionValue("model-name");
         outputDir = cmd.getOptionValue("output-dir");
         imageFile = cmd.getOptionValue("image");
-        if (cmd.hasOption("duration")) {
-            duration = Integer.parseInt(cmd.getOptionValue("duration"));
-        }
         if (cmd.hasOption("iteration")) {
             iteration = Integer.parseInt(cmd.getOptionValue("iteration"));
         }
@@ -78,13 +74,6 @@ public class Arguments {
                         .hasArg()
                         .argName("IMAGE")
                         .desc("Image file.")
-                        .build());
-        options.addOption(
-                Option.builder("d")
-                        .longOpt("duration")
-                        .hasArg()
-                        .argName("DURATION")
-                        .desc("Duration of the test.")
                         .build());
         options.addOption(
                 Option.builder("c")
@@ -149,10 +138,6 @@ public class Arguments {
 
     public boolean isImperative() {
         return isImperative;
-    }
-
-    public int getDuration() {
-        return duration;
     }
 
     public int getIteration() {

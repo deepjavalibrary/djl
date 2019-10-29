@@ -1305,6 +1305,23 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     /** {@inheritDoc} */
     @Override
+    public int MXCreateCachedOpEX(
+            Pointer handle,
+            int num_flags,
+            String[] keys,
+            String[] vals,
+            PointerByReference out,
+            byte thread_safe) {
+        if (functions.containsKey("MXCreateCachedOpEx")) {
+            return functions
+                    .get("MXCreateCachedOpEx")
+                    .apply(new Object[] {handle, num_flags, keys, vals, out, thread_safe});
+        }
+        out.setValue(TestHelper.toPointer("This is a cachedOp"));
+        return 0;
+    }
+
+    @Override
     public int MXFreeCachedOp(Pointer handle) {
         if (functions.containsKey("MXFreeCachedOp")) {
             return functions.get("MXFreeCachedOp").apply(new Object[] {handle});
@@ -1313,6 +1330,14 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     /** {@inheritDoc} */
+    @Override
+    public int MXFreeCachedOpEX(Pointer handle, byte thread_safe) {
+        if (functions.containsKey("MXFreeCachedOpEx")) {
+            return functions.get("MXFreeCachedOpEx").apply(new Object[] {handle, thread_safe});
+        }
+        return 0;
+    }
+
     @Override
     public int MXInvokeCachedOp(
             Pointer handle,
@@ -1337,6 +1362,42 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     /** {@inheritDoc} */
+    @Override
+    public int MXInvokeCachedOpEX(
+            Pointer handle,
+            int num_inputs,
+            Pointer inputs,
+            IntBuffer num_outputs,
+            PointerByReference outputs,
+            PointerByReference out_stypes,
+            byte thread_safe) {
+        if (functions.containsKey("MXInvokeCachedOpEx")) {
+            return functions
+                    .get("MXInvokeCachedOpEx")
+                    .apply(
+                            new Object[] {
+                                handle,
+                                num_inputs,
+                                inputs,
+                                num_outputs,
+                                outputs,
+                                out_stypes,
+                                thread_safe
+                            });
+        }
+
+        num_outputs.put(0, 3);
+        PointerArray arr =
+                new PointerArray(
+                        TestHelper.toPointer("a"),
+                        TestHelper.toPointer("b"),
+                        TestHelper.toPointer("c"));
+        outputs.setValue(arr);
+        Pointer sTypes = TestHelper.toPointer(new int[] {0, 0, 1});
+        out_stypes.setValue(sTypes);
+        return 0;
+    }
+
     @Override
     public int MXInvokeCachedOpEx(
             Pointer handle,
@@ -2688,6 +2749,47 @@ public class MockMxnetLibrary implements MxnetLibrary {
             PointerByReference aux_states,
             Pointer shared_exec_handle,
             PointerByReference out) {
+        if (functions.containsKey("MXExecutorSimpleBindEx64")) {
+            return functions
+                    .get("MXExecutorSimpleBindEx64")
+                    .apply(
+                            new Object[] {
+                                symbol_handle,
+                                dev_type,
+                                dev_id,
+                                num_g2c_keys,
+                                g2c_keys,
+                                g2c_dev_types,
+                                g2c_dev_ids,
+                                provided_grad_req_list_len,
+                                provided_grad_req_names,
+                                provided_grad_req_types,
+                                num_provided_arg_shapes,
+                                provided_arg_shape_names,
+                                provided_arg_shape_data,
+                                provided_arg_shape_idx,
+                                num_provided_arg_dtypes,
+                                provided_arg_dtype_names,
+                                provided_arg_dtypes,
+                                num_provided_arg_stypes,
+                                provided_arg_stype_names,
+                                provided_arg_stypes,
+                                num_shared_arg_names,
+                                shared_arg_name_list,
+                                shared_buffer_len,
+                                shared_buffer_name_list,
+                                shared_buffer_handle_list,
+                                updated_shared_buffer_name_list,
+                                updated_shared_buffer_handle_list,
+                                num_in_args,
+                                in_args,
+                                arg_grads,
+                                num_aux_states,
+                                aux_states,
+                                shared_exec_handle,
+                                out
+                            });
+        }
         return 0;
     }
 

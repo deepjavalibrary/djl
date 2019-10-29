@@ -95,7 +95,11 @@ public class CachedOp extends NativeResource {
         // fill allInputsNDArray with parameter values on correct device
         for (int index : paramIndices) {
             Parameter parameter = parameters.get(index);
-            allInputsNDArray[index] = (MxNDArray) parameterStore.getValue(parameter, device);
+            MxNDArray value = (MxNDArray) parameterStore.getValue(parameter, device);
+            if (value == null) {
+                throw new NullPointerException("Failed to find parameter from parameterStore");
+            }
+            allInputsNDArray[index] = value;
         }
 
         // fill allInputsNDArray with data values

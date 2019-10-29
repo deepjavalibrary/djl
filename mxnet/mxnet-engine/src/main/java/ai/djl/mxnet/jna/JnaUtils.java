@@ -62,6 +62,9 @@ public final class JnaUtils {
 
     private static final Map<String, FunctionInfo> OPS = getNdArrayFunctions();
 
+    private static boolean useThreadSafePredictor =
+            Boolean.getBoolean("MXNET_THREAD_SAFE_INFERENCE");
+
     private JnaUtils() {}
 
     /////////////////////////////////
@@ -1648,19 +1651,35 @@ public final class JnaUtils {
         }
 
         // Creating CachedOp
-        // static_alloc and static_shape are enabled by default
-        String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
-        String[] values = {dataIndices.values().toString(), paramIndices.toString(), "1", "1"};
-
         Pointer symbolHandle = symbol.getHandle();
         PointerByReference ref = new PointerByReference();
-        checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
+        if (useThreadSafePredictor) {
+            String[] keys = {"data_indices", "param_indices"};
+            String[] values = {dataIndices.values().toString(), paramIndices.toString()};
+            checkCall(
+                    LIB.MXCreateCachedOpEX(
+                            symbolHandle,
+                            keys.length,
+                            keys,
+                            values,
+                            ref,
+                            useThreadSafePredictorByte()));
+        } else {
+            // static_alloc and static_shape are enabled by default
+            String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
+            String[] values = {dataIndices.values().toString(), paramIndices.toString(), "1", "1"};
+            checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
+        }
 
         return new CachedOp(ref.getValue(), manager, parameters, paramIndices, dataIndices);
     }
 
     public static void freeCachedOp(Pointer handle) {
-        checkCall(LIB.MXFreeCachedOp(handle));
+        if (useThreadSafePredictor) {
+            checkCall(LIB.MXFreeCachedOpEX(handle, useThreadSafePredictorByte()));
+        } else {
+            checkCall(LIB.MXFreeCachedOp(handle));
+        }
     }
 
     public static MxNDArray[] cachedOpInvoke(
@@ -1673,9 +1692,21 @@ public final class JnaUtils {
         IntBuffer buf = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         PointerByReference outSTypeRef = new PointerByReference();
-        checkCall(
-                LIB.MXInvokeCachedOpEx(
-                        cachedOpHandle, inputs.length, array, buf, ref, outSTypeRef));
+        if (useThreadSafePredictor) {
+            checkCall(
+                    LIB.MXInvokeCachedOpEX(
+                            cachedOpHandle,
+                            inputs.length,
+                            array,
+                            buf,
+                            ref,
+                            outSTypeRef,
+                            useThreadSafePredictorByte()));
+        } else {
+            checkCall(
+                    LIB.MXInvokeCachedOpEx(
+                            cachedOpHandle, inputs.length, array, buf, ref, outSTypeRef));
+        }
         int numOutputs = buf.get();
         Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
         int[] sTypes = outSTypeRef.getValue().getIntArray(0, numOutputs);
@@ -1688,6 +1719,22 @@ public final class JnaUtils {
             }
         }
         return output;
+    }
+
+    public static boolean isThreadSafePredictor() {
+        return useThreadSafePredictor;
+    }
+
+    public static void setThreadSafePredictor(boolean value) {
+        useThreadSafePredictor = value;
+    }
+
+    private static byte useThreadSafePredictorByte() {
+        byte use = (byte) (useThreadSafePredictor ? 1 : 0);
+
+        ByteBuffer buf = ByteBuffer.allocate(1);
+        buf.put(0, use);
+        return buf.get(0);
     }
 
     public static void checkCall(int ret) {

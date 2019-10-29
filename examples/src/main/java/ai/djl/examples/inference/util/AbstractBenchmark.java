@@ -27,7 +27,6 @@ import ai.djl.util.Progress;
 import ai.djl.zoo.ModelZoo;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -96,16 +95,14 @@ public abstract class AbstractBenchmark<T> {
             CommandLine cmd = parser.parse(options, args, null, false);
             Arguments arguments = parseArguments(cmd);
 
-            Duration duration = Duration.ofMinutes(arguments.getDuration());
             int iteration = arguments.getIteration();
             progressBar = new ProgressBar("Iteration", iteration);
 
             logger.info(
-                    "Running {} on: {}, iteration: {}, duration: {} minutes.",
+                    "Running {} on: {}, iteration: {}.",
                     getClass().getSimpleName(),
                     Device.defaultDevice(),
-                    iteration,
-                    duration.toMinutes());
+                    iteration);
 
             long init = System.nanoTime();
             String version = Engine.getInstance().getVersion();
@@ -114,75 +111,71 @@ public abstract class AbstractBenchmark<T> {
                     String.format(
                             "Load library %s in %.3f ms.", version, (loaded - init) / 1_000_000f));
 
-            while (!duration.isNegative()) {
-                Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
+            Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
 
-                long begin = System.currentTimeMillis();
-                lastResult = predict(arguments, metrics, iteration);
-                long totalTime = System.currentTimeMillis() - begin;
+            long begin = System.currentTimeMillis();
+            lastResult = predict(arguments, metrics, iteration);
+            long totalTime = System.currentTimeMillis() - begin;
 
-                logger.info("Inference result: {}", lastResult);
-                int totalRuns = iteration;
-                if (metrics.hasMetric("thread")) {
-                    totalRuns *= metrics.getMetric("thread").get(0).getValue().intValue();
-                }
+            logger.info("Inference result: {}", lastResult);
+            int totalRuns = iteration;
+            if (metrics.hasMetric("thread")) {
+                totalRuns *= metrics.getMetric("thread").get(0).getValue().intValue();
+            }
+            logger.info(
+                    String.format(
+                            "total time: %d ms, total runs: %d iterations", totalTime, totalRuns));
+
+            if (metrics.hasMetric("LoadModel")) {
+                long loadModelTime = metrics.getMetric("LoadModel").get(0).getValue().longValue();
+                logger.info(
+                        "Model loading time: {} ms.",
+                        String.format("%.3f", loadModelTime / 1_000_000f));
+            }
+
+            if (metrics.hasMetric("Inference") && iteration > 1) {
+                float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
+                float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1_000_000f;
+                float p99 = metrics.percentile("Inference", 99).getValue().longValue() / 1_000_000f;
+                float preP50 =
+                        metrics.percentile("Preprocess", 50).getValue().longValue() / 1_000_000f;
+                float preP90 =
+                        metrics.percentile("Preprocess", 90).getValue().longValue() / 1_000_000f;
+                float preP99 =
+                        metrics.percentile("Preprocess", 99).getValue().longValue() / 1_000_000f;
+                float postP50 =
+                        metrics.percentile("Postprocess", 50).getValue().longValue() / 1_000_000f;
+                float postP90 =
+                        metrics.percentile("Postprocess", 90).getValue().longValue() / 1_000_000f;
+                float postP99 =
+                        metrics.percentile("Postprocess", 99).getValue().longValue() / 1_000_000f;
                 logger.info(
                         String.format(
-                                "total time: %d ms, total runs: %d iterations",
-                                totalTime, totalRuns));
+                                "inference P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
+                                p50, p90, p99));
+                logger.info(
+                        String.format(
+                                "preprocess P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
+                                preP50, preP90, preP99));
+                logger.info(
+                        String.format(
+                                "postprocess P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
+                                postP50, postP90, postP99));
 
-                if (metrics.hasMetric("LoadModel")) {
-                    long loadModelTime =
-                            metrics.getMetric("LoadModel").get(0).getValue().longValue();
-                    logger.info(
-                            "Model loading time: {} ms.",
-                            String.format("%.3f", loadModelTime / 1_000_000f));
+                if (Boolean.getBoolean("collect-memory")) {
+                    float heap = metrics.percentile("Heap", 90).getValue().longValue();
+                    float nonHeap = metrics.percentile("NonHeap", 90).getValue().longValue();
+                    float cpu = metrics.percentile("cpu", 90).getValue().longValue();
+                    float rss = metrics.percentile("rss", 90).getValue().longValue();
+
+                    logger.info(String.format("heap P90: %.3f", heap));
+                    logger.info(String.format("nonHeap P90: %.3f", nonHeap));
+                    logger.info(String.format("cpu P90: %.3f", cpu));
+                    logger.info(String.format("rss P90: %.3f", rss));
                 }
-
-                if (metrics.hasMetric("Inference") && iteration > 1) {
-                    float p50 =
-                            metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
-                    float p90 =
-                            metrics.percentile("Inference", 90).getValue().longValue() / 1_000_000f;
-                    float p99 =
-                            metrics.percentile("Inference", 99).getValue().longValue() / 1_000_000f;
-                    float preP50 =
-                            metrics.percentile("Preprocess", 50).getValue().longValue()
-                                    / 1_000_000f;
-                    float preP90 =
-                            metrics.percentile("Preprocess", 90).getValue().longValue()
-                                    / 1_000_000f;
-                    float preP99 =
-                            metrics.percentile("Preprocess", 99).getValue().longValue()
-                                    / 1_000_000f;
-                    float postP50 =
-                            metrics.percentile("Postprocess", 50).getValue().longValue()
-                                    / 1_000_000f;
-                    float postP90 =
-                            metrics.percentile("Postprocess", 90).getValue().longValue()
-                                    / 1_000_000f;
-                    float postP99 =
-                            metrics.percentile("Postprocess", 99).getValue().longValue()
-                                    / 1_000_000f;
-                    logger.info(
-                            String.format(
-                                    "inference P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
-                                    p50, p90, p99));
-                    logger.info(
-                            String.format(
-                                    "preprocess P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
-                                    preP50, preP90, preP99));
-                    logger.info(
-                            String.format(
-                                    "postprocess P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
-                                    postP50, postP90, postP99));
-                }
-
-                MemoryUtils.dumpMemoryInfo(metrics, arguments.getOutputDir());
-                long delta = System.currentTimeMillis() - begin;
-                duration = duration.minus(Duration.ofMillis(delta));
             }
-            return true;
+
+            MemoryUtils.dumpMemoryInfo(metrics, arguments.getOutputDir());
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.setLeftPadding(1);
