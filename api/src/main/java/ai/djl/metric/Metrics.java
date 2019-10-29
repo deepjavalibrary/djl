@@ -44,7 +44,10 @@ public class Metrics {
      * @param metric the {@link Metric} to be added
      */
     public void addMetric(Metric metric) {
-        List<Metric> list = metrics.computeIfAbsent(metric.getMetricName(), v -> new ArrayList<>());
+        List<Metric> list =
+                metrics.computeIfAbsent(
+                        metric.getMetricName(),
+                        v -> Collections.synchronizedList(new ArrayList<>()));
         list.add(metric);
     }
 

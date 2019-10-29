@@ -205,7 +205,7 @@ public class MxModel implements Model {
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         boolean firstPredictor = first.getAndSet(false);
-        boolean shouldCopyParameters = !JnaUtils.isThreadSafePredictor() && !firstPredictor;
+        boolean shouldCopyParameters = !JnaUtils.useThreadSafePredictor() && !firstPredictor;
         return new MxPredictor<>(this, translator, shouldCopyParameters);
     }
 
