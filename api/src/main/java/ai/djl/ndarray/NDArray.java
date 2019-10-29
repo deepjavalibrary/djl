@@ -630,13 +630,43 @@ public interface NDArray extends AutoCloseable {
      * Returns True if two arrays are element-wise equal within a tolerance.
      *
      * @param other NDArray to compare with
+     * @return the result {@code NDArray}
+     */
+    default boolean allClose(NDArray other) {
+        return allClose(other, 1e-5, 1e-08, false);
+    }
+
+    /**
+     * Returns True if two arrays are element-wise equal within a tolerance.
+     *
+     * @param other NDArray to compare with
      * @param rtol The relative tolerance parameter
      * @param atol The absolute tolerance parameter
      * @param equalNan Whether to compare NaN’s as equal. If True, NaN’s in a will be considered
      *     equal to NaN’s in b in the output array.
      * @return the result {@code NDArray}
      */
-    boolean allClose(NDArray other, float rtol, float atol, boolean equalNan);
+    default boolean allClose(NDArray other, double rtol, double atol, boolean equalNan) {
+        if (!getShape().equals(other.getShape())) {
+            return false;
+        }
+        Number[] actualDoubleArray = toArray();
+        Number[] expectedDoubleArray = other.toArray();
+        for (int i = 0; i < actualDoubleArray.length; i++) {
+            double a = actualDoubleArray[i].doubleValue();
+            double b = expectedDoubleArray[i].doubleValue();
+            // handle NaN
+            if (equalNan && Double.isNaN(a) && Double.isNaN(b)) {
+                continue;
+            }
+            if (Double.isNaN(a)
+                    || Double.isNaN(b)
+                    || (Math.abs(a - b) > (atol + rtol * Math.abs(b)))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Returns the binary NDArray for "Equals" comparison.

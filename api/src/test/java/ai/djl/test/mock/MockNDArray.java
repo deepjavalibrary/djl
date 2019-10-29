@@ -212,11 +212,6 @@ public class MockNDArray implements NDArray {
     }
 
     @Override
-    public boolean allClose(NDArray other, float rtol, float atol, boolean equalNan) {
-        return false;
-    }
-
-    @Override
     public NDArray eq(Number other) {
         return null;
     }

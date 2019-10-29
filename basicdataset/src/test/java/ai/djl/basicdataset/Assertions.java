@@ -45,21 +45,8 @@ public final class Assertions {
 
     public static void assertAlmostEquals(
             NDArray actual, NDArray expected, double rtol, double atol) {
-        if (!actual.getShape().equals(expected.getShape())) {
-            throw new AssertionError(
-                    getDefaultErrorMessage(
-                            actual.getShape(),
-                            expected.getShape(),
-                            "The shape of two NDArray are different!"));
-        }
-        Number[] actualDoubleArray = actual.toArray();
-        Number[] expectedDoubleArray = expected.toArray();
-        for (int i = 0; i < actualDoubleArray.length; i++) {
-            double a = actualDoubleArray[i].doubleValue();
-            double b = expectedDoubleArray[i].doubleValue();
-            if (Math.abs(a - b) > (atol + rtol * Math.abs(b))) {
-                throw new AssertionError(getDefaultErrorMessage(actual, expected));
-            }
+        if (!actual.allClose(expected, rtol, atol, false)) {
+            throw new AssertionError(getDefaultErrorMessage(actual, expected));
         }
     }
 }

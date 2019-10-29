@@ -85,6 +85,33 @@ public final class NDArrays {
     }
 
     /**
+     * Returns True if two arrays are element-wise equal within a tolerance.
+     *
+     * @param a NDArray to compare with
+     * @param b NDArray to compare with
+     * @return the result {@code NDArray}
+     */
+    public static boolean allClose(NDArray a, NDArray b) {
+        return a.allClose(b);
+    }
+
+    /**
+     * Returns True if two arrays are element-wise equal within a tolerance.
+     *
+     * @param a NDArray to compare with
+     * @param b NDArray to compare with
+     * @param rtol The relative tolerance parameter
+     * @param atol The absolute tolerance parameter
+     * @param equalNan Whether to compare NaN’s as equal. If True, NaN’s in a will be considered
+     *     equal to NaN’s in b in the output array.
+     * @return the result {@code NDArray}
+     */
+    public static boolean allClose(
+            NDArray a, NDArray b, double rtol, double atol, boolean equalNan) {
+        return a.allClose(b, rtol, atol, equalNan);
+    }
+
+    /**
      * Returns the binary ndarray for "Greater Than" comparison.
      *
      * @param a ndarray to be compared

@@ -119,6 +119,50 @@ public class NDArrayElementComparisonOpTest {
     }
 
     @Test
+    public void testAllClose() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array1 = manager.create(new float[] {1f, 0f, 2f, 2f, 4f});
+            NDArray array2 = manager.create(new float[] {1.001f, 0.001f, 1.999f, 1.999f, 3.999f});
+            Assert.assertTrue(array1.allClose(array2, 0, 0.01, false));
+            Assert.assertTrue(array1.allClose(array2, 1, 0, false));
+            Assert.assertTrue(NDArrays.allClose(array1, array2, 0, 0.01, false));
+            Assert.assertTrue(NDArrays.allClose(array1, array2, 1, 0, false));
+
+            array1 = manager.create(new double[] {1.0, Double.NaN});
+            array2 = manager.create(new double[] {1.0, Double.NaN});
+            Assert.assertFalse(array1.allClose(array2, 0, 0, false));
+            Assert.assertTrue(array1.allClose(array2, 0, 0, true));
+            Assert.assertFalse(NDArrays.allClose(array1, array2, 0, 0, false));
+            Assert.assertTrue(NDArrays.allClose(array1, array2, 0, 0, true));
+
+            array1 = manager.create(new double[] {Double.NaN, 2.0});
+            array2 = manager.create(new double[] {2.0, Double.NaN});
+            Assert.assertFalse(array1.allClose(array2, 0, 0, false));
+            Assert.assertFalse(array1.allClose(array2, 0, 0, true));
+            Assert.assertFalse(NDArrays.allClose(array1, array2, 0, 0, false));
+            Assert.assertFalse(NDArrays.allClose(array1, array2, 0, 0, true));
+
+            // test mult-dim
+            array1 = manager.arange(10, 20).reshape(2, 5);
+            array2 = array1.add(1e-5);
+            Assert.assertTrue(array1.allClose(array2));
+            Assert.assertTrue(NDArrays.allClose(array1, array2));
+
+            // test scalar
+            array1 = manager.create(5f);
+            array2 = manager.create(5f + 1e-5);
+            Assert.assertTrue(array1.allClose(array2));
+            Assert.assertTrue(NDArrays.allClose(array1, array2));
+
+            // test zero-dim
+            array1 = manager.create(new Shape(0));
+            array2 = manager.create(new Shape(0));
+            Assert.assertTrue(array1.allClose(array2));
+            Assert.assertTrue(array1.allClose(array2));
+        }
+    }
+
+    @Test
     public void testGreaterThanScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 0f, 2f, 2f, 4f});

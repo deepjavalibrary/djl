@@ -235,11 +235,6 @@ public class TfNDArray implements NDArray {
         return false;
     }
 
-    @Override
-    public boolean allClose(NDArray other, float rtol, float atol, boolean equalNan) {
-        return false;
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDArray eq(Number other) {

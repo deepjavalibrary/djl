@@ -430,7 +430,7 @@ public class MxMatrix implements Matrix {
     }
 
     @Override
-    public boolean allClose(NDArray other, float rtol, float atol, boolean equalNan) {
+    public boolean allClose(NDArray other, double rtol, double atol, boolean equalNan) {
         return array.allClose(other, rtol, atol, equalNan);
     }
 

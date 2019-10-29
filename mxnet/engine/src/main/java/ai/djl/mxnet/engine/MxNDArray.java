@@ -459,12 +459,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean allClose(NDArray other, float rtol, float atol, boolean equalNan) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray eq(Number other) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", other.toString());
