@@ -48,25 +48,25 @@ public class ParallelBlock extends AbstractBlock {
         this.blocks = blocks;
     }
 
-    public ParallelBlock addAll(Block... blocks) {
+    public final ParallelBlock addAll(Block... blocks) {
         this.blocks.addAll(Arrays.asList(blocks));
         initialized = false;
         return this;
     }
 
-    public ParallelBlock addAll(Collection<Block> blocks) {
+    public final ParallelBlock addAll(Collection<Block> blocks) {
         this.blocks.addAll(blocks);
         initialized = false;
         return this;
     }
 
-    public ParallelBlock add(Block block) {
+    public final ParallelBlock add(Block block) {
         blocks.add(block);
         initialized = false;
         return this;
     }
 
-    public ParallelBlock add(Function<NDList, NDList> f) {
+    public final ParallelBlock add(Function<NDList, NDList> f) {
         blocks.add(new LambdaBlock(f));
         initialized = false;
         return this;

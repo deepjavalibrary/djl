@@ -13,6 +13,7 @@
 package ai.djl.zoo;
 
 import ai.djl.repository.Repository;
+import ai.djl.zoo.cv.classification.MlpModelLoader;
 import ai.djl.zoo.cv.classification.ResNetModelLoader;
 
 public interface ModelZoo {
@@ -22,4 +23,5 @@ public interface ModelZoo {
     String GROUP_ID = "ai.djl";
 
     ResNetModelLoader RESNET = new ResNetModelLoader(REPOSITORY);
+    MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
 }

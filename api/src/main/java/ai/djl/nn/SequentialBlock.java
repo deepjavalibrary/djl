@@ -35,25 +35,25 @@ public class SequentialBlock extends AbstractBlock {
 
     private List<Block> blocks = new ArrayList<>();
 
-    public SequentialBlock addAll(Block... blocks) {
+    public final SequentialBlock addAll(Block... blocks) {
         this.blocks.addAll(Arrays.asList(blocks));
         initialized = false;
         return this;
     }
 
-    public SequentialBlock addAll(Collection<Block> blocks) {
+    public final SequentialBlock addAll(Collection<Block> blocks) {
         this.blocks.addAll(blocks);
         initialized = false;
         return this;
     }
 
-    public SequentialBlock add(Block block) {
+    public final SequentialBlock add(Block block) {
         blocks.add(block);
         initialized = false;
         return this;
     }
 
-    public SequentialBlock add(Function<NDList, NDList> f) {
+    public final SequentialBlock add(Function<NDList, NDList> f) {
         blocks.add(new LambdaBlock(f));
         initialized = false;
         return this;

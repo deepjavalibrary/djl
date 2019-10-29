@@ -21,10 +21,6 @@ import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
-import ai.djl.nn.Blocks;
-import ai.djl.nn.SequentialBlock;
-import ai.djl.nn.core.Linear;
-import ai.djl.training.Activation;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -36,6 +32,7 @@ import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.FactorTracker;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Pipeline;
+import ai.djl.zoo.cv.classification.Mlp;
 import java.io.IOException;
 import java.nio.file.Paths;
 
@@ -48,7 +45,7 @@ public final class TrainMnist extends AbstractTraining {
     @Override
     protected void train(Arguments arguments) throws IOException {
         // Construct neural network
-        Block block = constructBlock();
+        Block block = new Mlp(28, 28);
 
         // setup training configuration
         TrainingConfig config = setupTrainingConfig(arguments);
@@ -77,19 +74,9 @@ public final class TrainMnist extends AbstractTraining {
 
             // save model
             if (arguments.getOutputDir() != null) {
-                model.save(Paths.get(arguments.getOutputDir()), "mnist");
+                model.save(Paths.get(arguments.getOutputDir()), "mlp");
             }
         }
-    }
-
-    private Block constructBlock() {
-        return new SequentialBlock()
-                .add(Blocks.flattenBlock(28 * 28))
-                .add(new Linear.Builder().setOutChannels(128).build())
-                .add(Activation.reluBlock())
-                .add(new Linear.Builder().setOutChannels(64).build())
-                .add(Activation.reluBlock())
-                .add(new Linear.Builder().setOutChannels(10).build());
     }
 
     private TrainingConfig setupTrainingConfig(Arguments arguments) {

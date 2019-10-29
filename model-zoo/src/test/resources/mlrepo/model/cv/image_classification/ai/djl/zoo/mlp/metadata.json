@@ -1,0 +1,41 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.zoo",
+  "artifactId": "mlp",
+  "type": "cv",
+  "name": "MLP",
+  "description": "MLP image classification",
+  "website": "http://www.djl.ai/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mlp",
+      "properties": {
+        "dataset": "mnist"
+      },
+      "arguments": {
+        "flag": "GRAYSCALE",
+        "width": 28,
+        "height": 28
+      },
+      "files": {
+        "synset": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/zoo/synset_mnist.txt",
+          "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1",
+          "name": "synset.txt"
+        },
+        "parameters": {
+          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/zoo/mlp/0.0.1/mlp-0000.params",
+          "sha1Hash": "059c742cb22d85fe9f518d6041cbc9a1620e2039"
+        }
+      }
+    }
+  ]
+}
