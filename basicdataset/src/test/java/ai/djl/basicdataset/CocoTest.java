@@ -14,7 +14,7 @@ package ai.djl.basicdataset;
 
 import ai.djl.Model;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.repository.Repository;
+import ai.djl.repository.MRL;
 import ai.djl.training.Activation;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -30,20 +30,16 @@ import org.testng.annotations.Test;
 public class CocoTest {
 
     @Test
-    public void testCocoLocal() throws IOException {
+    public void testCocoRemote() throws IOException {
+        CocoDetection coco =
+                new CocoDetectionUnitTest(
+                        new CocoDetection.Builder()
+                                .setUsage(Dataset.Usage.TEST)
+                                .setRandomSampling(1));
+        coco.prepare();
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
-
-            Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
-            CocoDetection coco =
-                    new CocoDetection.Builder()
-                            .setUsage(Dataset.Usage.TEST)
-                            .optRepository(repository)
-                            .setRandomSampling(1)
-                            .build();
-            coco.prepare();
-
             try (Trainer trainer = model.newTrainer(config)) {
                 Iterator<Batch> ds = trainer.iterateDataset(coco).iterator();
                 Batch batch = ds.next();
@@ -52,6 +48,18 @@ public class CocoTest {
                 Assert.assertEquals(
                         batch.getLabels().singletonOrThrow().getShape(), new Shape(1, 20, 5));
             }
+        }
+    }
+
+    private static final class CocoDetectionUnitTest extends CocoDetection {
+
+        CocoDetectionUnitTest(CocoDetection.Builder builder) {
+            super(builder);
+        }
+
+        @Override
+        public MRL getMrl() {
+            return new MRL(MRL.Dataset.CV, BasicDatasets.GROUP_ID, "coco-unittest");
         }
     }
 }

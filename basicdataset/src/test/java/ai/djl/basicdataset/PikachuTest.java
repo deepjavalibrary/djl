@@ -15,7 +15,6 @@ package ai.djl.basicdataset;
 import ai.djl.Model;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.MRL;
-import ai.djl.repository.Repository;
 import ai.djl.training.Activation;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -31,13 +30,11 @@ import org.testng.annotations.Test;
 public class PikachuTest {
 
     @Test
-    public void testPikachuLocal() throws IOException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
+    public void testPikachuRemote() throws IOException {
         PikachuDetection pikachu =
                 new PikachuDetectionUnitTest(
                         new PikachuDetection.Builder()
                                 .setUsage(Dataset.Usage.TEST)
-                                .optRepository(repository)
                                 .setRandomSampling(1));
         pikachu.prepare();
         TrainingConfig config = new DefaultTrainingConfig(new NormalInitializer(0.01));
