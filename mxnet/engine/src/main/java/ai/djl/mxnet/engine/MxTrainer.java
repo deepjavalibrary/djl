@@ -81,7 +81,7 @@ public class MxTrainer implements Trainer {
 
     @Override
     public void initialize(Shape[] shapes) {
-        model.getBlock().initialize(model.getNDManager(), model.getDataType(), devices, shapes);
+        model.getBlock().initialize(model.getNDManager(), model.getDataType(), shapes);
     }
 
     @Override

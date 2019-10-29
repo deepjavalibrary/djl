@@ -12,7 +12,6 @@
  */
 package ai.djl.nn;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -40,7 +39,7 @@ public interface Block {
 
     void setInitializer(Initializer initializer, String paramName);
 
-    Shape[] initialize(NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes);
+    Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes);
 
     boolean isInitialized();
 

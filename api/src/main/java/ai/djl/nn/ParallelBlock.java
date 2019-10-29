@@ -12,7 +12,6 @@
  */
 package ai.djl.nn;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -83,12 +82,11 @@ public class ParallelBlock extends AbstractBlock {
     }
 
     @Override
-    public Shape[] initialize(
-            NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes) {
+    public Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
         if (!initialized) {
             beforeInitialize(inputShapes);
             for (Block child : getChildren().values()) {
-                child.initialize(manager, dataType, devices, inputShapes);
+                child.initialize(manager, dataType, inputShapes);
             }
             initialized = true;
         }

@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests.training;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
@@ -41,7 +40,6 @@ public class ModelTest {
             block.initialize(
                     saveModel.getNDManager(),
                     DataType.FLOAT32,
-                    new Device[] {Device.defaultDevice()},
                     new Shape[] {new Shape(1, 3, 32, 32)});
             ParameterList savedParameters = block.getParameters();
             saveModel.setBlock(block);

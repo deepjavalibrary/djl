@@ -13,7 +13,6 @@
 
 package ai.djl.mxnet.nn;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.mxnet.engine.CachedOp;
 import ai.djl.mxnet.engine.MxNDManager;
@@ -77,8 +76,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     }
 
     @Override
-    public Shape[] initialize(
-            NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes) {
+    public Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
         if (!initialized) {
             beforeInitialize(inputShapes);
             for (Parameter parameter : params) {

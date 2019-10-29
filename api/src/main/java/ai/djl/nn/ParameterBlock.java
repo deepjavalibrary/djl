@@ -12,7 +12,6 @@
  */
 package ai.djl.nn;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -20,8 +19,7 @@ import ai.djl.ndarray.types.Shape;
 public abstract class ParameterBlock extends AbstractBlock {
 
     @Override
-    public Shape[] initialize(
-            NDManager manager, DataType dataType, Device[] devices, Shape[] inputShapes) {
+    public Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
         if (!initialized) {
             beforeInitialize(inputShapes);
             for (Parameter parameter : getDirectParameters()) {
