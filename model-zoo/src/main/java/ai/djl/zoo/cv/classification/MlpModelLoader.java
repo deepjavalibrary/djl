@@ -13,6 +13,7 @@
 package ai.djl.zoo.cv.classification;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.modality.Classification;
 import ai.djl.modality.cv.ImageClassificationTranslator;
@@ -62,7 +63,8 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
     }
 
     @Override
-    protected Model loadModel(Artifact artifact, Path modelPath, Device device) throws IOException {
+    protected Model loadModel(Artifact artifact, Path modelPath, Device device)
+            throws IOException, MalformedModelException {
         Map<String, Object> arguments = artifact.getArguments();
         int width = ((Double) arguments.getOrDefault("width", 28d)).intValue();
         int height = ((Double) arguments.getOrDefault("height", 28d)).intValue();
