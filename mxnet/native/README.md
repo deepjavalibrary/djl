@@ -4,6 +4,14 @@
 
 Copy the library files and all dependencies in `<path_to_your_DJL>/mxnet/native/src/main/resources/<osName>/native/lib`.
 
+Make sure to upload all the libmxnet.so dependencies by command
+```bash
+# osx
+otool -L libmxnet.dylib
+# ubuntu
+ldd libmxnet.so
+```
+
 The example dependencies list for osx are
 - libiomp5.dylib
 - libmkldnn.0.dylib
@@ -21,7 +29,7 @@ do the followings to prepare your package:
 
 ```bash
 cd mxnet/native
-./gradlew -Plocal -Pflavor=mkl publish
+./gradlew -Pflavor=mkl publish
 ```
 
 The available flavor names are:
@@ -39,11 +47,3 @@ Supported classifier names are:
 - win-x86_64
 - linux-x86_64
 - linux-arm
-
-### Step 3: Refresh repo
-
-You can refresh the bucket by running
-```bash
-cd mxnet/native
-aws s3 sync build/repo/ s3://djl-ai/repo --acl public-read
-```
