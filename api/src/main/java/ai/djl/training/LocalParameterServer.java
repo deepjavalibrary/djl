@@ -43,18 +43,24 @@ public class LocalParameterServer implements ParameterServer {
     @Override
     public void pull(String parameterId, NDArray[] weights, int priority) {
         NDArray[] grads = gradMap.get(parameterId);
-        // reduce gradient on all devices
-        try (NDArray gradSum = grads[0].asInDevice(Device.cpu(), true)) {
-            for (int i = 1; i < grads.length; i++) {
-                gradSum.addi(grads[i].asInDevice(Device.cpu(), true));
+        Device firstDevice = grads[0].getDevice();
+        // reduce gradient from all devices to first device
+        for (int i = 1; i < grads.length; i++) {
+            try (NDArray gradCopy = grads[i].asInDevice(firstDevice, true)) {
+                grads[0].addi(gradCopy);
             }
-            // update weights on different devices with reduced gradient
-            for (NDArray weight : weights) {
-                try (NDArray gradSumCopy = gradSum.asInDevice(weight.getDevice(), true)) {
+        }
+        // update weights on different devices with reduced gradient
+        for (NDArray weight : weights) {
+            if (weight.getDevice().equals(firstDevice)) {
+                optimizer.update(parameterId, weight, grads[0]);
+            } else {
+                try (NDArray gradSumCopy = grads[0].asInDevice(weight.getDevice(), true)) {
                     optimizer.update(parameterId, weight, gradSumCopy);
                 }
             }
         }
+        Arrays.stream(grads).forEach(NDArray::close);
     }
 
     @Override

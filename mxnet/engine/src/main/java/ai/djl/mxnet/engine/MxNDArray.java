@@ -1017,22 +1017,16 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sum() {
-        // TODO remove this until MXNet numpy sum support boolean
-        NDArray thisArr =
-                (getDataType() == DataType.BOOLEAN) ? asType(DataType.INT32, false) : this;
-        return manager.invoke("_np_sum", thisArr, null);
+        return manager.invoke("_np_sum", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sum(int[] axes, boolean keepDims) {
-        // TODO remove this until MXNet numpy sum support boolean
-        NDArray thisArr =
-                (getDataType() == DataType.BOOLEAN) ? asType(DataType.INT32, false) : this;
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
         params.addParam("keepdims", keepDims);
-        return manager.invoke("_np_sum", thisArr, params);
+        return manager.invoke("_np_sum", this, params);
     }
 
     /** {@inheritDoc} */

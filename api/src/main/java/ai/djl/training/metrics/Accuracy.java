@@ -25,8 +25,8 @@ import ai.djl.ndarray.types.DataType;
  */
 public class Accuracy extends TrainingMetric {
 
-    private int correctInstances;
-    private int totalInstances;
+    private long correctInstances;
+    private long totalInstances;
     protected int axis;
     protected int index;
 
@@ -67,11 +67,11 @@ public class Accuracy extends TrainingMetric {
             predictionReduced = predictions;
         }
         // TODO: remove asType after bug in numpy argmax is fixed. argmax should return int values.
-        int numCorrect =
-                labels.asType(DataType.INT32, false)
-                        .eq(predictionReduced.asType(DataType.INT32, false))
-                        .sum()
-                        .getInt();
+        // result of sum operator is int64 now
+        long numCorrect =
+                labels.asType(DataType.INT64, false)
+                        .eq(predictionReduced.asType(DataType.INT64, false))
+                        .countNonzero();
         addCorrectInstances(numCorrect);
         addTotalInstances((int) labels.size());
     }
@@ -99,7 +99,7 @@ public class Accuracy extends TrainingMetric {
      *
      * @param numInstances the number to increment
      */
-    public void addCorrectInstances(int numInstances) {
+    public void addCorrectInstances(long numInstances) {
         this.correctInstances += numInstances;
     }
 
@@ -108,7 +108,7 @@ public class Accuracy extends TrainingMetric {
      *
      * @param totalInstances the number to increment
      */
-    public void addTotalInstances(int totalInstances) {
+    public void addTotalInstances(long totalInstances) {
         this.totalInstances += totalInstances;
     }
 }

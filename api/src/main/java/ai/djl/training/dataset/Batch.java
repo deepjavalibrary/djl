@@ -63,9 +63,16 @@ public class Batch implements AutoCloseable {
     public Batch[] split(Device[] devices, boolean evenSplit) {
         int size = devices.length;
         if (size == 1) {
-            NDList d = data.asInDevice(devices[0], true);
-            NDList l = labels.asInDevice(devices[0], true);
-            return new Batch[] {new Batch(manager, d, l, batchifier)};
+            // TODO: we should change to following once we support slice:
+            // NDList d = data.asInDevice(devices[0], false);
+            // avoid copy if data already in device
+            if (data.head().getDevice().equals(devices[0])) {
+                return new Batch[] {new Batch(manager, data, labels, batchifier)};
+            } else {
+                NDList d = data.asInDevice(devices[0], true);
+                NDList l = labels.asInDevice(devices[0], true);
+                return new Batch[] {new Batch(manager, d, l, batchifier)};
+            }
         }
 
         NDList[] splittedData = split(data, size, evenSplit);

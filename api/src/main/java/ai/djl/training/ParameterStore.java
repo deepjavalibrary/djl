@@ -71,7 +71,7 @@ public class ParameterStore {
         }
     }
 
-    public synchronized NDArray getValue(Parameter parameter, Device device) {
+    public NDArray getValue(Parameter parameter, Device device) {
         String parameterId = parameter.getId();
         int index = deviceMap.get(device);
         ParameterData data =
@@ -79,7 +79,10 @@ public class ParameterStore {
 
         if (data.isEmpty()) {
             NDArray array = parameter.getArray();
+
             if (parameterServer != null) {
+                // initialize on parameter store for first time
+                parameterServer.init(parameterId, new NDArray[] {array});
                 NDArray[] arrays = new NDArray[deviceMap.size()];
                 for (Map.Entry<Device, Integer> entry : deviceMap.entrySet()) {
                     Device dev = entry.getKey();
@@ -91,7 +94,6 @@ public class ParameterStore {
                         arrays[i].attach(manager);
                         arrays[i].attachGradient();
                     }
-                    parameterServer.init(parameterId, arrays);
                     data.add(arrays[i]);
                 }
             } else {

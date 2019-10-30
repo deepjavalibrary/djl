@@ -139,8 +139,9 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 Optimizer.sgd()
                         .setRescaleGrad(1.0f / batchSize)
                         .setLearningRateTracker(learningRateTracker)
-                        .optMomentum(0.9f)
-                        .optWeightDecays(0.001f)
+                        // TODO: fix states copy to multi-gpu
+                        // .optMomentum(0.9f)
+                        // .optWeightDecays(0.001f)
                         .optClipGrad(1f)
                         .build();
         return new DefaultTrainingConfig(initializer)

@@ -2388,7 +2388,8 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if all elements within this array are non-zero or {@code true}
      */
     default boolean all() {
-        return asType(DataType.BOOLEAN, false).sum().getInt() == size();
+        // result of sum operator is int64 now
+        return asType(DataType.BOOLEAN, false).sum().getLong() == size();
     }
 
     /**
@@ -2397,7 +2398,7 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if any of the elements within this array are non-zero or {@code true}
      */
     default boolean any() {
-        return asType(DataType.BOOLEAN, false).sum().getInt() > 0;
+        return asType(DataType.BOOLEAN, false).sum().getLong() > 0;
     }
 
     /**
@@ -2406,7 +2407,7 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if none of the elements within this array are non-zero or {@code true}
      */
     default boolean none() {
-        return asType(DataType.BOOLEAN, false).sum().getInt() == 0;
+        return asType(DataType.BOOLEAN, false).sum().getLong() == 0;
     }
 
     /**
@@ -2414,8 +2415,8 @@ public interface NDArray extends AutoCloseable {
      *
      * @return Number of non-zero values in the {@code NDArray}
      */
-    default int countNonzero() {
-        return asType(DataType.BOOLEAN, false).sum().getInt();
+    default long countNonzero() {
+        return asType(DataType.BOOLEAN, false).sum().getLong();
     }
 
     /**
@@ -2424,8 +2425,8 @@ public interface NDArray extends AutoCloseable {
      * @param axis axis to operate on
      * @return Number of non-zero values in the {@code NDArray} along a given axis
      */
-    default int countNonzero(int axis) {
-        return asType(DataType.BOOLEAN, false).sum(new int[] {axis}).getInt();
+    default long countNonzero(int axis) {
+        return asType(DataType.BOOLEAN, false).sum(new int[] {axis}).getLong();
     }
 
     /**

@@ -64,7 +64,7 @@ public abstract class AbstractTraining implements TrainingListener {
             int numGpus = arguments.getNumGpus();
             String devices;
             if (numGpus > 0) {
-                devices = numGpus + " GPUs";
+                devices = numGpus + " GPU";
             } else {
                 devices = Device.defaultDevice().toString();
             }
@@ -80,7 +80,7 @@ public abstract class AbstractTraining implements TrainingListener {
             logger.info(
                     String.format(
                             "Load library %s in %.3f ms.", version, (loaded - init) / 1_000_000f));
-
+            epochTime = System.nanoTime();
             train(arguments);
 
             logger.info("Training: {} batches", trainDataSize);

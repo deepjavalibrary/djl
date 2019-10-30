@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
 import ai.djl.examples.training.util.AbstractTraining;
@@ -86,25 +87,27 @@ public final class TrainMnist extends AbstractTraining {
         FactorTracker factorTracker =
                 LearningRateTracker.factorTracker()
                         .optBaseLearningRate(0.01f)
-                        .setStep(1000)
+                        .setStep(2000)
                         .optFactor(0.1f)
                         .optWarmUpBeginLearningRate(0.001f)
-                        .optWarmUpSteps(200)
+                        .optWarmUpSteps(500)
                         .optStopFactorLearningRate(1e-4f)
                         .build();
         Optimizer optimizer =
                 Optimizer.sgd()
                         .setRescaleGrad(1.0f / batchSize)
                         .setLearningRateTracker(factorTracker)
-                        .optWeightDecays(0.001f)
-                        .optMomentum(0.9f)
+                        // TODO: fix states copy to multi-gpu
+                        // .optWeightDecays(0.001f)
+                        // .optMomentum(0.9f)
                         .build();
 
         return new DefaultTrainingConfig(new XavierInitializer())
                 .setOptimizer(optimizer)
                 .setLoss(Loss.softmaxCrossEntropyLoss())
                 .addTrainingMetric(new Accuracy())
-                .setBatchSize(batchSize);
+                .setBatchSize(batchSize)
+                .setDevices(Device.getDevices(arguments.getNumGpus()));
     }
 
     private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)
