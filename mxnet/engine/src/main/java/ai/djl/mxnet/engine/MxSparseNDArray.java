@@ -37,6 +37,7 @@ public class MxSparseNDArray extends MxNDArray {
         return toDense().get(index);
     }
 
+    /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
         return toDense().toByteBuffer();

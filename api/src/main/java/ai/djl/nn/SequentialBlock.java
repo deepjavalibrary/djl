@@ -29,45 +29,83 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * {@code SequentialBlock} is a {@link Block} whose children form a chain of blocks, each child
+ * block feeding its output to the next. The output of the last child is returned as the output of
+ * the {@code SequentialBlock}.
+ *
+ * <p>{@code SequentialBlock} has no direct parameters.
+ */
 public class SequentialBlock extends AbstractBlock {
 
     private static final byte VERSION = 1;
 
     private List<Block> blocks = new ArrayList<>();
 
-    public final SequentialBlock addAll(Block... blocks) {
+    /**
+     * Adds an array of blocks to be executed in sequence, in order.
+     *
+     * @param blocks the array of blocks
+     * @return this block
+     */
+    public SequentialBlock addAll(Block... blocks) {
         this.blocks.addAll(Arrays.asList(blocks));
         initialized = false;
         return this;
     }
 
-    public final SequentialBlock addAll(Collection<Block> blocks) {
+    /**
+     * Adds a {@link Collection} of blocks to be executed in sequence, in order.
+     *
+     * @param blocks the {@link Collection} of blocks
+     * @return this block
+     */
+    public SequentialBlock addAll(Collection<Block> blocks) {
         this.blocks.addAll(blocks);
         initialized = false;
         return this;
     }
 
-    public final SequentialBlock add(Block block) {
+    /**
+     * Adds the given {@link Block} to the block to be executed in order.
+     *
+     * @param block the block to be added to the sequence of blocks
+     * @return this block
+     */
+    public SequentialBlock add(Block block) {
         blocks.add(block);
         initialized = false;
         return this;
     }
 
-    public final SequentialBlock add(Function<NDList, NDList> f) {
+    /**
+     * Adds a {@link LambdaBlock} that applies the given function to the sequence of blocks.
+     *
+     * @param f the function forms the {@link LambdaBlock}
+     * @return this block
+     */
+    public SequentialBlock add(Function<NDList, NDList> f) {
         blocks.add(new LambdaBlock(f));
         initialized = false;
         return this;
     }
 
+    /** Removes the {@link Block} added last from the sequence of blocks. */
     public void removeLastBlock() {
         blocks.remove(blocks.size() - 1);
     }
 
+    /**
+     * Replaces the {@link Block} last added from the sequence of blocks, and adds the given block.
+     *
+     * @param block the block to replace the last block with
+     */
     public void replaceLastBlock(Block block) {
         removeLastBlock();
         blocks.add(block);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -82,6 +120,7 @@ public class SequentialBlock extends AbstractBlock {
         return current;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
         if (!initialized) {
@@ -95,6 +134,7 @@ public class SequentialBlock extends AbstractBlock {
         return getOutputShapes(manager, inputShapes);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         if (blocks.isEmpty()) {
@@ -107,16 +147,19 @@ public class SequentialBlock extends AbstractBlock {
         return current;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.emptyList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         throw new IllegalArgumentException("SequentialBlocks have no parameters");
     }
 
+    /** {@inheritDoc} */
     @Override
     public BlockList getChildren() {
         int size = blocks.size();
@@ -131,6 +174,7 @@ public class SequentialBlock extends AbstractBlock {
         return children;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
@@ -139,6 +183,7 @@ public class SequentialBlock extends AbstractBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

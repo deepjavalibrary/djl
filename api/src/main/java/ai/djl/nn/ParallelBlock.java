@@ -30,7 +30,12 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/** ParallelBlock can be used to represent branches in the computational graph. */
+/**
+ * {@code ParallelBlock} is a {@link Block} whose children form a parallel branch in the network,
+ * that are then combined to produce a single output.
+ *
+ * <p>{@code ParallelBlock} has no direct parameters.
+ */
 public class ParallelBlock extends AbstractBlock {
 
     private static final byte VERSION = 1;
@@ -38,40 +43,80 @@ public class ParallelBlock extends AbstractBlock {
     private List<Block> blocks;
     private Function<List<NDList>, NDList> function;
 
+    /**
+     * Creates a parallel block whose branches are combined to form a single output by the given
+     * function.
+     *
+     * @param function the function to define how the parallel branches are combined to form a
+     *     single output
+     */
     public ParallelBlock(Function<List<NDList>, NDList> function) {
         this.function = function;
         blocks = new ArrayList<>();
     }
 
+    /**
+     * Creates a parallel block whose branches are formed by each block in the list of blocks, and
+     * are combined to form a single output by the given function.
+     *
+     * @param function the function to define how the parallel branches are combined
+     * @param blocks the blocks that form each of the parallel branches
+     */
     public ParallelBlock(Function<List<NDList>, NDList> function, List<Block> blocks) {
         this.function = function;
         this.blocks = blocks;
     }
 
+    /**
+     * Adds an array of blocks, each of which is a parallel branch.
+     *
+     * @param blocks the array of blocks to add
+     * @return this block
+     */
     public final ParallelBlock addAll(Block... blocks) {
         this.blocks.addAll(Arrays.asList(blocks));
         initialized = false;
         return this;
     }
 
+    /**
+     * Adds a {@link Collection} of blocks, each of which is a parallel branch.
+     *
+     * @param blocks the {@link Collection} of blocks to add
+     * @return this block
+     */
     public final ParallelBlock addAll(Collection<Block> blocks) {
         this.blocks.addAll(blocks);
         initialized = false;
         return this;
     }
 
+    /**
+     * Adds the given {@link Block} to the block, which is one parallel branch.
+     *
+     * @param block the block to be added as a parallel branch
+     * @return this block
+     */
     public final ParallelBlock add(Block block) {
         blocks.add(block);
         initialized = false;
         return this;
     }
 
+    /**
+     * Adds a {@link LambdaBlock}, that applies the given function, to the list of parallel
+     * branches.
+     *
+     * @param f the function that forms the {@link LambdaBlock}
+     * @return this block
+     */
     public final ParallelBlock add(Function<NDList, NDList> f) {
         blocks.add(new LambdaBlock(f));
         initialized = false;
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -81,6 +126,7 @@ public class ParallelBlock extends AbstractBlock {
                         .collect(Collectors.toList()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
         if (!initialized) {
@@ -93,6 +139,7 @@ public class ParallelBlock extends AbstractBlock {
         return getOutputShapes(manager, inputShapes);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         if (blocks.isEmpty()) {
@@ -118,16 +165,19 @@ public class ParallelBlock extends AbstractBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.emptyList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         throw new IllegalArgumentException("ParallelBlock have no parameters");
     }
 
+    /** {@inheritDoc} */
     @Override
     public BlockList getChildren() {
         int size = blocks.size();
@@ -142,6 +192,7 @@ public class ParallelBlock extends AbstractBlock {
         return children;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
@@ -150,6 +201,7 @@ public class ParallelBlock extends AbstractBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

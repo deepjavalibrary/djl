@@ -21,12 +21,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * {@code AbstractBlock} is an abstract implementation of {@link Block}. It is recommended that all
+ * {@code Block} classes that have children extend the {@code AbstractBlock}.
+ */
 public abstract class AbstractBlock implements Block {
 
     protected boolean initialized;
     protected Shape[] inputShapes;
     protected List<String> inputNames = Collections.singletonList("data");
 
+    /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
         if (!initialized) {
@@ -35,6 +40,7 @@ public abstract class AbstractBlock implements Block {
         return new PairList<>(inputNames, Arrays.asList(inputShapes));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer) {
         for (Parameter parameter : getDirectParameters()) {
@@ -45,6 +51,7 @@ public abstract class AbstractBlock implements Block {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer, String paramName) {
         Parameter parameter =
@@ -59,6 +66,7 @@ public abstract class AbstractBlock implements Block {
         parameter.setInitializer(initializer, true);
     }
 
+    /** {@inheritDoc} */
     @Override
     public ParameterList getParameters() {
         ParameterList parameters = new ParameterList();
@@ -69,20 +77,28 @@ public abstract class AbstractBlock implements Block {
         return parameters;
     }
 
+    /**
+     * Performs any action necessary before initialization.
+     *
+     * @param inputShapes the expected shapes of the input
+     */
     protected void beforeInitialize(Shape[] inputShapes) {
         this.inputShapes = inputShapes;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isInitialized() {
         return initialized;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void clear() {
         getParameters().forEach(param -> param.getValue().close());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Not implemented yet.");

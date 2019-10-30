@@ -16,8 +16,13 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
+/**
+ * {@code ParameterBlock} is an abstract implementation of {@link Block}. It is recommended that all
+ * {@link Block} classes that have no children extend the {@code ParameterBlock}.
+ */
 public abstract class ParameterBlock extends AbstractBlock {
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
         if (!initialized) {
@@ -30,8 +35,9 @@ public abstract class ParameterBlock extends AbstractBlock {
         return getOutputShapes(manager, inputShapes);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public BlockList getChildren() {
+    public final BlockList getChildren() {
         return new BlockList();
     }
 }
