@@ -350,6 +350,14 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
+    public int MXLoadTVMConfig(PointerByReference config) {
+        if (functions.containsKey("MXLoadTVMConfig")) {
+            return functions.get("MXLoadTVMConfig").apply(new Object[] {config});
+        }
+        return 0;
+    }
+
+    @Override
     public int MXNDArrayCreateNone(PointerByReference out) {
         if (functions.containsKey("MXNDArrayCreateNone")) {
             return functions.get("MXNDArrayCreateNone").apply(new Object[] {out});
@@ -1091,7 +1099,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     @Override
-    public int MXIsNumpyShape(ByteBuffer curr) {
+    public int MXIsNumpyShape(IntBuffer curr) {
         if (functions.containsKey("MXIsNumpyShape")) {
             return functions.get("MXIsNumpyShape").apply(new Object[] {curr});
         }
@@ -2476,6 +2484,45 @@ public class MockMxnetLibrary implements MxnetLibrary {
                                 out
                             });
         }
+        return 0;
+    }
+
+    @Override
+    public int MXExecutorSimpleBindEx64(
+            Pointer symbol_handle,
+            int dev_type,
+            int dev_id,
+            int num_g2c_keys,
+            String[] g2c_keys,
+            int[] g2c_dev_types,
+            int[] g2c_dev_ids,
+            int provided_grad_req_list_len,
+            String[] provided_grad_req_names,
+            String[] provided_grad_req_types,
+            int num_provided_arg_shapes,
+            String[] provided_arg_shape_names,
+            long[] provided_arg_shape_data,
+            int[] provided_arg_shape_idx,
+            int num_provided_arg_dtypes,
+            String[] provided_arg_dtype_names,
+            int[] provided_arg_dtypes,
+            int num_provided_arg_stypes,
+            String[] provided_arg_stype_names,
+            int[] provided_arg_stypes,
+            int num_shared_arg_names,
+            String[] shared_arg_name_list,
+            IntBuffer shared_buffer_len,
+            String[] shared_buffer_name_list,
+            PointerByReference shared_buffer_handle_list,
+            PointerByReference updated_shared_buffer_name_list,
+            PointerByReference updated_shared_buffer_handle_list,
+            IntBuffer num_in_args,
+            PointerByReference in_args,
+            PointerByReference arg_grads,
+            IntBuffer num_aux_states,
+            PointerByReference aux_states,
+            Pointer shared_exec_handle,
+            PointerByReference out) {
         return 0;
     }
 

@@ -126,7 +126,7 @@ public class JnaGenerator {
                     case 1:
                         writer.append("        return Collections.singletonList(");
                         String firstField = fieldNames.keySet().iterator().next();
-                        writer.append(firstField).append(");\n");
+                        writer.append('"').append(firstField).append("\");\n");
                         break;
                     default:
                         writer.append("        return Arrays.asList(");

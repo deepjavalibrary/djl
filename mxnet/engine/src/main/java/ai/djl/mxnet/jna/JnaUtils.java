@@ -596,9 +596,9 @@ public final class JnaUtils {
     }
 
     public static boolean isNumpyMode() {
-        ByteBuffer ret = ByteBuffer.allocate(1);
+        IntBuffer ret = IntBuffer.allocate(1);
         checkCall(LIB.MXIsNumpyShape(ret));
-        return ret.get() == 1;
+        return ret.get() != 0;
     }
 
     public static void setNumpyMode(boolean numpy) {
