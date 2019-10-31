@@ -61,12 +61,12 @@ public abstract class AbstractTraining implements TrainingListener {
             DefaultParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args, null, false);
             Arguments arguments = new Arguments(cmd);
-            int numGpus = arguments.getNumGpus();
+            int maxGpus = arguments.getMaxGpus();
             String devices;
-            if (numGpus > 0) {
-                devices = numGpus + " GPU";
+            if (maxGpus > 0) {
+                devices = maxGpus + " GPUs";
             } else {
-                devices = Device.defaultDevice().toString();
+                devices = Device.cpu().toString();
             }
             logger.info(
                     "Running {} on: {}, epoch: {}.",

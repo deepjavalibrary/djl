@@ -107,7 +107,7 @@ public final class TrainMnist extends AbstractTraining {
                 .setLoss(Loss.softmaxCrossEntropyLoss())
                 .addTrainingMetric(new Accuracy())
                 .setBatchSize(batchSize)
-                .setDevices(Device.getDevices(arguments.getNumGpus()));
+                .setDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
     private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)

@@ -149,7 +149,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 .setLoss(Loss.softmaxCrossEntropyLoss())
                 .addTrainingMetric(new Accuracy())
                 .setBatchSize(arguments.getBatchSize())
-                .setDevices(Device.getDevices(arguments.getNumGpus()));
+                .setDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
     private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)

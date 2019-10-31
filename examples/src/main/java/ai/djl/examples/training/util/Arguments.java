@@ -21,7 +21,7 @@ public class Arguments {
 
     private int epoch;
     private int batchSize;
-    private int numGpus;
+    private int maxGpus;
     private boolean isSymbolic;
     private boolean preTrained;
     private String outputDir;
@@ -33,14 +33,14 @@ public class Arguments {
         } else {
             epoch = 10;
         }
-        numGpus = Engine.getInstance().getGpuCount();
-        if (cmd.hasOption("num-gpus")) {
-            numGpus = Math.min(Integer.parseInt(cmd.getOptionValue("num-gpus")), numGpus);
+        maxGpus = Engine.getInstance().getGpuCount();
+        if (cmd.hasOption("max-gpus")) {
+            maxGpus = Math.min(Integer.parseInt(cmd.getOptionValue("max-gpus")), maxGpus);
         }
         if (cmd.hasOption("batch-size")) {
             batchSize = Integer.parseInt(cmd.getOptionValue("batch-size"));
         } else {
-            batchSize = numGpus > 0 ? 32 * numGpus : 32;
+            batchSize = maxGpus > 0 ? 32 * maxGpus : 32;
         }
         isSymbolic = cmd.hasOption("symbolic-model");
         preTrained = cmd.hasOption("pre-trained");
@@ -75,10 +75,10 @@ public class Arguments {
                         .build());
         options.addOption(
                 Option.builder("g")
-                        .longOpt("num-gpus")
+                        .longOpt("max-gpus")
                         .hasArg()
-                        .argName("NUMGPUS")
-                        .desc("Number of GPUs used for training")
+                        .argName("MAXGPUS")
+                        .desc("Max number of GPUs to use for training")
                         .build());
         options.addOption(
                 Option.builder("s")
@@ -124,8 +124,8 @@ public class Arguments {
         return epoch;
     }
 
-    public int getNumGpus() {
-        return numGpus;
+    public int getMaxGpus() {
+        return maxGpus;
     }
 
     public boolean getIsSymbolic() {
