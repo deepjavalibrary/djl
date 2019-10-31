@@ -147,6 +147,97 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
+    public void testAll() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.arange(10);
+            Assert.assertFalse(array.all());
+            Assert.assertTrue(array.add(1f).all());
+            array = manager.create(new boolean[] {true, false});
+            Assert.assertFalse(array.all());
+
+            // test multi-dim
+            array = manager.arange(20).reshape(2, 5, 2);
+            Assert.assertFalse(array.all());
+            Assert.assertTrue(array.add(1f).all());
+            array =
+                    manager.create(
+                            new boolean[] {true, false, true, false, true, false}, new Shape(2, 3));
+            Assert.assertFalse(array.all());
+
+            // test scalar
+            array = manager.create(1f);
+            Assert.assertTrue(array.all());
+            array = manager.create(false);
+            Assert.assertFalse(array.all());
+
+            // test zero-dim
+            array = manager.create(new Shape(0));
+            Assert.assertTrue(array.all());
+        }
+    }
+
+    @Test
+    public void testAny() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.arange(10);
+            Assert.assertTrue(array.any());
+            array = manager.zeros(new Shape(10));
+            Assert.assertFalse(array.all());
+            array = manager.create(new boolean[] {true, false});
+            Assert.assertTrue(array.any());
+
+            // test multi-dim
+            array = manager.eye(2);
+            Assert.assertTrue(array.any());
+            array =
+                    manager.create(
+                            new boolean[] {true, false, true, false, true, false}, new Shape(2, 3));
+            Assert.assertTrue(array.any());
+
+            // test scalar
+            array = manager.create(1f);
+            Assert.assertTrue(array.any());
+            array = manager.create(false);
+            Assert.assertFalse(array.any());
+
+            // test zero-dim
+            array = manager.create(new Shape(0));
+            Assert.assertFalse(array.any());
+        }
+    }
+
+    @Test
+    public void testNone() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.arange(10);
+            Assert.assertFalse(array.none());
+            array = manager.zeros(new Shape(10));
+            Assert.assertTrue(array.none());
+            array = manager.create(new boolean[] {false, false});
+            Assert.assertTrue(array.none());
+
+            // test multi-dim
+            array = manager.eye(2);
+            Assert.assertFalse(array.none());
+            array =
+                    manager.create(
+                            new boolean[] {false, false, false, false, false, false},
+                            new Shape(2, 3));
+            Assert.assertTrue(array.none());
+
+            // test scalar
+            array = manager.create(1f);
+            Assert.assertFalse(array.none());
+            array = manager.create(false);
+            Assert.assertTrue(array.none());
+
+            // test zero-dim
+            array = manager.create(new Shape(0));
+            Assert.assertTrue(array.none());
+        }
+    }
+
+    @Test
     public void testCountNonzero() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(4);
@@ -456,6 +547,7 @@ public class NDArrayOtherOpTest {
             Assert.assertEquals(original, original.clip(0.0, 1.0));
         }
     }
+
     // TODO Enable after fixing failure in jenkins
     @Test(enabled = false, expectedExceptions = EngineException.class)
     public void testSwapAxes() {
@@ -531,7 +623,6 @@ public class NDArrayOtherOpTest {
     }
 
     // TODO Enable after fixing failure in jenkins
-
     @Test(enabled = false, expectedExceptions = EngineException.class)
     public void testArgmax() {
         try (NDManager manager = NDManager.newBaseManager()) {

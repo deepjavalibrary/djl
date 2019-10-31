@@ -119,8 +119,8 @@ public class NDArrayCreationOpTest {
             Assert.assertEquals(actual, array);
         }
     }
-    // eye op not yet merge into MXNet master
-    @Test(enabled = false)
+
+    @Test
     public void testEye() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.eye(2);

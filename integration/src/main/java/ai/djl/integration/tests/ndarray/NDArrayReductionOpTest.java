@@ -22,7 +22,6 @@ import org.testng.annotations.Test;
 public class NDArrayReductionOpTest {
 
     // TODO:Enable test after fixing exception catch in jenkins
-
     @Test(enabled = false, expectedExceptions = EngineException.class)
     public void testMax() {
         try (NDManager manager = NDManager.newBaseManager()) {
@@ -49,8 +48,8 @@ public class NDArrayReductionOpTest {
             array.max();
         }
     }
-    // TODO:Enable test after fixing exception catch in jenkins
 
+    // TODO:Enable test after fixing exception catch in jenkins
     @Test(enabled = false, expectedExceptions = EngineException.class)
     public void testMin() {
         try (NDManager manager = NDManager.newBaseManager()) {
@@ -160,8 +159,8 @@ public class NDArrayReductionOpTest {
             // Assert.assertEquals(Float.NaN, array.mean().getFloat());
         }
     }
-    // TODO update libmxnet to get trace op
-    @Test(enabled = false)
+
+    @Test
     public void testTrace() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.arange(8).reshape(new Shape(2, 2, 2)).trace();
