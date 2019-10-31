@@ -16,7 +16,7 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
-/** Normalize an tensor of shape (C, H, W). */
+/** Normalizes a tensor of shape (C, H, W). */
 public class Normalize implements Transform {
     private float[] mean;
     private float[] std;

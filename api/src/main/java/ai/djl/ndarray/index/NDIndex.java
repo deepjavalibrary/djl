@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  * The {@code NDIndex} allows you to specify a subset of an NDArray that can be used for fetching or
  * updating.
  *
- * <p>It accepts different a index option for each dimension, given in the order of the dimensions.
+ * <p>It accepts a different index option for each dimension, given in the order of the dimensions.
  * Each dimension has options corresponding to:
  *
  * <ul>
@@ -61,32 +61,32 @@ public class NDIndex {
      * <pre>
      *     NDArray a = manager.ones(new Shape(5, 4, 3));
      *
-     *     // Get a subsection of the NDArray in the first axis
+     *     // Gets a subsection of the NDArray in the first axis.
      *     assertEquals(a.get(new NDIndex("2")).getShape(), new Shape(4, 3));
      *
-     *     // Get a subsection of the NDArray indexing from the end (-i == length - i)
+     *     // Gets a subsection of the NDArray indexing from the end (-i == length - i).
      *     assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(4, 3));
      *
-     *     // Get everything in the first axis and a subsection in the second axis.
+     *     // Gets everything in the first axis and a subsection in the second axis.
      *     // You can use either : or * to represent everything
      *     assertEquals(a.get(new NDIndex(":, 2")).getShape(), new Shape(5, 3));
      *     assertEquals(a.get(new NDIndex("*, 2")).getShape(), new Shape(5, 3));
      *
-     *     // Gets a range of values along the second axis that is inclusive on the bottom and exclusive on the top
+     *     // Gets a range of values along the second axis that is inclusive on the bottom and exclusive on the top.
      *     assertEquals(a.get(new NDIndex(":, 1:3")).getShape(), new Shape(5, 2, 3));
      *
-     *     // You can exclude either the min or the max of the range to go all the way to the beginning or end.
+     *     // Excludes either the min or the max of the range to go all the way to the beginning or end.
      *     assertEquals(a.get(new NDIndex(":, :3")).getShape(), new Shape(5, 3, 3));
      *     assertEquals(a.get(new NDIndex(":, 1:")).getShape(), new Shape(5, 4, 3));
      *
-     *     // The value after the second colon in a slicing range is the step. You can use it to get every other result:
+     *     // Uses the value after the second colon in a slicing range, the step, to get every other result.
      *     assertEquals(a.get(new NDIndex(":, 1::2")).getShape(), new Shape(5, 2, 3));
      *
-     *     // Use a negative step to reverse along the dimension
+     *     // Uses a negative step to reverse along the dimension.
      *     assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(5, 4, 3));
      * </pre>
      *
-     * @param indices A comma separated list of indices corresponding to either subsections,
+     * @param indices a comma separated list of indices corresponding to either subsections,
      *     everything, or slices on a particular dimension
      * @see <a href="https://docs.scipy.org/doc/numpy/reference/arrays.indexing.html">Numpy
      *     Indexing</a>
@@ -99,8 +99,8 @@ public class NDIndex {
     /**
      * Creates an NDIndex with the given indices as specified values on the NDArray.
      *
-     * @param indices indices with each index corresponding to the dimensions and negative indices
-     *     tarting from the end
+     * @param indices the indices with each index corresponding to the dimensions and negative
+     *     indices starting from the end
      */
     public NDIndex(long... indices) {
         this();
@@ -110,7 +110,7 @@ public class NDIndex {
     /**
      * Returns the number of dimensions specified in the Index.
      *
-     * @return the number of dimensions specified in the Index.
+     * @return the number of dimensions specified in the Index
      */
     public int getRank() {
         return rank;
@@ -119,7 +119,7 @@ public class NDIndex {
     /**
      * Returns the index affecting the given dimension.
      *
-     * @param dimension The affected dimension
+     * @param dimension the affected dimension
      * @return the index affecting the given dimension
      */
     public NDIndexElement get(int dimension) {
@@ -139,7 +139,7 @@ public class NDIndex {
      * Updates the NDIndex by appending indices to the array.
      *
      * @param indices the indices to add similar to {@link #NDIndex(String)}
-     * @return The updated {@link NDIndex}
+     * @return the updated {@link NDIndex}
      * @see #NDIndex(String)
      */
     public final NDIndex addIndices(String indices) {
@@ -154,7 +154,7 @@ public class NDIndex {
     /**
      * Updates the NDIndex by appending indices as specified values on the NDArray.
      *
-     * @param indices with each index corresponding to the dimensions and negative indices tarting
+     * @param indices with each index corresponding to the dimensions and negative indices starting
      *     from the end
      * @return the updated {@link NDIndex}
      */
@@ -170,7 +170,7 @@ public class NDIndex {
      * Updates the NDIndex by appending a boolean NDArray.
      *
      * <p>The NDArray should have a matching shape to the dimensions being fetched and will return
-     * where the values in NDIndex do not equal zero
+     * where the values in NDIndex do not equal zero.
      *
      * @param index a boolean NDArray where all nonzero elements correspond to elements to return
      * @return the updated {@link NDIndex}
@@ -184,8 +184,8 @@ public class NDIndex {
     /**
      * Appends a new index to slice the dimension and returns a range of values.
      *
-     * @param min The minimum of the range
-     * @param max The maximum of the range
+     * @param min the minimum of the range
+     * @param max the maximum of the range
      * @return the updated {@link NDIndex}
      */
     public NDIndex addSliceDim(long min, long max) {
@@ -197,9 +197,9 @@ public class NDIndex {
     /**
      * Appends a new index to slice the dimension and returns a range of values.
      *
-     * @param min The minimum of the range
-     * @param max The maximum of the range
-     * @param step The step of the slice
+     * @param min the minimum of the range
+     * @param max the maximum of the range
+     * @param step the step of the slice
      * @return the updated {@link NDIndex}
      */
     public NDIndex addSliceDim(long min, long max, long step) {

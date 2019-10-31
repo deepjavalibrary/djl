@@ -40,8 +40,8 @@ public enum SparseFormat {
     /**
      * Gets the {@code SparseFormat} from it's integer value.
      *
-     * @param value integer value of the {@code SparseFormat}
-     * @return {@code SparseFormat}
+     * @param value the integer value of the {@code SparseFormat}
+     * @return a {@code SparseFormat}
      */
     public static SparseFormat fromValue(int value) {
         for (SparseFormat t : values()) {
@@ -53,18 +53,18 @@ public enum SparseFormat {
     }
 
     /**
-     * Returns {@code SparseFormat} name.
+     * Returns the {@code SparseFormat} name.
      *
-     * @return {@code SparseFormat} name.
+     * @return the {@code SparseFormat} name
      */
     public String getType() {
         return type;
     }
 
     /**
-     * Returns integer value of this {@code SparseFormat}.
+     * Returns the integer value of this {@code SparseFormat}.
      *
-     * @return integer value of this {@code SparseFormat}
+     * @return the integer value of this {@code SparseFormat}
      */
     public int getValue() {
         return value;

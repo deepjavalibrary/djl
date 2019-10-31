@@ -20,7 +20,7 @@ public interface BoundingBox {
     /**
      * Returns the bounding {@code Rectangle} of this {@code BoundingBox}.
      *
-     * @return a new {@code Rectangle} for this {@code BoundingBox}.
+     * @return a new {@code Rectangle} for this {@code BoundingBox}
      */
     Rectangle getBounds();
 
@@ -29,21 +29,21 @@ public interface BoundingBox {
      * access to the geometry of the {@code BoundingBox} outline.
      *
      * @return a {@code PathIterator} object, which independently traverses the geometry of the
-     *     {@code BoundingBox}.
+     *     {@code BoundingBox}
      */
     PathIterator getPath();
 
     /**
      * Returns the top left point of the bounding box.
      *
-     * @return {@link Point} of top left corner
+     * @return the {@link Point} of the top left corner
      */
     Point getPoint();
 
     /**
-     * Draw the bounding box using the {@link Graphics2D}.
+     * Draws the bounding box using the {@link Graphics2D}.
      *
-     * @param g Graphics2D object of the image
+     * @param g the Graphics2D object of the image
      * @param imageWidth the width of the image
      * @param imageHeight the height of the image
      */

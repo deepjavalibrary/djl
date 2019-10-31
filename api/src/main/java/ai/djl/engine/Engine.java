@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The {@code Engine} interface shadows differences between each deep learning framework.
  *
- * <p>Any framework specific functionality should be provided through this class.
+ * <p>Any framework-specific functionality should be provided through this class.
  */
 public abstract class Engine {
 
@@ -62,14 +62,14 @@ public abstract class Engine {
     /**
      * Returns the name of the Engine.
      *
-     * @return name of the engine
+     * @return the name of the engine
      */
     public abstract String getEngineName();
 
     /**
      * Returns the default Engine.
      *
-     * @return instance of {@code Engine}
+     * @return the instance of {@code Engine}
      */
     public static Engine getInstance() {
         if (ENGINE == null) {
@@ -81,8 +81,8 @@ public abstract class Engine {
     /**
      * Returns {@code Engine} by engine name.
      *
-     * @param engineName name of Engine to retrieve
-     * @return instance of {@code Engine}
+     * @param engineName the name of Engine to retrieve
+     * @return the instance of {@code Engine}
      */
     public static Engine getEngine(String engineName) {
         return ALL_ENGINES.get(engineName);
@@ -91,7 +91,7 @@ public abstract class Engine {
     /**
      * Returns the number of GPUs available in the system.
      *
-     * @return number of GPUs available in the system
+     * @return the number of GPUs available in the system
      */
     public abstract int getGpuCount();
 
@@ -99,33 +99,33 @@ public abstract class Engine {
      * Returns {@link MemoryUsage} of specified GPU device.
      *
      * @param device the GPU {@link Device} to retrieve
-     * @return {@link MemoryUsage} of specified GPU device
+     * @return the {@link MemoryUsage} of specified GPU device
      * @throws EngineException if operation is not supported
      * @throws IllegalArgumentException if Device is not GPU device
      */
     public abstract MemoryUsage getGpuMemory(Device device);
 
     /**
-     * Returns system default device.
+     * Returns the system's default device.
      *
      * <p>If the system has GPU available, then the default device is {@link Device#gpu()}.
      * Otherwise the default device returned is {@link Device#cpu()}
      *
-     * @return default device
+     * @return the system's default device
      */
     public abstract Device defaultDevice();
 
     /**
      * Returns the version of the deep learning framework.
      *
-     * @return version number
+     * @return the version number of the deep learning framework
      */
     public abstract String getVersion();
 
     /**
-     * Construct a new model.
+     * Constructs a new model.
      *
-     * @param device the device that model to be loaded
+     * @param device the device that the model will be loaded onto
      * @return a new Model instance using the network defined in block
      */
     public abstract Model newModel(Device device);
@@ -135,15 +135,15 @@ public abstract class Engine {
      *
      * <p>{@code NDManager} will inherit default {@link Device}.
      *
-     * @return Returns a new top-level {@code NDManager}
+     * @return a new top-level {@code NDManager}
      */
     public abstract NDManager newBaseManager();
 
     /**
      * Creates a new top-level {@link NDManager} with specified {@link Device}.
      *
-     * @param device default {@link Device}
-     * @return Returns a new top-level {@code NDManager}
+     * @param device the default {@link Device}
+     * @return a new top-level {@code NDManager}
      */
     public abstract NDManager newBaseManager(Device device);
 }

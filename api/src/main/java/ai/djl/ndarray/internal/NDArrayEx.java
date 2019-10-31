@@ -20,7 +20,7 @@ import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.training.Activation;
 import ai.djl.util.PairList;
 
-/** An internal interface that encapsulate engine specific operator methods. */
+/** An internal interface that encapsulates engine specific operator methods. */
 public interface NDArrayEx {
 
     ////////////////////////////////////////
@@ -28,122 +28,122 @@ public interface NDArrayEx {
     ////////////////////////////////////////
 
     /**
-     * Reverse division with a scalar - i.e., (n / thisArrayValues).
+     * Applies reverse division with a scalar - i.e., (n / thisArrayValues).
      *
-     * @param n Value to use for reverse division
-     * @return copy of array after applying reverse division
+     * @param n the Value to use for reverse division
+     * @return a copy of the array after applying reverse division
      */
     NDArray rdiv(Number n);
 
     /**
-     * Reverse division with a scalar - i.e., (n / thisArrayValues).
+     * Applies reverse division with a scalar - i.e., (n / thisArrayValues).
      *
-     * @param b ndarray to use for reverse division
-     * @return copy of array after applying reverse division
+     * @param b the ndarray to use for reverse division
+     * @return a copy of the array after applying reverse division
      */
     NDArray rdiv(NDArray b);
 
     /**
-     * In place reverse division - i.e., (n / thisArrayValues).
+     * Applies in place reverse division - i.e., (n / thisArrayValues).
      *
-     * @param n Value to use for reverse division
+     * @param n the value to use for reverse division
      * @return this array after applying reverse division
      */
     NDArray rdivi(Number n);
 
     /**
-     * In place reverse division - i.e., (n / thisArrayValues).
+     * Applies in place reverse division - i.e., (n / thisArrayValues).
      *
-     * @param b ndarray to use for reverse division
+     * @param b the ndarray to use for reverse division
      * @return this array after applying reverse division
      */
     NDArray rdivi(NDArray b);
 
     /**
-     * Reverse subtraction with duplicates - i.e., (n - thisArrayValues).
+     * Applies reverse subtraction with duplicates - i.e., (n - thisArrayValues).
      *
-     * @param n Value to use for reverse subtraction
-     * @return copy of array after reverse subtraction
+     * @param n the value to use for reverse subtraction
+     * @return a copy of array after reverse subtraction
      */
     NDArray rsub(Number n);
 
     /**
-     * Reverse subtraction with duplicates - i.e., (n - thisArrayValues).
+     * Applies reverse subtraction with duplicates - i.e., (n - thisArrayValues).
      *
-     * @param b ndarray to use for reverse subtraction
-     * @return copy of array after reverse subtraction
+     * @param b the ndarray to use for reverse subtraction
+     * @return a copy of the array after reverse subtraction
      */
     NDArray rsub(NDArray b);
 
     /**
-     * Reverse subtraction in place - i.e., (n - thisArrayValues).
+     * Applies reverse subtraction in place - i.e., (n - thisArrayValues).
      *
-     * @param n Value to use for reverse subtraction
+     * @param n the value to use for reverse subtraction
      * @return this array after reverse subtraction
      */
     NDArray rsubi(Number n);
 
     /**
-     * Reverse subtraction in place - i.e., (n - thisArrayValues).
+     * Applies reverse subtraction in place - i.e., (n - thisArrayValues).
      *
-     * @param b ndarray to use for reverse subtraction
+     * @param b the ndarray to use for reverse subtraction
      * @return this array after reverse subtraction
      */
     NDArray rsubi(NDArray b);
 
     /**
-     * Reverse remainder of division with a scalar.
+     * Applies reverse remainder of division with a scalar.
      *
-     * @param n Value to use for reverse division
-     * @return copy of array after applying reverse division
+     * @param n the value to use for reverse division
+     * @return a copy of array after applying reverse division
      */
     NDArray rmod(Number n);
 
     /**
-     * Reverse remainder of division.
+     * Applies reverse remainder of division.
      *
-     * @param b ndarray to use for reverse division
-     * @return copy of array after applying reverse division
+     * @param b the ndarray to use for reverse division
+     * @return a copy of array after applying reverse division
      */
     NDArray rmod(NDArray b);
 
     /**
-     * In place reverse remainder of division with a scalar.
+     * Applies in place reverse remainder of division with a scalar.
      *
-     * @param n Value to use for reverse division
+     * @param n the value to use for reverse division
      * @return this array after applying reverse division
      */
     NDArray rmodi(Number n);
 
     /**
-     * In place reverse remainder of division.
+     * Applies in place reverse remainder of division.
      *
-     * @param b ndarray to use for reverse division
+     * @param b the ndarray to use for reverse division
      * @return this array after applying reverse division
      */
     NDArray rmodi(NDArray b);
 
     /**
-     * Reverse the power of each element being raised in the {@code NDArray}.
+     * Reverses the power of each element being raised in the {@code NDArray}.
      *
-     * @param n Value to use for reverse power
-     * @return copy of array after applying reverse power
+     * @param n the value to use for reverse power
+     * @return a copy of array after applying reverse power
      */
     NDArray rpow(Number n);
 
     /**
-     * In place reverse the power of each element being raised in the {@code NDArray}.
+     * Reverses the power of each element being raised in the {@code NDArray} in place.
      *
-     * @param n Value to use for reverse power
-     * @return copy of array after applying reverse power
+     * @param n the value to use for reverse power
+     * @return a copy of array after applying reverse power
      */
     NDArray rpowi(Number n);
 
     /**
      * Returns element-wise maximum of the input arrays with broadcasting.
      *
-     * @param n Value to be compared
-     * @return the maximum of two {@code NDArray}.
+     * @param n the value to be compared
+     * @return the maximum of two {@code NDArray}
      */
     NDArray max(Number n);
 
@@ -152,15 +152,15 @@ public interface NDArrayEx {
      *
      * @param other the arrays holding the elements to be compared. They must have the same shape,
      *     or shapes that can be broadcast to a single shape.
-     * @return the maximum of two {@code NDArray}.
+     * @return the maximum of two {@code NDArray}
      */
     NDArray max(NDArray other);
 
     /**
      * Returns element-wise minimum of the input arrays with broadcasting.
      *
-     * @param n Value to be compared
-     * @return the minimum of two {@code NDArray}.
+     * @param n the value to be compared
+     * @return the minimum of two {@code NDArray}
      */
     NDArray min(Number n);
 
@@ -169,7 +169,7 @@ public interface NDArrayEx {
      *
      * @param other the arrays holding the elements to be compared. They must have the same shape,
      *     or shapes that can be broadcast to a single shape.
-     * @return the minimum of two {@code NDArray}.
+     * @return the minimum of two {@code NDArray}
      */
     NDArray min(NDArray other);
 
@@ -180,7 +180,7 @@ public interface NDArrayEx {
     /**
      * Computes rectified linear activation.
      *
-     * @return copy of array after applying relu
+     * @return a copy of array after applying relu
      */
     NDArray relu();
 
@@ -338,14 +338,15 @@ public interface NDArrayEx {
     ////////////////////////////////////////
 
     /**
-     * Normalize a NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard deviation.
+     * Normalizes a NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard
+     * deviation.
      *
      * <p>Given mean `(m1, ..., mn)` and std `(s\ :sub:`1`\ , ..., s\ :sub:`n`)` for `n` channels,
      * this transform normalizes each channel of the input tensor with: output[i] = (input[i] - m\
      * :sub:`i`\ ) / s\ :sub:`i`
      *
-     * @param mean mean value for each channel
-     * @param std standard deviation for each channel
+     * @param mean the mean value for each channel
+     * @param std the standard deviation for each channel
      * @return the result of normalization
      */
     NDArray normalize(float[] mean, float[] std);
@@ -363,27 +364,29 @@ public interface NDArrayEx {
     /**
      * Picks elements from an input array according to the input indices along the given axis.
      *
-     * @param index The index array
-     * @param axis The axis to picking the elements. Negative values means indexing from right to
-     *     left. If is `None`, the elements in the index w.r.t the flattened input will be picked.
+     * @param index the index array
+     * @param axis the axis used to pick the elements. Negative values means indexing happens from
+     *     right to left. If it is `None`, the elements in the index w.r.t the flattened input will
+     *     be picked.
      * @param keepDims If true, the axis where we pick the elements is left in the result as
      *     dimension with size one.
      * @param mode Specify how out-of-bound indices behave. "clip" means clip to the range. So, if
      *     all indices mentioned are too large, they are replaced by the index that addresses the
      *     last element along an axis. "wrap" means to wrap around.
-     * @return copy of array
+     * @return a copy of the array
      */
     NDArray pick(NDArray index, int axis, boolean keepDims, String mode);
 
     /**
      * Picks elements from an input array according to the input indices along the given axis.
      *
-     * @param index The index array
-     * @param axis The axis to picking the elements. Negative values means indexing from right to
-     *     left. If is `None`, the elements in the index w.r.t the flattened input will be picked.
+     * @param index the index array
+     * @param axis the axis used to pick the elements. Negative values mean indexing happen from
+     *     right to left. If it is `None`, the elements in the index w.r.t the flattened input will
+     *     be picked.
      * @param keepDims If true, the axis where we pick the elements is left in the result as
      *     dimension with size one.
-     * @return copy of array
+     * @return a copy of the array
      */
     default NDArray pick(NDArray index, int axis, boolean keepDims) {
         return pick(index, axis, keepDims, "clip");
@@ -392,14 +395,16 @@ public interface NDArrayEx {
     // TODO Add default implementation
 
     /**
-     * Compute Multibox training targets.
+     * Computes Multibox training targets.
      *
-     * @param inputs NDList of (anchors, labels, and class prediction)
-     * @param iouThreshold Anchor-GroundTruth overlap threshold to be regarded as a positive match
-     * @param ignoreLabel Label for ignored anchors
-     * @param negativeMiningRatio Max negative to positive samples ratio, use -1 to disable mining
-     * @param negativeMiningThreshold Threshold used for negative mining
-     * @param minNegativeSamples Minimum number of negative samples
+     * @param inputs a NDList of (anchors, labels, and class prediction)
+     * @param iouThreshold the anchor-GroundTruth overlap threshold to be regarded as a positive
+     *     match
+     * @param ignoreLabel the label for ignored anchors
+     * @param negativeMiningRatio the max negative to positive samples ratio, use -1 to disable
+     *     mining
+     * @param negativeMiningThreshold the threshold used for negative mining
+     * @param minNegativeSamples the minimum number of negative samples
      * @return an NDList of (bounding box labels, bounding box masks, class labels)
      */
     NDList multiBoxTarget(
@@ -411,15 +416,15 @@ public interface NDArrayEx {
             int minNegativeSamples);
 
     /**
-     * Convert multibox detection predictions.
+     * Converts multibox detection predictions.
      *
-     * @param inputs NDList of (anchors, labels, and class prediction)
-     * @param clip Clip out-of-boundary boxes
-     * @param threshold Threshold to be a positive prediction
-     * @param backgroundId Background id
-     * @param nmsThreashold Non-maximum suppression threshold
-     * @param forceSuppress Suppress all detections regardless of class_id
-     * @param nmsTopK Keep maximum top k detections before nms, -1 for no limit
+     * @param inputs a NDList of (anchors, labels, and class prediction)
+     * @param clip the clip out-of-boundary boxes
+     * @param threshold the threshold to be a positive prediction
+     * @param backgroundId the background id
+     * @param nmsThreashold the non-maximum suppression threshold
+     * @param forceSuppress suppress all detections regardless of class_id
+     * @param nmsTopK keep maximum top k detections before nms, -1 for no limit
      * @return an NDList
      */
     NDList multiBoxDetection(

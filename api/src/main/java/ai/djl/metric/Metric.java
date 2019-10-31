@@ -21,23 +21,23 @@ public class Metric {
     private long timestamp;
 
     /**
-     * Constructs a {@code Metric} instance with specified {@code metricName} and <code>
+     * Constructs a {@code Metric} instance with the specified {@code metricName} and <code>
      * value</code>.
      *
-     * @param metricName metric name
-     * @param value metric value
+     * @param metricName the metric name
+     * @param value the metric value
      */
     public Metric(String metricName, Number value) {
         this(metricName, value, "count");
     }
 
     /**
-     * Constructs a {@code Metric} instance with specified {@code metricName}, <code>value
-     * </code> and {@code unit}.
+     * Constructs a {@code Metric} instance with the specified {@code metricName}, <code>value
+     * </code>, and {@code unit}.
      *
-     * @param metricName metric name
-     * @param value metric value
-     * @param unit metric unit
+     * @param metricName the metric name
+     * @param value the metric value
+     * @param unit the metric unit
      */
     public Metric(String metricName, Number value, String unit) {
         this.metricName = metricName;
@@ -47,36 +47,36 @@ public class Metric {
     }
 
     /**
-     * Returns name of the {@code Metric}.
+     * Returns the name of the {@code Metric}.
      *
-     * @return metric name
+     * @return the metric name
      */
     public String getMetricName() {
         return metricName;
     }
 
     /**
-     * Returns value of the {@code Metric}.
+     * Returns the value of the {@code Metric}.
      *
-     * @return metric value
+     * @return the metric value
      */
     public Number getValue() {
         return value;
     }
 
     /**
-     * Returns unit of the {@code Metric}.
+     * Returns the unit of the {@code Metric}.
      *
-     * @return metric unit
+     * @return the metric unit
      */
     public String getUnit() {
         return unit;
     }
 
     /**
-     * Returns timestamp of the {@code Metric}.
+     * Returns the timestamp of the {@code Metric}.
      *
-     * @return metric timestamp
+     * @return the metric timestamp
      */
     public long getTimestamp() {
         return timestamp;

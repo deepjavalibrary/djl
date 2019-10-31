@@ -16,7 +16,7 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
-/** Resize the image. */
+/** Resizes the image. */
 public class Resize implements Transform {
 
     private int width;

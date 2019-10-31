@@ -16,7 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
 
 /**
- * {@code NDImageUtils} is an image processing utility that can load, reshape and convert images
+ * {@code NDImageUtils} is an image processing utility that can load, reshape, and convert images
  * using {@link NDArray} images.
  */
 public final class NDImageUtils {
@@ -36,15 +36,16 @@ public final class NDImageUtils {
     }
 
     /**
-     * Normalize a NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard deviation.
+     * Normalizes a NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard
+     * deviation.
      *
      * <p>Given mean `(m1, ..., mn)` and std `(s\ :sub:`1`\ , ..., s\ :sub:`n`)` for `n` channels,
      * this transform normalizes each channel of the input tensor with: output[i] = (input[i] - m\
      * :sub:`i`\ ) / s\ :sub:`i`
      *
      * @param input the input image NDArray
-     * @param mean mean value for each channel
-     * @param std standard deviation for each channel
+     * @param mean the mean value for each channel
+     * @param std the standard deviation for each channel
      * @return the result of normalization
      */
     public static NDArray normalize(NDArray input, float[] mean, float[] std) {

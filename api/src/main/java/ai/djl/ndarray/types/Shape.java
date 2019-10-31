@@ -36,7 +36,7 @@ public class Shape {
      * Constructs and initializes a {@code Shape} with specified dimension as {@code (long...
      * shape)}.
      *
-     * @param shape dimensions of the shape
+     * @param shape the dimensions of the shape
      * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
      *     less than -1. Also thrown if the shape and layout do not have equal sizes.
      */
@@ -49,7 +49,7 @@ public class Shape {
     /**
      * Constructs and initializes a {@code Shape} with specified dimension.
      *
-     * @param shape dimensions of the shape
+     * @param shape the dimensions of the shape
      * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
      *     less than -1. Also thrown if the shape and layout do not have equal sizes.
      */
@@ -62,7 +62,7 @@ public class Shape {
     /**
      * Constructs and initializes a {@code Shape} with specified shape and layout pairList.
      *
-     * @param shape dimensions and layout of the shape
+     * @param shape the dimensions and layout of the shape
      * @throws IllegalArgumentException Thrown if any element in Shape is invalid. It should not be
      *     less than -1 .Also thrown if the shape and layout do not have equal sizes.
      */
@@ -105,9 +105,9 @@ public class Shape {
     }
 
     /**
-     * Returns dimensions of the {@code Shape}.
+     * Returns the dimensions of the {@code Shape}.
      *
-     * @return dimensions of the {@code Shape}
+     * @return the dimensions of the {@code Shape}
      */
     public long[] getShape() {
         return shape;
@@ -136,8 +136,8 @@ public class Shape {
     /**
      * Returns the size of a specific dimension or several specific dimensions.
      *
-     * @param dimensions The dimension or dimensions to find the size of
-     * @return size of specific dimension(s) or -1 for indeterminate size
+     * @param dimensions the dimension or dimensions to find the size of
+     * @return the size of specific dimension(s) or -1 for indeterminate size
      * @throws IllegalArgumentException thrown if passed an invalid dimension
      */
     public long size(int... dimensions) {
@@ -157,7 +157,7 @@ public class Shape {
     /**
      * Returns the total size.
      *
-     * @return total size or -1 for indeterminate size
+     * @return the total size or -1 for indeterminate size
      */
     public long size() {
         int total = 1;
@@ -173,7 +173,7 @@ public class Shape {
     /**
      * Returns the number of dimensions of this {@code Shape}.
      *
-     * @return number of dimensions of this {@code Shape}.
+     * @return the number of dimensions of this {@code Shape}
      */
     public int dimension() {
         return shape.length;
@@ -182,7 +182,7 @@ public class Shape {
     /**
      * Return the count of unknown value in this {@code Shape}.
      *
-     * @return number of unknown value in this {@code Shape}
+     * @return the number of unknown value in this {@code Shape}
      */
     public long getUnknownValueCount() {
         return Arrays.stream(shape).filter(s -> s == -1).count();
@@ -194,7 +194,7 @@ public class Shape {
      * <p>The sub shape begins at the specified {@code beginIndex} and extends to {@code endIndex -
      * 1}.
      *
-     * @param beginIndex the beginning index, inclusive.
+     * @param beginIndex the beginning index, inclusive
      * @return a new {@code Shape} whose content is a slice of this shape
      */
     public Shape slice(int beginIndex) {
@@ -207,8 +207,8 @@ public class Shape {
      * <p>The sub shape begins at the specified {@code beginIndex} and extends to {@code endIndex -
      * 1}.
      *
-     * @param beginIndex the beginning index, inclusive.
-     * @param endIndex the ending index, exclusive.
+     * @param beginIndex the beginning index, inclusive
+     * @param endIndex the ending index, exclusive
      * @return a new {@code Shape} whose content is a slice of this shape
      */
     public Shape slice(int beginIndex, int endIndex) {
@@ -221,7 +221,7 @@ public class Shape {
     /**
      * Returns only the axes of the Shape whose layout types match the predicate.
      *
-     * @param predicate Predicate returning true to Shape axis to be part of the filtered Shape
+     * @param predicate the predicate to compare the axes of the Shape with
      * @return a new filtered Shape
      */
     public Shape filterByLayoutType(Predicate<LayoutType> predicate) {
@@ -235,7 +235,7 @@ public class Shape {
     /**
      * Returns a mapped shape.
      *
-     * @param mapper The function to map each element of the Shape by
+     * @param mapper the function to map each element of the Shape by
      * @return a new mapped Shape
      */
     public Shape map(Function<Pair<Long, LayoutType>, Pair<Long, LayoutType>> mapper) {
@@ -245,7 +245,7 @@ public class Shape {
     /**
      * Returns a stream of the Shape.
      *
-     * @return the stream
+     * @return the stream of the Shape
      */
     public Stream<Pair<Long, LayoutType>> stream() {
         return new PairList<>(
@@ -257,8 +257,8 @@ public class Shape {
     /**
      * Joins a this shape with specified {@code other} shape.
      *
-     * @param other the shape the join
-     * @return joined {@code Shape}
+     * @param other the shape to join
+     * @return the joined {@code Shape}
      */
     public Shape addAll(Shape other) {
         return new Shape(
@@ -284,7 +284,7 @@ public class Shape {
      *
      * <p>For example, a rank 3 array with shape [10, 1, 1] would return 2 for this method
      *
-     * @return Number of trailing ones in shape
+     * @return the number of trailing ones in the shape
      */
     public int getTrailingOnes() {
         for (int i = 0; i < shape.length; i++) {
@@ -300,7 +300,7 @@ public class Shape {
      *
      * <p>For example, a rank 3 array with shape [1, 10, 1] would return value 1 for this method
      *
-     * @return Number of leading ones in shape
+     * @return the number of leading ones in the shape
      */
     public int getLeadingOnes() {
         for (int i = 0; i < shape.length; i++) {

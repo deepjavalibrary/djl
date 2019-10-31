@@ -90,7 +90,7 @@ public class DataDesc {
     /**
      * Sets the name of the {@link NDArray}.
      *
-     * @param name - the name of the {@link NDArray}
+     * @param name the name of the {@link NDArray}
      */
     public void setName(String name) {
         this.name = name;

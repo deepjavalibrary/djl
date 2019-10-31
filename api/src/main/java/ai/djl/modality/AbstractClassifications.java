@@ -72,7 +72,7 @@ public abstract class AbstractClassifications<I extends Item> {
         /**
          * Returns the class name.
          *
-         * @return Class name
+         * @return the class name
          */
         public String getClassName() {
             return classNames.get(index);
@@ -81,9 +81,9 @@ public abstract class AbstractClassifications<I extends Item> {
         /**
          * Returns the probability.
          *
-         * <p>Probability explains how accurately the classifier identified the target class
+         * <p>Probability explains how accurately the classifier identified the target class.
          *
-         * @return Probability
+         * @return the probability
          */
         public double getProbability() {
             return probabilities.get(index);

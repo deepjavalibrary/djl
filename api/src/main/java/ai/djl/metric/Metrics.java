@@ -36,7 +36,7 @@ public class Metrics {
     /**
      * Adds a {@link Metric} to the collection.
      *
-     * @param metric a {@link Metric} to be added
+     * @param metric the {@link Metric} to be added
      */
     public void addMetric(Metric metric) {
         List<Metric> list = metrics.computeIfAbsent(metric.getMetricName(), v -> new ArrayList<>());
@@ -46,8 +46,8 @@ public class Metrics {
     /**
      * Adds {@code Metric} by metric {@code name} and <code>value</code>.
      *
-     * @param name metric name
-     * @param value metric value
+     * @param name the metric name
+     * @param value the metric value
      */
     public void addMetric(String name, Number value) {
         addMetric(new Metric(name, value));
@@ -57,9 +57,9 @@ public class Metrics {
      * Adds {@code Metric} by metric {@code name}, <code>value</code> and <code>unit
      * </code> .
      *
-     * @param name metric name
-     * @param value metric value
-     * @param unit metric unit
+     * @param name the metric name
+     * @param value the metric value
+     * @param unit the metric unit
      */
     public void addMetric(String name, Number value, String unit) {
         addMetric(new Metric(name, value, unit));
@@ -70,10 +70,10 @@ public class Metrics {
     }
 
     /**
-     * Returns a list of {@link Metrics} with the specified metric name.
+     * Returns a list of {@link Metric} with the specified metric name.
      *
-     * @param name name of the metric
-     * @return a list of {@link Metrics} with specified metric name
+     * @param name the name of the metric
+     * @return a list of {@link Metric} with the specified metric name
      */
     public List<Metric> getMetric(String name) {
         List<Metric> list = metrics.get(name);
@@ -86,9 +86,9 @@ public class Metrics {
     /**
      * Returns a percentile {@link Metric} object for the specified metric name.
      *
-     * @param metricName name of the metric
-     * @param percentile percentile
-     * @return {@link Metric} object at specified {@code percentile}
+     * @param metricName the name of the metric
+     * @param percentile the percentile
+     * @return the {@link Metric} object at specified {@code percentile}
      */
     public Metric percentile(String metricName, int percentile) {
         List<Metric> metric = metrics.get(metricName);
@@ -105,8 +105,8 @@ public class Metrics {
     /**
      * Returns the average value of the specified metric.
      *
-     * @param metricName name of the metric
-     * @return average number of specified metric
+     * @param metricName the name of the metric
+     * @return the average value of the specified metric
      */
     public double mean(String metricName) {
         List<Metric> metric = metrics.get(metricName);

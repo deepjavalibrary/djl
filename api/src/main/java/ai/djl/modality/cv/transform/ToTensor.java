@@ -17,8 +17,8 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
 /**
- * Converts an image NDArray to tensor NDArray Converts an image NDArray of shape (H x W x C) in the
- * range [0, 255] to a float32 tensor NDArray of shape (C x H x W) in the range [0, 1].
+ * Converts an image NDArray of shape (H x W x C) in the range [0, 255] to a float32 tensor NDArray
+ * of shape (C x H x W) in the range [0, 1].
  */
 public class ToTensor implements Transform {
 

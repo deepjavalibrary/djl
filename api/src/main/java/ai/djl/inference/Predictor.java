@@ -21,8 +21,8 @@ import java.util.List;
 /**
  * The {@code Predictor} interface provides model inference functionality.
  *
- * <p>You can use this to do inference with {@link Model} with {@link Translator} specified. The
- * following is example code that uses {@code Predictor}:
+ * <p>You can use a {@code Predictor}, with a specified {@link Translator}, to perform inference on
+ * a {@link Model}. The following is example code that uses {@code Predictor}:
  *
  * <pre>
  * Model model = Model.load(modelDir, modelName);
@@ -35,8 +35,8 @@ import java.util.List;
  * }
  * </pre>
  *
- * @param <I> input type
- * @param <O> output type
+ * @param <I> the input type
+ * @param <O> the output type
  * @see Model
  * @see Translator
  */
@@ -46,7 +46,7 @@ public interface Predictor<I, O> extends AutoCloseable {
      * Predicts an item for inference.
      *
      * @param input Input follows the inputObject
-     * @return The Output object defined by user
+     * @return the Output object defined by user
      * @throws TranslateException if an error occurs during prediction
      */
     O predict(I input) throws TranslateException;
@@ -55,7 +55,7 @@ public interface Predictor<I, O> extends AutoCloseable {
      * Predicts a batch for inference.
      *
      * @param inputs Inputs follows the inputObject
-     * @return The Output objects defined by user
+     * @return the Output objects defined by user
      * @throws TranslateException if an error occurs during prediction
      */
     List<O> batchPredict(List<I> inputs) throws TranslateException;

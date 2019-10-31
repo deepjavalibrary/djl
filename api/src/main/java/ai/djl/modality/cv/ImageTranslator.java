@@ -24,7 +24,7 @@ import java.awt.image.BufferedImage;
 /**
  * Built-in {@code Translator} that provides default image pre-processing.
  *
- * @param <T> output object type
+ * @param <T> the output object type
  */
 public abstract class ImageTranslator<T> implements Translator<BufferedImage, T> {
 
@@ -44,9 +44,9 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
     /**
      * Processes the {@code BufferedImage} input and converts it to NDList.
      *
-     * @param ctx toolkit that helps create input NDArray
-     * @param input {@code BufferedImage} input
-     * @return {@link NDList}
+     * @param ctx the toolkit that helps create the input NDArray
+     * @param input the {@code BufferedImage} input
+     * @return a {@link NDList}
      */
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {

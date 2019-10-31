@@ -45,7 +45,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     /**
      * Constructs and initiates an NDList with the specified {@link NDArray}s.
      *
-     * @param arrays {@link NDArray}s
+     * @param arrays the {@link NDArray}s
      */
     public NDList(NDArray... arrays) {
         this();
@@ -80,7 +80,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     /**
      * Returns true if size() is 0.
      *
-     * @return true if size() is 0, otherwise false.
+     * @return true if size() is 0, otherwise false
      */
     public boolean isEmpty() {
         return size() == 0;
@@ -93,8 +93,8 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * element with the lowest index {@code i} such that {@code
      * (o==null&nbsp;?&nbsp;get(i)==null&nbsp;:&nbsp;o.equals(get(i)))} (if such an element exists).
      *
-     * @param name name of the NDArray to be removed from this NDList, if present
-     * @return the element which got removed
+     * @param name the name of the NDArray to be removed from this NDList, if present
+     * @return the element that was removed
      * @throws UnsupportedOperationException if the {@code NDList} is read only
      */
     public NDArray remove(String name) {
@@ -105,14 +105,14 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * Removes the index of the specified element from this NDList if it is present.
      *
      * @param index the index of the element to remove
-     * @return the element which got removed
+     * @return the element that was removed
      */
     public NDArray remove(int index) {
         return list.remove(index);
     }
 
     /**
-     * Returns a view of the portion of this NDList between the specified fromIndex. inclusive, and
+     * Returns a view of the portion of this NDList between the specified fromIndex, inclusive, and
      * toIndex, exclusive.
      *
      * @param fromIndex the start index (inclusive)
@@ -124,8 +124,8 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     }
 
     /**
-     * Returns a view of the portion of this NDList between the specified fromIndex. inclusive, and
-     * to the end
+     * Returns a view of the portion of this NDList between the specified fromIndex, inclusive, and
+     * to the end.
      *
      * @param fromIndex the start index (inclusive)
      * @return a view of the portion of this NDList
@@ -137,7 +137,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     /**
      * Returns {@code true} if this NDList contains an NDArray with the specified name.
      *
-     * @param name name of the NDArray to be removed from this NDList, if present
+     * @param name the name of the NDArray to be removed from this NDList, if present
      * @return {@code true} if this list contains the specified element
      */
     public boolean contains(String name) {
@@ -147,7 +147,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     /**
      * Returns the NDArray at the specified position in this list.
      *
-     * @param index index of the NDArray to return
+     * @param index the index of the NDArray to return
      * @return the NDArray at the specified position in this list
      * @throws IndexOutOfBoundsException if the index is out of range ({@code index &lt; 0 || index
      *     &gt;= size()})
@@ -159,8 +159,8 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     /**
      * Gets NDArray with Tag.
      *
-     * @param index numeric index to get
-     * @return tag and ndarray
+     * @param index the numeric index to get
+     * @return the tag and ndarray
      */
     public Pair<String, NDArray> getWithTag(int index) {
         return list.get(index);
@@ -196,7 +196,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     /**
      * Appends the specified NDArray to the end of this NDList.
      *
-     * @param array NDArray to be appended to this list
+     * @param array the NDArray to be appended to this list
      * @return this NDList after the addition
      * @throws UnsupportedOperationException if this NDList is read only
      * @see NDList#add(String, NDArray)
@@ -209,8 +209,8 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     /**
      * Appends the named NDArray to the end of this NDList.
      *
-     * @param name optional name of the {@link NDArray}
-     * @param array NDArray to be appended to this list
+     * @param name the optional name of the {@link NDArray}
+     * @param array the NDArray to be appended to this list
      * @return this NDList after the addition
      * @throws UnsupportedOperationException if this NDList is read only
      */
@@ -223,7 +223,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * Appends all of the NDArrays in the specified NDList to the end of this NDList, in the order
      * that they are returned by the specified NDList's iterator.
      *
-     * @param other NDList containing NDArray to be added to this list
+     * @param other the NDList containing NDArray to be added to this list
      * @return this NDList after the addition
      * @throws UnsupportedOperationException if this NDList is read only
      */
@@ -238,7 +238,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * Appends all of the pairs in the specified PairList to the end of this NDList, in the order
      * that they are returned by the specified PairList's iterator.
      *
-     * @param other PairList containing String NDArray pair to be added to this list
+     * @param other the PairList containing the String NDArray pair to be added to this list
      * @return this NDList after the addition
      * @throws UnsupportedOperationException if this NDList is read only
      */
@@ -250,8 +250,8 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
     /**
      * Converts all the {@code NDArray} in {@code NDList} to a different {@link Device}.
      *
-     * @param device {@link Device} to be set
-     * @param copy set {@code true} if you want to return a copy of the underlying NDArray.
+     * @param device the {@link Device} to be set
+     * @param copy set {@code true} if you want to return a copy of the underlying NDArray
      * @return a new {@code NDList} with the NDArrays on specified {@link Device}
      */
     public NDList asInDevice(Device device, boolean copy) {

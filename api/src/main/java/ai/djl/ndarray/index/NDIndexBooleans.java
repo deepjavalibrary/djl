@@ -22,16 +22,16 @@ public class NDIndexBooleans implements NDIndexElement {
     /**
      * Constructs a {@code NDIndexBooleans} instance with specified mask binary NDArray.
      *
-     * @param index mask binary {@code NDArray}
+     * @param index the mask binary {@code NDArray}
      */
     public NDIndexBooleans(NDArray index) {
         this.index = index;
     }
 
     /**
-     * Returns mask binary {@code NDArray}.
+     * Returns the mask binary {@code NDArray}.
      *
-     * @return mask binary {@code NDArray}
+     * @return the mask binary {@code NDArray}
      */
     public NDArray getIndex() {
         return index;

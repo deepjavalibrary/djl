@@ -20,7 +20,7 @@ public interface Matrix extends NDArray {
      *
      * @param row the row to insert
      * @param toPut the array to insert into
-     * @return this
+     * @return this matrix
      */
     NDArray putRow(long row, NDArray toPut);
 
@@ -29,7 +29,7 @@ public interface Matrix extends NDArray {
      *
      * @param column the column to insert
      * @param toPut the array to insert into
-     * @return this
+     * @return this array
      */
     NDArray putColumn(int column, NDArray toPut);
 
@@ -237,8 +237,8 @@ public interface Matrix extends NDArray {
     /**
      * Assigns a row vector to each row of this array in place.
      *
-     * @param rowVector row vector to put
-     * @return This array, after assigning every road to the specified value
+     * @param rowVector the row vector to assign
+     * @return this array, after assigning every row to the specified value
      */
     NDArray putiRowVector(NDArray rowVector);
 
@@ -269,23 +269,23 @@ public interface Matrix extends NDArray {
     /**
      * Returns a new NDArray comprised of the specified columns only.
      *
-     * @param columns Columns to extract out of the current array
-     * @return Array with only the specified columns
+     * @param columns the columns to extract out of the current array
+     * @return an array with only the specified columns
      */
     NDArray getColumns(int... columns);
 
     /**
      * Returns a new NDArray comprised of the specified rows only.
      *
-     * @param rows rows to extract from this array
-     * @return Array with only the specified rows
+     * @param rows the rows to extract from this array
+     * @return an array with only the specified rows
      */
     NDArray getRows(int... rows);
 
     /**
      * Inserts the element at the specified index.
      *
-     * @param i the row insert into
+     * @param i the row to insert into
      * @param j the column to insert into
      * @param element a scalar NDArray
      * @return a scalar NDArray of the element at this index

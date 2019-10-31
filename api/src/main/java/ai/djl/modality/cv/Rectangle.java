@@ -42,7 +42,7 @@ public class Rectangle implements BoundingBox {
      * Constructs a new {@code Rectangle} whose upper-left corner is specified as coordinate {@code
      * point} and whose width and height are specified by the arguments of the same name.
      *
-     * @param point upper-left corner of the coordinate
+     * @param point the upper-left corner of the coordinate
      * @param width the width of the {@code Rectangle}
      * @param height the height of the {@code Rectangle}
      */

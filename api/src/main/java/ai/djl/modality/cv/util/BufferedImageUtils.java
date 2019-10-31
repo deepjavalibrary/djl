@@ -41,9 +41,9 @@ public final class BufferedImageUtils {
     private BufferedImageUtils() {}
 
     /**
-     * Loads the image from the file specified.
+     * Loads the image from the specified file.
      *
-     * @param path the file path to be loaded
+     * @param path the path of the file to be loaded
      * @return a {@link BufferedImage}
      * @throws IOException file is not found
      */
@@ -58,9 +58,9 @@ public final class BufferedImageUtils {
     /**
      * Converts {@code BufferedImage} to RGB NDArray.
      *
-     * @param manager {@link NDManager} to create new NDArray with
+     * @param manager an {@link NDManager} to create the new NDArray with
      * @param image the buffered image to be converted
-     * @return {@link NDArray}
+     * @return a {@link NDArray}.
      */
     public static NDArray toNDArray(NDManager manager, BufferedImage image) {
         return toNDArray(manager, image, null);
@@ -69,10 +69,10 @@ public final class BufferedImageUtils {
     /**
      * Converts {@code BufferedImage} to NDArray with designated color mode.
      *
-     * @param manager {@link NDManager} to create new NDArray with
+     * @param manager a {@link NDManager} to create a new NDArray with
      * @param image the buffered image to be converted
-     * @param flag The color mode
-     * @return {@link NDArray}
+     * @param flag the color mode
+     * @return a {@link NDArray}
      */
     public static NDArray toNDArray(
             NDManager manager, BufferedImage image, NDImageUtils.Flag flag) {

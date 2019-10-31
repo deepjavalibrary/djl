@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** {@code Classification} is the container to store the classification results. */
+/** {@code Classification} is the container that stores the classification results. */
 public final class Classification extends AbstractClassifications<Item> {
 
     public Classification(List<String> classNames, List<Double> probabilities) {

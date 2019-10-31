@@ -39,9 +39,9 @@ public class DetectedObjects extends AbstractClassifications<Item> {
         }
 
         /**
-         * Returns {@link BoundingBox} of detected object.
+         * Returns the {@link BoundingBox} of the detected object.
          *
-         * @return {@link BoundingBox} of detected object
+         * @return the {@link BoundingBox} of the detected object
          */
         public BoundingBox getBoundingBox() {
             return boundingBoxes.get(index);

@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains utility classes for each predefined modalities. */
+/** Contains utility classes for each of the predefined modalities. */
 package ai.djl.modality;

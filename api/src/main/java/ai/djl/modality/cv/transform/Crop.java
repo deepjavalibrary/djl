@@ -16,7 +16,7 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
-/** Crop the image. The input shape of image is (H, W, C). */
+/** Crops the image. The input shape of the image is (H, W, C). */
 public class Crop implements Transform {
 
     private int x;

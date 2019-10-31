@@ -20,7 +20,7 @@ public class NDIndexFixed implements NDIndexElement {
     /**
      * Constructs a {@code NDIndexFixed} instance with specified dimension.
      *
-     * @param index dimension of the NDArray
+     * @param index the dimension of the NDArray
      */
     public NDIndexFixed(long index) {
         this.index = index;

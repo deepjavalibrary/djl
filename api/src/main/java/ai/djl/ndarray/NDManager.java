@@ -99,7 +99,7 @@ public interface NDManager extends AutoCloseable {
      *
      * <p>{@code NDManager} will inherit default {@link Device}.
      *
-     * @return Returns a new top-level {@code NDManager}
+     * @return a new top-level {@code NDManager}
      */
     static NDManager newBaseManager() {
         return Engine.getInstance().newBaseManager();
@@ -108,8 +108,8 @@ public interface NDManager extends AutoCloseable {
     /**
      * Creates a new top-level {@code NDManager} with specified {@link Device}.
      *
-     * @param device default {@link Device}
-     * @return Returns a new top-level {@code NDManager}
+     * @param device the default {@link Device}
+     * @return a new top-level {@code NDManager}
      */
     static NDManager newBaseManager(Device device) {
         return Engine.getInstance().newBaseManager(device);
@@ -118,8 +118,8 @@ public interface NDManager extends AutoCloseable {
     /**
      * Allocates a new engine specific direct byte buffer.
      *
-     * @param capacity The new buffer's capacity, in bytes
-     * @return The new byte buffer
+     * @param capacity the new buffer's capacity, in bytes
+     * @return the new byte buffer
      */
     ByteBuffer allocateDirect(int capacity);
 
@@ -128,7 +128,7 @@ public interface NDManager extends AutoCloseable {
      * {@link Shape}.
      *
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(Shape shape) {
         return create(shape, DataType.FLOAT32, getDevice());
@@ -138,7 +138,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a scalar {@link NDArray}.
      *
      * @param data the float that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(float data) {
         return create(new float[] {data}, new Shape());
@@ -148,7 +148,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a scalar {@link NDArray}.
      *
      * @param data the float data that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(int data) {
         return create(new int[] {data}, new Shape());
@@ -158,7 +158,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a scalar {@link NDArray}.
      *
      * @param data the double data that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(double data) {
         return create(new double[] {data}, new Shape());
@@ -168,7 +168,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a scalar {@link NDArray}.
      *
      * @param data the long data that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(long data) {
         return create(new long[] {data}, new Shape());
@@ -178,7 +178,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a scalar {@link NDArray}.
      *
      * @param data the byte data that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(byte data) {
         return create(new byte[] {data}, new Shape());
@@ -188,7 +188,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a scalar {@link NDArray}.
      *
      * @param data the boolean data that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(boolean data) {
         return create(new boolean[] {data}, new Shape());
@@ -198,7 +198,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 1D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(float[] data) {
         return create(data, new Shape(data.length));
@@ -208,7 +208,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 1D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(int[] data) {
         return create(data, new Shape(data.length));
@@ -218,7 +218,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 1D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(double[] data) {
         return create(data, new Shape(data.length));
@@ -228,7 +228,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 1D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(long[] data) {
         return create(data, new Shape(data.length));
@@ -238,7 +238,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 1D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(byte[] data) {
         return create(data, new Shape(data.length));
@@ -248,7 +248,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 1D {@link NDArray}.
      *
      * @param data the bool array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(boolean[] data) {
         return create(data, new Shape(data.length));
@@ -258,7 +258,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 2D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(float[][] data) {
         FloatBuffer buffer = FloatBuffer.allocate(data.length * data[0].length);
@@ -273,7 +273,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 2D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(int[][] data) {
         IntBuffer buffer = IntBuffer.allocate(data.length * data[0].length);
@@ -288,7 +288,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 2D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(double[][] data) {
         DoubleBuffer buffer = DoubleBuffer.allocate(data.length * data[0].length);
@@ -304,7 +304,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 2D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(long[][] data) {
         LongBuffer buffer = LongBuffer.allocate(data.length * data[0].length);
@@ -319,7 +319,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 2D {@link NDArray}.
      *
      * @param data the float array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(byte[][] data) {
         ByteBuffer buffer = ByteBuffer.allocate(data.length * data[0].length);
@@ -334,7 +334,7 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes a 2D {@link NDArray}.
      *
      * @param data the boolean array that needs to be set
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(boolean[][] data) {
         ByteBuffer buffer = ByteBuffer.allocate(data.length * data[0].length);
@@ -352,9 +352,9 @@ public interface NDManager extends AutoCloseable {
      *
      * <p>{@link DataType} of the NDArray will determined by type of Buffer.
      *
-     * @param data data to initialize the {@code NDArray}
+     * @param data the data to initialize the {@code NDArray}
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(Buffer data, Shape shape) {
         DataType dataType = DataType.fromBuffer(data);
@@ -367,7 +367,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param dataType the {@link DataType} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(Shape shape, DataType dataType) {
         return create(shape, dataType, getDevice());
@@ -377,10 +377,10 @@ public interface NDManager extends AutoCloseable {
      * Creates and initializes an instance of {@link NDArray} with specified {@link Shape} and
      * {@link DataType}.
      *
-     * @param data data to initialize the {@code NDArray}
+     * @param data the data to initialize the {@code NDArray}
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param dataType the {@link DataType} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(Buffer data, Shape shape, DataType dataType) {
         NDArray array = create(shape, dataType);
@@ -394,7 +394,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param data the float array that needs to be set
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(float[] data, Shape shape) {
         return create(FloatBuffer.wrap(data), shape);
@@ -406,7 +406,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param data the float array that needs to be set
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(int[] data, Shape shape) {
         return create(IntBuffer.wrap(data), shape);
@@ -418,7 +418,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param data the float array that needs to be set
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(double[] data, Shape shape) {
         return create(DoubleBuffer.wrap(data), shape);
@@ -430,7 +430,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param data the float array that needs to be set
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(long[] data, Shape shape) {
         return create(LongBuffer.wrap(data), shape);
@@ -442,7 +442,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param data the float array that needs to be set
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(byte[] data, Shape shape) {
         return create(ByteBuffer.wrap(data), shape);
@@ -454,7 +454,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param data the boolean array that needs to be set
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray create(boolean[] data, Shape shape) {
         byte[] byteData = new byte[data.length];
@@ -471,7 +471,7 @@ public interface NDManager extends AutoCloseable {
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     NDArray create(Shape shape, DataType dataType, Device device);
 
@@ -479,11 +479,11 @@ public interface NDManager extends AutoCloseable {
      * Creates a Compressed Sparse Row Storage (CSR) Format Matrix.
      *
      * @param data the data to set for the CSR Matrix
-     * @param indptr The indptr array is what will help identify the rows where the data appears
-     * @param indices The indices array stores the column index for each non-zero element in data
+     * @param indptr the indptr array is what will help identify the rows where the data appears
+     * @param indices the indices array stores the column index for each non-zero element in data
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape, Device device);
 
@@ -491,10 +491,10 @@ public interface NDManager extends AutoCloseable {
      * Creates a Compressed Sparse Row Storage (CSR) Format Matrix.
      *
      * @param data the data to set for the CSR Matrix
-     * @param indptr The indptr array is what will help identify the rows where the data appears
-     * @param indices The indices array stores the column index for each non-zero element in data
+     * @param indptr the indptr array is what will help identify the rows where the data appears
+     * @param indices the indices array stores the column index for each non-zero element in data
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
         return createCSR(data, indptr, indices, shape, getDevice());
@@ -508,7 +508,7 @@ public interface NDManager extends AutoCloseable {
      * @param indices the indices to store the data
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     NDArray createRowSparse(
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device);
@@ -520,7 +520,7 @@ public interface NDManager extends AutoCloseable {
      * @param dataShape the {@link Shape} of the data {@link NDArray}
      * @param indices the indices to store the data
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
         return createRowSparse(data, dataShape, indices, shape, getDevice());
@@ -530,7 +530,7 @@ public interface NDManager extends AutoCloseable {
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
      *
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      * @see #zeros(Shape, DataType, Device)
      */
     default NDArray zeros(Shape shape) {
@@ -542,7 +542,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param dataType the {@link DataType} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      * @see #zeros(Shape, DataType, Device)
      */
     default NDArray zeros(Shape shape, DataType dataType) {
@@ -556,7 +556,7 @@ public interface NDManager extends AutoCloseable {
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     NDArray zeros(Shape shape, DataType dataType, Device device);
 
@@ -565,7 +565,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param dataType the {@link DataType} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray ones(Shape shape, DataType dataType) {
         return ones(shape, dataType, getDevice());
@@ -575,7 +575,7 @@ public interface NDManager extends AutoCloseable {
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with ones.
      *
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray ones(Shape shape) {
         return ones(shape, DataType.FLOAT32, getDevice());
@@ -588,7 +588,7 @@ public interface NDManager extends AutoCloseable {
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     NDArray ones(Shape shape, DataType dataType, Device device);
 
@@ -600,8 +600,8 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in `range` function, but returns an instance of {@link
      * NDArray} rather than a list.
      *
-     * @param stop end of interval. The interval does not include this value.
-     * @return new instance of {@link NDArray}
+     * @param stop the end of the interval. The interval does not include this value.
+     * @return a new instance of {@link NDArray}
      */
     default NDArray arange(int stop) {
         return arange(0, stop, 1, DataType.FLOAT32, getDevice());
@@ -615,9 +615,9 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in `range` function, but returns an instance of {@link
      * NDArray} rather than a list.
      *
-     * @param start start of interval. The interval includes this value.
-     * @param stop end of interval. The interval does not include this value.
-     * @return new instance of {@link NDArray}
+     * @param start the start of interval. The interval includes this value.
+     * @param stop the end of interval. The interval does not include this value.
+     * @return a new instance of {@link NDArray}
      */
     default NDArray arange(int start, int stop) {
         return arange(start, stop, 1, DataType.FLOAT32, getDevice());
@@ -631,10 +631,10 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in `range` function, but returns an instance of {@link
      * NDArray} rather than a list.
      *
-     * @param start start of interval. The interval includes this value.
-     * @param stop end of interval. The interval does not include this value.
-     * @param step spacing between values.
-     * @return new instance of {@link NDArray}
+     * @param start the start of interval. The interval includes this value.
+     * @param stop the end of interval. The interval does not include this value.
+     * @param step the spacing between values
+     * @return a new instance of {@link NDArray}
      */
     default NDArray arange(int start, int stop, int step) {
         return arange(start, stop, step, DataType.FLOAT32, getDevice());
@@ -648,21 +648,21 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in `range` function, but returns an instance of {@link
      * NDArray} rather than a list.
      *
-     * @param start start of interval, inclusive
-     * @param stop end of interval, exclusive
-     * @param step spacing between values
+     * @param start the start of interval, inclusive
+     * @param stop the end of interval, exclusive
+     * @param step the spacing between values
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     NDArray arange(int start, int stop, int step, DataType dataType, Device device);
 
     /**
      * Returns a 2-D array with ones on the diagonal and zeros elsewhere on the current device.
      *
-     * @param rows number of rows and cols in the output
+     * @param rows the number of rows and cols in the output
      * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
-     *     whose values are equal to one.
+     *     whose values are equal to one
      */
     default NDArray eye(int rows) {
         return eye(rows, rows, 0, DataType.FLOAT32, getDevice());
@@ -671,11 +671,11 @@ public interface NDManager extends AutoCloseable {
     /**
      * Returns a 2-D array with ones on the diagonal and zeros elsewhere on the current device.
      *
-     * @param rows number of rows and cols in the output
-     * @param k index of the diagonal: 0 (the default) refers to the main diagonal, a positive value
-     *     refers to an upper diagonal, and a negative value to a lower diagonal.
+     * @param rows the number of rows and cols in the output
+     * @param k the index of the diagonal: 0 (the default) refers to the main diagonal, a positive
+     *     value refers to an upper diagonal, and a negative value to a lower diagonal
      * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
-     *     whose values are equal to one.
+     *     whose values are equal to one
      */
     default NDArray eye(int rows, int k) {
         return eye(rows, rows, k, DataType.FLOAT32, getDevice());
@@ -684,12 +684,12 @@ public interface NDManager extends AutoCloseable {
     /**
      * Returns a 2-D array with ones on the diagonal and zeros elsewhere on current device.
      *
-     * @param rows number of rows in the output
-     * @param cols number of columns in the output
-     * @param k index of the diagonal: 0 (the default) refers to the main diagonal, a positive value
-     *     refers to an upper diagonal, and a negative value to a lower diagonal.
+     * @param rows the number of rows in the output
+     * @param cols the number of columns in the output
+     * @param k the index of the diagonal: 0 (the default) refers to the main diagonal, a positive
+     *     value refers to an upper diagonal, and a negative value to a lower diagonal
      * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
-     *     whose values are equal to one.
+     *     whose values are equal to one
      */
     default NDArray eye(int rows, int cols, int k) {
         return eye(rows, cols, k, DataType.FLOAT32, getDevice());
@@ -698,14 +698,14 @@ public interface NDManager extends AutoCloseable {
     /**
      * Returns a 2-D array with ones on the diagonal and zeros elsewhere.
      *
-     * @param rows number of rows int the output
-     * @param cols number of columns in the output
-     * @param k index of the diagonal: 0 (the default) refers to the main diagonal, a positive value
-     *     refers to an upper diagonal, and a negative value to a lower diagonal.
+     * @param rows the number of rows int the output
+     * @param cols the number of columns in the output
+     * @param k the index of the diagonal: 0 (the default) refers to the main diagonal, a positive
+     *     value refers to an upper diagonal, and a negative value to a lower diagonal
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
      * @return a {@link NDArray} where all elements are equal to zero, except for the k-th diagonal,
-     *     whose values are equal to one.
+     *     whose values are equal to one
      */
     NDArray eye(int rows, int cols, int k, DataType dataType, Device device);
 
@@ -716,8 +716,8 @@ public interface NDManager extends AutoCloseable {
      *
      * @param start the starting value of the sequence
      * @param stop the end value of the sequence
-     * @param num number of samples to generate
-     * @return new instance of {@link NDArray}
+     * @param num the number of samples to generate
+     * @return a new instance of {@link NDArray}
      */
     default NDArray linspace(double start, double stop, int num) {
         return linspace(start, stop, num, true, getDevice());
@@ -731,10 +731,10 @@ public interface NDManager extends AutoCloseable {
      *
      * @param start the starting value of the sequence
      * @param stop the end value of the sequence
-     * @param num number of samples to generate
+     * @param num the number of samples to generate
      * @param endpoint if {@code true}, stop is the last sample, otherwise, it is not included
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     NDArray linspace(double start, double stop, int num, boolean endpoint, Device device);
 
@@ -745,12 +745,12 @@ public interface NDManager extends AutoCloseable {
      * low, but excludes high). In other words, any value within the given interval is equally
      * likely to be drawn by `uniform`.
      *
-     * @param low Lower boundary of the output interval. All values generated will be greater than
-     *     or equal to low.
-     * @param high Upper boundary of the output interval. All values generated will be less than
+     * @param low the lower boundary of the output interval. All values generated will be greater
+     *     than or equal to low.
+     * @param high the upper boundary of the output interval. All values generated will be less than
      *     high.
      * @param shape the {@link Shape} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray randomUniform(double low, double high, Shape shape) {
         return randomUniform(low, high, shape, DataType.FLOAT32, getDevice());
@@ -763,14 +763,14 @@ public interface NDManager extends AutoCloseable {
      * low, but excludes high). In other words, any value within the given interval is equally
      * likely to be drawn by `uniform`.
      *
-     * @param low Lower boundary of the output interval. All values generated will be greater than
-     *     or equal to low.
-     * @param high Upper boundary of the output interval. All values generated will be less than
+     * @param low the lower boundary of the output interval. All values generated will be greater
+     *     than or equal to low.
+     * @param high the upper boundary of the output interval. All values generated will be less than
      *     high.
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     NDArray randomUniform(double low, double high, Shape shape, DataType dataType, Device device);
 
@@ -779,8 +779,8 @@ public interface NDManager extends AutoCloseable {
      * to a normal distribution parametrized by mean = 0 and standard deviation = 1 on current
      * device.
      *
-     * @param shape Output shape.
-     * @return new instance of {@link NDArray}
+     * @param shape the output shape
+     * @return a new instance of {@link NDArray}
      */
     default NDArray randomNormal(Shape shape) {
         return randomNormal(0f, 1f, shape, DataType.FLOAT32, getDevice());
@@ -790,10 +790,10 @@ public interface NDManager extends AutoCloseable {
      * Draws random samples from a normal (Gaussian) distribution. Samples are distributed according
      * to a normal distribution parametrized by mean = 0 and standard deviation = 1.
      *
-     * @param shape Output shape.
+     * @param shape the output shape
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     default NDArray randomNormal(Shape shape, DataType dataType, Device device) {
         return randomNormal(0d, 1d, shape, dataType, device);
@@ -804,12 +804,12 @@ public interface NDManager extends AutoCloseable {
      * to a normal distribution parametrized by {@code *loc*} (mean) and *scale* (standard
      * deviation).
      *
-     * @param loc Mean (centre) of the distribution.
-     * @param scale Standard deviation (spread or "width") of the distribution.
-     * @param shape Output shape.
+     * @param loc the mean (centre) of the distribution
+     * @param scale the standard deviation (spread or "width") of the distribution
+     * @param shape the output shape
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
-     * @return new instance of {@link NDArray}
+     * @return a new instance of {@link NDArray}
      */
     NDArray randomNormal(double loc, double scale, Shape shape, DataType dataType, Device device);
 
@@ -821,11 +821,11 @@ public interface NDManager extends AutoCloseable {
      * experiments. Its values, ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the
      * outcome was ``i``.
      *
-     * @param n Number of experiments.
-     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1 The
-     *     last element is always assumed to account for the remaining probability, as long as
+     * @param n the number of experiments
+     * @param pValues the probabilities of each of the p different outcomes. These should sum to 1
+     *     The last element is always assumed to account for the remaining probability, as long as
      *     ``sum(pvals[:-1]) &lt;= 1)``
-     * @return Returns the random NDArray
+     * @return the random NDArray
      */
     NDArray randomMultinomial(int n, NDArray pValues);
 
@@ -836,19 +836,19 @@ public interface NDManager extends AutoCloseable {
      * through 6. Each sample drawn from the distribution represents n such experiments. Its values,
      * ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the outcome was ``i``.
      *
-     * @param n Number of experiments.
-     * @param pValues Probabilities of each of the p different outcomes. These should sum to 1 The
-     *     last element is always assumed to account for the remaining probability, as long as
+     * @param n the number of experiments
+     * @param pValues the probabilities of each of the p different outcomes. These should sum to 1
+     *     The last element is always assumed to account for the remaining probability, as long as
      *     ``sum(pvals[:-1]) &lt;= 1)``
-     * @param shape Output shape
-     * @return Returns the random NDArray
+     * @param shape the output shape
+     * @return the random NDArray
      */
     NDArray randomMultinomial(int n, NDArray pValues, Shape shape);
 
     /**
-     * Returns parent NDManager.
+     * Returns the parent NDManager.
      *
-     * @return parent NDManager
+     * @return the parent NDManager
      */
     NDManager getParentManager();
 
@@ -864,15 +864,15 @@ public interface NDManager extends AutoCloseable {
     /**
      * Creates a child NDManager with specified default {@link Device}.
      *
-     * @param device default {@link Device}
+     * @param device the default {@link Device}
      * @return a child NDManager
      */
     NDManager newSubManager(Device device);
 
     /**
-     * Returns default {@link Device} of this NDManager.
+     * Returns the default {@link Device} of this NDManager.
      *
-     * @return default {@link Device} of this NDManager
+     * @return the default {@link Device} of this NDManager
      */
     Device getDevice();
 
@@ -881,8 +881,8 @@ public interface NDManager extends AutoCloseable {
      *
      * <p>Attached resource will be closed when this manager is closed.
      *
-     * @param resourceId unique resourceId
-     * @param resource {@link AutoCloseable} resource to be attached
+     * @param resourceId the unique resourceId
+     * @param resource the {@link AutoCloseable} resource to be attached
      */
     void attach(String resourceId, AutoCloseable resource);
 
@@ -893,7 +893,7 @@ public interface NDManager extends AutoCloseable {
      * Failed to close the resource has to wait on GC to be freed, and might cause out of native
      * memory.
      *
-     * @param resourceId resourceId to be remove out of this NDManager's lifecycle
+     * @param resourceId the resourceId to be removed from this NDManager's lifecycle
      */
     void detach(String resourceId);
 
@@ -904,10 +904,10 @@ public interface NDManager extends AutoCloseable {
      * using this API may cause a portability issue. Native operation may not be compatible between
      * each version.
      *
-     * @param operation native operation to performance
-     * @param src array of source NDArray
-     * @param dest array of destination to save output
-     * @param params parameters to be passed to native operator
+     * @param operation the native operation to perform
+     * @param src the NDList of source NDArray
+     * @param dest the NDList to save output to
+     * @param params the parameters to be passed to the native operator
      * @throws IllegalArgumentException if operation is not supported by Engine
      * @throws EngineException if operation failed in native engine
      */
@@ -920,10 +920,10 @@ public interface NDManager extends AutoCloseable {
      * using this API may cause a portability issue. Native operation may not compatible between
      * each version.
      *
-     * @param operation native operation to performance
-     * @param src array of source NDArray
-     * @param params parameters to be passed to native operator
-     * @return output array of {@link NDArray}
+     * @param operation the native operation to perform
+     * @param src the NDList of source NDArray
+     * @param params the parameters to be passed to the native operator
+     * @return the output array of {@link NDArray}
      * @throws IllegalArgumentException if operation is not supported by Engine
      * @throws EngineException if operation failed in native engine
      */

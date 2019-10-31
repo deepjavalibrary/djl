@@ -25,7 +25,7 @@ public interface PathIterator {
     /**
      * Tests if the iteration is complete.
      *
-     * @return {@code true} if all the segments have been read; {@code false} otherwise.
+     * @return {@code true} if all the segments have been read; {@code false} otherwise
      */
     boolean hasNext();
 
@@ -38,7 +38,7 @@ public interface PathIterator {
     /**
      * Returns the coordinates and type of the current path segment in the iteration.
      *
-     * @return the path-segment type of the current path segment.
+     * @return the path-segment type of the current path segment
      */
     Point currentPoint();
 }

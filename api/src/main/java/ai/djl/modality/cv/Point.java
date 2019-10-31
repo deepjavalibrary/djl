@@ -35,7 +35,7 @@ public class Point {
     /**
      * Returns the X coordinate of this {@code Point} in {@code double} precision.
      *
-     * @return the X coordinate of this {@code Point}.
+     * @return the X coordinate of this {@code Point}
      */
     public double getX() {
         return x;
@@ -44,7 +44,7 @@ public class Point {
     /**
      * Returns the Y coordinate of this {@code Point} in {@code double} precision.
      *
-     * @return the Y coordinate of this {@code Point}.
+     * @return the Y coordinate of this {@code Point}
      */
     public double getY() {
         return y;
