@@ -1,5 +1,6 @@
 plugins {
     id 'maven-publish'
+    id 'signing'
 }
 
 dependencies {
@@ -30,6 +31,13 @@ task sourcesJar(type: Jar) {
 task javadocJar(type: Jar) {
     from javadoc
     archiveClassifier = 'javadoc'
+}
+
+if (shouldSign()) {
+    signing {
+        useGpgCmd()
+        sign publishing.publications
+    }
 }
 
 task uploadJavadoc(type:Exec) {

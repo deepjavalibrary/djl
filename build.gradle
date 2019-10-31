@@ -82,6 +82,10 @@ def getClassifier() {
     return osPrefix + "-x86_64"
 }
 
+def shouldSign() {
+    return project.findProperty("publishTo") != null
+}
+
 Closure publishRepository() {
     def publishTo = project.findProperty("publishTo")
     switch(publishTo) {

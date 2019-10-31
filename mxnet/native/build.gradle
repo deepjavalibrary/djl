@@ -1,5 +1,6 @@
 plugins {
     id 'maven-publish'
+    id 'signing'
 }
 
 group = "ai.djl.mxnet"
@@ -40,6 +41,13 @@ platformNames.each { osName ->
         archiveClassifier = "${osName}-x86_64"
     }
     artifactsNames.add(tasks["${osName}Jar"])
+}
+
+if (shouldSign()) {
+    signing {
+        useGpgCmd()
+        sign publishing.publications
+    }
 }
 
 // Only publish if the project directory equals the current directory

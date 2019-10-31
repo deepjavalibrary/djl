@@ -1,5 +1,6 @@
 plugins {
     id 'maven-publish'
+    id 'signing'
 }
 
 group 'ai.djl.mxnet'
@@ -23,6 +24,13 @@ task sourcesJar(type: Jar) {
 task javadocJar(type: Jar) {
     from javadoc
     archiveClassifier = 'javadoc'
+}
+
+if (shouldSign()) {
+    signing {
+        useGpgCmd()
+        sign publishing.publications
+    }
 }
 
 task syncS3(type:Exec) {
