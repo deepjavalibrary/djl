@@ -134,10 +134,7 @@ public class Symbol extends NativeResource {
      * @return Map of arguments with names and shapes
      */
     public Map<String, Shape> inferShape(PairList<String, Shape> pairs) {
-        // TODO: infershape on old model would cause problem
-        JnaUtils.setNumpyMode(false);
         List<List<Shape>> shapes = JnaUtils.inferShape(this, pairs);
-        JnaUtils.setNumpyMode(true);
         if (shapes == null) {
             throw new IllegalArgumentException("Cannot infer shape based on the data provided!");
         }

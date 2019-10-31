@@ -15,7 +15,6 @@ package ai.djl.integration.tests.training;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.Cifar10;
-import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -249,17 +248,8 @@ public class DatasetTest {
             model.setBlock(Activation.IDENTITY_BLOCK);
             NDManager manager = model.getNDManager();
 
-            ExecutorService executor =
-                    Executors.newFixedThreadPool(
-                            10,
-                            r ->
-                                    new Thread( // NOPMD
-                                            () -> {
-                                                // TODO current setNumpyMode flag is thread local
-                                                // so need to set it everytime we launch the thread
-                                                JnaUtils.setNumpyMode(true);
-                                                r.run();
-                                            }));
+            ExecutorService executor = Executors.newFixedThreadPool(5);
+
             Cifar10 cifar10 =
                     new Cifar10.Builder()
                             .setManager(manager)

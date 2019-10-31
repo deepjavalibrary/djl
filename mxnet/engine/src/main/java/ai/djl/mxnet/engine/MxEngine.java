@@ -27,7 +27,7 @@ public class MxEngine extends Engine {
         // Workaround MXNet engine lazy initialization issue
         JnaUtils.getAllOpNames();
 
-        JnaUtils.setNumpyMode(true);
+        JnaUtils.setNumpyMode(JnaUtils.NumpyMode.GLOBAL_ON);
     }
 
     /** {@inheritDoc} */
@@ -86,15 +86,5 @@ public class MxEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return MxNDManager.getSystemManager().newSubManager();
-    }
-
-    /**
-     * Sets whether to run the MxEngine in numpy mode.
-     *
-     * @param numpy True to use numpy mode
-     */
-    public void setNumpyMode(boolean numpy) {
-        // Helper to avoid race condition with MxEngine initialization
-        JnaUtils.setNumpyMode(numpy);
     }
 }

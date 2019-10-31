@@ -15,7 +15,6 @@ package ai.djl.mxnet.engine;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.nn.MxSymbolBlock;
@@ -104,33 +103,20 @@ public class MxModel implements Model {
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException, MalformedModelException {
-        MxEngine engine = ((MxEngine) Engine.getEngine(MxEngine.ENGINE_NAME));
-        // TODO: currently, most of the models are saved into non-numpy model
-        // loading that way may cause problems. Wait MXNet 1.6fixes
-        engine.setNumpyMode(false);
-
-        try {
-            modelDir = modelPath.toAbsolutePath();
-            if (block == null) {
-                // load MxSymbolBlock
-                Path symbolFile = modelDir.resolve(modelName + "-symbol.json");
-                if (Files.notExists(symbolFile)) {
-                    throw new FileNotFoundException(
-                            "Symbol file not found in: "
-                                    + modelPath
-                                    + ", please set block manually.");
-                }
-                Symbol symbol = Symbol.load(manager, symbolFile.toAbsolutePath().toString());
-                // TODO: change default name "data" to model-specific one
-                block = new MxSymbolBlock(manager, symbol);
+        modelDir = modelPath.toAbsolutePath();
+        if (block == null) {
+            // load MxSymbolBlock
+            Path symbolFile = modelDir.resolve(modelName + "-symbol.json");
+            if (Files.notExists(symbolFile)) {
+                throw new FileNotFoundException(
+                        "Symbol file not found in: " + modelPath + ", please set block manually.");
             }
-
-            loadParameters(modelName, options);
-
-            // TODO: Check if Symbol has all names that params file have
-        } finally {
-            engine.setNumpyMode(true);
+            Symbol symbol = Symbol.load(manager, symbolFile.toAbsolutePath().toString());
+            // TODO: change default name "data" to model-specific one
+            block = new MxSymbolBlock(manager, symbol);
         }
+        loadParameters(modelName, options);
+        // TODO: Check if Symbol has all names that params file have
     }
 
     /** {@inheritDoc} */

@@ -48,6 +48,12 @@ public final class JnaUtils {
 
     public static final String[] EMPTY_ARRAY = new String[0];
 
+    public enum NumpyMode {
+        OFF,
+        THREAD_LOCAL_ON,
+        GLOBAL_ON
+    }
+
     private static final String[] OP_NAME_PREFIX = {
         "_contrib_", "_linalg_", "_sparse_", "_image_", "_random_"
     };
@@ -595,15 +601,15 @@ public final class JnaUtils {
                         gradSparseFormatRef));
     }
 
-    public static boolean isNumpyMode() {
+    public static int isNumpyMode() {
         IntBuffer ret = IntBuffer.allocate(1);
         checkCall(LIB.MXIsNumpyShape(ret));
-        return ret.get() != 0;
+        return ret.get();
     }
 
-    public static void setNumpyMode(boolean numpy) {
+    public static void setNumpyMode(NumpyMode mode) {
         IntBuffer ret = IntBuffer.allocate(1);
-        checkCall(LIB.MXSetIsNumpyShape(numpy ? 1 : 0, ret));
+        checkCall(LIB.MXSetIsNumpyShape(mode.ordinal(), ret));
     }
 
     public static Pointer getGradient(Pointer handle) {
