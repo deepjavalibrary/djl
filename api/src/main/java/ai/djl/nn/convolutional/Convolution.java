@@ -157,9 +157,7 @@ public abstract class Convolution extends ParameterBlock {
     private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         NDArray data = inputs.singletonOrThrow();
         Device device = data.getDevice();
-        NDList ret = new NDList(3);
-        ret.add(data);
-        ret.add(parameterStore.getValue(weight, device));
+        NDList ret = new NDList(3).add(data).add(parameterStore.getValue(weight, device));
         if (bias != null) {
             ret.add(parameterStore.getValue(bias, device));
         }

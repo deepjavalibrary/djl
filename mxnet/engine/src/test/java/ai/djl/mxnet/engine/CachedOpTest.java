@@ -108,10 +108,11 @@ public class CachedOpTest extends PowerMockTestCase {
             Assert.assertEquals(inputNDArray[3].getShape(), new Shape(4));
             Assert.assertEquals(inputNDArray[4].getShape(), new Shape(5));
             logger.info("Test: Named input");
-            input = new NDList();
-            input.add("data2", manager.create(new Shape(2)));
-            input.add("data1", manager.create(new Shape(4)));
-            input.add("data0", manager.create(new Shape(5)));
+            input =
+                    new NDList()
+                            .add("data2", manager.create(new Shape(2)))
+                            .add("data1", manager.create(new Shape(4)))
+                            .add("data0", manager.create(new Shape(5)));
             co.forward(parameterStore, input);
             inputNDArray = co.getInputNDArray();
             Assert.assertEquals(inputNDArray[0].getShape(), new Shape(5));
@@ -123,8 +124,7 @@ public class CachedOpTest extends PowerMockTestCase {
             Assert.assertEquals(inputNDArray[5].getShape(), new Shape(5));
             Assert.assertEquals(inputNDArray[6].getShape(), new Shape(6));
             logger.info("Test: Illegal inputs");
-            NDList input2 = new NDList();
-            input2.add("data_not_exist", null);
+            NDList input2 = new NDList().add("data_not_exist", null);
             co.forward(parameterStore, input2);
         }
     }

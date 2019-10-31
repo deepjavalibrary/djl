@@ -598,8 +598,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray add(NDArray... others) {
-        NDList toAdd = new NDList(this);
-        toAdd.addAll(new NDList(others));
+        NDList toAdd = new NDList(this).addAll(new NDList(others));
         if (others.length == 0) {
             throw new IllegalArgumentException("Passed in arrays must have at least one element");
         } else if (others.length == 1) {
@@ -720,8 +719,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray addi(NDArray... others) {
-        NDList toAdd = new NDList(this);
-        toAdd.addAll(new NDList(others));
+        NDList toAdd = new NDList(this).addAll(new NDList(others));
         if (others.length == 0) {
             throw new IllegalArgumentException("Passed in arrays must have at least one element");
         } else if (others.length == 1) {

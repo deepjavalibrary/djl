@@ -81,9 +81,7 @@ public final class HelloWorld {
         public NDList processInput(TranslatorContext ctx, BufferedImage img)
                 throws TranslateException {
             NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), img);
-            NDList ndList = new NDList();
-            ndList.add("image_tensor", array);
-            return ndList;
+            return new NDList().add("image_tensor", array);
         }
 
         @Override

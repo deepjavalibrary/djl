@@ -120,9 +120,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * @return a view of the portion of this NDList
      */
     public NDList subList(int fromIndex, int toIndex) {
-        NDList subList = new NDList();
-        subList.addAll(list.subList(fromIndex, toIndex));
-        return subList;
+        return new NDList().addAll(list.subList(fromIndex, toIndex));
     }
 
     /**
@@ -199,11 +197,13 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * Appends the specified NDArray to the end of this NDList.
      *
      * @param array NDArray to be appended to this list
+     * @return this NDList after the addition
      * @throws UnsupportedOperationException if this NDList is read only
      * @see NDList#add(String, NDArray)
      */
-    public void add(NDArray array) {
+    public NDList add(NDArray array) {
         list.add(null, array);
+        return this;
     }
 
     /**
@@ -211,10 +211,12 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      *
      * @param name optional name of the {@link NDArray}
      * @param array NDArray to be appended to this list
+     * @return this NDList after the addition
      * @throws UnsupportedOperationException if this NDList is read only
      */
-    public void add(String name, NDArray array) {
+    public NDList add(String name, NDArray array) {
         list.add(name, array);
+        return this;
     }
 
     /**
@@ -222,12 +224,14 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * that they are returned by the specified NDList's iterator.
      *
      * @param other NDList containing NDArray to be added to this list
+     * @return this NDList after the addition
      * @throws UnsupportedOperationException if this NDList is read only
      */
-    public void addAll(NDList other) {
+    public NDList addAll(NDList other) {
         for (Pair<String, NDArray> pair : other) {
             list.add(pair);
         }
+        return this;
     }
 
     /**
@@ -235,10 +239,12 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * that they are returned by the specified PairList's iterator.
      *
      * @param other PairList containing String NDArray pair to be added to this list
+     * @return this NDList after the addition
      * @throws UnsupportedOperationException if this NDList is read only
      */
-    public void addAll(PairList<String, NDArray> other) {
+    public NDList addAll(PairList<String, NDArray> other) {
         list.addAll(other);
+        return this;
     }
 
     /**

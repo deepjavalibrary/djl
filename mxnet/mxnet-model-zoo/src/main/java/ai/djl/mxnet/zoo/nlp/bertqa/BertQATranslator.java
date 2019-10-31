@@ -53,12 +53,7 @@ public class BertQATranslator implements Translator<QAInput, String> {
         NDArray data1 = manager.create(types, new Shape(1, seqLength));
         NDArray data2 = manager.create(new float[] {validLength});
 
-        NDList list = new NDList(3);
-        list.add("data0", data0);
-        list.add("data1", data1);
-        list.add("data2", data2);
-
-        return list;
+        return new NDList(3).add("data0", data0).add("data1", data1).add("data2", data2);
     }
 
     @Override

@@ -151,13 +151,13 @@ public class RNN extends RecurrentCell {
         NDArray head = inputs.singletonOrThrow();
         Device device = head.getDevice();
 
-        NDList result = new NDList();
-        result.add(head);
+        NDList result = new NDList().add(head);
         try (NDList parameterList = new NDList(4)) {
-            parameterList.add(parameterStore.getValue(i2hWeight, device).flatten());
-            parameterList.add(parameterStore.getValue(i2hBias, device).flatten());
-            parameterList.add(parameterStore.getValue(h2hWeight, device).flatten());
-            parameterList.add(parameterStore.getValue(h2hBias, device).flatten());
+            parameterList
+                    .add(parameterStore.getValue(i2hWeight, device).flatten())
+                    .add(parameterStore.getValue(i2hBias, device).flatten())
+                    .add(parameterStore.getValue(h2hWeight, device).flatten())
+                    .add(parameterStore.getValue(h2hBias, device).flatten());
 
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);
