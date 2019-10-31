@@ -35,6 +35,10 @@ application {
     mainClassName = System.getProperty("main", "ai.djl.examples.inference.ClassifyExample")
 }
 
+run{
+    systemProperties System.getProperties()
+}
+
 tasks.distTar.enabled = false
 
 def getClassifier() {

@@ -34,6 +34,10 @@ application {
     mainClassName = System.getProperty("main", "ai.djl.integration.IntegrationTest")
 }
 
+run{
+    systemProperties System.getProperties()
+}
+
 jacoco {
     toolVersion = "0.8.4"
 }
