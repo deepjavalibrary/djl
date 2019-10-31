@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Computes N-D convolution on (N+2)-D input. */
 public abstract class Convolution extends ParameterBlock {
 
     protected Shape kernel;
@@ -46,13 +47,13 @@ public abstract class Convolution extends ParameterBlock {
     protected Parameter bias;
 
     public Convolution(BaseBuilder<?> builder) {
-        kernel = builder.getKernel();
-        stride = builder.getStride();
-        pad = builder.getPad();
-        dilate = builder.getDilate();
-        numFilters = builder.getNumFilters();
-        numGroups = builder.getNumGroups();
-        includeBias = builder.isIncludeBias();
+        kernel = builder.kernel;
+        stride = builder.stride;
+        pad = builder.pad;
+        dilate = builder.dilate;
+        numFilters = builder.numFilters;
+        numGroups = builder.numGroups;
+        includeBias = builder.includeBias;
 
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (includeBias) {
@@ -62,10 +63,25 @@ public abstract class Convolution extends ParameterBlock {
 
     protected abstract byte getVersion();
 
+    /**
+     * Returns the expected layout of the input.
+     *
+     * @return the expected layout of the input
+     */
     protected abstract LayoutType[] getExpectedLayout();
 
+    /**
+     * Returns the string representing the layout of the input.
+     *
+     * @return the string representing the layout of the input
+     */
     protected abstract String getStringLayout();
 
+    /**
+     * Returns the number of dimensions of the input.
+     *
+     * @return the number of dimensions of the input
+     */
     protected abstract int numDimensions();
 
     /** {@inheritDoc} */
@@ -185,39 +201,11 @@ public abstract class Convolution extends ParameterBlock {
         protected int numGroups = 1;
         protected boolean includeBias = true;
 
-        public Shape getKernel() {
-            return kernel;
-        }
-
-        public Shape getStride() {
-            return stride;
-        }
-
-        public Shape getPad() {
-            return pad;
-        }
-
-        public Shape getDilate() {
-            return dilate;
-        }
-
-        public int getNumFilters() {
-            return numFilters;
-        }
-
-        public int getNumGroups() {
-            return numGroups;
-        }
-
-        public boolean isIncludeBias() {
-            return includeBias;
-        }
-
         /**
          * Sets the shape of the kernel.
          *
-         * @param kernel Shape of the kernel
-         * @return Returns this Builder
+         * @param kernel the shape of the kernel
+         * @return this Builder
          */
         public T setKernel(Shape kernel) {
             this.kernel = kernel;
@@ -227,8 +215,8 @@ public abstract class Convolution extends ParameterBlock {
         /**
          * Sets the stride of the convolution. Defaults to 1 in each dimension.
          *
-         * @param stride Shape of the stride
-         * @return Returns this Builder
+         * @param stride the shape of the stride
+         * @return this Builder
          */
         public T optStride(Shape stride) {
             this.stride = stride;
@@ -236,9 +224,9 @@ public abstract class Convolution extends ParameterBlock {
         }
 
         /**
-         * Sets the padding along each dimension. Defaults to zero along each dimension
+         * Sets the padding along each dimension. Defaults to 0 along each dimension
          *
-         * @param pad Padding along each dimension
+         * @param pad the shape of padding along each dimension
          * @return Returns this Builder
          */
         public T optPad(Shape pad) {
@@ -247,10 +235,10 @@ public abstract class Convolution extends ParameterBlock {
         }
 
         /**
-         * Sets the padding along each dimension. Defaults to zero along each dimension
+         * Sets the dilation along each dimension. Defaults to 1 along each dimension
          *
-         * @param dilate Padding along each dimension
-         * @return Returns this Builder
+         * @param dilate the shape of dilation along each dimension
+         * @return this Builder
          */
         public T optDilate(Shape dilate) {
             this.dilate = dilate;
@@ -260,8 +248,8 @@ public abstract class Convolution extends ParameterBlock {
         /**
          * Sets the <b>Required</b> number of filters.
          *
-         * @param numFilters Number of convolution filter(channel)
-         * @return Returns this Builder
+         * @param numFilters the number of convolution filter(channel)
+         * @return this Builder
          */
         public T setNumFilters(int numFilters) {
             this.numFilters = numFilters;
@@ -271,8 +259,8 @@ public abstract class Convolution extends ParameterBlock {
         /**
          * Sets the number of group partitions.
          *
-         * @param numGroups Number of group partitions
-         * @return Returns this Builder
+         * @param numGroups the number of group partitions
+         * @return this Builder
          */
         public T optNumGroups(int numGroups) {
             this.numGroups = numGroups;
@@ -284,13 +272,18 @@ public abstract class Convolution extends ParameterBlock {
          * default.
          *
          * @param includeBias Whether to use a bias vector parameter
-         * @return Returns this Builder
+         * @return this Builder
          */
         public T optBias(boolean includeBias) {
             this.includeBias = includeBias;
             return self();
         }
 
+        /**
+         * Validates that the required arguments are set.
+         *
+         * @throws IllegalArgumentException if the required arguments are not set
+         */
         protected void validate() {
             if (kernel == null || numFilters == 0) {
                 throw new IllegalArgumentException("Kernel and numFilters must be set");

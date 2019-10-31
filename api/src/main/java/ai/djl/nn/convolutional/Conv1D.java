@@ -16,6 +16,24 @@ import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 
+/**
+ * Computes 1-D convolution on 3-D input.
+ *
+ * <p>The input to a {@code Conv1D} is an {@link ai.djl.ndarray.NDList} with a single 3-D {@link
+ * ai.djl.ndarray.NDArray}. The layout of the {@link ai.djl.ndarray.NDArray} must be "NCW". The
+ * shapes are
+ *
+ * <ul>
+ *   <li>{@code data: (batch_size, channel, width)}
+ *   <li>{@code weight: (num_filter, channel, kernel[0])}
+ *   <li>{@code bias: (num_filter,)}
+ *   <li>{@code out: (batch_size, num_filter, out_width)} <br>
+ *       {@code out_width = f(width, kernel[0], pad[0], stride[0], dilate[0])} <br>
+ *       {@code where f(x, k, p, s, d) = floor((x + 2 * p - d * (k - 1) - 1)/s) + 1}
+ * </ul>
+ *
+ * <p>Both {@code weight} and {@code bias} are learn-able parameters.
+ */
 public class Conv1D extends Convolution {
 
     private static final LayoutType[] EXPECTED_LAYOUT = {
@@ -57,6 +75,7 @@ public class Conv1D extends Convolution {
     /** The Builder to construct a {@link Conv1D} type of {@link Block}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
+        /** Creates a builder that can build a {@link Conv1D} block. */
         public Builder() {
             stride = new Shape(1);
             pad = new Shape(0);
@@ -69,6 +88,11 @@ public class Conv1D extends Convolution {
             return this;
         }
 
+        /**
+         * Builds a {@link Conv1D} block.
+         *
+         * @return the {@link Conv1D} block
+         */
         public Conv1D build() {
             validate();
             return new Conv1D(this);

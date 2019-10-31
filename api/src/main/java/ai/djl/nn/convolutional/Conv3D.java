@@ -16,6 +16,26 @@ import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 
+/**
+ * Computes 3-D convolution on 5-D input.
+ *
+ * <p>The input to a {@code Conv3D} is an {@link ai.djl.ndarray.NDList} with a single 5-D {@link
+ * ai.djl.ndarray.NDArray}. The layout of the {@link ai.djl.ndarray.NDArray} must be "NCDHW". The
+ * shapes are
+ *
+ * <ul>
+ *   <li>{@code data: (batch_size, channel, depth, height, width)}
+ *   <li>{@code weight: (num_filter, channel, kernel[0], kernel[1], kernel[2])}
+ *   <li>{@code bias: (num_filter,)}
+ *   <li>{@code out: (batch_size, num_filter, out_depth, out_height, out_width)} <br>
+ *       {@code out_depth = f(depth, kernel[0], pad[0], stride[0], dilate[0])} <br>
+ *       {@code out_height = f(height, kernel[1], pad[1], stride[1], dilate[1])} <br>
+ *       {@code out_width = f(width, kernel[2], pad[2], stride[2], dilate[2])} <br>
+ *       {@code where f(x, k, p, s, d) = floor((x + 2 * p - d * (k - 1) - 1)/s) + 1}
+ * </ul>
+ *
+ * <p>Both {@code weight} and {@code bias} are learn-able parameters.
+ */
 public class Conv3D extends Convolution {
 
     private static final LayoutType[] EXPECTED_LAYOUT = {
@@ -55,7 +75,7 @@ public class Conv3D extends Convolution {
 
     /** The Builder to construct a {@link Conv3D} type of {@link Block}. */
     public static final class Builder extends BaseBuilder<Builder> {
-
+        /** Creates a builder that can build a {@link Conv3D} block. */
         public Builder() {
             stride = new Shape(1, 1, 1);
             pad = new Shape(0, 0, 0);
@@ -68,6 +88,11 @@ public class Conv3D extends Convolution {
             return this;
         }
 
+        /**
+         * Builds a {@link Conv3D} block.
+         *
+         * @return the {@link Conv3D} block
+         */
         public Conv3D build() {
             validate();
             return new Conv3D(this);
