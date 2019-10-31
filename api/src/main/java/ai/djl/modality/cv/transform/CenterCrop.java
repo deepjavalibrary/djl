@@ -26,7 +26,7 @@ public class CenterCrop implements Transform {
         height = -1;
     }
 
-    public CenterCrop(int height, int width) {
+    public CenterCrop(int width, int height) {
         this.width = width;
         this.height = height;
     }
@@ -36,6 +36,6 @@ public class CenterCrop implements Transform {
         if (width < 0) {
             return NDImageUtils.centerCrop(array);
         }
-        return NDImageUtils.centerCrop(array, height, width);
+        return NDImageUtils.centerCrop(array, width, height);
     }
 }

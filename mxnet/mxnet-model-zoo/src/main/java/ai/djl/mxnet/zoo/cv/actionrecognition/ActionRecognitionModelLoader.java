@@ -48,7 +48,7 @@ public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage,
         int height = ((Double) arguments.getOrDefault("height", 299d)).intValue();
 
         Pipeline pipeline = new Pipeline();
-        pipeline.add(new Resize(height, width))
+        pipeline.add(new Resize(width, height))
                 .add(new ToTensor())
                 .add(
                         new Normalize(

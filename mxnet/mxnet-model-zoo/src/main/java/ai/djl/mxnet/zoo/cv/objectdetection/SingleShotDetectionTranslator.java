@@ -63,7 +63,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
                 double w = box[2] / 512 - x;
                 double h = box[3] / 512 - y;
 
-                Rectangle rect = new Rectangle(y, x, h, w);
+                Rectangle rect = new Rectangle(x, y, w, h);
                 retNames.add(className);
                 retProbs.add(probability);
                 retBB.add(rect);

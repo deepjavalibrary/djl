@@ -125,8 +125,8 @@ public class CocoMetadata {
                 JsonElement json, Type typeOfT, JsonDeserializationContext ctx) {
             JsonArray array = json.getAsJsonArray();
             return new Rectangle(
-                    array.get(1).getAsDouble(), array.get(0).getAsDouble(),
-                    array.get(3).getAsDouble(), array.get(2).getAsDouble());
+                    array.get(0).getAsDouble(), array.get(1).getAsDouble(),
+                    array.get(2).getAsDouble(), array.get(3).getAsDouble());
         }
     }
 }

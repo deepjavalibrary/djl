@@ -19,8 +19,8 @@ import ai.djl.training.Activation;
 
 public class Mlp extends SequentialBlock {
 
-    public Mlp(int height, int width) {
-        add(Blocks.flattenBlock(height * (long) width))
+    public Mlp(int width, int height) {
+        add(Blocks.flattenBlock(width * (long) height))
                 .add(new Linear.Builder().setOutChannels(128).build())
                 .add(Activation.reluBlock())
                 .add(new Linear.Builder().setOutChannels(64).build())

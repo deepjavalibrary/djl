@@ -45,7 +45,7 @@ public final class ImageVisualization {
             BoundingBox box = result.getBoundingBox();
             g.setPaint(BufferedImageUtils.randomColor().darker());
 
-            box.draw(g, imageHeight, imageWidth);
+            box.draw(g, imageWidth, imageHeight);
             Point p = box.getPoint();
             int x = (int) (p.getX() * imageWidth);
             int y = (int) (p.getY() * imageHeight);

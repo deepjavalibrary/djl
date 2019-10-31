@@ -49,7 +49,7 @@ public abstract class ImageClassificationModelLoader
         String flag = (String) arguments.getOrDefault("flag", NDImageUtils.Flag.COLOR.name());
 
         Pipeline pipeline = new Pipeline();
-        pipeline.add(new CenterCrop()).add(new Resize(height, width)).add(new ToTensor());
+        pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
 
         return new ImageClassificationTranslator.Builder()
                 .optFlag(NDImageUtils.Flag.valueOf(flag))

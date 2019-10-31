@@ -46,7 +46,7 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
         int height = ((Double) arguments.getOrDefault("height", 256d)).intValue();
 
         Pipeline pipeline = new Pipeline();
-        pipeline.add(new Resize(height, width))
+        pipeline.add(new Resize(width, height))
                 .add(new ToTensor())
                 .add(
                         new Normalize(

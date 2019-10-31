@@ -23,7 +23,7 @@ public class MultiBoxPriors {
     private int mapHeight;
 
     public MultiBoxPriors(
-            List<Float> sizes, List<Float> ratios, int inputSize, int mapHeight, int mapWidth) {
+            List<Float> sizes, List<Float> ratios, int inputSize, int mapWidth, int mapHeight) {
         this.sizes = sizes;
         this.ratios = ratios;
         this.inputSize = inputSize;
@@ -52,7 +52,7 @@ public class MultiBoxPriors {
             double height = inputSize * sizes.get(0) / Math.sqrt(ratio);
             double x = point.getX() * inputSize / mapWidth - width / 2;
             double y = point.getY() * inputSize / mapHeight + height / 2;
-            Rectangle box = new Rectangle(y, x, height, width);
+            Rectangle box = new Rectangle(x, y, width, height);
             multiBoxPriors.add(box);
         }
         for (int i = 1; i < sizes.size(); i++) {
@@ -60,7 +60,7 @@ public class MultiBoxPriors {
             double height = inputSize * sizes.get(i) / Math.sqrt(ratios.get(0));
             double x = point.getX() * inputSize / mapWidth - width / 2;
             double y = point.getY() * inputSize / mapHeight + height / 2;
-            Rectangle box = new Rectangle(y, x, height, width);
+            Rectangle box = new Rectangle(x, y, width, height);
             multiBoxPriors.add(box);
         }
         return multiBoxPriors;

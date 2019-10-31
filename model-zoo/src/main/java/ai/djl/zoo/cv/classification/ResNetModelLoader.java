@@ -56,7 +56,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
         int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
 
         Pipeline pipeline = new Pipeline();
-        pipeline.add(new CenterCrop()).add(new Resize(height, width)).add(new ToTensor());
+        pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
         return new ImageClassificationTranslator.Builder()
                 .setPipeline(pipeline)
                 .setSynsetArtifactName("synset.txt")

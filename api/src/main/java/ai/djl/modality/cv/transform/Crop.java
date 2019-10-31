@@ -18,12 +18,13 @@ import ai.djl.translate.Transform;
 
 /** Crop the image. The input shape of image is (H, W, C). */
 public class Crop implements Transform {
+
     private int x;
     private int y;
     private int width;
     private int height;
 
-    public Crop(int y, int x, int height, int width) {
+    public Crop(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -32,6 +33,6 @@ public class Crop implements Transform {
 
     @Override
     public NDArray transform(NDArray array) {
-        return NDImageUtils.crop(array, y, x, height, width);
+        return NDImageUtils.crop(array, x, y, width, height);
     }
 }

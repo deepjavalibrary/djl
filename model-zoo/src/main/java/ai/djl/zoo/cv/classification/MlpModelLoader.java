@@ -54,7 +54,7 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
         String flag = (String) arguments.getOrDefault("flag", NDImageUtils.Flag.COLOR.name());
 
         Pipeline pipeline = new Pipeline();
-        pipeline.add(new CenterCrop()).add(new Resize(height, width)).add(new ToTensor());
+        pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
         return new ImageClassificationTranslator.Builder()
                 .optFlag(NDImageUtils.Flag.valueOf(flag))
                 .setPipeline(pipeline)
@@ -70,7 +70,7 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
         int height = ((Double) arguments.getOrDefault("height", 28d)).intValue();
 
         Model model = Model.newInstance(device);
-        model.setBlock(new Mlp(height, width));
+        model.setBlock(new Mlp(width, height));
         model.load(modelPath, artifact.getName());
         return model;
     }

@@ -97,7 +97,7 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
                     maskVal[j / maskVal.length][j % maskVal.length] = flattened[j];
                 }
 
-                Mask mask = new Mask(y, x, h, w, maskVal);
+                Mask mask = new Mask(x, y, w, h, maskVal);
 
                 retNames.add(className);
                 retProbs.add(probability);
@@ -117,8 +117,8 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
         Shape shape = image.getShape();
         int width = (int) shape.get(1);
         int height = (int) shape.get(0);
-        int min = Math.min(height, width);
-        int max = Math.max(height, width);
+        int min = Math.min(width, height);
+        int max = Math.max(width, height);
         float scale = shortEdge / (float) min;
         if (Math.round(scale * max) > maxEdge) {
             scale = maxEdge / (float) max;
@@ -126,7 +126,7 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
         rescaledHeight = Math.round(height * scale);
         rescaledWidth = Math.round(width * scale);
 
-        return NDImageUtils.resize(image, rescaledHeight, rescaledWidth);
+        return NDImageUtils.resize(image, rescaledWidth, rescaledHeight);
     }
 
     public static class Builder extends BaseBuilder<Builder> {

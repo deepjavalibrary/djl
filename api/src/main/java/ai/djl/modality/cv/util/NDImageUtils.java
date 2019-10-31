@@ -27,8 +27,8 @@ public final class NDImageUtils {
         return image.getNDArrayInternal().resize(size, size);
     }
 
-    public static NDArray resize(NDArray image, int height, int width) {
-        return image.getNDArrayInternal().resize(height, width);
+    public static NDArray resize(NDArray image, int width, int height) {
+        return image.getNDArrayInternal().resize(width, height);
     }
 
     public static NDArray normalize(NDArray input, float mean, float std) {
@@ -71,7 +71,7 @@ public final class NDImageUtils {
         return centerCrop(image, w, w);
     }
 
-    public static NDArray centerCrop(NDArray image, int height, int width) {
+    public static NDArray centerCrop(NDArray image, int width, int height) {
         Shape shape = image.getShape();
         int w = (int) shape.get(1);
         int h = (int) shape.get(0);
@@ -93,11 +93,11 @@ public final class NDImageUtils {
             y = 0;
         }
 
-        return crop(image, y, x, h, w);
+        return crop(image, x, y, w, h);
     }
 
-    public static NDArray crop(NDArray image, int y, int x, int height, int width) {
-        return image.getNDArrayInternal().crop(y, x, height, width);
+    public static NDArray crop(NDArray image, int x, int y, int width, int height) {
+        return image.getNDArrayInternal().crop(x, y, width, height);
     }
 
     public enum Flag {

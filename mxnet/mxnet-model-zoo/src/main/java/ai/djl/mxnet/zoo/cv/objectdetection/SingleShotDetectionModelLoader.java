@@ -50,7 +50,7 @@ public class SingleShotDetectionModelLoader
         double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
 
         Pipeline pipeline = new Pipeline();
-        pipeline.add(new Resize(height, width)).add(new ToTensor());
+        pipeline.add(new Resize(width, height)).add(new ToTensor());
 
         return new SingleShotDetectionTranslator.Builder()
                 .setPipeline(pipeline)

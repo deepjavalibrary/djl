@@ -44,8 +44,8 @@ public interface BoundingBox {
      * Draw the bounding box using the {@link Graphics2D}.
      *
      * @param g Graphics2D object of the image
-     * @param imageHeight the height of the image
      * @param imageWidth the width of the image
+     * @param imageHeight the height of the image
      */
-    void draw(Graphics2D g, int imageHeight, int imageWidth);
+    void draw(Graphics2D g, int imageWidth, int imageHeight);
 }
