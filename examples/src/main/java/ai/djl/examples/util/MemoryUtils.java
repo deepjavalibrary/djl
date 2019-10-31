@@ -46,7 +46,7 @@ public final class MemoryUtils {
      * @param metrics {@link Metrics} to store memory information
      */
     public static void collectMemoryInfo(Metrics metrics) {
-        if (metrics != null) {
+        if (metrics != null && Boolean.getBoolean("collect-memory")) {
             MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
             MemoryUsage heap = memBean.getHeapMemoryUsage();
             MemoryUsage nonHeap = memBean.getNonHeapMemoryUsage();
@@ -59,6 +59,8 @@ public final class MemoryUtils {
             metrics.addMetric("NonHeap", nonHeapCommitted, "bytes");
             Engine engine = Engine.getInstance();
             int gpuCount = engine.getGpuCount();
+            // TODO: For some reason, MxEngine.getGpuMemory() is very slow and allocates memory on
+            // GPUs that are NOT in use.
             for (int i = 0; i < gpuCount; ++i) {
                 Device device = Device.gpu(i);
                 MemoryUsage mem = engine.getGpuMemory(device);
