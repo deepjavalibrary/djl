@@ -96,7 +96,7 @@ public class Embedding<T> extends ParameterBlock {
      * @param manager the manager to create the new NDArray
      * @param items the items to retrieve the embeddings for
      * @return a 3D NDArray where the first two embeddingSize correspond to the items, and the last
-     *     dimension is the embedding.
+     *     dimension is the embedding
      */
     public NDArray forward(ParameterStore parameterStore, NDManager manager, T[][] items) {
         return forward(parameterStore, new NDList(manager.create(embed(items)))).singletonOrThrow();
@@ -109,7 +109,7 @@ public class Embedding<T> extends ParameterBlock {
      * @param manager the manager to create the new NDArray
      * @param items the items to retrieve the embeddings for
      * @return a 2D NDArray where the first dimension corresponds to the items, and the last
-     *     dimension is the embedding.
+     *     dimension is the embedding
      */
     public NDArray forward(ParameterStore parameterStore, NDManager manager, T[] items) {
         return forward(parameterStore, new NDList(manager.create(embed(items)))).singletonOrThrow();
@@ -208,7 +208,7 @@ public class Embedding<T> extends ParameterBlock {
         /**
          * Sets the collection of items that should feature embeddings.
          *
-         * @param items a collection containing all the items that embeddings should be created for.
+         * @param items a collection containing all the items that embeddings should be created for
          * @return this Builder
          */
         public Builder<T> setItems(Collection<T> items) {

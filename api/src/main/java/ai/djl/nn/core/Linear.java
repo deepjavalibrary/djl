@@ -201,10 +201,11 @@ public class Linear extends ParameterBlock {
         }
 
         /**
-         * Sets the optional parameter of whether to include a bias vector with default of true.
+         * Sets the optional parameter that indicates whether to include a bias vector with default
+         * value of true.
          *
          * @param bias whether to use a bias vector parameter
-         * @return Returns this Builder
+         * @return this Builder
          */
         public Builder optBias(boolean bias) {
             this.bias = bias;

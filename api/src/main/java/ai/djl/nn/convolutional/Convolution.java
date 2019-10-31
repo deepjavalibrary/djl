@@ -224,10 +224,10 @@ public abstract class Convolution extends ParameterBlock {
         }
 
         /**
-         * Sets the padding along each dimension. Defaults to 0 along each dimension
+         * Sets the padding along each dimension. Defaults to 0 along each dimension.
          *
          * @param pad the shape of padding along each dimension
-         * @return Returns this Builder
+         * @return this Builder
          */
         public T optPad(Shape pad) {
             this.pad = pad;
@@ -235,7 +235,7 @@ public abstract class Convolution extends ParameterBlock {
         }
 
         /**
-         * Sets the dilation along each dimension. Defaults to 1 along each dimension
+         * Sets the dilation along each dimension. Defaults to 1 along each dimension.
          *
          * @param dilate the shape of dilation along each dimension
          * @return this Builder
@@ -248,7 +248,7 @@ public abstract class Convolution extends ParameterBlock {
         /**
          * Sets the <b>Required</b> number of filters.
          *
-         * @param numFilters the number of convolution filter(channel)
+         * @param numFilters the number of convolution filters(channels)
          * @return this Builder
          */
         public T setNumFilters(int numFilters) {
@@ -271,7 +271,7 @@ public abstract class Convolution extends ParameterBlock {
          * Sets the optional parameter of whether to include a bias vector. Includes bias by
          * default.
          *
-         * @param includeBias Whether to use a bias vector parameter
+         * @param includeBias whether to use a bias vector parameter
          * @return this Builder
          */
         public T optBias(boolean includeBias) {

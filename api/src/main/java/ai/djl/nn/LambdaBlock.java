@@ -28,7 +28,7 @@ import java.util.function.Function;
  * {@code LambdaBlock} is a {@link Block} with no parameters or children.
  *
  * <p>{@code LambdaBlock} allows converting any function that takes an {@code NDList} as input and
- * returns an {@code NDList} into a parameter-less, and child-less {@link Block}. This can be useful
+ * returns an {@code NDList} into a parameter-less and child-less {@link Block}. This can be useful
  * in converting activation functions, identity blocks, and more. For example, identity block can be
  * created as {@code new LambdaBlock(x -> x)}.
  */

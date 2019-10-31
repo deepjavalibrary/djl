@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * {@code SequentialBlock} is a {@link Block} whose children form a chain of blocks, each child
+ * {@code SequentialBlock} is a {@link Block} whose children form a chain of blocks with each child
  * block feeding its output to the next. The output of the last child is returned as the output of
  * the {@code SequentialBlock}.
  *

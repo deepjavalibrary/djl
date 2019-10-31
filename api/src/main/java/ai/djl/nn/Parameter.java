@@ -238,13 +238,13 @@ public class Parameter implements AutoCloseable {
     }
 
     /**
-     * Load parameter NDArrays from InputStream.
+     * Loads parameter NDArrays from InputStream.
      *
-     * <p>Currently, we cannot deserialize into exact subclass of NDArray. The SparseNDArray and
-     * Matrix will be restored as NDArray only.
+     * <p>Currently, we cannot deserialize into the exact subclass of NDArray. The SparseNDArray and
+     * Matrix will be loaded as NDArray only.
      *
-     * @param manager NDManager
-     * @param dis InputStream
+     * @param manager the NDManager
+     * @param dis the InputStream
      * @throws IOException if failed to read
      * @throws MalformedModelException Exception thrown when model is not in expected format
      *     (parameters).

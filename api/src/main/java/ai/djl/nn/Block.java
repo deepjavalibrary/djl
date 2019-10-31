@@ -53,22 +53,22 @@ import java.util.List;
  *
  * <p>A block and its children together form a neural network. The way the network is structured
  * depends on the implementation of the block, and its interaction with its children. The children
- * can be aligned in sequence (eg. {@link SequentialBlock}) or in parallel (eg. {@link
+ * can be aligned in sequence (eg. {@link SequentialBlock}), in parallel (eg. {@link
  * ParallelBlock}), or in many other ways.
  *
- * <p>A block does not necessarily have to children and parameters. For example, {@link
+ * <p>A block does not necessarily have to have children and parameters. For example, {@link
  * SequentialBlock}, and {@link ParallelBlock} don't have any parameters, but do have child blocks.
- * Similarly, {@link ai.djl.nn.convolutional.Conv2D} does not have children but has parameters. It
- * is recommended for blocks that don't have children to extend {@link ParameterBlock}. There can be
- * special cases where blocks have neither parameters nor children. One such example is {@link
+ * Similarly, {@link ai.djl.nn.convolutional.Conv2D} does not have children, but has parameters. We
+ * recommend extending {@link ParameterBlock} to create blocks that don't have children. There can
+ * be special cases where blocks have neither parameters nor children. One such example is {@link
  * LambdaBlock}. {@link LambdaBlock} takes in a function, and applies that function to its input in
  * the {@link #forward(ParameterStore, NDList) forward} method.
  *
  * <p>Now that we understand the components of the block, we can explore what the block really
- * represents. A block combined with the recursive, hierarchical structure of its children together
- * forms a network. It takes in the input to the network, performs its operation, and returns the
- * output of the network. When a block is added as a child of another block, it becomes a
- * sub-network of that block.
+ * represents. A block combined with the recursive, hierarchical structure of its children forms a
+ * network. It takes in the input to the network, performs its operation, and returns the output of
+ * the network. When a block is added as a child of another block, it becomes a sub-network of that
+ * block.
  *
  * <p>The life-cycle of a block has 3 stages:
  *
@@ -114,7 +114,7 @@ public interface Block {
      * @param parameterStore the parameter store
      * @param inputs the input NDList
      * @param params optional parameters
-     * @return output of the forward pass
+     * @return the output of the forward pass
      */
     NDList forward(ParameterStore parameterStore, NDList inputs, PairList<String, Object> params);
 
@@ -154,7 +154,7 @@ public interface Block {
     /**
      * Guaranteed to throw an exception. Not yet implemented
      *
-     * @param dataType the datatype to cast to
+     * @param dataType the data type to cast to
      * @throws UnsupportedOperationException always
      */
     void cast(DataType dataType);

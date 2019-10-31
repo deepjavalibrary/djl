@@ -31,8 +31,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * {@code ParallelBlock} is a {@link Block} whose children form a parallel branch in the network,
- * that are then combined to produce a single output.
+ * {@code ParallelBlock} is a {@link Block} whose children form a parallel branch in the network and
+ * are combined to produce a single output.
  *
  * <p>{@code ParallelBlock} has no direct parameters.
  */
