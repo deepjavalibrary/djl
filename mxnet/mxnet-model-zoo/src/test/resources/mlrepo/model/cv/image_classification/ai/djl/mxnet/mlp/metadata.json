@@ -35,7 +35,7 @@
           "sha1Hash": "1660b18b452226e4f550f3de7164b51d1f798ab6"
         },
         "parameters": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/mlp/0.0.1/mlp-0000.params",
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/mlp/0.0.1/mlp-0000.params",
           "sha1Hash": "59a36647d05efbdf458a2fde0791c9c1cb9882ba"
         }
       }

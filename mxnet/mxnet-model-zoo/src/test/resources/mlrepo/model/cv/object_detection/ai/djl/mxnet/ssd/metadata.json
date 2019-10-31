@@ -30,7 +30,7 @@
       },
       "files": {
         "classes": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
           "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
           "name": "classes.txt"
         },
@@ -40,7 +40,7 @@
           "name": "ssd_512_resnet50_v1_voc-symbol.json"
         },
         "parameters": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/object_detection/ai/djl/mxnet/ssd/0.0.1/ssd_512_resnet50_v1_voc-0000.params.gz",
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/ssd/0.0.1/ssd_512_resnet50_v1_voc-0000.params.gz",
           "sha1Hash": "d830eb4d786776577eaf0b0198125a932f055262"
         }
       }
@@ -62,7 +62,7 @@
       },
       "files": {
         "classes": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/object_detection/ai/djl/mxnet/classes_coco.txt",
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_coco.txt",
           "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
           "name": "classes.txt"
         },
@@ -72,7 +72,7 @@
           "name": "ssd_512_vgg16_atrous_coco-symbol.json"
         },
         "parameters": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/object_detection/ai/djl/mxnet/ssd/0.0.1/ssd_512_vgg16_atrous_coco-0000.params.gz",
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/ssd/0.0.1/ssd_512_vgg16_atrous_coco-0000.params.gz",
           "sha1Hash": "491ed6ac57d252bee0721744176cdab93b6f8296"
         }
       }

@@ -16,7 +16,7 @@ import ai.djl.repository.Repository;
 
 public interface BasicDatasets {
 
-    String MXNET_REPO_URL = "https://djl-ai.s3.amazonaws.com/mlrepo/";
+    String MXNET_REPO_URL = "https://mlrepo.djl.ai/";
 
     Repository REPOSITORY = Repository.newInstance("BasicDataset", MXNET_REPO_URL);
 

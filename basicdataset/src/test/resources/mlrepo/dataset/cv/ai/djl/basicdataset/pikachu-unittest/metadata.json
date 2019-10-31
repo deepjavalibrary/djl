@@ -18,11 +18,11 @@
       "snapshot": false,
       "files": {
         "train": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/dataset/cv/ai/djl/basicdataset/pikachu-unittest/train.zip",
+          "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/pikachu-unittest/train.zip",
           "sha1Hash": "9f5b61a3ca560e1913fca2bcf98079471e2eaa3d"
         },
         "test": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/dataset/cv/ai/djl/basicdataset/pikachu-unittest/test.zip",
+          "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/pikachu-unittest/test.zip",
           "sha1Hash": "43ade34fccbfaa93009bcd739db8f7560f6ac02b"
         }
       }

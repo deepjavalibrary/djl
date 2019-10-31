@@ -28,7 +28,7 @@
       },
       "files": {
         "synset": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
           "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2"
         },
         "symbol": {
@@ -36,7 +36,7 @@
           "sha1Hash": "8392531d32fa03c848901e72408d03771a3a0eba"
         },
         "parameters": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/se_resnext/0.0.1/se_resnext101_32x4d-0000.params.gz",
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/se_resnext/0.0.1/se_resnext101_32x4d-0000.params.gz",
           "sha1Hash": "66678545f940331f7cbd1b11ceea89ec8bd1655c"
         }
       }
@@ -52,7 +52,7 @@
       },
       "files": {
         "synset": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
           "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2"
         },
         "symbol": {
@@ -60,7 +60,7 @@
           "sha1Hash": "e63b19cdf422088abdbe8bab9921fd65f93f2e6d"
         },
         "parameters": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/se_resnext/0.0.1/se_resnext101_64x4d-0000.params.gz",
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/se_resnext/0.0.1/se_resnext101_64x4d-0000.params.gz",
           "sha1Hash": "3cba46daf11e882005103676497e407a93341397"
         }
       }

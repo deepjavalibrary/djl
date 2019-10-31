@@ -27,12 +27,12 @@
       },
       "files": {
         "synset": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/zoo/synset_mnist.txt",
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_mnist.txt",
           "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1",
           "name": "synset.txt"
         },
         "parameters": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/zoo/mlp/0.0.1/mlp-0000.params",
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/mlp/0.0.1/mlp-0000.params",
           "sha1Hash": "a848dc6c63097d2e2d01f236fcfba1652f50ce6b"
         }
       }

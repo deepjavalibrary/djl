@@ -26,7 +26,7 @@ import ai.djl.repository.Repository;
 
 public interface MxModelZoo {
 
-    String MXNET_REPO_URL = "https://djl-ai.s3.amazonaws.com/mlrepo/";
+    String MXNET_REPO_URL = "https://mlrepo.djl.ai/";
     Repository REPOSITORY = Repository.newInstance("MxNet", MXNET_REPO_URL);
     String GROUP_ID = "ai.djl.mxnet";
 

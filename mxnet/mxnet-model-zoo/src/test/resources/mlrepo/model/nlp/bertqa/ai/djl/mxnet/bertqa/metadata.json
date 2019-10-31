@@ -23,7 +23,7 @@
       },
       "files": {
         "vocabulary": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/nlp/bertqa/ai/djl/mxnet/bertqa/vocab.json",
+          "uri": "https://mlrepo.djl.ai/model/nlp/bertqa/ai/djl/mxnet/bertqa/vocab.json",
           "sha1Hash": "a66073971aa0b1a262453fe51342e57166a8abcf"
         },
         "symbol": {
@@ -31,7 +31,7 @@
           "sha1Hash": "0507f21bd3f73361dfcff72c20147cf25ce3623f"
         },
         "parameters": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/nlp/bertqa/ai/djl/mxnet/bertqa/0.0.1/static_bert_qa-0002.params.gz",
+          "uri": "https://mlrepo.djl.ai/model/nlp/bertqa/ai/djl/mxnet/bertqa/0.0.1/static_bert_qa-0002.params.gz",
           "sha1Hash": "967db47d92fe7ef1b80d7dd89975effb1dbef1ef"
         }
       }
