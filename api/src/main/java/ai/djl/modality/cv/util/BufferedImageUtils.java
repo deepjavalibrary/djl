@@ -22,7 +22,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
 
@@ -31,8 +30,6 @@ import javax.imageio.ImageIO;
  * images using {@link BufferedImage}.
  */
 public final class BufferedImageUtils {
-
-    private static final NDImageUtils.Flag DEFAULT_FLAG = NDImageUtils.Flag.COLOR;
 
     static {
         if (System.getProperty("apple.awt.UIElement") == null) {
@@ -59,46 +56,6 @@ public final class BufferedImageUtils {
     }
 
     /**
-     * Converts image to an RGB float buffer.
-     *
-     * @param manager {@link NDManager} to allocate direct buffer
-     * @param image the buffered image to be converted
-     * @return {@link FloatBuffer}
-     */
-    private static ByteBuffer toByteBuffer(NDManager manager, BufferedImage image) {
-        // Get height and width of the image
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        // 3 times height and width for R,G,B channels
-        ByteBuffer bb = manager.allocateDirect(3 * height * width);
-        if (image.getType() == BufferedImage.TYPE_BYTE_GRAY) {
-            byte[] data = ((DataBufferByte) image.getData().getDataBuffer()).getData();
-            for (byte gray : data) {
-                bb.put(gray);
-                bb.put(gray);
-                bb.put(gray);
-            }
-            bb.rewind();
-            return bb;
-        }
-
-        // get an array of integer pixels in the default RGB color mode
-        int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
-
-        for (int rgb : pixels) {
-            // getting red color
-            bb.put((byte) (rgb >> 16));
-            // getting green color
-            bb.put((byte) (rgb >> 8));
-            // getting blue color
-            bb.put((byte) rgb);
-        }
-        bb.rewind();
-        return bb;
-    }
-
-    /**
      * Converts {@code BufferedImage} to RGB NDArray.
      *
      * @param manager {@link NDManager} to create new NDArray with
@@ -119,20 +76,48 @@ public final class BufferedImageUtils {
      */
     public static NDArray toNDArray(
             NDManager manager, BufferedImage image, NDImageUtils.Flag flag) {
-        if (flag == null) {
-            flag = DEFAULT_FLAG;
-        }
         int width = image.getWidth();
         int height = image.getHeight();
-        NDArray rgb = manager.create(new Shape(height, width, 3), DataType.UINT8);
-        rgb.set(toByteBuffer(manager, image));
-        if (flag == NDImageUtils.Flag.COLOR) {
-            return rgb;
-        } else if (flag == NDImageUtils.Flag.GRAYSCALE) {
-            return rgb.mean(new int[] {-1}, true);
+        int channel;
+        if (flag == NDImageUtils.Flag.GRAYSCALE) {
+            channel = 1;
         } else {
-            throw new IllegalArgumentException("Cannot convert to NDArray with flag: " + flag);
+            channel = 3;
         }
+
+        ByteBuffer bb = manager.allocateDirect(channel * height * width);
+        if (image.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+            byte[] data = ((DataBufferByte) image.getData().getDataBuffer()).getData();
+            for (byte gray : data) {
+                bb.put(gray);
+                if (flag != NDImageUtils.Flag.GRAYSCALE) {
+                    bb.put(gray);
+                    bb.put(gray);
+                }
+            }
+        } else {
+            // get an array of integer pixels in the default RGB color mode
+            int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
+            for (int rgb : pixels) {
+                int red = (rgb >> 16) & 0xFF;
+                int green = (rgb >> 8) & 0xFF;
+                int blue = rgb & 0xFF;
+
+                if (flag == NDImageUtils.Flag.GRAYSCALE) {
+                    int gray = (red + green + blue) / 3;
+                    bb.put((byte) gray);
+                } else {
+                    bb.put((byte) red);
+                    bb.put((byte) green);
+                    bb.put((byte) blue);
+                }
+            }
+        }
+
+        NDArray array = manager.create(new Shape(height, width, channel), DataType.UINT8);
+        bb.rewind();
+        array.set(bb);
+        return array;
     }
 
     public static NDArray readFileToArray(NDManager manager, Path path) throws IOException {
