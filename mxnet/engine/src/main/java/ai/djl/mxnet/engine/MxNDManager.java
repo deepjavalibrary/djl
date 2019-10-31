@@ -305,6 +305,19 @@ public class MxNDManager implements NDManager {
         return JnaUtils.op(operation).invoke(this, EMPTY.toArray(), params)[0];
     }
 
+    @Override
+    public String toString() {
+        String parentUID = parent == null ? "No Parent" : ((MxNDManager) parent).uid;
+        return "UID: "
+                + uid
+                + " Parent UID: "
+                + parentUID
+                + " isOpen: "
+                + isOpen()
+                + " Resource size: "
+                + resources.size();
+    }
+
     /** {@inheritDoc} */
     @Override
     public synchronized void close() {
