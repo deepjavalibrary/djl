@@ -118,7 +118,7 @@ public abstract class AbstractInference<T> {
 
                 logger.info("Inference result: {}", lastResult);
 
-                if (metrics.hasMetric("Inference")) {
+                if (metrics.hasMetric("Inference") && iteration > 1) {
                     float p50 =
                             metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
                     float p90 =
