@@ -47,14 +47,6 @@ public final class TrainMnist extends AbstractTraining {
         // Construct neural network
         Block block = new Mlp(28, 28);
 
-        // setup training configuration
-        TrainingConfig config = setupTrainingConfig(arguments);
-
-        // configure input data shape based on batch size
-        int batchSize = arguments.getBatchSize();
-        int numOfSlices = config.getDevices().length;
-        Shape inputShape = new Shape(batchSize / numOfSlices, 28 * 28);
-
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -62,11 +54,20 @@ public final class TrainMnist extends AbstractTraining {
             Dataset trainingSet = getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
             Dataset validateSet = getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
 
+            // setup training configuration
+            TrainingConfig config = setupTrainingConfig(arguments);
+
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(metrics);
                 trainer.setTrainingListener(this);
 
-                // initialize trainer
+                /*
+                 * MNIST is 28x28 grayscale image and pre processed into 28 * 28 NDArray.
+                 * 1st axis is batch axis, we can use 1 for initialization.
+                 */
+                Shape inputShape = new Shape(1, 28 * 28);
+
+                // initialize trainer with proper input shape
                 trainer.initialize(new Shape[] {inputShape});
 
                 TrainingUtils.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);

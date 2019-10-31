@@ -55,13 +55,6 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
 
     @Override
     protected void train(Arguments arguments) throws IOException, ModelNotFoundException {
-        // setup training configuration
-        TrainingConfig config = setupTrainingConfig(arguments);
-
-        // configure input data shape based on batch size
-        int batchSize = arguments.getBatchSize();
-        Shape inputShape = new Shape(batchSize, 3, 32, 32);
-
         try (Model model = getModel(arguments.getIsSymbolic(), arguments.getPreTrained())) {
 
             // get training dataset
@@ -69,11 +62,20 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
             Dataset validationDataset =
                     getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
 
+            // setup training configuration
+            TrainingConfig config = setupTrainingConfig(arguments);
+
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(metrics);
                 trainer.setTrainingListener(this);
 
-                // initialize trainer
+                /*
+                 * CIFAR10 is 32x32 image and pre processed into NCHW NDArray.
+                 * 1st axis is batch axis, we can use 1 for initialization.
+                 */
+                Shape inputShape = new Shape(1, 3, 32, 32);
+
+                // initialize trainer with proper input shape
                 trainer.initialize(new Shape[] {inputShape});
 
                 TrainingUtils.fit(trainer, arguments.getEpoch(), trainDataset, validationDataset);
