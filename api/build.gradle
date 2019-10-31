@@ -63,12 +63,6 @@ publishing {
         }
     }
     repositories {
-        maven {
-            name = "s3"
-            url = "s3://djl-ai/dev"
-            authentication {
-                awsIm(AwsImAuthentication)
-            }
-        }
+        maven publishRepository()
     }
 }

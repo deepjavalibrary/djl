@@ -81,3 +81,32 @@ def getClassifier() {
     }
     return osPrefix + "-x86_64"
 }
+
+Closure publishRepository() {
+    def publishTo = project.findProperty("publishTo")
+    switch(publishTo) {
+        case "S3": return {
+            name = "s3"
+            url = "s3://djl-ai/dev"
+            authentication {
+                awsIm(AwsImAuthentication)
+            }
+        }
+        case "snapshot": return {
+            name = "snapshot"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
+        case "staging": return {
+            name = "staging"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
+        default:
+            if (tasks.withType(PublishToMavenRepository).find {gradle.taskGraph.hasTask it} ) {
+                throw new GradleException("Unknown publishTo Repository")
+            } else {
+                return {}
+            }
+    }
+}

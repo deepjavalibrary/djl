@@ -42,32 +42,31 @@ platformNames.each { osName ->
     artifactsNames.add(tasks["${osName}Jar"])
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            artifactId "mxnet-native-${flavor}"
-            from components.java
-            artifacts = artifactsNames
-            pom {
-                name = "MXNet native library"
-                description = "MXNet Engine native library binary distribution"
-                url = "http://www.djl.ai/mxnet/native"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+// Only publish if the project directory equals the current directory
+// This means that publishing from the main project does not publish the native jars
+// and the native jars have to be published separately
+if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                artifactId "mxnet-native-${flavor}"
+                from components.java
+                artifacts = artifactsNames
+                pom {
+                    name = "MXNet native library"
+                    description = "MXNet Engine native library binary distribution"
+                    url = "http://www.djl.ai/mxnet/native"
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                        }
                     }
                 }
             }
         }
-    }
-    repositories {
-        maven {
-            name = "s3"
-            url = "s3://djl-ai/dev"
-            authentication {
-                awsIm(AwsImAuthentication)
-            }
+        repositories {
+            maven publishRepository()
         }
     }
 }
