@@ -87,7 +87,7 @@ public class ParameterStore {
                 for (Map.Entry<Device, Integer> entry : deviceMap.entrySet()) {
                     Device dev = entry.getKey();
                     int i = entry.getValue();
-                    if (i == index) {
+                    if (i == index && array.getDevice().equals(dev)) {
                         arrays[i] = array;
                     } else {
                         arrays[i] = array.asInDevice(dev, true);
