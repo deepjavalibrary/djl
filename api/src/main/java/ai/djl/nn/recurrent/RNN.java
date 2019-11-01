@@ -32,6 +32,21 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Applies a single-gate recurrent layer to input. Two kinds of activation function are supported:
+ * ReLU and Tanh.
+ *
+ * <p>Reference paper: Finding structure in time - Elman, 1988.
+ * https://crl.ucsd.edu/~elman/Papers/fsit.pdf
+ *
+ * <p>With ReLU activation function:
+ *
+ * <p>$$ h_t = relu(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} + b_{hh}) $$
+ *
+ * <p>With Tanh activtion function:
+ *
+ * <p>$$ h_t = \tanh(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} + b_{hh}) $$
+ */
 public class RNN extends RecurrentCell {
 
     private static final LayoutType[] EXPECTED_LAYOUT = {
@@ -46,9 +61,14 @@ public class RNN extends RecurrentCell {
     private Parameter h2hBias;
     private Parameter state;
 
+    /**
+     * Creates a vanilla RNN block.
+     *
+     * @param builder the builder used to create the RNN block
+     */
     RNN(Builder builder) {
         super(builder);
-        mode = builder.getActivation() == Activation.RELU ? "rnn_relu" : "rnn_tanh";
+        mode = builder.activation == Activation.RELU ? "rnn_relu" : "rnn_tanh";
         i2hWeight = new Parameter("i2h_weight", this, ParameterType.WEIGHT);
         h2hWeight = new Parameter("h2h_weight", this, ParameterType.WEIGHT);
         i2hBias = new Parameter("i2h_bias", this, ParameterType.BIAS);
@@ -182,6 +202,11 @@ public class RNN extends RecurrentCell {
             return this;
         }
 
+        /**
+         * Builds a {@link RNN} block.
+         *
+         * @return the {@link RNN} block
+         */
         public RNN build() {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");

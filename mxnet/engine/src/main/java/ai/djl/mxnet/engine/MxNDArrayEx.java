@@ -453,6 +453,7 @@ class MxNDArrayEx implements NDArrayEx {
             Shape kernel,
             Shape stride,
             Shape pad,
+            Shape dilate,
             int numFilters,
             int numGroups,
             String layout,
@@ -462,6 +463,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("kernel", kernel);
         params.addParam("stride", stride);
         params.addParam("pad", pad);
+        params.addParam("dilate", dilate);
         params.addParam("num_filter", numFilters);
         params.addParam("num_group", numGroups);
         params.add("layout", layout);
@@ -575,9 +577,8 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList rnn(
+    public NDList lstm(
             NDList inputs,
-            String mode,
             long stateSize,
             float dropRate,
             int numStackedLayers,
@@ -588,7 +589,7 @@ class MxNDArrayEx implements NDArrayEx {
             double lstmStateClipMax,
             PairList<String, Object> additional) {
         MxOpParams params = new MxOpParams();
-        params.addParam("mode", mode);
+        params.addParam("mode", "lstm");
         params.addParam("p", dropRate);
         params.addParam("state_size", stateSize);
         params.addParam("num_layers", numStackedLayers);

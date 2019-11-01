@@ -14,6 +14,10 @@ package ai.djl.nn.recurrent;
 
 import ai.djl.nn.ParameterBlock;
 
+/**
+ * Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are implemented,
+ * with both multi-layer and bidirectional support.
+ */
 public abstract class RecurrentCell extends ParameterBlock {
 
     protected long stateSize;
@@ -25,12 +29,12 @@ public abstract class RecurrentCell extends ParameterBlock {
     protected boolean stateOutputs;
 
     public RecurrentCell(BaseBuilder<?> builder) {
-        stateSize = builder.getStateSize();
-        dropRate = builder.getDropRate();
-        numStackedLayers = builder.getNumStackedLayers();
-        useSequenceLength = builder.isUseSequenceLength();
-        useBidirectional = builder.isUseBidirectional();
-        stateOutputs = builder.isStateOutputs();
+        stateSize = builder.stateSize;
+        dropRate = builder.dropRate;
+        numStackedLayers = builder.numStackedLayers;
+        useSequenceLength = builder.useSequenceLength;
+        useBidirectional = builder.useBidirectional;
+        stateOutputs = builder.stateOutputs;
     }
 
     @SuppressWarnings("rawtypes")
@@ -47,52 +51,12 @@ public abstract class RecurrentCell extends ParameterBlock {
         protected boolean stateOutputs;
         protected RNN.Activation activation;
 
-        public float getDropRate() {
-            return dropRate;
-        }
-
-        public long getStateSize() {
-            return stateSize;
-        }
-
-        public int getNumStackedLayers() {
-            return numStackedLayers;
-        }
-
-        public double getLstmStateClipMin() {
-            return lstmStateClipMin;
-        }
-
-        public double getLstmStateClipMax() {
-            return lstmStateClipMax;
-        }
-
-        public boolean isClipLstmState() {
-            return clipLstmState;
-        }
-
-        public boolean isUseSequenceLength() {
-            return useSequenceLength;
-        }
-
-        public boolean isUseBidirectional() {
-            return useBidirectional;
-        }
-
-        public boolean isStateOutputs() {
-            return stateOutputs;
-        }
-
-        public RNN.Activation getActivation() {
-            return activation;
-        }
-
         /**
          * Sets the drop rate of the dropout on the outputs of each RNN layer, except the last
          * layer.
          *
-         * @param dropRate drop rate of the dropout
-         * @return Returns this Builder
+         * @param dropRate the drop rate of the dropout
+         * @return this Builder
          */
         public T optDropRate(float dropRate) {
             this.dropRate = dropRate;
@@ -102,9 +66,9 @@ public abstract class RecurrentCell extends ParameterBlock {
         /**
          * Sets the minimum and maximum clip value of LSTM states.
          *
-         * @param lstmStateClipMin Minimum clip value of LSTM states
-         * @param lstmStateClipMax Maximum clip value of LSTM states
-         * @return Returns this Builder
+         * @param lstmStateClipMin the minimum clip value of LSTM states
+         * @param lstmStateClipMax the maximum clip value of LSTM states
+         * @return this Builder
          */
         public T optLstmStateClipMin(float lstmStateClipMin, float lstmStateClipMax) {
             this.lstmStateClipMin = lstmStateClipMin;
@@ -116,8 +80,8 @@ public abstract class RecurrentCell extends ParameterBlock {
         /**
          * Sets the <b>Required</b> size of the state for each layer.
          *
-         * @param stateSize Number of convolution filter(channel)
-         * @return Returns this Builder
+         * @param stateSize the size of the state for each layer
+         * @return this Builder
          */
         public T setStateSize(int stateSize) {
             this.stateSize = stateSize;
@@ -127,8 +91,8 @@ public abstract class RecurrentCell extends ParameterBlock {
         /**
          * Sets the <b>Required</b> number of stacked layers.
          *
-         * @param numStackedLayers Number of convolution filter(channel)
-         * @return Returns this Builder
+         * @param numStackedLayers the number of stacked layers
+         * @return this Builder
          */
         public T setNumStackedLayers(int numStackedLayers) {
             this.numStackedLayers = numStackedLayers;
@@ -138,8 +102,8 @@ public abstract class RecurrentCell extends ParameterBlock {
         /**
          * Sets the activation for the RNN - ReLu or Tanh.
          *
-         * @param activation Projection size.
-         * @return Returns this Builder
+         * @param activation the activation
+         * @return this Builder
          */
         public T setActivation(RNN.Activation activation) {
             this.activation = activation;
@@ -147,11 +111,11 @@ public abstract class RecurrentCell extends ParameterBlock {
         }
 
         /**
-         * Sets the optional parameter of whether to include an extra input parameter
+         * Sets the optional parameter that indicates whether to include an extra input parameter
          * sequence_length to specify variable length sequence.
          *
-         * @param useSequenceLength Whether to use sequence length
-         * @return Returns this Builder
+         * @param useSequenceLength whether to use sequence length
+         * @return this Builder
          */
         public T setSequenceLength(boolean useSequenceLength) {
             this.useSequenceLength = useSequenceLength;
@@ -159,10 +123,10 @@ public abstract class RecurrentCell extends ParameterBlock {
         }
 
         /**
-         * Sets the optional parameter of whether to use bidirectional recurrent layers.
+         * Sets the optional parameter that indicates whether to use bidirectional recurrent layers.
          *
-         * @param useBidirectional Whether to use bidirectional recurrent layers
-         * @return Returns this Builder
+         * @param useBidirectional whether to use bidirectional recurrent layers
+         * @return this Builder
          */
         public T optBidrectional(boolean useBidirectional) {
             this.useBidirectional = useBidirectional;
@@ -170,10 +134,10 @@ public abstract class RecurrentCell extends ParameterBlock {
         }
 
         /**
-         * Sets the optional parameter of whether to have the states as symbol outputs.
+         * Sets the optional parameter that indicates whether to have the states as symbol outputs.
          *
-         * @param stateOutputs Whether to have the states as symbol output
-         * @return Returns this Builder
+         * @param stateOutputs whether to have the states as symbol output
+         * @return this Builder
          */
         public T optStateOutput(boolean stateOutputs) {
             this.stateOutputs = stateOutputs;

@@ -269,11 +269,31 @@ public interface NDArrayEx {
     // Neural network
     ////////////////////////////////////////
 
+    /**
+     * Computes N-D convolution on (N+2)-D input.
+     *
+     * @param inputs the inputs to the convolution operator. Msut include input data, weight
+     *     parameter matrix, and bias parameter
+     * @param kernel the convolution kernel size: (w,), (h, w) or (d, h, w)
+     * @param stride the convolution stride: (w,), (h, w) or (d, h, w). Defaults to 1 for each
+     *     dimension
+     * @param pad the zero pad for convolution: (w,), (h, w) or (d, h, w). Defaults to no padding
+     * @param dilate the convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each
+     *     dimension
+     * @param numFilters the convolution filter(channel) number
+     * @param numGroups the number of group partitions. Defaults to 1.
+     * @param layout the layout for input, output and weight. Empty for default layout: NCW for 1d,
+     *     NCHW for 2d and NCDHW for 3d. NHWC and NDHWC are only supported on GPU
+     * @param noBias whether to disable bias parameter. Defaults to false
+     * @param additional additional parameters
+     * @return the output of the convolution operator
+     */
     NDList convolution(
             NDList inputs,
             Shape kernel,
             Shape stride,
             Shape pad,
+            Shape dilate,
             int numFilters,
             int numGroups,
             String layout,
@@ -309,6 +329,26 @@ public interface NDArrayEx {
             int axis,
             PairList<String, Object> additional);
 
+    /**
+     * Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are implemented,
+     * with both multi-layer and bidirectional support.
+     *
+     * @param inputs the inputs to the recurrent operator. Must include input data, parameter vector
+     *     of all trainable parameters concatenated, initial hidden state of the RNN. For LSTM, it
+     *     must include initial cell state. If useSequenceLength is true, it must also include
+     *     vector of valid sequence lengths for each element in the batch
+     * @param mode the type of RNN to compute
+     * @param stateSize the sizes of the state for each layer
+     * @param dropRate the drop rate of the dropout on the outputs of each RNN layer, except the
+     *     last layer
+     * @param numStackedLayers the number of stacked layers
+     * @param useSequenceLength if set to true, this layer takes in an extra input parameter
+     *     sequence_length to specify variable length sequence.
+     * @param useBidirectional whether to use bidirectional recurrent layers
+     * @param stateOutputs whether to have the states as symbol outputs
+     * @param additional additional parameters
+     * @return the output of the operator
+     */
     NDList rnn(
             NDList inputs,
             String mode,
@@ -320,9 +360,28 @@ public interface NDArrayEx {
             boolean stateOutputs,
             PairList<String, Object> additional);
 
-    NDList rnn(
+    /**
+     * Applies LSTM recurrent layers to input data.
+     *
+     * @param inputs the inputs to the recurrent operator. Must include input data, parameter vector
+     *     of all trainable parameters concatenated, initial hidden state of the RNN and initial
+     *     cell state. If useSequenceLength is true, it must also include vector of valid sequence
+     *     lengths for each element in the batch
+     * @param stateSize the sizes of the state for each layer
+     * @param dropRate the drop rate of the dropout on the outputs of each RNN layer, except the
+     *     last layer
+     * @param numStackedLayers the number of stacked layers
+     * @param useSequenceLength if set to true, this layer takes in an extra input parameter
+     *     sequence_length to specify variable length sequence.
+     * @param useBidirectional whether to use bidirectional recurrent layers
+     * @param stateOutputs whether to have the states as symbol outputs
+     * @param lstmStateClipMin the minimum clip value of LSTM states
+     * @param lstmStateClipMax the maximum clip value of LSTM states
+     * @param additional additional parameters
+     * @return the output of the operator
+     */
+    NDList lstm(
             NDList inputs,
-            String mode,
             long stateSize,
             float dropRate,
             int numStackedLayers,

@@ -79,6 +79,7 @@ public abstract class Convolution extends ParameterBlock {
                 kernel,
                 stride,
                 pad,
+                dilate,
                 numFilters,
                 numGroups,
                 getStringLayout(),

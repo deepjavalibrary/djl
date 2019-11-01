@@ -33,6 +33,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Applies Long Short-Term Memory recurrent layer to input.
+ *
+ * <p>Reference paper - LONG SHORT-TERM MEMORY - Hochreiter, 1997.
+ * http://www.bioinf.jku.at/publications/older/2604.pdf
+ *
+ * <p>$$ \begin{split}\begin{array}{ll} i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{hi}
+ * h_{(t-1)} + b_{hi}) \\ f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{hf} h_{(t-1)} + b_{hf}) \\
+ * g_t = \tanh(W_{ig} x_t + b_{ig} + W_{hc} h_{(t-1)} + b_{hg}) \\ o_t = \mathrm{sigmoid}(W_{io} x_t
+ * + b_{io} + W_{ho} h_{(t-1)} + b_{ho}) \\ c_t = f_t * c_{(t-1)} + i_t * g_t \\ h_t = o_t *
+ * \tanh(c_t) \end{array}\end{split} $$
+ */
 public class LSTM extends RecurrentCell {
 
     private static final LayoutType[] EXPECTED_LAYOUT = {
@@ -67,12 +79,17 @@ public class LSTM extends RecurrentCell {
     private Parameter state = new Parameter("state", this, ParameterType.OTHER);
     private Parameter stateCell = new Parameter("state_cell", this, ParameterType.OTHER);
 
+    /**
+     * Creates an LSTM block.
+     *
+     * @param builder the builder used to create the RNN block
+     */
     LSTM(Builder builder) {
         super(builder);
         mode = "lstm";
-        clipLstmState = builder.isClipLstmState();
-        lstmStateClipMin = builder.getLstmStateClipMin();
-        lstmStateClipMax = builder.getLstmStateClipMax();
+        clipLstmState = builder.clipLstmState;
+        lstmStateClipMin = builder.lstmStateClipMin;
+        lstmStateClipMax = builder.lstmStateClipMax;
     }
 
     /** {@inheritDoc} */
@@ -83,9 +100,8 @@ public class LSTM extends RecurrentCell {
         NDArrayEx ex = inputs.head().getNDArrayInternal();
 
         if (clipLstmState) {
-            return ex.rnn(
+            return ex.lstm(
                     inputs,
-                    mode,
                     stateSize,
                     dropRate,
                     numStackedLayers,
@@ -227,6 +243,11 @@ public class LSTM extends RecurrentCell {
             return this;
         }
 
+        /**
+         * Builds a {@link LSTM} block.
+         *
+         * @return the {@link LSTM} block
+         */
         public LSTM build() {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
