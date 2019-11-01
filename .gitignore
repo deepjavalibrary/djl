@@ -5,3 +5,10 @@
 .ipynb_checkpoints
 build
 libs
+*.gz
+*.zip
+*.jar
+*.so
+*.dylib
+*.dll
+*.class
