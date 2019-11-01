@@ -50,6 +50,16 @@ if (shouldSign()) {
     }
 }
 
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
 // Only publish if the project directory equals the current directory
 // This means that publishing from the main project does not publish the native jars
 // and the native jars have to be published separately
@@ -60,6 +70,8 @@ if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
                 artifactId "mxnet-native-${flavor}"
                 from components.java
                 artifacts = artifactsNames
+                artifact javadocJar
+                artifact sourcesJar
                 pom standardPom({
                     name = "MXNet native library"
                     description = "MXNet Engine native library binary distribution"

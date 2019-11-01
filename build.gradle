@@ -89,6 +89,10 @@ def shouldSign() {
 Closure publishRepository() {
     def publishTo = project.findProperty("publishTo")
     switch(publishTo) {
+        case "local": return {
+            name "local"
+            url project.rootProject.buildDir.toPath().resolve("repo").toAbsolutePath().toString()
+        }
         case "S3": return {
             name = "s3"
             url = "s3://djl-ai/dev"
