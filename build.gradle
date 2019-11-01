@@ -114,3 +114,40 @@ Closure publishRepository() {
             }
     }
 }
+
+Closure standardPom(Closure base) {
+    return {
+
+        packaging = "jar"
+        url = "http://www.djl.ai/"
+
+        base.setDelegate(delegate)
+        base()
+
+        licenses {
+            license {
+                name = 'The Apache License, Version 2.0'
+                url = 'https://www.apache.org/licenses/LICENSE-2.0'
+            }
+        }
+
+        scm {
+            connection = "scm:git:git@github.com:awslabs/djl.git"
+            developerConnection = "scm:git:git@github.com:awslabs/djl.git"
+            url = "https://github.com/awslabs/djl"
+            tag = "HEAD"
+        }
+
+        developers {
+            developer {
+                name = "DJL.AI Team"
+                email = "djl-dev@amazon.com"
+                organization = "Amazon"
+                organizationUrl = "https://amazon.com"
+            }
+        }
+
+        name = "Deeplearning Java Library - " + name.get()
+
+    }
+}

@@ -58,17 +58,11 @@ publishing {
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
-            pom {
-                name = "Deeplearning Java Library - Basic Dataset"
+            pom standardPom({
+                name = "Basic Dataset"
                 description = "Basic Dataset for djl.ai"
-                url = "http://www.djl.ai/mxnet/basicdataset"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
-                    }
-                }
-            }
+                url = url.get() + "mxnet/basicdataset"
+            })
         }
     }
     repositories {

@@ -39,17 +39,11 @@ publishing {
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
-            pom {
-                name = "Deeplearning Java Library - Repository API"
+            pom standardPom({
+                name = "Repository API"
                 description = "A respository specification for Deeplearning resources"
-                url = "http://www.djl.ai/repository"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
-                    }
-                }
-            }
+                url = url.get() + "repository"
+            })
         }
     }
     repositories {

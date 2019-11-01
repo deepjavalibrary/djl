@@ -58,17 +58,11 @@ publishing {
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, sourcesJar, javadocJar]
-            pom {
-                name = "Deeplearning Java Library - Examples"
+            pom standardPom({
+                name = "Examples"
                 description = "Examples for djl.ai"
-                url = "http://www.djl.ai/examples"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
-                    }
-                }
-            }
+                url = url.get() + "examples"
+            })
             pom.withXml {
                 Node pomNode = asNode()
                 pomNode.dependencies.'*'.findAll() {

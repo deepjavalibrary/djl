@@ -47,17 +47,11 @@ publishing {
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
-            pom {
-                name = "Deeplearning Java Library - Model Zoo"
+            pom standardPom({
+                name = "Model Zoo"
                 description = "A built-in model zoo gallary for djl.ai"
-                url = "http://www.djl.ai/model-zoo"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
-                    }
-                }
-            }
+                url = url.get() + "model-zoo"
+            })
         }
     }
     repositories {

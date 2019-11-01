@@ -119,17 +119,11 @@ publishing {
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]
-            pom {
-                name = "Deeplearning Java Library - MXNet Engine Adapter"
+            pom standardPom({
+                name = "MXNet Engine Adapter"
                 description = "MXNet Engine Adapter for djl.ai"
-                url = "http://www.djl.ai/mxnet/engine"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
-                    }
-                }
-            }
+                url = url.get() + "mxnet/engine"
+            })
         }
     }
     repositories {

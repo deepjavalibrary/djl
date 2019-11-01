@@ -60,17 +60,11 @@ if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
                 artifactId "mxnet-native-${flavor}"
                 from components.java
                 artifacts = artifactsNames
-                pom {
+                pom standardPom({
                     name = "MXNet native library"
                     description = "MXNet Engine native library binary distribution"
-                    url = "http://www.djl.ai/mxnet/native"
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'https://www.apache.org/licenses/LICENSE-2.0'
-                        }
-                    }
-                }
+                    url = url.get() + "mxnet/native"
+                })
             }
         }
         repositories {
