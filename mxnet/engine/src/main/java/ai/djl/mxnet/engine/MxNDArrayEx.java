@@ -23,11 +23,9 @@ import ai.djl.util.PairList;
 class MxNDArrayEx implements NDArrayEx {
 
     private MxNDArray array;
-    private MxNDManager manager;
 
     MxNDArrayEx(MxNDArray parent) {
         this.array = parent;
-        this.manager = (MxNDManager) parent.getManager();
     }
 
     ////////////////////////////////////////
@@ -39,7 +37,7 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rdiv(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_rdiv_scalar", array, params);
+        return getManager().invoke("_rdiv_scalar", array, params);
     }
 
     /** {@inheritDoc} */
@@ -53,14 +51,14 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rdivi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        manager.invoke("_rdiv_scalar", new NDList(array), new NDList(array), params);
+        getManager().invoke("_rdiv_scalar", new NDList(array), new NDList(array), params);
         return array;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rdivi(NDArray b) {
-        manager.invoke("elemwise_div", new NDList(b, array), new NDList(array), null);
+        getManager().invoke("elemwise_div", new NDList(b, array), new NDList(array), null);
         return array;
     }
 
@@ -93,7 +91,7 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rmod(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_npi_rmod_scalar", array, params);
+        return getManager().invoke("_npi_rmod_scalar", array, params);
     }
 
     /** {@inheritDoc} */
@@ -107,14 +105,14 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rmodi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        manager.invoke("_npi_rmod_scalar", new NDList(array), new NDList(array), params);
+        getManager().invoke("_npi_rmod_scalar", new NDList(array), new NDList(array), params);
         return array;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(NDArray b) {
-        manager.invoke("_npi_mod", new NDList(b, array), new NDList(array), null);
+        getManager().invoke("_npi_mod", new NDList(b, array), new NDList(array), null);
         return array;
     }
 
@@ -123,7 +121,7 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rpow(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_npi_rpower_scalar", array, params);
+        return getManager().invoke("_npi_rpower_scalar", array, params);
     }
 
     /** {@inheritDoc} */
@@ -131,7 +129,7 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rpowi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        manager.invoke("_npi_rpower_scalar", new NDList(array), new NDList(array), params);
+        getManager().invoke("_npi_rpower_scalar", new NDList(array), new NDList(array), params);
         return array;
     }
 
@@ -140,19 +138,23 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray max(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_npi_maximum_scalar", array, params);
+        return getManager().invoke("_npi_maximum_scalar", array, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray max(NDArray other) {
-        return manager.invoke("_npi_maximum", new NDList(array, other), null).singletonOrThrow();
+        return getManager()
+                .invoke("_npi_maximum", new NDList(array, other), null)
+                .singletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray min(NDArray other) {
-        return manager.invoke("_npi_minimum", new NDList(array, other), null).singletonOrThrow();
+        return getManager()
+                .invoke("_npi_minimum", new NDList(array, other), null)
+                .singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -160,7 +162,7 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray min(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        return manager.invoke("_npi_minimum_scalar", array, params);
+        return getManager().invoke("_npi_minimum_scalar", array, params);
     }
 
     ////////////////////////////////////////
@@ -171,35 +173,35 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray relu() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "relu");
-        return manager.invoke("Activation", array, params);
+        return getManager().invoke("Activation", array, params);
     }
 
     @Override
     public NDArray sigmoid() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "sigmoid");
-        return manager.invoke("Activation", array, params);
+        return getManager().invoke("Activation", array, params);
     }
 
     @Override
     public NDArray tanh() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "tanh");
-        return manager.invoke("Activation", array, params);
+        return getManager().invoke("Activation", array, params);
     }
 
     @Override
     public NDArray softrelu() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "softrelu");
-        return manager.invoke("Activation", array, params);
+        return getManager().invoke("Activation", array, params);
     }
 
     @Override
     public NDArray softsign() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "softsign");
-        return manager.invoke("Activation", array, params);
+        return getManager().invoke("Activation", array, params);
     }
 
     @Override
@@ -207,7 +209,7 @@ class MxNDArrayEx implements NDArrayEx {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "leaky");
         params.addParam("slope", alpha);
-        return manager.invoke("LeakyReLU", array, params);
+        return getManager().invoke("LeakyReLU", array, params);
     }
 
     @Override
@@ -215,21 +217,21 @@ class MxNDArrayEx implements NDArrayEx {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "elu");
         params.addParam("slope", alpha);
-        return manager.invoke("LeakyReLU", array, params);
+        return getManager().invoke("LeakyReLU", array, params);
     }
 
     @Override
     public NDArray selu() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "selu");
-        return manager.invoke("LeakyReLU", array, params);
+        return getManager().invoke("LeakyReLU", array, params);
     }
 
     @Override
     public NDArray gelu() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "gelu");
-        return manager.invoke("LeakyReLU", array, params);
+        return getManager().invoke("LeakyReLU", array, params);
     }
 
     ////////////////////////////////////////
@@ -336,7 +338,7 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     private NDArray pool(MxOpParams params) {
-        return manager.invoke("Pooling", getArray(), params);
+        return getManager().invoke("Pooling", getArray(), params);
     }
 
     ////////////////////////////////////////
@@ -367,7 +369,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("epsilon", epsilon);
         params.addParam("lazy_update", lazyUpdate);
 
-        manager.invoke("adam_update", inputs, weights, params);
+        getManager().invoke("adam_update", inputs, weights, params);
     }
 
     /** {@inheritDoc} */
@@ -388,9 +390,9 @@ class MxNDArrayEx implements NDArrayEx {
 
         if (momentum != 0) {
             params.addParam("momentum", momentum);
-            manager.invoke("nag_mom_update", inputs, weights, params);
+            getManager().invoke("nag_mom_update", inputs, weights, params);
         } else {
-            manager.invoke("sgd_update", inputs, weights, params);
+            getManager().invoke("sgd_update", inputs, weights, params);
         }
     }
 
@@ -414,9 +416,9 @@ class MxNDArrayEx implements NDArrayEx {
 
         if (momentum != 0) {
             params.addParam("momentum", momentum);
-            manager.invoke("sgd_mom_update", inputs, weights, params);
+            getManager().invoke("sgd_mom_update", inputs, weights, params);
         } else {
-            manager.invoke("sgd_update", inputs, weights, params);
+            getManager().invoke("sgd_update", inputs, weights, params);
         }
     }
 
@@ -446,7 +448,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.add("no_bias", noBias);
         params.addAll(additional);
 
-        return manager.invoke("Convolution", inputs, params);
+        return getManager().invoke("Convolution", inputs, params);
     }
 
     /** {@inheritDoc} */
@@ -463,7 +465,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("no_bias", noBias);
         params.addAll(additional);
 
-        return manager.invoke("FullyConnected", inputs, params);
+        return getManager().invoke("FullyConnected", inputs, params);
     }
 
     /** {@inheritDoc} */
@@ -481,7 +483,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.setDataType(dataType);
         params.addAll(additional);
 
-        return manager.invoke("Embedding", inputs, params);
+        return getManager().invoke("Embedding", inputs, params);
     }
 
     /** {@inheritDoc} */
@@ -491,7 +493,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("act_type", "prelu");
         params.addAll(additional);
 
-        return manager.invoke("LeakyReLU", inputs, params);
+        return getManager().invoke("LeakyReLU", inputs, params);
     }
 
     /** {@inheritDoc} */
@@ -506,7 +508,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addTupleParam("axes", sharedAxes);
         params.addAll(additional);
 
-        return manager.invoke("Dropout", inputs, params);
+        return getManager().invoke("Dropout", inputs, params);
     }
 
     /** {@inheritDoc} */
@@ -523,7 +525,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("axis", axis);
         params.addAll(additional);
 
-        return manager.invoke("BatchNorm", inputs, params);
+        return getManager().invoke("BatchNorm", inputs, params);
     }
 
     /** {@inheritDoc} */
@@ -548,7 +550,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("mode", mode);
         params.addAll(additional);
 
-        return manager.invoke("RNN", inputs, params);
+        return getManager().invoke("RNN", inputs, params);
     }
 
     /** {@inheritDoc} */
@@ -578,7 +580,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("lstm_state_clip_max", lstmStateClipMax);
         params.addAll(additional);
 
-        return manager.invoke("RNN", inputs, params);
+        return getManager().invoke("RNN", inputs, params);
     }
 
     ////////////////////////////////////////
@@ -590,12 +592,12 @@ class MxNDArrayEx implements NDArrayEx {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("mean", mean);
         params.addTupleParam("std", std);
-        return manager.invoke("_npx__image_normalize", array, params);
+        return getManager().invoke("_npx__image_normalize", array, params);
     }
 
     @Override
     public NDArray toTensor() {
-        return manager.invoke("_npx__image_to_tensor", array, null);
+        return getManager().invoke("_npx__image_to_tensor", array, null);
     }
 
     @Override
@@ -605,7 +607,7 @@ class MxNDArrayEx implements NDArrayEx {
         }
         MxOpParams params = new MxOpParams();
         params.addTupleParam("size", width, height);
-        return manager.invoke("_npx__image_resize", array, params);
+        return getManager().invoke("_npx__image_resize", array, params);
     }
 
     @Override
@@ -615,7 +617,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.add("y", y);
         params.add("width", width);
         params.add("height", height);
-        return manager.invoke("_npx__image_crop", array, params);
+        return getManager().invoke("_npx__image_crop", array, params);
     }
 
     ////////////////////////////////////////
@@ -629,7 +631,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("axis", axis);
         params.addParam("keepdims", keepDims);
         params.add("mode", mode);
-        return manager.invoke("pick", new NDList(array, index), params).singletonOrThrow();
+        return getManager().invoke("pick", new NDList(array, index), params).singletonOrThrow();
     }
     /** {@inheritDoc} */
     @Override
@@ -646,7 +648,7 @@ class MxNDArrayEx implements NDArrayEx {
         parameters.add("ignore_label", ignoreLabel);
         parameters.add("negative_mining_ratio", negativeMiningRatio);
         parameters.add("negative_mining_thresh", negativeMiningThreshold);
-        return manager.invoke("MultiBoxTarget", inputs, parameters);
+        return getManager().invoke("MultiBoxTarget", inputs, parameters);
     }
 
     /** {@inheritDoc} */
@@ -666,11 +668,15 @@ class MxNDArrayEx implements NDArrayEx {
         parameters.add("nms_threshold", nmsThreashold);
         parameters.add("force_suppress", forceSuppress);
         parameters.add("nms_topk", nmsTopK);
-        return manager.invoke("MultiBoxDetection", inputs, parameters);
+        return getManager().invoke("MultiBoxDetection", inputs, parameters);
     }
 
     @Override
     public NDArray getArray() {
         return array;
+    }
+
+    public MxNDManager getManager() {
+        return (MxNDManager) array.getManager();
     }
 }

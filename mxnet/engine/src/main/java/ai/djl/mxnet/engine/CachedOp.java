@@ -46,7 +46,6 @@ public class CachedOp extends NativeResource {
     private PairList<String, Integer> dataIndices;
     private Map<String, Integer> dataIndicesMap;
     private List<Integer> paramIndices;
-
     private MxNDManager manager;
 
     /**
@@ -92,6 +91,8 @@ public class CachedOp extends NativeResource {
         this.debugInputs = allInputsNDArray;
         // check device of input
         Device device = data.head().getDevice();
+        // get the manager of the data
+        MxNDManager inputManager = (MxNDManager) data.head().getManager();
 
         // fill allInputsNDArray with parameter values on correct device
         for (int index : paramIndices) {
@@ -123,10 +124,10 @@ public class CachedOp extends NativeResource {
                                     + ") by default");
                 }
                 allInputsNDArray[pair.getValue()] =
-                        (MxNDArray) manager.create(new Shape(batchSize));
+                        (MxNDArray) inputManager.create(new Shape(batchSize));
             }
         }
-        MxNDArray[] result = JnaUtils.cachedOpInvoke(manager, getHandle(), allInputsNDArray);
+        MxNDArray[] result = JnaUtils.cachedOpInvoke(inputManager, getHandle(), allInputsNDArray);
         return new NDList(result);
     }
 
