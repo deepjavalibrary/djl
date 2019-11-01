@@ -29,16 +29,27 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Applies Leaky Parametric ReLU activation element-wise to the input.
+ *
+ * <p>Leaky ReLUs attempt to fix the 'dying ReLU' problem by allowing a small slope when the input
+ * is negative and has a slope of one when input is positive. This is defined by \(y= x \gt 0 ? x :
+ * slope * x\).
+ *
+ * <p>Parametric ReLU is a Leaky ReLU in which the slope is learnt during training.
+ */
 public class Prelu extends ParameterBlock {
 
     private static final byte VERSION = 1;
 
     private Parameter alpha;
 
+    /** Creates a Parametric ReLU Block. */
     public Prelu() {
         alpha = new Parameter("alpha", this, ParameterType.OTHER);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -49,16 +60,19 @@ public class Prelu extends ParameterBlock {
         return ex.prelu(list, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         return new Shape[] {inputs[0]};
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.singletonList(alpha);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         if ("alpha".equals(name)) {
@@ -67,12 +81,14 @@ public class Prelu extends ParameterBlock {
         throw new IllegalArgumentException("Invalid parameter name");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
         alpha.save(os);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

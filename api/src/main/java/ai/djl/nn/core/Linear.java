@@ -60,13 +60,14 @@ public class Linear extends ParameterBlock {
     private Parameter bias;
 
     Linear(Builder builder) {
-        outChannels = builder.getOutChannels();
+        outChannels = builder.outChannels;
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (builder.isBias()) {
             bias = new Parameter("bias", this, ParameterType.BIAS);
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -90,6 +91,7 @@ public class Linear extends ParameterBlock {
         return Collections.singletonList(weight);
     }
 
+    /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
         return new PairList<>(
@@ -135,6 +137,7 @@ public class Linear extends ParameterBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
@@ -146,6 +149,7 @@ public class Linear extends ParameterBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
@@ -180,15 +184,11 @@ public class Linear extends ParameterBlock {
         private long outChannels;
         private boolean bias = true;
 
-        public long getOutChannels() {
-            return outChannels;
-        }
-
         /**
-         * Sets the <b>Required</b> number of output channels.
+         * Sets the number of output channels.
          *
-         * @param outChannels Number of desired output channels
-         * @return Returns this Builder
+         * @param outChannels the number of desired output channels
+         * @return this Builder
          */
         public Builder setOutChannels(long outChannels) {
             this.outChannels = outChannels;
@@ -202,7 +202,7 @@ public class Linear extends ParameterBlock {
         /**
          * Sets the optional parameter of whether to include a bias vector with default of true.
          *
-         * @param bias Whether to use a bias vector parameter
+         * @param bias whether to use a bias vector parameter
          * @return Returns this Builder
          */
         public Builder optBias(boolean bias) {
@@ -213,9 +213,9 @@ public class Linear extends ParameterBlock {
         /**
          * Returns the constructed {@code Linear}.
          *
-         * @return Returns the constructed {@code Linear}
-         * @throws IllegalArgumentException Thrown if all required parameters (outChannels) have not
-         *     been set
+         * @return the constructed {@code Linear}
+         * @throws IllegalArgumentException if all required parameters (outChannels) have not been
+         *     set
          */
         public Linear build() {
             if (outChannels == 0) {

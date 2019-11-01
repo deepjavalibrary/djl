@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * An Embedding block map a collection of items to 1-Dimensional representative {@link NDArray}s.
  *
- * @param <T> The type of item that should be embedded and map to the array
+ * @param <T> the type of item that should be embedded and map to the array
  */
 public class Embedding<T> extends ParameterBlock {
 
@@ -53,31 +53,34 @@ public class Embedding<T> extends ParameterBlock {
 
     private Parameter embedding;
 
-    public Embedding(Builder<T> builder) {
-        embeddingSize = builder.getEmbeddingSize();
-        useDefault = builder.isUseDefault();
-        dataType = builder.getDataType();
+    Embedding(Builder<T> builder) {
+        embeddingSize = builder.embeddingSize;
+        useDefault = builder.useDefault;
+        dataType = builder.dataType;
         embedding = new Parameter("embedding", this, ParameterType.WEIGHT);
-        embedder = new ConcurrentHashMap<>(builder.getItems().size());
+        embedder = new ConcurrentHashMap<>(builder.items.size());
         numItems = 0;
         if (useDefault) {
             numItems++;
         }
-        for (T item : builder.getItems()) {
+        for (T item : builder.items) {
             embedder.put(item, numItems++);
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[] {inputShapes[0].addAll(new Shape(embeddingSize))};
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.singletonList(embedding);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         if ("embedding".equals(name)) {
@@ -90,10 +93,10 @@ public class Embedding<T> extends ParameterBlock {
      * Finds the embedding of items as a {@link NDArray}.
      *
      * @param parameterStore the ParameterStore
-     * @param manager The manager to create the new NDArray
-     * @param items The items to retrieve the embeddings for
-     * @return Returns a 3D NDArray where the first two embeddingSize correspond to the items, and
-     *     the last dimension is the embedding.
+     * @param manager the manager to create the new NDArray
+     * @param items the items to retrieve the embeddings for
+     * @return a 3D NDArray where the first two embeddingSize correspond to the items, and the last
+     *     dimension is the embedding.
      */
     public NDArray forward(ParameterStore parameterStore, NDManager manager, T[][] items) {
         return forward(parameterStore, new NDList(manager.create(embed(items)))).singletonOrThrow();
@@ -103,9 +106,9 @@ public class Embedding<T> extends ParameterBlock {
      * Finds the embedding of items as a {@link NDArray}.
      *
      * @param parameterStore the ParameterStore
-     * @param manager The manager to create the new NDArray
-     * @param items The items to retrieve the embeddings for
-     * @return Returns a 2D NDArray where the first dimension corresponds to the items, and the last
+     * @param manager the manager to create the new NDArray
+     * @param items the items to retrieve the embeddings for
+     * @return a 2D NDArray where the first dimension corresponds to the items, and the last
      *     dimension is the embedding.
      */
     public NDArray forward(ParameterStore parameterStore, NDManager manager, T[] items) {
@@ -116,9 +119,9 @@ public class Embedding<T> extends ParameterBlock {
      * Finds the embedding of an item as a {@link NDArray}.
      *
      * @param parameterStore the ParameterStore
-     * @param manager The manager to create the new NDArray
-     * @param item The item to retrieve the embedding for
-     * @return Returns the 1D NDArray of the embedding
+     * @param manager the manager to create the new NDArray
+     * @param item the item to retrieve the embedding for
+     * @return the 1D NDArray of the embedding
      */
     public NDArray forward(ParameterStore parameterStore, NDManager manager, T item) {
         return forward(parameterStore, new NDList(manager.create(embed(item)))).singletonOrThrow();
@@ -138,12 +141,14 @@ public class Embedding<T> extends ParameterBlock {
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
         embedding.save(os);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
@@ -191,7 +196,7 @@ public class Embedding<T> extends ParameterBlock {
     /**
      * The Builder to construct a {@link Embedding} type of {@link Block}.
      *
-     * @param <T> The type of object to embed
+     * @param <T> the type of object to embed
      */
     public static final class Builder<T> {
 
@@ -200,27 +205,11 @@ public class Embedding<T> extends ParameterBlock {
         private boolean useDefault = true;
         private DataType dataType = DataType.FLOAT32;
 
-        public Collection<T> getItems() {
-            return items;
-        }
-
-        public int getEmbeddingSize() {
-            return embeddingSize;
-        }
-
-        public boolean isUseDefault() {
-            return useDefault;
-        }
-
-        public DataType getDataType() {
-            return dataType;
-        }
-
         /**
          * Sets the collection of items that should feature embeddings.
          *
-         * @param items A collection containing all the items that embeddings should be created for.
-         * @return Returns this Builder
+         * @param items a collection containing all the items that embeddings should be created for.
+         * @return this Builder
          */
         public Builder<T> setItems(Collection<T> items) {
             this.items = items;
@@ -230,8 +219,8 @@ public class Embedding<T> extends ParameterBlock {
         /**
          * Sets the size of the embeddings.
          *
-         * @param embeddingSize The size of the 1D embedding array
-         * @return Returns this Builder
+         * @param embeddingSize the size of the 1D embedding array
+         * @return this Builder
          */
         public Builder<T> setEmbeddingSize(int embeddingSize) {
             this.embeddingSize = embeddingSize;
@@ -241,9 +230,9 @@ public class Embedding<T> extends ParameterBlock {
         /**
          * Sets whether to use a default embedding for undefined items (default true).
          *
-         * @param useDefault True to provide a default embedding and false to throw an {@link
+         * @param useDefault true to provide a default embedding and false to throw an {@link
          *     IllegalArgumentException} when the item can not be found
-         * @return Returns this Builder
+         * @return this Builder
          */
         public Builder<T> optUseDefault(boolean useDefault) {
             this.useDefault = useDefault;
@@ -253,8 +242,8 @@ public class Embedding<T> extends ParameterBlock {
         /**
          * Sets the data type of the embedding arrays (default is Float32).
          *
-         * @param dataType The dataType to use for the embedding
-         * @return Returns this Builder
+         * @param dataType the dataType to use for the embedding
+         * @return this Builder
          */
         public Builder<T> optDataType(DataType dataType) {
             this.dataType = dataType;
@@ -264,9 +253,9 @@ public class Embedding<T> extends ParameterBlock {
         /**
          * Builds the {@link Embedding}.
          *
-         * @return Returns the constructed {@code Embedding}
-         * @throws IllegalArgumentException Thrown if all required parameters (items, embeddingSize)
-         *     have not been set
+         * @return the constructed {@code Embedding}
+         * @throws IllegalArgumentException if all required parameters (items, embeddingSize) have
+         *     not been set
          */
         public Embedding<T> build() {
             if (items == null) {
