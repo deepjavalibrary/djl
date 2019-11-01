@@ -26,6 +26,14 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Applies dropout operation to input array
+ *
+ * <p>During training, each element of the input is set to zero with probability p. The whole array
+ * is rescaled by 1/(1−p) to keep the expected sum of the input unchanged. During testing, this
+ * operator does not change the input if mode is ‘training’. If mode is ‘always’, the same
+ * computaion as during training will be applied.
+ */
 public class Dropout extends ParameterBlock {
 
     private static final byte VERSION = 1;
@@ -34,40 +42,43 @@ public class Dropout extends ParameterBlock {
     private int[] sharedAxes;
 
     Dropout(Builder builder) {
-        probability = builder.getProbability();
-        sharedAxes = builder.getSharedAxes();
+        probability = builder.probability;
+        sharedAxes = builder.sharedAxes;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        if (inputs.size() != 1) {
-            throw new IllegalArgumentException("Dropout requires exactly 1 NDArray");
-        }
-        NDArrayEx ex = inputs.head().getNDArrayInternal();
+        NDArrayEx ex = inputs.singletonOrThrow().getNDArrayInternal();
         return ex.dropout(inputs, probability, sharedAxes, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[] {inputShapes[0]};
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.emptyList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         throw new IllegalArgumentException("Dropout has no parameters");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
         byte version = is.readByte();
@@ -81,24 +92,34 @@ public class Dropout extends ParameterBlock {
         private float probability = 0.5f;
         private int[] sharedAxes = {};
 
-        public float getProbability() {
-            return probability;
-        }
-
-        public int[] getSharedAxes() {
-            return sharedAxes;
-        }
-
+        /**
+         * Sets the probability or the fraction of the input that gets dropped out during training
+         * time. Defaults to 0.5.
+         *
+         * @param probability fraction of the input that gets dropped out during training
+         * @return this Builder
+         */
         public Builder optProbability(float probability) {
             this.probability = probability;
             return this;
         }
 
+        /**
+         * Sets the axes for variational dropout kernel.
+         *
+         * @param sharedAxes the axes for variational dropout kernel
+         * @return this Builder
+         */
         public Builder optSharedAxes(int[] sharedAxes) {
             this.sharedAxes = sharedAxes;
             return this;
         }
 
+        /**
+         * Builds a {@link Dropout} block.
+         *
+         * @return the {@link Dropout} block
+         */
         public Dropout build() {
             return new Dropout(this);
         }

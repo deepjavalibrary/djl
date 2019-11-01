@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Normalizes a data batch by mean and variance, and applies a scale gamma as well as offset beta.
+ */
 public class BatchNorm extends ParameterBlock {
 
     private static final byte VERSION = 1;
@@ -43,13 +46,14 @@ public class BatchNorm extends ParameterBlock {
     private Parameter runningVar;
 
     BatchNorm(Builder builder) {
-        axis = builder.getAxis();
-        epsilon = builder.getEpsilon();
-        momentum = builder.getMomentum();
+        axis = builder.axis;
+        epsilon = builder.epsilon;
+        momentum = builder.momentum;
         runningMean = new Parameter("runningMean", this, ParameterType.RUNNING_MEAN, false);
         runningVar = new Parameter("runningVar", this, ParameterType.RUNNING_VAR, false);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -102,6 +106,7 @@ public class BatchNorm extends ParameterBlock {
         return new NDList(data, gamma, beta, runningMeanValue, runningVarValue);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
@@ -110,6 +115,7 @@ public class BatchNorm extends ParameterBlock {
         runningVar.save(os);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
@@ -128,33 +134,44 @@ public class BatchNorm extends ParameterBlock {
         private float epsilon = 1E-5f;
         private float momentum = .9f;
 
-        public int getAxis() {
-            return axis;
-        }
-
-        public float getEpsilon() {
-            return epsilon;
-        }
-
-        public float getMomentum() {
-            return momentum;
-        }
-
+        /**
+         * Set the axis in which channel is specified. Defaults to 1.
+         *
+         * @param val the axis in which channel is specified
+         * @return this Builder
+         */
         public Builder optAxis(int val) {
             axis = val;
             return this;
         }
 
+        /**
+         * Sets the epsilon value to prevent division by 0.
+         *
+         * @param val the epsilon value
+         * @return this Builder
+         */
         public Builder optEpsilon(float val) {
             epsilon = val;
             return this;
         }
 
+        /**
+         * Set the momentum for moving average.
+         *
+         * @param val the momentum for moving average
+         * @return this Builder
+         */
         public Builder optMomentum(float val) {
             momentum = val;
             return this;
         }
 
+        /**
+         * Builds a {@link BatchNorm} block.
+         *
+         * @return the {@link BatchNorm} block
+         */
         public BatchNorm build() {
             return new BatchNorm(this);
         }
