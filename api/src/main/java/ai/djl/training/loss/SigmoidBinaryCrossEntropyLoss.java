@@ -23,11 +23,11 @@ public class SigmoidBinaryCrossEntropyLoss extends Loss {
     private boolean fromSigmoid;
 
     /**
-     * The Sigmoid cross-entropy loss for binary classification.
+     * Performs Sigmoid cross-entropy loss for binary classification.
      *
-     * @param weight weight to apply on loss value, default 1
-     * @param batchAxis axis that represents mini-batch, default 0
-     * @param fromSigmoid Whether the input is from the output of sigmoid, default false
+     * @param weight the weight to apply on the loss value, default 1
+     * @param batchAxis the axis that represents the mini-batch, default 0
+     * @param fromSigmoid whether the input is from the output of sigmoid, default false
      */
     public SigmoidBinaryCrossEntropyLoss(float weight, int batchAxis, boolean fromSigmoid) {
         this.weight = weight;
@@ -35,7 +35,7 @@ public class SigmoidBinaryCrossEntropyLoss extends Loss {
         this.fromSigmoid = fromSigmoid;
     }
 
-    /** The Sigmoid cross-entropy loss for binary classification. */
+    /** Performs Sigmoid cross-entropy loss for binary classification. */
     public SigmoidBinaryCrossEntropyLoss() {
         weight = 1;
         batchAxis = 0;

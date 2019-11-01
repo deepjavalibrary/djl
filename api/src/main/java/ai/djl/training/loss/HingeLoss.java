@@ -23,13 +23,13 @@ public class HingeLoss extends Loss {
     private int batchAxis;
 
     /**
-     * Calculate Hinge loss.
+     * Calculates Hinge loss.
      *
      * <p>.. math:: L = \sum_i max(0, {margin} - {pred}_i \cdot {label}_i)
      *
-     * @param margin The margin in hinge loss. Defaults to 1.0
-     * @param weight weight to apply on loss value, default 1
-     * @param batchAxis axis that represents mini-batch, default 0
+     * @param margin the margin in hinge loss. Defaults to 1.0
+     * @param weight the weight to apply on loss value, default 1
+     * @param batchAxis the axis that represents mini-batch, default 0
      */
     public HingeLoss(int margin, float weight, int batchAxis) {
         this.margin = margin;
@@ -38,7 +38,7 @@ public class HingeLoss extends Loss {
     }
 
     /**
-     * Calculate Hinge loss.
+     * Calculates Hinge loss.
      *
      * <p>.. math:: L = \sum_i max(0, {margin} - {pred}_i \cdot {label}_i)
      */

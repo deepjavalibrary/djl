@@ -17,20 +17,21 @@ import ai.djl.ndarray.NDArray;
 import java.util.stream.IntStream;
 
 /**
- * Computes top k predictions accuracy. {@code TopKAccuracy} differs from {@link Accuracy} in that
- * it considers the prediction to be ``True`` as long as the ground truth label is in the top K
- * predicated labels. If `top_k = 1`, then {@code TopKAccuracy} is identical to {@code Accuracy}.
+ * Computes the accuracy of the top k predictions. {@code TopKAccuracy} differs from {@link
+ * Accuracy} in that it considers the prediction to be ``True`` as long as the ground truth label is
+ * in the top K predicated labels. If `top_k = 1`, then {@code TopKAccuracy} is identical to {@code
+ * Accuracy}.
  */
 public class TopKAccuracy extends Accuracy {
 
     private int topK;
 
     /**
-     * Create TopKAccuracy.
+     * Creates a {@code TopKAccuracy} instance.
      *
-     * @param name Accuracy name, default "Top_K_Accuracy"
-     * @param index index of the NDArray in labels to compute topK accuracy for
-     * @param topK whether labels are in top K predictions
+     * @param name the accuracy name, default "Top_K_Accuracy"
+     * @param index the index of the NDArray in labels to compute topK accuracy for
+     * @param topK whether the labels are in top K predictions
      */
     public TopKAccuracy(String name, int index, int topK) {
         super(name, index);

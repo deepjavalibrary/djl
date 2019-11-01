@@ -20,21 +20,21 @@ public class SsdBoxPredictionError extends TrainingMetric {
     private float ssdBoxPredictionError;
 
     /**
-     * Creates SSDBoxPredictionError metric.
+     * Creates an SSDBoxPredictionError metric.
      *
-     * @param name name of the metric, default is "Accuracy"
+     * @param name the name of the metric, default is "Accuracy"
      */
     public SsdBoxPredictionError(String name) {
         super(name);
     }
 
     /**
-     * Update training metrics based on {@link NDList} of labels and predictions. For SSD Box offset
-     * accuracy, targets must contain (bounding box labels, bounding box masks) that are returned by
-     * the MultiBoxTarget operator.
+     * Updates training metrics based on {@link NDList} of labels and predictions. For SSD Box
+     * offset accuracy, targets must contain (bounding box labels, bounding box masks) that are
+     * returned by the MultiBoxTarget operator.
      *
-     * @param targets {@code NDList} of targets
-     * @param predictions {@code NDList} of predictions
+     * @param targets the {@code NDList} of targets
+     * @param predictions the {@code NDList} of predictions
      */
     @Override
     public void update(NDList targets, NDList predictions) {

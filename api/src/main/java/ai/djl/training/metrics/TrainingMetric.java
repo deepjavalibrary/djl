@@ -22,9 +22,9 @@ public abstract class TrainingMetric implements Cloneable {
     private String name;
 
     /**
-     * Base class for metric with abstract update methods.
+     * Creates a metric with abstract update methods.
      *
-     * @param name String, name of the metric
+     * @param name the name of the metric
      */
     public TrainingMetric(String name) {
         this.name = name;
@@ -40,14 +40,14 @@ public abstract class TrainingMetric implements Cloneable {
     }
 
     /**
-     * Update training metrics based on {@link NDList} of labels and predictions.
+     * Updates the training metrics based on a {@link NDList} of labels and predictions.
      *
-     * @param labels {@code NDList} of labels
-     * @param predictions {@code NDList} of predictions
+     * @param labels a {@code NDList} of labels
+     * @param predictions a {@code NDList} of predictions
      */
     public abstract void update(NDList labels, NDList predictions);
 
-    /** reset metric values. */
+    /** Resets metric values. */
     public abstract void reset();
 
     public String getName() {
@@ -55,17 +55,17 @@ public abstract class TrainingMetric implements Cloneable {
     }
 
     /**
-     * calculate metric values.
+     * Calculates metric values.
      *
-     * @return {@link Pair} of metric name and value
+     * @return a {@link Pair} of metric name and value
      */
     public abstract float getValue();
 
     /**
-     * Check if the two input {@code NDArray} have the same length or shape.
+     * Checks if the two input {@code NDArray} have the same length or shape.
      *
-     * @param labels {@code NDArray} of labels
-     * @param predictions {@code NDArray} of predictions
+     * @param labels a {@code NDArray} of labels
+     * @param predictions a {@code NDArray} of predictions
      * @param checkDimOnly whether to check for first dimension only
      */
     protected void checkLabelShapes(NDArray labels, NDArray predictions, boolean checkDimOnly) {
@@ -90,10 +90,10 @@ public abstract class TrainingMetric implements Cloneable {
     }
 
     /**
-     * Convenient method for checking length of NDArrays.
+     * Checks the length of NDArrays.
      *
-     * @param labels {@code NDArray} of labels
-     * @param predictions {@code NDArray} of predictions
+     * @param labels a {@code NDArray} of labels
+     * @param predictions a {@code NDArray} of predictions
      */
     protected void checkLabelShapes(NDArray labels, NDArray predictions) {
         checkLabelShapes(labels, predictions, true);

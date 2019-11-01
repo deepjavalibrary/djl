@@ -30,11 +30,11 @@ public abstract class Loss extends TrainingMetric {
     }
 
     /**
-     * Calculate loss between label and prediction.
+     * Calculates loss between the label and prediction.
      *
-     * @param label true label
-     * @param prediction predicted label
-     * @return loss value
+     * @param label the true label
+     * @param prediction the predicted label
+     * @return the loss value
      */
     public abstract NDArray getLoss(NDArray label, NDArray prediction);
 
@@ -125,12 +125,12 @@ public abstract class Loss extends TrainingMetric {
     }
 
     /**
-     * Helper function to get all axes except batch axis, loss functions requires reduction on all
-     * axes except batch axis.
+     * Gets all axes except the batch axis because loss functions require reduction on all axes
+     * except the batch axis.
      *
-     * @param loss loss {@code NDArray}
-     * @param batchAxis axis that represents mini-batch
-     * @return all axes except batch axis
+     * @param loss the loss {@code NDArray}
+     * @param batchAxis the axis that represents the mini-batch
+     * @return all axes except the batch axis
      */
     protected int[] excludeBatchAxis(NDArray loss, int batchAxis) {
         return IntStream.range(0, loss.getShape().dimension())
@@ -139,13 +139,13 @@ public abstract class Loss extends TrainingMetric {
     }
 
     /**
-     * Calculate loss between label and prediction.
+     * Calculates the loss between the label and prediction.
      *
      * <p>the default implementation is simply adding all losses together
      *
-     * @param labels true labels
-     * @param predictions predicted labels
-     * @return loss value
+     * @param labels the true labels
+     * @param predictions the predicted labels
+     * @return the loss value
      */
     public NDArray calculateLoss(NDList labels, NDList predictions) {
         // TODO: support composite loss for ssd (multi output)

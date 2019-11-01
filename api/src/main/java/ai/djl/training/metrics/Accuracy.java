@@ -18,7 +18,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 
 /**
- * Computes accuracy classification score.
+ * Computes an accuracy classification score.
  *
  * <p>The accuracy score is defined as .. math:: \\text{accuracy}(y, \\hat{y}) = \\frac{1}{n}
  * \\sum_{i=0}^{n-1} \\text{1}(\\hat{y_i} == y_i)
@@ -31,11 +31,11 @@ public class Accuracy extends TrainingMetric {
     protected int index;
 
     /**
-     * Creates Accuracy metric.
+     * Creates an accuracy metric.
      *
-     * @param name name of the metric, default is "Accuracy"
-     * @param index index of the NDArray in labels to compute accuracy for
-     * @param axis axis the axis that represent classes in prediction, default 1
+     * @param name the name of the metric, default is "Accuracy"
+     * @param index the index of the NDArray in labels to compute accuracy for
+     * @param axis the axis that represent classes in prediction, default 1
      */
     public Accuracy(String name, int index, int axis) {
         super(name);
@@ -95,18 +95,18 @@ public class Accuracy extends TrainingMetric {
     }
 
     /**
-     * Add number to correct instances.
+     * Add a number to the correct instances.
      *
-     * @param numInstances the number to increment
+     * @param numInstances the number to increment by
      */
     public void addCorrectInstances(long numInstances) {
         this.correctInstances += numInstances;
     }
 
     /**
-     * Add number to total instances.
+     * Add a number to the total instances.
      *
-     * @param totalInstances the number to increment
+     * @param totalInstances the number to increment by
      */
     public void addTotalInstances(long totalInstances) {
         this.totalInstances += totalInstances;

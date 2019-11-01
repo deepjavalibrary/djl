@@ -22,17 +22,17 @@ import ai.djl.ndarray.types.Shape;
  * Initializer performing "Xavier" initialization for weights. This initializer is designed to keep
  * the scale of gradients roughly the same in all layers.
  *
- * <p>By default, {@link RandomType} is ``UNIFORM`` and {@code factorType} is ``AVG``, the
- * initializer fills the weights with random numbers in the range of :math:`[-c, c]`, where :math:`c
- * = \\sqrt{\\frac{3.}{0.5 * (n_{in} + n_{out})}}`. :math:`n_{in}` is the number of neurons feeding
+ * <p>By default, {@link RandomType} is UNIFORM and {@code factorType} is AVG, the initializer fills
+ * the weights with random numbers in the range of :math:`[-c, c]`, where :math:`c =
+ * \\sqrt{\\frac{3.}{0.5 * (n_{in} + n_{out})}}`. :math:`n_{in}` is the number of neurons feeding
  * into weights, and :math:`n_{out}` is the number of neurons the result is fed to.
  *
- * <p>If {@code RandomType} is ``UNIFORM`` and {@code factorType} is ``IN``, then :math:`c =
+ * <p>If {@code RandomType} is UNIFORM and {@code factorType} is IN, then :math:`c =
  * \\sqrt{\\frac{3.}{n_{in}}}`. Similarly when {@code factorType} is ``OUT``, then :math:`c =
  * \\sqrt{\\frac{3.}{n_{out}}}`.
  *
- * <p>If {@code RandomType} is ``GAUSSIAN`` and {@code factorType} is ``AVG``, the initializer fills
- * the weights with numbers from normal distribution with a standard deviation of
+ * <p>If {@code RandomType} is GAUSSIAN and {@code factorType} is AVG, the initializer fills the
+ * weights with numbers from normal distribution with a standard deviation of
  * :math:`\\sqrt{\\frac{3.}{0.5 * (n_{in} + n_{out})}}`.
  */
 public class XavierInitializer implements Initializer {
@@ -54,11 +54,11 @@ public class XavierInitializer implements Initializer {
     private double magnitude;
 
     /**
-     * Initialize Xavier initializer.
+     * Initializes a Xavier initializer.
      *
-     * @param randomType Random generator type, can be ``GAUSSIAN'`` or ``'UNIFORM'``
-     * @param factorType enum, can be one of ``AVG``, ``IN``, or ``OUT``
-     * @param magnitude double, scale of random number
+     * @param randomType the random generator type, can be GAUSSIAN or UNIFORM
+     * @param factorType the factor type, can be one of AVG, IN, or OUT
+     * @param magnitude the scale of the random number
      */
     public XavierInitializer(RandomType randomType, FactorType factorType, double magnitude) {
         this.randomType = randomType;

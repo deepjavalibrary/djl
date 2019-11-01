@@ -23,9 +23,9 @@ import ai.djl.ndarray.NDArray;
 public interface GradientCollector extends AutoCloseable {
 
     /**
-     * Run backward and calculate gradient w.r.t previously marked variable (head).
+     * Calculate the gradient w.r.t previously marked variable (head).
      *
-     * @param target target NDArray to run backward and calculate gradient w.r.t head
+     * @param target the target NDArray to calculate the gradient w.r.t head
      */
     void backward(NDArray target);
 

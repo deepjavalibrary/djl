@@ -27,10 +27,10 @@ public class UniformInitializer implements Initializer {
     }
 
     /**
-     * Initialize uniform initializer.
+     * Initializes a uniform initializer.
      *
-     * @param scale float, The bound on the range of the generated random values. Values are
-     *     generated from the range [-`scale`, `scale`]. Default scale is 0.07.
+     * @param scale the bound on the range of the generated random values. Values are generated from
+     *     the range [-`scale`, `scale`]. Default scale is 0.07.
      */
     public UniformInitializer(float scale) {
         this.scale = scale;

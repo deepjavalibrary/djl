@@ -23,7 +23,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
     private boolean fromLogit;
 
     /**
-     * Calculate the softmax cross entropy loss. If {@code sparse_label} is {@code true} (default),
+     * Calculates the softmax cross entropy loss. If {@code sparse_label} is {@code true} (default),
      * {@code label} should contain integer category indicators:
      *
      * <p>.. math:: \DeclareMathOperator{softmax}{softmax} p = \softmax({prediction}) L = -\sum_i
@@ -34,9 +34,9 @@ public class SoftmaxCrossEntropyLoss extends Loss {
      *
      * <p>.. math:: p = \softmax({prediction}) L = -\sum_i \sum_j {label}_j \log p_{ij}
      *
-     * @param weight weight to apply on loss value, default 1
-     * @param batchAxis axis that represents mini-batch, default 0
-     * @param classAxis axis that represents class probabilities, default -1
+     * @param weight the weight to apply on the loss value, default 1
+     * @param batchAxis the axis that represents the mini-batch, default 0
+     * @param classAxis the axis that represents the class probabilities, default -1
      * @param sparseLabel whether labels are integer array or probabilities, default true
      * @param fromLogit whether labels are log probabilities or un-normalized numbers
      */
@@ -50,7 +50,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
     }
 
     /**
-     * Calculate the softmax cross entropy loss. If {@code sparse_label} is {@code true} (default),
+     * Calculates the softmax cross entropy loss. If {@code sparse_label} is {@code true} (default),
      * {@code label} should contain integer category indicators:
      *
      * <p>.. math:: \DeclareMathOperator{softmax}{softmax} p = \softmax({prediction}) L = -\sum_i

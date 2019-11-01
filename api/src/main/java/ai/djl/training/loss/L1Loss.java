@@ -21,12 +21,12 @@ public class L1Loss extends Loss {
     private int batchAxis;
 
     /**
-     * Calculate L1 Loss between label and prediction, a.k.a. MAE(Mean Absolute Error).
+     * Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error).
      *
      * <p>.. math:: L = \sum_i \vert {label}_i - {prediction}_i \vert.
      *
-     * @param weight weight to apply on loss value, default 1
-     * @param batchAxis axis that represents mini-batch, default 0
+     * @param weight the weight to apply on loss value, default 1
+     * @param batchAxis the axis that represents mini-batch, default 0
      */
     public L1Loss(float weight, int batchAxis) {
         this.weight = weight;
@@ -34,7 +34,7 @@ public class L1Loss extends Loss {
     }
 
     /**
-     * Calculate L1 Loss between label and prediction, a.k.a. MAE(Mean Absolute Error).
+     * Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error).
      *
      * <p>.. math:: L = \sum_i \vert {label}_i - {prediction}_i \vert.
      */
