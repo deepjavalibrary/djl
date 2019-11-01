@@ -18,9 +18,9 @@ import ai.djl.zoo.cv.classification.ResNetModelLoader;
 
 public interface ModelZoo {
 
-    String REPO_URL = "https://djl-ai.s3.amazonaws.com/djl-repo/";
+    String REPO_URL = "https://djl-ai.s3.amazonaws.com/mlrepo/";
     Repository REPOSITORY = Repository.newInstance("DjlRepo", REPO_URL);
-    String GROUP_ID = "ai.djl";
+    String GROUP_ID = "ai.djl.zoo";
 
     ResNetModelLoader RESNET = new ResNetModelLoader(REPOSITORY);
     MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);

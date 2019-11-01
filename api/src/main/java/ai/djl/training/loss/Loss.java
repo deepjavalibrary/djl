@@ -119,9 +119,9 @@ public abstract class Loss extends TrainingMetric {
     }
 
     public NDArray getLastUpdate() {
-
         return lastUpdate;
     }
+
     /**
      * Helper function to get all axes except batch axis, loss functions requires reduction on all
      * axes except batch axis.

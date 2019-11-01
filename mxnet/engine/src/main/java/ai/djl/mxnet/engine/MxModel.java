@@ -70,6 +70,7 @@ public class MxModel implements Model {
     private MxNDManager manager;
     private Block block;
     private DataType dataType;
+    private Map<String, String> properties;
     private PairList<String, Shape> inputData;
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
     // the variable is used to avoid ParameterStore copy for the first time
@@ -78,6 +79,7 @@ public class MxModel implements Model {
     MxModel(Device device) {
         device = Device.defaultIfNull(device);
         dataType = DataType.FLOAT32;
+        properties = new ConcurrentHashMap<>();
         manager = MxNDManager.getSystemManager().newSubManager(device);
         first = new AtomicBoolean(true);
     }
@@ -147,6 +149,12 @@ public class MxModel implements Model {
                     dos.writeUTF(name);
                 }
                 dos.write(desc.getValue().getEncoded());
+            }
+
+            dos.writeInt(properties.size());
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                dos.writeUTF(entry.getKey());
+                dos.writeUTF(entry.getValue());
             }
 
             block.saveParameters(dos);
@@ -293,6 +301,18 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public void setProperty(String key, String value) {
+        properties.put(key, value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getProperty(String key) {
+        return properties.get(key);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void close() {
         // TODO workaround for MXNet Engine crash issue
         JnaUtils.waitAll();
@@ -392,10 +412,16 @@ public class MxModel implements Model {
             int numberOfInputs = dis.readInt();
             inputData = new PairList<>();
             for (int i = 0; i < numberOfInputs; ++i) {
-                // TODO: store header information in model
                 String inputName = dis.readUTF(); // input name
                 Shape shape = Shape.decode(dis);
                 inputData.add(inputName, shape);
+            }
+
+            int numberOfProperties = dis.readInt();
+            for (int i = 0; i < numberOfProperties; ++i) {
+                String key = dis.readUTF();
+                String value = dis.readUTF();
+                properties.put(key, value);
             }
 
             block.loadParameters(manager, dis);

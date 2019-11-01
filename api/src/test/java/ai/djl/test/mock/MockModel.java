@@ -64,6 +64,14 @@ public class MockModel implements Model {
     public void setBlock(Block block) {}
 
     @Override
+    public String getProperty(String key) {
+        return null;
+    }
+
+    @Override
+    public void setProperty(String key, String value) {}
+
+    @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         return null;
     }

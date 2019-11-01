@@ -138,6 +138,10 @@ public interface Model extends AutoCloseable {
 
     void setBlock(Block block);
 
+    String getProperty(String key);
+
+    void setProperty(String key, String value);
+
     /**
      * Get the NDArray Manager from the model.
      *

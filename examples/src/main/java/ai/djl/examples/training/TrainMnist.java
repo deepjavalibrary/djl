@@ -76,6 +76,8 @@ public final class TrainMnist extends AbstractTraining {
 
             // save model
             if (arguments.getOutputDir() != null) {
+                model.setProperty("Epoch", String.valueOf(arguments.getEpoch()));
+                model.setProperty("Accuracy", String.format("%.2f", getValidationAccuracy()));
                 model.save(Paths.get(arguments.getOutputDir()), "mlp");
             }
         }

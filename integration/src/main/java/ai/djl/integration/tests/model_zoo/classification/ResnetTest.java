@@ -53,7 +53,7 @@ import org.testng.annotations.Test;
 
 public class ResnetTest {
 
-    @Test
+    @Test(enabled = false)
     public void testTrain() {
         Optimizer optimizer =
                 new Nag.Builder()
@@ -101,7 +101,7 @@ public class ResnetTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testLoadPredict()
             throws IOException, ModelNotFoundException, TranslateException,
                     MalformedModelException {
@@ -114,7 +114,7 @@ public class ResnetTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testLoadTrain()
             throws IOException, ModelNotFoundException, MalformedModelException {
         try (ZooModel<BufferedImage, Classification> model = getModel()) {

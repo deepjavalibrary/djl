@@ -33,7 +33,7 @@
         },
         "parameters": {
           "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/zoo/mlp/0.0.1/mlp-0000.params",
-          "sha1Hash": "059c742cb22d85fe9f518d6041cbc9a1620e2039"
+          "sha1Hash": "a848dc6c63097d2e2d01f236fcfba1652f50ce6b"
         }
       }
     }

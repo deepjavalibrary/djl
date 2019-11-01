@@ -59,6 +59,14 @@ public class ZooModel<I, O> implements Model {
         model.setBlock(block);
     }
 
+    @Override
+    public String getProperty(String key) {
+        return null;
+    }
+
+    @Override
+    public void setProperty(String key, String value) {}
+
     /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {

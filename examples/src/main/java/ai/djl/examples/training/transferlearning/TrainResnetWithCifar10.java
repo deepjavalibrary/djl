@@ -84,7 +84,9 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
 
             // save model
             if (arguments.getOutputDir() != null) {
-                model.save(Paths.get(arguments.getOutputDir()), "resnet");
+                model.setProperty("Epoch", String.valueOf(arguments.getEpoch()));
+                model.setProperty("Accuracy", String.format("%.2f", getValidationAccuracy()));
+                model.save(Paths.get(arguments.getOutputDir()), "resnetv1");
             }
         } catch (MalformedModelException e) {
             throw new IllegalArgumentException(e);
