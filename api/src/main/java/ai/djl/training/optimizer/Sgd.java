@@ -12,6 +12,7 @@
  */
 package ai.djl.training.optimizer;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -25,7 +26,7 @@ public class Sgd extends Optimizer {
     private LearningRateTracker learningRateTracker;
     private float momentum;
     private boolean lazyUpdate;
-    private Map<String, NDArray> momentumStates;
+    private Map<String, Map<Device, NDArray>> momentumStates;
 
     protected Sgd(Builder builder) {
         super(builder);
@@ -43,11 +44,16 @@ public class Sgd extends Optimizer {
         float learningRate = learningRateTracker.getNewLearningRate(updateCount(parameterId));
         NDList inputs;
         if (momentum != 0f) {
-            inputs =
-                    new NDList(
-                            weight,
-                            grad,
-                            withDefaultState(momentumStates, parameterId, k -> weight.zerosLike()));
+            NDArray state =
+                    withDefaultState(
+                            momentumStates,
+                            parameterId,
+                            weight.getDevice(),
+                            k -> weight.zerosLike());
+            if (!state.getDevice().equals(weight.getDevice())) {
+                state = state.asInDevice(weight.getDevice(), true);
+            }
+            inputs = new NDList(weight, grad, state);
         } else {
             inputs = new NDList(weight, grad);
         }

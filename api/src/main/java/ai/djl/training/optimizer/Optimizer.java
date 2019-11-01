@@ -12,6 +12,7 @@
  */
 package ai.djl.training.optimizer;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,18 +68,28 @@ public abstract class Optimizer {
     public abstract void update(String parameterId, NDArray weight, NDArray grad);
 
     protected NDArray withDefaultState(
-            Map<String, NDArray> state, String key, Function<String, NDArray> defaultFunction) {
-        return state.computeIfAbsent(
-                key,
-                k -> {
-                    NDArray s = defaultFunction.apply(k);
-                    s.detach(); // s is detached because it would be put into the optimizer
-                    // callback manager and closed after the optimizer callback
-                    // when using the MxParameterServer. For now, this will let it be closed by the
-                    // GC when the optimizer is out of scope. Ideally, it should be put into the
-                    // trainer manager instead.
-                    return s;
-                });
+            Map<String, Map<Device, NDArray>> state,
+            String key,
+            Device device,
+            Function<String, NDArray> defaultFunction) {
+        Map<Device, NDArray> arrayMap =
+                state.computeIfAbsent(
+                        key,
+                        k -> {
+                            Map<Device, NDArray> map = new ConcurrentHashMap<>();
+                            NDArray s = defaultFunction.apply(k);
+                            s.detach(); // s is detached because it would be put into the optimizer
+                            // callback manager and closed after the optimizer callback
+                            // when using the MxParameterServer. For now, this will let it be closed
+                            // by the
+                            // GC when the optimizer is out of scope. Ideally, it should be put into
+                            // the
+                            // trainer manager instead.
+                            map.put(device, s);
+                            return map;
+                        });
+        return arrayMap.computeIfAbsent(
+                device, k -> ((NDArray) arrayMap.values().toArray()[0]).asInDevice(device, true));
     }
 
     @SuppressWarnings("rawtypes")

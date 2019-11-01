@@ -44,6 +44,7 @@ import ai.djl.translate.Pipeline;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -124,24 +125,26 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
 
     private TrainingConfig setupTrainingConfig(Arguments arguments) {
         int batchSize = arguments.getBatchSize();
+        // epoch number to change learning rate
+        int[] epoch = {3, 5, 8};
+        int[] steps = Arrays.stream(epoch).map(k -> k * 60000 / batchSize).toArray();
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
         MultiFactorTracker learningRateTracker =
                 LearningRateTracker.multiFactorTracker()
-                        .setSteps(new int[] {1000, 3000, 8000})
+                        .setSteps(steps)
                         .optBaseLearningRate(0.01f)
                         .optFactor(0.1f)
                         .optWarmUpBeginLearningRate(1e-3f)
-                        .optWarmUpSteps(300)
+                        .optWarmUpSteps(500)
                         .build();
         Optimizer optimizer =
                 Optimizer.sgd()
                         .setRescaleGrad(1.0f / batchSize)
                         .setLearningRateTracker(learningRateTracker)
-                        // TODO: fix states copy to multi-gpu
-                        // .optMomentum(0.9f)
-                        // .optWeightDecays(0.001f)
+                        .optMomentum(0.9f)
+                        .optWeightDecays(0.001f)
                         .optClipGrad(1f)
                         .build();
         return new DefaultTrainingConfig(initializer)

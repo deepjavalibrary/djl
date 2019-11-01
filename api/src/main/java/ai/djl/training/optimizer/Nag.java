@@ -13,6 +13,7 @@
 
 package ai.djl.training.optimizer;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -25,7 +26,7 @@ public class Nag extends Optimizer {
 
     private LearningRateTracker learningRateTracker;
     private float momentum;
-    private Map<String, NDArray> momentumStates;
+    private Map<String, Map<Device, NDArray>> momentumStates;
 
     protected Nag(Builder builder) {
         super(builder);
@@ -46,7 +47,11 @@ public class Nag extends Optimizer {
                     new NDList(
                             weight,
                             grad,
-                            withDefaultState(momentumStates, parameterId, k -> weight.zerosLike()));
+                            withDefaultState(
+                                    momentumStates,
+                                    parameterId,
+                                    weight.getDevice(),
+                                    k -> weight.zerosLike()));
         } else {
             inputs = new NDList(weight, grad);
         }

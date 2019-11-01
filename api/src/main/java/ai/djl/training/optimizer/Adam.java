@@ -12,6 +12,7 @@
  */
 package ai.djl.training.optimizer;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -26,8 +27,8 @@ public class Adam extends Optimizer {
     private float epsilon;
     private boolean lazyUpdate;
 
-    private Map<String, NDArray> means;
-    private Map<String, NDArray> variances;
+    private Map<String, Map<Device, NDArray>> means;
+    private Map<String, Map<Device, NDArray>> variances;
 
     protected Adam(Builder builder) {
         super(builder);
@@ -56,8 +57,13 @@ public class Adam extends Optimizer {
                 new NDList(
                         weight,
                         grad,
-                        withDefaultState(means, parameterId, k -> weight.zerosLike()),
-                        withDefaultState(variances, parameterId, k -> weight.zerosLike()));
+                        withDefaultState(
+                                means, parameterId, weight.getDevice(), k -> weight.zerosLike()),
+                        withDefaultState(
+                                variances,
+                                parameterId,
+                                weight.getDevice(),
+                                k -> weight.zerosLike()));
         NDList weights = new NDList(weight);
 
         NDArrayEx ex = weight.getNDArrayInternal();

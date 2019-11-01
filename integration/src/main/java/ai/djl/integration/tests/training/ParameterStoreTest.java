@@ -15,6 +15,7 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.integration.util.Assertions;
 import ai.djl.mxnet.engine.MxParameterServer;
 import ai.djl.ndarray.NDArray;
@@ -31,16 +32,41 @@ public class ParameterStoreTest {
     public void testParameterStore() {
         try (Model model = Model.newInstance()) {
             NDManager manager = model.getNDManager();
-            int arraySize = 2;
-            NDArray weight = manager.randomNormal(new Shape(5, 5)).asInDevice(Device.cpu(0), true);
-            NDArray grad = manager.randomNormal(new Shape(5, 5)).asInDevice(Device.cpu(0), true);
-            NDArray[] weights = {weight};
-            NDArray[] grads = new NDArray[arraySize];
-            for (int i = 0; i < arraySize; i++) {
-                grads[i] = grad.asInDevice(Device.cpu(i), true);
+            int numGpus = Engine.getInstance().getGpuCount();
+            int numDevices;
+            if (numGpus > 0) {
+                numDevices = numGpus;
+            } else {
+                numDevices = 4;
             }
+            int numWeights = 10;
+            // TODO: this test is currently flaky with large numUpdates
+            int numUpdates = 100;
+            NDArray[][] weights = new NDArray[numWeights][numDevices];
+            NDArray[][] grads = new NDArray[numWeights][numDevices];
+            NDArray[] expected = new NDArray[numWeights];
             float lr = .1f;
-            NDArray expectedWeight = weight.add(grad.mul(arraySize).mul(lr));
+            for (int i = 0; i < numWeights; i++) {
+                NDArray w = manager.randomNormal(new Shape(1, 1));
+                NDArray g = manager.randomNormal(new Shape(1, 1));
+                // simulate aggregate gradient from all device and apply on weight
+                expected[i] = w;
+                for (int n = 0; n < numUpdates; n++) {
+                    expected[i] = updateHelper(expected[i], g, numDevices, lr);
+                }
+                // copy weight and gradient to all devices
+                for (int j = 0; j < numDevices; j++) {
+                    Device device;
+                    if (numGpus > 0) {
+                        device = Device.gpu(j);
+                    } else {
+                        device = Device.cpu(j);
+                    }
+                    weights[i][j] = w.asInDevice(device, true);
+                    grads[i][j] = g.asInDevice(device, true);
+                }
+            }
+
             Optimizer optimizer =
                     new TestOptimizer.Builder()
                             .setRescaleGrad(1.0f)
@@ -48,12 +74,30 @@ public class ParameterStoreTest {
                             .build();
 
             try (ParameterServer ps = new MxParameterServer(optimizer)) {
-                ps.init("0", weights);
-                ps.push("0", grads, 0);
-                ps.pull("0", weights, 0);
-                Assertions.assertAlmostEquals(weights[0], expectedWeight);
+
+                // init
+                for (int i = 0; i < weights.length; i++) {
+                    ps.init(String.valueOf(i), new NDArray[] {weights[i][0]});
+                }
+                for (int n = 0; n < numUpdates; n++) {
+                    // push
+                    for (int i = 0; i < weights.length; i++) {
+                        ps.push(String.valueOf(i), grads[i], -i);
+                    }
+                    // pull
+                    for (int i = 0; i < weights.length; i++) {
+                        ps.pull(String.valueOf(i), weights[i], -i);
+                    }
+                }
+                for (int i = 0; i < weights.length; i++) {
+                    Assertions.assertAlmostEquals(weights[i][0], expected[i]);
+                }
             }
         }
+    }
+
+    private static NDArray updateHelper(NDArray weight, NDArray grad, int numDevices, float lr) {
+        return weight.add(grad.mul(numDevices).mul(lr));
     }
 
     private static class TestOptimizer extends Optimizer {

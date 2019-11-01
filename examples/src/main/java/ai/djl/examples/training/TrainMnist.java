@@ -83,23 +83,22 @@ public final class TrainMnist extends AbstractTraining {
 
     private TrainingConfig setupTrainingConfig(Arguments arguments) {
         int batchSize = arguments.getBatchSize();
-
         FactorTracker factorTracker =
                 LearningRateTracker.factorTracker()
-                        .optBaseLearningRate(0.01f)
-                        .setStep(2000)
+                        .optBaseLearningRate(0.1f)
+                        .setStep(60000 / batchSize)
                         .optFactor(0.1f)
-                        .optWarmUpBeginLearningRate(0.001f)
+                        .optWarmUpBeginLearningRate(0.01f)
                         .optWarmUpSteps(500)
-                        .optStopFactorLearningRate(1e-4f)
+                        .optStopFactorLearningRate(1e-3f)
                         .build();
         Optimizer optimizer =
                 Optimizer.sgd()
                         .setRescaleGrad(1.0f / batchSize)
                         .setLearningRateTracker(factorTracker)
-                        // TODO: fix states copy to multi-gpu
-                        // .optWeightDecays(0.001f)
-                        // .optMomentum(0.9f)
+                        .optWeightDecays(0.001f)
+                        .optMomentum(0.9f)
+                        .optClipGrad(1f)
                         .build();
 
         return new DefaultTrainingConfig(new XavierInitializer())

@@ -13,6 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
@@ -36,47 +37,52 @@ public class ImageFolderTest {
 
     @Test
     public void testImageFolder() throws IOException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
+        if (Engine.getInstance().getGpuCount() == 0) {
+            TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
-        try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            try (Model model = Model.newInstance()) {
+                model.setBlock(Activation.IDENTITY_BLOCK);
 
-            ImageFolder dataset =
-                    new ImageFolder.Builder()
-                            .setRoot("src/test/resources/imagefolder")
-                            .optPipeline(
-                                    new Pipeline().add(new Resize(100, 100)).add(new ToTensor()))
-                            .setSequenceSampling(1, false)
-                            .build();
-            dataset.prepare();
+                ImageFolder dataset =
+                        new ImageFolder.Builder()
+                                .setRoot("src/test/resources/imagefolder")
+                                .optPipeline(
+                                        new Pipeline()
+                                                .add(new Resize(100, 100))
+                                                .add(new ToTensor()))
+                                .setSequenceSampling(1, false)
+                                .build();
+                dataset.prepare();
 
-            try (Trainer trainer = model.newTrainer(config)) {
-                NDManager manager = trainer.getManager();
-                NDArray cat =
-                        BufferedImageUtils.readFileToArray(
-                                manager, Paths.get("src/test/resources/imagefolder/cat/cat2.jpeg"));
-                NDArray dog =
-                        BufferedImageUtils.readFileToArray(
-                                manager,
-                                Paths.get("src/test/resources/imagefolder/dog/puppy1.jpg"));
+                try (Trainer trainer = model.newTrainer(config)) {
+                    NDManager manager = trainer.getManager();
+                    NDArray cat =
+                            BufferedImageUtils.readFileToArray(
+                                    manager,
+                                    Paths.get("src/test/resources/imagefolder/cat/cat2.jpeg"));
+                    NDArray dog =
+                            BufferedImageUtils.readFileToArray(
+                                    manager,
+                                    Paths.get("src/test/resources/imagefolder/dog/puppy1.jpg"));
 
-                Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
+                    Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
 
-                Batch catBatch = ds.next();
-                Assertions.assertAlmostEquals(
-                        NDImageUtils.toTensor(NDImageUtils.resize(cat, 100, 100)).expandDims(0),
-                        catBatch.getData().singletonOrThrow());
-                Assert.assertEquals(
-                        manager.create(new int[] {0}), catBatch.getLabels().singletonOrThrow());
-                catBatch.close();
+                    Batch catBatch = ds.next();
+                    Assertions.assertAlmostEquals(
+                            NDImageUtils.toTensor(NDImageUtils.resize(cat, 100, 100)).expandDims(0),
+                            catBatch.getData().singletonOrThrow());
+                    Assert.assertEquals(
+                            manager.create(new int[] {0}), catBatch.getLabels().singletonOrThrow());
+                    catBatch.close();
 
-                Batch dogBatch = ds.next();
-                Assertions.assertAlmostEquals(
-                        NDImageUtils.toTensor(NDImageUtils.resize(dog, 100, 100)).expandDims(0),
-                        dogBatch.getData().singletonOrThrow());
-                Assert.assertEquals(
-                        manager.create(new int[] {1}), dogBatch.getLabels().singletonOrThrow());
-                dogBatch.close();
+                    Batch dogBatch = ds.next();
+                    Assertions.assertAlmostEquals(
+                            NDImageUtils.toTensor(NDImageUtils.resize(dog, 100, 100)).expandDims(0),
+                            dogBatch.getData().singletonOrThrow());
+                    Assert.assertEquals(
+                            manager.create(new int[] {1}), dogBatch.getLabels().singletonOrThrow());
+                    dogBatch.close();
+                }
             }
         }
     }
