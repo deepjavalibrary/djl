@@ -9,7 +9,7 @@ defaultTasks 'build'
 
 allprojects {
     group 'ai.djl'
-    version = "0.1.0" + (project.hasProperty("release") ? "" : "-SNAPSHOT")
+    version = "0.2.0" + (project.hasProperty("release") ? "" : "-SNAPSHOT")
 
     repositories {
         jcenter()
