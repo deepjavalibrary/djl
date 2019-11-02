@@ -128,9 +128,6 @@ public class MockModel implements Model {
     @Override
     public InputStream getArtifactAsStream(String name) throws IOException {
         URL url = getArtifact(name);
-        if (url == null) {
-            return null;
-        }
         return url.openStream();
     }
 

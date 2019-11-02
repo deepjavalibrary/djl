@@ -280,16 +280,13 @@ public class MxModel implements Model {
         if (Files.exists(file) && Files.isReadable(file)) {
             return file.toUri().toURL();
         }
-        return null;
+        throw new FileNotFoundException("File not found: " + file);
     }
 
     /** {@inheritDoc} */
     @Override
     public InputStream getArtifactAsStream(String name) throws IOException {
         URL url = getArtifact(name);
-        if (url == null) {
-            return null;
-        }
         return url.openStream();
     }
 
