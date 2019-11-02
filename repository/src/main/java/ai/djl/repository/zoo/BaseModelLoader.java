@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BaseModelLoader<I, O> {
+public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     protected Repository repository;
     protected MRL mrl;
@@ -42,21 +42,13 @@ public abstract class BaseModelLoader<I, O> {
 
     public abstract Translator<I, O> getTranslator(Artifact artifact);
 
-    private Metadata getMetadata() throws IOException, ModelNotFoundException {
-        if (metadata == null) {
-            metadata = repository.locate(mrl);
-            if (metadata == null) {
-                throw new ModelNotFoundException(mrl.getArtifactId() + " Models not found.");
-            }
-        }
-        return metadata;
-    }
-
+    @Override
     public ZooModel<I, O> loadModel(Map<String, String> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
         return loadModel(criteria, Device.defaultDevice());
     }
 
+    @Override
     public ZooModel<I, O> loadModel(Map<String, String> criteria, Device device)
             throws IOException, ModelNotFoundException, MalformedModelException {
         Artifact artifact = match(criteria);
@@ -91,5 +83,15 @@ public abstract class BaseModelLoader<I, O> {
     public List<Artifact> search(Map<String, String> criteria)
             throws IOException, ModelNotFoundException {
         return getMetadata().search(VersionRange.parse(version), criteria);
+    }
+
+    private Metadata getMetadata() throws IOException, ModelNotFoundException {
+        if (metadata == null) {
+            metadata = repository.locate(mrl);
+            if (metadata == null) {
+                throw new ModelNotFoundException(mrl.getArtifactId() + " Models not found.");
+            }
+        }
+        return metadata;
     }
 }

@@ -23,6 +23,9 @@ import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
 import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
 import ai.djl.mxnet.zoo.nlp.bertqa.BertQAModelLoader;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.ModelLoader;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import java.lang.reflect.Field;
 
 public interface MxModelZoo {
 
@@ -40,4 +43,15 @@ public interface MxModelZoo {
     InstanceSegmentationModelLoader MASK_RCNN = new InstanceSegmentationModelLoader(REPOSITORY);
     ActionRecognitionModelLoader ACTION_RECOGNITION = new ActionRecognitionModelLoader(REPOSITORY);
     BertQAModelLoader BERT_QA = new BertQAModelLoader(REPOSITORY);
+
+    @SuppressWarnings("unchecked")
+    static <I, O> ModelLoader<I, O> getModelLoader(String name) throws ModelNotFoundException {
+        try {
+            Field field = MxModelZoo.class.getDeclaredField(name);
+            return (ModelLoader<I, O>) field.get(null);
+        } catch (ReflectiveOperationException e) {
+            throw new ModelNotFoundException(
+                    "Model: " + name + " is not defined in MxModelZoo.", e);
+        }
+    }
 }

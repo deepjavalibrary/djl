@@ -22,6 +22,7 @@ import ai.djl.metric.Metrics;
 import ai.djl.modality.Classification;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
+import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
@@ -39,6 +40,11 @@ public final class ClassifyExample extends AbstractInference<Classification> {
     @Override
     public Classification predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {
+        String modelName = arguments.getModelName();
+        if (modelName == null) {
+            modelName = "RESNET";
+        }
+
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
@@ -52,8 +58,10 @@ public final class ClassifyExample extends AbstractInference<Classification> {
             criteria.put("layers", "18");
             criteria.put("flavor", "v1");
         }
-        ZooModel<BufferedImage, Classification> model =
-                MxModelZoo.RESNET.loadModel(criteria, device);
+
+        ModelLoader<BufferedImage, Classification> loader = MxModelZoo.getModelLoader(modelName);
+
+        ZooModel<BufferedImage, Classification> model = loader.loadModel(criteria, device);
 
         Classification predictResult = null;
         try (Predictor<BufferedImage, Classification> predictor = model.newPredictor()) {

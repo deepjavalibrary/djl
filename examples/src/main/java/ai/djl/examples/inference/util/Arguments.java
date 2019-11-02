@@ -120,9 +120,6 @@ public class Arguments {
     }
 
     public String getModelName() {
-        if (modelName == null) {
-            throw new IllegalArgumentException("Missing --model-name parameter.");
-        }
         return modelName;
     }
 
