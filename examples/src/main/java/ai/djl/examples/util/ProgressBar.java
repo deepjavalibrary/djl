@@ -14,10 +14,11 @@ package ai.djl.examples.util;
 
 public final class ProgressBar {
 
+    private static final int TOTAL_BAR_LENGTH = 40;
+
     private String message;
     private int max;
     private int current;
-    private int totalBarLength = 40;
 
     public ProgressBar(String message, int max) {
         this.message = message;
@@ -31,7 +32,7 @@ public final class ProgressBar {
 
     @SuppressWarnings("PMD.SystemPrintln")
     public void printProgress(int index, String additionalMessage) {
-        if (Boolean.getBoolean("disableProgressBar")) {
+        if (Boolean.getBoolean("disableProgressBar") || max <= 1) {
             return;
         }
 
@@ -47,8 +48,8 @@ public final class ProgressBar {
             sb.append(' ');
         }
         sb.append(String.format("%3d", percent)).append("% |");
-        for (int i = 0; i < totalBarLength; ++i) {
-            if (i <= percent * totalBarLength / 100) {
+        for (int i = 0; i < TOTAL_BAR_LENGTH; ++i) {
+            if (i <= percent * TOTAL_BAR_LENGTH / 100) {
                 sb.append('█');
             } else {
                 sb.append(' ');
@@ -56,7 +57,7 @@ public final class ProgressBar {
         }
         sb.append('|');
         if (additionalMessage != null) {
-            sb.append(" " + additionalMessage);
+            sb.append(' ').append(additionalMessage);
         }
         if (index == max - 1) {
             System.out.println(sb);
