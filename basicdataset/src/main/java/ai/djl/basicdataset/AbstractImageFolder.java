@@ -50,7 +50,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     protected List<String> synsets;
     protected PairList<String, Integer> items;
 
-    public AbstractImageFolder(BaseBuilder<?> builder) {
+    public AbstractImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
         this.flag = builder.flag;
         if (pipeline == null) {
@@ -166,8 +166,8 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     }
 
     @SuppressWarnings("rawtypes")
-    public abstract static class BaseBuilder<T extends BaseBuilder>
-            extends RandomAccessDataset.BaseBuilder<T> {
+    public abstract static class ImageFolderBuilder<T extends ImageFolderBuilder>
+            extends BaseBuilder<T> {
 
         Flag flag = NDImageUtils.Flag.COLOR;
 

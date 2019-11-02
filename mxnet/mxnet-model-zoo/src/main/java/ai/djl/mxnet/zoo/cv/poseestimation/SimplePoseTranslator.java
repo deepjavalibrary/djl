@@ -66,7 +66,7 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
         return new Joints(joints);
     }
 
-    public static class Builder extends ImageTranslator.BaseBuilder<Builder> {
+    public static class Builder extends BaseBuilder<Builder> {
 
         @Override
         protected Builder self() {

@@ -36,7 +36,7 @@ public final class ImageFolder extends AbstractImageFolder {
         listImages(root);
     }
 
-    public static final class Builder extends AbstractImageFolder.BaseBuilder<Builder> {
+    public static final class Builder extends ImageFolderBuilder<Builder> {
 
         private String root;
 

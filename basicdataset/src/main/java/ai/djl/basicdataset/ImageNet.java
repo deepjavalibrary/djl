@@ -111,7 +111,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
         return root.resolve(key);
     }
 
-    public static class Builder extends AbstractImageFolder.BaseBuilder<Builder> {
+    public static class Builder extends ImageFolderBuilder<Builder> {
 
         private Repository repository = BasicDatasets.REPOSITORY;
         private Usage usage;
