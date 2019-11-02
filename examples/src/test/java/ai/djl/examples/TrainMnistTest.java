@@ -20,7 +20,7 @@ public class TrainMnistTest {
 
     @Test
     public void testTrainMnist() {
-        String[] args = new String[] {"-e", "2", "-o", "build/logs"};
+        String[] args = new String[] {"-e", "2", "-g", "1", "-o", "build/logs"};
 
         TrainMnist test = new TrainMnist();
         Assert.assertTrue(test.runExample(args));

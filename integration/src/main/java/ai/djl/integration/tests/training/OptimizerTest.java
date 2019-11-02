@@ -143,7 +143,10 @@ public class OptimizerTest {
     @Test
     public void testAdam() {
         Optimizer optim =
-                new Adam.Builder().setRescaleGrad(1.0f / BATCH_SIZE).optLearningRate(0.1f).build();
+                new Adam.Builder()
+                        .setRescaleGrad(1.0f / BATCH_SIZE)
+                        .optLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
+                        .build();
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES)

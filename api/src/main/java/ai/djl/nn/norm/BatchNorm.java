@@ -42,6 +42,8 @@ public class BatchNorm extends ParameterBlock {
     private float momentum;
     private long inChannels;
 
+    private Parameter gamma;
+    private Parameter beta;
     private Parameter runningMean;
     private Parameter runningVar;
 
@@ -49,6 +51,8 @@ public class BatchNorm extends ParameterBlock {
         axis = builder.axis;
         epsilon = builder.epsilon;
         momentum = builder.momentum;
+        gamma = new Parameter("gamma", this, ParameterType.GAMMA);
+        beta = new Parameter("beta", this, ParameterType.BETA);
         runningMean = new Parameter("runningMean", this, ParameterType.RUNNING_MEAN, false);
         runningVar = new Parameter("runningVar", this, ParameterType.RUNNING_VAR, false);
     }
@@ -71,7 +75,7 @@ public class BatchNorm extends ParameterBlock {
     /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
-        return Arrays.asList(runningMean, runningVar);
+        return Arrays.asList(gamma, beta, runningMean, runningVar);
     }
 
     /** {@inheritDoc} */
@@ -85,6 +89,8 @@ public class BatchNorm extends ParameterBlock {
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         switch (name) {
+            case "gamma":
+            case "beta":
             case "runningMean":
             case "runningVar":
                 return new Shape(inChannels);
@@ -99,11 +105,11 @@ public class BatchNorm extends ParameterBlock {
         }
         NDArray data = inputs.singletonOrThrow();
         Device device = data.getDevice();
-        NDArray gamma = data.getManager().ones(new Shape(inChannels));
-        NDArray beta = data.getManager().zeros(new Shape(inChannels));
+        NDArray gammaValue = parameterStore.getValue(gamma, device);
+        NDArray betaValue = parameterStore.getValue(beta, device);
         NDArray runningMeanValue = parameterStore.getValue(runningMean, device);
         NDArray runningVarValue = parameterStore.getValue(runningVar, device);
-        return new NDList(data, gamma, beta, runningMeanValue, runningVarValue);
+        return new NDList(data, gammaValue, betaValue, runningMeanValue, runningVarValue);
     }
 
     /** {@inheritDoc} */
@@ -111,6 +117,8 @@ public class BatchNorm extends ParameterBlock {
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
         os.writeLong(inChannels);
+        gamma.save(os);
+        beta.save(os);
         runningMean.save(os);
         runningVar.save(os);
     }
@@ -124,6 +132,8 @@ public class BatchNorm extends ParameterBlock {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         inChannels = is.readLong();
+        gamma.load(manager, is);
+        beta.load(manager, is);
         runningMean.load(manager, is);
         runningVar.load(manager, is);
     }

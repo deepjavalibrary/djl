@@ -73,7 +73,7 @@ public class Accuracy extends TrainingMetric {
                         .eq(predictionReduced.asType(DataType.INT64, false))
                         .countNonzero();
         addCorrectInstances(numCorrect);
-        addTotalInstances((int) labels.size());
+        addTotalInstances(labels.size());
     }
 
     /** {@inheritDoc} */

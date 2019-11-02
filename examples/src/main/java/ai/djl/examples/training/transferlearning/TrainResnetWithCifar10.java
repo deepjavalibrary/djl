@@ -129,24 +129,28 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
     private TrainingConfig setupTrainingConfig(Arguments arguments) {
         int batchSize = arguments.getBatchSize();
         // epoch number to change learning rate
-        int[] epoch = {3, 5, 8};
-        int[] steps = Arrays.stream(epoch).map(k -> k * 60000 / batchSize).toArray();
+        int[] epochs;
+        if (arguments.getPreTrained()) {
+            epochs = new int[] {2, 5, 8};
+        } else {
+            epochs = new int[] {80, 120, 160, 180};
+        }
+        int[] steps = Arrays.stream(epochs).map(k -> k * 60000 / batchSize).toArray();
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
         MultiFactorTracker learningRateTracker =
                 LearningRateTracker.multiFactorTracker()
                         .setSteps(steps)
-                        .optBaseLearningRate(0.01f)
+                        .optBaseLearningRate(1e-3f)
                         .optFactor(0.1f)
-                        .optWarmUpBeginLearningRate(1e-3f)
-                        .optWarmUpSteps(500)
+                        .optWarmUpBeginLearningRate(1e-4f)
+                        .optWarmUpSteps(200)
                         .build();
         Optimizer optimizer =
-                Optimizer.sgd()
+                Optimizer.adam()
                         .setRescaleGrad(1.0f / batchSize)
-                        .setLearningRateTracker(learningRateTracker)
-                        .optMomentum(0.9f)
+                        .optLearningRateTracker(learningRateTracker)
                         .optWeightDecays(0.001f)
                         .optClipGrad(1f)
                         .build();

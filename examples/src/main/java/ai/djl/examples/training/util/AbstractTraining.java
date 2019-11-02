@@ -45,6 +45,7 @@ public abstract class AbstractTraining implements TrainingListener {
     protected int validateProgress;
 
     private long epochTime;
+    private int numEpochs;
 
     private ProgressBar trainingProgressBar;
     private ProgressBar validateProgressBar;
@@ -155,10 +156,11 @@ public abstract class AbstractTraining implements TrainingListener {
         if (epochTime > 0L) {
             metrics.addMetric("epoch", System.nanoTime() - epochTime);
         }
+        logger.info("Epoch " + numEpochs + " finished.");
         printTrainingStatus(metrics);
 
         epochTime = System.nanoTime();
-
+        numEpochs++;
         trainingProgress = 0;
         validateProgress = 0;
     }

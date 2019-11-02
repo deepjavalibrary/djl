@@ -73,6 +73,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
     @Override
     public NDArray getLoss(NDArray label, NDArray prediction) {
         if (!fromLogit) {
+            // TODO: use numpy log softmax
             prediction = prediction.softmax(classAxis).log();
         }
         NDArray loss;
@@ -86,6 +87,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
             loss = loss.mul(weight);
         }
         // apply mean on all axes except the batchAxis
+        // TODO: alternative use numpy batch flatten and mean batch axis
         return loss.mean(excludeBatchAxis(loss, batchAxis));
     }
 }

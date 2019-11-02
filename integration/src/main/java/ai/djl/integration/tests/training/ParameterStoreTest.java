@@ -24,6 +24,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ParameterStoreTest {
@@ -67,7 +68,7 @@ public class ParameterStoreTest {
                 }
             }
 
-            Optimizer optimizer =
+            TestOptimizer optimizer =
                     new TestOptimizer.Builder()
                             .setRescaleGrad(1.0f)
                             .setLearningRateTracker(LearningRateTracker.fixedLearningRate(lr))
@@ -76,21 +77,23 @@ public class ParameterStoreTest {
             try (ParameterServer ps = new MxParameterServer(optimizer)) {
 
                 // init
-                for (int i = 0; i < weights.length; i++) {
+                for (int i = 0; i < numWeights; i++) {
                     ps.init(String.valueOf(i), new NDArray[] {weights[i][0]});
                 }
                 for (int n = 0; n < numUpdates; n++) {
                     // push
-                    for (int i = 0; i < weights.length; i++) {
+                    for (int i = 0; i < numWeights; i++) {
                         ps.push(String.valueOf(i), grads[i], -i);
                     }
                     // pull
-                    for (int i = 0; i < weights.length; i++) {
+                    for (int i = 0; i < numWeights; i++) {
                         ps.pull(String.valueOf(i), weights[i], -i);
                     }
                 }
-                for (int i = 0; i < weights.length; i++) {
+                for (int i = 0; i < numWeights; i++) {
                     Assertions.assertAlmostEquals(weights[i][0], expected[i]);
+                    // check the number of updates has been invoked
+                    Assert.assertEquals(optimizer.updateCount, numWeights * numUpdates);
                 }
             }
         }
@@ -103,6 +106,7 @@ public class ParameterStoreTest {
     private static class TestOptimizer extends Optimizer {
 
         private LearningRateTracker learningRateTracker;
+        int updateCount;
 
         protected TestOptimizer(TestOptimizer.Builder builder) {
             super(builder);
@@ -113,6 +117,7 @@ public class ParameterStoreTest {
         @Override
         public void update(String parameterId, NDArray weight, NDArray grad) {
             weight.addi(grad.mul(learningRateTracker.getNewLearningRate(0)));
+            updateCount++;
         }
 
         public static final class Builder extends BaseBuilder<TestOptimizer.Builder> {

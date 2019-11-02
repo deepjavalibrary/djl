@@ -16,12 +16,13 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Adam extends Optimizer {
 
-    private float learningRate;
+    private LearningRateTracker learningRateTracker;
     private float beta1;
     private float beta2;
     private float epsilon;
@@ -32,7 +33,7 @@ public class Adam extends Optimizer {
 
     protected Adam(Builder builder) {
         super(builder);
-        learningRate = builder.getLearningRate();
+        learningRateTracker = builder.getLearningRateTracker();
         beta1 = builder.getBeta1();
         beta2 = builder.getBeta2();
         epsilon = builder.getEpsilon();
@@ -44,11 +45,11 @@ public class Adam extends Optimizer {
     // TODO: make this protected after integrate with PS store
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
-        double t = updateCount(parameterId);
+        int t = updateCount(parameterId);
         double coef1 = 1.0 - Math.pow(beta1, t);
         double coef2 = 1.0 - Math.pow(beta2, t);
-        float newLearningRate = (float) (learningRate * Math.sqrt(coef2) / coef1);
-
+        float lr = learningRateTracker.getNewLearningRate(t);
+        float newLearningRate = (float) (lr * Math.sqrt(coef2) / coef1);
         float weightDecay = getWeightDecay(parameterId);
         if (Float.isNaN(newLearningRate) || Float.isNaN(weightDecay)) {
             throw new IllegalStateException("learning rate or weight decay is nan");
@@ -83,7 +84,8 @@ public class Adam extends Optimizer {
 
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private float learningRate = 0.001f;
+        private LearningRateTracker learningRateTracker =
+                LearningRateTracker.fixedLearningRate(0.001f);
         private float beta1 = 0.9f;
         private float beta2 = 0.999f;
         private float epsilon = 1e-8f;
@@ -95,8 +97,8 @@ public class Adam extends Optimizer {
             return this;
         }
 
-        public Builder optLearningRate(float learningRate) {
-            this.learningRate = learningRate;
+        public Builder optLearningRateTracker(LearningRateTracker learningRateTracker) {
+            this.learningRateTracker = learningRateTracker;
             return this;
         }
 
@@ -120,8 +122,8 @@ public class Adam extends Optimizer {
             return this;
         }
 
-        public float getLearningRate() {
-            return learningRate;
+        public LearningRateTracker getLearningRateTracker() {
+            return learningRateTracker;
         }
 
         public float getBeta1() {

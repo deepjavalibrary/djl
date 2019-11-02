@@ -108,9 +108,7 @@ public class MxTrainer implements Trainer {
                 collector.backward(loss);
                 addMetric("backward", time);
                 time = System.nanoTime();
-                // this step is synchronized, should be done at end of batch
-                trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
-                updateTrainingMetrics();
+                updateTrainingMetrics(labels, preds);
                 addMetric("training-metrics", time);
             }
         }
@@ -180,7 +178,13 @@ public class MxTrainer implements Trainer {
         this.listener = listener;
     }
 
-    private void updateTrainingMetrics() {
+    private void updateTrainingMetrics(NDList labels, NDList preds) {
+        // stop recording as this is end of computation graph
+        // any metric calculation or update operation should not be recorded
+        MxGradientCollector.setRecording(false);
+        MxGradientCollector.setTraining(false);
+        // this step is synchronized, should be done at end of batch
+        trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
         // TODO: this can be done during onBatch listener
         if (trainingLoss != null) {
             addMetric("train", trainingLoss);
@@ -193,6 +197,9 @@ public class MxTrainer implements Trainer {
             }
         }
         trainingMetrics.forEach(metric -> addMetric("train", metric));
+        // turn gradient recording back on
+        MxGradientCollector.setRecording(true);
+        MxGradientCollector.setTraining(true);
     }
 
     private void updateValidationMetrics() {

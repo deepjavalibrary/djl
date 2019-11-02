@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.util.PairList;
+import java.util.Arrays;
 
 class MxNDArrayEx implements NDArrayEx {
 
@@ -266,6 +267,8 @@ class MxNDArrayEx implements NDArrayEx {
     @Override
     public NDArray globalMaxPool() {
         MxOpParams params = new MxOpParams();
+        params.add("kernel", getGlobalPoolingShapes(1));
+        params.add("pad", getGlobalPoolingShapes(0));
         params.add("pool_type", "max");
         params.addParam("global_pool", true);
         return pool(params);
@@ -319,6 +322,8 @@ class MxNDArrayEx implements NDArrayEx {
     @Override
     public NDArray globalAvgPool() {
         MxOpParams params = new MxOpParams();
+        params.add("kernel", getGlobalPoolingShapes(1));
+        params.add("pad", getGlobalPoolingShapes(0));
         params.add("pool_type", "avg");
         params.addParam("global_pool", true);
         return pool(params);
@@ -696,6 +701,22 @@ class MxNDArrayEx implements NDArrayEx {
     @Override
     public NDArray getArray() {
         return array;
+    }
+
+    private Shape getGlobalPoolingShapes(long fillValue) {
+        // determine pooling dimension according to input
+        // input dimension minus 2 (batch and channel dim)
+        int poolDim = getArray().getShape().dimension() - 2;
+        if (poolDim < 1 || poolDim > 3) {
+            throw new IllegalStateException(
+                    "GlobalPooling only support"
+                            + "1 to 3 Dimensions, "
+                            + poolDim
+                            + "D is not supported.");
+        }
+        long[] shape = new long[poolDim];
+        Arrays.fill(shape, fillValue);
+        return new Shape(shape);
     }
 
     public MxNDManager getManager() {
