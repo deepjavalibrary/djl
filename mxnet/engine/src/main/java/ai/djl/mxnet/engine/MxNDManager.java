@@ -42,7 +42,8 @@ public class MxNDManager implements NDManager {
      */
     private static final MxNDManager SYSTEM_MANAGER = new SystemManager();
 
-    private static final NDList EMPTY = new NDList(0);
+    private static final NDList EMPTY_LIST = new NDList(0);
+    private static final NDArray[] EMPTY_ARRAY = new NDArray[0];
 
     private NDManager parent;
     private String uid;
@@ -166,7 +167,7 @@ public class MxNDManager implements NDManager {
         params.addParam("step", step);
         params.setDataType(dataType);
         params.setDevice(Device.defaultIfNull(dev, device));
-        return invoke("_npi_arange", EMPTY, params).singletonOrThrow();
+        return invoke("_npi_arange", EMPTY_LIST, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -178,7 +179,7 @@ public class MxNDManager implements NDManager {
         params.addParam("k", k);
         params.setDataType(dataType);
         params.setDevice(Device.defaultIfNull(dev, device));
-        return invoke("_npi_eye", EMPTY, params).singletonOrThrow();
+        return invoke("_npi_eye", EMPTY_LIST, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -194,7 +195,7 @@ public class MxNDManager implements NDManager {
         params.addParam("endpoint", endpoint);
         params.setDataType(DataType.FLOAT32);
         params.setDevice(Device.defaultIfNull(dev, device));
-        return invoke("_npi_linspace", EMPTY, params).singletonOrThrow();
+        return invoke("_npi_linspace", EMPTY_LIST, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -207,7 +208,7 @@ public class MxNDManager implements NDManager {
         params.addParam("size", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
         params.setDataType(dataType);
-        return invoke("_npi_uniform", EMPTY, params).singletonOrThrow();
+        return invoke("_npi_uniform", EMPTY_LIST, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -220,7 +221,7 @@ public class MxNDManager implements NDManager {
         params.addParam("size", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
         params.setDataType(dataType);
-        return invoke("_npi_normal", EMPTY, params).singletonOrThrow();
+        return invoke("_npi_normal", EMPTY_LIST, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -288,13 +289,14 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public void invoke(String operation, NDList src, NDList dest, PairList<String, ?> params) {
-        JnaUtils.op(operation).invoke(this, src.toArray(), dest.toArray(), params);
+        JnaUtils.op(operation)
+                .invoke(this, src.toArray(EMPTY_ARRAY), dest.toArray(EMPTY_ARRAY), params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
-        return new NDList(JnaUtils.op(operation).invoke(this, src.toArray(), params));
+        return new NDList(JnaUtils.op(operation).invoke(this, src.toArray(EMPTY_ARRAY), params));
     }
 
     public NDArray invoke(String operation, NDArray src, PairList<String, ?> params) {
@@ -302,7 +304,7 @@ public class MxNDManager implements NDManager {
     }
 
     public NDArray invoke(String operation, PairList<String, ?> params) {
-        return JnaUtils.op(operation).invoke(this, EMPTY.toArray(), params)[0];
+        return JnaUtils.op(operation).invoke(this, EMPTY_ARRAY, params)[0];
     }
 
     @Override

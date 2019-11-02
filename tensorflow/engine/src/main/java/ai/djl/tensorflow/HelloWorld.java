@@ -25,7 +25,6 @@ import ai.djl.tensorflow.engine.TfNDArray;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import ai.djl.util.Pair;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -69,8 +68,8 @@ public final class HelloWorld {
             Predictor<BufferedImage, NDList> predictor = model.newPredictor(translator);
             NDList list = predictor.predict(img);
 
-            for (Pair<String, NDArray> pair : list) {
-                System.out.println(pair.getKey() + " " + pair.getValue().getShape().toString());
+            for (NDArray array : list) {
+                System.out.println(array.getName() + ": " + array.getShape().toString());
             }
         }
     }
@@ -78,10 +77,10 @@ public final class HelloWorld {
     private static final class GenericTranslator implements Translator<BufferedImage, NDList> {
 
         @Override
-        public NDList processInput(TranslatorContext ctx, BufferedImage img)
-                throws TranslateException {
+        public NDList processInput(TranslatorContext ctx, BufferedImage img) {
             NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), img);
-            return new NDList().add("image_tensor", array);
+            array.setName("image_tensor");
+            return new NDList(array);
         }
 
         @Override

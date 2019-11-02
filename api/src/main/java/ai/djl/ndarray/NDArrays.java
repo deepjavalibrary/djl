@@ -790,7 +790,7 @@ public final class NDArrays {
      */
     public static NDArray stack(NDList arrays, int axis) {
         NDArray array = arrays.head();
-        return array.stack(arrays.subList(1), axis);
+        return array.stack(arrays.subNDList(1), axis);
     }
 
     /**
@@ -812,7 +812,7 @@ public final class NDArrays {
      */
     public static NDArray concat(NDList arrays, int axis) {
         NDArray array = arrays.head();
-        return array.concat(arrays.subList(1), axis);
+        return array.concat(arrays.subNDList(1), axis);
     }
 
     /**

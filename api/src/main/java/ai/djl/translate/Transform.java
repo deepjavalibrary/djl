@@ -13,18 +13,8 @@
 package ai.djl.translate;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
-import ai.djl.util.Pair;
 
 public interface Transform {
 
     NDArray transform(NDArray array);
-
-    default NDList transform(NDList list) {
-        NDList result = new NDList(list.size());
-        for (Pair<String, NDArray> pair : list) {
-            result.add(pair.getKey(), transform(pair.getValue()));
-        }
-        return result;
-    }
 }

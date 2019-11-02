@@ -45,6 +45,20 @@ public interface NDArray extends AutoCloseable {
     NDManager getManager();
 
     /**
+     * Returns the name of the {@code NDArray}.
+     *
+     * @return the name of the {@code NDArray}
+     */
+    String getName();
+
+    /**
+     * Sets name of the {@code NDArray}.
+     *
+     * @param name the name of the {@code NDArray}
+     */
+    void setName(String name);
+
+    /**
      * Returns unique identifier of the {@code NDArray}.
      *
      * @return unique identifier of the {@code NDArray}

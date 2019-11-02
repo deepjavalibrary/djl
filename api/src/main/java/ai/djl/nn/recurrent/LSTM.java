@@ -170,17 +170,17 @@ public class LSTM extends RecurrentCell {
         NDArray head = inputs.singletonOrThrow();
         Device device = head.getDevice();
 
-        NDList result = new NDList().add(head);
+        NDList result = new NDList(head);
         try (NDList parameterList = new NDList()) {
             for (Parameter parameter : parameters) {
                 NDArray array = parameterStore.getValue(parameter, device);
-                parameterList.add(parameter.getName(), array.flatten());
+                parameterList.add(array.flatten());
             }
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);
         }
-        result.add(parameterStore.getValue(state, device))
-                .add(parameterStore.getValue(stateCell, device));
+        result.add(parameterStore.getValue(state, device));
+        result.add(parameterStore.getValue(stateCell, device));
         if (useSequenceLength) {
             result.add(inputs.get(1));
         }

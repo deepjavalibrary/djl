@@ -158,12 +158,14 @@ public class GRU extends RecurrentCell {
         NDArray head = inputs.singletonOrThrow();
         Device device = head.getDevice();
 
-        NDList result = new NDList().add(head);
+        NDList result = new NDList(head);
 
         try (NDList parameterList = new NDList()) {
             for (Parameter parameter : parameters) {
                 NDArray array = parameterStore.getValue(parameter, device);
-                parameterList.add(parameter.getName(), array.flatten());
+                array = array.flatten();
+                array.setName(parameter.getName());
+                parameterList.add(array);
             }
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);

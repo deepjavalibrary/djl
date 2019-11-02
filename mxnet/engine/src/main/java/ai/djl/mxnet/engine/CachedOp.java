@@ -102,11 +102,11 @@ public class CachedOp extends NativeResource {
 
         // fill allInputsNDArray with data values
         int index = 0;
-        for (Pair<String, NDArray> pair : data) {
-            String inputName = pair.getKey();
+        for (NDArray array : data) {
+            String inputName = array.getName();
             // if inputName not provided, value will follow the default order
             int idx = indexOf(inputName, index++);
-            allInputsNDArray[idx] = (MxNDArray) pair.getValue();
+            allInputsNDArray[idx] = (MxNDArray) array;
         }
 
         // check the input, set as Shape(batchSize) by default

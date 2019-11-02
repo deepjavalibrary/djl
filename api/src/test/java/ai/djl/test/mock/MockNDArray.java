@@ -34,6 +34,7 @@ import java.util.function.Predicate;
 
 public class MockNDArray implements NDArray {
 
+    private String name;
     private Device device;
     private String uid;
     private SparseFormat sparseFormat;
@@ -61,6 +62,16 @@ public class MockNDArray implements NDArray {
     @Override
     public NDManager getManager() {
         return manager;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -653,7 +664,7 @@ public class MockNDArray implements NDArray {
 
     @Override
     public NDArray squeeze(int[] axes) {
-        return null;
+        return new MockNDArray();
     }
 
     @Override

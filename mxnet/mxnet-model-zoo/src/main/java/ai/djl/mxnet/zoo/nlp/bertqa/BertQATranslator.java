@@ -50,10 +50,13 @@ public class BertQATranslator implements Translator<QAInput, String> {
         int seqLength = input.getSeqLength();
         NDManager manager = ctx.getNDManager();
         NDArray data0 = manager.create(indexesFloat, new Shape(1, seqLength));
+        data0.setName("data0");
         NDArray data1 = manager.create(types, new Shape(1, seqLength));
+        data1.setName("data1");
         NDArray data2 = manager.create(new float[] {validLength});
+        data2.setName("data2");
 
-        return new NDList(3).add("data0", data0).add("data1", data1).add("data2", data2);
+        return new NDList(data0, data1, data2);
     }
 
     @Override

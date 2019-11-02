@@ -25,13 +25,11 @@ public class NDListTest {
         Assert.assertEquals(list.size(), 0);
         list.add(new MockNDArray());
         Assert.assertEquals(list.size(), 1);
-        list.add("test1", new MockNDArray());
+        NDArray array = new MockNDArray();
+        array.setName("test1");
+        list.add(array);
         Assert.assertTrue(list.contains("test1"));
         Assert.assertNotNull(list.remove("test1"));
         Assert.assertNotNull(list.singletonOrThrow());
-        list.addAll(list);
-        Assert.assertEquals(list.size(), 2);
-        NDArray[] arr = list.toArray();
-        Assert.assertEquals(arr.length, 2);
     }
 }

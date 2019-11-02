@@ -171,7 +171,8 @@ public class Linear extends ParameterBlock {
         }
         Device device = inputs.head().getDevice();
 
-        NDList result = new NDList().addAll(inputs).add(parameterStore.getValue(weight, device));
+        NDList result = new NDList(inputs);
+        result.add(parameterStore.getValue(weight, device));
         if (bias != null) {
             result.add(parameterStore.getValue(bias, device));
         }

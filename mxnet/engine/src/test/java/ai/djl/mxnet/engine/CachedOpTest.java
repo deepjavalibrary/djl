@@ -20,6 +20,7 @@ import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.mxnet.jna.MxnetLibrary;
 import ai.djl.mxnet.jna.PointerArray;
 import ai.djl.mxnet.test.MockMxnetLibrary;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
@@ -108,11 +109,12 @@ public class CachedOpTest extends PowerMockTestCase {
             Assert.assertEquals(inputNDArray[3].getShape(), new Shape(4));
             Assert.assertEquals(inputNDArray[4].getShape(), new Shape(5));
             logger.info("Test: Named input");
-            input =
-                    new NDList()
-                            .add("data2", manager.create(new Shape(2)))
-                            .add("data1", manager.create(new Shape(4)))
-                            .add("data0", manager.create(new Shape(5)));
+            NDArray data0 = manager.create(new Shape(5));
+            data0.setName("data0");
+            NDArray data1 = manager.create(new Shape(4));
+            data1.setName("data1");
+            NDArray data2 = manager.create(new Shape(2));
+            input = new NDList(data2, data1, data0);
             co.forward(parameterStore, input);
             inputNDArray = co.getInputNDArray();
             Assert.assertEquals(inputNDArray[0].getShape(), new Shape(5));
@@ -124,7 +126,7 @@ public class CachedOpTest extends PowerMockTestCase {
             Assert.assertEquals(inputNDArray[5].getShape(), new Shape(5));
             Assert.assertEquals(inputNDArray[6].getShape(), new Shape(6));
             logger.info("Test: Illegal inputs");
-            NDList input2 = new NDList().add("data_not_exist", null);
+            NDList input2 = new NDList((NDArray) null);
             co.forward(parameterStore, input2);
         }
     }

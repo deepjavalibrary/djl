@@ -34,8 +34,8 @@ public class TfPredictor<I, O> extends BasePredictor<I, O> {
         Session session = ((TfNDManager) model).getSession();
         TfNDManager tfNDManager = (TfNDManager) manager;
         Session.Runner runner = session.runner();
-        for (Pair<String, NDArray> pair : ndList) {
-            runner.feed(pair.getKey(), ((TfNDArray) pair.getValue()).getTensor());
+        for (NDArray array : ndList) {
+            runner.feed(array.getName(), ((TfNDArray) array).getTensor());
         }
         // TODO We can extract input name from decribeInput in Model if NDList doesn't have names
         PairList<String, Shape> dataDescs = model.describeOutput();
@@ -46,7 +46,9 @@ public class TfPredictor<I, O> extends BasePredictor<I, O> {
 
         NDList resultNDList = new NDList();
         for (int i = 0; i < result.size(); i++) {
-            resultNDList.add(dataDescs.get(i).getKey(), tfNDManager.create(result.get(i)));
+            NDArray array = tfNDManager.create(result.get(i));
+            array.setName(dataDescs.get(i).getKey());
+            resultNDList.add(array);
         }
 
         return resultNDList;

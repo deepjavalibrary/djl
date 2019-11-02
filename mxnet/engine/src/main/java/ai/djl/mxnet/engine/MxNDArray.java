@@ -46,6 +46,7 @@ import java.util.stream.Stream;
 
 public class MxNDArray extends NativeResource implements NDArray {
 
+    private String name;
     private Device device;
     private SparseFormat sparseFormat;
     private DataType dataType;
@@ -82,6 +83,18 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDManager getManager() {
         return manager;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
     /** {@inheritDoc} */
@@ -432,7 +445,7 @@ public class MxNDArray extends NativeResource implements NDArray {
                                         "_npi_boolean_mask",
                                         new NDList(reshaped, reshapedIndex),
                                         params)
-                                .singletonOrThrow(); ) {
+                                .singletonOrThrow()) {
             return result.reshape(reshape);
         }
     }
@@ -1128,14 +1141,14 @@ public class MxNDArray extends NativeResource implements NDArray {
         params.addParam("axis", axis);
         NDArray[] srcArray = new NDArray[arrays.size() + 1];
         srcArray[0] = this;
-        System.arraycopy(arrays.toArray(), 0, srcArray, 1, arrays.size());
+        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
         return manager.invoke("_npi_stack", new NDList(srcArray), params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray concat(NDList list, int axis) {
-        NDArray[] arrays = list.toArray();
+        NDArray[] arrays = list.toArray(new NDArray[0]);
         if (Stream.of(arrays).allMatch(array -> array.getShape().dimension() == 0)) {
             throw new IllegalArgumentException(
                     "scalar(zero-dimensional) arrays cannot be concatenated");
@@ -1685,7 +1698,21 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (Utils.DEBUG) {
             return NDFormat.format(this);
         }
-        return super.toString();
+        StringBuilder sb = new StringBuilder(100);
+        sb.append('[');
+        if (name != null) {
+            sb.append(name).append(": ");
+        } else {
+            sb.append("ND: ");
+        }
+        sb.append(getShape())
+                .append(' ')
+                .append(getDevice())
+                .append(' ')
+                .append(getDataType())
+                .append("]@")
+                .append(getUid());
+        return sb.toString();
     }
 
     /** {@inheritDoc} */

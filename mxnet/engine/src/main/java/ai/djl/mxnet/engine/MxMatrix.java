@@ -294,6 +294,18 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public String getName() {
+        return array.getName();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setName(String name) {
+        array.setName(name);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getUid() {
         return 'M' + array.getUid();
     }

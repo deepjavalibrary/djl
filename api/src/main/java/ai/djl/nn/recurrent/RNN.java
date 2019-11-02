@@ -143,6 +143,8 @@ public class RNN extends RecurrentCell {
         if (inputs.size() != 1) {
             throw new IllegalArgumentException("RNN requires exactly 1 NDArray");
         }
+
+        // TODO: there seems a bug in if condition
         if (useSequenceLength && inputs.size() < 2) {
             throw new IllegalArgumentException(
                     "Input must include data, and sequenceLength as useSequenceLength is set to true");
@@ -151,13 +153,12 @@ public class RNN extends RecurrentCell {
         NDArray head = inputs.singletonOrThrow();
         Device device = head.getDevice();
 
-        NDList result = new NDList().add(head);
+        NDList result = new NDList(head);
         try (NDList parameterList = new NDList(4)) {
-            parameterList
-                    .add(parameterStore.getValue(i2hWeight, device).flatten())
-                    .add(parameterStore.getValue(i2hBias, device).flatten())
-                    .add(parameterStore.getValue(h2hWeight, device).flatten())
-                    .add(parameterStore.getValue(h2hBias, device).flatten());
+            parameterList.add(parameterStore.getValue(i2hWeight, device).flatten());
+            parameterList.add(parameterStore.getValue(i2hBias, device).flatten());
+            parameterList.add(parameterStore.getValue(h2hWeight, device).flatten());
+            parameterList.add(parameterStore.getValue(h2hBias, device).flatten());
 
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);

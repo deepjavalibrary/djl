@@ -13,9 +13,9 @@
 package ai.djl.ndarray;
 
 import ai.djl.Device;
-import ai.djl.util.Pair;
-import ai.djl.util.PairList;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * An {@code NDList} represents a sequence of {@link NDArray}s with names.
@@ -23,14 +23,12 @@ import java.util.Iterator;
  * <p>Each {@link NDArray} in this list can optionally have a name. You can use the name to look up
  * an NDArray in the NDList.
  */
-public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
+public class NDList extends ArrayList<NDArray> implements AutoCloseable {
 
-    protected PairList<String, NDArray> list;
+    private static final long serialVersionUID = 1L;
 
     /** Constructs an empty NDList. */
-    public NDList() {
-        this.list = new PairList<>();
-    }
+    public NDList() {}
 
     /**
      * Constructs an empty NDList with the specified initial capacity.
@@ -39,7 +37,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * @throws IllegalArgumentException if the specified initial capacity is negative
      */
     public NDList(int initialCapacity) {
-        this.list = new PairList<>(initialCapacity);
+        super(initialCapacity);
     }
 
     /**
@@ -48,42 +46,11 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * @param arrays the {@link NDArray}s
      */
     public NDList(NDArray... arrays) {
-        this();
-        for (NDArray array : arrays) {
-            list.add(null, array);
-        }
+        super(Arrays.asList(arrays));
     }
 
-    /**
-     * Returns an array of {@link NDArray} in the same order as in the NDList.
-     *
-     * <p>The returning array will lose the name information in the NDList.
-     *
-     * @return an array of {@link NDArray}
-     */
-    public NDArray[] toArray() {
-        return list.valueArray(new NDArray[0]);
-    }
-
-    /**
-     * Returns the number of NDArrays in this NDList.
-     *
-     * <p>If this list contains more than {@code Integer.MAX_VALUE} NDArrays, returns {@code
-     * Integer.MAX_VALUE}.
-     *
-     * @return the number of NDArrays in this NDList
-     */
-    public int size() {
-        return list.size();
-    }
-
-    /**
-     * Returns true if size() is 0.
-     *
-     * @return true if size() is 0, otherwise false
-     */
-    public boolean isEmpty() {
-        return size() == 0;
+    public NDList(Collection<NDArray> other) {
+        super(other);
     }
 
     /**
@@ -95,43 +62,17 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      *
      * @param name the name of the NDArray to be removed from this NDList, if present
      * @return the element that was removed
-     * @throws UnsupportedOperationException if the {@code NDList} is read only
      */
     public NDArray remove(String name) {
-        return list.remove(name);
-    }
-
-    /**
-     * Removes the index of the specified element from this NDList if it is present.
-     *
-     * @param index the index of the element to remove
-     * @return the element that was removed
-     */
-    public NDArray remove(int index) {
-        return list.remove(index);
-    }
-
-    /**
-     * Returns a view of the portion of this NDList between the specified fromIndex, inclusive, and
-     * toIndex, exclusive.
-     *
-     * @param fromIndex the start index (inclusive)
-     * @param toIndex the end index (exclusive)
-     * @return a view of the portion of this NDList
-     */
-    public NDList subList(int fromIndex, int toIndex) {
-        return new NDList().addAll(list.subList(fromIndex, toIndex));
-    }
-
-    /**
-     * Returns a view of the portion of this NDList between the specified fromIndex, inclusive, and
-     * to the end.
-     *
-     * @param fromIndex the start index (inclusive)
-     * @return a view of the portion of this NDList
-     */
-    public NDList subList(int fromIndex) {
-        return subList(fromIndex, size());
+        int index = 0;
+        for (NDArray array : this) {
+            if (name.equals(array.getName())) {
+                remove(index);
+                return array;
+            }
+            ++index;
+        }
+        return null;
     }
 
     /**
@@ -141,29 +82,12 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      * @return {@code true} if this list contains the specified element
      */
     public boolean contains(String name) {
-        return list.contains(name);
-    }
-
-    /**
-     * Returns the NDArray at the specified position in this list.
-     *
-     * @param index the index of the NDArray to return
-     * @return the NDArray at the specified position in this list
-     * @throws IndexOutOfBoundsException if the index is out of range ({@code index &lt; 0 || index
-     *     &gt;= size()})
-     */
-    public NDArray get(int index) {
-        return list.valueAt(index);
-    }
-
-    /**
-     * Gets NDArray with Tag.
-     *
-     * @param index the numeric index to get
-     * @return the tag and ndarray
-     */
-    public Pair<String, NDArray> getWithTag(int index) {
-        return list.get(index);
+        for (NDArray array : this) {
+            if (name.equals(array.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -174,7 +98,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      *     &gt;= size()})
      */
     public NDArray head() {
-        return list.valueAt(0);
+        return get(0);
     }
 
     /**
@@ -190,33 +114,7 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
                     "Incorrect number of elements in NDList.singletonOrThrow: Expected 1 and was "
                             + size());
         }
-        return list.valueAt(0);
-    }
-
-    /**
-     * Appends the specified NDArray to the end of this NDList.
-     *
-     * @param array the NDArray to be appended to this list
-     * @return this NDList after the addition
-     * @throws UnsupportedOperationException if this NDList is read only
-     * @see NDList#add(String, NDArray)
-     */
-    public NDList add(NDArray array) {
-        list.add(null, array);
-        return this;
-    }
-
-    /**
-     * Appends the named NDArray to the end of this NDList.
-     *
-     * @param name the optional name of the {@link NDArray}
-     * @param array the NDArray to be appended to this list
-     * @return this NDList after the addition
-     * @throws UnsupportedOperationException if this NDList is read only
-     */
-    public NDList add(String name, NDArray array) {
-        list.add(name, array);
-        return this;
+        return get(0);
     }
 
     /**
@@ -225,26 +123,23 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      *
      * @param other the NDList containing NDArray to be added to this list
      * @return this NDList after the addition
-     * @throws UnsupportedOperationException if this NDList is read only
      */
     public NDList addAll(NDList other) {
-        for (Pair<String, NDArray> pair : other) {
-            list.add(pair);
+        for (NDArray array : other) {
+            add(array);
         }
         return this;
     }
 
     /**
-     * Appends all of the pairs in the specified PairList to the end of this NDList, in the order
-     * that they are returned by the specified PairList's iterator.
+     * Returns a view of the portion of this NDList between the specified fromIndex, inclusive, and
+     * to the end.
      *
-     * @param other the PairList containing the String NDArray pair to be added to this list
-     * @return this NDList after the addition
-     * @throws UnsupportedOperationException if this NDList is read only
+     * @param fromIndex the start index (inclusive)
+     * @return a view of the portion of this NDList
      */
-    public NDList addAll(PairList<String, NDArray> other) {
-        list.addAll(other);
-        return this;
+    public NDList subNDList(int fromIndex) {
+        return new NDList(subList(fromIndex, size()));
     }
 
     /**
@@ -256,57 +151,39 @@ public class NDList implements Iterable<Pair<String, NDArray>>, AutoCloseable {
      */
     public NDList asInDevice(Device device, boolean copy) {
         NDList newNDList = new NDList(size());
-        for (Pair<String, NDArray> pair : list) {
-            NDArray array = pair.getValue().asInDevice(device, copy);
-            newNDList.add(pair.getKey(), array);
-        }
-
+        forEach(a -> newNDList.add(a.asInDevice(device, copy)));
         return newNDList;
     }
 
     public void attach(NDManager manager) {
-        for (NDArray array : list.values()) {
-            array.attach(manager);
-        }
+        forEach(a -> a.attach(manager));
     }
 
     public void detach() {
-        for (NDArray array : list.values()) {
-            array.detach();
-        }
-    }
-
-    /**
-     * Returns an iterator over the NDArrays in this list in proper sequence.
-     *
-     * @return an iterator over the NDArrays in this list in proper sequence
-     */
-    @Override
-    public Iterator<Pair<String, NDArray>> iterator() {
-        return list.iterator();
+        forEach(NDArray::detach);
     }
 
     @Override
     public void close() {
-        for (NDArray array : list.values()) {
-            array.close();
-        }
+        forEach(NDArray::close);
+        clear();
     }
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder(20);
+        StringBuilder builder = new StringBuilder(200);
         builder.append("NDList size: ").append(size()).append('\n');
-        for (int i = 0; i < list.size(); i++) {
-            Pair<String, NDArray> pair = list.get(i);
-            builder.append(i).append(' ');
-            if (pair.getKey() != null) {
-                builder.append(pair.getKey());
+        int index = 0;
+        for (NDArray array : this) {
+            String name = array.getName();
+            builder.append(index++).append(' ');
+            if (name != null) {
+                builder.append(name);
             }
             builder.append(": ")
-                    .append(pair.getValue().getShape())
+                    .append(array.getShape())
                     .append(' ')
-                    .append(pair.getValue().getDataType())
+                    .append(array.getDataType())
                     .append('\n');
         }
         return builder.toString();

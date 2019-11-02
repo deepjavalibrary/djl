@@ -364,8 +364,8 @@ public class MxModel implements Model {
         Map<String, Parameter> map = new LinkedHashMap<>();
         parameters.forEach(p -> map.put(p.getName(), p));
 
-        for (Pair<String, NDArray> pair : paramNDlist) {
-            String key = pair.getKey();
+        for (NDArray nd : paramNDlist) {
+            String key = nd.getName();
             if (key == null) {
                 throw new IllegalArgumentException("Array names must be present in parameter file");
             }
@@ -373,7 +373,7 @@ public class MxModel implements Model {
             String paramName = key.split(":", 2)[1];
             Parameter parameter = map.remove(paramName);
 
-            NDArray array = pair.getValue().asInDevice(device, false);
+            NDArray array = nd.asInDevice(device, false);
             parameter.setArray(array);
         }
         symbolBlock.setInputNames(new ArrayList<>(map.keySet()));

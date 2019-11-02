@@ -383,7 +383,9 @@ public final class JnaUtils {
         } else {
             String[] names = namesRef.getValue().getStringArray(0, nameCount);
             for (int i = 0; i < ndArrayCount; i++) {
-                ndList.add(names[i], manager.create(handles[i]));
+                NDArray array = manager.create(handles[i]);
+                array.setName(names[i]);
+                ndList.add(array);
             }
         }
         return ndList;

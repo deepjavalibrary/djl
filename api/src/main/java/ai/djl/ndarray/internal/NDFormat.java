@@ -48,8 +48,13 @@ public abstract class NDFormat {
 
     private String dump(NDArray array) {
         StringBuilder sb = new StringBuilder(1000);
-        sb.append("ND: ")
-                .append(array.getShape())
+        String name = array.getName();
+        if (name != null) {
+            sb.append(name).append(": ");
+        } else {
+            sb.append("ND: ");
+        }
+        sb.append(array.getShape())
                 .append(' ')
                 .append(array.getDevice())
                 .append(' ')

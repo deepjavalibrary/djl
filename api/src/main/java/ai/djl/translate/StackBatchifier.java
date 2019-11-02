@@ -15,7 +15,6 @@ package ai.djl.translate;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
-import ai.djl.util.Pair;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -72,10 +71,12 @@ public class StackBatchifier implements Batchifier {
             dataList[i] = new NDList();
         }
 
-        for (Pair<String, NDArray> input : inputs) {
-            NDList splitList = input.getValue().split(size);
+        for (NDArray input : inputs) {
+            NDList splitList = input.split(size);
             for (int i = 0; i < size; i++) {
-                dataList[i].add(input.getKey(), splitList.get(i).squeeze(0));
+                NDArray array = splitList.get(i).squeeze(0);
+                array.setName(input.getName());
+                dataList[i].add(array);
             }
         }
         return dataList;
@@ -89,13 +90,14 @@ public class StackBatchifier implements Batchifier {
         NDList[] splitted = new NDList[numOfSlices];
         Arrays.setAll(splitted, i -> new NDList());
 
-        for (Pair<String, NDArray> pair : list) {
-            String name = pair.getKey();
-            NDArray nd = pair.getValue();
+        for (NDArray nd : list) {
+            String name = nd.getName();
             NDList rows = split(nd, numOfSlices, evenSplit);
 
             for (int i = 0; i < numOfSlices; ++i) {
-                splitted[i].add(name, rows.get(i));
+                NDArray array = rows.get(i);
+                array.setName(name);
+                splitted[i].add(array);
             }
         }
         return splitted;

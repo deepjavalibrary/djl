@@ -72,6 +72,16 @@ public class TfNDArray implements NDArray {
         return manager;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setName(String name) {}
+
     @Override
     public final String getUid() {
         return uid;

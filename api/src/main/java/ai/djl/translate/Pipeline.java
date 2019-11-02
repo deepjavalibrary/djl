@@ -18,7 +18,6 @@ import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.IntStream;
 
 public class Pipeline {
 
@@ -60,30 +59,31 @@ public class Pipeline {
             return input;
         }
 
-        NDArray[] arrays = input.toArray();
-        String[] strings = new String[input.size()];
+        NDArray[] arrays = input.toArray(new NDArray[0]);
 
         Map<String, Integer> map = new ConcurrentHashMap<>();
         // create mapping
         for (int i = 0; i < input.size(); i++) {
-            String key = input.getWithTag(i).getKey();
+            String key = input.get(i).getName();
             if (key != null) {
                 map.put(key, i);
             }
-            strings[i] = key;
         }
         // apply transform
         for (Pair<String, Transform> transform : transforms) {
-            int index = (transform.getKey() != null) ? map.getOrDefault(transform.getKey(), -1) : 0;
-            if (index == -1) {
-                throw new IllegalArgumentException(
-                        transform.getKey() + " can't be found in input NDList");
+            String key = transform.getKey();
+            int index;
+            if (key != null) {
+                index = map.get(key);
+            } else {
+                index = 0;
             }
-            arrays[index] = transform.getValue().transform(arrays[index]);
+            NDArray array = arrays[index];
+
+            arrays[index] = transform.getValue().transform(array);
+            arrays[index].setName(array.getName());
         }
-        // restore the NDList
-        NDList res = new NDList(input.size());
-        IntStream.range(0, input.size()).forEach(i -> res.add(strings[i], arrays[i]));
-        return res;
+
+        return new NDList(arrays);
     }
 }
