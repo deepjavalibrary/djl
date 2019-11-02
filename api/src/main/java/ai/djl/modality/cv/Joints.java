@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Joints {
 
-    List<Joint> joints;
+    private List<Joint> joints;
 
     public Joints(List<Joint> joints) {
         this.joints = joints;
@@ -28,7 +28,19 @@ public class Joints {
 
     @Override
     public String toString() {
-        return joints.toString();
+        StringBuilder sb = new StringBuilder(4000);
+        sb.append("\n[\t");
+        boolean first = true;
+        for (Joint joint : joints) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",\n\t");
+            }
+            sb.append(joint);
+        }
+        sb.append("\n]");
+        return sb.toString();
     }
 
     public static class Joint extends Point {
@@ -45,7 +57,8 @@ public class Joints {
 
         @Override
         public String toString() {
-            return "Joint x: " + getX() + " y: " + getY() + " confidence: " + getConfidence();
+            return String.format(
+                    "Joint [x=%.3f, y=%.3f], confidence: %.4f", getX(), getY(), getConfidence());
         }
     }
 }

@@ -105,16 +105,7 @@ public class PoseEstimationExample extends AbstractInference<List<Joints>> {
         }
         pose.close();
 
-        drawJoints(
-                filtered.get(0),
-                new Joints(
-                        poseResult
-                                .get(0)
-                                .getJoints()
-                                .stream()
-                                .filter(ele -> ele.getConfidence() > 0.2f)
-                                .collect(Collectors.toList())),
-                arguments.getLogDir());
+        drawJoints(filtered.get(0), poseResult.get(0), arguments.getLogDir());
         return poseResult;
     }
 

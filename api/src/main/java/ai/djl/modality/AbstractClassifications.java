@@ -92,7 +92,13 @@ public abstract class AbstractClassifications<I extends Item> {
         /** {@inheritDoc} */
         @Override
         public String toString() {
-            return "class: \"" + getClassName() + "\", probability: " + getProbability();
+            String className = getClassName();
+            double probability = getProbability();
+            if (probability < 0.00001) {
+                return String.format("class: \"%s\", probability: %.1e", className, probability);
+            }
+            probability = (int) (probability * 100000) / 100000f;
+            return String.format("class: \"%s\", probability: %.5f", className, probability);
         }
     }
 }

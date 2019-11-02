@@ -26,8 +26,11 @@ import java.util.List;
 
 public class SimplePoseTranslator extends ImageTranslator<Joints> {
 
-    public SimplePoseTranslator(BaseBuilder<?> builder) {
+    private float threshold;
+
+    public SimplePoseTranslator(Builder builder) {
         super(builder);
+        this.threshold = builder.threshold;
     }
 
     @Override
@@ -56,21 +59,30 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
         float[] flattened = result.get(predMask).toFloatArray();
         float[] flattenedConfidence = maxValues.toFloatArray();
         List<Joint> joints = new ArrayList<>(numJoints);
-        for (int i = 0; i < numJoints; i++) {
-            joints.add(
-                    new Joint(
-                            flattened[i * 2] / width,
-                            flattened[i * 2 + 1] / height,
-                            flattenedConfidence[i]));
+        for (int i = 0; i < numJoints; ++i) {
+            if (flattenedConfidence[i] > threshold) {
+                joints.add(
+                        new Joint(
+                                flattened[i * 2] / width,
+                                flattened[i * 2 + 1] / height,
+                                flattenedConfidence[i]));
+            }
         }
         return new Joints(joints);
     }
 
     public static class Builder extends BaseBuilder<Builder> {
 
+        float threshold;
+
         @Override
         protected Builder self() {
             return this;
+        }
+
+        public Builder optThreshold(float threshold) {
+            this.threshold = threshold;
+            return self();
         }
 
         public SimplePoseTranslator build() {

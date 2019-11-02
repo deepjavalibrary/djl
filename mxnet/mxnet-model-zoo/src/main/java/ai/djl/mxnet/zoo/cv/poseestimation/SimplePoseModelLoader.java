@@ -44,6 +44,7 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
         Map<String, Object> arguments = artifact.getArguments();
         int width = ((Double) arguments.getOrDefault("width", 192d)).intValue();
         int height = ((Double) arguments.getOrDefault("height", 256d)).intValue();
+        double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
 
         Pipeline pipeline = new Pipeline();
         pipeline.add(new Resize(width, height))
@@ -53,6 +54,9 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
                                 new float[] {0.485f, 0.456f, 0.406f},
                                 new float[] {0.229f, 0.224f, 0.225f}));
 
-        return new SimplePoseTranslator.Builder().setPipeline(pipeline).build();
+        return new SimplePoseTranslator.Builder()
+                .setPipeline(pipeline)
+                .optThreshold((float) threshold)
+                .build();
     }
 }
