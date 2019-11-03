@@ -51,6 +51,7 @@ public class FuncInfo {
         parameters.add(parameter);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -71,6 +72,7 @@ public class FuncInfo {
         return sb.toString();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -83,6 +85,7 @@ public class FuncInfo {
         return name.equals(funcInfo.name) && parameters.equals(funcInfo.parameters);
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return Objects.hash(name);

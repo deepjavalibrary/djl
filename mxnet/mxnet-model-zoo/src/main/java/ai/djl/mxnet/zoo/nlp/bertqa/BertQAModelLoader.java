@@ -32,6 +32,7 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Translator<QAInput, String> getTranslator(Artifact artifact) {
         return new BertQATranslator();

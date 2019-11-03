@@ -41,6 +41,7 @@ public abstract class ImageClassificationModelLoader
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, artifactId), version);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Translator<BufferedImage, Classification> getTranslator(Artifact artifact) {
         Map<String, Object> arguments = artifact.getArguments();

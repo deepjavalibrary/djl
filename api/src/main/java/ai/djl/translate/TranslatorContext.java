@@ -46,6 +46,7 @@ public interface TranslatorContext extends AutoCloseable {
      */
     Metrics getMetrics();
 
+    /** {@inheritDoc} */
     @Override
     void close();
 }

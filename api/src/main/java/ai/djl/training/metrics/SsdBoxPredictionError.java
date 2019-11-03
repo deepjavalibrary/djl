@@ -46,11 +46,13 @@ public class SsdBoxPredictionError extends TrainingMetric {
         ssdBoxPredictionError += boundingBoxError.getFloat();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void reset() {
         this.ssdBoxPredictionError = 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public float getValue() {
         return ssdBoxPredictionError;

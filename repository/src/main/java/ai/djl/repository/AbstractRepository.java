@@ -29,16 +29,19 @@ import java.util.zip.ZipInputStream;
 
 public abstract class AbstractRepository implements Repository {
 
+    /** {@inheritDoc} */
     @Override
     public InputStream openStream(Artifact.Item item, String path) throws IOException {
         return Files.newInputStream(Paths.get(resolvePath(item, path)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public String[] listDirectory(Artifact.Item item, String path) throws IOException {
         return Paths.get(resolvePath(item, path)).toFile().list();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Path getFile(Artifact.Item item, String path) throws IOException {
         return Paths.get(resolvePath(item, path)).toAbsolutePath();
@@ -73,6 +76,7 @@ public abstract class AbstractRepository implements Repository {
         return getBaseUri().resolve(artifactUri.resolve(uriSuffix));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void prepare(Artifact artifact) throws IOException {
         Path cacheDir = getCacheDirectory();
@@ -103,6 +107,7 @@ public abstract class AbstractRepository implements Repository {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Path getCacheDirectory() throws IOException {
         String cacheDir = System.getProperty("DJL_CACHE_DIR");

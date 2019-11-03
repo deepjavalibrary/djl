@@ -49,6 +49,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Translator<BufferedImage, Classification> getTranslator(Artifact artifact) {
         Map<String, Object> arguments = artifact.getArguments();
@@ -63,6 +64,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
                 .build();
     }
 
+    /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
     protected Model loadModel(Artifact artifact, Path modelPath, Device device)

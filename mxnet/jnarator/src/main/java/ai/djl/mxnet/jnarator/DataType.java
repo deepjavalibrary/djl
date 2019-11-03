@@ -143,6 +143,7 @@ public class DataType {
         return typeName;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -159,6 +160,7 @@ public class DataType {
         return sb.toString();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -171,6 +173,7 @@ public class DataType {
         return type.toString().equals(dataType.type.toString());
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return Objects.hash(type);

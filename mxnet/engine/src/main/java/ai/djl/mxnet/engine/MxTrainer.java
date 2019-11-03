@@ -79,16 +79,19 @@ public class MxTrainer implements Trainer {
         parameterStore.setParameterServer(parameterServer, devices);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initialize(Shape[] shapes) {
         model.getBlock().initialize(model.getNDManager(), model.getDataType(), shapes);
     }
 
+    /** {@inheritDoc} */
     @Override
     public GradientCollector newGradientCollector() {
         return new MxGradientCollector();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void trainBatch(Batch batch) {
         Batch[] splits = batch.split(devices, false);
@@ -121,6 +124,7 @@ public class MxTrainer implements Trainer {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(NDList input) {
         long begin = System.nanoTime();
@@ -131,6 +135,7 @@ public class MxTrainer implements Trainer {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void validateBatch(Batch batch) {
         long begin = System.nanoTime();
@@ -163,11 +168,13 @@ public class MxTrainer implements Trainer {
         addMetric("step", begin);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setMetrics(Metrics metrics) {
         this.metrics = metrics;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setTrainingListener(TrainingListener listener) {
         this.listener = listener;
@@ -196,6 +203,7 @@ public class MxTrainer implements Trainer {
         validateMetrics.forEach(metric -> addMetric("validate", metric));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void resetTrainingMetrics() {
         trainingMetrics.forEach(TrainingMetric::reset);
@@ -210,11 +218,13 @@ public class MxTrainer implements Trainer {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Loss getLoss() {
         return trainingLoss;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Loss getValidationLoss() {
         return validationLoss;
@@ -224,6 +234,7 @@ public class MxTrainer implements Trainer {
         return metrics;
     }
 
+    /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
     public final <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz) {
@@ -235,6 +246,7 @@ public class MxTrainer implements Trainer {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
     public <T extends TrainingMetric> T getValidationMetric(Class<T> clazz) {
@@ -246,6 +258,7 @@ public class MxTrainer implements Trainer {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager getManager() {
         return manager;
@@ -301,6 +314,7 @@ public class MxTrainer implements Trainer {
         super.finalize();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         parameterStore.sync();

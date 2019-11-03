@@ -61,6 +61,7 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         return JnaUtils.parameterStoreCreate("device");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         Pointer pointer = handle.getAndSet(null);
@@ -77,6 +78,7 @@ public class MxParameterServer extends NativeResource implements ParameterServer
             this.optimizer = optimizer;
         }
 
+        /** {@inheritDoc} */
         @Override
         public void apply(String parameterId, Pointer recv, Pointer local, Pointer handle) {
             // updater callback arguments order is: index, gradient, weight.

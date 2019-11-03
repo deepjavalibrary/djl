@@ -39,31 +39,37 @@ public class ZooModel<I, O> implements Model {
         this.translator = translator;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options) {
         throw new IllegalArgumentException("ZooModel should not be re-loaded.");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void save(Path modelPath, String modelName) throws IOException {
         model.save(modelPath, modelName);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Block getBlock() {
         return model.getBlock();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setBlock(Block block) {
         model.setBlock(block);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getProperty(String key) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setProperty(String key, String value) {}
 

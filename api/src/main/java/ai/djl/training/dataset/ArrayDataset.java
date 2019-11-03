@@ -63,6 +63,7 @@ public class ArrayDataset extends RandomAccessDataset {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Record get(NDManager manager, long index) {
         NDList datum = new NDList();
@@ -86,6 +87,7 @@ public class ArrayDataset extends RandomAccessDataset {
         private NDArray[] data;
         private NDArray[] labels;
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

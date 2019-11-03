@@ -152,11 +152,13 @@ public class ResnetTest {
 
     private static class TestTranslator implements Translator<NDList, NDList> {
 
+        /** {@inheritDoc} */
         @Override
         public NDList processOutput(TranslatorContext ctx, NDList list) {
             return list;
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, NDList input) {
             return input;

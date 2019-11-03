@@ -26,11 +26,13 @@ public final class ImageFolder extends AbstractImageFolder {
         this.root = builder.getRoot();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Path getImagePath(String key) {
         return Paths.get(key);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void prepare() throws IOException {
         listImages(root);
@@ -49,6 +51,7 @@ public final class ImageFolder extends AbstractImageFolder {
             return self();
         }
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

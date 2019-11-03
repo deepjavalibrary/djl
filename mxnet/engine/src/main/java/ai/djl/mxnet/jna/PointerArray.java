@@ -33,6 +33,7 @@ public class PointerArray extends Memory {
         return length;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (o == this) {
@@ -46,6 +47,7 @@ public class PointerArray extends Memory {
                 && super.equals(o);
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return super.hashCode() ^ this.numElements();

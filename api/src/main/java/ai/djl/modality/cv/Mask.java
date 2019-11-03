@@ -27,6 +27,7 @@ public class Mask extends Rectangle {
         return probDist;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void draw(Graphics2D g, int imageWidth, int imageHeight) {
         super.draw(g, imageWidth, imageHeight);

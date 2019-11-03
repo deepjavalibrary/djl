@@ -68,6 +68,7 @@ public abstract class Convolution extends ParameterBlock {
 
     protected abstract int numDimensions();
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -85,6 +86,7 @@ public abstract class Convolution extends ParameterBlock {
                 params);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void beforeInitialize(Shape[] inputs) {
         this.inputShapes = inputs;
@@ -92,6 +94,7 @@ public abstract class Convolution extends ParameterBlock {
         Block.validateLayout(getExpectedLayout(), inputShape.getLayout());
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         long[] shape = new long[numDimensions()];
@@ -109,6 +112,7 @@ public abstract class Convolution extends ParameterBlock {
         return new Shape[] {new Shape(shape)};
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         Shape shape = inputShapes[0];
@@ -122,6 +126,7 @@ public abstract class Convolution extends ParameterBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         List<Parameter> parameters = new ArrayList<>();
@@ -132,6 +137,7 @@ public abstract class Convolution extends ParameterBlock {
         return parameters;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(getVersion());
@@ -141,6 +147,7 @@ public abstract class Convolution extends ParameterBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

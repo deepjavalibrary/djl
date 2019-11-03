@@ -89,6 +89,7 @@ public class Adam extends Optimizer {
         private float epsilon = 1e-8f;
         private boolean lazyUpdate = true;
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

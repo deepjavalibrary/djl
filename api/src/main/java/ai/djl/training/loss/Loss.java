@@ -80,6 +80,7 @@ public abstract class Loss extends TrainingMetric {
         return new HingeLoss(margin, weight, batchAxis);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Loss duplicate() {
         try {
@@ -110,6 +111,7 @@ public abstract class Loss extends TrainingMetric {
         totalInstances = 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public float getValue() {
         if (totalInstances == 0) {

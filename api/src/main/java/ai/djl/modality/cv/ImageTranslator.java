@@ -36,6 +36,7 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
         pipeline = builder.pipeline;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Pipeline getPipeline() {
         return pipeline;

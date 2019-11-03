@@ -35,6 +35,7 @@ public class MxPredictor<I, O> extends BasePredictor<I, O> {
         super(model, translator, first);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void waitToRead(NDList list) {
         list.forEach(a -> ((MxNDArray) a).waitToRead());

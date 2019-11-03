@@ -163,12 +163,14 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
         forEach(NDArray::detach);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         forEach(NDArray::close);
         clear();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(200);

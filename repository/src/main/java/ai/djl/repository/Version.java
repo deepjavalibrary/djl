@@ -43,6 +43,7 @@ public class Version implements Comparable<Version> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public int compareTo(Version otherVersion) {
         Comp comp = new Comp();
@@ -59,6 +60,7 @@ public class Version implements Comparable<Version> {
         return Integer.compare(currentSize, otherSize);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -70,6 +72,7 @@ public class Version implements Comparable<Version> {
         return compareTo((Version) o) == 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return Objects.hash(comparable);
@@ -113,6 +116,7 @@ public class Version implements Comparable<Version> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return version;
@@ -122,6 +126,7 @@ public class Version implements Comparable<Version> {
 
         private static final long serialVersionUID = 1L;
 
+        /** {@inheritDoc} */
         @Override
         public int compare(Object o1, Object o2) {
             if (o1 instanceof Integer) {

@@ -132,6 +132,7 @@ public class DataDesc {
         this.dataType = dataType;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return name + " shape: " + shape + " dataType: " + dataType;

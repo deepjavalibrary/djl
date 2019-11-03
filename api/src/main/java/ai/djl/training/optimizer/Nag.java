@@ -85,6 +85,7 @@ public class Nag extends Optimizer {
             return momentum;
         }
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

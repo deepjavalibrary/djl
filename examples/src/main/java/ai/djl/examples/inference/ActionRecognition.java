@@ -34,6 +34,7 @@ public class ActionRecognition extends AbstractInference<Classification> {
         new ActionRecognition().runExample(args);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Classification predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {

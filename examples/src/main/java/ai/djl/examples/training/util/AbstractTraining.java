@@ -129,6 +129,7 @@ public abstract class AbstractTraining implements TrainingListener {
 
     protected abstract void train(Arguments arguments) throws IOException, ModelNotFoundException;
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingBatch() {
         MemoryUtils.collectMemoryInfo(metrics);
@@ -138,6 +139,7 @@ public abstract class AbstractTraining implements TrainingListener {
         trainingProgressBar.printProgress(trainingProgress++, getTrainingStatus(metrics));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onValidationBatch() {
         MemoryUtils.collectMemoryInfo(metrics);
@@ -147,6 +149,7 @@ public abstract class AbstractTraining implements TrainingListener {
         validateProgressBar.printProgress(validateProgress++);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onEpoch() {
         if (epochTime > 0L) {

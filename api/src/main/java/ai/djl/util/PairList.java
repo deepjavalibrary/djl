@@ -353,11 +353,13 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
 
         Itr() {}
 
+        /** {@inheritDoc} */
         @Override
         public boolean hasNext() {
             return cursor < size;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Pair<K, V> next() {
             if (cursor >= size) {

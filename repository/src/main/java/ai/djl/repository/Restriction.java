@@ -73,6 +73,7 @@ class Restriction {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -88,11 +89,13 @@ class Restriction {
                 && Objects.equals(upperBound, that.upperBound);
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return Objects.hash(lowerBound, lowerBoundInclusive, upperBound, upperBoundInclusive);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();

@@ -26,6 +26,7 @@ public class Normalize implements Transform {
         this.std = std;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray transform(NDArray array) {
         return NDImageUtils.normalize(array, mean, std);

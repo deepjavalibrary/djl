@@ -328,6 +328,7 @@ public class MxMatrix implements Matrix {
         return array.getShape();
     }
 
+    /** {@inheritDoc} */
     @Override
     public SparseFormat getSparseFormat() {
         return array.getSparseFormat();
@@ -441,6 +442,7 @@ public class MxMatrix implements Matrix {
         return array.contentEquals(other);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean allClose(NDArray other, double rtol, double atol, boolean equalNan) {
         return array.allClose(other, rtol, atol, equalNan);
@@ -518,6 +520,7 @@ public class MxMatrix implements Matrix {
         return array.lte(other);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray where(NDArray condition, NDArray other) {
         return array.where(condition, other);
@@ -949,6 +952,7 @@ public class MxMatrix implements Matrix {
         return array.stack(arrays, axis);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray concat(NDList arrays, int axis) {
         return array.concat(arrays, axis);

@@ -37,6 +37,7 @@ public final class ClassifyExample extends AbstractInference<Classification> {
         new ClassifyExample().runExample(args);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Classification predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {

@@ -82,6 +82,7 @@ public class TfNDArray implements NDArray {
     @Override
     public void setName(String name) {}
 
+    /** {@inheritDoc} */
     @Override
     public final String getUid() {
         return uid;
@@ -317,6 +318,7 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray where(NDArray condition, NDArray other) {
         return null;
@@ -442,6 +444,7 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray toSparse(SparseFormat fmt) {
         return null;
@@ -775,6 +778,7 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray concat(NDList arrays, int axis) {
         return null;
@@ -1040,6 +1044,7 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray nonzero() {
         return null;

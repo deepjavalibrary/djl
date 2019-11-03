@@ -63,6 +63,7 @@ public class GRU extends RecurrentCell {
         mode = "gru";
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -80,12 +81,14 @@ public class GRU extends RecurrentCell {
                 params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         Shape inputShape = inputs[0];
         return new Shape[] {new Shape(inputShape.get(0), inputShape.get(1), stateSize)};
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         List<Parameter> directParameters = new ArrayList<>(parameters);
@@ -93,6 +96,7 @@ public class GRU extends RecurrentCell {
         return directParameters;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void beforeInitialize(Shape[] inputShapes) {
         this.inputShapes = inputShapes;
@@ -100,6 +104,7 @@ public class GRU extends RecurrentCell {
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         Shape shape = inputShapes[0];
@@ -128,6 +133,7 @@ public class GRU extends RecurrentCell {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
@@ -137,6 +143,7 @@ public class GRU extends RecurrentCell {
         state.save(os);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

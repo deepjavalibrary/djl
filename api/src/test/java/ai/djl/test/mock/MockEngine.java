@@ -25,41 +25,49 @@ public class MockEngine extends Engine {
     private Device device = Device.cpu();
     private String version;
 
+    /** {@inheritDoc} */
     @Override
     public Model newModel(Device device) {
         return new MockModel();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getEngineName() {
         return "MockEngine";
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getGpuCount() {
         return gpuCount;
     }
 
+    /** {@inheritDoc} */
     @Override
     public MemoryUsage getGpuMemory(Device device) {
         return gpuMemory;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Device defaultDevice() {
         return device;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getVersion() {
         return version;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager() {
         return new MockNDManager();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
         return new MockNDManager();

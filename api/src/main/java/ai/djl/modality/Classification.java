@@ -43,6 +43,7 @@ public final class Classification extends AbstractClassifications<Item> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Item item(int index) {
         return new Item(index);

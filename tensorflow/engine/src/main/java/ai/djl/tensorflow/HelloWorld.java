@@ -76,6 +76,7 @@ public final class HelloWorld {
 
     private static final class GenericTranslator implements Translator<BufferedImage, NDList> {
 
+        /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, BufferedImage img) {
             NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), img);
@@ -83,6 +84,7 @@ public final class HelloWorld {
             return new NDList(array);
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDList processOutput(TranslatorContext ctx, NDList list) {
             return list;

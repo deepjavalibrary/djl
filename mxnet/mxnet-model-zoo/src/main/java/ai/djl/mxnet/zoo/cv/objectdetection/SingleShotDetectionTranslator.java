@@ -36,6 +36,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         this.synsetArtifactName = builder.synsetArtifactName;
     }
 
+    /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
@@ -88,6 +89,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

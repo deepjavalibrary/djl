@@ -26,69 +26,86 @@ import ai.djl.training.metrics.TrainingMetric;
 
 public class MockTrainer implements Trainer {
 
+    /** {@inheritDoc} */
     @Override
     public void initialize(Shape[] shapes) {}
 
+    /** {@inheritDoc} */
     @Override
     public GradientCollector newGradientCollector() {
         return new GradientCollector() {
 
+            /** {@inheritDoc} */
             @Override
             public void backward(NDArray target) {}
 
+            /** {@inheritDoc} */
             @Override
             public void close() {}
         };
     }
 
+    /** {@inheritDoc} */
     @Override
     public void step() {}
 
+    /** {@inheritDoc} */
     @Override
     public void trainBatch(Batch batch) {}
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(NDList input) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void validateBatch(Batch batch) {}
 
+    /** {@inheritDoc} */
     @Override
     public void setMetrics(Metrics metrics) {}
 
+    /** {@inheritDoc} */
     @Override
     public void setTrainingListener(TrainingListener listener) {}
 
+    /** {@inheritDoc} */
     @Override
     public void resetTrainingMetrics() {}
 
+    /** {@inheritDoc} */
     @Override
     public Loss getLoss() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Loss getValidationLoss() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public <T extends TrainingMetric> T getValidationMetric(Class<T> clazz) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager getManager() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {}
 }

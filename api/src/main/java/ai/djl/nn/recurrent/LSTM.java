@@ -75,6 +75,7 @@ public class LSTM extends RecurrentCell {
         lstmStateClipMax = builder.getLstmStateClipMax();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -108,12 +109,14 @@ public class LSTM extends RecurrentCell {
                 params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         Shape inputShape = inputShapes[0];
         return new Shape[] {new Shape(inputShape.get(0), inputShape.get(1), stateSize)};
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         List<Parameter> directParameters = new ArrayList<>(this.parameters);
@@ -122,6 +125,7 @@ public class LSTM extends RecurrentCell {
         return directParameters;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void beforeInitialize(Shape[] inputs) {
         this.inputShapes = inputs;
@@ -129,6 +133,7 @@ public class LSTM extends RecurrentCell {
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         Shape shape = inputShapes[0];
@@ -187,6 +192,7 @@ public class LSTM extends RecurrentCell {
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
@@ -197,6 +203,7 @@ public class LSTM extends RecurrentCell {
         stateCell.save(os);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

@@ -47,6 +47,7 @@ public class MultithreadedInferenceExample extends AbstractInference<Classificat
         new MultithreadedInferenceExample().runExample(args);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Classification predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException {
@@ -144,6 +145,7 @@ public class MultithreadedInferenceExample extends AbstractInference<Classificat
             this.iteration = iteration;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Classification call() throws TranslateException {
             predictor.setMetrics(metrics);

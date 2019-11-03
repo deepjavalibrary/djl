@@ -2473,6 +2473,7 @@ public interface NDArray extends AutoCloseable {
      */
     NDArrayEx getNDArrayInternal();
 
+    /** {@inheritDoc} */
     @Override
     void close();
 }

@@ -29,9 +29,11 @@ public class LocalParameterServer implements ParameterServer {
         gradMap = new ConcurrentHashMap<>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void init(String parameterId, NDArray[] value) {}
 
+    /** {@inheritDoc} */
     @Override
     public void push(String parameterId, NDArray[] grads, int priority) {
         NDArray[] oldGrads = gradMap.put(parameterId, grads);
@@ -40,6 +42,7 @@ public class LocalParameterServer implements ParameterServer {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void pull(String parameterId, NDArray[] weights, int priority) {
         NDArray[] grads = gradMap.get(parameterId);
@@ -63,6 +66,7 @@ public class LocalParameterServer implements ParameterServer {
         Arrays.stream(grads).forEach(NDArray::close);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {}
 }

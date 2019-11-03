@@ -73,21 +73,25 @@ public class TfNDManager implements NDManager, AutoCloseable {
         return nameAssignment++;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray create(float[] data, Shape shape) {
         return new TfNDArray(this, Tensors.create(data));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray create(Shape shape, DataType dataType, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray create(int data) {
         return new TfNDArray(this, Tensors.create(data));
@@ -101,12 +105,14 @@ public class TfNDManager implements NDManager, AutoCloseable {
         return new TfNDArray(this, shape, data);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray createCSR(
             Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray createRowSparse(
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
@@ -123,11 +129,13 @@ public class TfNDManager implements NDManager, AutoCloseable {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray ones(Shape shape, DataType dataType, Device device) {
         return null;

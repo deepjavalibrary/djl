@@ -42,12 +42,14 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     public abstract Translator<I, O> getTranslator(Artifact artifact);
 
+    /** {@inheritDoc} */
     @Override
     public ZooModel<I, O> loadModel(Map<String, String> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
         return loadModel(criteria, Device.defaultDevice());
     }
 
+    /** {@inheritDoc} */
     @Override
     public ZooModel<I, O> loadModel(Map<String, String> criteria, Device device)
             throws IOException, ModelNotFoundException, MalformedModelException {

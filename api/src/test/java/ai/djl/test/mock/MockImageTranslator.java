@@ -35,6 +35,7 @@ public class MockImageTranslator implements Translator<BufferedImage, DetectedOb
                         Collections.singletonList(new Rectangle(0, 0, 1, 1)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
         return new NDList(
@@ -42,6 +43,7 @@ public class MockImageTranslator implements Translator<BufferedImage, DetectedOb
                         null, null, new Shape(3, 24, 24), DataType.FLOAT32, SparseFormat.DENSE));
     }
 
+    /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         return output;

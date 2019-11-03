@@ -169,6 +169,7 @@ class MxNDArrayEx implements NDArrayEx {
     // Activations
     ////////////////////////////////////////
 
+    /** {@inheritDoc} */
     @Override
     public NDArray relu() {
         MxOpParams params = new MxOpParams();
@@ -176,6 +177,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("Activation", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sigmoid() {
         MxOpParams params = new MxOpParams();
@@ -183,6 +185,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("Activation", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
         MxOpParams params = new MxOpParams();
@@ -190,6 +193,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("Activation", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray softrelu() {
         MxOpParams params = new MxOpParams();
@@ -197,6 +201,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("Activation", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray softsign() {
         MxOpParams params = new MxOpParams();
@@ -204,6 +209,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("Activation", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray leakyRelu(float alpha) {
         MxOpParams params = new MxOpParams();
@@ -212,6 +218,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("LeakyReLU", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray elu(float alpha) {
         MxOpParams params = new MxOpParams();
@@ -220,6 +227,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("LeakyReLU", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray selu() {
         MxOpParams params = new MxOpParams();
@@ -227,6 +235,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("LeakyReLU", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray gelu() {
         MxOpParams params = new MxOpParams();
@@ -238,6 +247,7 @@ class MxNDArrayEx implements NDArrayEx {
     // Pooling Operations
     ////////////////////////////////////////
 
+    /** {@inheritDoc} */
     @Override
     public NDArray maxPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
@@ -252,6 +262,7 @@ class MxNDArrayEx implements NDArrayEx {
         return pool(params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray globalMaxPool() {
         MxOpParams params = new MxOpParams();
@@ -260,6 +271,7 @@ class MxNDArrayEx implements NDArrayEx {
         return pool(params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sumPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
@@ -274,6 +286,7 @@ class MxNDArrayEx implements NDArrayEx {
         return pool(params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray globalSumPool() {
         MxOpParams params = new MxOpParams();
@@ -282,6 +295,7 @@ class MxNDArrayEx implements NDArrayEx {
         return pool(params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray avgPool(
             Shape kernel,
@@ -301,6 +315,7 @@ class MxNDArrayEx implements NDArrayEx {
         return pool(params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray globalAvgPool() {
         MxOpParams params = new MxOpParams();
@@ -309,6 +324,7 @@ class MxNDArrayEx implements NDArrayEx {
         return pool(params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray lpPool(
             Shape kernel,
@@ -328,6 +344,7 @@ class MxNDArrayEx implements NDArrayEx {
         return pool(params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray globalLpPool(int pValue) {
         MxOpParams params = new MxOpParams();
@@ -587,6 +604,7 @@ class MxNDArrayEx implements NDArrayEx {
     // Image and CV
     ////////////////////////////////////////
 
+    /** {@inheritDoc} */
     @Override
     public NDArray normalize(float[] mean, float[] std) {
         MxOpParams params = new MxOpParams();
@@ -595,11 +613,13 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_normalize", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray toTensor() {
         return getManager().invoke("_npx__image_to_tensor", array, null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray resize(int width, int height) {
         if (array.isEmpty()) {
@@ -610,6 +630,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_resize", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray crop(int x, int y, int width, int height) {
         MxOpParams params = new MxOpParams();
@@ -671,6 +692,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("MultiBoxDetection", inputs, parameters);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray getArray() {
         return array;

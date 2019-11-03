@@ -32,6 +32,7 @@ public class FactorTracker extends LearningRateTracker {
         this.count = 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public float getNewLearningRate(int numUpdate) {
         if (numUpdate < warmUpSteps) {
@@ -62,6 +63,7 @@ public class FactorTracker extends LearningRateTracker {
         private float factor = 1;
         private float stopFactorLearningRate = 1e-8f;
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

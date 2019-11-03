@@ -37,16 +37,19 @@ public class RemoteRepository extends AbstractRepository {
         this.uri = uri;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getName() {
         return name;
     }
 
+    /** {@inheritDoc} */
     @Override
     public URI getBaseUri() {
         return uri;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Metadata locate(MRL mrl) throws IOException {
         URI mrlUri = mrl.toURI();
@@ -80,6 +83,7 @@ public class RemoteRepository extends AbstractRepository {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
             throws IOException {

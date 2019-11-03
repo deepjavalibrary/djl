@@ -59,80 +59,96 @@ public class MockNDArray implements NDArray {
         uid = UUID.randomUUID().toString();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager getManager() {
         return manager;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getName() {
         return name;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getUid() {
         return uid;
     }
 
+    /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
         return dataType;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Device getDevice() {
         return device;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getShape() {
         return shape;
     }
 
+    /** {@inheritDoc} */
     @Override
     public SparseFormat getSparseFormat() {
         return sparseFormat;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isSparse() {
         return sparseFormat != SparseFormat.DENSE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray asInDevice(Device device, boolean copy) {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray asType(DataType dtype, boolean copy) {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Matrix asMatrix() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void attachGradient() {}
 
+    /** {@inheritDoc} */
     @Override
     public NDArray getGradient() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
         data.rewind();
         return data;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
         int size = data.remaining();
@@ -165,15 +181,19 @@ public class MockNDArray implements NDArray {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void set(NDIndex index, NDArray value) {}
 
+    /** {@inheritDoc} */
     @Override
     public void set(NDIndex index, Number value) {}
 
+    /** {@inheritDoc} */
     @Override
     public void setScalar(NDIndex index, Number value) {}
 
+    /** {@inheritDoc} */
     @Override
     public NDArray get(NDIndex index) {
         NDIndexFixed ie = (NDIndexFixed) index.get(0);
@@ -189,234 +209,281 @@ public class MockNDArray implements NDArray {
         return array;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void copyTo(NDArray array) {}
 
+    /** {@inheritDoc} */
     @Override
     public NDArray booleanMask(NDArray index, int axis) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray zerosLike() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray onesLike() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray like() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean contentEquals(NDArray other) {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray eq(Number other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray neq(Number other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray gt(Number other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray gte(Number other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray lt(Number other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray lte(Number other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray lte(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray where(NDArray condition, NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray add(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray add(NDArray... others) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sub(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray mul(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray mul(NDArray... others) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray div(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray div(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray mod(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray mod(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray pow(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray pow(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray addi(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray addi(NDArray... others) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray subi(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray subi(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray muli(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray muli(NDArray... others) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray divi(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray divi(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray modi(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray modi(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray powi(Number n) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray powi(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray neg() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray negi() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray abs() {
         Number[] values = toArray();
@@ -458,181 +525,217 @@ public class MockNDArray implements NDArray {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray square() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cbrt() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray floor() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray ceil() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray round() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray trunc() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray exp() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray log() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray log10() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray log2() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sin() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cos() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tan() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray asin() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray acos() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray atan() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sinh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cosh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray asinh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray acosh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray atanh() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray toDegrees() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray toRadians() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray max() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray max(int[] axes, boolean keepDims) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray min() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray min(int[] axes, boolean keepDims) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sum() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sum(int[] axes, boolean keepDims) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray prod() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray prod(int[] axes, boolean keepDims) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray mean() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray mean(int[] axes, boolean keepDims) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray trace(int offset, int axis1, int axis2) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList split(int sections, int axis) {
         NDList list = new NDList();
@@ -642,262 +745,314 @@ public class MockNDArray implements NDArray {
         return list;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList split(int[] indices, int axis) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray flatten() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray reshape(Shape shape) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray expandDims(int axis) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray squeeze(int[] axes) {
         return new MockNDArray();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray stack(NDList arrays, int axis) {
         Shape newShape = new Shape(arrays.size() + 1).addAll(getShape());
         return new MockNDArray(manager, device, newShape, dataType, sparseFormat);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray concat(NDList arrays, int axis) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray logicalAnd(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray logicalOr(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray logicalXor(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray logicalNot() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray argsort(int axis, boolean ascending) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sort(int axis) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sort() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray softmax(int[] axes, double temperature) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cumsumi(int axis) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cumsumi() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cumsum(int axis) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray cumsum() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray toSparse(SparseFormat fmt) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray toDense() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray isInfinite() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray isNaN() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray createMask(NDIndex index) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray createMask(Predicate<Number> predicate) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tile(long repeats) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tile(int axis, long repeats) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tile(long[] repeats) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tile(Shape desiredShape) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray repeat(long repeats) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray repeat(int axis, long repeats) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray repeat(long[] repeats) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray repeat(Shape desiredShape) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray dot(NDArray other) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray clip(double min, double max) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray swapAxes(int axis1, int axis2) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray transpose() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray transpose(int... dimensions) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray broadcast(Shape shape) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equalShapes(NDArray other) {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray argmax() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray argmax(int axis) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray argmin() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray argmin(int axis) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Number percentileNumber(Number percentile) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Number medianNumber() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray median(int... dimension) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray percentile(Number percentile, int... dimension) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray nonzero() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isEmpty() {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArrayEx getNDArrayInternal() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {}
 }

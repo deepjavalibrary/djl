@@ -40,6 +40,7 @@ public class MockModel implements Model {
     private Map<String, Object> artifacts = new ConcurrentHashMap<>();
     private AtomicBoolean first = new AtomicBoolean(true);
 
+    /** {@inheritDoc} */
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException {
@@ -48,6 +49,7 @@ public class MockModel implements Model {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void save(Path modelPath, String modelName) throws IOException {
         if (Files.notExists(modelPath)) {
@@ -55,42 +57,51 @@ public class MockModel implements Model {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Block getBlock() {
         return new SequentialBlock();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setBlock(Block block) {}
 
+    /** {@inheritDoc} */
     @Override
     public String getProperty(String key) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setProperty(String key, String value) {}
 
+    /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         return new BasePredictor<>(this, translator, first.getAndSet(false));
     }
 
+    /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
         return new PairList<>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeOutput() {
         return new PairList<>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String[] getArtifactNames() {
         return new String[] {"synset.txt"};
@@ -120,35 +131,42 @@ public class MockModel implements Model {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public URL getArtifact(String name) {
         return Thread.currentThread().getContextClassLoader().getResource(name);
     }
 
+    /** {@inheritDoc} */
     @Override
     public InputStream getArtifactAsStream(String name) throws IOException {
         URL url = getArtifact(name);
         return url.openStream();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager getNDManager() {
         return new MockNDManager();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setDataType(DataType dataType) {}
 
+    /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
         return DataType.FLOAT32;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {}
 

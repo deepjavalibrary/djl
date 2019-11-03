@@ -24,109 +24,131 @@ import java.nio.ByteBuffer;
 
 public class MockNDManager implements NDManager {
 
+    /** {@inheritDoc} */
     @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray create(Shape shape, DataType dataType, Device device) {
         return new MockNDArray(this, device, shape, dataType, null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray createCSR(
             Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray createRowSparse(
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray ones(Shape shape, DataType dataType, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray linspace(double start, double stop, int num, boolean endPoint, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
             double low, double high, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
             double loc, double scale, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomMultinomial(int n, NDArray pValues) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager getParentManager() {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Device getDevice() {
         return Device.defaultDevice();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newSubManager() {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newSubManager(Device device) {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void attach(String resourceId, AutoCloseable resource) {}
 
+    /** {@inheritDoc} */
     @Override
     public void detach(String resourceId) {}
 
+    /** {@inheritDoc} */
     @Override
     public void invoke(String operation, NDList src, NDList dest, PairList<String, ?> params) {}
 
+    /** {@inheritDoc} */
     @Override
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {}
 }

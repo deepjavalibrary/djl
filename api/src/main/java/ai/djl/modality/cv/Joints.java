@@ -26,6 +26,7 @@ public class Joints {
         return joints;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(4000);
@@ -55,6 +56,7 @@ public class Joints {
             return confidence;
         }
 
+        /** {@inheritDoc} */
         @Override
         public String toString() {
             return String.format(

@@ -75,6 +75,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         return params;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
         if (!initialized) {
@@ -107,6 +108,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         return symbol;
     }
 
+    /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
         PairList<String, Shape> inputData = new PairList<>();
@@ -117,6 +119,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         return inputData;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -126,6 +129,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         return op.forward(parameterStore, inputs);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         if (outputShapes == null) {
@@ -138,6 +142,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         return outputShapes;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         return params.stream()
@@ -145,6 +150,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
                 .collect(Collectors.toList());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void removeLastBlock() {
         List<String> layerNames = getLayerNames();
@@ -163,6 +169,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         if (paramShapes == null) {
@@ -179,6 +186,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
@@ -194,6 +202,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

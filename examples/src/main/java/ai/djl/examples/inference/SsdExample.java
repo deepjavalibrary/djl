@@ -40,6 +40,7 @@ public final class SsdExample extends AbstractInference<DetectedObjects> {
         new SsdExample().runExample(args);
     }
 
+    /** {@inheritDoc} */
     @Override
     public DetectedObjects predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {

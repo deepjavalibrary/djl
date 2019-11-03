@@ -54,6 +54,7 @@ public class Batch implements AutoCloseable {
         return labels;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         manager.close();

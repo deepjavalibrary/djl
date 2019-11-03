@@ -24,6 +24,7 @@ public class EchoTranslator<T> implements Translator<T, T> {
     private TranslateException inputException;
     private TranslateException outputException;
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, T input) throws TranslateException {
         if (inputException != null) {
@@ -33,6 +34,7 @@ public class EchoTranslator<T> implements Translator<T, T> {
         return preprocessResult;
     }
 
+    /** {@inheritDoc} */
     @Override
     public T processOutput(TranslatorContext ctx, NDList list) throws TranslateException {
         if (outputException != null) {

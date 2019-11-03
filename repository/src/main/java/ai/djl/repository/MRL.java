@@ -60,6 +60,7 @@ public class MRL {
         this.artifactId = artifactId;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return toURI().toString();

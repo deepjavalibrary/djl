@@ -29,6 +29,7 @@ public class MultiFactorTracker extends LearningRateTracker {
         this.factor = builder.getFactor();
     }
 
+    /** {@inheritDoc} */
     @Override
     public float getNewLearningRate(int numUpdate) {
         if (numUpdate < warmUpSteps) {
@@ -55,6 +56,7 @@ public class MultiFactorTracker extends LearningRateTracker {
         private int[] steps;
         private float factor = 1;
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

@@ -77,6 +77,7 @@ public class Sgd extends Optimizer {
         private float momentum;
         private boolean lazyUpdate = true;
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

@@ -36,6 +36,7 @@ public interface ZooDataset extends Dataset, PreparedDataset {
 
     void prepareData(Usage usage) throws IOException;
 
+    /** {@inheritDoc} */
     @Override
     default void prepare() throws IOException {
         if (!isPrepared()) {

@@ -30,21 +30,25 @@ public class Conv1D extends Convolution {
         super(builder);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected byte getVersion() {
         return VERSION;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected LayoutType[] getExpectedLayout() {
         return EXPECTED_LAYOUT;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected String getStringLayout() {
         return STRING_LAYOUT;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected int numDimensions() {
         return NUM_DIMENSIONS;

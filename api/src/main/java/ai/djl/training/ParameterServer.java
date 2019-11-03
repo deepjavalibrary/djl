@@ -40,6 +40,7 @@ public interface ParameterServer extends AutoCloseable {
      */
     void pull(String parameterId, NDArray[] weights, int priority);
 
+    /** {@inheritDoc} */
     @Override
     void close();
 }

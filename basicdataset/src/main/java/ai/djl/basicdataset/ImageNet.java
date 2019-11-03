@@ -56,6 +56,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
         return classFull;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void prepare() throws IOException {
         if (!prepared) {
@@ -106,6 +107,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
         listImages(root.toString(), wordNetIds);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Path getImagePath(String key) {
         return root.resolve(key);
@@ -129,6 +131,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Builder self() {
             return this;

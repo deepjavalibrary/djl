@@ -109,6 +109,7 @@ public class ParameterStoreTest {
             learningRateTracker = builder.getLearningRateTracker();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void update(String parameterId, NDArray weight, NDArray grad) {
             weight.addi(grad.mul(learningRateTracker.getNewLearningRate(0)));
@@ -128,6 +129,7 @@ public class ParameterStoreTest {
                 return learningRateTracker;
             }
 
+            /** {@inheritDoc} */
             @Override
             protected TestOptimizer.Builder self() {
                 return this;

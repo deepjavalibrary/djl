@@ -31,6 +31,7 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
         this.synsetArtifactName = builder.synsetArtifactName;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Classification processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
@@ -49,6 +50,7 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

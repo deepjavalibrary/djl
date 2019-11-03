@@ -29,6 +29,7 @@ public class TfPredictor<I, O> extends BasePredictor<I, O> {
         super(model, translator, first);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected NDList forward(NDList ndList) {
         Session session = ((TfNDManager) model).getSession();

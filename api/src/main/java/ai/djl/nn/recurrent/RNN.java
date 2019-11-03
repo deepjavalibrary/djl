@@ -56,6 +56,7 @@ public class RNN extends RecurrentCell {
         state = new Parameter("state", this, ParameterType.OTHER);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -115,6 +116,7 @@ public class RNN extends RecurrentCell {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
@@ -125,6 +127,7 @@ public class RNN extends RecurrentCell {
         state.save(os);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

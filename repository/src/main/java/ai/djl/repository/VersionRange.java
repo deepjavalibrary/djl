@@ -167,6 +167,7 @@ public final class VersionRange {
         return contains(artifact.getParsedVersion());
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         if (recommendedVersion != null) {

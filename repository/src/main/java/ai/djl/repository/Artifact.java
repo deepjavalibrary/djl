@@ -265,6 +265,7 @@ public class Artifact {
 
         private static final long serialVersionUID = 1L;
 
+        /** {@inheritDoc} */
         @Override
         public int compare(Artifact o1, Artifact o2) {
             return o1.getParsedVersion().compareTo(o2.getParsedVersion());

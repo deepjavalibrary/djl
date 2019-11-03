@@ -72,41 +72,49 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public MRL getMrl() {
         return new MRL(MRL.Dataset.CV, BasicDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Repository getRepository() {
         return repository;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Artifact getArtifact() {
         return artifact;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Usage getUsage() {
         return usage;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isPrepared() {
         return prepared;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setPrepared(boolean prepared) {
         this.prepared = prepared;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void useDefaultArtifact() throws IOException {
         artifact = repository.resolve(getMrl(), "1.0", null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void prepareData(Usage usage) throws IOException {
         Path cacheDir = repository.getCacheDirectory();
@@ -149,6 +157,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         size = imagePaths.size();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Record get(NDManager manager, long index) throws IOException {
         int idx = Math.toIntExact(index);
@@ -165,6 +174,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         private Artifact artifact;
         private Usage usage;
 
+        /** {@inheritDoc} */
         @Override
         public Builder self() {
             return this;

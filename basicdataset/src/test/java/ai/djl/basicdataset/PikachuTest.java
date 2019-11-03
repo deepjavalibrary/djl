@@ -57,6 +57,7 @@ public class PikachuTest {
             super(builder);
         }
 
+        /** {@inheritDoc} */
         @Override
         public MRL getMrl() {
             return new MRL(MRL.Dataset.CV, BasicDatasets.GROUP_ID, "pikachu-unittest");

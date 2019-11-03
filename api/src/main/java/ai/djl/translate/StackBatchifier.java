@@ -24,6 +24,7 @@ import java.util.stream.IntStream;
  */
 public class StackBatchifier implements Batchifier {
 
+    /** {@inheritDoc} */
     @Override
     public NDList batchify(NDList[] inputs) {
         // each input as NDList might contain several data or labels
@@ -56,6 +57,7 @@ public class StackBatchifier implements Batchifier {
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList[] unbatchify(NDList inputs) {
         if (inputs.size() == 0) {
@@ -82,6 +84,7 @@ public class StackBatchifier implements Batchifier {
         return dataList;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList[] split(NDList list, int numOfSlices, boolean evenSplit) {
         int batchSize = Math.toIntExact(list.head().size(0));

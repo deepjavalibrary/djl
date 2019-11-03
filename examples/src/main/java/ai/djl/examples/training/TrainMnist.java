@@ -43,6 +43,7 @@ public final class TrainMnist extends AbstractTraining {
         new TrainMnist().runExample(args);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void train(Arguments arguments) throws IOException {
         // Construct neural network

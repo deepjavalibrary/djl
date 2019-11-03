@@ -34,16 +34,19 @@ public class LocalRepository extends AbstractRepository {
         this.path = path;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getName() {
         return name;
     }
 
+    /** {@inheritDoc} */
     @Override
     public URI getBaseUri() {
         return path.toUri();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Metadata locate(MRL mrl) throws IOException {
         URI uri = mrl.toURI();
@@ -59,6 +62,7 @@ public class LocalRepository extends AbstractRepository {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
             throws IOException {

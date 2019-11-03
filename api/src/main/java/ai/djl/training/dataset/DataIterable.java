@@ -80,11 +80,13 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Iterator<Batch> iterator() {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean hasNext() {
         if (++count > maxIteration) {
@@ -105,6 +107,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Batch next() {
         if (executor == null) {
@@ -180,6 +183,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             this.indices = indices;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Batch call() throws IOException {
             return fetch(indices);

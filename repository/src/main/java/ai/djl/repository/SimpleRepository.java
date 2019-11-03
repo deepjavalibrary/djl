@@ -30,22 +30,26 @@ public class SimpleRepository extends AbstractRepository {
         this.path = path;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getName() {
         return name;
     }
 
+    /** {@inheritDoc} */
     @Override
     public URI getBaseUri() {
         return path.toUri();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Metadata locate(MRL mrl) {
         // return new MatchAllMetadata();
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Artifact resolve(MRL mrl, String version, Map<String, String> filter) {
         Metadata metadata = new Metadata();
@@ -55,11 +59,13 @@ public class SimpleRepository extends AbstractRepository {
         return artifact;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void prepare(Artifact artifact) {
         // Do nothing
     }
 
+    /** {@inheritDoc} */
     @Override
     public Path getCacheDirectory() {
         return path;

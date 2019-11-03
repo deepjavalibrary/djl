@@ -65,11 +65,13 @@ public class Rectangle implements BoundingBox {
 
             private int index;
 
+            /** {@inheritDoc} */
             @Override
             public boolean hasNext() {
                 return index < 4;
             }
 
+            /** {@inheritDoc} */
             @Override
             public void next() {
                 if (index > 3) {
@@ -78,6 +80,7 @@ public class Rectangle implements BoundingBox {
                 ++index;
             }
 
+            /** {@inheritDoc} */
             @Override
             public Point currentPoint() {
                 switch (index) {
@@ -96,11 +99,13 @@ public class Rectangle implements BoundingBox {
         };
     }
 
+    /** {@inheritDoc} */
     @Override
     public Point getPoint() {
         return point;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void draw(Graphics2D g, int imageWidth, int imageHeight) {
         int x = (int) (getX() * imageWidth);

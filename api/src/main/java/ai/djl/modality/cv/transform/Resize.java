@@ -32,6 +32,7 @@ public class Resize implements Transform {
         this.height = height;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray transform(NDArray array) {
         return NDImageUtils.resize(array, width, height);

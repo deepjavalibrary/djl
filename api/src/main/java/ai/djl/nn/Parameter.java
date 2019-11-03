@@ -210,6 +210,7 @@ public class Parameter implements AutoCloseable {
         array = manager.create(dataType.asDataType(data), shape);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         if (array != null) {

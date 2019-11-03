@@ -161,11 +161,13 @@ public class MxModel implements Model {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Block getBlock() {
         return block;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setBlock(Block block) {
         this.block = block;

@@ -122,6 +122,7 @@ public class Metrics {
 
         private static final long serialVersionUID = 1L;
 
+        /** {@inheritDoc} */
         @Override
         public int compare(Metric o1, Metric o2) {
             Number n1 = o1.getValue();

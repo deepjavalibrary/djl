@@ -49,6 +49,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
 
     public abstract Record get(NDManager manager, long index) throws IOException;
 
+    /** {@inheritDoc} */
     @Override
     public Iterable<Batch> getData(NDManager manager) {
         return new DataIterable(

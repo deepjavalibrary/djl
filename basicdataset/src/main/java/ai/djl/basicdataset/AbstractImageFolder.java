@@ -61,6 +61,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         this.items = new PairList<>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Record get(NDManager manager, long index) throws IOException {
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
@@ -72,6 +73,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         return new Record(d, l);
     }
 
+    /** {@inheritDoc} */
     @Override
     public long size() {
         return items.size();

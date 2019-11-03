@@ -23,6 +23,7 @@ public class TfEngine extends Engine {
 
     TfEngine() {}
 
+    /** {@inheritDoc} */
     @Override
     public Model newModel(Device device) {
         return null;
@@ -58,11 +59,13 @@ public class TfEngine extends Engine {
         return TensorFlow.version();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager() {
         return TfNDManager.newBaseManager();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
         return TfNDManager.newBaseManager(device);

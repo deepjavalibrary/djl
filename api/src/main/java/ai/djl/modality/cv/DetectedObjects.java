@@ -27,6 +27,7 @@ public class DetectedObjects extends AbstractClassifications<Item> {
         this.boundingBoxes = boundingBoxes;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Item item(int index) {
         return new Item(index);

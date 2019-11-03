@@ -40,6 +40,7 @@ public final class BertQaInferenceExample extends AbstractInference<String> {
         new BertQaInferenceExample().runExample(args);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String predict(Arguments args, Metrics metrics, int iteration)
             throws IOException, TranslateException, ModelException {
@@ -71,11 +72,13 @@ public final class BertQaInferenceExample extends AbstractInference<String> {
         return predictResult;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Options getOptions() {
         return BertArguments.getOptions();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected BertArguments parseArguments(CommandLine cmd) {
         return new BertArguments(cmd);

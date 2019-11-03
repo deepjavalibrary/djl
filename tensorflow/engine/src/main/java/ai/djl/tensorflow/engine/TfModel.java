@@ -77,6 +77,7 @@ public class TfModel implements Model {
         constructDataDescFromModel(sig.getOutputsMap());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException, MalformedModelException {
@@ -97,6 +98,7 @@ public class TfModel implements Model {
                         .load();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void save(Path modelPath, String modelName) {}
 
@@ -112,22 +114,27 @@ public class TfModel implements Model {
         return bundle.metaGraphDef();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Block getBlock() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setBlock(Block block) {}
 
+    /** {@inheritDoc} */
     @Override
     public String getProperty(String key) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setProperty(String key, String value) {}
 
+    /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         return null;
@@ -204,6 +211,7 @@ public class TfModel implements Model {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {}
 }

@@ -31,6 +31,7 @@ public class CenterCrop implements Transform {
         this.height = height;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray transform(NDArray array) {
         if (width < 0) {

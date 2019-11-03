@@ -33,6 +33,7 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
         this.threshold = builder.threshold;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Joints processOutput(TranslatorContext ctx, NDList list) {
         NDArray pred = list.singletonOrThrow();
@@ -75,6 +76,7 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
 
         float threshold;
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

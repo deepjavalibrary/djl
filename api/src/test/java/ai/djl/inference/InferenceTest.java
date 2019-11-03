@@ -79,6 +79,7 @@ public class InferenceTest {
         Translator<String, Classification> translator =
                 new Translator<String, Classification>() {
 
+                    /** {@inheritDoc} */
                     @Override
                     public NDList processInput(TranslatorContext ctx, String input) {
                         return new NDList(
@@ -90,6 +91,7 @@ public class InferenceTest {
                                         SparseFormat.DENSE));
                     }
 
+                    /** {@inheritDoc} */
                     @Override
                     public Classification processOutput(TranslatorContext ctx, NDList list) {
                         return new Classification(

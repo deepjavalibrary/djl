@@ -218,6 +218,7 @@ public abstract class NDFormat {
             }
         }
 
+        /** {@inheritDoc} */
         @Override
         public CharSequence format(Number value) {
             double d = value.doubleValue();
@@ -256,6 +257,7 @@ public abstract class NDFormat {
 
     private static final class HexFormat extends NDFormat {
 
+        /** {@inheritDoc} */
         @Override
         public CharSequence format(Number value) {
             return String.format("0x%02X", value.byteValue());
@@ -298,6 +300,7 @@ public abstract class NDFormat {
             }
         }
 
+        /** {@inheritDoc} */
         @Override
         public CharSequence format(Number value) {
             if (exponential) {
@@ -309,6 +312,7 @@ public abstract class NDFormat {
 
     private static final class BooleanFormat extends NDFormat {
 
+        /** {@inheritDoc} */
         @Override
         public CharSequence format(Number value) {
             return value.byteValue() != 0 ? " true" : "false";

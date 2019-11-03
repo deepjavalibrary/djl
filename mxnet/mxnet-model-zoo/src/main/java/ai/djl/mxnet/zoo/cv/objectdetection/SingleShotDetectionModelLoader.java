@@ -42,6 +42,7 @@ public class SingleShotDetectionModelLoader
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Translator<BufferedImage, DetectedObjects> getTranslator(Artifact artifact) {
         Map<String, Object> arguments = artifact.getArguments();
@@ -59,6 +60,7 @@ public class SingleShotDetectionModelLoader
                 .build();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Artifact match(Map<String, String> criteria) throws IOException, ModelNotFoundException {
         List<Artifact> list = search(criteria);

@@ -33,6 +33,7 @@ public class RandomSampler implements Sampler.SubSampler {
         arr[j] = tmp;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Iterator<Long> sample(RandomAccessDataset dataset) {
         return new Iterate(dataset, seed);
@@ -55,11 +56,13 @@ public class RandomSampler implements Sampler.SubSampler {
             }
         }
 
+        /** {@inheritDoc} */
         @Override
         public boolean hasNext() {
             return current < indices.length;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Long next() {
             if (!hasNext()) {

@@ -39,6 +39,7 @@ public class InstanceSegmentationExample extends AbstractInference<DetectedObjec
         new InstanceSegmentationExample().runExample(args);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected DetectedObjects predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {

@@ -62,6 +62,7 @@ public class MxNDManager implements NDManager {
         return SYSTEM_MANAGER;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
@@ -307,6 +308,7 @@ public class MxNDManager implements NDManager {
         return JnaUtils.op(operation).invoke(this, EMPTY_ARRAY, params)[0];
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         String parentUID = parent == null ? "No Parent" : ((MxNDManager) parent).uid;

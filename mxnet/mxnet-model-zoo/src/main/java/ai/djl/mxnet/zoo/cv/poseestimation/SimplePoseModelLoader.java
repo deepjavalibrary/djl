@@ -39,6 +39,7 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Translator<BufferedImage, Joints> getTranslator(Artifact artifact) {
         Map<String, Object> arguments = artifact.getArguments();

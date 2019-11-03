@@ -49,11 +49,13 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
         this.maxEdge = builder.maxEdge;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray transform(NDArray array) {
         return resizeShort(array);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage image) {
         Pipeline pipeline = getPipeline();
@@ -61,6 +63,7 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
         return super.processInput(ctx, image);
     }
 
+    /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
@@ -156,6 +159,7 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

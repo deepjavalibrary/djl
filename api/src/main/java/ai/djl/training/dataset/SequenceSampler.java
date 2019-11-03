@@ -18,6 +18,7 @@ import java.util.NoSuchElementException;
 /** Sampler the data from [0, dataset.size) sequentially. */
 public class SequenceSampler implements Sampler.SubSampler {
 
+    /** {@inheritDoc} */
     @Override
     public Iterator<Long> sample(RandomAccessDataset dataset) {
         return new Iterate(dataset);
@@ -33,11 +34,13 @@ public class SequenceSampler implements Sampler.SubSampler {
             current = 0;
         }
 
+        /** {@inheritDoc} */
         @Override
         public boolean hasNext() {
             return current < size;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Long next() {
             if (!hasNext()) {

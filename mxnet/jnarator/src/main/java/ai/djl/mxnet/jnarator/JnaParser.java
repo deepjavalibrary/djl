@@ -58,6 +58,7 @@ public class JnaParser {
             CBaseListener listener =
                     new CBaseListener() {
 
+                        /** {@inheritDoc} */
                         @Override
                         public void enterDeclaration(CParser.DeclarationContext ctx) {
                             CParser.DeclarationSpecifiersContext specs =

@@ -196,6 +196,7 @@ public class Symbol extends NativeResource {
 
      */
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return Arrays.toString(getOutputNames());

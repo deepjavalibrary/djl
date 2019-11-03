@@ -126,6 +126,7 @@ public class DatasetUtilsTest {
                             return stackBatchifier.batchify(inputs);
                         }
 
+                        /** {@inheritDoc} */
                         @Override
                         public NDList[] unbatchify(NDList inputs) {
                             return stackBatchifier.unbatchify(inputs);

@@ -120,6 +120,7 @@ public class CocoMetadata {
 
     public static final class RectangleDeserializer implements JsonDeserializer<Rectangle> {
 
+        /** {@inheritDoc} */
         @Override
         public Rectangle deserialize(
                 JsonElement json, Type typeOfT, JsonDeserializationContext ctx) {

@@ -41,11 +41,13 @@ public class MockMxnetLibrary implements MxnetLibrary {
         functions = new HashMap<>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String MXGetLastError() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXLoadLib(String path) {
         if (functions.containsKey("MXLoadLib")) {
@@ -54,6 +56,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXLibInfoFeatures(LibFeature.ByReference[] libFeature, NativeSizeByReference size) {
         if (functions.containsKey("MXLibInfoFeatures")) {
@@ -62,6 +65,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRandomSeed(int seed) {
         if (functions.containsKey("MXRandomSeed")) {
@@ -70,6 +74,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRandomSeedContext(int seed, int dev_type, int dev_id) {
         if (functions.containsKey("MXRandomSeedContext")) {
@@ -80,6 +85,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNotifyShutdown() {
         if (functions.containsKey("MXNotifyShutdown")) {
@@ -88,6 +94,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSetProcessProfilerConfig(
             int num_params, String[] keys, String[] vals, Pointer kvstoreHandle) {
@@ -99,6 +106,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSetProfilerConfig(int num_params, String[] keys, String[] vals) {
         if (functions.containsKey("MXSetProfilerConfig")) {
@@ -109,6 +117,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSetProcessProfilerState(int state, int profile_process, Pointer kvStoreHandle) {
         if (functions.containsKey("MXSetProcessProfilerState")) {
@@ -119,6 +128,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSetProfilerState(int state) {
         if (functions.containsKey("MXSetProfilerState")) {
@@ -127,6 +137,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDumpProcessProfile(int finished, int profile_process, Pointer kvStoreHandle) {
         if (functions.containsKey("MXDumpProcessProfile")) {
@@ -137,6 +148,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDumpProfile(int finished) {
         if (functions.containsKey("MXDumpProfile")) {
@@ -145,6 +157,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAggregateProfileStatsPrint(String[] out_str, int reset) {
         if (functions.containsKey("MXAggregateProfileStatsPrint")) {
@@ -155,6 +168,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAggregateProfileStatsPrintEx(
             String[] out_str, int reset, int format, int sort_by, int ascending) {
@@ -166,6 +180,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProcessProfilePause(int paused, int profile_process, Pointer kvStoreHandle) {
         if (functions.containsKey("MXProcessProfilePause")) {
@@ -176,6 +191,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfilePause(int paused) {
         if (functions.containsKey("MXProfilePause")) {
@@ -184,6 +200,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileCreateDomain(String domain, PointerByReference out) {
         if (functions.containsKey("MXProfileCreateDomain")) {
@@ -192,6 +209,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileCreateTask(Pointer domain, String task_name, PointerByReference out) {
         if (functions.containsKey("MXProfileCreateTask")) {
@@ -202,6 +220,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileCreateFrame(Pointer domain, String frame_name, PointerByReference out) {
         if (functions.containsKey("MXProfileCreateFrame")) {
@@ -212,6 +231,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileCreateEvent(String event_name, PointerByReference out) {
         if (functions.containsKey("MXProfileCreateEvent")) {
@@ -220,6 +240,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileCreateCounter(Pointer domain, String counter_name, PointerByReference out) {
         if (functions.containsKey("MXProfileCreateCounter")) {
@@ -230,6 +251,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileDestroyHandle(Pointer frame_handle) {
         if (functions.containsKey("MXProfileDestroyHandle")) {
@@ -238,6 +260,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileDurationStart(Pointer duration_handle) {
         if (functions.containsKey("MXProfileDurationStart")) {
@@ -246,6 +269,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileDurationStop(Pointer duration_handle) {
         if (functions.containsKey("MXProfileDurationStop")) {
@@ -254,6 +278,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileSetCounter(Pointer counter_handle, long value) {
         if (functions.containsKey("MXProfileSetCounter")) {
@@ -262,6 +287,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileAdjustCounter(Pointer counter_handle, long value) {
         if (functions.containsKey("MXProfileAdjustCounter")) {
@@ -272,6 +298,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXProfileSetMarker(Pointer domain, String instant_marker_name, String scope) {
         if (functions.containsKey("MXProfileSetMarker")) {
@@ -282,6 +309,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSetNumOMPThreads(int thread_num) {
         if (functions.containsKey("MXSetNumOMPThreads")) {
@@ -290,6 +318,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXEngineSetBulkSize(int bulk_size, IntBuffer prev_bulk_size) {
         if (functions.containsKey("MXEngineSetBulkSize")) {
@@ -300,6 +329,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXGetGPUCount(IntBuffer out) {
         if (functions.containsKey("MXGetGPUCount")) {
@@ -309,6 +339,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXGetGPUMemoryInformation(int dev, IntBuffer free_mem, IntBuffer total_mem) {
         if (functions.containsKey("MXGetGPUMemoryInformation")) {
@@ -319,6 +350,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXGetGPUMemoryInformation64(int dev, LongBuffer free_mem, LongBuffer total_mem) {
         if (functions.containsKey("MXGetGPUMemoryInformation64")) {
@@ -332,6 +364,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXGetVersion(IntBuffer out) {
         if (functions.containsKey("MXGetVersion")) {
@@ -341,6 +374,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXLoadTVMOp(String libpath) {
         if (functions.containsKey("MXLoadTVMOp")) {
@@ -349,6 +383,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXLoadTVMConfig(PointerByReference config) {
         if (functions.containsKey("MXLoadTVMConfig")) {
@@ -357,6 +392,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayCreateNone(PointerByReference out) {
         if (functions.containsKey("MXNDArrayCreateNone")) {
@@ -365,6 +401,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayCreate(
             int[] shape,
@@ -381,6 +418,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayCreateEx(
             int[] shape,
@@ -400,6 +438,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayCreateEx64(
             long[] shape,
@@ -417,6 +456,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayCreateSparseEx(
             int storage_type,
@@ -453,6 +493,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayCreateSparseEx64(
             int storage_type,
@@ -489,6 +530,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayLoadFromRawBytes(Pointer buf, NativeSize size, PointerByReference out) {
         if (functions.containsKey("MXNDArrayLoadFromRawBytes")) {
@@ -497,6 +539,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArraySaveRawBytes(
             Pointer handle, NativeSizeByReference out_size, PointerByReference out_buf) {
@@ -508,6 +551,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArraySave(String fname, int num_args, PointerArray args, String[] keys) {
         if (functions.containsKey("MXNDArraySave")) {
@@ -516,6 +560,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayLoad(
             String fname,
@@ -548,6 +593,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayLoadFromBuffer(
             Pointer ndarray_buffer,
@@ -567,6 +613,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArraySyncCopyFromCPU(Pointer handle, Pointer data, NativeSize size) {
         if (functions.containsKey("MXNDArraySyncCopyFromCPU")) {
@@ -577,6 +624,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArraySyncCopyToCPU(Pointer handle, Pointer data, NativeSize size) {
         if (functions.containsKey("MXNDArraySyncCopyToCPU")) {
@@ -585,6 +633,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArraySyncCopyFromNDArray(Pointer handle_dst, Pointer handle_src, int i) {
         if (functions.containsKey("MXNDArraySyncCopyFromNDArray")) {
@@ -595,6 +644,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArraySyncCheckFormat(Pointer handle, byte full_check) {
         if (functions.containsKey("MXNDArraySyncCheckFormat")) {
@@ -605,6 +655,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayWaitToRead(Pointer handle) {
         if (functions.containsKey("MXNDArrayWaitToRead")) {
@@ -613,6 +664,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayWaitToWrite(Pointer handle) {
         if (functions.containsKey("MXNDArrayWaitToWrite")) {
@@ -621,6 +673,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayWaitAll() {
         if (functions.containsKey("MXNDArrayWaitAll")) {
@@ -629,6 +682,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayFree(Pointer handle) {
         if (functions.containsKey("MXNDArrayFree")) {
@@ -637,6 +691,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArraySlice(
             Pointer handle, int slice_begin, int slice_end, PointerByReference out) {
@@ -648,6 +703,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArraySlice64(
             Pointer handle, long slice_begin, long slice_end, PointerByReference out) {
@@ -659,6 +715,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayAt(Pointer handle, int idx, PointerByReference out) {
         if (functions.containsKey("MXNDArrayAt")) {
@@ -667,6 +724,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayAt64(Pointer handle, long idx, PointerByReference out) {
         if (functions.containsKey("MXNDArrayAt64")) {
@@ -675,6 +733,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetStorageType(Pointer handle, IntBuffer out_storage_type) {
         if (functions.containsKey("MXNDArrayGetStorageType")) {
@@ -687,6 +746,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayReshape(Pointer handle, int ndim, IntBuffer dims, PointerByReference out) {
         if (functions.containsKey("MXNDArrayReshape")) {
@@ -695,6 +755,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayReshape64(
             Pointer handle, int ndim, LongBuffer dims, byte reverse, PointerByReference out) {
@@ -706,6 +767,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetShape(Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
         if (functions.containsKey("MXNDArrayGetShape")) {
@@ -720,6 +782,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetShape64(
             Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
@@ -735,6 +798,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetShapeEx(
             Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
@@ -750,6 +814,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetShapeEx64(
             Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
@@ -765,6 +830,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetData(Pointer handle, PointerByReference out_pdata) {
         if (functions.containsKey("MXNDArrayGetData")) {
@@ -773,6 +839,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayToDLPack(Pointer handle, PointerByReference out_dlpack) {
         if (functions.containsKey("MXNDArrayToDLPack")) {
@@ -781,6 +848,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayFromDLPack(Pointer dlpack, PointerByReference out_handle) {
         if (functions.containsKey("MXNDArrayFromDLPack")) {
@@ -789,6 +857,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayFromDLPackEx(
             Pointer dlpack, byte transient_handle, PointerByReference out_handle) {
@@ -800,6 +869,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayCallDLPackDeleter(Pointer dlpack) {
         if (functions.containsKey("MXNDArrayCallDLPackDeleter")) {
@@ -808,6 +878,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetDType(Pointer handle, IntBuffer out_dtype) {
         if (functions.containsKey("MXNDArrayGetDType")) {
@@ -816,6 +887,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetAuxType(Pointer handle, int i, IntBuffer out_type) {
         if (functions.containsKey("MXNDArrayGetAuxType")) {
@@ -824,6 +896,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetAuxType64(Pointer handle, long i, IntBuffer out_type) {
         if (functions.containsKey("MXNDArrayGetAuxType64")) {
@@ -832,6 +905,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetAuxNDArray(Pointer handle, int i, PointerByReference out) {
         if (functions.containsKey("MXNDArrayGetAuxNDArray")) {
@@ -840,6 +914,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetAuxNDArray64(Pointer handle, long i, PointerByReference out) {
         if (functions.containsKey("MXNDArrayGetAuxNDArray64")) {
@@ -848,6 +923,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetDataNDArray(Pointer handle, PointerByReference out) {
         if (functions.containsKey("MXNDArrayGetDataNDArray")) {
@@ -856,6 +932,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetContext(Pointer handle, IntBuffer out_dev_type, IntBuffer out_dev_id) {
         if (functions.containsKey("MXNDArrayGetContext")) {
@@ -869,6 +946,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetGrad(Pointer handle, PointerByReference out) {
         if (functions.containsKey("MXNDArrayGetGrad")) {
@@ -877,6 +955,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayDetach(Pointer handle, PointerByReference out) {
         if (functions.containsKey("MXNDArrayDetach")) {
@@ -885,6 +964,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArraySetGradState(Pointer handle, int state) {
         if (functions.containsKey("MXNDArraySetGradState")) {
@@ -893,6 +973,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetGradState(Pointer handle, IntBuffer out) {
         if (functions.containsKey("MXNDArrayGetGradState")) {
@@ -901,6 +982,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXListFunctions(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("MXListFunctions")) {
@@ -909,6 +991,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXGetFunction(String name, PointerByReference out) {
         if (functions.containsKey("MXGetFunction")) {
@@ -917,6 +1000,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXFuncGetInfo(
             Pointer fun,
@@ -945,6 +1029,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXFuncDescribe(
             Pointer fun,
@@ -963,6 +1048,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXFuncInvoke(
             Pointer fun,
@@ -977,6 +1063,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXFuncInvokeEx(
             Pointer fun,
@@ -1003,6 +1090,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXImperativeInvoke(
             Pointer creator,
@@ -1031,6 +1119,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXImperativeInvokeEx(
             Pointer creator,
@@ -1064,6 +1153,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAutogradSetIsRecording(int is_recording, IntBuffer prev) {
         if (functions.containsKey("MXAutogradSetIsRecording")) {
@@ -1074,6 +1164,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAutogradSetIsTraining(int is_training, IntBuffer prev) {
         if (functions.containsKey("MXAutogradSetIsTraining")) {
@@ -1082,6 +1173,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAutogradIsRecording(ByteBuffer curr) {
         if (functions.containsKey("MXAutogradIsRecording")) {
@@ -1090,6 +1182,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAutogradIsTraining(ByteBuffer curr) {
         if (functions.containsKey("MXAutogradIsTraining")) {
@@ -1098,6 +1191,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXIsNumpyShape(IntBuffer curr) {
         if (functions.containsKey("MXIsNumpyShape")) {
@@ -1106,6 +1200,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSetIsNumpyShape(int is_np_shape, IntBuffer prev) {
         if (functions.containsKey("MXSetIsNumpyShape")) {
@@ -1114,6 +1209,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAutogradMarkVariables(
             int num_var,
@@ -1128,6 +1224,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAutogradComputeGradient(int num_output, PointerByReference output_handles) {
         if (functions.containsKey("MXAutogradComputeGradient")) {
@@ -1138,6 +1235,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAutogradBackward(
             int num_output,
@@ -1152,6 +1250,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAutogradBackwardEx(
             int num_output,
@@ -1172,6 +1271,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXAutogradGetSymbol(Pointer handle, PointerByReference out) {
         if (functions.containsKey("MXAutogradGetSymbol")) {
@@ -1180,6 +1280,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXCreateCachedOp(Pointer handle, PointerByReference out) {
         if (functions.containsKey("MXCreateCachedOp")) {
@@ -1188,6 +1289,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXCreateCachedOpEx(
             Pointer handle, int num_flags, String[] keys, String[] vals, PointerByReference out) {
@@ -1201,6 +1303,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXFreeCachedOp(Pointer handle) {
         if (functions.containsKey("MXFreeCachedOp")) {
@@ -1209,6 +1312,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXInvokeCachedOp(
             Pointer handle,
@@ -1232,6 +1336,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXInvokeCachedOpEx(
             Pointer handle,
@@ -1261,6 +1366,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXCachedOpRegisterOpHook(
             Pointer handle, CachedOpMonitorCallback callback, byte monitor_all) {
@@ -1272,6 +1378,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXListAllOpNames(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("MXListAllOpNames")) {
@@ -1288,6 +1395,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolListAtomicSymbolCreators(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("MXSymbolListAtomicSymbolCreators")) {
@@ -1298,6 +1406,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGetAtomicSymbolName(Pointer creator, String[] name) {
         if (functions.containsKey("MXSymbolGetAtomicSymbolName")) {
@@ -1306,6 +1415,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGetInputSymbols(
             Pointer sym, PointerByReference inputs, IntBuffer input_size) {
@@ -1317,6 +1427,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolCutSubgraph(Pointer sym, PointerByReference inputs, IntBuffer input_size) {
         if (functions.containsKey("MXSymbolCutSubgraph")) {
@@ -1327,6 +1438,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGetAtomicSymbolInfo(
             Pointer creator,
@@ -1357,6 +1469,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolCreateAtomicSymbol(
             Pointer creator, int num_param, String[] keys, String[] vals, PointerByReference out) {
@@ -1368,6 +1481,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolCreateVariable(String name, PointerByReference out) {
         if (functions.containsKey("MXSymbolCreateVariable")) {
@@ -1376,6 +1490,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolCreateGroup(
             int num_symbols, PointerByReference symbols, PointerByReference out) {
@@ -1387,6 +1502,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolCreateFromFile(String fname, PointerByReference out) {
         if (functions.containsKey("MXSymbolCreateFromFile")) {
@@ -1397,6 +1513,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolCreateFromJSON(String json, PointerByReference out) {
         if (functions.containsKey("MXSymbolCreateFromJSON")) {
@@ -1405,6 +1522,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolRemoveAmpCast(Pointer sym_handle, PointerByReference ret_sym_handle) {
         if (functions.containsKey("MXSymbolRemoveAmpCast")) {
@@ -1415,6 +1533,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolSaveToFile(Pointer symbol, String fname) {
         if (functions.containsKey("MXSymbolSaveToFile")) {
@@ -1423,6 +1542,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolSaveToJSON(Pointer symbol, String[] out_json) {
         if (functions.containsKey("MXSymbolSaveToJSON")) {
@@ -1431,6 +1551,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolFree(Pointer symbol) {
         if (functions.containsKey("MXSymbolFree")) {
@@ -1439,6 +1560,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolCopy(Pointer symbol, PointerByReference out) {
         if (functions.containsKey("MXSymbolCopy")) {
@@ -1447,6 +1569,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolPrint(Pointer symbol, String[] out_str) {
         if (functions.containsKey("MXSymbolPrint")) {
@@ -1455,6 +1578,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGetName(Pointer symbol, String[] out, IntBuffer success) {
         if (functions.containsKey("MXSymbolGetName")) {
@@ -1463,6 +1587,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGetAttr(Pointer symbol, String key, String[] out, IntBuffer success) {
         if (functions.containsKey("MXSymbolGetAttr")) {
@@ -1471,6 +1596,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolSetAttr(Pointer symbol, String key, String value) {
         if (functions.containsKey("MXSymbolSetAttr")) {
@@ -1479,6 +1605,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolListAttr(Pointer symbol, IntBuffer out_size, PointerByReference out) {
         if (functions.containsKey("MXSymbolListAttr")) {
@@ -1487,6 +1614,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolListAttrShallow(Pointer symbol, IntBuffer out_size, PointerByReference out) {
         if (functions.containsKey("MXSymbolListAttrShallow")) {
@@ -1497,6 +1625,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolListArguments(
             Pointer symbol, IntBuffer out_size, PointerByReference out_str_array) {
@@ -1508,6 +1637,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolListOutputs(
             Pointer symbol, IntBuffer out_size, PointerByReference out_str_array) {
@@ -1519,6 +1649,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGetNumOutputs(Pointer symbol, IntBuffer output_count) {
         if (functions.containsKey("MXSymbolGetNumOutputs")) {
@@ -1529,6 +1660,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGetInternals(Pointer symbol, PointerByReference out) {
         if (functions.containsKey("MXSymbolGetInternals")) {
@@ -1537,6 +1669,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGetChildren(Pointer symbol, PointerByReference out) {
         if (functions.containsKey("MXSymbolGetChildren")) {
@@ -1545,6 +1678,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGetOutput(Pointer symbol, int index, PointerByReference out) {
         if (functions.containsKey("MXSymbolGetOutput")) {
@@ -1553,6 +1687,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolListAuxiliaryStates(
             Pointer symbol, IntBuffer out_size, PointerByReference out_str_array) {
@@ -1564,6 +1699,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolCompose(
             Pointer sym, String name, int num_args, String[] keys, PointerByReference args) {
@@ -1575,6 +1711,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolGrad(Pointer sym, int num_wrt, String[] wrt, PointerByReference out) {
         if (functions.containsKey("MXSymbolGrad")) {
@@ -1583,6 +1720,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferShape(
             Pointer sym,
@@ -1625,6 +1763,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferShape64(
             Pointer sym,
@@ -1667,6 +1806,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferShapeEx(
             Pointer sym,
@@ -1709,6 +1849,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferShapeEx64(
             Pointer sym,
@@ -1751,6 +1892,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferShapePartial(
             Pointer sym,
@@ -1793,6 +1935,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferShapePartial64(
             Pointer sym,
@@ -1835,6 +1978,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferShapePartialEx(
             Pointer sym,
@@ -1877,6 +2021,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferShapePartialEx64(
             Pointer sym,
@@ -1919,6 +2064,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferType(
             Pointer sym,
@@ -1953,6 +2099,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSymbolInferTypePartial(
             Pointer sym,
@@ -1987,6 +2134,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXQuantizeSymbol(
             Pointer sym_handle,
@@ -2027,6 +2175,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXReducePrecisionSymbol(
             Pointer sym_handle,
@@ -2085,6 +2234,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXSetCalibTableToQuantizedSymbol(
             Pointer qsym_handle,
@@ -2109,6 +2259,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXGenBackendSubgraph(
             Pointer sym_handle, String backend, PointerByReference ret_sym_handle) {
@@ -2120,6 +2271,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXGenAtomicSymbolFromSymbol(Pointer sym_handle, PointerByReference ret_sym_handle) {
         if (functions.containsKey("MXGenAtomicSymbolFromSymbol")) {
@@ -2130,6 +2282,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXOptimizeForBackend(
             Pointer sym_handle,
@@ -2160,6 +2313,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorFree(Pointer handle) {
         if (functions.containsKey("MXExecutorFree")) {
@@ -2168,6 +2322,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorPrint(Pointer handle, String[] out_str) {
         if (functions.containsKey("MXExecutorPrint")) {
@@ -2176,6 +2331,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorForward(Pointer handle, int is_train) {
         if (functions.containsKey("MXExecutorForward")) {
@@ -2184,6 +2340,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorBackward(Pointer handle, int len, PointerByReference head_grads) {
         if (functions.containsKey("MXExecutorBackward")) {
@@ -2194,6 +2351,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorBackwardEx(
             Pointer handle, int len, PointerByReference head_grads, int is_train) {
@@ -2205,6 +2363,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorOutputs(Pointer handle, IntBuffer out_size, PointerByReference out) {
         if (functions.containsKey("MXExecutorOutputs")) {
@@ -2213,6 +2372,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorBind(
             Pointer symbol_handle,
@@ -2245,6 +2405,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorBindX(
             Pointer symbol_handle,
@@ -2285,6 +2446,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorBindEX(
             Pointer symbol_handle,
@@ -2327,6 +2489,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorSimpleBind(
             Pointer symbol_handle,
@@ -2407,6 +2570,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorSimpleBindEx(
             Pointer symbol_handle,
@@ -2487,6 +2651,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorSimpleBindEx64(
             Pointer symbol_handle,
@@ -2526,6 +2691,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorReshape(
             int partial_shaping,
@@ -2576,6 +2742,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorReshapeEx(
             int partial_shaping,
@@ -2626,6 +2793,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorGetOptimizedSymbol(Pointer handle, PointerByReference out) {
         if (functions.containsKey("MXExecutorGetOptimizedSymbol")) {
@@ -2634,6 +2802,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorSetMonitorCallback(
             Pointer handle, ExecutorMonitorCallback callback, Pointer callback_handle) {
@@ -2645,6 +2814,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXExecutorSetMonitorCallbackEX(
             Pointer handle,
@@ -2659,6 +2829,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXListDataIters(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("MXListDataIters")) {
@@ -2667,6 +2838,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDataIterCreateIter(
             Pointer handle, int num_param, String[] keys, String[] vals, PointerByReference out) {
@@ -2678,6 +2850,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDataIterGetIterInfo(
             Pointer creator,
@@ -2704,6 +2877,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDataIterFree(Pointer handle) {
         if (functions.containsKey("MXDataIterFree")) {
@@ -2712,6 +2886,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDataIterNext(Pointer handle, IntBuffer out) {
         if (functions.containsKey("MXDataIterNext")) {
@@ -2720,6 +2895,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDataIterBeforeFirst(Pointer handle) {
         if (functions.containsKey("MXDataIterBeforeFirst")) {
@@ -2728,6 +2904,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDataIterGetData(Pointer handle, PointerByReference out) {
         if (functions.containsKey("MXDataIterGetData")) {
@@ -2736,6 +2913,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDataIterGetIndex(
             Pointer handle, PointerByReference out_index, LongBuffer out_size) {
@@ -2747,6 +2925,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDataIterGetPadNum(Pointer handle, IntBuffer pad) {
         if (functions.containsKey("MXDataIterGetPadNum")) {
@@ -2755,6 +2934,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXDataIterGetLabel(Pointer handle, PointerByReference out) {
         if (functions.containsKey("MXDataIterGetLabel")) {
@@ -2763,6 +2943,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXInitPSEnv(int num_vars, String[] keys, String[] vals) {
         if (functions.containsKey("MXInitPSEnv")) {
@@ -2771,6 +2952,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreCreate(String type, PointerByReference out) {
         if (functions.containsKey("MXKVStoreCreate")) {
@@ -2779,6 +2961,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreSetGradientCompression(
             Pointer handle, int num_params, String[] keys, String[] vals) {
@@ -2790,6 +2973,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreFree(Pointer handle) {
         if (functions.containsKey("MXKVStoreFree")) {
@@ -2798,6 +2982,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreInit(Pointer handle, int num, int[] keys, PointerArray vals) {
         if (functions.containsKey("MXKVStoreInit")) {
@@ -2806,6 +2991,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreInitEx(Pointer handle, int num, String[] keys, PointerArray vals) {
         if (functions.containsKey("MXKVStoreInitEx")) {
@@ -2814,6 +3000,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePush(Pointer handle, int num, int[] keys, PointerArray vals, int priority) {
         if (functions.containsKey("MXKVStorePush")) {
@@ -2824,6 +3011,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePushEx(
             Pointer handle, int num, String[] keys, PointerArray vals, int priority) {
@@ -2835,6 +3023,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePullWithSparse(
             Pointer handle,
@@ -2851,6 +3040,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePullWithSparseEx(
             Pointer handle,
@@ -2867,6 +3057,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePull(Pointer handle, int num, int[] keys, PointerArray vals, int priority) {
         if (functions.containsKey("MXKVStorePull")) {
@@ -2877,6 +3068,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePullEx(
             Pointer handle, int num, String[] keys, PointerArray vals, int priority) {
@@ -2888,6 +3080,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePullRowSparse(
             Pointer handle,
@@ -2904,6 +3097,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePullRowSparseEx(
             Pointer handle,
@@ -2920,6 +3114,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePushPull(
             Pointer handle,
@@ -2938,6 +3133,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStorePushPullEx(
             Pointer handle,
@@ -2956,6 +3152,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreSetUpdater(
             Pointer handle, MXKVStoreUpdater updater, Pointer updater_handle) {
@@ -2967,6 +3164,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreSetUpdaterEx(
             Pointer handle,
@@ -2981,6 +3179,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreGetType(Pointer handle, String[] type) {
         if (functions.containsKey("MXKVStoreGetType")) {
@@ -2989,6 +3188,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreGetRank(Pointer handle, IntBuffer ret) {
         if (functions.containsKey("MXKVStoreGetRank")) {
@@ -2997,6 +3197,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreGetGroupSize(Pointer handle, IntBuffer ret) {
         if (functions.containsKey("MXKVStoreGetGroupSize")) {
@@ -3005,6 +3206,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreIsWorkerNode(IntBuffer ret) {
         if (functions.containsKey("MXKVStoreIsWorkerNode")) {
@@ -3013,6 +3215,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreIsServerNode(IntBuffer ret) {
         if (functions.containsKey("MXKVStoreIsServerNode")) {
@@ -3021,6 +3224,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreIsSchedulerNode(IntBuffer ret) {
         if (functions.containsKey("MXKVStoreIsSchedulerNode")) {
@@ -3029,6 +3233,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreBarrier(Pointer handle) {
         if (functions.containsKey("MXKVStoreBarrier")) {
@@ -3037,6 +3242,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreSetBarrierBeforeExit(Pointer handle, int barrier_before_exit) {
         if (functions.containsKey("MXKVStoreSetBarrierBeforeExit")) {
@@ -3047,6 +3253,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreRunServer(
             Pointer handle, MXKVStoreServerController controller, Pointer controller_handle) {
@@ -3058,6 +3265,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreSendCommmandToServers(Pointer handle, int cmd_id, String cmd_body) {
         if (functions.containsKey("MXKVStoreSendCommmandToServers")) {
@@ -3068,6 +3276,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXKVStoreGetNumDeadNode(
             Pointer handle, int node_id, IntBuffer number, int timeout_sec) {
@@ -3079,6 +3288,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRecordIOWriterCreate(String uri, PointerByReference out) {
         if (functions.containsKey("MXRecordIOWriterCreate")) {
@@ -3087,6 +3297,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRecordIOWriterFree(Pointer handle) {
         if (functions.containsKey("MXRecordIOWriterFree")) {
@@ -3095,6 +3306,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRecordIOWriterWriteRecord(Pointer handle, String buf, NativeSize size) {
         if (functions.containsKey("MXRecordIOWriterWriteRecord")) {
@@ -3105,6 +3317,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRecordIOWriterTell(Pointer handle, NativeSizeByReference pos) {
         if (functions.containsKey("MXRecordIOWriterTell")) {
@@ -3113,6 +3326,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRecordIOReaderCreate(String uri, PointerByReference out) {
         if (functions.containsKey("MXRecordIOReaderCreate")) {
@@ -3121,6 +3335,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRecordIOReaderFree(Pointer handle) {
         if (functions.containsKey("MXRecordIOReaderFree")) {
@@ -3129,6 +3344,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRecordIOReaderReadRecord(Pointer handle, String buf, NativeSizeByReference size) {
         if (functions.containsKey("MXRecordIOReaderReadRecord")) {
@@ -3139,6 +3355,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRecordIOReaderSeek(Pointer handle, NativeSize pos) {
         if (functions.containsKey("MXRecordIOReaderSeek")) {
@@ -3147,6 +3364,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRecordIOReaderTell(Pointer handle, NativeSizeByReference pos) {
         if (functions.containsKey("MXRecordIOReaderTell")) {
@@ -3155,6 +3373,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRtcCreate(
             ByteBuffer name,
@@ -3185,6 +3404,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRtcPush(
             Pointer handle,
@@ -3219,6 +3439,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRtcFree(Pointer handle) {
         if (functions.containsKey("MXRtcFree")) {
@@ -3227,6 +3448,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXCustomOpRegister(String op_type, CustomOpPropCreator creator) {
         if (functions.containsKey("MXCustomOpRegister")) {
@@ -3235,6 +3457,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXCustomFunctionRecord(
             int num_inputs,
@@ -3250,6 +3473,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRtcCudaModuleCreate(
             String source,
@@ -3266,6 +3490,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRtcCudaModuleFree(Pointer handle) {
         if (functions.containsKey("MXRtcCudaModuleFree")) {
@@ -3274,6 +3499,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRtcCudaKernelCreate(
             Pointer handle,
@@ -3294,6 +3520,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRtcCudaKernelFree(Pointer handle) {
         if (functions.containsKey("MXRtcCudaKernelFree")) {
@@ -3302,6 +3529,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXRtcCudaKernelCall(
             Pointer handle,
@@ -3334,6 +3562,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayGetSharedMemHandle(
             Pointer handle, IntBuffer shared_pid, IntBuffer shared_id) {
@@ -3345,6 +3574,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayCreateFromSharedMem(
             int shared_pid,
@@ -3361,6 +3591,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXStorageEmptyCache(int dev_type, int dev_id) {
         if (functions.containsKey("MXStorageEmptyCache")) {
@@ -3369,6 +3600,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXNDArrayCreateFromSharedMemEx(
             int shared_pid,
@@ -3385,6 +3617,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXEnginePushAsync(
             EngineAsyncFunc async_func,
@@ -3421,6 +3654,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXEnginePushSync(
             EngineSyncFunc sync_func,
@@ -3455,6 +3689,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXShallowCopyNDArray(Pointer src, PointerByReference out) {
         if (functions.containsKey("MXShallowCopyNDArray")) {
@@ -3463,6 +3698,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXShallowCopySymbol(Pointer src, PointerByReference out) {
         if (functions.containsKey("MXShallowCopySymbol")) {
@@ -3471,6 +3707,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXEnginePushAsyncND(
             EngineAsyncFunc async_func,
@@ -3507,6 +3744,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXEnginePushSyncND(
             EngineSyncFunc sync_func,
@@ -3541,6 +3779,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void NNAPISetLastError(String msg) {
         if (functions.containsKey("NNAPISetLastError")) {
@@ -3548,11 +3787,13 @@ public class MockMxnetLibrary implements MxnetLibrary {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String NNGetLastError() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNListAllOpNames(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("NNListAllOpNames")) {
@@ -3561,6 +3802,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNGetOpHandle(String op_name, PointerByReference op_out) {
         if (functions.containsKey("NNGetOpHandle")) {
@@ -3571,6 +3813,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNListUniqueOps(IntBuffer out_size, PointerByReference out_array) {
         if (functions.containsKey("NNListUniqueOps")) {
@@ -3579,6 +3822,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNGetOpInfo(
             Pointer op,
@@ -3607,6 +3851,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolCreateAtomicSymbol(
             Pointer op, int num_param, String[] keys, String[] vals, PointerByReference out) {
@@ -3618,6 +3863,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolCreateVariable(String name, PointerByReference out) {
         if (functions.containsKey("NNSymbolCreateVariable")) {
@@ -3626,6 +3872,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolCreateGroup(
             int num_symbols, PointerByReference symbols, PointerByReference out) {
@@ -3637,6 +3884,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNAddControlDeps(Pointer handle, Pointer src_dep) {
         if (functions.containsKey("NNAddControlDeps")) {
@@ -3645,6 +3893,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolFree(Pointer symbol) {
         if (functions.containsKey("NNSymbolFree")) {
@@ -3653,6 +3902,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolCopy(Pointer symbol, PointerByReference out) {
         if (functions.containsKey("NNSymbolCopy")) {
@@ -3661,6 +3911,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolPrint(Pointer symbol, String[] out_str) {
         if (functions.containsKey("NNSymbolPrint")) {
@@ -3669,6 +3920,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolGetAttr(Pointer symbol, String key, String[] out, IntBuffer success) {
         if (functions.containsKey("NNSymbolGetAttr")) {
@@ -3677,6 +3929,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolSetAttrs(Pointer symbol, int num_param, String[] keys, String[] values) {
         if (functions.containsKey("NNSymbolSetAttrs")) {
@@ -3687,6 +3940,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolListAttrs(
             Pointer symbol, int recursive_option, IntBuffer out_size, PointerByReference out) {
@@ -3698,6 +3952,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolListInputVariables(
             Pointer symbol, int option, IntBuffer out_size, PointerByReference out_sym_array) {
@@ -3709,6 +3964,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolListInputNames(
             Pointer symbol, int option, IntBuffer out_size, PointerByReference out_str_array) {
@@ -3730,6 +3986,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolListOutputNames(
             Pointer symbol, IntBuffer out_size, PointerByReference out_str_array) {
@@ -3741,6 +3998,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolGetNumOutputs(Pointer symbol, IntBuffer output_count) {
         if (functions.containsKey("NNSymbolGetNumOutputs")) {
@@ -3751,6 +4009,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolGetInternals(Pointer symbol, PointerByReference out) {
         if (functions.containsKey("NNSymbolGetInternals")) {
@@ -3759,6 +4018,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolGetChildren(Pointer symbol, PointerByReference out) {
         if (functions.containsKey("NNSymbolGetChildren")) {
@@ -3767,6 +4027,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolGetOutput(Pointer symbol, int index, PointerByReference out) {
         if (functions.containsKey("NNSymbolGetOutput")) {
@@ -3775,6 +4036,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNSymbolCompose(
             Pointer sym, String name, int num_args, String[] keys, PointerByReference args) {
@@ -3786,6 +4048,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNGraphCreate(Pointer symbol, PointerByReference graph) {
         if (functions.containsKey("NNGraphCreate")) {
@@ -3794,6 +4057,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNGraphFree(Pointer handle) {
         if (functions.containsKey("NNGraphFree")) {
@@ -3802,6 +4066,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNGraphGetSymbol(Pointer graph, PointerByReference symbol) {
         if (functions.containsKey("NNGraphGetSymbol")) {
@@ -3810,6 +4075,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNGraphSetJSONAttr(Pointer handle, String key, String json_value) {
         if (functions.containsKey("NNGraphSetJSONAttr")) {
@@ -3820,6 +4086,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNGraphGetJSONAttr(
             Pointer handle, String key, String[] json_out, IntBuffer success) {
@@ -3831,6 +4098,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNGraphSetNodeEntryListAttr_(Pointer handle, String key, Pointer list) {
         if (functions.containsKey("NNGraphSetNodeEntryListAttr_")) {
@@ -3841,6 +4109,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int NNGraphApplyPasses(
             Pointer src, int num_pass, String[] pass_names, PointerByReference dst) {

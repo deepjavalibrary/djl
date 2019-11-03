@@ -462,6 +462,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return manager.invoke("_np_ones_like", this, null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
         if (number == null) {
@@ -472,6 +473,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean contentEquals(NDArray other) {
         if (other == null || (!getShape().equals(other.getShape()))) {
@@ -708,6 +710,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return manager.invoke("_npi_mod", new NDList(this, other), null).singletonOrThrow();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray pow(Number n) {
         MxOpParams params = new MxOpParams();
@@ -715,6 +718,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return manager.invoke("_npi_power_scalar", this, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray pow(NDArray other) {
         return manager.invoke("_npi_power", new NDList(this, other), null).singletonOrThrow();
@@ -812,6 +816,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray powi(Number n) {
         MxOpParams params = new MxOpParams();
@@ -820,6 +825,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray powi(NDArray other) {
         manager.invoke("_npi_power", new NDList(this, other), new NDList(this), null);
@@ -1387,6 +1393,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return tile(repeatsArray);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tile(long[] repeats) {
         MxOpParams params = new MxOpParams();
@@ -1423,6 +1430,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return repeat(repeatsArray);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray repeat(long[] repeats) {
         // TODO get rid of for loop once bug in MXNet np.repeat is fixed
@@ -1676,6 +1684,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         JnaUtils.waitToRead(getHandle());
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MxNDArray) {
@@ -1684,6 +1693,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return 0;

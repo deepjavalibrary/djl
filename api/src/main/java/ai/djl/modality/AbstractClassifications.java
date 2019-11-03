@@ -50,6 +50,7 @@ public abstract class AbstractClassifications<I extends Item> {
         return item(probabilities.indexOf(Collections.max(probabilities)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

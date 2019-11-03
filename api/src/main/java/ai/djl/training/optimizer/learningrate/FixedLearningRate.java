@@ -18,6 +18,7 @@ class FixedLearningRate extends LearningRateTracker {
         super(builder);
     }
 
+    /** {@inheritDoc} */
     @Override
     public float getNewLearningRate(int numUpdate) {
         return baseLearningRate;
@@ -25,6 +26,7 @@ class FixedLearningRate extends LearningRateTracker {
 
     public static final class Builder extends LrBaseBuilder<Builder> {
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

@@ -49,41 +49,49 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
         this.usage = builder.usage;
     }
 
+    /** {@inheritDoc} */
     @Override
     public MRL getMrl() {
         return new MRL(MRL.Dataset.CV, BasicDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Repository getRepository() {
         return repository;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Artifact getArtifact() {
         return artifact;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Usage getUsage() {
         return usage;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isPrepared() {
         return prepared;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setPrepared(boolean prepared) {
         this.prepared = prepared;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void useDefaultArtifact() throws IOException {
         artifact = repository.resolve(getMrl(), "1.0", null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void prepareData(Usage usage) throws IOException {
         Map<String, Artifact.Item> map = artifact.getFiles();
@@ -142,6 +150,7 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
         private Artifact artifact;
         private Usage usage;
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;

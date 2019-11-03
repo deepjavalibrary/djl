@@ -33,6 +33,7 @@ public class BatchSampler implements Sampler {
         this.dropLast = dropLast;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Iterator<List<Long>> sample(RandomAccessDataset dataset) {
         return new Iterate(dataset);
@@ -54,11 +55,13 @@ public class BatchSampler implements Sampler {
             itemSampler = subSampler.sample(dataset);
         }
 
+        /** {@inheritDoc} */
         @Override
         public boolean hasNext() {
             return current < size;
         }
 
+        /** {@inheritDoc} */
         @Override
         public List<Long> next() {
             List<Long> batchIndices = new ArrayList<>();

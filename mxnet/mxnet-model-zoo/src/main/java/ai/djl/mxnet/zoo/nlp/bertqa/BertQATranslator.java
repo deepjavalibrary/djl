@@ -29,11 +29,13 @@ public class BertQATranslator implements Translator<QAInput, String> {
 
     BertQATranslator() {}
 
+    /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, QAInput input) throws IOException {
         BertDataParser parser = ctx.getModel().getArtifact("vocab.json", BertDataParser::parse);
@@ -59,6 +61,7 @@ public class BertQATranslator implements Translator<QAInput, String> {
         return new NDList(data0, data1, data2);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String processOutput(TranslatorContext ctx, NDList list) {
         NDArray array = list.singletonOrThrow();

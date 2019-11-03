@@ -54,6 +54,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         new TrainResnetWithCifar10().runExample(args);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void train(Arguments arguments) throws IOException, ModelNotFoundException {
         try (Model model = getModel(arguments.getIsSymbolic(), arguments.getPreTrained())) {

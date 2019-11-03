@@ -47,6 +47,7 @@ public class PoseEstimationExample extends AbstractInference<List<Joints>> {
         new PoseEstimationExample().runExample(args);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected List<Joints> predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {

@@ -60,6 +60,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Device[] getDevices() {
         if (devices == null) {
@@ -78,26 +79,31 @@ public class DefaultTrainingConfig implements TrainingConfig {
         return devices;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Initializer getInitializer() {
         return initializer;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optimizer getOptimizer() {
         return optimizer;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Loss getLossFunction() {
         return loss;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<TrainingMetric> getTrainingMetrics() {
         return trainingMetrics;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getBatchSize() {
         return batchSize;
