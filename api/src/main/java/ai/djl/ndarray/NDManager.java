@@ -911,7 +911,7 @@ public interface NDManager extends AutoCloseable {
      * @throws IllegalArgumentException if operation is not supported by Engine
      * @throws EngineException if operation failed in native engine
      */
-    void invoke(String operation, NDList src, NDList dest, PairList<String, ?> params);
+    void invoke(String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params);
 
     /**
      * An engine specific generic invocation to native operator.

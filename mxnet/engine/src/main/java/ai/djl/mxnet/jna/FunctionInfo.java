@@ -46,11 +46,6 @@ public class FunctionInfo {
         return invoke((MxNDManager) manager, srcHandles, params);
     }
 
-    public NDArray[] invoke(NDManager manager, NDArray src, PairList<String, ?> params) {
-        PointerArray handles = JnaUtils.toPointerArray(new NDArray[] {src});
-        return invoke((MxNDManager) manager, handles, params);
-    }
-
     private NDArray[] invoke(MxNDManager manager, PointerArray src, PairList<String, ?> params) {
         PointerByReference destRef = new PointerByReference();
 

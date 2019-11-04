@@ -121,7 +121,8 @@ public class TfNDManager implements NDManager, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public void invoke(String operation, NDList src, NDList dest, PairList<String, ?> params) {}
+    public void invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {}
 
     /** {@inheritDoc} */
     @Override

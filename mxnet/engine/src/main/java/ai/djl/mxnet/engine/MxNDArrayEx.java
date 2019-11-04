@@ -52,14 +52,14 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rdivi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        getManager().invoke("_rdiv_scalar", new NDList(array), new NDList(array), params);
+        getManager().invoke("_rdiv_scalar", new NDArray[] {array}, new NDArray[] {array}, params);
         return array;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rdivi(NDArray b) {
-        getManager().invoke("elemwise_div", new NDList(b, array), new NDList(array), null);
+        getManager().invoke("elemwise_div", new NDArray[] {b, array}, new NDArray[] {array}, null);
         return array;
     }
 
@@ -106,14 +106,15 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rmodi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        getManager().invoke("_npi_rmod_scalar", new NDList(array), new NDList(array), params);
+        getManager()
+                .invoke("_npi_rmod_scalar", new NDArray[] {array}, new NDArray[] {array}, params);
         return array;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(NDArray b) {
-        getManager().invoke("_npi_mod", new NDList(b, array), new NDList(array), null);
+        getManager().invoke("_npi_mod", new NDArray[] {b, array}, new NDArray[] {array}, null);
         return array;
     }
 
@@ -130,7 +131,8 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray rpowi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
-        getManager().invoke("_npi_rpower_scalar", new NDList(array), new NDList(array), params);
+        getManager()
+                .invoke("_npi_rpower_scalar", new NDArray[] {array}, new NDArray[] {array}, params);
         return array;
     }
 
@@ -145,17 +147,13 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray max(NDArray other) {
-        return getManager()
-                .invoke("_npi_maximum", new NDList(array, other), null)
-                .singletonOrThrow();
+        return getManager().invoke("_npi_maximum", new NDArray[] {array, other}, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray min(NDArray other) {
-        return getManager()
-                .invoke("_npi_minimum", new NDList(array, other), null)
-                .singletonOrThrow();
+        return getManager().invoke("_npi_minimum", new NDArray[] {array, other}, null);
     }
 
     /** {@inheritDoc} */
