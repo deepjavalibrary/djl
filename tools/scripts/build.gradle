@@ -7,12 +7,12 @@ repositories {
     jcenter()
     // mavenLocal()
     maven {
-        url 'https://djl-ai.s3.amazonaws.com/benchmark-repo'
+        url 'https://djl-ai.s3.amazonaws.com/dev'
     }
 }
 
 dependencies {
-    compile "ai.djl:examples:0.1.0-SNAPSHOT"
+    compile "ai.djl:examples:0.2.0-SNAPSHOT"
 }
 
 application {
