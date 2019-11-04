@@ -6,6 +6,7 @@
 build
 libs
 *.gz
+*.params
 *.zip
 *.jar
 *.so
