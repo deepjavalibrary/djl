@@ -67,6 +67,7 @@ public class Parameter implements AutoCloseable {
 
     public void setArray(NDArray array) {
         this.array = array;
+        array.setName(name);
     }
 
     public NDArray getArray() {
@@ -103,6 +104,7 @@ public class Parameter implements AutoCloseable {
                             manager,
                             shape,
                             mandatoryDataType == null ? dataType : mandatoryDataType);
+            array.setName(name);
         }
 
         if (requireGradient()) {

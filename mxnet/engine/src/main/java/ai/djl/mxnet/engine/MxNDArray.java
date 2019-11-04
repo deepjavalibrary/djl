@@ -155,6 +155,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             return slice();
         }
         MxNDArray nd = manager.create(getShape(), getDataType(), dev);
+        nd.name = name;
         copyTo(nd);
         return nd;
     }
@@ -166,6 +167,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             return slice();
         }
         MxNDArray nd = manager.create(getShape(), dtype, getDevice());
+        nd.name = name;
         copyTo(nd);
         return nd;
     }

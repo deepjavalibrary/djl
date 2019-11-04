@@ -585,6 +585,7 @@ public interface NDArray extends AutoCloseable {
      */
     default NDArray duplicate() {
         NDArray array = getManager().create(getShape(), getDataType(), getDevice());
+        array.setName(getName());
         copyTo(array);
         return array;
     }
