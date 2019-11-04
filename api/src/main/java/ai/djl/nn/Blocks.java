@@ -23,18 +23,53 @@ public final class Blocks {
         return flatten(arrays, batch, -1);
     }
 
-    private static NDList flatten(NDList arrays, long batch, long size) {
-        return new NDList(arrays.singletonOrThrow().reshape(batch, size));
+    /**
+     * Flattens the only {@link ai.djl.ndarray.NDArray} in the input to a 2-D {@link
+     * ai.djl.ndarray.NDArray} of shape (batch, size).
+     *
+     * @param array a singleton {@link NDList}
+     * @param batch the batch size
+     * @param size the size of the flattened array
+     * @return a singleton {@link NDList} that contains the flattened {@link ai.djl.ndarray.NDArray}
+     * @throws IndexOutOfBoundsException if the input {@link NDList} has more than one {@link
+     *     ai.djl.ndarray.NDArray}
+     */
+    private static NDList flatten(NDList array, long batch, long size) {
+        return new NDList(array.singletonOrThrow().reshape(batch, size));
     }
 
+    /**
+     * Creates a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
+     * method.
+     *
+     * @return a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
+     *     method
+     */
     public static Block flattenBlock() {
         return new LambdaBlock(arrays -> flatten(arrays));
     }
 
+    /**
+     * Creates a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
+     * method. The size of input to the block returned must be batch_size * size.
+     *
+     * @param size the expected size of each input
+     * @return a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
+     *     method
+     */
     public static Block flattenBlock(long size) {
         return flattenBlock(-1, size);
     }
 
+    /**
+     * Creates a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
+     * method. The size of input to the block returned must be batch * size.
+     *
+     * @param batch the batch size
+     * @param size the expected size of each input
+     * @return a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
+     *     method
+     */
     public static Block flattenBlock(long batch, long size) {
         return new LambdaBlock(arrays -> flatten(arrays, batch, size));
     }

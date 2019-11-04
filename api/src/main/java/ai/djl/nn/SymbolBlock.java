@@ -12,7 +12,12 @@
  */
 package ai.djl.nn;
 
+/**
+ * {@code SymbolBlock} is a {@link Block} is used to load models which were exported directly from
+ * the engine in its native format.
+ */
 public interface SymbolBlock extends Block {
 
+    /** Removes the last block in the symbolic graph. */
     void removeLastBlock();
 }

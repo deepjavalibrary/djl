@@ -14,6 +14,7 @@ package ai.djl.nn;
 
 import ai.djl.training.initializer.Initializer;
 
+/** Enumerates the types of {@link Parameter}. */
 public enum ParameterType {
     WEIGHT(null),
     BIAS(Initializer.ZEROS),

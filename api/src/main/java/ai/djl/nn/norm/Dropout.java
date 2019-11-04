@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Applies dropout operation to input array
+ * Applies dropout operation to an input array.
  *
  * <p>During training, each element of the input is set to zero with probability p. The whole array
  * is rescaled by 1/(1−p) to keep the expected sum of the input unchanged. During testing, this

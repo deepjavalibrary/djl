@@ -25,6 +25,14 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * {@code Parameter} is a container class that holds a learnable parameter of a model.
+ *
+ * <p>Every {@code Parameter} is associated with a {@link Block}. The output of the block's forward
+ * function depends on the values in the {@code Parameter}. During training, the values in the
+ * {@code Parameter} are updated to reflect the training data. This process forms the crux of
+ * learning.
+ */
 public class Parameter implements AutoCloseable {
 
     private static final byte VERSION = 1;
@@ -40,10 +48,27 @@ public class Parameter implements AutoCloseable {
     private NDArray array;
     private boolean requireGrad;
 
+    /**
+     * Creates a {@code Parameter} with the given name, and parameter type, and associated with the
+     * given {@link Block}.
+     *
+     * @param name the name of the {@code Parameter}
+     * @param block the block with which this {@code Parameter} is associated
+     * @param type the type of this {@code Parameter}
+     */
     public Parameter(String name, Block block, ParameterType type) {
         this(name, block, type, true);
     }
 
+    /**
+     * Creates a {@code Parameter} with the given name, and parameter type, and associated with the
+     * given {@link Block}.
+     *
+     * @param name the name of the {@code Parameter}
+     * @param block the block with which this {@code Parameter} is associated
+     * @param type the type of this {@code Parameter}
+     * @param requireGrad whether this {@code Parameter} needs to compute gradients
+     */
     public Parameter(String name, Block block, ParameterType type, boolean requireGrad) {
         this.id = UUID.randomUUID().toString();
         this.name = name;
@@ -53,23 +78,48 @@ public class Parameter implements AutoCloseable {
         this.initializer = type.getInitializer();
     }
 
+    /**
+     * Gets the ID of this {@code Parameter}.
+     *
+     * @return the ID of this {@code Parameter}
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Gets the name of this {@code Parameter}.
+     *
+     * @return the name of this {@code Parameter}
+     */
     public String getName() {
         return name == null ? "" : name;
     }
 
+    /**
+     * Gets the type of this {@code Parameter}.
+     *
+     * @return the type of this {@code Parameter}
+     */
     public ParameterType getType() {
         return type;
     }
 
+    /**
+     * Sets the values of this {@code Parameter}.
+     *
+     * @param array the {@link NDArray} that contains values of this {@code Parameter}
+     */
     public void setArray(NDArray array) {
         this.array = array;
         array.setName(name);
     }
 
+    /**
+     * Gets the values of this {@code Parameter} as an {@link NDArray}.
+     *
+     * @return an {@link NDArray} that contains values of this {@code Parameter}.
+     */
     public NDArray getArray() {
         if (!isInitialized()) {
             throw new IllegalStateException("The array has not been initialized");
@@ -77,24 +127,54 @@ public class Parameter implements AutoCloseable {
         return array;
     }
 
+    /**
+     * Returns whether this parameter needs gradients to be computed.
+     *
+     * @return whether this parameter needs gradients to be computed
+     */
     public boolean requireGradient() {
         return requireGrad;
     }
 
+    /**
+     * Sets the mandatory data type for this {@code Parameter}.
+     *
+     * @param mandatoryDataType the mandatory data type for this {@code Parameter}
+     */
     public void setMandatoryDataType(DataType mandatoryDataType) {
         this.mandatoryDataType = mandatoryDataType;
     }
 
+    /**
+     * Checks if this {@code Parameter} is initialzed.
+     *
+     * @return true if this {@code Parameter} is initialzed
+     */
     public boolean isInitialized() {
         return array != null;
     }
 
+    /**
+     * Sets the {@link Initializer} for this {@code Parameter}, if not already set. If overwrite
+     * flag is true, sets the initializer regardless.
+     *
+     * @param initializer the initializer to be set
+     * @param overwrite if true, set the initializer regardless of whether its already set or not
+     */
     public void setInitializer(Initializer initializer, boolean overwrite) {
         if (overwrite || this.initializer == null) {
             this.initializer = initializer;
         }
     }
 
+    /**
+     * Initializes the parameter with the given {@link NDManager}, with given {@link DataType} for
+     * the given expected input shapes.
+     *
+     * @param manager an NDManager to create the arrays
+     * @param dataType the datatype of the {@code Parameter}
+     * @param inputShapes the expected input shapes
+     */
     public void initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
         Objects.requireNonNull(initializer, "No initializer has been set");
         if (!isInitialized()) {
@@ -112,6 +192,12 @@ public class Parameter implements AutoCloseable {
         }
     }
 
+    /**
+     * Writes the parameter NDArrays to the given output stream.
+     *
+     * @param dos the output stream to write to
+     * @throws IOException if the write operation fails
+     */
     public void save(DataOutputStream dos) throws IOException {
         if (!isInitialized()) {
             dos.writeChar('N');
@@ -152,14 +238,14 @@ public class Parameter implements AutoCloseable {
     }
 
     /**
-     * Load parameter ndarrays from InputStream.
+     * Load parameter NDArrays from InputStream.
      *
      * <p>Currently, we cannot deserialize into exact subclass of NDArray. The SparseNDArray and
      * Matrix will be restored as NDArray only.
      *
      * @param manager NDManager
      * @param dis InputStream
-     * @throws IOException if failed to write
+     * @throws IOException if failed to read
      * @throws MalformedModelException Exception thrown when model is not in expected format
      *     (parameters).
      */
