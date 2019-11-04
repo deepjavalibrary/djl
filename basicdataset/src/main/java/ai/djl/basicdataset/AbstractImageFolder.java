@@ -46,6 +46,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
             new HashSet<>(Arrays.asList(".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"));
     private static final Logger logger = LoggerFactory.getLogger(AbstractImageFolder.class);
 
+    protected Repository repository;
     protected Flag flag;
     protected List<String> synsets;
     protected PairList<String, Integer> items;
@@ -53,6 +54,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     public AbstractImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
         this.flag = builder.flag;
+        this.repository = builder.repository;
         if (pipeline == null) {
             pipeline = new Pipeline();
             pipeline.add(new ToTensor());
@@ -170,11 +172,16 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     @SuppressWarnings("rawtypes")
     public abstract static class ImageFolderBuilder<T extends ImageFolderBuilder>
             extends BaseBuilder<T> {
-
+        private Repository repository;
         Flag flag = NDImageUtils.Flag.COLOR;
 
         public T optFlag(Flag flag) {
             this.flag = flag;
+            return self();
+        }
+
+        public T setRepository(Repository repository) {
+            this.repository = repository;
             return self();
         }
     }

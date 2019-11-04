@@ -20,6 +20,7 @@ import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.repository.Repository;
 import ai.djl.training.Activation;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -37,6 +38,7 @@ public class ImageFolderTest {
 
     @Test
     public void testImageFolder() throws IOException {
+        Repository repository = Repository.newInstance("test", "src/test/resources/imagefolder");
         if (Engine.getInstance().getGpuCount() == 0) {
             TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
@@ -45,7 +47,7 @@ public class ImageFolderTest {
 
                 ImageFolder dataset =
                         new ImageFolder.Builder()
-                                .setRoot("src/test/resources/imagefolder")
+                                .setRepository(repository)
                                 .optPipeline(
                                         new Pipeline()
                                                 .add(new Resize(100, 100))

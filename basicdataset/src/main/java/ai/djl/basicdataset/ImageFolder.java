@@ -19,11 +19,8 @@ import java.nio.file.Paths;
 /** A dataset for loading image files stored in a folder structure. */
 public final class ImageFolder extends AbstractImageFolder {
 
-    private String root;
-
     ImageFolder(Builder builder) {
         super(builder);
-        this.root = builder.getRoot();
     }
 
     /** {@inheritDoc} */
@@ -35,21 +32,11 @@ public final class ImageFolder extends AbstractImageFolder {
     /** {@inheritDoc} */
     @Override
     public void prepare() throws IOException {
-        listImages(root);
+        Path root = Paths.get(repository.getBaseUri());
+        listImages(root.toString());
     }
 
     public static final class Builder extends ImageFolderBuilder<Builder> {
-
-        private String root;
-
-        public String getRoot() {
-            return root;
-        }
-
-        public Builder setRoot(String root) {
-            this.root = root;
-            return self();
-        }
 
         /** {@inheritDoc} */
         @Override

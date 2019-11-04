@@ -12,9 +12,8 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.repository.Repository;
-import ai.djl.repository.SimpleRepository;
 import ai.djl.repository.dataset.PreparedDataset;
+import ai.djl.training.dataset.Dataset;
 import ai.djl.util.PairList;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -27,18 +26,14 @@ import java.util.ArrayList;
 
 public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 
-    private Repository repository;
     private Usage usage;
     private boolean prepared;
-    private Path root;
-
     private String[] wordNetIds;
     private String[] classNames;
     private String[] classFull;
 
     ImageNet(Builder builder) {
         super(builder);
-        this.repository = builder.repository;
         this.usage = builder.usage;
         this.synsets = new ArrayList<>();
         this.items = new PairList<>();
@@ -89,42 +84,36 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
         }
     }
 
-    private void prepareItems() throws IOException {
+    private String getUsagePath(Dataset.Usage usage) {
         String usagePath;
         switch (usage) {
             case TRAIN:
                 usagePath = "train";
-                break;
+                return usagePath;
             case VALIDATION:
                 usagePath = "val";
-                break;
+                return usagePath;
             case TEST:
                 throw new UnsupportedOperationException("Test data not available.");
             default:
                 throw new UnsupportedOperationException("Data not available.");
         }
-        root = Paths.get(repository.getBaseUri()).resolve(usagePath);
+    }
+
+    private void prepareItems() throws IOException {
+        Path root = Paths.get(repository.getBaseUri()).resolve(getUsagePath(usage));
         listImages(root.toString(), wordNetIds);
     }
 
     /** {@inheritDoc} */
     @Override
     protected Path getImagePath(String key) {
-        return root.resolve(key);
+        return Paths.get(repository.getBaseUri()).resolve(getUsagePath(usage)).resolve(key);
     }
 
     public static class Builder extends ImageFolderBuilder<Builder> {
 
-        private Repository repository = BasicDatasets.REPOSITORY;
         private Usage usage;
-
-        public Builder optRepository(Repository repository) {
-            if (!(repository instanceof SimpleRepository)) {
-                throw new IllegalArgumentException("ImageNet requires a SimpleRepository");
-            }
-            this.repository = repository;
-            return this;
-        }
 
         public Builder setUsage(Usage usage) {
             this.usage = usage;
