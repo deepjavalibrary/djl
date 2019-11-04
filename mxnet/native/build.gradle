@@ -6,7 +6,9 @@ plugins {
 group = "ai.djl.mxnet"
 
 def VERSION = "1.6.0"
-version = VERSION + (project.hasProperty("release") ? "" : "-SNAPSHOT")
+boolean isRelease = project.hasProperty("release") || project.findProperty("publishTo") == "staging"
+version = VERSION + (isRelease ? "" : "-SNAPSHOT")
+
 
 def flavor = project.findProperty("flavor") ?: "mkl"
 
@@ -74,7 +76,7 @@ if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
                 artifact sourcesJar
                 pom standardPom({
                     name = "MXNet native library"
-                    description = "MXNet Engine native library binary distribution"
+                    delegate.description = "MXNet Engine native library binary distribution"
                     url = url.get() + "mxnet/native"
                 })
             }

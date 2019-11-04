@@ -41,7 +41,8 @@ publishing {
             artifacts = [jar, javadocJar, sourcesJar]
             pom standardPom({
                 name = "Repository API"
-                description = "A respository specification for Deeplearning resources"
+                // Set delegate.description due to name conflict between MavenPom.description and Project.description
+                delegate.description = "A respository specification for Deeplearning resources"
                 url = url.get() + "repository"
             })
         }

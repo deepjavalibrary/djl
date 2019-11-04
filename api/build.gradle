@@ -59,7 +59,7 @@ publishing {
             artifacts = [jar, javadocJar, sourcesJar]
             pom standardPom({
                 name = "Core API"
-                description = "A Deeplearning API in Java"
+                delegate.description = "A Deeplearning API in Java"
                 url = url.get() + "api"
             })
         }

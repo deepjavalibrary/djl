@@ -121,7 +121,7 @@ publishing {
             artifacts = [jar, javadocJar, sourcesJar]
             pom standardPom({
                 name = "MXNet Engine Adapter"
-                description = "MXNet Engine Adapter for djl.ai"
+                delegate.description = "MXNet Engine Adapter for djl.ai"
                 url = url.get() + "mxnet/engine"
             })
         }

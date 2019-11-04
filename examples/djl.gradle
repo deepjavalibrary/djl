@@ -60,7 +60,7 @@ publishing {
             artifacts = [jar, sourcesJar, javadocJar]
             pom standardPom({
                 name = "Examples"
-                description = "Examples for djl.ai"
+                delegate.description = "Examples for djl.ai"
                 url = url.get() + "examples"
             })
             pom.withXml {

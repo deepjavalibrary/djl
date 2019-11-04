@@ -9,7 +9,8 @@ defaultTasks 'build'
 
 allprojects {
     group 'ai.djl'
-    version = "0.2.0" + (project.hasProperty("release") ? "" : "-SNAPSHOT")
+    boolean isRelease = project.hasProperty("release") || project.findProperty("publishTo") == "staging"
+    version = "0.2.0" + (isRelease ? "" : "-SNAPSHOT")
 
     repositories {
         jcenter()
@@ -103,12 +104,18 @@ Closure publishRepository() {
         case "snapshot": return {
             name = "snapshot"
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
-            authentication(userName: ossrhUsername, password: ossrhPassword)
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
         }
         case "staging": return {
             name = "staging"
             url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            authentication(userName: ossrhUsername, password: ossrhPassword)
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
         }
         default:
             if (tasks.withType(PublishToMavenRepository).find {gradle.taskGraph.hasTask it} ) {
@@ -152,6 +159,5 @@ Closure standardPom(Closure base) {
         }
 
         name = "Deeplearning Java Library - " + name.get()
-
     }
 }
