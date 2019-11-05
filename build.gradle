@@ -84,7 +84,7 @@ def getClassifier() {
 }
 
 def shouldSign() {
-    return project.findProperty("publishTo") != null
+    return project.findProperty("publishTo") in ["staging", "snapshot"]
 }
 
 Closure publishRepository() {
@@ -118,11 +118,13 @@ Closure publishRepository() {
             }
         }
         default:
-            if (tasks.withType(PublishToMavenRepository).find {gradle.taskGraph.hasTask it} ) {
-                throw new GradleException("Unknown publishTo Repository")
-            } else {
-                return {}
+            if (gradle.startParameter.taskNames.contains("publish")) {
+                if (publishTo == null) {
+                    throw new GradleException("Please specify publishTo property for publish task: gradle publish -PpublishTo=XXX")
+                }
+                throw new GradleException("Unknown publishTo: ${publishTo}. Supported target: [staging, snapshot, s3, local]")
             }
+            return {}
     }
 }
 
