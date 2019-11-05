@@ -21,6 +21,7 @@ import ai.djl.training.optimizer.Optimizer;
 import java.util.ArrayList;
 import java.util.List;
 
+/** {@code DefaultTrainingConfig} is an implementation of the {@link TrainingConfig} interface. */
 public class DefaultTrainingConfig implements TrainingConfig {
 
     private Initializer initializer;
@@ -30,31 +31,66 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private List<TrainingMetric> trainingMetrics;
     private int batchSize;
 
+    /**
+     * Creates an instance of {@code DefaultTrainingConfig} with the given {@link Initializer}.
+     *
+     * @param initializer the initializer to initialize the parameters with
+     */
     public DefaultTrainingConfig(Initializer initializer) {
         this.initializer = initializer;
         trainingMetrics = new ArrayList<>();
     }
 
+    /**
+     * Sets the array of {@link Device} available for training.
+     *
+     * @param devices an array of devices to be set
+     * @return this {@code DefaultTrainingConfig}
+     */
     public DefaultTrainingConfig setDevices(Device[] devices) {
         this.devices = devices;
         return this;
     }
 
+    /**
+     * Sets the {@link Optimizer} used during training.
+     *
+     * @param optimizer the optimizer to be set
+     * @return this {@code DefaultTrainingConfig}
+     */
     public DefaultTrainingConfig setOptimizer(Optimizer optimizer) {
         this.optimizer = optimizer;
         return this;
     }
 
+    /**
+     * Sets the {@link Loss} function for training.
+     *
+     * @param loss the loss function to be set
+     * @return this {@code DefaultTrainingConfig}
+     */
     public DefaultTrainingConfig setLoss(Loss loss) {
         this.loss = loss;
         return this;
     }
 
+    /**
+     * Adds a {@link TrainingMetric} that needs to be computed during training.
+     *
+     * @param trainingMetric the training metric to be added
+     * @return this {@code DefaultTrainingConfig}
+     */
     public DefaultTrainingConfig addTrainingMetric(TrainingMetric trainingMetric) {
         trainingMetrics.add(trainingMetric);
         return this;
     }
 
+    /**
+     * Sets the size of a batch for training.
+     *
+     * @param batchSize the batch size
+     * @return this {@code DefaultTrainingConfig}
+     */
     public DefaultTrainingConfig setBatchSize(int batchSize) {
         this.batchSize = batchSize;
         return this;

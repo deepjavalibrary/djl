@@ -21,23 +21,54 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetric;
 
+/**
+ * An interface that represents a single training iteration.
+ *
+ * <p>{@code Trainer} provides an easy, and manageable interface for training. {@code Trainer} is
+ * not thread-safe.
+ */
 public interface Trainer extends AutoCloseable {
 
     void initialize(Shape[] shapes);
 
+    /**
+     * Fetches an iterator that can iterate through the given {@link Dataset}.
+     *
+     * @param dataset the dataset to iterate through
+     * @return an {@link Iterable} of {@link Batch} that contains batches of data from the dataset
+     */
     default Iterable<Batch> iterateDataset(Dataset dataset) {
         return dataset.getData(getManager());
     }
 
     GradientCollector newGradientCollector();
 
+    /**
+     * Trains the model with one iteration of the given {@link Batch} of data.
+     *
+     * @param batch a {@link Batch} that contains data, and its respective labels
+     */
     void trainBatch(Batch batch);
 
+    /**
+     * Applies the forward function of the model once on the given input {@link NDList}.
+     *
+     * @param input the input {@link NDList}
+     * @return the output of the forward function
+     */
     NDList forward(NDList input);
 
+    /**
+     * Validates the given batch of data.
+     *
+     * <p>During validation, the loss and training metrics are computed, but gradients aren't
+     * computed, and parameters aren't updated.
+     *
+     * @param batch a {@link Batch} of data
+     */
     void validateBatch(Batch batch);
 
-    /** Makes one step of parameter update. */
+    /** Updates all of the parameters of the model once. */
     void step();
 
     /**
@@ -47,18 +78,53 @@ public interface Trainer extends AutoCloseable {
      */
     void setMetrics(Metrics metrics);
 
+    /**
+     * Sets a {@link TrainingListener} to the {@link Trainer}.
+     *
+     * @param listener the {@link TrainingListener} to be set
+     */
     void setTrainingListener(TrainingListener listener);
 
+    /** Resets each of the training metrics and loss to its respective initial value. */
     void resetTrainingMetrics();
 
+    /**
+     * Gets the training {@link Loss} function of the trainer.
+     *
+     * @return the {@link Loss} function
+     */
     Loss getLoss();
 
+    /**
+     * Gets the validation {@link Loss} function of the trainer.
+     *
+     * @return the validation {@link Loss} function
+     */
     Loss getValidationLoss();
 
+    /**
+     * Gets the training {@link TrainingMetric} that is an instance of the given {@link Class}.
+     *
+     * @param clazz the {@link Class} of the {@link TrainingMetric} sought
+     * @param <T> the type of the training metric
+     * @return the training metric requested
+     */
     <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz);
 
+    /**
+     * Gets the validation {@link TrainingMetric} that is an instance of the given {@link Class}.
+     *
+     * @param clazz the {@link Class} of the {@link TrainingMetric} sought
+     * @param <T> the type of the validation metric
+     * @return the validation metric requested
+     */
     <T extends TrainingMetric> T getValidationMetric(Class<T> clazz);
 
+    /**
+     * Gets the {@link NDManager} from the model.
+     *
+     * @return the {@link NDManager}
+     */
     NDManager getManager();
 
     /** {@inheritDoc} */
