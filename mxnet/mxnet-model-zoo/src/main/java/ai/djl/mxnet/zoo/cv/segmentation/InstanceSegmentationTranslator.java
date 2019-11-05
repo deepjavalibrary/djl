@@ -111,10 +111,10 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
     }
 
     /**
-     * resize the image based on the shorter edge or maximum edge length.
+     * Resizes the image based on the shorter edge or maximum edge length.
      *
      * @param image the input image
-     * @return resized image
+     * @return the resized image
      */
     private NDArray resizeShort(NDArray image) {
         Shape shape = image.getShape();

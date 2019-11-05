@@ -109,12 +109,12 @@ public class StackBatchifier implements Batchifier {
     /**
      * Splits an {@code NDArray} into the given number of slices along the given batch axis.
      *
-     * <p>Usually used for data parallelism where each slices is sent to one device (i.e. GPU).
+     * <p>Usually used for data parallelism where each slice is sent to one device (i.e. GPU).
      *
-     * @param array a batch of {@code NDArray}.
-     * @param numOfSlices number of desired slices.
-     * @param evenSplit whether to force all slices to have the same number of elements.
-     * @return return value is a NDList even if `numOfSlice` is 1.
+     * @param array a batch of {@code NDArray}
+     * @param numOfSlices the number of desired slices
+     * @param evenSplit whether to force all slices to have the same number of elements
+     * @return an NDList even if `numOfSlice` is 1.
      */
     private NDList split(NDArray array, int numOfSlices, boolean evenSplit) {
         int size = Math.toIntExact(array.size(0));

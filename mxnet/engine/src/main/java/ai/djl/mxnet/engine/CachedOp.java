@@ -13,7 +13,6 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
-import ai.djl.inference.Predictor;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.nn.MxSymbolBlock;
 import ai.djl.ndarray.NDArray;
@@ -32,10 +31,10 @@ import org.slf4j.LoggerFactory;
 /**
  * The {@code CachedOp} class provides the core functionality to execute a graph with MXNet.
  *
- * <p>Users are not recommended to interact with this class directly, use {@link Predictor} instead.
- * CachedOp is an operator that simplify the input by self-analyzing the input shape such as the
- * batch size. It require minimum input to do inference since most of the information can be
- * obtained from the model itself.
+ * <p>We don't recommended users interact with this class directly. Users should use {@link
+ * ai.djl.inference.Predictor} instead. CachedOp is an operator that simplifies the input by
+ * self-analyzing the input shape. It requires minimum input to do inference because most of the
+ * information can be obtained from the model itself.
  */
 public class CachedOp extends NativeResource {
 
@@ -49,15 +48,16 @@ public class CachedOp extends NativeResource {
     private MxNDManager manager;
 
     /**
-     * Create an instance of {@link CachedOp}.
+     * Creates an instance of {@link CachedOp}.
      *
      * <p>It can be created by using {@link JnaUtils#createCachedOp(MxSymbolBlock, MxNDManager)}
      *
-     * @param handle The C handle of the CachedOp
-     * @param manager manager used to create NDArray
-     * @param parameters parameter values
-     * @param paramIndices parameter required by the model and their corresponding location
-     * @param dataIndices input data names required by the model and their corresponding location
+     * @param handle the C handle of the CachedOp
+     * @param manager the manager used to create the NDArray
+     * @param parameters the parameter values
+     * @param paramIndices the parameters required by the model and their corresponding location
+     * @param dataIndices the input data names required by the model and their corresponding
+     *     location
      */
     public CachedOp(
             Pointer handle,
@@ -76,13 +76,11 @@ public class CachedOp extends NativeResource {
     }
 
     /**
-     * Forwarding method of CachedOp.
+     * Assigns inputs to the empty locations of the input NDArray.
      *
-     * <p>All inputs will be assigned to the empty locations of the inputNDArray
-     *
-     * @param parameterStore ParameterStore
-     * @param data input in {@link NDList} format
-     * @return result {@link NDList}
+     * @param parameterStore the parameterStore
+     * @param data the input in {@link NDList} format
+     * @return an {@link NDList}
      */
     public NDList forward(ParameterStore parameterStore, NDList data) {
         // reset the input data index at the beginning
@@ -132,9 +130,9 @@ public class CachedOp extends NativeResource {
     }
 
     /**
-     * For unit test only.
+     * Gets an input NDArray. For unit tests only.
      *
-     * @return array of NDArray
+     * @return an array of NDArray
      */
     MxNDArray[] getInputNDArray() {
         return debugInputs;

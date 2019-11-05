@@ -42,8 +42,8 @@ import java.util.function.Function;
  * </ul>
  *
  * <p>In a common inference case, the model is usually loaded from a file. Once the model is loaded,
- * you can create {@link Predictor} with the loaded model and call {@link Predictor#predict(Object)}
- * to get the inference result.
+ * you can create a {@link Predictor} with the loaded model and call {@link
+ * Predictor#predict(Object)} to get the inference result.
  *
  * <pre>
  * Model model = <b>Model.load</b>(modelDir, modelName);
@@ -63,7 +63,7 @@ import java.util.function.Function;
 public interface Model extends AutoCloseable {
 
     /**
-     * Create an empty model instance.
+     * Creates an empty model instance.
      *
      * @return a new Model instance
      */
@@ -72,10 +72,10 @@ public interface Model extends AutoCloseable {
     }
 
     /**
-     * Create an empty model instance on specified {@link Device}.
+     * Creates an empty model instance on the specified {@link Device}.
      *
-     * @param device the device that model to be loaded
-     * @return a new Model instance
+     * @param device the device to load the model onto
+     * @return a new model instance
      */
     static Model newInstance(Device device) {
         return Engine.getInstance().newModel(device);
@@ -85,9 +85,8 @@ public interface Model extends AutoCloseable {
      * Loads the model from the {@code modelPath}.
      *
      * @param modelPath the directory or file path of the model location
-     * @throws IOException IO exception happened in loading
-     * @throws MalformedModelException Exception thrown when model is not in expected format
-     *     (parameters).
+     * @throws IOException when IO operation fails in loading a resource
+     * @throws MalformedModelException if model file is corrupted
      */
     default void load(Path modelPath) throws IOException, MalformedModelException {
         load(modelPath, modelPath.toFile().getName(), null);
@@ -97,10 +96,9 @@ public interface Model extends AutoCloseable {
      * Loads the model from the {@code modelPath} and the given name.
      *
      * @param modelPath the directory or file path of the model location
-     * @param modelName model file name or assigned name
-     * @throws IOException IO exception happened in loading
-     * @throws MalformedModelException Exception thrown when model is not in expected format
-     *     (parameters).
+     * @param modelName the model file name
+     * @throws IOException when IO operation fails in loading a resource
+     * @throws MalformedModelException if model file is corrupted
      */
     default void load(Path modelPath, String modelName)
             throws IOException, MalformedModelException {
@@ -111,28 +109,27 @@ public interface Model extends AutoCloseable {
      * Loads the model from the {@code modelPath} with the name and options provided.
      *
      * @param modelPath the directory or file path of the model location
-     * @param modelName model file name or assigned name
-     * @param options engine specific load model options, see document for each engine
-     * @throws IOException IO exception happened in loading
-     * @throws MalformedModelException Exception thrown when model is not in expected format
-     *     (parameters).
+     * @param modelName the model file name
+     * @param options engine specific load model options, see documentation for each engine
+     * @throws IOException when IO operation fails in loading a resource
+     * @throws MalformedModelException if model file is corrupted
      */
     void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException, MalformedModelException;
 
     /**
-     * Saves the model to specified {@code modelPath} with the name provided.
+     * Saves the model to the specified {@code modelPath} with the name provided.
      *
      * @param modelPath the directory or file path of the model location
-     * @param modelName model file name or assigned name
-     * @throws IOException IO exception happened in loading
+     * @param modelName the model file name
+     * @throws IOException when IO operation fails in loading a resource
      */
     void save(Path modelPath, String modelName) throws IOException;
 
     /**
-     * Get the block from the Model.
+     * Gets the block from the Model.
      *
-     * @return {@link Block}
+     * @return the {@link Block}
      */
     Block getBlock();
 
@@ -145,9 +142,9 @@ public interface Model extends AutoCloseable {
     void setProperty(String key, String value);
 
     /**
-     * Get the NDArray Manager from the model.
+     * Gets the NDArray Manager from the model.
      *
-     * @return {@link NDManager}
+     * @return the {@link NDManager}
      */
     NDManager getNDManager();
 
@@ -155,17 +152,17 @@ public interface Model extends AutoCloseable {
      * Creates a new {@link Trainer} instance for a Model.
      *
      * @param trainingConfig training configuration settings
-     * @return Trainer
+     * @return the {@link Trainer} instance
      */
     Trainer newTrainer(TrainingConfig trainingConfig);
 
     /**
      * Creates a new Predictor based on the model.
      *
-     * @param translator The Object used for preprocessing and post processing
-     * @param <I> Input object for preprocessing
-     * @param <O> Output object come from postprocessing
-     * @return instance of {@code Predictor}
+     * @param translator the object used for pre-processing and postprocessing
+     * @param <I> the input object for pre-processing
+     * @param <O> the output object from postprocessing
+     * @return an instance of {@code Predictor}
      */
     <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator);
 
@@ -175,62 +172,62 @@ public interface Model extends AutoCloseable {
      * <p>It contains the information that can be extracted from the model, usually name, shape,
      * layout and DataType.
      *
-     * @return PairList of String and Shape
+     * @return a PairList of String and Shape
      */
     PairList<String, Shape> describeInput();
 
     /**
      * Returns the output descriptor of the model.
      *
-     * <p>It contains the output information that can be obtained from the model
+     * <p>It contains the output information that can be obtained from the model.
      *
-     * @return PairList of String and Shape
+     * @return a PairList of String and Shape
      */
     PairList<String, Shape> describeOutput();
 
     /**
-     * Returns artifact names associated with the model.
+     * Returns the artifact names associated with the model.
      *
-     * @return array of artifact names
+     * @return an array of artifact names
      */
     String[] getArtifactNames();
 
     /**
-     * If the specified artifact is not already cached, attempts to load the artifact using the
-     * given function and cache it.
+     * Attempts to load the artifact using the given function and cache it if the specified artifact
+     * is not already cached.
      *
-     * <p>Model will cache loaded artifact, so user doesn't need to keep tracking it.
+     * <p>Model will cache loaded artifact, so the user doesn't need to keep tracking it.
      *
      * <pre>{@code
      * String synset = model.getArtifact("synset.txt", k -> IOUtils.toString(k)));
      * }</pre>
      *
-     * @param name name of the desired artifact
-     * @param function the function to load artifact
-     * @param <T> type of return artifact object
+     * @param name the name of the desired artifact
+     * @param function the function to load the artifact
+     * @param <T> the type of the returned artifact object
      * @return the current (existing or computed) artifact associated with the specified name, or
      *     null if the computed value is null
-     * @throws IOException if an error occurs during loading resource
-     * @throws ClassCastException if the cached artifact cannot be casted to target class
+     * @throws IOException when IO operation fails in loading a resource
+     * @throws ClassCastException if the cached artifact cannot be cast to the target class
      */
     <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException;
 
     /**
      * Finds an artifact resource with a given name in the model.
      *
-     * @param name name of the desired artifact
-     * @return A {@link java.net.URL} object or {@code null} if no artifact with this name is found
-     * @throws IOException if an error occurs during loading resource
+     * @param name the name of the desired artifact
+     * @return a {@link java.net.URL} object or {@code null} if no artifact with this name is found
+     * @throws IOException when IO operation fails in loading a resource
      */
     URL getArtifact(String name) throws IOException;
 
     /**
      * Finds an artifact resource with a given name in the model.
      *
-     * @param name name of the desired artifact
-     * @return A {@link java.io.InputStream} object or {@code null} if no resource with this name is
+     * @param name the name of the desired artifact
+     * @return a {@link java.io.InputStream} object or {@code null} if no resource with this name is
      *     found
-     * @throws IOException if an error occurs during loading resource
+     * @throws IOException when IO operation fails in loading a resource
      */
     InputStream getArtifactAsStream(String name) throws IOException;
 

@@ -286,8 +286,8 @@ public class MxTrainer implements Trainer {
     }
 
     /**
-     * Check if all gradients are zeros, prevent users from calling step() without running {@code
-     * backward}.
+     * Checks if all gradients are zeros. This prevent users from calling step() without running
+     * {@code backward}.
      */
     private void checkGradients() {
         List<NDArray> grads = new ArrayList<>();

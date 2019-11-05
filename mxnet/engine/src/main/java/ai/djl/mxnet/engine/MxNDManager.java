@@ -37,8 +37,8 @@ public class MxNDManager implements NDManager {
      * A global {@link NDManager} singleton instance.
      *
      * <p>This NDManager is the root of all the other {@code NDManager}s. NDArrays created by this
-     * manager are un-managed, user has to close them manually. Those NDArrays will be released on
-     * GC, and might be run into out of native memory issue.
+     * manager are un-managed, so the user has to close them manually. Those NDArrays will be
+     * released on GC, and might be run into an out of native memory issue.
      */
     private static final MxNDManager SYSTEM_MANAGER = new SystemManager();
 

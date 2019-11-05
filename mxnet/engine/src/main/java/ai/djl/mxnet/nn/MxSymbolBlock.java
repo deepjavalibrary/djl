@@ -91,9 +91,9 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     }
 
     /**
-     * return layers' name.
+     * Returns the layers' name.
      *
-     * @return an List of String contains layers' nanme
+     * @return a List of String containing the layers' name
      */
     public List<String> getLayerNames() {
         return symbol.getLayerNames();
@@ -102,7 +102,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     /**
      * Returns the Symbolic graph from the model.
      *
-     * @return {@link Symbol} object
+     * @return a {@link Symbol} object
      */
     public Symbol getSymbol() {
         return symbol;

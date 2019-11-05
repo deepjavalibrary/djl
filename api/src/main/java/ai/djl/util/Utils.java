@@ -42,9 +42,9 @@ public final class Utils {
      * Returns the index of the first occurrence of the specified element in {@code array}, or -1 if
      * this list does not contain the element.
      *
-     * @param array input array
-     * @param value element to search for
-     * @param <T> array type
+     * @param array the input array
+     * @param value the element to search for
+     * @param <T> the array type
      * @return the index of the first occurrence of the specified element in {@code array}, or -1 if
      *     this list does not contain the element
      */
@@ -63,9 +63,9 @@ public final class Utils {
     /**
      * Returns {@code true} if the {@code array} contains the specified element.
      *
-     * @param array input array
-     * @param value element whose presence in {@code array} is to be tested
-     * @param <T> array type
+     * @param array the input array
+     * @param value the element whose presence in {@code array} is to be tested
+     * @param <T> the array type
      * @return {@code true} if this list contains the specified element
      */
     public static <T> boolean contains(T[] array, T value) {
@@ -76,8 +76,8 @@ public final class Utils {
      * Adds padding chars to specified StringBuilder.
      *
      * @param sb the StringBuilder to append
-     * @param c padding char
-     * @param count number characters to be added
+     * @param c the padding char
+     * @param count the number characters to be added
      */
     public static void pad(StringBuilder sb, char c, int count) {
         for (int i = 0; i < count; ++i) {
@@ -86,9 +86,9 @@ public final class Utils {
     }
 
     /**
-     * Deletes entire directory and ignore all errors.
+     * Deletes an entire directory and ignore all errors.
      *
-     * @param dir directory to be removed
+     * @param dir the directory to be removed
      */
     public static void deleteQuietly(Path dir) {
         try {
@@ -108,10 +108,10 @@ public final class Utils {
     }
 
     /**
-     * Read {@code is} as UTF-8 string.
+     * Reads {@code is} as UTF-8 string.
      *
      * @param is the InputStream to be read
-     * @return UTF-8 encoded string
+     * @return a UTF-8 encoded string
      * @throws IOException if IO error occurs
      */
     public static String toString(InputStream is) throws IOException {
@@ -119,10 +119,10 @@ public final class Utils {
     }
 
     /**
-     * Read {@code is} as byte array.
+     * Reads {@code is} as byte array.
      *
      * @param is the InputStream to be read
-     * @return bytes
+     * @return a byte array
      * @throws IOException if IO error occurs
      */
     public static byte[] toByteArray(InputStream is) throws IOException {
@@ -153,7 +153,7 @@ public final class Utils {
     }
 
     /**
-     * Reads all lines from specified InputStream.
+     * Reads all lines from the specified InputStream.
      *
      * @param is the InputStream to read
      * @return all lines from the input
@@ -170,10 +170,10 @@ public final class Utils {
     }
 
     /**
-     * Convert a List of Number to float array.
+     * Converts a List of Number to float array.
      *
      * @param list the list to be converted
-     * @return float array
+     * @return a float array
      */
     public static float[] toFloatArray(List<? extends Number> list) {
         float[] ret = new float[list.size()];
@@ -208,9 +208,9 @@ public final class Utils {
     /**
      * Utility function to help debug nan values in parameters and their gradients.
      *
-     * @param parameters list of parameters to check
+     * @param parameters the list of parameters to check
      * @param checkGradient whether to check parameter value or its gradient value
-     * @param logger logger to log result
+     * @param logger the logger to log the result
      */
     public static void checkParameterValues(
             PairList<String, Parameter> parameters, boolean checkGradient, Logger logger) {

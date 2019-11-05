@@ -28,10 +28,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This is the Utility for pre-processing the data for Bert Model.
+ * This is the Utility for pre-processing data for the Bert Model.
  *
  * <p>You can use this utility to parse vocabulary JSON into Java Array and Dictionary, clean and
- * tokenize sentences and pad the text
+ * tokenize sentences, and pad the text.
  */
 @SuppressWarnings("unused")
 public class BertDataParser {
@@ -46,10 +46,10 @@ public class BertDataParser {
     private List<String> idx2token;
 
     /**
-     * Parse the Vocabulary to JSON files [PAD], [CLS], [SEP], [MASK], [UNK] are reserved tokens.
+     * Parses the Vocabulary to JSON files. [PAD], [CLS], [SEP], [MASK], [UNK] are reserved tokens.
      *
      * @param is the {@code InputStream} for the vocab.json
-     * @return instance of {@code BertDataParser}
+     * @return an instance of {@code BertDataParser}
      * @throws IllegalStateException if failed read from {@code InputStream}
      */
     public static BertDataParser parse(InputStream is) {
@@ -61,11 +61,11 @@ public class BertDataParser {
     }
 
     /**
-     * Tokenize the input, split all kinds of whitespace and Separate the end of sentence symbol: .
-     * , ? !
+     * Tokenizes the input, splits all kinds of whitespace, and separates the end of sentence
+     * symbol.
      *
-     * @param input The input string
-     * @return List of tokens
+     * @param input the input string
+     * @return a list of tokens
      */
     public static List<String> tokenizer(String input) {
         List<String> ret = new LinkedList<>();
@@ -83,13 +83,13 @@ public class BertDataParser {
     }
 
     /**
-     * Pad the tokens to the required length.
+     * Pads the tokens to the required length.
      *
      * @param <E> the type of the List
-     * @param tokens input tokens
-     * @param padItem things to pad at the end
-     * @param num total length after padding
-     * @return List of padded tokens
+     * @param tokens the input tokens
+     * @param padItem the things to pad at the end
+     * @param num the total length after padding
+     * @return a list of padded tokens
      */
     public static <E> List<E> pad(List<E> tokens, E padItem, int num) {
         if (tokens.size() >= num) {
@@ -104,12 +104,12 @@ public class BertDataParser {
     }
 
     /**
-     * Form the token types List [0000...1111...000] where all questions are 0 and answers are 1.
+     * Forms the token types List [0000...1111...000] where all questions are 0 and answers are 1.
      *
-     * @param question question tokens
-     * @param answer answer tokens
-     * @param seqLength sequence length
-     * @return List of tokenTypes
+     * @param question the question tokens
+     * @param answer the answer tokens
+     * @param seqLength the sequence length
+     * @return a list of tokenTypes
      */
     public static List<Float> getTokenTypes(
             List<String> question, List<String> answer, int seqLength) {
@@ -120,12 +120,12 @@ public class BertDataParser {
     }
 
     /**
-     * Form tokens with separation that can be used for BERT.
+     * Forms tokens with separation that can be used for BERT.
      *
-     * @param question question tokens
-     * @param answer answer tokens
-     * @param seqLength sequence length
-     * @return List of tokenTypes
+     * @param question the question tokens
+     * @param answer the answer tokens
+     * @param seqLength the sequence length
+     * @return a list of tokenTypes
      */
     public static List<String> formTokens(
             List<String> question, List<String> answer, int seqLength) {
@@ -140,10 +140,10 @@ public class BertDataParser {
     }
 
     /**
-     * Convert tokens to indexes.
+     * Converts tokens to indexes.
      *
-     * @param tokens input tokens
-     * @return List of indexes
+     * @param tokens the input tokens
+     * @return a list of indexes
      */
     public List<Integer> token2idx(List<String> tokens) {
         List<Integer> indexes = new ArrayList<>();
@@ -158,10 +158,10 @@ public class BertDataParser {
     }
 
     /**
-     * Convert indexes to tokens.
+     * Converts indexes to tokens.
      *
-     * @param indexes List of indexes
-     * @return List of tokens
+     * @param indexes the list of indexes
+     * @return a list of tokens
      */
     public List<String> idx2token(List<Integer> indexes) {
         List<String> tokens = new ArrayList<>();

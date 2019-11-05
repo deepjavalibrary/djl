@@ -186,7 +186,7 @@ public class MxNDArray extends NativeResource implements NDArray {
      * <p>It should not be freed in cases such as MxParameterServer optimizer callback where the
      * NDArray is merely intended to be read, not freed.
      *
-     * @param shouldFree True if the MxNDArray should be freed on close
+     * @param shouldFree {@code true} if the MxNDArray should be freed on close
      */
     public void setShouldFree(boolean shouldFree) {
         this.shouldFree = shouldFree;
@@ -195,8 +195,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     /**
      * Computes the gradients of the NDArray w.r.t variables.
      *
-     * @param retainGraph Whether to retain the computation graph for another backward pass on the
-     *     same graph. By default the computation history is cleared.
+     * @param retainGraph whether to retain the computation graph for another backward pass on the
+     *     same graph. By default, the computation history is cleared.
      */
     public void backward(boolean retainGraph) {
         JnaUtils.autogradBackward(new NDList(this), retainGraph ? 1 : 0);

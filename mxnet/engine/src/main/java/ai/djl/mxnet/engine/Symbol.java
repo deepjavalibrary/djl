@@ -127,11 +127,10 @@ public class Symbol extends NativeResource {
     }
 
     /**
-     * Infershape is used to infer the shapes for all parameters inside a symbol from given input
-     * shapes.
+     * Infers the shapes for all parameters inside a symbol from given input shapes.
      *
-     * @param pairs The given input name and shape
-     * @return Map of arguments with names and shapes
+     * @param pairs the given input name and shape
+     * @return a map of arguments with names and shapes
      */
     public Map<String, Shape> inferShape(PairList<String, Shape> pairs) {
         List<List<Shape>> shapes = JnaUtils.inferShape(this, pairs);

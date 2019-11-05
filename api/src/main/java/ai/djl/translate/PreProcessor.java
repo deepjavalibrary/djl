@@ -23,9 +23,9 @@ public interface PreProcessor<I> {
     /**
      * Processes the input and converts it to NDList.
      *
-     * @param ctx Toolkit that would help to creating input NDArray
-     * @param input Input Object
-     * @return {@link NDList}
+     * @param ctx the toolkit for creating the input NDArray
+     * @param input the input object
+     * @return an {@link NDList}
      * @throws Exception if an error occurs during processing input
      */
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")

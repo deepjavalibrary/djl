@@ -14,7 +14,7 @@ package ai.djl.util;
 
 import java.util.Random;
 
-/** A class hold a static instance of {@link Random} object. */
+/** A class that holds a static instance of {@link Random} object. */
 public final class RandomUtils {
 
     public static final Random RANDOM = new Random();

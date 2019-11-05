@@ -15,7 +15,7 @@ package ai.djl.util;
 import java.util.Objects;
 
 /**
- * A class contains key-value pair.
+ * A class containing the key-value pair.
  *
  * @param <K> the key type
  * @param <V> the value type

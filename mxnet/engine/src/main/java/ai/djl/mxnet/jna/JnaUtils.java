@@ -1618,14 +1618,14 @@ public final class JnaUtils {
     //////////////////////////////////
 
     /**
-     * Method to create the cached op flags.
+     * Creates cached op flags.
      *
      * <p>data_indices : [0, 2, 4] Used to label input location, param_indices : [1, 3] Used to
      * label param location
      *
-     * @param block {@link MxSymbolBlock} that loaded in the backend
-     * @param manager NDManager to create NDArray
-     * @return CachedOp for inference
+     * @param block the {@link MxSymbolBlock} that loaded in the backend
+     * @param manager the NDManager used to create NDArray
+     * @return a CachedOp for inference
      */
     public static CachedOp createCachedOp(MxSymbolBlock block, MxNDManager manager) {
         Symbol symbol = block.getSymbol();

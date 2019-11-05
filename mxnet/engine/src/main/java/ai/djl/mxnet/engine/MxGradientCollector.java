@@ -35,38 +35,38 @@ public class MxGradientCollector implements GradientCollector {
     }
 
     /**
-     * Get status on whether Autograd is recording computations.
+     * Gets whether Autograd is recording computations.
      *
-     * @return Current state of recording.
+     * @return the current state of recording
      */
     public static boolean isRecording() {
         return JnaUtils.autogradIsRecording();
     }
 
     /**
-     * Get status on whether Autograd is in training/predicting mode.
+     * Gets whether Autograd is in training/predicting mode.
      *
-     * @return Current state of training/predicting.
+     * @return the current state of training/predicting
      */
     public static boolean isTraining() {
         return JnaUtils.autogradIsTraining();
     }
 
     /**
-     * Set status to recording/not recording. When recording, graph will be constructed for gradient
-     * computation.
+     * Sets the status to recording/not recording. When recording, graph will be constructed for
+     * gradient computation.
      *
-     * @param isRecording recording state to be set
-     * @return previous recording state before this set
+     * @param isRecording the recording state to be set
+     * @return the previous recording state before this set
      */
     public static boolean setRecording(boolean isRecording) {
         return JnaUtils.autogradSetIsRecording(isRecording);
     }
 
     /**
-     * Set status to training/predicting. This affects ctx.is_train in operator running device. For
-     * example, Dropout will drop inputs randomly when isTraining=True while simply passing through
-     * if isTraining=False.
+     * Sets the status to training/predicting. This affects ctx.is_train in the device running the
+     * operator. For example, Dropout will drop inputs randomly when isTraining=True, while simply
+     * passing through if isTraining=False.
      *
      * @param isTraining {@code true} if for training
      * @return the previous status before this set
@@ -91,8 +91,8 @@ public class MxGradientCollector implements GradientCollector {
     /**
      * Computes the gradients of the NDArray w.r.t variables.
      *
-     * @param array target/head array to run backward on.
-     * @param retainGraph Whether to retain the computation graph for another backward pass on the
+     * @param array the target/head array to run backward on.
+     * @param retainGraph whether to retain the computation graph for another backward pass on the
      *     same graph. By default the computation history is cleared.
      */
     private void backward(NDArray array, boolean retainGraph) {

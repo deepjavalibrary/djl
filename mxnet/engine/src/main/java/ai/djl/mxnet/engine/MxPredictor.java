@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
  *
  * <p>MxPredictor contains all methods in the Predictor class and MXNet specific implementations.
  *
- * @param <I> Input Object
- * @param <O> Output Object
+ * @param <I> the input object
+ * @param <O> the output object
  */
 public class MxPredictor<I, O> extends BasePredictor<I, O> {
 

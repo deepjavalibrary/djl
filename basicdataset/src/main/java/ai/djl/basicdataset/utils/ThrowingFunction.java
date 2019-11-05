@@ -13,7 +13,7 @@
 package ai.djl.basicdataset.utils;
 
 /**
- * Represents a function that accepts one argument and produces a result and throwing an Exception.
+ * Represents a function that accepts one argument, produces a result, and throws an Exception.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a> whose functional method is
  * {@link #apply(Object)}.

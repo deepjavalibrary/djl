@@ -230,8 +230,8 @@ public final class ResNetV1 {
         /**
          * Sets the <b>Required</b> number of layers in the network.
          *
-         * @param numLayers Number of layers
-         * @return Returns this Builder
+         * @param numLayers the number of layers
+         * @return this Builder
          */
         public Builder setNumLayers(int numLayers) {
             this.numLayers = numLayers;
@@ -241,8 +241,8 @@ public final class ResNetV1 {
         /**
          * Sets the <b>Required</b> size of the output.
          *
-         * @param outSize Number of layers
-         * @return Returns this Builder
+         * @param outSize the number of layers
+         * @return this Builder
          */
         public Builder setOutSize(long outSize) {
             this.outSize = outSize;
@@ -252,8 +252,8 @@ public final class ResNetV1 {
         /**
          * Sets the <b>Required</b> size of the output.
          *
-         * @param batchNormMomemtum Number of layers
-         * @return Returns this Builder
+         * @param batchNormMomemtum the number of layers
+         * @return this Builder
          */
         public Builder optBatchNormMomemtum(float batchNormMomemtum) {
             this.batchNormMomentum = batchNormMomemtum;
@@ -263,8 +263,8 @@ public final class ResNetV1 {
         /**
          * Sets the shape of the image.
          *
-         * @param imageShape Shape of the image
-         * @return Returns this Builder
+         * @param imageShape the shape of the image
+         * @return this Builder
          */
         public Builder setImageShape(Shape imageShape) {
             this.imageShape = imageShape;

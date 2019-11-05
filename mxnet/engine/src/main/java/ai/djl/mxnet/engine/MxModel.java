@@ -54,11 +54,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code MxModel} is MXNet implementation of {@link Model}.
+ * {@code MxModel} is the MXNet implementation of {@link Model}.
  *
- * <p>MxModel contains all methods in Model to load and process model. In addition, it provides
- * MXNet Specific functionality, such as getSymbol to obtain the Symbolic graph and getParameters to
- * obtain the parameter NDArrays
+ * <p>MxModel contains all the methods in Model to load and process a model. In addition, it
+ * provides MXNet Specific functionality, such as getSymbol to obtain the Symbolic graph and
+ * getParameters to obtain the parameter NDArrays
  */
 public class MxModel implements Model {
 
@@ -86,11 +86,11 @@ public class MxModel implements Model {
     }
 
     /**
-     * Load the MXNet model from specified location.
+     * Loads the MXNet model from a specified location.
      *
-     * <p>MXNet engine looks for MODEL_NAME-symbol.json and MODEL_NAME-xxxx.params files in
-     * specified directory. By default, MXNet engine will pick up latest epoch of parameter file.
-     * However, user can explicitly an epoch to be loaded:
+     * <p>MXNet engine looks for MODEL_NAME-symbol.json and MODEL_NAME-xxxx.params files in the
+     * specified directory. By default, MXNet engine will pick up the latest epoch of the parameter
+     * file. However, users can explicitly specify an epoch to be loaded:
      *
      * <pre>
      * Map&lt;String, String&gt; options = new HashMap&lt;&gt;()
@@ -98,9 +98,9 @@ public class MxModel implements Model {
      * model.load(modelPath, "squeezenet", options);
      * </pre>
      *
-     * @param modelPath Directory of the model
-     * @param modelName Name/Prefix of the model
-     * @param options load model options, check document for specific engine
+     * @param modelPath the directory of the model
+     * @param modelName the name/prefix of the model
+     * @param options load model options, see documentation for the specific engine
      * @throws IOException Exception for file loading
      */
     @Override

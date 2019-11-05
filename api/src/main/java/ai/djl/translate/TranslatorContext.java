@@ -28,21 +28,21 @@ public interface TranslatorContext extends AutoCloseable {
     /**
      * Returns the {@link Model} object to understand the input/output.
      *
-     * @return {@link Model}
+     * @return the {@link Model}
      */
     Model getModel();
 
     /**
      * Returns the {@link NDManager} to create {@link NDArray}.
      *
-     * @return {@link NDManager}
+     * @return the {@link NDManager}
      */
     NDManager getNDManager();
 
     /**
      * Returns the Metric tool to do benchmark.
      *
-     * @return {@link Metrics}
+     * @return the {@link Metrics}
      */
     Metrics getMetrics();
 

@@ -22,10 +22,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * The {@code PairList} class provides an efficient way to access a list of key-value pair.
+ * The {@code PairList} class provides an efficient way to access a list of key-value pairs.
  *
- * @param <K> key type
- * @param <V> value type
+ * @param <K> the key type
+ * @param <V> the value type
  */
 public class PairList<K, V> implements Iterable<Pair<K, V>> {
 
@@ -52,8 +52,8 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Constructs a {@code PairList} containing the elements of the specified keys and values.
      *
-     * @param keys the key list whose elements are to be placed into this PairList
-     * @param values the value list whose elements are to be placed into this PairList
+     * @param keys the key list containing elements to be placed into this PairList
+     * @param values the value list containing elements to be placed into this PairList
      * @throws IllegalArgumentException if the keys and values size are different
      */
     public PairList(List<K> keys, List<V> values) {
@@ -67,7 +67,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Constructs a {@code PairList} containing the elements of the specified list of Pairs.
      *
-     * @param list the list whose elements are to be placed into this PairList
+     * @param list the list containing elements to be placed into this PairList
      */
     public PairList(List<Pair<K, V>> list) {
         this(list.size());
@@ -96,7 +96,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
      * Shifts the element currently at that position (if any) and any subsequent elements to the
      * right (adds one to their indices).
      *
-     * @param index index at which the specified element is to be inserted
+     * @param index the index at which the specified element is to be inserted
      * @param key the key
      * @param value the value
      */
@@ -106,7 +106,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Adds key and value to the list.
+     * Adds a key and value to the list.
      *
      * @param key the key
      * @param value the value
@@ -117,9 +117,9 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Adds key-value pair to the list.
+     * Adds a key-value pair to the list.
      *
-     * @param pair key-value pair
+     * @param pair the key-value pair
      */
     public void add(Pair<K, V> pair) {
         keys.add(pair.getKey());
@@ -129,7 +129,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Appends all of the elements in the specified pair list to the end of this list.
      *
-     * @param other {@code PairList} containing elements to be added to this list
+     * @param other the {@code PairList} containing elements to be added to this list
      */
     public void addAll(PairList<K, V> other) {
         if (other != null) {
@@ -159,7 +159,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Returns the key-value pair at the specified position in this list.
      *
-     * @param index index of the element to return
+     * @param index the index of the element to return
      * @return the key-value pair at the specified position in this list
      */
     public Pair<K, V> get(int index) {
@@ -169,7 +169,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Returns the key at the specified position in this list.
      *
-     * @param index index of the element to return
+     * @param index the index of the element to return
      * @return the key at the specified position in this list
      */
     public K keyAt(int index) {
@@ -179,7 +179,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Returns the value at the specified position in this list.
      *
-     * @param index index of the element to return
+     * @param index the index of the element to return
      * @return the value at the specified position in this list
      */
     public V valueAt(int index) {
@@ -249,7 +249,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Removes the key-value pair using index.
+     * Removes the key-value pair at an index.
      *
      * @param index the index of the element to remove
      * @return the value of the removed element, {@code null} if not found
@@ -287,7 +287,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Returns the {@link Stream} type of the PairList.
      *
-     * @return {@link Stream} of PairList
+     * @return a {@link Stream} of PairList
      */
     public Stream<Pair<K, V>> stream() {
         return StreamSupport.stream(spliterator(), false);
@@ -296,7 +296,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Returns {@code true} if this list contains the specified key.
      *
-     * @param key key whose presence in this list is to be tested
+     * @param key the key whose presence will be tested
      * @return {@code true} if this list contains the specified key
      */
     public boolean contains(K key) {
@@ -306,8 +306,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Removes all duplicate values from the list.
      *
-     * @return Returns a new list with the duplicate values removed, taking the latest value for
-     *     each key.
+     * @return a new list with the duplicate values removed, taking the latest value for each key
      */
     public PairList<K, V> unique() {
         return new PairList<>(toMap(false));
@@ -320,9 +319,9 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Returns a Map that contains key value mapping of this list.
+     * Returns a Map that contains a key-value mapping of this list.
      *
-     * @return a Map that contains key value mapping of this list
+     * @return a Map that contains a key-value mapping of this list
      */
     public Map<K, V> toMap() {
         return toMap(true);
@@ -332,7 +331,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
      * Returns a Map that contains key value mapping of this list.
      *
      * @param checkDuplicate {@code true} to make sure not duplicated keys in the list
-     * @return a Map that contains key value mapping of this list
+     * @return a Map that contains a key-value mapping of this list
      */
     public Map<K, V> toMap(boolean checkDuplicate) {
         int size = keys.size();

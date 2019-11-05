@@ -17,11 +17,11 @@ import ai.djl.ndarray.NDList;
 public interface PostProcessor<O> {
 
     /**
-     * Processes the output NDList to the corresponding Output Object.
+     * Processes the output NDList to the corresponding output object.
      *
-     * @param ctx Toolkit used to do postprocessing
-     * @param list Output NDList after inference
-     * @return output object
+     * @param ctx the toolkit used for postprocessing
+     * @param list the output NDList
+     * @return the output object
      * @throws Exception if an error occurs during processing output
      */
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")

@@ -30,10 +30,10 @@ public class Device {
     private int deviceId;
 
     /**
-     * Creates {@code Device} with basic information.
+     * Creates a {@code Device} with basic information.
      *
-     * @param deviceType device type user would like to use, typically CPU or GPU
-     * @param deviceId deviceId on the hardware. For example, if you have multiple GPUs, you can
+     * @param deviceType the device type, typically CPU or GPU
+     * @param deviceId the deviceId on the hardware. For example, if you have multiple GPUs, you can
      *     choose which GPU to process the NDArray
      */
     public Device(String deviceType, int deviceId) {
@@ -42,18 +42,18 @@ public class Device {
     }
 
     /**
-     * Returns device type of the Device.
+     * Returns the device type of the Device.
      *
-     * @return device type of the Device
+     * @return the device type of the Device
      */
     public String getDeviceType() {
         return deviceType;
     }
 
     /**
-     * Returns {@code deviceId} of the Device.
+     * Returns the {@code deviceId} of the Device.
      *
-     * @return {@code deviceId} of the Device
+     * @return the {@code deviceId} of the Device
      */
     public int getDeviceId() {
         return deviceId;
@@ -85,37 +85,37 @@ public class Device {
     }
 
     /**
-     * Returns default CPU Device.
+     * Returns the default CPU Device.
      *
-     * @return default CPU Device
+     * @return the default CPU Device
      */
     public static Device cpu() {
         return CPU;
     }
 
     /**
-     * Returns a new instance of CPU Device with specified {@code deviceId}.
+     * Returns a new instance of CPU Device with the specified {@code deviceId}.
      *
-     * @param deviceId CPU device ID
-     * @return a new instance of CPU Device with specified {@code deviceId}
+     * @param deviceId the CPU device ID
+     * @return a new instance of CPU Device with the specified {@code deviceId}
      */
     public static Device cpu(int deviceId) {
         return new Device("cpu", deviceId);
     }
 
     /**
-     * Returns default GPU Device.
+     * Returns the default GPU Device.
      *
-     * @return default GPU Device
+     * @return the default GPU Device
      */
     public static Device gpu() {
         return GPU;
     }
 
     /**
-     * Returns a new instance of GPU Device with specified {@code deviceId}.
+     * Returns a new instance of GPU Device with the specified {@code deviceId}.
      *
-     * @param deviceId GPU device ID
+     * @param deviceId the GPU device ID
      * @return a new instance of GPU Device with specified {@code deviceId}
      */
     public static Device gpu(int deviceId) {
@@ -125,7 +125,7 @@ public class Device {
     /**
      * Returns an array of devices.
      *
-     * @param maxGpus max number of gpus to use
+     * @param maxGpus the max number of GPUs to use
      * @return an array of devices
      */
     public static Device[] getDevices(int maxGpus) {
@@ -143,12 +143,12 @@ public class Device {
     }
 
     /**
-     * Returns the default context used in Engine
+     * Returns the default context used in Engine.
      *
-     * <p>default type is defined by whether the Deep Learning framework is recognizing GPUs
+     * <p>The default type is defined by whether the Deep Learning framework is recognizing GPUs
      * available on your machine. If there is no GPU available, CPU will be used.
      *
-     * @return {@link Device}
+     * @return a {@link Device}
      */
     public static Device defaultDevice() {
         return Engine.getInstance().defaultDevice();
