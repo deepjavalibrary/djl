@@ -111,11 +111,7 @@ public class SequentialBlock extends AbstractBlock {
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         NDList current = inputs;
         for (Block block : blocks) {
-            NDList previous = current;
             current = block.forward(parameterStore, current);
-            if (previous != inputs) {
-                previous.close();
-            }
         }
         return current;
     }
