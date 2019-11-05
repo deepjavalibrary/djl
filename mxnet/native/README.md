@@ -2,7 +2,7 @@
 
 ### Step 1: Copy library
 
-Copy the library files and all dependencies in `<path_to_your_DJL>/mxnet/native/src/main/resources/<osName>/native/lib`.
+Copy the library files and all dependencies in `<path_to_your_DJL>/mxnet/native/src/main/resources/binaries/<osName>/native/lib`.
 
 Make sure to upload all the libmxnet.so dependencies by command
 ```bash

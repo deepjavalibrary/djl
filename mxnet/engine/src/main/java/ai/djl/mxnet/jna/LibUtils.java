@@ -90,6 +90,10 @@ public class LibUtils {
         try (InputStream conf = url.openStream()) {
             Properties prop = new Properties();
             prop.load(conf);
+            if (prop.getProperty("placeholder") != null) {
+                throw new IllegalStateException(
+                        "You are using a placeholder jar. Make sure that the Maven Dependency Classifier includes your system type");
+            }
             String version = prop.getProperty("version");
             String libs = prop.getProperty("libraries");
             String[] files = libs.split(",");
