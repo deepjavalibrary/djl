@@ -41,30 +41,31 @@ The following is pseudo code of how to write training code:
 
 ```java
     // Construct your neural network with built-in blocks
-    Block block = new ResnetV1();
-
-    // setup your training configurations, such as Initializer, Optimizer, Loss ...
-    TrainingConfig config = setupTrainingConfig();
-
-    // configure inputShape based on batch size and number of GPU
-    Shape inputShape = new Shape(batchSize / numGpu, 28 * 28);
+    Block block = new Mlp(28, 28);
 
     try (Model model = Model.newInstance()) { // Create an empty model
         model.setBlock(block); // set neural network to model
 
-        // Prepare training and validating data set
-        Mnist trainSet = new Mnist.Builder().setUsage(Usage.TRAIN).build();
-        Mnist validateSet = new Mnist.Builder().setUsage(Usage.VALIDATION).build();
+        // Get training and validation dataset (MNIST dataset)
+        Dataset trainingSet = new Mnist.Builder().setUsage(Usage.TRAIN) ... .build();
+        Dataset validateSet = new Mnist.Builder().setUsage(Usage.TEST) ... .build();
 
-        try (Trainer trainer = model.newTrainer(config)) { // Create training session
-            trainer.init(new DataDesc[] {new DataDesc(inputShape)}); // initialize trainer
+        // Setup training configurations, such as Initializer, Optimizer, Loss ...
+        TrainingConfig config = setupTrainingConfig();
+        try (Trainer trainer = model.newTrainer(config)) {
+            /*
+             * Configure input shape based on dataset to initialize the trainer.
+             * 1st axis is batch axis, we can use 1 for initialization.
+             * MNIST is 28x28 grayscale image and pre processed into 28 * 28 NDArray.
+             */
+            Shape inputShape = new Shape(1, 28 * 28);
+            trainer.initialize(new Shape[] {inputShape});
 
-            // Train the model with train/validate dataset             
-            TrainingUtils.fit(trainer, trainSet, validateSet);
+            TrainingUtils.fit(trainer, epoch, trainingSet, validateSet);
         }
 
         // Save the model
-        model.save(modelDir, "myMnist");
+        model.save(modelDir, "mlp");
     }
 ```
 
