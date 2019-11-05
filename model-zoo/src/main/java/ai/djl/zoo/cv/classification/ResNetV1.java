@@ -213,8 +213,7 @@ public final class ResNetV1 {
         }
         return resNet.add(new LambdaBlock(arrays -> new NDList(Pool.globalAvgPool(arrays.head()))))
                 .add(Blocks.flattenBlock())
-                .add(new Linear.Builder().setOutChannels(builder.outSize).build())
-                .add(new LambdaBlock(arrays -> new NDList(arrays.singletonOrThrow().softmax(0))));
+                .add(new Linear.Builder().setOutChannels(builder.outSize).build());
     }
 
     public static final class Builder {

@@ -25,6 +25,7 @@ import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
+import ai.djl.zoo.ModelZoo;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -53,14 +54,20 @@ public final class ClassifyExample extends AbstractInference<Classification> {
         // Change to a specific device if needed.
         Device device = Device.defaultDevice();
 
-        Map<String, String> criteria = arguments.getCriteria();
-        if (criteria == null) {
-            criteria = new ConcurrentHashMap<>();
-            criteria.put("layers", "18");
-            criteria.put("flavor", "v1");
-        }
+        ModelLoader<BufferedImage, Classification> loader;
 
-        ModelLoader<BufferedImage, Classification> loader = MxModelZoo.getModelLoader(modelName);
+        Map<String, String> criteria = arguments.getCriteria();
+
+        if (arguments.isImperative()) {
+            loader = ModelZoo.RESNET;
+        } else {
+            if (criteria == null) {
+                criteria = new ConcurrentHashMap<>();
+                criteria.put("layers", "18");
+                criteria.put("flavor", "v1");
+            }
+            loader = MxModelZoo.getModelLoader(modelName);
+        }
 
         ZooModel<BufferedImage, Classification> model = loader.loadModel(criteria, device);
 

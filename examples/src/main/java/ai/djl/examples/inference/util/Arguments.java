@@ -36,6 +36,8 @@ public class Arguments {
     private int duration;
     private int iteration = 1;
 
+    private boolean isImperative;
+
     public Arguments(CommandLine cmd) {
         modelDir = cmd.getOptionValue("model-dir");
         modelName = cmd.getOptionValue("model-name");
@@ -51,6 +53,7 @@ public class Arguments {
             Type type = new TypeToken<Map<String, String>>() {}.getType();
             criteria = new Gson().fromJson(cmd.getOptionValue("criteria"), type);
         }
+        isImperative = cmd.hasOption("imperative");
     }
 
     public static Options getOptions() {
@@ -104,6 +107,12 @@ public class Arguments {
                         .argName("CRITERIA")
                         .desc("The criteria used for the model.")
                         .build());
+        options.addOption(
+                Option.builder("m")
+                        .longOpt("imperative")
+                        .argName("IMPERATIVE")
+                        .desc("set to true to use imperative model.")
+                        .build());
         return options;
     }
 
@@ -136,6 +145,10 @@ public class Arguments {
             throw new FileNotFoundException("image file not found: " + imageFile);
         }
         return path;
+    }
+
+    public boolean isImperative() {
+        return isImperative;
     }
 
     public int getDuration() {
