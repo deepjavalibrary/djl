@@ -580,7 +580,7 @@ public class NDArrayElementComparisonOpTest {
                     manager.create(
                             new float[] {-2f, 3f, 2f, 7f, 10f, 3f, -234f, 2f}, new Shape(2, 4));
             result = NDArrays.where(condition, array1, array2);
-            Assert.assertEquals(result, actual, "where: Incorrect comparison");
+            Assert.assertEquals(actual, result, "where: Incorrect comparison");
 
             // test cond broadcasting
             array1 =
@@ -594,7 +594,7 @@ public class NDArrayElementComparisonOpTest {
                     manager.create(
                             new float[] {-2f, 43f, 2f, 7f, 11f, 12f, -2f, -4f}, new Shape(2, 4));
             result = NDArrays.where(condition, array1, array2);
-            Assert.assertEquals(result, actual, "where: Incorrect comparison");
+            Assert.assertEquals(actual, result, "where: Incorrect comparison");
             // test x, y broadcasting
             array1 = manager.create(new float[] {0f, 1f, 2f}).reshape(3, 1);
             array2 = manager.create(new float[] {3f, 4f, 5f, 6f}).reshape(1, 4);
@@ -610,7 +610,23 @@ public class NDArrayElementComparisonOpTest {
                     manager.create(
                             new float[] {3f, 0f, 0f, 0f, 3f, 4f, 1f, 1f, 3f, 4f, 5f, 2f},
                             new Shape(3, 4));
-            Assert.assertEquals(result, actual, "where: Incorrect comparison");
+            Assert.assertEquals(actual, result, "where: Incorrect comparison");
+
+            // test where examples in numpy website
+            array1 = manager.arange(10);
+            result = NDArrays.where(array1.lt(5), array1, array1.mul(10));
+            actual = manager.create(new float[] {0, 1, 2, 3, 4, 50, 60, 70, 80, 90});
+            Assert.assertEquals(actual, result);
+
+            array1 =
+                    manager.create(
+                            new float[] {0f, 1f, 2f, 0f, 2f, 4f, 0f, 3f, 6f}, new Shape(3, 3));
+            array2 = manager.create(new float[] {-1f});
+            result = NDArrays.where(array1.lt(4), array1, array2);
+            actual =
+                    manager.create(
+                            new float[] {0f, 1f, 2f, 0f, 2f, -1f, 0f, 3f, -1f}, new Shape(3, 3));
+            Assert.assertEquals(actual, result);
 
             // test scalar with scalar
             array1 = manager.create(4f);
@@ -618,7 +634,7 @@ public class NDArrayElementComparisonOpTest {
             condition = manager.create(false);
             result = NDArrays.where(condition, array1, array2);
             actual = manager.create(6f);
-            Assert.assertEquals(result, actual, "where: Incorrect comparison");
+            Assert.assertEquals(actual, result, "where: Incorrect comparison");
 
             // test zero-dim
             array1 = manager.create(new Shape(1, 0, 0));
@@ -626,7 +642,7 @@ public class NDArrayElementComparisonOpTest {
             condition = manager.create(new Shape(1, 0, 0));
             result = NDArrays.where(condition, array1, array2);
             actual = manager.create(new Shape(1, 0, 0));
-            Assert.assertEquals(result, actual, "where: Incorrect comparison");
+            Assert.assertEquals(actual, result, "where: Incorrect comparison");
         }
     }
 }

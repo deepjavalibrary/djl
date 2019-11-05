@@ -799,25 +799,21 @@ public interface NDArray extends AutoCloseable {
      */
     NDArray lte(NDArray other);
 
-    // TODO where operator is not compliant with numpy
     /**
-     * Return the elements, either from this NDArray or other, depending on the condition.
+     * Returns elements chosen from this {@code NDArray} or the other {@code NDArray} depending on
+     * condition.
      *
-     * <p>Given three NDArrays, condition, this, and other, return an NDArray with the elements from
-     * this or other, depending on whether the elements from condition are true or false. The other
-     * array must have the same shape as this. If condition has the same shape as this, each element
-     * in the output array is from this if the corresponding element in the condition is true, and
-     * from other if false.
+     * <p>Given three {@code NDArray}s, condition, this, and other, returns an {@code NDArray} with
+     * the elements from this or other, depending on whether the elements from condition {@code
+     * NDArray} are true or false. If condition has the same shape as this, each element in the
+     * output array is from this if the corresponding element in the condition is true, and from
+     * other if false.
      *
-     * <p>If condition does not have the same shape as this, it must be a 1D array whose size is the
-     * same as this array's first dimension size. Each row of the output array is from this array's
-     * row if the corresponding element from condition is true, and from other’s row if false.
+     * <p>Note that all non-zero values are interpreted as true in condition {@code NDArray}.
      *
-     * <p>Note that all non-zero values are interpreted as True in condition.
-     *
-     * @param condition the condition array
-     * @param other the other NDArray
-     * @return the result NDArray
+     * @param condition the condition {@code NDArray}
+     * @param other the other {@code NDArray}
+     * @return the result {@code NDArray}
      */
     NDArray where(NDArray condition, NDArray other);
 
@@ -826,158 +822,171 @@ public interface NDArray extends AutoCloseable {
     ////////////////////////////////////////
 
     /**
-     * Adds a number to each element of the array.
+     * Adds a number to this {@code NDArray} element-wise.
      *
      * @param n the number to add
-     * @return the result of the addition
+     * @return the result {@code NDArray}
      */
     NDArray add(Number n);
 
     /**
-     * Adds (broadcasting) another NDArray to this {@code NDArray}.
+     * Adds other {@code NDArray}s to this {@code NDArray} element-wise.
      *
-     * @param others the other NDArrays to add
-     * @return the result of the addition
+     * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
+     *
+     * @param others the other {@code NDArray}s to add
+     * @return the result {@code NDArray}
+     * @throws IllegalArgumentException others arrays must have at least one element
      */
     NDArray add(NDArray... others);
 
     /**
-     * Applies scalar subtraction on an array (copied).
+     * Subtracts a number from this {@code NDArray} element-wise.
      *
-     * @param n the number to subtract by
-     * @return a copy of this array after applying subtraction operation
+     * @param n the number to subtract from
+     * @return the result {@code NDArray}
      */
     NDArray sub(Number n);
 
     /**
-     * Applies copy subtraction of two NDArrays.
+     * Subtracts the other {@code NDArray} from this {@code NDArray} element-wise.
      *
-     * @param other the second NDArray to subtract
-     * @return the result of the subtraction
+     * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
+     *
+     * @param other the other {@code NDArray} to subtract from
+     * @return the result {@code NDArray}
      */
     NDArray sub(NDArray other);
 
     /**
-     * Applies scalar multiplication on an array (copy).
+     * Multiplies this {@code NDArray} by a number element-wise.
      *
      * @param n the number to multiply by
-     * @return a copy of this NDArray multiplied by the given number
+     * @return the result {@code NDArray}
      */
     NDArray mul(Number n);
 
     /**
-     * Applies element-wise multiplication of other NDArrays to this NDArray.
+     * Multiplies this {@code NDArray} by other {@code NDArray}s element-wise.
      *
-     * @param others the other NDArrays to multiply with
-     * @return the result of the multiplication
+     * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
+     *
+     * @param others the other {@code NDArray}s to multiply by
+     * @return the result {@code NDArray}
      * @throws IllegalArgumentException others arrays must have at least one element
      */
     NDArray mul(NDArray... others);
 
     /**
-     * Divides an array by a number.
+     * Divides this {@code NDArray} by a number element-wise.
      *
      * @param n the number to divide values by
-     * @return a copy of the array after division
+     * @return the result {@code NDArray}
      */
     NDArray div(Number n);
 
     /**
-     * Applies element-wise division of two NDArrays.
+     * Divides this {@code NDArray} by the other {@code NDArray} element-wise.
      *
-     * @param other the second NDArray to divide
-     * @return the result of the divide
+     * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
+     * @param other the other {@code NDArray} to divide by
+     * @return the result {@code NDArray}
      */
     NDArray div(NDArray other);
 
     /**
      * Returns element-wise remainder of division.
      *
-     * <p>NDArray nd = manager.create(new float[] {-3, -5}, null, new Shape(2)); nd.mod(-2) //
-     * return [-1, -1]
-     *
      * @param n the divisor number
-     * @return a copy of {@code NDArray} after division
+     * @return the result {@code NDArray}
      */
     NDArray mod(Number n);
 
     /**
      * Returns element-wise remainder of division.
      *
-     * @param other the second NDArray to divide by
-     * @return the result of the divide
+     * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
+     * @param other the divisor {@code NDArray}
+     * @return the result {@code NDArray}
      */
     NDArray mod(NDArray other);
 
     /**
-     * Raises the power of each element in the {@code NDArray}.
+     * Takes the power of this {@code NDArray} with a number element-wise.
      *
-     * @param n the number to raise the power to
+     * @param n the number to take the power with
      * @return the result {@code NDArray}
      */
     NDArray pow(Number n);
 
     /**
-     * Raises the power of each element in the NDArray by the corresponding element in the other
-     * {@code NDArray}.
+     * Takes the power of this {@code NDArray} with the other {@code NDArray} element-wise.
      *
-     * @param other the NDArray by which the raise the power by
+     * @param other the other {@code NDArray} to take the power with
      * @return the result {@code NDArray}
      */
     NDArray pow(NDArray other);
 
     /**
-     * Adds a number to each element of the array in place.
+     * Adds a number to this {@code NDArray} element-wise in place.
      *
      * @param n the number to add
-     * @return the result of the addition
+     * @return the result {@code NDArray}
      */
     NDArray addi(Number n);
 
     /**
-     * Adds (broadcasting) another NDArray to this NDArray in place.
+     * Adds other {@code NDArray}s to this {@code NDArray} element-wise in place.
      *
-     * @param others the other NDArrays to add
-     * @return the result of the addition
+     * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
+     *
+     * @param others the other {@code NDArray}s to add
+     * @return the result {@code NDArray}
      * @throws IllegalArgumentException others arrays must have at least one element
      */
     NDArray addi(NDArray... others);
 
     /**
-     * Applies in place scalar subtraction of an array.
+     * Subtracts a number from this {@code NDArray} element-wise in place.
      *
      * @param n the number to subtract
-     * @return this array after applying the subtraction operation
+     * @return the result {@code NDArray}
      */
     NDArray subi(Number n);
 
     /**
-     * Performs in place (element wise) subtraction of two NDArrays.
+     * Subtracts the other {@code NDArray} from this {@code NDArray} element-wise in place.
      *
-     * @param other the second NDArray to subtract
-     * @return the result of the subtraction
+     * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
+     *
+     * @param other the other {@code NDArray} to subtract from
+     * @return the result {@code NDArray}
      */
     NDArray subi(NDArray other);
 
     /**
-     * Performs in place scalar multiplication of an array.
+     * Multiplies this {@code NDArray} by a number element-wise in place.
      *
      * @param n the number to multiply by
-     * @return this array after applying scalar multiplication
+     * @return the result {@code NDArray}
      */
     NDArray muli(Number n);
 
     /**
-     * Performs element-wise multiplication of other NDArrays to this NDArray in place.
+     * Multiplies this {@code NDArray} by other {@code NDArray}s element-wise in place.
+     *
+     * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
      *
      * @param others the other NDArrays to multiply with
-     * @return the result of the multiplication
+     * @return the result {@code NDArray}
      * @throws IllegalArgumentException others arrays must have at least one element
      */
     NDArray muli(NDArray... others);
 
     /**
-     * Performs in place scalar division of an array.
+     * Divides this {@code NDArray} by a number element-wise in place.
      *
      * @param n the number to divide values by
      * @return this array after applying division operation
@@ -985,31 +994,33 @@ public interface NDArray extends AutoCloseable {
     NDArray divi(Number n);
 
     /**
-     * Performs in place element-wise division of two NDArrays.
+     * Divides this {@code NDArray} by the other {@code NDArray} element-wise in place.
      *
-     * @param other the second NDArray to divide by
+     * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
+     * @param other the other {@code NDArray} to divide by
      * @return the result of the divide
      */
     NDArray divi(NDArray other);
 
     /**
-     * Returns element-wise remainder of division.
+     * Returns element-wise remainder of division in place.
      *
      * @param n the divisor number
-     * @return a copy of {@code NDArray} after division
+     * @return the result {@code NDArray}
      */
     NDArray modi(Number n);
 
     /**
-     * Returns in place element-wise remainder of division.
+     * Returns in place element-wise remainder of division in place.
      *
-     * @param other the second NDArray to divide
+     * @param other the divisor {@code NDArray}
      * @return the result of the divide
      */
     NDArray modi(NDArray other);
 
     /**
-     * Raises the power of each element in the NDArray in-place.
+     * Takes the power of this {@code NDArray} with a number element-wise in place.
      *
      * @param n the number to raise the power to
      * @return the result {@code NDArray}
@@ -1017,10 +1028,9 @@ public interface NDArray extends AutoCloseable {
     NDArray powi(Number n);
 
     /**
-     * Raises the power of each element in the NDArray by the corresponding element in the other
-     * NDArray in-place.
+     * Takes the power of this {@code NDArray} with the other {@code NDArray} element-wise in place.
      *
-     * @param other the NDArray by which the raise the power by
+     * @param other the other {@code NDArray} to take the power with
      * @return the result {@code NDArray}
      */
     NDArray powi(NDArray other);
