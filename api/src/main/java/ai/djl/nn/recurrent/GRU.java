@@ -169,15 +169,11 @@ public class GRU extends RecurrentCell {
     }
 
     private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
-        if (inputs.size() != 1) {
-            throw new IllegalArgumentException("RNN requires exactly 1 NDArray");
-        }
-
-        NDArray head = inputs.singletonOrThrow();
+        validateInputSize(inputs);
+        NDArray head = inputs.head();
         Device device = head.getDevice();
 
         NDList result = new NDList(head);
-
         try (NDList parameterList = new NDList()) {
             for (Parameter parameter : parameters) {
                 NDArray array = parameterStore.getValue(parameter, device);

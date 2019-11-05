@@ -12,6 +12,7 @@
  */
 package ai.djl.nn.recurrent;
 
+import ai.djl.ndarray.NDList;
 import ai.djl.nn.ParameterBlock;
 
 /**
@@ -35,6 +36,20 @@ public abstract class RecurrentCell extends ParameterBlock {
         useSequenceLength = builder.useSequenceLength;
         useBidirectional = builder.useBidirectional;
         stateOutputs = builder.stateOutputs;
+    }
+
+    protected void validateInputSize(NDList inputs) {
+        int numberofInputsRequired = 1;
+        if (useSequenceLength) {
+            numberofInputsRequired = 2;
+        }
+        if (inputs.size() != numberofInputsRequired) {
+            throw new IllegalArgumentException(
+                    "Invalid number of inputs for RNN. Size of input NDList must be "
+                            + numberofInputsRequired
+                            + " when useSequenceLength is "
+                            + useSequenceLength);
+        }
     }
 
     @SuppressWarnings("rawtypes")
