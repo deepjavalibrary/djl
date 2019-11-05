@@ -95,6 +95,7 @@ public class NDArrayShapesManipulationOpTest {
             NDArray array = manager.create(new float[] {1f, 2f});
             NDArray actual = manager.create(new float[] {1f, 2f}, new Shape(1, 2));
             Assert.assertEquals(actual, array.expandDims(0));
+
             // multi-dim
             array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             actual = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 1, 2));

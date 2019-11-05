@@ -13,7 +13,6 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
-import ai.djl.engine.Engine;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
@@ -42,71 +41,64 @@ public class ImageFolderTest {
     @Test
     public void testImageFolder() throws IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/imagefolder");
-        if (Engine.getInstance().getGpuCount() == 0) {
-            TrainingConfig config =
-                    new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
-            try (Model model = Model.newInstance()) {
-                model.setBlock(Activation.IDENTITY_BLOCK);
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Activation.IDENTITY_BLOCK);
 
-                ImageFolder dataset =
-                        new ImageFolder.Builder()
-                                .setRepository(repository)
-                                .optPipeline(
-                                        new Pipeline()
-                                                .add(new Resize(100, 100))
-                                                .add(new ToTensor()))
-                                .setSampling(1, false)
-                                .build();
-                dataset.prepare();
+            ImageFolder dataset =
+                    new ImageFolder.Builder()
+                            .setRepository(repository)
+                            .optPipeline(
+                                    new Pipeline().add(new Resize(100, 100)).add(new ToTensor()))
+                            .setSampling(1, false)
+                            .build();
+            dataset.prepare();
 
-                List<String> synsets = Arrays.asList("cat", "dog", "misc");
-                Assert.assertEquals(synsets, dataset.getSynset());
+            List<String> synsets = Arrays.asList("cat", "dog", "misc");
+            Assert.assertEquals(synsets, dataset.getSynset());
 
-                try (Trainer trainer = model.newTrainer(config)) {
-                    NDManager manager = trainer.getManager();
-                    NDArray cat =
-                            BufferedImageUtils.readFileToArray(
-                                    manager,
-                                    Paths.get("src/test/resources/imagefolder/cat/kitten.jpg"));
-                    NDArray dog =
-                            BufferedImageUtils.readFileToArray(
-                                    manager,
-                                    Paths.get("src/test/resources/imagefolder/dog/3dogs.jpg"));
+            try (Trainer trainer = model.newTrainer(config)) {
+                NDManager manager = trainer.getManager();
+                NDArray cat =
+                        BufferedImageUtils.readFileToArray(
+                                manager,
+                                Paths.get("src/test/resources/imagefolder/cat/kitten.jpg"));
+                NDArray dog =
+                        BufferedImageUtils.readFileToArray(
+                                manager, Paths.get("src/test/resources/imagefolder/dog/3dogs.jpg"));
 
-                    NDArray pikachu =
-                            BufferedImageUtils.readFileToArray(
-                                    manager,
-                                    Paths.get("src/test/resources/imagefolder/misc/pikachu.png"));
+                NDArray pikachu =
+                        BufferedImageUtils.readFileToArray(
+                                manager,
+                                Paths.get("src/test/resources/imagefolder/misc/pikachu.png"));
 
-                    Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
+                Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
 
-                    Batch catBatch = ds.next();
-                    Assertions.assertAlmostEquals(
-                            NDImageUtils.toTensor(NDImageUtils.resize(cat, 100, 100)).expandDims(0),
-                            catBatch.getData().singletonOrThrow());
-                    Assert.assertEquals(
-                            manager.create(new int[] {0}), catBatch.getLabels().singletonOrThrow());
-                    catBatch.close();
+                Batch catBatch = ds.next();
+                Assertions.assertAlmostEquals(
+                        NDImageUtils.toTensor(NDImageUtils.resize(cat, 100, 100)).expandDims(0),
+                        catBatch.getData().singletonOrThrow());
+                Assert.assertEquals(
+                        manager.create(new int[] {0}), catBatch.getLabels().singletonOrThrow());
+                catBatch.close();
 
-                    Batch dogBatch = ds.next();
-                    Assertions.assertAlmostEquals(
-                            NDImageUtils.toTensor(NDImageUtils.resize(dog, 100, 100)).expandDims(0),
-                            dogBatch.getData().singletonOrThrow());
-                    Assert.assertEquals(
-                            manager.create(new int[] {1}), dogBatch.getLabels().singletonOrThrow());
-                    dogBatch.close();
+                Batch dogBatch = ds.next();
+                Assertions.assertAlmostEquals(
+                        NDImageUtils.toTensor(NDImageUtils.resize(dog, 100, 100)).expandDims(0),
+                        dogBatch.getData().singletonOrThrow());
+                Assert.assertEquals(
+                        manager.create(new int[] {1}), dogBatch.getLabels().singletonOrThrow());
+                dogBatch.close();
 
-                    Batch pikachuBatch = ds.next();
-                    Assertions.assertAlmostEquals(
-                            NDImageUtils.toTensor(NDImageUtils.resize(pikachu, 100, 100))
-                                    .expandDims(0),
-                            pikachuBatch.getData().singletonOrThrow());
-                    Assert.assertEquals(
-                            manager.create(new int[] {2}),
-                            pikachuBatch.getLabels().singletonOrThrow());
-                    pikachuBatch.close();
-                }
+                Batch pikachuBatch = ds.next();
+                Assertions.assertAlmostEquals(
+                        NDImageUtils.toTensor(NDImageUtils.resize(pikachu, 100, 100)).expandDims(0),
+                        pikachuBatch.getData().singletonOrThrow());
+                Assert.assertEquals(
+                        manager.create(new int[] {2}), pikachuBatch.getLabels().singletonOrThrow());
+                pikachuBatch.close();
             }
         }
     }

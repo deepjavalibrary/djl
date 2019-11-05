@@ -1127,6 +1127,9 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray expandDims(int axis) {
+        if (isScalar()) {
+            return reshape(1);
+        }
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         return manager.invoke("_npi_expand_dims", this, params);

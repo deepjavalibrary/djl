@@ -728,7 +728,7 @@ class MxNDArrayEx implements NDArrayEx {
         }
         MxOpParams params = new MxOpParams();
         // MXNet backend use dim as argument name
-        params.addParam("dim", axis);
+        params.addParam("axis", axis);
         NDArray[] srcArray = new NDArray[arrays.length + 1];
         srcArray[0] = array;
         System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
