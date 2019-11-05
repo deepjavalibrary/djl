@@ -66,7 +66,7 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
                 for (I input : inputs) {
                     timestamp = System.nanoTime();
                     NDList ndList = translator.processInput(context, input);
-                    preprocessEnd();
+                    preprocessEnd(ndList);
 
                     NDList result = forward(ndList);
                     forwardEnd(result);
@@ -79,7 +79,7 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
 
             timestamp = System.nanoTime();
             NDList inputBatch = processInputs(context, inputs);
-            preprocessEnd();
+            preprocessEnd(inputBatch);
 
             NDList result = forward(inputBatch);
             forwardEnd(result);
@@ -127,8 +127,9 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
         return outputs;
     }
 
-    private void preprocessEnd() {
+    private void preprocessEnd(NDList list) {
         if (metrics != null) {
+            waitToRead(list);
             long tmp = System.nanoTime();
             long duration = tmp - timestamp;
             timestamp = tmp;
