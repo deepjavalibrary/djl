@@ -89,6 +89,14 @@ def shouldSign() {
 
 Closure publishRepository() {
     def publishTo = project.findProperty("publishTo")
+
+    if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+        if (publishTo != null || gradle.startParameter.taskNames.contains("publish")) {
+            throw new GradleException("JDK 1.8 is required to compile java class to be published.")
+        }
+        return {}
+    }
+
     switch(publishTo) {
         case "local": return {
             name "local"
