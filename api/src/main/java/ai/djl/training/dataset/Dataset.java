@@ -13,12 +13,11 @@
 package ai.djl.training.dataset;
 
 import ai.djl.ndarray.NDManager;
-import java.io.IOException;
 
 /** An interface to represent Dataset. All the datasets should implement this interface. */
 public interface Dataset {
 
-    Iterable<Batch> getData(NDManager manager) throws IOException;
+    Iterable<Batch> getData(NDManager manager);
 
     enum Usage {
         TRAIN,

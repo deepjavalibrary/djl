@@ -20,13 +20,12 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetric;
-import java.io.IOException;
 
 public interface Trainer extends AutoCloseable {
 
     void initialize(Shape[] shapes);
 
-    default Iterable<Batch> iterateDataset(Dataset dataset) throws IOException {
+    default Iterable<Batch> iterateDataset(Dataset dataset) {
         return dataset.getData(getManager());
     }
 

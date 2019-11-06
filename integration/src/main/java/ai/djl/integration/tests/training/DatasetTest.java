@@ -46,7 +46,7 @@ public class DatasetTest {
     private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);
 
     @Test
-    public void testSequenceSampler() throws IOException {
+    public void testSequenceSampler() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 
@@ -75,7 +75,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testRandomSampler() throws IOException {
+    public void testRandomSampler() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 
@@ -102,7 +102,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testBatchSampler() throws IOException {
+    public void testBatchSampler() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 
@@ -185,7 +185,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testArrayDataset() throws IOException {
+    public void testArrayDataset() {
         try (Model model = Model.newInstance()) {
             model.setBlock(Activation.IDENTITY_BLOCK);
 

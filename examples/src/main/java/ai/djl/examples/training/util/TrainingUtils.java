@@ -34,9 +34,7 @@ public final class TrainingUtils {
     private TrainingUtils() {}
 
     public static void fit(
-            Trainer trainer, int numEpoch, Dataset trainingDataset, Dataset validateDataset)
-            throws IOException {
-
+            Trainer trainer, int numEpoch, Dataset trainingDataset, Dataset validateDataset) {
         for (int epoch = 0; epoch < numEpoch; epoch++) {
             for (Batch batch : trainer.iterateDataset(trainingDataset)) {
                 trainer.trainBatch(batch);

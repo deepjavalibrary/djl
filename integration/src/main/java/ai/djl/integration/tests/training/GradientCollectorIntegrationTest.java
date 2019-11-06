@@ -31,7 +31,6 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.Sgd;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
-import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -61,7 +60,7 @@ public class GradientCollectorIntegrationTest {
     }
 
     @Test
-    public void testTrain() throws IOException {
+    public void testTrain() {
         int numOfData = 1000;
         int batchSize = 10;
         int epochs = 10;
