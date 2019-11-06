@@ -1341,7 +1341,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray isNaN() {
-        return manager.invoke("_npi_equal", new NDArray[] {this, this}, null);
+        return manager.invoke("_npi_not_equal", new NDArray[] {this, this}, null);
     }
 
     /** {@inheritDoc} */

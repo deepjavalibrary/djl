@@ -132,7 +132,12 @@ public class MxModel implements Model {
             throw new IllegalStateException("Model has not be trained or loaded yet.");
         }
 
-        int epoch = Utils.getCurrentEpoch(modelPath, modelName) + 1;
+        String epochValue = getProperty("Epoch");
+        int epoch =
+                epochValue == null
+                        ? Utils.getCurrentEpoch(modelPath, modelName) + 1
+                        : Integer.parseInt(epochValue);
+
         Path paramFile = modelPath.resolve(String.format("%s-%04d.params", modelName, epoch));
         try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(paramFile))) {
             dos.writeBytes("DJL@");
@@ -344,7 +349,11 @@ public class MxModel implements Model {
             if (epochOption == null) {
                 epoch = Utils.getCurrentEpoch(modelDir, modelName);
                 if (epoch == -1) {
-                    throw new IOException("Parameter file not found in: " + modelDir);
+                    throw new IOException(
+                            "Parameter file not found in: "
+                                    + modelDir
+                                    + ". If you only specified model path, make sure path name match"
+                                    + "your saved model file name.");
                 }
             } else {
                 epoch = Integer.parseInt(epochOption);

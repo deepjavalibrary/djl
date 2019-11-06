@@ -81,7 +81,7 @@ parser.add_argument('--resume', type=str, default='',
                     help='path to saved weight where you want resume')
 parser.add_argument('--lr-factor', default=0.1, type=float,
                     help='learning rate decay ratio')
-parser.add_argument('--lr-steps', default='80,120,160,180', type=str,
+parser.add_argument('--lr-steps', default='30,60,90', type=str,
                     help='list of learning rate decay epochs as in str')
 parser.add_argument('--dtype', default='float32', type=str,
                     help='data type, float32 or float16 if applicable')

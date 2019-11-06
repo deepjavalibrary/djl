@@ -13,6 +13,7 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
+import ai.djl.Model;
 import ai.djl.TrainingDivergedException;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
@@ -91,6 +92,15 @@ public class MxTrainer implements Trainer {
     @Override
     public void initialize(Shape[] shapes) {
         model.getBlock().initialize(model.getNDManager(), model.getDataType(), shapes);
+        // call getValue on all params to initialize on all devices
+        model.getBlock()
+                .getParameters()
+                .forEach(
+                        pair -> {
+                            for (Device device : devices) {
+                                parameterStore.getValue(pair.getValue(), device);
+                            }
+                        });
     }
 
     /** {@inheritDoc} */
@@ -198,7 +208,7 @@ public class MxTrainer implements Trainer {
             NDArray loss = trainingLoss.getLastUpdate();
             if (loss != null) {
                 NDArray result = loss.isNaN();
-                if (!result.all()) {
+                if (result.any()) {
                     throw new TrainingDivergedException("The Loss NDArray has NaNs");
                 }
             }
@@ -242,6 +252,12 @@ public class MxTrainer implements Trainer {
     @Override
     public Loss getValidationLoss() {
         return validationLoss;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Model getModel() {
+        return model;
     }
 
     public Metrics getMetrics() {
@@ -289,7 +305,10 @@ public class MxTrainer implements Trainer {
                 .values()
                 .stream()
                 .filter(Parameter::requireGradient)
-                .forEach(param -> grads.add(parameterStore.getValue(param, devices[0])));
+                .forEach(
+                        param ->
+                                grads.add(
+                                        parameterStore.getValue(param, devices[0]).getGradient()));
 
         NDList list = new NDList(grads.stream().map(NDArray::sum).toArray(NDArray[]::new));
         NDArray gradSum = NDArrays.stack(list);

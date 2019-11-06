@@ -85,7 +85,12 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
 
                 // initialize trainer with proper input shape
                 trainer.initialize(new Shape[] {inputShape});
-                TrainingUtils.fit(trainer, arguments.getEpoch(), trainDataset, validationDataset);
+                TrainingUtils.fit(
+                        trainer,
+                        arguments.getEpoch(),
+                        trainDataset,
+                        validationDataset,
+                        arguments.getOutputDir());
             }
 
             // save model
@@ -149,7 +154,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         if (arguments.getPreTrained()) {
             epochs = new int[] {2, 5, 8};
         } else {
-            epochs = new int[] {80, 120, 160, 180};
+            epochs = new int[] {20, 60, 90, 120, 180};
         }
         int[] steps = Arrays.stream(epochs).map(k -> k * 60000 / batchSize).toArray();
         Initializer initializer =
@@ -159,7 +164,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 LearningRateTracker.multiFactorTracker()
                         .setSteps(steps)
                         .optBaseLearningRate(1e-3f)
-                        .optFactor(0.1f)
+                        .optFactor((float) Math.sqrt(.1f))
                         .optWarmUpBeginLearningRate(1e-4f)
                         .optWarmUpSteps(200)
                         .build();
@@ -168,7 +173,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                         .setRescaleGrad(1.0f / batchSize)
                         .optLearningRateTracker(learningRateTracker)
                         .optWeightDecays(0.001f)
-                        .optClipGrad(1f)
+                        .optClipGrad(5f)
                         .build();
         return new DefaultTrainingConfig(initializer)
                 .setOptimizer(optimizer)

@@ -12,6 +12,7 @@
  */
 package ai.djl.training;
 
+import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -101,6 +102,13 @@ public interface Trainer extends AutoCloseable {
      * @return the validation {@link Loss} function
      */
     Loss getValidationLoss();
+
+    /**
+     * Returns the model used to create this trainer.
+     *
+     * @return the model associated with this trainer
+     */
+    Model getModel();
 
     /**
      * Gets the training {@link TrainingMetric} that is an instance of the given {@link Class}.

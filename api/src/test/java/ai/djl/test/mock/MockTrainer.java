@@ -12,6 +12,7 @@
  */
 package ai.djl.test.mock;
 
+import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -84,6 +85,12 @@ public class MockTrainer implements Trainer {
     /** {@inheritDoc} */
     @Override
     public Loss getValidationLoss() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Model getModel() {
         return null;
     }
 

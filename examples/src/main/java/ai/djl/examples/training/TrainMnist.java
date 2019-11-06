@@ -72,7 +72,12 @@ public final class TrainMnist extends AbstractTraining {
                 // initialize trainer with proper input shape
                 trainer.initialize(new Shape[] {inputShape});
 
-                TrainingUtils.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);
+                TrainingUtils.fit(
+                        trainer,
+                        arguments.getEpoch(),
+                        trainingSet,
+                        validateSet,
+                        arguments.getOutputDir());
             }
 
             // save model

@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training.util;
 
+import ai.djl.Model;
 import ai.djl.metric.Metric;
 import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
@@ -34,7 +35,12 @@ public final class TrainingUtils {
     private TrainingUtils() {}
 
     public static void fit(
-            Trainer trainer, int numEpoch, Dataset trainingDataset, Dataset validateDataset) {
+            Trainer trainer,
+            int numEpoch,
+            Dataset trainingDataset,
+            Dataset validateDataset,
+            String outputDir)
+            throws IOException {
         for (int epoch = 0; epoch < numEpoch; epoch++) {
             for (Batch batch : trainer.iterateDataset(trainingDataset)) {
                 trainer.trainBatch(batch);
@@ -50,6 +56,12 @@ public final class TrainingUtils {
             }
             // reset training and validation metric at end of epoch
             trainer.resetTrainingMetrics();
+            // save model at end of each epoch
+            if (outputDir != null) {
+                Model model = trainer.getModel();
+                model.setProperty("Epoch", String.valueOf(epoch));
+                model.save(Paths.get(outputDir), "resnetv1");
+            }
         }
     }
 

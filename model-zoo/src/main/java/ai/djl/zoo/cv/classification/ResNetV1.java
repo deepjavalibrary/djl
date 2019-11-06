@@ -271,11 +271,6 @@ public final class ResNetV1 {
             return this;
         }
 
-        public Builder optBottleneck(boolean bottleneck) {
-            this.bottleneck = bottleneck;
-            return this;
-        }
-
         public Block build() {
             if (imageShape == null) {
                 throw new IllegalArgumentException("Must set imageShape");

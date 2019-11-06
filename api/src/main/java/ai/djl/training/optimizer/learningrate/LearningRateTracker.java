@@ -12,6 +12,8 @@
  */
 package ai.djl.training.optimizer.learningrate;
 
+import ai.djl.TrainingDivergedException;
+
 public abstract class LearningRateTracker {
 
     float baseLearningRate;
@@ -51,7 +53,7 @@ public abstract class LearningRateTracker {
 
     void checkLearningRate(float learningRate) {
         if (Float.isNaN(learningRate)) {
-            throw new IllegalStateException("Warm up learning rate is Nan.");
+            throw new TrainingDivergedException("Learning rate is Nan.");
         }
     }
 
