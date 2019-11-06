@@ -123,7 +123,7 @@
         },
         "parameters": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet50_v1_cifar10-0000.params.gz",
-          "sha1Hash": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+          "sha1Hash": "cf1f6660d73cd324c25ab04405b8b07c3a35fad3"
         }
       }
     }
