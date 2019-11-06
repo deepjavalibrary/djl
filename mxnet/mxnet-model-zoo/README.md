@@ -4,54 +4,73 @@
 
 MXNet model zoo contains most of the Symbolic model that can be used for inference and training.
 
-## Add new Model
+All of the models in this model zoo contain pre-trained parameters for their specific datasets.
 
-Please follow the step to step instruction to add your new model
+## Pre-trained models
 
-### Step 1: Create the folder
+MXNet model zoo contains two major categories, CV and NLP. All of the models are grouped by their application under these categories:
 
-go to `test/resources/repo/model` and find the type of the model you are looking for.
-Then create the corresponding folder to store your model. For example, `image_classification.org.apache.mxnet.resnet`.
+* CV
+  * Action Recognition
+  * Image Classification
+  * Object Detection
+  * Pose Estimation
+  * Semantic Segmentation/Instance Segmentation
+* NLP
+  * Question and Answer
 
-### Step 2: Place your model files
-Please create a folder with the version number (e.g `0.0.1`) and upload the model files.
+## How to find a pre-trained model in model zoo
 
-- symbol
-- params.gz
+In a model zoo repository, there are many pre-trained models that belong to the same model family.
+You can use the `MxModelZoo` class to search for the model that you need.
+To get started, you need to decide which model family you want to use, then define key/values search criteria
+to narrow down the model you want. If there are multiple models that match your search criteria, the first model
+found will be returned. *ModelNotFoundException* will be thrown if no matching model is found.
 
-Note, please zip the params to save the space.
+The following is an example of criteria to find a resnet50-v1 model that is trained on the imagenet dataset:
+```java
+    Map<String, String> criteria = new HashMap<>();
+    criteria.put("layers", "50");
+    criteria.put("flavor", "v1");
+    criteria.put("dataset", "imagenet");
 
-### Step 3: Place your model artifacts
-You may need to provide the artifact files for your model.
-It should be placed outside the version number folder.
+    ZooModel<BufferedImage, Classification> model = MxModelZoo.RESNET.loadModel(criteria, device);
+``` 
 
-For cv or classification model, you may need a `synset.txt` to translate classes.
+## List of search criteria for each model
 
-For nlp model, you may need a `vocabulary.json` to tokenize/untokenize the sentence.
+| Category | Application           | Model Family      | Criteria | Possible values                                            |
+|----------|-----------------------|-------------------|----------|------------------------------------------------------------|
+| CV       | Action Recognition    | ActionRecognition | backbone | vgg16, inceptionv3                                         |
+|          |                       |                   | dataset  | ucf101                                                     |
+|          | Image Classification  | MLP               | dataset  | mnist                                                      |
+|          |                       | Resnet            | layers   | 18, 34, 50, 101, 152                                       |
+|          |                       |                   | flavor   | v1, v2, v1b, v1c, v1d, v1e, v1s                            |
+|          |                       |                   | dataset  | imagenet, cifar10                                          |
+|          |                       | Resnext           | layers   | 101, 150                                                   |
+|          |                       |                   | flavor   | 32x4d, 64x4d                                               |
+|          |                       |                   | dataset  | imagenet                                                   |
+|          |                       | Senet             | layers   | 154                                                        |
+|          |                       |                   | dataset  | imagenet                                                   |
+|          |                       | SeResnext         | layers   | 101, 150                                                   |
+|          |                       |                   | flavor   | 32x4d, 64x4d                                               |
+|          |                       |                   | dataset  | imagenet                                                   |
+|          | Instance Segmentation | mask_rcnn         | backbone | resnet18, resnet50, resnet101                              |
+|          |                       |                   | flavor   | v1b, v1d                                                   |
+|          |                       |                   | dataset  | coco                                                       |
+|          | Object Detection      | SSD               | size     | 300, 512                                                   |
+|          |                       |                   | backbone | vgg16, mobilenet, resnet18, resnet50, resnet101, resnet152 |
+|          |                       |                   | flavor   | atrous, 1.0, v1, v2                                        |
+|          |                       |                   | dataset  | coco, voc                                                  |
+|          | Pose Estimation       | SimplePose        | backbone | resnet18, resnet50, resnet101, resnet152                   |
+|          |                       |                   | flavor   | v1b, v1d                                                   |
+|          |                       |                   | dataset  | imagenet                                                   |
+| NLP      | Question and Answer   | BertQA            | backbone | bert                                                       |
+|          |                       |                   | dataset  | book_corpus_wiki_en_uncased                                |
 
-### Step 4: Create a `metadata.json`
-You need to create this file for modelzoo to load the model.
-You can refer the format from the existing ones and make your own.
+**Note:** Not all combinations in the above table are available. Please check `metadata.json` files
+in `src/test/resources/mlrepo/model` folder for detail.
 
-run `shasum -a 1 <file_name>` to get the sha1Hash value.
+## Developer guide
 
-### Step 5: Wrap it up
-Now you need to register this model in the model zoo.
-Please make all necessary changes to load and use your model.
-
-### Step 6: Upload your model
-
-Double check if you have the files
-
-- <version>/<model_name>-symbol.json
-- <version>/<model_name>-00xx.params.gz
-- metadata.json
-- ...
-
-```shell script
-$ ./gradlew syncS3
-```
-
-### Step 7:
-Please avoid checking in binary files to git. Binary files should only be uploaded to S3 bucket.
-Remove all the files except the metadata.json and checkin the code.
+### [How to add new models to model zoo](../../docs/development/add_model_to_model-zoo.md)
