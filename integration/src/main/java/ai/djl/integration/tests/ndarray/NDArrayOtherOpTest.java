@@ -555,15 +555,15 @@ public class NDArrayOtherOpTest {
             NDArray array = manager.arange(10).reshape(new Shape(2, 5));
             NDArray actual =
                     manager.create(new float[] {0, 5, 1, 6, 2, 7, 3, 8, 4, 9}, new Shape(5, 2));
-            Assert.assertEquals(actual, array.swapAxes(0, 1));
+            Assert.assertEquals(actual, array.swapaxes(0, 1));
             // test zero-dim
             array = manager.create(new Shape(2, 0));
             actual = manager.create(new Shape(0, 2));
-            Assert.assertEquals(actual, array.swapAxes(0, 1));
+            Assert.assertEquals(actual, array.swapaxes(0, 1));
 
             // scalar
             array = manager.create(5f);
-            array.swapAxes(0, 1);
+            array.swapaxes(0, 1);
         }
     }
 
@@ -580,7 +580,7 @@ public class NDArrayOtherOpTest {
             NDArray transpose = original.transpose(1, 0, 2);
             NDArray transposeActual = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 1, 2));
             Assert.assertEquals(transposeActual, transpose, "Incorrect transpose all");
-            Assert.assertEquals(transposeActual, original.swapAxes(0, 1), "Incorrect swap axes");
+            Assert.assertEquals(transposeActual, original.swapaxes(0, 1), "Incorrect swap axes");
 
             // zero-dim
             original = manager.create(new Shape(2, 0, 1));

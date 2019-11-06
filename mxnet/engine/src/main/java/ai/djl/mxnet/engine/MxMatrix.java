@@ -1116,8 +1116,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(int axis1, int axis2) {
-        return array.swapAxes(axis1, axis2);
+    public NDArray swapaxes(int axis1, int axis2) {
+        return array.swapaxes(axis1, axis2);
     }
 
     /** {@inheritDoc} */
@@ -1140,8 +1140,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equalShapes(NDArray other) {
-        return array.equalShapes(other);
+    public boolean shapeEquals(NDArray other) {
+        return array.shapeEquals(other);
     }
 
     /** {@inheritDoc} */
@@ -1170,26 +1170,26 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public Number percentileNumber(Number percentile) {
-        return array.percentileNumber(percentile);
+    public NDArray percentile(Number percentile) {
+        return array.percentile(percentile);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number medianNumber() {
-        return array.medianNumber();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray median(int... dimension) {
-        return array.median(dimension);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray percentile(Number percentile, int... dimension) {
+    public NDArray percentile(Number percentile, int[] dimension) {
         return array.percentile(percentile, dimension);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray median() {
+        return array.median();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray median(int[] axes) {
+        return array.median(axes);
     }
 
     /** {@inheritDoc} */

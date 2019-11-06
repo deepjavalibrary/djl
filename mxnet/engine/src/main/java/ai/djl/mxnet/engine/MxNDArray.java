@@ -1473,7 +1473,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(int axis1, int axis2) {
+    public NDArray swapaxes(int axis1, int axis2) {
         MxOpParams params = new MxOpParams();
         params.addParam("dim1", axis1);
         params.addParam("dim2", axis2);
@@ -1558,25 +1558,25 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number percentileNumber(Number percentile) {
+    public NDArray percentile(Number percentile) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number medianNumber() {
+    public NDArray percentile(Number percentile, int[] dimension) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray median(int... dimension) {
+    public NDArray median() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray percentile(Number percentile, int... dimension) {
+    public NDArray median(int[] axes) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 

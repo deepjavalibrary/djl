@@ -962,7 +962,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(int axis1, int axis2) {
+    public NDArray swapaxes(int axis1, int axis2) {
         return null;
     }
 
@@ -986,7 +986,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equalShapes(NDArray other) {
+    public boolean shapeEquals(NDArray other) {
         return false;
     }
 
@@ -1016,25 +1016,25 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public Number percentileNumber(Number percentile) {
+    public NDArray percentile(Number percentile) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Number medianNumber() {
+    public NDArray percentile(Number percentile, int[] dimension) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray median(int... dimension) {
+    public NDArray median() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray percentile(Number percentile, int... dimension) {
+    public NDArray median(int[] axes) {
         return null;
     }
 
