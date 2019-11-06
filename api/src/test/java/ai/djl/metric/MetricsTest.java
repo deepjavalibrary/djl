@@ -46,6 +46,16 @@ public class MetricsTest {
         Assert.assertEquals(list.size(), 0);
     }
 
+    @Test
+    public void testMetricsMean() {
+        Metrics metrics = new Metrics();
+        metrics.addMetric("m1", 2.4d);
+        metrics.addMetric("m1", 3.4d);
+        metrics.addMetric("m1", -1.3d);
+        double mean = metrics.mean("m1");
+        Assert.assertEquals(mean, 1.5d);
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testMeanException() {
         Metrics metrics = new Metrics();

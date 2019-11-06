@@ -114,7 +114,7 @@ public class Metrics {
             throw new IllegalArgumentException("Metric name not found: " + metricName);
         }
 
-        return metric.stream().collect(Collectors.averagingLong(m -> m.getValue().longValue()));
+        return metric.stream().collect(Collectors.averagingDouble(m -> m.getValue().doubleValue()));
     }
 
     /** Comparator based on {@code Metric}'s value field. */
