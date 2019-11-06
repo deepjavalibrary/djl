@@ -15,6 +15,10 @@ package ai.djl.training.metrics;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 
+/**
+ * {@code SsdBoxPredictionError} is a {@link TrainingMetric} that computes the error in the
+ * prediction of bounding boxes in SSD.
+ */
 public class SsdBoxPredictionError extends TrainingMetric {
 
     private float ssdBoxPredictionError;
@@ -29,9 +33,11 @@ public class SsdBoxPredictionError extends TrainingMetric {
     }
 
     /**
-     * Updates training metrics based on {@link NDList} of labels and predictions. For SSD Box
-     * offset accuracy, targets must contain (bounding box labels, bounding box masks) that are
-     * returned by the MultiBoxTarget operator.
+     * Computes and updates the SSD box prediction error based on {@link NDList} of labels and
+     * predictions.
+     *
+     * <p>For SSD Box offset accuracy, targets must contain (bounding box labels, bounding box
+     * masks) that are returned by the MultiBoxTarget operator.
      *
      * @param targets the {@code NDList} of targets
      * @param predictions the {@code NDList} of predictions

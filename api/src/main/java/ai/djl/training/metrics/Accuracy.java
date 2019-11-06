@@ -18,10 +18,10 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 
 /**
- * Computes an accuracy classification score.
+ * {@code Accuracy} is a {@link TrainingMetric} that computes the accuracy score.
  *
- * <p>The accuracy score is defined as .. math:: \\text{accuracy}(y, \\hat{y}) = \\frac{1}{n}
- * \\sum_{i=0}^{n-1} \\text{1}(\\hat{y_i} == y_i)
+ * <p>The accuracy score is defined as: $$ accuracy(y, \hat{y}) =
+ * \frac{1}{n}\sum_{i=0}^{n-1}1(\hat{y_i} == y_i)$$
  */
 public class Accuracy extends TrainingMetric {
 
@@ -43,10 +43,17 @@ public class Accuracy extends TrainingMetric {
         this.index = index;
     }
 
+    /** Creates an accuracy metric that computes accuracy across axis 1 along the 0th index. */
     public Accuracy() {
         this("Accuracy", 0, 1);
     }
 
+    /**
+     * Creates an accuracy metric that computes accuracy across axis 1 along given index.
+     *
+     * @param name the name of the metric, default is "Accuracy"
+     * @param index the index of the NDArray in labels to compute accuracy for
+     */
     public Accuracy(String name, int index) {
         this(name, index, 1);
     }
@@ -58,6 +65,12 @@ public class Accuracy extends TrainingMetric {
         totalInstances = 0;
     }
 
+    /**
+     * Computes and updates the accuracy based on the labels and predictions.
+     *
+     * @param labels a {@link NDList} of labels
+     * @param predictions a {@link NDList} of predictions
+     */
     public void update(NDArray labels, NDArray predictions) {
         checkLabelShapes(labels, predictions);
         NDArray predictionReduced;

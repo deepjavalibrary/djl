@@ -40,7 +40,7 @@ public abstract class TrainingMetric implements Cloneable {
     }
 
     /**
-     * Updates the training metrics based on a {@link NDList} of labels and predictions.
+     * Computes and updates the training metrics based on the labels and predictions.
      *
      * @param labels a {@code NDList} of labels
      * @param predictions a {@code NDList} of predictions

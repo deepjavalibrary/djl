@@ -15,10 +15,12 @@ package ai.djl.training;
 import ai.djl.ndarray.NDArray;
 
 /**
- * The gradient collector should be opened with a try-with-resources. First call collectFor on
- * whatever data you want to collect gradients for, then execute the operations. Call
- * collectProgress to execute backwards multiple times and collect to execute backwards for the
- * final time.
+ * An interface that provides a mechanism to collect gradients during training.
+ *
+ * <p>The {@code GradientCollector} should be opened with a try-with-resources. All operations
+ * performed within the try-with-resources are recorded and the variables marked. When {@link
+ * #backward(NDArray) backward function} is called, gradients are collected w.r.t previously marked
+ * variables.
  */
 public interface GradientCollector extends AutoCloseable {
 

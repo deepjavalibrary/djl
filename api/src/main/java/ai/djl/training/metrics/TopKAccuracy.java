@@ -10,17 +10,18 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
 package ai.djl.training.metrics;
 
 import ai.djl.ndarray.NDArray;
 import java.util.stream.IntStream;
 
 /**
- * Computes the accuracy of the top k predictions. {@code TopKAccuracy} differs from {@link
- * Accuracy} in that it considers the prediction to be ``True`` as long as the ground truth label is
- * in the top K predicated labels. If `top_k = 1`, then {@code TopKAccuracy} is identical to {@code
- * Accuracy}.
+ * {@code TopKAccuracy} is a {@link TrainingMetric} that computes the accuracy of the top k
+ * predictions.
+ *
+ * <p>{@code TopKAccuracy} differs from {@link Accuracy} in that it considers the prediction to be
+ * `True` as long as the ground truth label is in the top K predicated labels. If `top_k = 1`, then
+ * {@code TopKAccuracy} is identical to {@code Accuracy}.
  */
 public class TopKAccuracy extends Accuracy {
 
@@ -31,7 +32,7 @@ public class TopKAccuracy extends Accuracy {
      *
      * @param name the accuracy name, default "Top_K_Accuracy"
      * @param index the index of the NDArray in labels to compute topK accuracy for
-     * @param topK whether the labels are in top K predictions
+     * @param topK the value of K
      */
     public TopKAccuracy(String name, int index, int topK) {
         super(name, index);
@@ -42,10 +43,23 @@ public class TopKAccuracy extends Accuracy {
         }
     }
 
+    /**
+     * Creates an instance of {@code TopKAccuracy} metric that computes topK accuracy across axis 1
+     * along the given index.
+     *
+     * @param index the index of the NDArray in labels to compute topK accuracy for
+     * @param topK the value of K
+     */
     public TopKAccuracy(int index, int topK) {
         this("Top_" + topK + "_Accuracy", index, topK);
     }
 
+    /**
+     * Creates an instance of {@code TopKAccuracy} metric that computes topK accuracy across axis 1
+     * along the 0th index.
+     *
+     * @param topK the value of K
+     */
     public TopKAccuracy(int topK) {
         this("Top_" + topK + "_Accuracy", 0, topK);
     }
