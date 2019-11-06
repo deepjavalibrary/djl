@@ -14,12 +14,10 @@
     </module>
     -->
 
-    <module name="SuppressionCommentFilter"/>
     <module name="SuppressionFilter">
         <property name="file" value="${checkstyle.suppressions.file}"/>
     </module>
     <module name="SuppressWarningsFilter"/>
-    <module name="SuppressWithNearbyCommentFilter"/>
 
     <!-- Headers -->
     <module name="Header">
@@ -144,13 +142,8 @@
             <property name="exceptionVariableName" value="expected|ignore"/>
             <property name="commentFormat" value="ignore.*"/>
         </module>
-        <module name="LeftCurly">
-            <property name="maxLineLength" value="120"/>
-        </module>
         <module name="NeedBraces"/>
-        <module name="RightCurly"/>
         <module name="RightCurly">
-            <property name="option" value="alone"/>
             <property name="tokens"
                     value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, STATIC_INIT, INSTANCE_INIT"/>
         </module>
@@ -292,8 +285,6 @@
         <module name="JavadocMethod">
             <property name="allowUndeclaredRTE" value="true"/>
             <property name="allowThrowsTagsForSubclasses" value="true"/>
-            <property name="allowMissingPropertyJavadoc" value="true"/>
-            <property name="allowMissingJavadoc" value="true"/>
         </module>
         <module name="JavadocParagraph"/>
         <module name="JavadocStyle">
@@ -302,6 +293,9 @@
         <module name="JavadocTagContinuationIndentation"/>
         <module name="NonEmptyAtclauseDescription"/>
         <module name="SummaryJavadoc"/>
+        <module name="MissingJavadocMethod"/>
+        <module name="MissingJavadocPackage"/>
+        <module name="MissingJavadocType"/>
         <!--
         <module name="JavadocPackage" />
         <module name="JavadocType">
@@ -353,7 +347,6 @@
         <!--
         <module name="DescendantToken"/>
         -->
-        <module name="FileContentsHolder"/>
         <!--
         <module name="FinalParameters">
             <property name="severity" value="ignore"/>

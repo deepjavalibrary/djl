@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The {@code ParameterStore} contains a map from a parameter to the mirrors of it on other devices.
+ */
 public class ParameterStore {
 
     private NDManager manager;
@@ -31,6 +34,12 @@ public class ParameterStore {
     private boolean copy;
     private ParameterServer parameterServer;
 
+    /**
+     * Constructs an empty {@code ParameterStore}.
+     *
+     * @param manager the manager to attach mirrored parameters to
+     * @param copy whether to always copy even for the same device as the original parameter
+     */
     public ParameterStore(NDManager manager, boolean copy) {
         this.manager = manager;
         this.copy = copy;
@@ -39,6 +48,12 @@ public class ParameterStore {
         deviceMap.put(manager.getDevice(), 0);
     }
 
+    /**
+     * Sets the parameterServer used to apply updates to the parameters.
+     *
+     * @param parameterServer the parameterServer
+     * @param devices the devices to create mirrored parameters on
+     */
     public void setParameterServer(ParameterServer parameterServer, Device[] devices) {
         this.parameterServer = parameterServer;
         deviceMap.clear();
@@ -49,6 +64,7 @@ public class ParameterStore {
         }
     }
 
+    /** Updates all the mirrored parameters. */
     public void updateAllParameters() {
         int priority = 0;
         for (Map.Entry<String, ParameterData> entry : parameterMap.entrySet()) {
@@ -77,6 +93,13 @@ public class ParameterStore {
         }
     }
 
+    /**
+     * Returns the value of a mirrored parameter on a device.
+     *
+     * @param parameter the parameter to get the value for
+     * @param device the device to get the mirror from
+     * @return the value of the mirrored parameter on the device
+     */
     public NDArray getValue(Parameter parameter, Device device) {
         String parameterId = parameter.getId();
         int index = deviceMap.get(device);
@@ -115,47 +138,49 @@ public class ParameterStore {
         return data.get(index);
     }
 
+    /** Synchronizes the values on all mirrors with the main parameter. */
     public void sync() {
         for (ParameterData data : parameterMap.values()) {
             data.sync();
         }
     }
 
+    /** A helper for {@link ParameterStore} that stores data for a single parameter. */
     private final class ParameterData {
 
         private Parameter parameter;
         private List<NDArray> list;
 
-        public ParameterData(Parameter parameter) {
+        private ParameterData(Parameter parameter) {
             this.parameter = parameter;
             list = Collections.synchronizedList(new ArrayList<>());
         }
 
-        public List<NDArray> getNDArrays() {
+        private List<NDArray> getNDArrays() {
             return list;
         }
 
-        public boolean isEmpty() {
+        private boolean isEmpty() {
             return list.isEmpty();
         }
 
-        public void add(NDArray array) {
+        private void add(NDArray array) {
             list.add(array);
         }
 
-        public NDArray get(int index) {
+        private NDArray get(int index) {
             return list.get(index);
         }
 
-        public NDArray[] toArray() {
+        private NDArray[] toArray() {
             return list.toArray(new NDArray[0]);
         }
 
-        public boolean requireGradient() {
+        private boolean requireGradient() {
             return parameter.requireGradient();
         }
 
-        public void sync() {
+        private void sync() {
             NDArray array = parameter.getArray();
             Device device = array.getDevice();
             if (!deviceMap.containsKey(device)) {

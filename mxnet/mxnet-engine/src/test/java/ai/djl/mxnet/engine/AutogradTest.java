@@ -13,8 +13,6 @@
 
 package ai.djl.mxnet.engine;
 
-// CHECKSTYLE:OFF:AvoidStaticImport
-
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import ai.djl.mxnet.jna.LibUtils;
@@ -31,8 +29,6 @@ import org.testng.IObjectFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
-
-// CHECKSTYLE:ON:AvoidStaticImport
 
 @PrepareForTest(LibUtils.class)
 public class AutogradTest extends PowerMockTestCase {

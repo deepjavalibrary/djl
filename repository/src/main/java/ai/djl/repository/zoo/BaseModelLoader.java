@@ -104,6 +104,15 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         return getMetadata().getArtifacts();
     }
 
+    /**
+     * Returns the first artifact that matches a given criteria.
+     *
+     * @param criteria the criteria to match against
+     * @return the first artifact that matches the criteria. Null will be returned if no artifact
+     *     matches
+     * @throws IOException for errors while loading the model
+     * @throws ModelNotFoundException if the metadata to get artifacts from is not found
+     */
     public Artifact match(Map<String, String> criteria) throws IOException, ModelNotFoundException {
         List<Artifact> list = search(criteria);
         if (list.isEmpty()) {
@@ -112,6 +121,14 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         return list.get(0);
     }
 
+    /**
+     * Returns all the artifacts that match a given criteria.
+     *
+     * @param criteria the criteria to match against
+     * @return all the artifacts that match a given criteria
+     * @throws IOException for errors while loading the model
+     * @throws ModelNotFoundException if the metadata to get artifacts from is not found
+     */
     public List<Artifact> search(Map<String, String> criteria)
             throws IOException, ModelNotFoundException {
         return getMetadata().search(VersionRange.parse(version), criteria);

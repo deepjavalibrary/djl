@@ -12,7 +12,6 @@
  */
 
 package ai.djl.mxnet.engine;
-// CHECKSTYLE:OFF:AvoidStaticImport
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -35,8 +34,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
-
-// CHECKSTYLE:ON:AvoidStaticImport
 
 @PrepareForTest(LibUtils.class)
 public class MxNDArrayTest extends PowerMockTestCase {

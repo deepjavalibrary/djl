@@ -22,6 +22,7 @@ import ai.djl.util.PairList;
 import java.util.List;
 
 /** An internal interface that encapsulates engine specific operator methods. */
+@SuppressWarnings("MissingJavadocMethod")
 public interface NDArrayEx {
 
     ////////////////////////////////////////

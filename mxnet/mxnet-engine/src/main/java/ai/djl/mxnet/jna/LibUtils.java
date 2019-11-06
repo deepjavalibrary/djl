@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// CHECKSTYLE:OFF:FinalClass
 /**
  * Utilities for finding the MXNet Engine binary on the System.
  *
@@ -48,7 +47,11 @@ import org.slf4j.LoggerFactory;
  *   <li>In the python path. These can be installed using pip.
  * </ol>
  */
-@SuppressWarnings("PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal")
+@SuppressWarnings({
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal",
+    "FinalClass",
+    "MissingJavadocMethod"
+})
 public class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
@@ -223,4 +226,3 @@ public class LibUtils {
         return null;
     }
 }
-// CHECKSTYLE:ON:FinalClass

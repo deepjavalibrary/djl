@@ -4,4 +4,14 @@
 <suppressions>
     <suppress checks="." files="MockMxnetLibrary.java" />
     <suppress checks="FileLength" files="NDArray.java" />
+
+    <suppress checks="(AvoidStaticImport|ImportOrder)" files="src[\\/]test[\\/]java[\\/]"/>
+
+    <suppress checks="(MissingJavadocMethod|MissingJavadocType|MissingJavadocPackage)" files="src[\\/](test|it)[\\/].*"/>
+
+    <!--    Suppress javadoc in modules-->
+    <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="ai[\\/]djl[\\/]integration[\\/]"/>
+    <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="ai[\\/]djl[\\/]examples[\\/]"/>
+    <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="ai[\\/]djl[\\/]mxnet[\\/]jnarator[\\/]"/>
+    <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="ai[\\/]djl[\\/]tensorflow[\\/]"/>
 </suppressions>
