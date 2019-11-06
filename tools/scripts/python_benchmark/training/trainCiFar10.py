@@ -81,7 +81,7 @@ parser.add_argument('--resume', type=str, default='',
                     help='path to saved weight where you want resume')
 parser.add_argument('--lr-factor', default=0.1, type=float,
                     help='learning rate decay ratio')
-parser.add_argument('--lr-steps', default='30,60,90', type=str,
+parser.add_argument('--lr-steps', default='80,120,160,180', type=str,
                     help='list of learning rate decay epochs as in str')
 parser.add_argument('--dtype', default='float32', type=str,
                     help='data type, float32 or float16 if applicable')
@@ -133,7 +133,6 @@ net = get_model(opt.model, context, opt)
 
 def test(ctx, val_data):
     metric.reset()
-    val_data.reset()
     for batch in val_data:
         data = gluon.utils.split_and_load(batch[0].astype(opt.dtype, copy=False),
                                           ctx_list=ctx, batch_axis=0)
@@ -183,10 +182,9 @@ def train(opt, ctx):
         batch_size=batch_size, shuffle=False, num_workers=num_workers)
 
     net.collect_params().reset_ctx(ctx)
-    trainer = gluon.Trainer(net.collect_params(), 'sgd',
+    trainer = gluon.Trainer(net.collect_params(), 'adam',
                             optimizer_params={'learning_rate': opt.lr,
                                               'wd': opt.wd,
-                                              'momentum': opt.momentum,
                                               'multi_precision': False},
                             kvstore=kv)
     loss = gluon.loss.SoftmaxCrossEntropyLoss()

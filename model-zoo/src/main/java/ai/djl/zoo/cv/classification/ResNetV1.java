@@ -54,11 +54,11 @@ public final class ResNetV1 {
                                     .setNumFilters(numFilters / 4)
                                     .optStride(stride)
                                     .optPad(new Shape(0, 0))
-                                    .optBias(false)
+                                    .optBias(true)
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .optEpsilon(2E-5f)
+                                    .optEpsilon(1e-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build())
                     .add(Activation.reluBlock())
@@ -82,11 +82,11 @@ public final class ResNetV1 {
                                     .setNumFilters(numFilters)
                                     .optStride(new Shape(1, 1))
                                     .optPad(new Shape(0, 0))
-                                    .optBias(false)
+                                    .optBias(true)
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .optEpsilon(2E-5f)
+                                    .optEpsilon(1E-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build());
 
@@ -101,7 +101,7 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .optEpsilon(2E-5f)
+                                    .optEpsilon(1E-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build())
                     .add(Activation.reluBlock())
@@ -115,7 +115,7 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .optEpsilon(2E-5f)
+                                    .optEpsilon(1E-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build());
         }
@@ -133,7 +133,7 @@ public final class ResNetV1 {
                                     .build())
                     .add(
                             new BatchNorm.Builder()
-                                    .optEpsilon(2E-5f)
+                                    .optEpsilon(1E-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build());
         }
@@ -141,7 +141,11 @@ public final class ResNetV1 {
                 list -> {
                     NDList unit = list.get(0);
                     NDList parallel = list.get(1);
-                    return new NDList(unit.singletonOrThrow().add(parallel.singletonOrThrow()));
+                    return new NDList(
+                            unit.singletonOrThrow()
+                                    .add(parallel.singletonOrThrow())
+                                    .getNDArrayInternal()
+                                    .relu());
                 },
                 Arrays.asList(resUnit, shortcut));
     }
@@ -152,18 +156,13 @@ public final class ResNetV1 {
         SequentialBlock resNet = new SequentialBlock();
         if (height <= 32) {
             resNet.add(
-                            new Conv2D.Builder()
-                                    .setKernel(new Shape(3, 3))
-                                    .setNumFilters(builder.filters[0])
-                                    .optStride(new Shape(1, 1))
-                                    .optPad(new Shape(1, 1))
-                                    .optBias(false)
-                                    .build())
-                    .add(
-                            new BatchNorm.Builder()
-                                    .optEpsilon(2E-5f)
-                                    .optMomentum(builder.batchNormMomentum)
-                                    .build());
+                    new Conv2D.Builder()
+                            .setKernel(new Shape(3, 3))
+                            .setNumFilters(builder.filters[0])
+                            .optStride(new Shape(1, 1))
+                            .optPad(new Shape(1, 1))
+                            .optBias(false)
+                            .build());
         } else {
             resNet.add(
                             new Conv2D.Builder()
@@ -213,7 +212,8 @@ public final class ResNetV1 {
         }
         return resNet.add(new LambdaBlock(arrays -> new NDList(Pool.globalAvgPool(arrays.head()))))
                 .add(Blocks.flattenBlock())
-                .add(new Linear.Builder().setOutChannels(builder.outSize).build());
+                .add(new Linear.Builder().setOutChannels(builder.outSize).build())
+                .add(Blocks.flattenBlock());
     }
 
     public static final class Builder {

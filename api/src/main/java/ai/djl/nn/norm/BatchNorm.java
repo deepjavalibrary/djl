@@ -41,6 +41,8 @@ public class BatchNorm extends ParameterBlock {
     private float epsilon;
     private float momentum;
     private long inChannels;
+    private boolean center;
+    private boolean scale;
 
     private Parameter gamma;
     private Parameter beta;
@@ -51,8 +53,12 @@ public class BatchNorm extends ParameterBlock {
         axis = builder.axis;
         epsilon = builder.epsilon;
         momentum = builder.momentum;
-        gamma = new Parameter("gamma", this, ParameterType.GAMMA);
-        beta = new Parameter("beta", this, ParameterType.BETA);
+        center = builder.center;
+        scale = builder.scale;
+        // make gamma trainable if scale
+        gamma = new Parameter("gamma", this, ParameterType.GAMMA, scale);
+        // make beta trainable if center
+        beta = new Parameter("beta", this, ParameterType.BETA, center);
         runningMean = new Parameter("runningMean", this, ParameterType.RUNNING_MEAN, false);
         runningVar = new Parameter("runningVar", this, ParameterType.RUNNING_VAR, false);
     }
@@ -143,6 +149,8 @@ public class BatchNorm extends ParameterBlock {
         private int axis = 1;
         private float epsilon = 1E-5f;
         private float momentum = .9f;
+        private boolean center = true;
+        private boolean scale = true;
 
         /**
          * Set the axis in which channel is specified. Defaults to 1.
@@ -152,6 +160,28 @@ public class BatchNorm extends ParameterBlock {
          */
         public Builder optAxis(int val) {
             axis = val;
+            return this;
+        }
+
+        /**
+         * If True, add offset of `beta` to normalized tensor. Defaults to True.
+         *
+         * @param val True or False on whether to add and train offset value
+         * @return this Builder
+         */
+        public Builder optCenter(boolean val) {
+            center = val;
+            return this;
+        }
+
+        /**
+         * If True, multiply result by `gamma`. Defaults to True;
+         *
+         * @param val True or False on whether to add and train scale value
+         * @return this Builder
+         */
+        public Builder optScale(boolean val) {
+            scale = val;
             return this;
         }
 

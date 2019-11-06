@@ -39,6 +39,7 @@ public abstract class AbstractTraining implements TrainingListener {
     private float validationAccuracy;
     private float validationLoss;
 
+    protected int batchSize;
     protected int trainDataSize;
     protected int validateDataSize;
     protected int trainingProgress;
@@ -182,15 +183,21 @@ public abstract class AbstractTraining implements TrainingListener {
     }
 
     private String getTrainingStatus(Metrics metrics) {
-        String trainStatus;
+        StringBuilder sb = new StringBuilder();
         List<Metric> list = metrics.getMetric("train_Loss");
         trainingLoss = list.get(list.size() - 1).getValue().floatValue();
 
         list = metrics.getMetric("train_Accuracy");
         trainingAccuracy = list.get(list.size() - 1).getValue().floatValue();
         // use .2 precision to avoid new line in progress bar
-        trainStatus = String.format("accuracy: %.2f loss: %.2f", trainingAccuracy, trainingLoss);
-        return trainStatus;
+        sb.append(String.format("accuracy: %.2f loss: %.2f", trainingAccuracy, trainingLoss));
+
+        list = metrics.getMetric("train");
+        if (!list.isEmpty()) {
+            float batchTime = list.get(list.size() - 1).getValue().longValue() / 1_000_000_000f;
+            sb.append(String.format(" speed: %.2f images/sec", (float) batchSize / batchTime));
+        }
+        return sb.toString();
     }
 
     private void printTrainingStatus(Metrics metrics) {

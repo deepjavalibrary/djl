@@ -19,12 +19,14 @@ import ai.djl.basicdataset.Cifar10;
 import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.TrainingUtils;
+import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Blocks;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
@@ -57,8 +59,12 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
     /** {@inheritDoc} */
     @Override
     protected void train(Arguments arguments) throws IOException, ModelNotFoundException {
-        try (Model model = getModel(arguments.getIsSymbolic(), arguments.getPreTrained())) {
-
+        try (Model model =
+                getModel(
+                        arguments.getIsSymbolic(),
+                        arguments.getPreTrained(),
+                        arguments.getModelDir())) {
+            batchSize = arguments.getBatchSize();
             // get training dataset
             Dataset trainDataset = getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
             Dataset validationDataset =
@@ -79,7 +85,6 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
 
                 // initialize trainer with proper input shape
                 trainer.initialize(new Shape[] {inputShape});
-
                 TrainingUtils.fit(trainer, arguments.getEpoch(), trainDataset, validationDataset);
             }
 
@@ -94,7 +99,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         }
     }
 
-    private Model getModel(boolean isSymbolic, boolean preTrained)
+    private Model getModel(boolean isSymbolic, boolean preTrained, String path)
             throws IOException, ModelNotFoundException, MalformedModelException {
         if (isSymbolic) {
             // load the model
@@ -108,14 +113,16 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
             newBlock.add(block);
             newBlock.add(x -> new NDList(x.singletonOrThrow().squeeze()));
             newBlock.add(new Linear.Builder().setOutChannels(10).build());
+            newBlock.add(Blocks.flattenBlock());
             model.setBlock(newBlock);
             if (!preTrained) {
                 model.getBlock().clear();
             }
             return model;
         }
-
+        // imperative resnet50
         Model model = Model.newInstance();
+
         Block resNet50 =
                 new ResNetV1.Builder()
                         .setImageShape(new Shape(3, 32, 32))
@@ -123,11 +130,20 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                         .setOutSize(10)
                         .build();
         model.setBlock(resNet50);
+
+        if (preTrained) {
+            if (path == null) {
+                throw new IllegalArgumentException(
+                        "You specified pre-trained "
+                                + "imperative model, please provide local model dir using "
+                                + "command line option -d");
+            }
+            model.load(Paths.get(path), "resnetv1");
+        }
         return model;
     }
 
     private TrainingConfig setupTrainingConfig(Arguments arguments) {
-        int batchSize = arguments.getBatchSize();
         // epoch number to change learning rate
         int[] epochs;
         if (arguments.getPreTrained()) {
@@ -158,14 +174,18 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 .setOptimizer(optimizer)
                 .setLoss(Loss.softmaxCrossEntropyLoss())
                 .addTrainingMetric(new Accuracy())
-                .setBatchSize(arguments.getBatchSize())
+                .setBatchSize(batchSize)
                 .setDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
     private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)
             throws IOException {
-        Pipeline pipeline = new Pipeline(new ToTensor());
-        int batchSize = arguments.getBatchSize();
+        Pipeline pipeline =
+                new Pipeline(
+                        new ToTensor(),
+                        new Normalize(
+                                new float[] {0.4914f, 0.4822f, 0.4465f},
+                                new float[] {0.2023f, 0.1994f, 0.2010f}));
         long maxIterations = arguments.getMaxIterations();
         Cifar10 cifar10 =
                 new Cifar10.Builder()

@@ -26,6 +26,7 @@ public class Arguments {
     private boolean preTrained;
     private String outputDir;
     private long maxIterations;
+    private String modelDir;
 
     public Arguments(CommandLine cmd) {
         if (cmd.hasOption("epoch")) {
@@ -54,6 +55,11 @@ public class Arguments {
             maxIterations = Long.parseLong(cmd.getOptionValue("max-iterations"));
         } else {
             maxIterations = Long.MAX_VALUE;
+        }
+        if (cmd.hasOption("model-dir")) {
+            modelDir = cmd.getOptionValue("model-dir");
+        } else {
+            modelDir = null;
         }
     }
 
@@ -107,11 +113,11 @@ public class Arguments {
                         .desc("Limit each epoch to a fixed number of iterations")
                         .build());
         options.addOption(
-                Option.builder("l")
-                        .longOpt("log-interval")
+                Option.builder("d")
+                        .longOpt("model-dir")
                         .hasArg()
-                        .argName("LOG-INTERVAL")
-                        .desc("log training status every n batches")
+                        .argName("MODEL-DIR")
+                        .desc("pre-trained model file directory")
                         .build());
         return options;
     }
@@ -134,6 +140,10 @@ public class Arguments {
 
     public boolean getPreTrained() {
         return preTrained;
+    }
+
+    public String getModelDir() {
+        return modelDir;
     }
 
     public String getOutputDir() {
