@@ -9,54 +9,10 @@ def VERSION = "1.6.0"
 boolean isRelease = project.hasProperty("release") || project.findProperty("publishTo") == "staging"
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 
-
-def flavor = project.findProperty("flavor") ?: "mkl"
-
-def platformNames = file("src/main/resources/binaries").list() ?: []
-
-def artifactsNames = []
-
-platformNames.each { osName ->
-    tasks.create(name: "${osName}Jar", type: Jar) {
-        doFirst {
-            def propFile = file("src/main/resources/binaries/${osName}/native/lib/mxnet.properties")
-            propFile.delete()
-            def dsStore = file("src/main/resources/binaries/${osName}/native/lib/.DS_Store")
-            dsStore.delete()
-
-            def versionName = String.format("${VERSION}-%s", new Date().format('yyyyMMdd'))
-            def dir = file("src/main/resources/binaries/${osName}/native/lib")
-            def sb = new StringBuilder()
-            sb.append("version=${versionName}\nlibraries=")
-            def first = true
-            for (String name : dir.list().sort()) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append(',')
-                }
-                sb.append(name)
-            }
-            propFile.text = sb.toString()
-        }
-        from file("src/main/resources/binaries/${osName}")
-        archiveClassifier = "${osName}-x86_64"
-    }
-    artifactsNames.add(tasks["${osName}Jar"])
-}
-
 // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
 tasks.create(name: "PlaceholderJar", type: Jar) {
     from file("src/main/resources/placeholder")
     archiveClassifier = ""
-}
-artifactsNames.add(tasks["PlaceholderJar"])
-
-if (shouldSign()) {
-    signing {
-        useGpgCmd()
-        sign publishing.publications
-    }
 }
 
 task sourcesJar(type: Jar) {
@@ -69,27 +25,70 @@ task javadocJar(type: Jar) {
     archiveClassifier = 'javadoc'
 }
 
-// Only publish if the project directory equals the current directory
-// This means that publishing from the main project does not publish the native jars
-// and the native jars have to be published separately
-if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                artifactId "mxnet-native-${flavor}"
-                from components.java
-                artifacts = artifactsNames
-                artifact javadocJar
-                artifact sourcesJar
-                pom standardPom({
-                    name = "MXNet native library"
-                    delegate.description = "MXNet Engine native library binary distribution"
-                    url = url.get() + "mxnet/native"
-                })
+
+def flavorNames = file("src/main/resources/binaries").list() ?: []
+flavorNames.each{ flavor ->
+
+    def platformNames = file("src/main/resources/binaries/${flavor}").list() ?: []
+
+    def artifactsNames = []
+
+    platformNames.each { osName ->
+        tasks.create(name: "${flavor}-${osName}Jar", type: Jar) {
+            doFirst {
+                def propFile = file("src/main/resources/binaries/${flavor}/${osName}/native/lib/mxnet.properties")
+                propFile.delete()
+                def dsStore = file("src/main/resources/binaries/${flavor}/${osName}/native/lib/.DS_Store")
+                dsStore.delete()
+
+                def versionName = String.format("${VERSION}-%s", new Date().format('yyyyMMdd'))
+                def dir = file("src/main/resources/binaries/${flavor}/${osName}/native/lib")
+                def sb = new StringBuilder()
+                sb.append("version=${versionName}\nlibraries=")
+                def first = true
+                for (String name : dir.list().sort()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(',')
+                    }
+                    sb.append(name)
+                }
+                propFile.text = sb.toString()
             }
+            from file("src/main/resources/binaries/${flavor}/${osName}")
+            archiveClassifier = "${osName}-x86_64"
         }
-        repositories {
-            maven publishRepository()
+        artifactsNames.add(tasks["${flavor}-${osName}Jar"])
+    }
+
+    // Only publish if the project directory equals the current directory
+    // This means that publishing from the main project does not publish the native jars
+    // and the native jars have to be published separately
+    if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
+        publishing.publications.create("publication-${flavor}", MavenPublication) {
+            artifactId "mxnet-native-${flavor}"
+            from components.java
+            artifacts = artifactsNames
+            artifact PlaceholderJar
+            artifact javadocJar
+            artifact sourcesJar
+            pom standardPom({
+                name = "MXNet native library"
+                delegate.description = "MXNet Engine native library binary distribution"
+                url = url.get() + "mxnet/native"
+            })
         }
     }
+}
+
+if (shouldSign()) {
+    signing {
+        useGpgCmd()
+        sign publishing.publications
+    }
+}
+
+publishing.repositories {
+    maven publishRepository()
 }
