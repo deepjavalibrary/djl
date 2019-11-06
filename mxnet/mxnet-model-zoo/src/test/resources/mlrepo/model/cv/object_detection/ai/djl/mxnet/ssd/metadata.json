@@ -19,8 +19,8 @@
       "name": "ssd_512_resnet50_v1_voc",
       "properties": {
         "size": "512",
-        "backbone": "resnet50_v1",
-        "flavor": "none",
+        "backbone": "resnet50",
+        "flavor": "v1",
         "dataset": "voc"
       },
       "arguments": {

@@ -59,7 +59,8 @@ public class PoseEstimationExample extends AbstractInference<List<Joints>> {
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("size", "512");
-        criteria.put("backbone", "resnet50_v1");
+        criteria.put("backbone", "resnet50");
+        criteria.put("flavor", "v1");
         criteria.put("dataset", "voc");
         ZooModel<BufferedImage, DetectedObjects> ssd = MxModelZoo.SSD.loadModel(criteria);
 
