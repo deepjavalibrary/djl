@@ -23,7 +23,7 @@ import ai.djl.translate.Translator;
 
 public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
 
-    private static final Anchor BASE_ANCHOR = NLP.BERTQA;
+    private static final Anchor BASE_ANCHOR = NLP.QUESTION_ANSWER;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "bertqa";
     private static final String VERSION = "0.0.1";

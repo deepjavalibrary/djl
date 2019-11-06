@@ -86,15 +86,7 @@ public class MRL {
 
         interface NLP {
 
-            Anchor WORD_EMBEDDING = new Anchor("model/nlp/word_embedding");
-            Anchor LANGUAGE_MODELING = new Anchor("model/nlp/language_modeling");
-            Anchor MACHINE_TRANSLATION = new Anchor("model/nlp/machine_translation");
-            Anchor TEXT_CLASSIFICATION = new Anchor("model/nlp/text_classification");
-            Anchor SENTIMENT_ANALYSIS = new Anchor("model/nlp/sentiment_analysis");
-            Anchor PARSING = new Anchor("model/nlp/parsing");
-            Anchor NATURAL_LANGUAGE_INFERENCE = new Anchor("model/nlp/natural_language_inference");
-            Anchor TEXT_GENERATION = new Anchor("model/nlp/TEXT_GENERATION");
-            Anchor BERTQA = new Anchor("model/nlp/bertqa");
+            Anchor QUESTION_ANSWER = new Anchor("model/nlp/qa");
         }
     }
 }
