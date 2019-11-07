@@ -118,7 +118,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
             newBlock.add(block);
             newBlock.add(x -> new NDList(x.singletonOrThrow().squeeze()));
             newBlock.add(new Linear.Builder().setOutChannels(10).build());
-            newBlock.add(Blocks.flattenBlock());
+            newBlock.add(Blocks.batchFlattenBlock());
             model.setBlock(newBlock);
             if (!preTrained) {
                 model.getBlock().clear();

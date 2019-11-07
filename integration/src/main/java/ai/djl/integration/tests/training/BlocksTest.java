@@ -33,7 +33,7 @@ public class BlocksTest {
     @Test
     public void testFlattenBlock() {
         try (Model model = Model.newInstance()) {
-            model.setBlock(Blocks.flattenBlock());
+            model.setBlock(Blocks.batchFlattenBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();

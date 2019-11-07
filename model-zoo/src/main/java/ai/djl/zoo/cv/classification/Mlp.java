@@ -20,7 +20,7 @@ import ai.djl.nn.core.Linear;
 public class Mlp extends SequentialBlock {
 
     public Mlp(int width, int height) {
-        add(Blocks.flattenBlock(width * (long) height))
+        add(Blocks.batchFlattenBlock(width * (long) height))
                 .add(new Linear.Builder().setOutChannels(128).build())
                 .add(Activation.reluBlock())
                 .add(new Linear.Builder().setOutChannels(64).build())

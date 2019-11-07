@@ -18,9 +18,9 @@ public final class Blocks {
 
     private Blocks() {}
 
-    private static NDList flatten(NDList arrays) {
+    private static NDList batchFlatten(NDList arrays) {
         long batch = arrays.head().size(0);
-        return flatten(arrays, batch, -1);
+        return batchFlatten(arrays, batch, -1);
     }
 
     /**
@@ -34,43 +34,43 @@ public final class Blocks {
      * @throws IndexOutOfBoundsException if the input {@link NDList} has more than one {@link
      *     ai.djl.ndarray.NDArray}
      */
-    private static NDList flatten(NDList array, long batch, long size) {
+    private static NDList batchFlatten(NDList array, long batch, long size) {
         return new NDList(array.singletonOrThrow().reshape(batch, size));
     }
 
     /**
-     * Creates a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
-     * method.
+     * Creates a {@link Block} whose forward function applies the {@link #batchFlatten(NDList)
+     * batchFlatten} method.
      *
-     * @return a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
-     *     method
+     * @return a {@link Block} whose forward function applies the {@link #batchFlatten(NDList)
+     *     batchFlatten} method
      */
-    public static Block flattenBlock() {
-        return new LambdaBlock(arrays -> flatten(arrays));
+    public static Block batchFlattenBlock() {
+        return new LambdaBlock(arrays -> batchFlatten(arrays));
     }
 
     /**
-     * Creates a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
-     * method. The size of input to the block returned must be batch_size * size.
+     * Creates a {@link Block} whose forward function applies the {@link #batchFlatten(NDList)
+     * batchFlatten} method. The size of input to the block returned must be batch_size * size.
      *
      * @param size the expected size of each input
-     * @return a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
-     *     method
+     * @return a {@link Block} whose forward function applies the {@link #batchFlatten(NDList)
+     *     batchFlatten} method
      */
-    public static Block flattenBlock(long size) {
-        return flattenBlock(-1, size);
+    public static Block batchFlattenBlock(long size) {
+        return batchFlattenBlock(-1, size);
     }
 
     /**
-     * Creates a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
-     * method. The size of input to the block returned must be batch * size.
+     * Creates a {@link Block} whose forward function applies the {@link #batchFlatten(NDList)
+     * batchFlatten} method. The size of input to the block returned must be batch * size.
      *
      * @param batch the batch size
      * @param size the expected size of each input
-     * @return a {@link Block} whose forward function applies the {@link #flatten(NDList) flatten}
-     *     method
+     * @return a {@link Block} whose forward function applies the {@link #batchFlatten(NDList)
+     *     batchFlatten} method
      */
-    public static Block flattenBlock(long batch, long size) {
-        return new LambdaBlock(arrays -> flatten(arrays, batch, size));
+    public static Block batchFlattenBlock(long batch, long size) {
+        return new LambdaBlock(arrays -> batchFlatten(arrays, batch, size));
     }
 }
