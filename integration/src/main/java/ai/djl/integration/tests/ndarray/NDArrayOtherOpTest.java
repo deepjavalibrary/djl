@@ -256,6 +256,34 @@ public class NDArrayOtherOpTest {
         }
     }
 
+    @Test
+    public void testIsNaN() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.create(new float[] {Float.NaN, 0f});
+            NDArray actual = manager.create(new boolean[] {true, false});
+            Assert.assertEquals(actual, array.isNaN());
+            array = manager.create(new float[] {1f, 2f});
+            Assert.assertFalse(array.isNaN().all());
+
+            // test multi-dim
+            array =
+                    manager.create(
+                            new float[] {Float.NaN, Float.NaN, Float.NaN, 0f}, new Shape(2, 2));
+            actual = manager.create(new boolean[] {true, true, true, false}, new Shape(2, 2));
+            Assert.assertEquals(actual, array.isNaN());
+
+            // test scalar
+            array = manager.create(Float.NaN);
+            actual = manager.create(true);
+            Assert.assertEquals(actual, array.isNaN());
+
+            // test zero-dim
+            array = manager.create(new Shape(0));
+            actual = manager.create(new Shape(0), DataType.BOOLEAN);
+            Assert.assertEquals(actual, array.isNaN());
+        }
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testBooleanMask() {
         try (NDManager manager = NDManager.newBaseManager()) {

@@ -1590,12 +1590,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isEmpty() {
-        return getShape().size() == 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArrayEx getNDArrayInternal() {
         return mxNDArrayEx;
     }

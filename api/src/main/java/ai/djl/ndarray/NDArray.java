@@ -2484,7 +2484,9 @@ public interface NDArray extends AutoCloseable {
      *
      * @return {@code true} if this NDArray is empty
      */
-    boolean isEmpty();
+    default boolean isEmpty() {
+        return getShape().size() == 0;
+    }
 
     /**
      * Returns {@code true} if all elements within the {@code NDArray} are non-zero or {@code true}.
