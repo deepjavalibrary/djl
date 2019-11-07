@@ -28,7 +28,7 @@ public final class Activation {
     /**
      * Applies ReLU activation on the input {@link NDArray}.
      *
-     * <p>ReLU is defined by: $$ y = max(0, x) $$
+     * <p>ReLU is defined by: \( y = max(0, x) \)
      *
      * @param array the input {@link NDArray}
      * @return the {@link NDArray} after applying ReLU activation
@@ -40,7 +40,7 @@ public final class Activation {
     /**
      * Applies ReLU activation on the input singleton {@link NDList}.
      *
-     * <p>ReLU is defined by: $$ y = max(0, x) $$
+     * <p>ReLU is defined by: \( y = max(0, x) \)
      *
      * @param arrays the input singleton {@link NDList}
      * @return the singleton {@link NDList} after applying ReLU activation
@@ -52,7 +52,7 @@ public final class Activation {
     /**
      * Applies Sigmoid activation on the input {@link NDArray}.
      *
-     * <p>Sigmoid is defined by: $$ y = 1 / (1 + e^{-x}) $$
+     * <p>Sigmoid is defined by: \( y = 1 / (1 + e^{-x}) \)
      *
      * @param array the input {@link NDArray}
      * @return the {@link NDArray} after applying Sigmoid activation
@@ -64,7 +64,7 @@ public final class Activation {
     /**
      * Applies Sigmoid activation on the input singleton {@link NDList}.
      *
-     * <p>Sigmoid is defined by: $$ y = 1 / (1 + e^{-x}) $$
+     * <p>Sigmoid is defined by: \( y = 1 / (1 + e^{-x}) \)
      *
      * @param arrays the input singleton {@link NDList}
      * @return the singleton {@link NDList} after applying Sigmoid activation
@@ -76,7 +76,7 @@ public final class Activation {
     /**
      * Applies Tanh activation on the input {@link NDArray}.
      *
-     * <p>Tanh is defined by: $$ y = (e^x - e^{-x}) / (e^x + e^{-x}) $$
+     * <p>Tanh is defined by: \( y = (e^x - e^{-x}) / (e^x + e^{-x}) \)
      *
      * @param array the input {@link NDArray}
      * @return the {@link NDArray} after applying Tanh activation
@@ -88,7 +88,7 @@ public final class Activation {
     /**
      * Applies tanh activation on the input singleton {@link NDList}.
      *
-     * <p>Tanh is defined by: $$ y = (e^x - e^{-x}) / (e^x + e^{-x}) $$
+     * <p>Tanh is defined by: \( y = (e^x - e^{-x}) / (e^x + e^{-x}) \)
      *
      * @param arrays the input singleton {@link NDList}
      * @return the singleton {@link NDList} after applying tanh activation
@@ -100,7 +100,7 @@ public final class Activation {
     /**
      * Applies soft ReLU activation on the input {@link NDArray}.
      *
-     * <p>Soft ReLU is defined by: $$ y = log(1 + e^x) $$
+     * <p>Soft ReLU is defined by: \( y = log(1 + e^x) \)
      *
      * @param array the input {@link NDArray}
      * @return the {@link NDArray} after applying soft ReLU activation
@@ -112,7 +112,7 @@ public final class Activation {
     /**
      * Applies soft ReLU activation on the input singleton {@link NDList}.
      *
-     * <p>Soft ReLU is defined by: $$ y = log(1 + e^x) $$
+     * <p>Soft ReLU is defined by: \( y = log(1 + e^x) \)
      *
      * @param arrays the input singleton {@link NDList}
      * @return the singleton {@link NDList} after applying soft ReLU activation
@@ -124,7 +124,7 @@ public final class Activation {
     /**
      * Applies Leaky ReLU activation on the input {@link NDArray}.
      *
-     * <p>Leaky ReLU is defined by: $$ y = x \gt 0 ? x : alpha * x $$
+     * <p>Leaky ReLU is defined by: \( y = x \gt 0 ? x : alpha * x \)
      *
      * @param array the input {@link NDArray}
      * @param alpha the slope for the activation
@@ -137,7 +137,7 @@ public final class Activation {
     /**
      * Applies Leaky ReLU activation on the input singleton {@link NDList}.
      *
-     * <p>Leaky ReLU is defined by: $$ y = x \gt 0 ? x : alpha * x $$
+     * <p>Leaky ReLU is defined by: \( y = x \gt 0 ? x : alpha * x \)
      *
      * @param arrays the input singleton {@link NDList}
      * @param alpha the slope for the activation
@@ -150,7 +150,7 @@ public final class Activation {
     /**
      * Applies ELU activation on the input {@link NDArray}.
      *
-     * <p>ELU is defined by: $$ y = x \gt 0 ? x : alpha * (e^x - 1) $$
+     * <p>ELU is defined by: \( y = x \gt 0 ? x : alpha * (e^x - 1) \)
      *
      * @param array the input {@link NDArray}
      * @param alpha the slope for the activation
@@ -163,7 +163,7 @@ public final class Activation {
     /**
      * Applies ELU(Exponential Linear Unit) activation on the input singleton {@link NDList}.
      *
-     * <p>ELU is defined by: $$ y = x \gt 0 ? x : alpha * (e^x - 1) $$
+     * <p>ELU is defined by: \( y = x \gt 0 ? x : alpha * (e^x - 1) \)
      *
      * @param arrays the input singleton {@link NDList}
      * @param alpha the slope for the activation
@@ -176,8 +176,9 @@ public final class Activation {
     /**
      * Applies Scaled ELU activation on the input {@link NDArray}.
      *
-     * <p>Scaled ELU is defined by: $$ y = lambda * (x \gt 0 ? x : alpha * (e^x - 1)) where lambda =
-     * 1.0507009873554804934193349852946 and alpha = 1.6732632423543772848170429916717 $$
+     * <p>Scaled ELU is defined by: \( y = lambda * (x \gt 0 ? x : alpha * (e^x - 1))\) where
+     * \(lambda = 1.0507009873554804934193349852946\) and \(alpha =
+     * 1.6732632423543772848170429916717\)
      *
      * @param array the input {@link NDArray}
      * @return the {@link NDArray} after applying Scale ELU activation
@@ -189,8 +190,9 @@ public final class Activation {
     /**
      * Applies Scaled ELU activation on the input singleton {@link NDList}.
      *
-     * <p>Scaled ELU is defined by: $$ y = lambda * (x \gt 0 ? x : alpha * (e^x - 1)) where lambda =
-     * 1.0507009873554804934193349852946 and alpha = 1.6732632423543772848170429916717 $$
+     * <p>Scaled ELU is defined by: \( y = lambda * (x \gt 0 ? x : alpha * (e^x - 1))\) where
+     * \(lambda = 1.0507009873554804934193349852946\) and \(alpha =
+     * 1.6732632423543772848170429916717 \)
      *
      * @param arrays the input singleton {@link NDList}
      * @return the singleton {@link NDList} after applying Scaled ELU activation
@@ -222,7 +224,7 @@ public final class Activation {
     /**
      * Applies Swish activation on the input {@link NDArray}.
      *
-     * <p>Swish is defined as $$y = x * sigmoid(beta * x)$$
+     * <p>Swish is defined as \(y = x * sigmoid(beta * x)\)
      *
      * @param array the input {@link NDArray}
      * @param beta a hyper-parameter
@@ -235,7 +237,7 @@ public final class Activation {
     /**
      * Applies SWish activation on the input singleton {@link NDList}.
      *
-     * <p>Swish is defined as $$y = x * sigmoid(beta * x)$$
+     * <p>Swish is defined as \(y = x * sigmoid(beta * x)\)
      *
      * @param arrays the input singleton {@link NDList}
      * @param beta a hyper-parameter

@@ -20,8 +20,8 @@ import ai.djl.ndarray.types.DataType;
 /**
  * {@code Accuracy} is a {@link TrainingMetric} that computes the accuracy score.
  *
- * <p>The accuracy score is defined as: $$ accuracy(y, \hat{y}) =
- * \frac{1}{n}\sum_{i=0}^{n-1}1(\hat{y_i} == y_i)$$
+ * <p>The accuracy score is defined as \(accuracy(y, \hat{y}) =
+ * \frac{1}{n}\sum_{i=0}^{n-1}1(\hat{y_i} == y_i)\)
  */
 public class Accuracy extends TrainingMetric {
 

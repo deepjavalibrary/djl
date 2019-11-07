@@ -39,13 +39,11 @@ import java.util.List;
  * <p>Reference paper: Finding structure in time - Elman, 1988.
  * https://crl.ucsd.edu/~elman/Papers/fsit.pdf
  *
- * <p>With ReLU activation function:
+ * <p>With ReLU activation function: \(h_t = relu(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} +
+ * b_{hh})\)
  *
- * <p>$$ h_t = relu(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} + b_{hh}) $$
- *
- * <p>With Tanh activtion function:
- *
- * <p>$$ h_t = \tanh(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} + b_{hh}) $$
+ * <p>With Tanh activtion function: \(h_t = \tanh(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} +
+ * b_{hh})\)
  */
 public class RNN extends RecurrentCell {
 
