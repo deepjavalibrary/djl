@@ -113,7 +113,7 @@
       "files": {
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset_cifar10.txt",
-          "sha1Hash": "9e5321bb62ab5bb5ffb9c20fb8538c9466ce799e",
+          "sha1Hash": "107a31d7b87d44ff07d50cfceb176add6d8b9518",
           "name": "synset.txt"
         },
         "symbol": {
