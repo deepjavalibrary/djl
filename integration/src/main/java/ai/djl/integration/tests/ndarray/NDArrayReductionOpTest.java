@@ -21,8 +21,7 @@ import org.testng.annotations.Test;
 
 public class NDArrayReductionOpTest {
 
-    // TODO:Enable test after fixing exception catch in jenkins
-    @Test(enabled = false, expectedExceptions = EngineException.class)
+    @Test(expectedExceptions = EngineException.class)
     public void testMax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 5f, 1f});
@@ -43,14 +42,15 @@ public class NDArrayReductionOpTest {
             // test scalar
             array = manager.create(5f);
             Assert.assertEquals(5f, array.max().getFloat());
+
+            // TODO MXNet engine crash
             // zero-dim
-            array = manager.create(new Shape(1, 0));
-            array.max();
+            // array = manager.create(new Shape(1, 0));
+            // array.max();
         }
     }
 
-    // TODO:Enable test after fixing exception catch in jenkins
-    @Test(enabled = false, expectedExceptions = EngineException.class)
+    @Test(expectedExceptions = EngineException.class)
     public void testMin() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {2f, 1f, 5f, 0f});
@@ -71,9 +71,11 @@ public class NDArrayReductionOpTest {
             // test scalar
             array = manager.create(0f);
             Assert.assertEquals(0f, array.min().getFloat());
+
+            // TODO MXNet engine crash
             // zero-dim
-            array = manager.create(new Shape(0, 2, 0));
-            array.min();
+            // array = manager.create(new Shape(0, 2, 0));
+            // array.min();
         }
     }
 

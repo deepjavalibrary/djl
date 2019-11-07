@@ -14,7 +14,6 @@ package ai.djl.integration.tests.ndarray;
 
 import ai.djl.engine.EngineException;
 import ai.djl.integration.util.Assertions;
-import ai.djl.mxnet.engine.MxNDArray;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -576,22 +575,23 @@ public class NDArrayOtherOpTest {
         }
     }
 
-    // TODO Enable after fixing failure in jenkins
-    @Test(enabled = false, expectedExceptions = EngineException.class)
+    @Test(expectedExceptions = EngineException.class)
     public void testSwapAxes() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10).reshape(new Shape(2, 5));
             NDArray actual =
                     manager.create(new float[] {0, 5, 1, 6, 2, 7, 3, 8, 4, 9}, new Shape(5, 2));
             Assert.assertEquals(actual, array.swapaxes(0, 1));
+
+            // TODO MXNet engine crash
+            // scalar
+            // array = manager.create(5f);
+            // array.swapaxes(0, 1);
+
             // test zero-dim
             array = manager.create(new Shape(2, 0));
             actual = manager.create(new Shape(0, 2));
             Assert.assertEquals(actual, array.swapaxes(0, 1));
-
-            // scalar
-            array = manager.create(5f);
-            array.swapaxes(0, 1);
         }
     }
 
@@ -610,17 +610,17 @@ public class NDArrayOtherOpTest {
             Assert.assertEquals(transposeActual, transpose, "Incorrect transpose all");
             Assert.assertEquals(transposeActual, original.swapaxes(0, 1), "Incorrect swap axes");
 
+            // scalar
+            original = manager.create(5f);
+            Assert.assertEquals(original, original.transpose());
+            original.transpose(0);
+
             // zero-dim
             original = manager.create(new Shape(2, 0, 1));
             transposeActual = manager.create(new Shape(1, 0, 2));
             Assert.assertEquals(transposeActual, original.transpose());
             transposeActual = manager.create(new Shape(2, 1, 0));
             Assert.assertEquals(transposeActual, original.transpose(0, 2, 1));
-
-            // scalar
-            original = manager.create(5f);
-            Assert.assertEquals(original, original.transpose());
-            original.transpose(0);
         }
     }
 
@@ -650,8 +650,7 @@ public class NDArrayOtherOpTest {
         }
     }
 
-    // TODO Enable after fixing failure in jenkins
-    @Test(enabled = false, expectedExceptions = EngineException.class)
+    @Test(expectedExceptions = EngineException.class)
     public void testArgmax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array =
@@ -680,13 +679,11 @@ public class NDArrayOtherOpTest {
             actual = manager.create(0f);
             Assert.assertEquals(actual, array.argmax());
             Assert.assertEquals(actual, array.argmax(0));
+
+            // TODO MXNet engine crash
             // zero-dim
-            array = manager.create(new Shape(2, 0, 1));
-
-            // add waitAll to make sure it catch the exception because
-            // inferShape and operator forward happened in different threads
-
-            ((MxNDArray) array.argmax()).waitAll();
+            // array = manager.create(new Shape(2, 0, 1));
+            // array.argmax();
         }
     }
 
