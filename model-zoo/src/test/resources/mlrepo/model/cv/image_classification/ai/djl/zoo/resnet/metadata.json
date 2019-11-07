@@ -33,13 +33,13 @@
       },
       "files": {
         "synset": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/zoo/synset_cifar10.txt",
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_cifar10.txt",
           "sha1Hash": "9e5321bb62ab5bb5ffb9c20fb8538c9466ce799e",
           "name": "synset.txt"
         },
         "parameters": {
-          "uri": "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/zoo/resnet/0.0.1/resnetv1-0000.params.gz",
-          "sha1Hash": "16a7ba9487221be89648bbe4b55ff8ae50b2ba5a"
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/resnet/0.0.1/resnetv1-0000.params.gz",
+          "sha1Hash": "298b81702088f31d3348d7581eee47b21632cfd3"
         }
       }
     }

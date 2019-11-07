@@ -50,9 +50,6 @@ public class Sgd extends Optimizer {
                             parameterId,
                             weight.getDevice(),
                             k -> weight.zerosLike());
-            if (!state.getDevice().equals(weight.getDevice())) {
-                state = state.asInDevice(weight.getDevice(), true);
-            }
             inputs = new NDList(weight, grad, state);
         } else {
             inputs = new NDList(weight, grad);
