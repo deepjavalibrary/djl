@@ -21,7 +21,7 @@ import ai.djl.mxnet.zoo.cv.classification.Senet;
 import ai.djl.mxnet.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
 import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
 import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
-import ai.djl.mxnet.zoo.nlp.bertqa.BertQAModelLoader;
+import ai.djl.mxnet.zoo.nlp.qa.BertQAModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelNotFoundException;

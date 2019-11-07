@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.zoo.nlp.bertqa;
+package ai.djl.mxnet.zoo.nlp.qa;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

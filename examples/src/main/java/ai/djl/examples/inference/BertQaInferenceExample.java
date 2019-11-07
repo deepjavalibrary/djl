@@ -20,7 +20,7 @@ import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.mxnet.zoo.nlp.bertqa.QAInput;
+import ai.djl.mxnet.zoo.nlp.qa.QAInput;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
