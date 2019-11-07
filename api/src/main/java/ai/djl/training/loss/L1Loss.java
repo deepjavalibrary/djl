@@ -15,6 +15,11 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 
+/**
+ * {@code L1Loss} calculates L1 loss between label and prediction.
+ *
+ * <p>L1 loss is defined by \(L = \sum_i \vert {label}_i - {prediction}_i \vert\).
+ */
 public class L1Loss extends Loss {
 
     private float weight;
@@ -22,8 +27,6 @@ public class L1Loss extends Loss {
 
     /**
      * Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error).
-     *
-     * <p>.. math:: L = \sum_i \vert {label}_i - {prediction}_i \vert.
      *
      * @param weight the weight to apply on loss value, default 1
      * @param batchAxis the axis that represents mini-batch, default 0
@@ -33,11 +36,7 @@ public class L1Loss extends Loss {
         this.batchAxis = batchAxis;
     }
 
-    /**
-     * Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error).
-     *
-     * <p>.. math:: L = \sum_i \vert {label}_i - {prediction}_i \vert.
-     */
+    /** Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error). */
     public L1Loss() {
         weight = 1;
         batchAxis = 0;

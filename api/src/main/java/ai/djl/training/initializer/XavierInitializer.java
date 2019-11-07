@@ -19,21 +19,24 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
 /**
- * Initializer performing "Xavier" initialization for weights. This initializer is designed to keep
- * the scale of gradients roughly the same in all layers.
+ * {@code XavierInitializer} is an {@link Initializer} that performs "Xavier" initialization for
+ * parameters. This initializer is designed to keep the scale of gradients roughly the same in all
+ * layers.
  *
- * <p>By default, {@link RandomType} is UNIFORM and {@code factorType} is AVG, the initializer fills
- * the weights with random numbers in the range of :math:`[-c, c]`, where :math:`c =
- * \\sqrt{\\frac{3.}{0.5 * (n_{in} + n_{out})}}`. :math:`n_{in}` is the number of neurons feeding
- * into weights, and :math:`n_{out}` is the number of neurons the result is fed to.
+ * <p>{@code XavierInitializer} is specified by the type of random distribution({@link RandomType}),
+ * the factor type({@link FactorType}), and the magnitude of the scale. By default, {@link
+ * RandomType} is {@code UNIFORM} and {@link FactorType} is {@code AVG}. The initializer fills the
+ * weights with random numbers in the range of \([-c, c]\), where \(c = \sqrt{\frac{3.}{0.5 *
+ * (n_{in} + n_{out})}}\) where \(n_{in}\) is the number of neurons feeding into weights, and
+ * \(n_{out}\) is the number of neurons the result is fed to.
  *
- * <p>If {@code RandomType} is UNIFORM and {@code factorType} is IN, then :math:`c =
- * \\sqrt{\\frac{3.}{n_{in}}}`. Similarly when {@code factorType} is ``OUT``, then :math:`c =
- * \\sqrt{\\frac{3.}{n_{out}}}`.
+ * <p>If {@link RandomType} is {@code UNIFORM} and {@link FactorType} is {@code IN}, then \(c =
+ * \sqrt{\frac{3.}{n_{in}}}\). Similarly when {@link FactorType} is {@code OUT}, then \(c =
+ * \sqrt{\frac{3.}{n_{out}}}\).
  *
- * <p>If {@code RandomType} is GAUSSIAN and {@code factorType} is AVG, the initializer fills the
- * weights with numbers from normal distribution with a standard deviation of
- * :math:`\\sqrt{\\frac{3.}{0.5 * (n_{in} + n_{out})}}`.
+ * <p>If {@link RandomType} is {@code GAUSSIAN} and {@link FactorType} is {@code AVG}, the
+ * initializer fills the weights with numbers from normal distribution with a standard deviation of
+ * \(\sqrt{\frac{3.}{0.5 * (n_{in} + n_{out})}}\).
  */
 public class XavierInitializer implements Initializer {
     /** Enum for different types of random distributions. */

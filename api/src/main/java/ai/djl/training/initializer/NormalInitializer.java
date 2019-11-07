@@ -19,13 +19,15 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
 /**
- * Initializes weights with random values sampled from a normal distribution with a mean of zero and
- * standard deviation of {@code sigma}. Default standard deviation is 0.01.
+ * {@code NormalInitializer} initializes weights with random values sampled from a normal
+ * distribution with a mean of zero and standard deviation of {@code sigma}. Default standard
+ * deviation is 0.01.
  */
 public class NormalInitializer implements Initializer {
 
     private double sigma;
 
+    /** Creates an instance of {@code NormalInitializer} with a default sigma of 0.01. */
     public NormalInitializer() {
         this.sigma = 0.01;
     }

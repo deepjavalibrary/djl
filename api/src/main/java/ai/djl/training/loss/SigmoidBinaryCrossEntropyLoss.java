@@ -16,6 +16,12 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.training.Activation;
 
+/**
+ * {@code SigmoidBinaryCrossEntropyLoss} is a type of {@link Loss}.
+ *
+ * <p>Sigmoid binary cross-entropy loss is defined by: \(L = -\sum_i {label_i * log(prob_i) *
+ * posWeight + (1 - label_i) * log(1 - prob_i)}\) where \(prob = \frac{1}{1 + e^{-pred}}\)
+ */
 public class SigmoidBinaryCrossEntropyLoss extends Loss {
 
     private float weight;

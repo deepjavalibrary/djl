@@ -38,44 +38,109 @@ public abstract class Loss extends TrainingMetric {
      */
     public abstract NDArray getLoss(NDArray label, NDArray prediction);
 
+    /**
+     * Returns a new instance of {@link L1Loss} with default weight and batch axis.
+     *
+     * @return a new instance of {@link L1Loss}
+     */
     public static L1Loss l1Loss() {
         return new L1Loss();
     }
 
+    /**
+     * Returns a new instance of {@link L1Loss} with given weight and batch axis.
+     *
+     * @param weight the weight to apply on loss value, default 1
+     * @param batchAxis the axis that represents mini-batch, default 0
+     * @return a new instance of {@link L1Loss}
+     */
     public static L1Loss l1Loss(float weight, int batchAxis) {
         return new L1Loss(weight, batchAxis);
     }
 
+    /**
+     * Returns a new instance of {@link L2Loss} with default weight and batch axis.
+     *
+     * @return a new instance of {@link L2Loss}
+     */
     public static L2Loss l2Loss() {
         return new L2Loss();
     }
 
+    /**
+     * Returns a new instance of {@link L2Loss} with given weight and batch axis.
+     *
+     * @param weight the weight to apply on loss value, default 1
+     * @param batchAxis the axis that represents mini-batch, default 0
+     * @return a new instance of {@link L2Loss}
+     */
     public static L2Loss l2Loss(float weight, int batchAxis) {
         return new L2Loss(weight, batchAxis);
     }
 
+    /**
+     * Returns a new instance of {@link SigmoidBinaryCrossEntropyLoss} with default arguments.
+     *
+     * @return a new instance of {@link SigmoidBinaryCrossEntropyLoss}
+     */
     public static SigmoidBinaryCrossEntropyLoss sigmoidBinaryCrossEntropyLoss() {
         return new SigmoidBinaryCrossEntropyLoss();
     }
 
+    /**
+     * Returns a new instance of {@link SigmoidBinaryCrossEntropyLoss} with the given arguments.
+     *
+     * @param weight the weight to apply on the loss value, default 1
+     * @param batchAxis the axis that represents the mini-batch, default 0
+     * @param fromSigmoid whether the input is from the output of sigmoid, default false
+     * @return a new instance of {@link SigmoidBinaryCrossEntropyLoss}
+     */
     public static SigmoidBinaryCrossEntropyLoss sigmoidBinaryCrossEntropyLoss(
             float weight, int batchAxis, boolean fromSigmoid) {
         return new SigmoidBinaryCrossEntropyLoss(weight, batchAxis, fromSigmoid);
     }
 
+    /**
+     * Returns a new instance of {@link SoftmaxCrossEntropyLoss} with default arguments.
+     *
+     * @return a new instance of {@link SoftmaxCrossEntropyLoss}
+     */
     public static SoftmaxCrossEntropyLoss softmaxCrossEntropyLoss() {
         return new SoftmaxCrossEntropyLoss();
     }
 
+    /**
+     * Returns a new instance of {@link SoftmaxCrossEntropyLoss} with the given arguments.
+     *
+     * @param weight the weight to apply on the loss value, default 1
+     * @param batchAxis the axis that represents the mini-batch, default 0
+     * @param classAxis the axis that represents the class probabilities, default -1
+     * @param sparseLabel whether labels are integer array or probabilities, default true
+     * @param fromLogit whether labels are log probabilities or un-normalized numbers
+     * @return a new instance of {@link SoftmaxCrossEntropyLoss}
+     */
     public static SoftmaxCrossEntropyLoss softmaxCrossEntropyLoss(
             float weight, int batchAxis, int classAxis, boolean sparseLabel, boolean fromLogit) {
         return new SoftmaxCrossEntropyLoss(weight, batchAxis, classAxis, sparseLabel, fromLogit);
     }
 
+    /**
+     * Returns a new instance of {@link HingeLoss} with default arguments.
+     *
+     * @return a new instance of {@link HingeLoss}
+     */
     public static HingeLoss hingeLoss() {
         return new HingeLoss();
     }
 
+    /**
+     * Returns a new instance of {@link HingeLoss} with the given arguments.
+     *
+     * @param margin the margin in hinge loss. Defaults to 1.0
+     * @param weight the weight to apply on loss value, default 1
+     * @param batchAxis the axis that represents mini-batch, default 0
+     * @return a new instance of {@link HingeLoss}
+     */
     public static HingeLoss hingeLoss(int margin, float weight, int batchAxis) {
         return new HingeLoss(margin, weight, batchAxis);
     }
@@ -91,10 +156,16 @@ public abstract class Loss extends TrainingMetric {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Updates the training metrics based on a {@link NDList} of labels and predictions.
+     *
+     * <p>This is a synchronized operation. You should only call it at the end of a batch or epoch.
+     *
+     * @param labels a {@code NDList} of labels
+     * @param predictions a {@code NDList} of predictions
+     */
     @Override
     public void update(NDList labels, NDList predictions) {
-        // this is a synchronized operation, only call it at end of batch or epoch
         if (lastUpdate == null) {
             throw new IllegalStateException(
                     "You have not calculate loss yet, please "
@@ -140,8 +211,6 @@ public abstract class Loss extends TrainingMetric {
 
     /**
      * Calculates the loss between the label and prediction.
-     *
-     * <p>the default implementation is simply adding all losses together
      *
      * @param labels the true labels
      * @param predictions the predicted labels

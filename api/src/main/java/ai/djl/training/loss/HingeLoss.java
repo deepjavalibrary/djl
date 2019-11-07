@@ -16,6 +16,11 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.training.Activation;
 
+/**
+ * {@code HingeLoss} is a type of {@link Loss}.
+ *
+ * <p>Hinge loss is defined by: \(L = \sum_i max(0, margin - pred_i \cdot label_i)\)
+ */
 public class HingeLoss extends Loss {
 
     private int margin;
@@ -24,8 +29,6 @@ public class HingeLoss extends Loss {
 
     /**
      * Calculates Hinge loss.
-     *
-     * <p>.. math:: L = \sum_i max(0, {margin} - {pred}_i \cdot {label}_i)
      *
      * @param margin the margin in hinge loss. Defaults to 1.0
      * @param weight the weight to apply on loss value, default 1
@@ -37,11 +40,7 @@ public class HingeLoss extends Loss {
         this.batchAxis = batchAxis;
     }
 
-    /**
-     * Calculates Hinge loss.
-     *
-     * <p>.. math:: L = \sum_i max(0, {margin} - {pred}_i \cdot {label}_i)
-     */
+    /** Calculates Hinge loss. */
     public HingeLoss() {
         margin = 1;
         weight = 1;

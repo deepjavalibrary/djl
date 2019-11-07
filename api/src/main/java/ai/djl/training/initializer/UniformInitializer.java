@@ -18,10 +18,14 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
-/** Initializes weights with random values uniformly sampled from a given range. */
+/**
+ * {@code UniformInitializer} initializes weights with random values uniformly sampled from a given
+ * range.
+ */
 public class UniformInitializer implements Initializer {
     private float scale;
 
+    /** Creates an instance of {@code UniformInitializer} with a default {@code scale} of 0.07. */
     public UniformInitializer() {
         this.scale = 0.07f;
     }

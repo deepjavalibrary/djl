@@ -14,6 +14,15 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 
+/**
+ * {@code SoftmaxCrossEntropyLoss} is a type of {@link Loss} that calculates the softmax cross
+ * entropy loss.
+ *
+ * <p>If {@code sparse_label} is {@code true} (default), {@code label} should contain integer
+ * category indicators. Then, \(L = -\sum_i \log p_{i, label_i}\). If {@code sparse_label} is {@code
+ * false}, {@code label} should contain probability distribution and its shape should be the same as
+ * the shape of {@code prediction}. Then, \(L = -\sum_i \sum_j {label}_j \log p_{ij}\).
+ */
 public class SoftmaxCrossEntropyLoss extends Loss {
 
     private float weight;
@@ -23,16 +32,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
     private boolean fromLogit;
 
     /**
-     * Calculates the softmax cross entropy loss. If {@code sparse_label} is {@code true} (default),
-     * {@code label} should contain integer category indicators:
-     *
-     * <p>.. math:: \DeclareMathOperator{softmax}{softmax} p = \softmax({prediction}) L = -\sum_i
-     * \log p_{i,{label}_i}
-     *
-     * <p>If {@code sparse_label} is {@code false}, {@code label} should contain probability
-     * distribution and {@code label}'s shape should be the same with {@code prediction}:
-     *
-     * <p>.. math:: p = \softmax({prediction}) L = -\sum_i \sum_j {label}_j \log p_{ij}
+     * Creates a new instance of {@code SoftmaxCrossEntropyLoss} with the given parameters.
      *
      * @param weight the weight to apply on the loss value, default 1
      * @param batchAxis the axis that represents the mini-batch, default 0
@@ -49,18 +49,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
         this.fromLogit = fromLogit;
     }
 
-    /**
-     * Calculates the softmax cross entropy loss. If {@code sparse_label} is {@code true} (default),
-     * {@code label} should contain integer category indicators:
-     *
-     * <p>.. math:: \DeclareMathOperator{softmax}{softmax} p = \softmax({prediction}) L = -\sum_i
-     * \log p_{i,{label}_i}
-     *
-     * <p>If {@code sparse_label} is {@code false}, {@code label} should contain probability
-     * distribution and {@code label}'s shape should be the same with {@code prediction}:
-     *
-     * <p>.. math:: p = \softmax({prediction}) L = -\sum_i \sum_j {label}_j \log p_{ij}
-     */
+    /** Creates a new instance of {@code SoftmaxCrossEntropyLoss} with default parameters. */
     public SoftmaxCrossEntropyLoss() {
         weight = 1;
         batchAxis = 0;

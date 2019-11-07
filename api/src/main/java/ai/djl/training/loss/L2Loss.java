@@ -14,7 +14,11 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 
-/** Calculates L2Loss between label and prediction, a.k.a. MSE(Mean Square Error). */
+/**
+ * Calculates L2Loss between label and prediction, a.k.a. MSE(Mean Square Error).
+ *
+ * <p>L2 loss is defined by \(L = \frac{1}{2} \sum_i \vert {label}_i - {prediction}_i \vert^2\)
+ */
 public class L2Loss extends Loss {
 
     private float weight;
@@ -22,8 +26,6 @@ public class L2Loss extends Loss {
 
     /**
      * Calculates L2Loss between the label and prediction, a.k.a. MSE(Mean Square Error).
-     *
-     * <p>.. math:: L = \frac{1}{2} \sum_i \vert {label}_i - {prediction}_i \vert^2.
      *
      * @param weight the weight to apply on loss value, default 1/2
      * @param batchAxis the axis that represents mini-batch, default 0
@@ -33,11 +35,7 @@ public class L2Loss extends Loss {
         this.batchAxis = batchAxis;
     }
 
-    /**
-     * Calculate L2Loss between the label and prediction, a.k.a. MSE(Mean Square Error).
-     *
-     * <p>.. math:: L = \frac{1}{2} \sum_i \vert {label}_i - {prediction}_i \vert^2.
-     */
+    /** Calculate L2Loss between the label and prediction, a.k.a. MSE(Mean Square Error). */
     public L2Loss() {
         weight = 1.f / 2;
         batchAxis = 0;
