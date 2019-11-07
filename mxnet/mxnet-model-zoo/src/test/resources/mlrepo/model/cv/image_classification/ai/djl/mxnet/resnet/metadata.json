@@ -119,7 +119,7 @@
         "symbol": {
           "uri": "0.0.1/resnet50_v1-symbol.json",
           "name": "resnet50_v1_cifar10-symbol.json",
-          "sha1Hash": "b77533fe19a25ced5062fb5d5b4f174d359065f4"
+          "sha1Hash": "a326bd546630fa171398ea33d0136f8e43530748"
         },
         "parameters": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet50_v1_cifar10-0000.params.gz",
