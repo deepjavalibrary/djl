@@ -21,11 +21,11 @@ MXNet model zoo contains two major categories, CV and NLP. All of the models are
 
 ## How to find a pre-trained model in model zoo
 
-In a model zoo repository, there are many pre-trained models that belong to the same model family.
+In a model zoo repository, there can be many pre-trained that belongs to the same model family.
 You can use the `MxModelZoo` class to search for the model that you need.
-To get started, you need to decide which model family you want to use, then define key/values search criteria
-to narrow down the model you want. If there are multiple models that match your search criteria, the first model
-found will be returned. *ModelNotFoundException* will be thrown if no matching model is found.
+First, you need to decide which model family you want to use, then define key/values search criteria
+to narrow down the model you want. If there are multiple models that match your search criteria, the first
+model found will be returned. *ModelNotFoundException* will be thrown if no matching model is found.
 
 The following is an example of criteria to find a resnet50-v1 model that is trained on the imagenet dataset:
 ```java
