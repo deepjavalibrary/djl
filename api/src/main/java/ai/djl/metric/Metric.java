@@ -12,7 +12,7 @@
  */
 package ai.djl.metric;
 
-/** A class representing a {@code Metric} item. */
+/** A class representing a single recorded {@code Metric} value. */
 public class Metric {
 
     private String metricName;

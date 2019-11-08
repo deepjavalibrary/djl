@@ -21,14 +21,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-/** A collection of {@link Metric} objects organized by metric name. */
+/**
+ * A collection of {@link Metric} objects organized by metric name.
+ *
+ * <p>{@code Metric} is a utility class that is used in the {@link ai.djl.training.Trainer} and
+ * {@link ai.djl.inference.Predictor} to track the
+ */
 public class Metrics {
 
     private static final MetricValueComparator VALUE_COMPARATOR = new MetricValueComparator();
 
     private Map<String, List<Metric>> metrics;
 
-    /** Constructs a {@code Metrics} instance. */
+    /** Constructs an empty {@code Metrics} instance. */
     public Metrics() {
         metrics = new ConcurrentHashMap<>();
     }
@@ -44,7 +49,7 @@ public class Metrics {
     }
 
     /**
-     * Adds {@code Metric} by metric {@code name} and <code>value</code>.
+     * Adds a {@code Metric} given the metric's {@code name} and {@code value}.
      *
      * @param name the metric name
      * @param value the metric value
@@ -54,8 +59,7 @@ public class Metrics {
     }
 
     /**
-     * Adds {@code Metric} by metric {@code name}, <code>value</code> and <code>unit
-     * </code> .
+     * Adds a {@code Metric} given the metric's {@code name}, {@code value}, and {@code unit}.
      *
      * @param name the metric name
      * @param value the metric value
@@ -70,7 +74,7 @@ public class Metrics {
     }
 
     /**
-     * Returns a list of {@link Metric} with the specified metric name.
+     * Returns all {@link Metric}s with the specified metric name.
      *
      * @param name the name of the metric
      * @return a list of {@link Metric} with the specified metric name
