@@ -61,7 +61,7 @@ publishing {
             pom standardPom({
                 name = "Basic Dataset"
                 delegate.description = "Basic Dataset for djl.ai"
-                url = url.get() + "mxnet/basicdataset"
+                url = url.get() + "basicdataset"
             })
         }
     }
