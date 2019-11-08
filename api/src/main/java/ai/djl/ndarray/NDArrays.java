@@ -12,6 +12,7 @@
  */
 package ai.djl.ndarray;
 
+import ai.djl.ndarray.types.Shape;
 import java.util.Arrays;
 
 /** This class contains various methods for manipulating NDArrays. */
@@ -24,11 +25,29 @@ public final class NDArrays {
     ////////////////////////////////////////
 
     /**
-     * Returns the boolean {@code true} iff all elements in the NDArray are equal to the Number.
+     * Checks 2 {@link NDArray}s for equal shapes.
      *
-     * @param a the NDArray to compare
+     * <p>Shapes are considered equal if:
+     *
+     * <ul>
+     *   <li>Both {@link NDArray}s have equal rank, and
+     *   <li>size(0)...size(rank()-1) are equal for both {@link NDArray}s
+     * </ul>
+     *
+     * @param a the {@link NDArray} to compare
+     * @param b the {@link NDArray} to compare
+     * @return {@code true} if the {@link Shape}s are the same
+     */
+    public static boolean shapeEquals(NDArray a, NDArray b) {
+        return a.shapeEquals(b);
+    }
+
+    /**
+     * Returns {@code true} if all elements in the {@link NDArray} are equal to the Number.
+     *
+     * @param a the {@link NDArray} to compare
      * @param n the number to compare
-     * @return the binary NDArray for "Equals" comparison
+     * @return the result boolean
      */
     public static boolean equals(NDArray a, Number n) {
         if (a == null) {
@@ -38,11 +57,11 @@ public final class NDArrays {
     }
 
     /**
-     * Returns the boolean {@code true} iff all elements in both the NDArrays are equal.
+     * Returns {@code true} if all elements in both the {@link NDArray}s are equal.
      *
-     * @param a the NDArray to compare
-     * @param b the NDArray to compare
-     * @return the binary NDArray for "Equals" comparison
+     * @param a the {@link NDArray} to compare
+     * @param b the {@link NDArray} to compare
+     * @return the result boolean
      */
     public static boolean equals(NDArray a, NDArray b) {
         if (a == null) {
@@ -52,59 +71,26 @@ public final class NDArrays {
     }
 
     /**
-     * Returns the binary NDArray for "Equals" comparison.
+     * Returns {@code true} if two {@link NDArray} are element-wise equal within a tolerance.
      *
-     * @param a the NDArray to compare
-     * @param n the number to compare
-     * @return the binary NDArray for "Equals" comparison
-     */
-    public static NDArray eq(NDArray a, Number n) {
-        return a.eq(n);
-    }
-
-    /**
-     * Returns the binary NDArray for "Equals" comparison.
-     *
-     * @param n the number to compare
-     * @param a the NDArray to compare
-     * @return the binary NDArray for "Equals" comparison
-     */
-    public static NDArray eq(Number n, NDArray a) {
-        return a.eq(n);
-    }
-
-    /**
-     * Returns the binary NDArray for "Equals" comparison.
-     *
-     * @param a the NDArray to compare
-     * @param b the NDArray to compare
-     * @return the binary NDArray for "Equals" comparison
-     */
-    public static NDArray eq(NDArray a, NDArray b) {
-        return a.eq(b);
-    }
-
-    /**
-     * Returns True if two arrays are element-wise equal within a tolerance.
-     *
-     * @param a the NDArray to compare with
-     * @param b the NDArray to compare with
-     * @return the result {@code NDArray}
+     * @param a the {@link NDArray} to compare with
+     * @param b the {@link NDArray} to compare with
+     * @return the boolean result
      */
     public static boolean allClose(NDArray a, NDArray b) {
         return a.allClose(b);
     }
 
     /**
-     * Returns True if two arrays are element-wise equal within a tolerance.
+     * Returns {@code true} if two {@link NDArray} are element-wise equal within a tolerance.
      *
-     * @param a the NDArray to compare with
-     * @param b the NDArray to compare with
+     * @param a the {@link NDArray} to compare with
+     * @param b the {@link NDArray} to compare with
      * @param rtol the relative tolerance parameter
      * @param atol the absolute tolerance parameter
-     * @param equalNan whether to compare NaN’s as equal. If True, NaN’s in a will be considered
-     *     equal to NaN’s in b in the output array.
-     * @return the result {@code NDArray}
+     * @param equalNan whether to compare NaN’s as equal. If {@code true}, NaN’s in the {@link
+     *     NDArray} will be considered equal to NaN’s in the other {@link NDArray}
+     * @return the boolean result
      */
     public static boolean allClose(
             NDArray a, NDArray b, double rtol, double atol, boolean equalNan) {
@@ -112,135 +98,223 @@ public final class NDArrays {
     }
 
     /**
-     * Returns the binary NDArray for "Greater Than" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Equals" comparison.
      *
-     * @param a the NDArray to be compared
+     * @param a the {@link NDArray} to compare
+     * @param n the number to compare
+     * @return the boolean {@link NDArray} for element-wise "Equals" comparison
+     */
+    public static NDArray eq(NDArray a, Number n) {
+        return a.eq(n);
+    }
+
+    /**
+     * Returns the boolean {@link NDArray} for element-wise "Equals" comparison.
+     *
+     * @param n the number to compare
+     * @param a the {@link NDArray} to compare
+     * @return the boolean {@link NDArray} for element-wise "Equals" comparison
+     */
+    public static NDArray eq(Number n, NDArray a) {
+        return a.eq(n);
+    }
+
+    /**
+     * Returns the boolean {@link NDArray} for element-wise "Equals" comparison.
+     *
+     * @param a the {@link NDArray} to compare
+     * @param b the {@link NDArray} to compare
+     * @return the boolean {@link NDArray} for element-wise "Equals" comparison
+     */
+    public static NDArray eq(NDArray a, NDArray b) {
+        return a.eq(b);
+    }
+
+    /**
+     * Returns the boolean {@link NDArray} for element-wise "Not equals" comparison.
+     *
+     * @param a the {@link NDArray} to compare
+     * @param n the number to compare
+     * @return the boolean {@link NDArray} for element-wise "Not equals" comparison
+     */
+    public static NDArray neq(NDArray a, Number n) {
+        return a.neq(n);
+    }
+
+    /**
+     * Returns the boolean {@link NDArray} for element-wise "Not equals" comparison.
+     *
+     * @param n the number to compare
+     * @param a the {@link NDArray} to compare
+     * @return the boolean {@link NDArray} for element-wise "Not equals" comparison
+     */
+    public static NDArray neq(Number n, NDArray a) {
+        return a.neq(n);
+    }
+
+    /**
+     * Returns the boolean {@link NDArray} for element-wise "Not equals" comparison.
+     *
+     * @param a the {@link NDArray} to compare
+     * @param b the {@link NDArray} to compare
+     * @return the boolean {@link NDArray} for element-wise "Not equals" comparison
+     */
+    public static NDArray neq(NDArray a, NDArray b) {
+        return a.neq(b);
+    }
+
+    /**
+     * Returns the boolean {@link NDArray} for element-wise "Greater Than" comparison.
+     *
+     * @param a the {@link NDArray} to compare
      * @param n the number to be compared against
-     * @return the binary NDArray for "Greater Than" comparison
+     * @return the boolean {@link NDArray} for element-wise "Greater Than" comparison
      */
     public static NDArray gt(NDArray a, Number n) {
         return a.gt(n);
     }
 
     /**
-     * Returns the binary NDArray for "Greater Than" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Greater Than" comparison.
      *
      * @param n the number to be compared
      * @param a the NDArray to be compared against
-     * @return the binary NDArray for "Greater Than" comparison
+     * @return the boolean {@link NDArray} for element-wise "Greater Than" comparison
      */
     public static NDArray gt(Number n, NDArray a) {
         return a.lt(n);
     }
 
     /**
-     * Returns the binary NDArray for "Greater Than" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Greater Than" comparison.
      *
-     * @param a the NDArray to be compared
-     * @param b the NDArray to be compared against
-     * @return the binary NDArray for "Greater Than" comparison
+     * @param a the {@link NDArray} to be compared
+     * @param b the {@link NDArray} to be compared against
+     * @return the boolean {@link NDArray} for element-wise "Greater Than" comparison
      */
     public static NDArray gt(NDArray a, NDArray b) {
         return a.gt(b);
     }
 
     /**
-     * Returns the binary NDArray for "Greater or equals" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Greater or equals" comparison.
      *
-     * @param a the NDArray to be compared
+     * @param a the {@link NDArray} to be compared
      * @param n the number to be compared against
-     * @return the binary NDArray for "Greater or equals" comparison
+     * @return the boolean {@link NDArray} for element-wise "Greater or equals" comparison
      */
     public static NDArray gte(NDArray a, Number n) {
         return a.gte(n);
     }
 
     /**
-     * Returns the binary NDArray for "Greater or equals" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Greater or equals" comparison.
      *
      * @param n the number to be compared
-     * @param a the NDArray to be compared against
-     * @return the binary NDArray for "Greater or equals" comparison
+     * @param a the {@link NDArray} to be compared against
+     * @return the boolean {@link NDArray} for element-wise "Greater or equals" comparison
      */
     public static NDArray gte(Number n, NDArray a) {
         return a.lte(n);
     }
 
     /**
-     * Returns the binary NDArray for "Greater or Equals" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Greater or equals" comparison.
      *
-     * @param a the NDArray to be compared
-     * @param b the NDArray to be compared against
-     * @return the binary NDArray for "Greater Than" comparison
+     * @param a the {@link NDArray} to be compared
+     * @param b the {@link NDArray} to be compared against
+     * @return the boolean {@link NDArray} for element-wise "Greater or equals" comparison
      */
     public static NDArray gte(NDArray a, NDArray b) {
         return a.gte(b);
     }
 
     /**
-     * Returns the binary NDArray for "Less" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Less" comparison.
      *
-     * @param a the NDArray to be compared
+     * @param a the {@link NDArray} to be compared
      * @param n the number to be compared against
-     * @return the binary NDArray for "Less" comparison
+     * @return the boolean {@link NDArray} for element-wise "Less" comparison
      */
     public static NDArray lt(NDArray a, Number n) {
         return a.lt(n);
     }
 
     /**
-     * Returns the binary NDArray for "Less" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Less" comparison.
      *
      * @param n the number to be compared
-     * @param a the NDArray to be compared against
-     * @return the binary NDArray for "Less" comparison
+     * @param a the {@link NDArray} to be compared against
+     * @return the boolean {@link NDArray} for element-wise "Less" comparison
      */
     public static NDArray lt(Number n, NDArray a) {
         return a.gt(n);
     }
 
     /**
-     * Returns the binary NDArray for "Less" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Less" comparison.
      *
-     * @param a the NDArray to be compared
-     * @param b the NDArray to be compared against
-     * @return the binary NDArray for "Less" comparison
+     * @param a the {@link NDArray} to be compared
+     * @param b the {@link NDArray} to be compared against
+     * @return the boolean {@link NDArray} for element-wise "Less" comparison
      */
     public static NDArray lt(NDArray a, NDArray b) {
         return a.lt(b);
     }
 
     /**
-     * Returns the binary NDArray for "Less or equals" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Less or equals" comparison.
      *
-     * @param a the NDArray to be compared
+     * @param a the {@link NDArray} to be compared
      * @param n the number to be compared against
-     * @return the binary NDArray for "Less or equals" comparison
+     * @return the boolean {@link NDArray} for element-wise "Less or equals" comparison
      */
     public static NDArray lte(NDArray a, Number n) {
         return a.lte(n);
     }
 
     /**
-     * Returns the binary NDArray for "Less or equals" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Less or equals" comparison.
      *
      * @param n the number to be compared
-     * @param a the NDArray to be compared against
-     * @return the binary NDArray for "Less or equals" comparison
+     * @param a the {@link NDArray} to be compared against
+     * @return the boolean {@link NDArray} for element-wise "Less or equals" comparison
      */
     public static NDArray lte(Number n, NDArray a) {
         return a.gte(n);
     }
 
     /**
-     * Returns the binary NDArray for "Lesser or equals" comparison.
+     * Returns the boolean {@link NDArray} for element-wise "Less or equals" comparison.
      *
-     * @param a the NDArray to be compared
-     * @param b the NDArray to be compared against
-     * @return the binary NDArray for "Less" comparison
+     * @param a the {@link NDArray} to be compared
+     * @param b the {@link NDArray} to be compared against
+     * @return the boolean {@link NDArray} for element-wise "Less or equals" comparison
      */
     public static NDArray lte(NDArray a, NDArray b) {
         return a.lte(b);
+    }
+
+    /**
+     * Returns elements chosen from the {@link NDArray} or the other {@link NDArray} depending on
+     * condition.
+     *
+     * <p>Given three {@link NDArray}s, condition, a, and b, returns an {@link NDArray} with the
+     * elements from a or b, depending on whether the elements from condition {@link NDArray} are
+     * {@code true} or {@code false}. If condition has the same shape as a, each element in the
+     * output {@link NDArray} is from this if the corresponding element in the condition is {@code
+     * true}, and from other if {@code false}.
+     *
+     * <p>Note that all non-zero values are interpreted as {@code true} in condition {@link
+     * NDArray}.
+     *
+     * @param condition the condition {@code NDArray}
+     * @param a the first {@link NDArray}
+     * @param b the other {@link NDArray}
+     * @return the result {@link NDArray}
+     */
+    public static NDArray where(NDArray condition, NDArray a, NDArray b) {
+        return a.where(condition, b);
     }
 
     /**
@@ -318,35 +392,25 @@ public final class NDArrays {
     }
 
     /**
-     * Returns the elements, either from this NDArray or other, depending on the condition.
+     * Returns portion of the {@link NDArray} given the index boolean {@link NDArray} along first
+     * axis.
      *
-     * @param condition the condition array
-     * @param a the first NDArray
-     * @param b the other NDArray
-     * @return the result NDArray
-     */
-    public static NDArray where(NDArray condition, NDArray a, NDArray b) {
-        return a.where(condition, b);
-    }
-
-    /**
-     * Returns partial of {@code NDArray} based on boolean index {@code NDArray} from axis 0.
-     *
-     * @param data the data to operate on
-     * @param index the boolean {@code NDArray} mask
-     * @return the new {@code NDArray}
+     * @param data the {@link NDArray} to operate on
+     * @param index the boolean {@link NDArray} mask
+     * @return the result {@link NDArray}
      */
     public static NDArray booleanMask(NDArray data, NDArray index) {
         return booleanMask(data, index, 0);
     }
 
     /**
-     * Returns partial of {@code NDArray} based on boolean index {@code NDArray} and axis.
+     * Returns portion of the {@link NDArray} given the index boolean {@link NDArray} along given
+     * axis.
      *
-     * @param data the data to operate on
-     * @param index the boolean {@code NDArray} mask
-     * @param axis an integer that represents the axis in {@code NDArray} to mask from
-     * @return the new {@code NDArray}
+     * @param data the {@link NDArray} to operate on
+     * @param index the boolean {@link NDArray} mask
+     * @param axis an integer that represents the axis of {@link NDArray} to mask from
+     * @return the result {@link NDArray}
      */
     public static NDArray booleanMask(NDArray data, NDArray index, int axis) {
         return data.booleanMask(index, axis);
@@ -357,32 +421,34 @@ public final class NDArrays {
     ////////////////////////////////////////
 
     /**
-     * Adds a number to each element of an {@link NDArray}.
+     * Adds a number to the {@link NDArray} element-wise.
      *
-     * @param a the NDArray that will be added to
-     * @param n the number to add to the {@link NDArray} elements
-     * @return the result of the addition
+     * @param a the {@link NDArray} to be added to
+     * @param n the number to add
+     * @return the result {@link NDArray}
      */
     public static NDArray add(NDArray a, Number n) {
         return a.add(n);
     }
 
     /**
-     * Adds a number to each element of an {@link NDArray}.
+     * Adds a {@link NDArray} to a number element-wise.
      *
-     * @param a the NDArray that will be added to
-     * @param n the number to add to the {@link NDArray} elements
-     * @return the result of the addition
+     * @param n the number to be added to
+     * @param a the {@link NDArray} to add
+     * @return the result {@link NDArray}
      */
     public static NDArray add(Number n, NDArray a) {
         return a.add(n);
     }
 
     /**
-     * Adds {@link NDArray}s element-wise with broadcasting.
+     * Adds all of the {@link NDArray}s together element-wise.
      *
-     * @param arrays the arrays to add together
-     * @return the result of the addition
+     * <p>The shapes of all of the {@link NDArray}s must be broadcastable.
+     *
+     * @param arrays the {@link NDArray}s to add together
+     * @return the result {@link NDArray}
      * @throws IllegalArgumentException arrays must have at least two elements
      */
     public static NDArray add(NDArray... arrays) {
@@ -393,65 +459,69 @@ public final class NDArrays {
     }
 
     /**
-     * Performs scalar subtraction of an NDArray (copied).
+     * Subtracts a number from the {@link NDArray} element-wise.
      *
-     * @param a the NDArray to be operated on
-     * @param n the number to subtract by
-     * @return a copy of this array after applying subtraction operation
+     * @param a the {@link NDArray} to be subtracted
+     * @param n the number to subtract from
+     * @return the result {@link NDArray}
      */
     public static NDArray sub(NDArray a, Number n) {
         return a.sub(n);
     }
 
     /**
-     * Subtracts an NDArray with duplicates - i.e., (n - thisArrayValues).
+     * Subtracts a {@link NDArray} from a number element-wise.
      *
-     * @param n the value to use for subtraction
-     * @param a the NDArray to be operated on
-     * @return a copy of the array after subtraction
+     * @param n the number to be subtracted
+     * @param a the {@link NDArray} to subtract from
+     * @return the result {@link NDArray}
      */
     public static NDArray sub(Number n, NDArray a) {
         return a.getNDArrayInternal().rsub(n);
     }
 
     /**
-     * Performs scalar subtraction (copied).
+     * Subtracts a {@link NDArray} from a {@link NDArray} element-wise.
      *
-     * @param a the NDArray to be operated on
-     * @param b the NDArray to subtract by
-     * @return a copy of this array after applying subtraction operation
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * @param a the {@link NDArray} to be subtracted
+     * @param b the {@link NDArray} to subtract from
+     * @return the result {@link NDArray}
      */
     public static NDArray sub(NDArray a, NDArray b) {
         return a.sub(b);
     }
 
     /**
-     * Performs scalar multiplication (copy).
+     * Multiplies the {@link NDArray} by a number element-wise.
      *
-     * @param a the NDArray to be operated on
+     * @param a the NDArray to be multiplied
      * @param n the number to multiply by
-     * @return a copy of this NDArray multiplied by the given number
+     * @return the result {@link NDArray}
      */
     public static NDArray mul(NDArray a, Number n) {
         return a.mul(n);
     }
 
     /**
-     * Performs scalar multiplication (copy).
+     * Multiplies a number by a {@link NDArray} element-wise.
      *
      * @param n the number to multiply by
-     * @param a the NDArray to be operated on
-     * @return a copy of this NDArray multiplied by the given number
+     * @param a the {@link NDArray} to multiply by
+     * @return the result {@link NDArray}
      */
     public static NDArray mul(Number n, NDArray a) {
         return a.mul(n);
     }
 
     /**
-     * Multiplies {@link NDArray}s element-wise with broadcasting.
+     * Multiplies all of the {@link NDArray}s together element-wise.
      *
-     * @param arrays the arrays to multiply together
-     * @return the result of the multiplication
+     * <p>The shapes of all of the {@link NDArray}s must be broadcastable.
+     *
+     * @param arrays the {@link NDArray}s to multiply together
+     * @return the result {@link NDArray}
      * @throws IllegalArgumentException arrays must have at least two elements
      */
     public static NDArray mul(NDArray... arrays) {
@@ -462,132 +532,137 @@ public final class NDArrays {
     }
 
     /**
-     * Divides an NDArray by a number.
+     * Divides the {@link NDArray} by a number element-wise.
      *
-     * @param a the NDArray to be operated on
-     * @param n the number to divide values by
-     * @return a copy of the array after division
+     * @param a the {@link NDArray} to be be divided
+     * @param n the number to divide by
+     * @return the result {@link NDArray}
      */
     public static NDArray div(NDArray a, Number n) {
         return a.div(n);
     }
 
     /**
-     * Divides an NDArray with a scalar - i.e., (n / thisArrayValues).
+     * Divides a number by a {@link NDArray} element-wise.
      *
-     * @param n the value to use for division
-     * @param a the NDArray to be operated on
-     * @return a copy of the array after applying division
+     * @param n the number to be be divided
+     * @param a the {@link NDArray} to divide by
+     * @return the result {@link NDArray}
      */
     public static NDArray div(Number n, NDArray a) {
         return a.getNDArrayInternal().rdiv(n);
     }
 
     /**
-     * Performs in-place scalar division.
+     * Divides a {@link NDArray} by a {@link NDArray} element-wise.
      *
-     * @param a the NDArray to be operated on
-     * @param b the NDArray to divide values by
-     * @return this array after applying division operation
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * @param a the {@link NDArray} to be be divided
+     * @param b the {@link NDArray} to divide by
+     * @return the result {@link NDArray}
      */
     public static NDArray div(NDArray a, NDArray b) {
         return a.div(b);
     }
 
     /**
-     * Returns the scalar remainder of division (copy).
+     * Returns element-wise remainder of division.
      *
-     * @param a the NDArray to be operated on
-     * @param n the number to multiply by
-     * @return a copy of this NDArray multiplied by the given number
+     * @param a the dividend {@link NDArray}
+     * @param n the divisor number
+     * @return the result {@link NDArray}
      */
     public static NDArray mod(NDArray a, Number n) {
         return a.mod(n);
     }
 
     /**
-     * Copies the scalar remainder of division.
+     * Returns element-wise remainder of division.
      *
-     * @param n the number to multiply by
-     * @param a the NDArray to be operated on
-     * @return a copy of this NDArray multiplied by the given number
+     * @param n the dividend number
+     * @param a the divisor {@link NDArray}
+     * @return the result {@link NDArray}
      */
     public static NDArray mod(Number n, NDArray a) {
         return a.getNDArrayInternal().rmod(n);
     }
 
     /**
-     * Copies the scalar remainder of division.
+     * Returns element-wise remainder of division.
      *
-     * @param a the NDArray to be operated on
-     * @param b the NDArray to multiply by
-     * @return this array after applying scalar multiplication
+     * @param a the dividend NDArray
+     * @param b the dividend NDArray
+     * @return the result {@link NDArray}
      */
     public static NDArray mod(NDArray a, NDArray b) {
         return a.mod(b);
     }
 
     /**
-     * Raises the power of each element in the NDArray.
+     * Takes the power of the {@link NDArray} with a number element-wise.
      *
-     * @param a the NDArray to be operated on
-     * @param n the number to raise the power to
-     * @return the result {@code NDArray}
+     * @param a the {@link NDArray} to be taken the power with
+     * @param n the number to take the power with
+     * @return the result {@link NDArray}
      */
     public static NDArray pow(NDArray a, Number n) {
         return a.pow(n);
     }
 
     /**
-     * Raises the power of each element in the NDArray by the corresponding element in the other
-     * NDArray.
+     * Takes the power of a number with a {@link NDArray} element-wise.
      *
-     * @param a the NDArray to be operated on
-     * @param b the NDArray by which the raise the power by
-     * @return the result {@code NDArray}
-     */
-    public static NDArray pow(NDArray a, NDArray b) {
-        return a.pow(b);
-    }
-
-    /**
-     * Raises the power of a number by the corresponding element in the {@code NDArray}.
-     *
-     * @param n the number to be operated on
-     * @param a the {@code NDArray} by which the raise the power by
-     * @return the result {@code NDArray}
+     * @param n the number to be taken the power with
+     * @param a the {@link NDArray} to take the power with
+     * @return the result {@link NDArray}
      */
     public static NDArray pow(Number n, NDArray a) {
         return a.getNDArrayInternal().rpow(n);
     }
 
     /**
-     * Adds a number to each element of an {@link NDArray} in-place.
+     * Takes the power of a {@link NDArray} with a {@link NDArray} element-wise.
      *
-     * @param a the NDArray that will be added to
-     * @param n the number to add to the {@link NDArray} elements
-     * @return the result of the addition
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * @param a the {@link NDArray} to be taken the power with
+     * @param b the {@link NDArray} to take the power with
+     * @return the result {@link NDArray}
+     */
+    public static NDArray pow(NDArray a, NDArray b) {
+        return a.pow(b);
+    }
+
+    /**
+     * Adds a number to the {@link NDArray} element-wise in place.
+     *
+     * @param a the {@link NDArray} to be added to
+     * @param n the number to add
+     * @return the result {@link NDArray}
      */
     public static NDArray addi(NDArray a, Number n) {
         return a.addi(n);
     }
 
     /**
-     * Adds a number to each element of an {@link NDArray}.
+     * Adds a {@link NDArray} to a number element-wise in place.
      *
-     * @param a the NDArray that will be added to
-     * @param n the number to add to the {@link NDArray} elements
-     * @return the result of the addition
+     * @param a the number to be added to
+     * @param n the {@link NDArray} to add
+     * @return the result {@link NDArray}
      */
     public static NDArray addi(Number n, NDArray a) {
         return a.addi(n);
     }
 
     /**
-     * Adds {@link NDArray}s element-wise with broadcasting.
+     * Adds all of the {@link NDArray}s together element-wise in place.
      *
-     * @param arrays the arrays to add together
-     * @return the result of the addition
+     * <p>The shapes of all of the {@link NDArray}s must be broadcastable.
+     *
+     * @param arrays the {@link NDArray}s to add together
+     * @return the result {@link NDArray}
      * @throws IllegalArgumentException arrays must have at least two elements
      */
     public static NDArray addi(NDArray... arrays) {
@@ -598,65 +673,69 @@ public final class NDArrays {
     }
 
     /**
-     * Performs in-place scalar subtraction of an NDArray.
+     * Subtracts a number from the {@link NDArray} element-wise in place.
      *
-     * @param a the NDArray to be operated on
-     * @param n the number to subtract
-     * @return this array after applying subtraction operation
+     * @param a the {@link NDArray} to be subtracted
+     * @param n the number to subtract from
+     * @return the result {@link NDArray}
      */
     public static NDArray subi(NDArray a, Number n) {
         return a.subi(n);
     }
 
     /**
-     * Subtracts an NDArray in place - i.e., (n - thisArrayValues).
+     * Subtracts a {@link NDArray} from a number element-wise in place.
      *
-     * @param n the value to use for subtraction
-     * @param a the NDArray to be operated on
-     * @return this array after subtraction
+     * @param n the number to be subtracted
+     * @param a the {@link NDArray} to subtract from
+     * @return the result {@link NDArray}
      */
     public static NDArray subi(Number n, NDArray a) {
         return a.getNDArrayInternal().rsubi(n);
     }
 
     /**
-     * Performs in-place scalar subtraction.
+     * Subtracts a {@link NDArray} from a {@link NDArray} element-wise in place.
      *
-     * @param a the NDArray to be operated on
-     * @param b the NDArray to subtract by
-     * @return this array after applying subtraction operation
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * @param a the {@link NDArray} to be subtracted
+     * @param b the {@link NDArray} to subtract from
+     * @return the result {@link NDArray}
      */
     public static NDArray subi(NDArray a, NDArray b) {
         return a.subi(b);
     }
 
     /**
-     * Performs in-place scalar multiplication.
+     * Multiplies the {@link NDArray} by a number element-wise in place.
      *
-     * @param a the NDArray to be operated on
+     * @param a the NDArray to be multiplied
      * @param n the number to multiply by
-     * @return this array after applying scalar multiplication
+     * @return the result {@link NDArray}
      */
     public static NDArray muli(NDArray a, Number n) {
         return a.muli(n);
     }
 
     /**
-     * Performs in-place scalar multiplication.
+     * Multiplies a number by a {@link NDArray} element-wise.
      *
      * @param n the number to multiply by
-     * @param a the NDArray to be operated on
-     * @return this array after applying scalar multiplication
+     * @param a the {@link NDArray} to multiply by
+     * @return the result {@link NDArray}
      */
     public static NDArray muli(Number n, NDArray a) {
         return a.muli(n);
     }
 
     /**
-     * Multiplies {@link NDArray}s in place element-wise with broadcasting.
+     * Multiplies all of the {@link NDArray}s together element-wise in place.
      *
-     * @param arrays the arrays to multiply together
-     * @return the result of the multiplication
+     * <p>The shapes of all of the {@link NDArray}s must be broadcastable.
+     *
+     * @param arrays the {@link NDArray}s to multiply together
+     * @return the result {@link NDArray}
      * @throws IllegalArgumentException arrays must have at least two elements
      */
     public static NDArray muli(NDArray... arrays) {
@@ -667,126 +746,146 @@ public final class NDArrays {
     }
 
     /**
-     * Divides an NDArray by a number.
+     * Divides a number by a {@link NDArray} element-wise in place.
      *
-     * @param a the NDArray to be operated on
-     * @param n the number to divide values by
-     * @return a copy of the array after division
+     * @param a the {@link NDArray} to be be divided
+     * @param n the number to divide by
+     * @return the result {@link NDArray}
      */
     public static NDArray divi(NDArray a, Number n) {
         return a.divi(n);
     }
 
     /**
-     * Divides an NDArray - i.e., (n / thisArrayValues) in-place.
+     * Divides a number by a {@link NDArray} element-wise.
      *
-     * @param n the value to use for division
-     * @param a the NDArray to be operated on
-     * @return this array after applying division
+     * @param n the number to be be divided
+     * @param a the {@link NDArray} to divide by
+     * @return the result {@link NDArray}
      */
     public static NDArray divi(Number n, NDArray a) {
         return a.getNDArrayInternal().rdivi(n);
     }
 
     /**
-     * Performs in-place scalar division.
+     * Divides a {@link NDArray} by a {@link NDArray} element-wise.
      *
-     * @param a the NDArray to be operated on
-     * @param b the NDArray to divide values by
-     * @return this array after applying division operation
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * @param a the {@link NDArray} to be be divided
+     * @param b the {@link NDArray} to divide by
+     * @return the result {@link NDArray}
      */
     public static NDArray divi(NDArray a, NDArray b) {
         return a.divi(b);
     }
 
     /**
-     * Returns the in-place remainder of division.
+     * Returns element-wise remainder of division in place.
      *
-     * @param a the NDArray to be operated on
-     * @param n the number to multiply by
-     * @return this array after applying scalar multiplication
+     * @param a the dividend {@link NDArray}
+     * @param n the divisor number
+     * @return the result {@link NDArray}
      */
     public static NDArray modi(NDArray a, Number n) {
         return a.modi(n);
     }
 
     /**
-     * Returns the in-place scalar remainder of division.
+     * Returns element-wise remainder of division in place.
      *
-     * @param n the number to multiply by
-     * @param a the NDArray to be operated on
-     * @return this array after applying scalar multiplication
+     * @param n the dividend number
+     * @param a the divisor {@link NDArray}
+     * @return the result {@link NDArray}
      */
     public static NDArray modi(Number n, NDArray a) {
         return a.getNDArrayInternal().rmodi(n);
     }
 
     /**
-     * Returns the in-place scalar remainder of division.
+     * Returns element-wise remainder of division.
      *
-     * @param a the NDArray to be operated on
-     * @param b the NDArray to multiply by
-     * @return this array after applying scalar multiplication
+     * @param a the dividend NDArray
+     * @param b the dividend NDArray
+     * @return the result {@link NDArray}
      */
     public static NDArray modi(NDArray a, NDArray b) {
         return a.modi(b);
     }
 
     /**
-     * Raises the power of each element in the NDArray in-place.
+     * Takes the power of the {@link NDArray} with a number element-wise in place.
      *
-     * @param a the NDArray to be operated on
-     * @param n the number to raise the power to
-     * @return this {@code NDArray} after applying raising power
+     * @param a the {@link NDArray} to be taken the power with
+     * @param n the number to take the power with
+     * @return the result {@link NDArray}
      */
     public static NDArray powi(NDArray a, Number n) {
         return a.powi(n);
     }
 
     /**
-     * Raises the power of a number by the corresponding element in the {@code NDArray}.
+     * Takes the power of a number with a {@link NDArray} element-wise in place.
      *
-     * @param n the number to be operated on
-     * @param a the {@code NDArray} by which the raise the power by
-     * @return this {@code NDArray} after applying raising power
+     * @param n the number to be taken the power with
+     * @param a the {@link NDArray} to take the power with
+     * @return the result {@link NDArray}
      */
     public static NDArray powi(Number n, NDArray a) {
         return a.getNDArrayInternal().rpowi(n);
     }
 
     /**
-     * Raises the power of each element in the NDArray by the corresponding element in the other
-     * NDArray in-place.
+     * Takes the power of a {@link NDArray} with a {@link NDArray} element-wise.
      *
-     * @param a the NDArray to be operated on
-     * @param b the NDArray to raise the power by
-     * @return the result {@code NDArray}
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * @param a the {@link NDArray} to be taken the power with
+     * @param b the {@link NDArray} to take the power with
+     * @return the result {@link NDArray}
      */
     public static NDArray powi(NDArray a, NDArray b) {
         return a.powi(b);
     }
 
     /**
-     * Copies matrix multiplication of two NDArrays.
+     * Dot product of {@link NDArray} a and {@link NDArray} b.
      *
-     * @param a the NDArray to be operated on
-     * @param b the second NDArray to multiply
-     * @return the result of the addition
+     * <ul>
+     *   <li>If both the {@link NDArray} and the other {@link NDArray} are 1-D {@link NDArray}s, it
+     *       is inner product of vectors (without complex conjugation).
+     *   <li>If both the {@link NDArray} and the other {@link NDArray} are 2-D {@link NDArray}s, it
+     *       is matrix multiplication.
+     *   <li>If either the {@link NDArray} or the other {@link NDArray} is 0-D {@link NDArray}
+     *       (scalar), it is equivalent to mul.
+     *   <li>If the {@link NDArray} is N-D {@link NDArray} and the other {@link NDArray} is 1-D
+     *       {@link NDArray}, it is a sum product over the last axis of those.
+     *   <li>If the {@link NDArray} is N-D {@link NDArray} and the other {@link NDArray} is M-D
+     *       {@link NDArray}(where M&gt;&#61;2), it is a sum product over the last axis of this
+     *       {@link NDArray} and the second-to-last axis of the other {@link NDArray}
+     * </ul>
+     *
+     * @param a the {@link NDArray} to perform dot product with
+     * @param b the {@link NDArray} to perform dot product with
+     * @return the result {@link NDArray}
      */
     public static NDArray dot(NDArray a, NDArray b) {
         return a.dot(b);
     }
 
     /**
-     * Joins a sequence of {@link NDArray} in NDList along a new axis.
+     * Joins a sequence of {@link NDArray}s in {@link NDList} along a new axis.
      *
      * <p>The axis parameter specifies the index of the new axis in the dimensions of the result.
-     * For example, if `axis=0` it will be the first dimension and if `axis=-1` it will be the last
+     * For example, if axis=0 it will be the first dimension and if axis=-1 it will be the last
      * dimension.
      *
-     * @param arrays the input {@link NDList}. Each {@link NDArray} must have the same shape.
-     * @param axis the axis in the result array along which the input arrays are stacked
-     * @return the {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @param arrays the input {@link NDList}. Each {@link NDArray} in the {@link NDList} must have
+     *     the same shape as the {@link NDArray}
+     * @param axis the axis in the result {@link NDArray} along which the input {@link NDList} are
+     *     stacked
+     * @return the result {@link NDArray}. The stacked {@link NDArray} has one more dimension than
+     *     the the {@link NDArray}
      */
     public static NDArray stack(NDList arrays, int axis) {
         NDArray array = arrays.head();
@@ -794,21 +893,24 @@ public final class NDArrays {
     }
 
     /**
-     * Joins a sequence of {@link NDArray} in NDList along axis 0.
+     * Joins a sequence of {@link NDArray}s in {@link NDList} along first axis.
      *
-     * @param arrays the input NDList. Each {@link NDArray} must have the same shape.
-     * @return the {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @param arrays the input {@link NDList}. Each {@link NDArray} in the {@link NDList} must have
+     *     the same shape as the {@link NDArray}
+     * @return the result {@link NDArray}. The stacked {@link NDArray} has one more dimension than
+     *     the {@link NDArray}s in {@link NDList}
      */
     public static NDArray stack(NDList arrays) {
         return stack(arrays, 0);
     }
 
     /**
-     * Joins a sequence of {@link NDArray} in NDList along existing axis.
+     * Joins a {@link NDList} along an existing axis.
      *
-     * @param arrays the input NDList. Each {@link NDArray} must have the same shape.
-     * @param axis the axis along which the arrays will be joined
-     * @return the {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @param arrays a {@link NDList} which have the same shape as the {@link NDArray}, except in
+     *     the dimension corresponding to axis
+     * @param axis the axis along which the {@link NDList} will be joined
+     * @return the concatenated {@link NDArray}
      */
     public static NDArray concat(NDList arrays, int axis) {
         NDArray array = arrays.head();
@@ -816,46 +918,49 @@ public final class NDArrays {
     }
 
     /**
-     * Joins a sequence of {@link NDArray} in NDList along axis 0.
+     * Joins a {@link NDList} along first axis.
      *
-     * @param arrays the input NDList. Each {@link NDArray} must have the same shape.
-     * @return the {@link NDArray}. The stacked array has one more dimension than the input arrays.
+     * @param arrays a {@link NDList} which have the same shape as the {@link NDArray}, except in
+     *     the dimension corresponding to axis
+     * @return the concatenated {@link NDArray}
      */
     public static NDArray concat(NDList arrays) {
         return concat(arrays, 0);
     }
 
     /**
-     * Computes the truth value of {@code NDArray} a AND {@code NDArray} b element-wise.
+     * Returns the truth value of {@link NDArray} a AND {@link NDArray} b element-wise.
      *
-     * @param a the input {@code NDArray}
-     * @param b the other input {@code NDArray}
-     * @return the boolean result of the logical AND operation applied to the elements of two {@code
-     *     NDArray}
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * @param a the {@link NDArray} to operate on
+     * @param b the {@link NDArray} to operate on
+     * @return the boolean {@link NDArray} of the logical AND operation applied to the elements of
+     *     the {@link NDArray} a and {@link NDArray} b
      */
     public static NDArray logicalAnd(NDArray a, NDArray b) {
         return a.logicalAnd(b);
     }
 
     /**
-     * Computes the truth value of {@code NDArray} a OR {@code NDArray} b element-wise.
+     * Computes the truth value of {@link NDArray} a AND {@link NDArray} b element-wise.
      *
-     * @param a the input {@code NDArray}
-     * @param b the other input {@code NDArray}
-     * @return the boolean result of the logical OR operation applied to the elements of two {@code
-     *     NDArray}
+     * @param a the {@link NDArray} to operate on
+     * @param b the {@link NDArray} to operate on
+     * @return the boolean {@link NDArray} of the logical AND operation applied to the elements of
+     *     the {@link NDArray} a and {@link NDArray} b
      */
     public static NDArray logicalOr(NDArray a, NDArray b) {
         return a.logicalOr(b);
     }
 
     /**
-     * Computes the truth value of {@code NDArray} a XOR {@code NDArray} b element-wise.
+     * Computes the truth value of {@link NDArray} a AND {@link NDArray} b element-wise.
      *
-     * @param a the input {@code NDArray}
-     * @param b the other input {@code NDArray}
-     * @return the boolean result of the logical XOR operation applied to the elements of two {@code
-     *     NDArray}
+     * @param a the {@link NDArray} to operate on
+     * @param b the {@link NDArray} to operate on
+     * @return the boolean {@link NDArray} of the logical XOR operation applied to the elements of
+     *     the {@link NDArray} a and {@link NDArray} b
      */
     public static NDArray logicalXor(NDArray a, NDArray b) {
         return a.logicalXor(b);

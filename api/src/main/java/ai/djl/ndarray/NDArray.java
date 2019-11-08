@@ -592,7 +592,8 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Returns portion of {@code NDArray} given the index boolean {@code NDArray} on first axis.
+     * Returns portion of the {@code NDArray} given the index boolean {@code NDArray} along first
+     * axis.
      *
      * @param index boolean {@code NDArray} mask
      * @return the result {@code NDArray}
@@ -602,7 +603,8 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Returns portion of {@code NDArray} given the index boolean {@code NDArray} on first axis.
+     * Returns portion of the {@code NDArray} given the index boolean {@code NDArray} along given
+     * axis.
      *
      * @param index boolean {@code NDArray} mask
      * @param axis an integer that represents the axis of {@code NDArray} to mask from
@@ -826,7 +828,7 @@ public interface NDArray extends AutoCloseable {
      * the elements from this or other, depending on whether the elements from condition {@code
      * NDArray} are {@code true} or {@code false}. If condition has the same shape as this, each
      * element in the output {@code NDArray} is from this if the corresponding element in the
-     * condition is true, and from other if false.
+     * condition is {@code true}, and from other if {@code false}.
      *
      * <p>Note that all non-zero values are interpreted as {@code true} in condition {@link
      * NDArray}.
@@ -900,7 +902,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Divides the {@code NDArray} by a number element-wise.
      *
-     * @param n the number to divide values by
+     * @param n the number to divide by
      * @return the result {@code NDArray}
      */
     NDArray div(Number n);
@@ -1034,6 +1036,8 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns in place element-wise remainder of division in place.
      *
+     * <p>The shapes of the {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
      * @param other the divisor {@code NDArray}
      * @return the result of the divide
      */
@@ -1049,6 +1053,8 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Takes the power of the {@code NDArray} with the other {@code NDArray} element-wise in place.
+     *
+     * <p>The shapes of the {@code NDArray} and the other {@code NDArray} must be broadcastable.
      *
      * @param other the other {@code NDArray} to take the power with
      * @return the result {@code NDArray}
@@ -2012,6 +2018,8 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the truth value of the {@code NDArray} AND the other {@code NDArray} element-wise.
      *
+     * <p>The shapes of the {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
      * @param other the other {@code NDArray} to operate on
      * @return the boolean {@code NDArray} of the logical AND operation applied to the elements of
      *     the {@code NDArray} and the other {@code NDArray}
@@ -2028,7 +2036,7 @@ public interface NDArray extends AutoCloseable {
     NDArray logicalOr(NDArray other);
 
     /**
-     * Computes the truth value of the {@code NDArray} XOR the other {@code NDArray} element-wise..
+     * Computes the truth value of the {@code NDArray} XOR the other {@code NDArray} element-wise.
      *
      * @param other the other {@code NDArray} to operate on
      * @return the boolean {@code NDArray} of the logical XOR operation applied to the elements of
