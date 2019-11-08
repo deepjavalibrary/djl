@@ -16,17 +16,19 @@ package ai.djl.engine;
  * The {@code EngineProvider} instance manufactures an {@link Engine} instance, which is available
  * in the system.
  *
- * <p>At initialization time, {@link java.util.ServiceLoader} will search {@code EngineProvider }
- * implementations available in the class path.
+ * <p>At initialization time, the {@link java.util.ServiceLoader} will search for {@code
+ * EngineProvider} implementations available in the class path.
  *
- * <p>Engine is designed as a singleton. {@link Engine#getInstance()} will only return the first
- * Engine found in the class path. However, you can directly create a specific Engine instance (e.g.
- * {@code MxEngine}).
+ * <p>{@link Engine} is designed as a collection of singletons. {@link Engine#getInstance()} will
+ * return the default Engine, which is the first one found in the classpath. Many of the standard
+ * APIs will rely on this default Engine instance such as when creating a {@link
+ * ai.djl.ndarray.NDManager} or {@link ai.djl.Model}. However, you can directly get a specific
+ * Engine instance (e.g. {@code MxEngine}) by calling {@link Engine#getEngine(String)}.
  */
 public interface EngineProvider {
 
     /**
-     * Returns the instance of {@link Engine} class that EngineProvider should bind to.
+     * Returns the instance of the {@link Engine} class EngineProvider should bind to.
      *
      * @return the instance of {@link Engine}
      */

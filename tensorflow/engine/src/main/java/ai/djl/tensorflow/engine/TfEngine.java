@@ -19,6 +19,13 @@ import ai.djl.ndarray.NDManager;
 import java.lang.management.MemoryUsage;
 import org.tensorflow.TensorFlow;
 
+/**
+ * The {@code TfEngine} is an implementation of the {@link Engine} based on the <a
+ * href="https://www.tensorflow.org/">Tensorflow Deep Learning Framework</a>.
+ *
+ * <p>To get an instance of the {@code TfEngine} when it is not the default Engine, call {@link
+ * Engine#getEngine(String)} with the Engine name "Tensorflow".
+ */
 public class TfEngine extends Engine {
 
     TfEngine() {}

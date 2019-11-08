@@ -12,7 +12,7 @@
  */
 package ai.djl.engine;
 
-/** Thrown to indicate that a native error is raised from the underlying engine. */
+/** Thrown to indicate that a native error is raised from the underlying {@link Engine}. */
 public class EngineException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

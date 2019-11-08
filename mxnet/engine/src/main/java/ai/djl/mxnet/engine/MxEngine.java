@@ -19,6 +19,13 @@ import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDManager;
 import java.lang.management.MemoryUsage;
 
+/**
+ * The {@code MxEngine} is an implementation of the {@link Engine} based on the <a
+ * href="https://mxnet.apache.org/">Apache MXNet Deep Learning Framework</a>.
+ *
+ * <p>To get an instance of the {@code MxEngine} when it is not the default Engine, call {@link
+ * Engine#getEngine(String)} with the Engine name "MXNet".
+ */
 public class MxEngine extends Engine {
 
     public static final String ENGINE_NAME = "MXNet";

@@ -25,9 +25,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@code Engine} interface shadows differences between each deep learning framework.
+ * The {@code Engine} interface is the base of the provided implementation for the djl.ai API.
  *
- * <p>Any framework-specific functionality should be provided through this class.
+ * <p>Any framework-specific functionality should be provided through this class. In general, it
+ * should contain methods to detect information about the usable machine hardware and to create a
+ * new {@link NDManager} and {@link Model}.
+ *
+ * @see EngineProvider
  */
 public abstract class Engine {
 
@@ -70,6 +74,7 @@ public abstract class Engine {
      * Returns the default Engine.
      *
      * @return the instance of {@code Engine}
+     * @see EngineProvider
      */
     public static Engine getInstance() {
         if (ENGINE == null) {
@@ -79,10 +84,11 @@ public abstract class Engine {
     }
 
     /**
-     * Returns {@code Engine} by engine name.
+     * Returns the {@code Engine} with the given name.
      *
      * @param engineName the name of Engine to retrieve
      * @return the instance of {@code Engine}
+     * @see EngineProvider
      */
     public static Engine getEngine(String engineName) {
         return ALL_ENGINES.get(engineName);
@@ -96,10 +102,10 @@ public abstract class Engine {
     public abstract int getGpuCount();
 
     /**
-     * Returns {@link MemoryUsage} of specified GPU device.
+     * Returns the {@link MemoryUsage} of the specified GPU device.
      *
      * @param device the GPU {@link Device} to retrieve
-     * @return the {@link MemoryUsage} of specified GPU device
+     * @return the {@link MemoryUsage} of the specified GPU device
      * @throws EngineException if operation is not supported
      * @throws IllegalArgumentException if Device is not GPU device
      */
@@ -109,7 +115,7 @@ public abstract class Engine {
      * Returns the system's default device.
      *
      * <p>If the system has GPU available, then the default device is {@link Device#gpu()}.
-     * Otherwise the default device returned is {@link Device#cpu()}
+     * Otherwise, the default device returned is {@link Device#cpu()}
      *
      * @return the system's default device
      */
