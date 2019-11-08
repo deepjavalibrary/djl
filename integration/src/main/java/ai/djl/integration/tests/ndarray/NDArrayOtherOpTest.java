@@ -556,6 +556,7 @@ public class NDArrayOtherOpTest {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray actual = manager.create(new float[] {2f, 2f, 3f, 3f});
             Assert.assertEquals(actual, original.clip(2.0, 3.0));
+            Assert.assertEquals(actual, original.clip(2, 3));
             // multi-dim
             original =
                     manager.create(new float[] {5f, 4f, 2f, 5f, 6f, 7f, 2f, 22f, -23f, -2f})
@@ -565,13 +566,17 @@ public class NDArrayOtherOpTest {
                             new float[] {3f, 3f, 2f, 3f, 3f, 3f, 2f, 3f, 2f, 2f},
                             new Shape(2, 1, 5, 1));
             Assert.assertEquals(actual, original.clip(2.0, 3.0));
+            Assert.assertEquals(actual, original.clip(2, 3));
+
             // scalar
             original = manager.create(5f);
             actual = manager.create(1f);
             Assert.assertEquals(actual, original.clip(0.0, 1.0));
+            Assert.assertEquals(actual, original.clip(0, 1));
             // zero-dim
             original = manager.create(new Shape(0, 0));
             Assert.assertEquals(original, original.clip(0.0, 1.0));
+            Assert.assertEquals(original, original.clip(0, 1));
         }
     }
 

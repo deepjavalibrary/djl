@@ -1116,7 +1116,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray clip(double min, double max) {
+    public NDArray clip(Number min, Number max) {
         return array.clip(min, max);
     }
 

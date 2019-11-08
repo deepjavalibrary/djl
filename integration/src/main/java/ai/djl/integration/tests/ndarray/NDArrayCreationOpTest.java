@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -198,13 +199,28 @@ public class NDArrayCreationOpTest {
     @Test
     public void testArange() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
-            NDArray actual = manager.arange(0, 10, 1);
+            NDArray array = manager.arange(0, 10, 1);
+            NDArray actual = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
             Assert.assertEquals(actual, array);
-            actual = manager.arange(0, 10, 1);
+            array = manager.arange(0, 10, 1);
             Assert.assertEquals(actual, array);
-            actual = manager.arange(10);
+            array = manager.arange(10);
             Assert.assertEquals(actual, array);
+            array = manager.arange(3.5);
+            actual = manager.create(new float[] {0f, 1f, 2f, 3f});
+            Assert.assertEquals(actual, array);
+            array = manager.arange(0.1, 5.4, 0.3);
+            actual =
+                    manager.create(
+                            new float[] {
+                                0.1f, 0.4f, 0.7f, 1f, 1.3f, 1.6f, 1.9f, 2.2f, 2.5f, 2.8f, 3.1f,
+                                3.4f, 3.7f, 4f, 4.3f, 4.6f, 4.9f, 5.2f
+                            });
+            Assertions.assertAlmostEquals(actual, array);
+            array = manager.arange(0, 2, 0.3);
+            actual = manager.create(new float[] {0f, 0.3f, 0.6f, 0.9f, 1.2f, 1.5f, 1.8f});
+            Assertions.assertAlmostEquals(actual, array);
+
             // test 0 dimension
             array = manager.arange(10, 0, 1);
             actual = manager.create(new Shape(0));
@@ -217,8 +233,8 @@ public class NDArrayCreationOpTest {
     @Test
     public void testEye() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.eye(2);
-            NDArray actual = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
+            NDArray actual = manager.eye(2);
+            NDArray array = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
             Assert.assertEquals(actual, array);
             array = manager.eye(2, 3, 0);
             actual = manager.create(new float[] {1f, 0f, 0f, 0f, 1f, 0f}, new Shape(2, 3));

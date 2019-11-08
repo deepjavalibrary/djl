@@ -2306,23 +2306,7 @@ public interface NDArray extends AutoCloseable {
      * @return an {@code NDArray} with the elements of this {@code NDArray}, but where values &lt;
      *     min are replaced with min, and those &gt; max with max
      */
-    NDArray clip(double min, double max);
-
-    /**
-     * Clips (limit) the values in this {@code NDArray}.
-     *
-     * <p>Given an interval, values outside the interval are clipped to the interval edges. For
-     * example, if an interval of [0, 1] is specified, values smaller than 0 become 0, and values
-     * larger than 1 become 1.
-     *
-     * @param min the minimum value int type
-     * @param max the maximum value int type
-     * @return an {@code NDArray} with the elements of this {@code NDArray}, but where values &lt;
-     *     min are replaced with min, and those &gt; max with max
-     */
-    default NDArray clip(int min, int max) {
-        return clip((double) min, (double) max);
-    }
+    NDArray clip(Number min, Number max);
 
     /**
      * Interchanges two axes of this {@code NDArray}.

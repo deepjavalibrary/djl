@@ -1421,7 +1421,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray clip(double min, double max) {
+    public NDArray clip(Number min, Number max) {
         MxOpParams params = new MxOpParams();
         params.addParam("a_min", min);
         params.addParam("a_max", max);

@@ -160,12 +160,14 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(int start, int stop, int step, DataType dataType, Device dev) {
+    public NDArray arange(Number start, Number stop, Number step, DataType dataType, Device dev) {
         MxOpParams params = new MxOpParams();
         params.addParam("start", start);
         params.addParam("stop", stop);
         params.addParam("step", step);
-        params.setDataType(dataType);
+        if (dataType != null) {
+            params.setDataType(dataType);
+        }
         params.setDevice(Device.defaultIfNull(dev, device));
         return invoke("_npi_arange", params);
     }
@@ -184,7 +186,7 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(double start, double stop, int num, boolean endpoint, Device dev) {
+    public NDArray linspace(Number start, Number stop, int num, boolean endpoint, Device dev) {
         if (num < 0) {
             throw new IllegalArgumentException("Num argument must be non-negative");
         }
@@ -193,7 +195,6 @@ public class MxNDManager implements NDManager {
         params.addParam("stop", stop);
         params.addParam("num", num);
         params.addParam("endpoint", endpoint);
-        params.setDataType(DataType.FLOAT32);
         params.setDevice(Device.defaultIfNull(dev, device));
         return invoke("_npi_linspace", params);
     }
@@ -201,26 +202,30 @@ public class MxNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, DataType dataType, Device dev) {
+            Number low, Number high, Shape shape, DataType dataType, Device dev) {
         MxOpParams params = new MxOpParams();
         params.addParam("low", low);
         params.addParam("high", high);
         params.addParam("size", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
-        params.setDataType(dataType);
+        if (dataType != null) {
+            params.setDataType(dataType);
+        }
         return invoke("_npi_uniform", params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, DataType dataType, Device dev) {
+            Number loc, Number scale, Shape shape, DataType dataType, Device dev) {
         MxOpParams params = new MxOpParams();
         params.addParam("loc", loc);
         params.addParam("scale", scale);
         params.addParam("size", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
-        params.setDataType(dataType);
+        if (dataType != null) {
+            params.setDataType(dataType);
+        }
         return invoke("_npi_normal", params);
     }
 

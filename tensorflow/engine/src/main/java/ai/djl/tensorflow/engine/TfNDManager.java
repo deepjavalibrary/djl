@@ -144,7 +144,8 @@ public class TfNDManager implements NDManager, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
+    public NDArray arange(
+            Number start, Number stop, Number step, DataType dataType, Device device) {
         return null;
     }
 
@@ -156,21 +157,21 @@ public class TfNDManager implements NDManager, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(double start, double stop, int num, boolean endpoint, Device device) {
+    public NDArray linspace(Number start, Number stop, int num, boolean endpoint, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, DataType dataType, Device device) {
+            Number low, Number high, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, DataType dataType, Device device) {
+            Number loc, Number scale, Shape shape, DataType dataType, Device device) {
         return null;
     }
 

@@ -962,7 +962,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray clip(double min, double max) {
+    public NDArray clip(Number min, Number max) {
         return null;
     }
 
