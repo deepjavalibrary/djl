@@ -59,11 +59,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
     /** {@inheritDoc} */
     @Override
     protected void train(Arguments arguments) throws IOException, ModelNotFoundException {
-        try (Model model =
-                getModel(
-                        arguments.getIsSymbolic(),
-                        arguments.getPreTrained(),
-                        arguments.getModelDir())) {
+        try (Model model = getModel(arguments)) {
             batchSize = arguments.getBatchSize();
             // get training dataset
             Dataset trainDataset = getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
@@ -104,13 +100,19 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         }
     }
 
-    private Model getModel(boolean isSymbolic, boolean preTrained, String path)
+    private Model getModel(Arguments arguments)
             throws IOException, ModelNotFoundException, MalformedModelException {
+        boolean isSymbolic = arguments.isSymbolic();
+        boolean preTrained = arguments.isPreTrained();
+        String path = arguments.getModelDir();
+        Map<String, String> criteria = arguments.getCriteria();
         if (isSymbolic) {
             // load the model
-            Map<String, String> criteria = new ConcurrentHashMap<>();
-            criteria.put("layers", "152");
-            criteria.put("flavor", "v1d");
+            if (criteria == null) {
+                criteria = new ConcurrentHashMap<>();
+                criteria.put("layers", "50");
+                criteria.put("flavor", "v1");
+            }
             Model model = MxModelZoo.RESNET.loadModel(criteria);
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
@@ -151,7 +153,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
     private TrainingConfig setupTrainingConfig(Arguments arguments) {
         // epoch number to change learning rate
         int[] epochs;
-        if (arguments.getPreTrained()) {
+        if (arguments.isPreTrained()) {
             epochs = new int[] {2, 5, 8};
         } else {
             epochs = new int[] {20, 60, 90, 120, 180};

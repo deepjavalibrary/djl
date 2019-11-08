@@ -13,6 +13,10 @@
 package ai.djl.examples.training.util;
 
 import ai.djl.engine.Engine;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -27,6 +31,7 @@ public class Arguments {
     private String outputDir;
     private long maxIterations;
     private String modelDir;
+    private Map<String, String> criteria;
 
     public Arguments(CommandLine cmd) {
         if (cmd.hasOption("epoch")) {
@@ -60,6 +65,10 @@ public class Arguments {
             modelDir = cmd.getOptionValue("model-dir");
         } else {
             modelDir = null;
+        }
+        if (cmd.hasOption("criteria")) {
+            Type type = new TypeToken<Map<String, String>>() {}.getType();
+            criteria = new Gson().fromJson(cmd.getOptionValue("criteria"), type);
         }
     }
 
@@ -119,6 +128,13 @@ public class Arguments {
                         .argName("MODEL-DIR")
                         .desc("pre-trained model file directory")
                         .build());
+        options.addOption(
+                Option.builder("r")
+                        .longOpt("criteria")
+                        .hasArg()
+                        .argName("CRITERIA")
+                        .desc("The criteria used for the model.")
+                        .build());
         return options;
     }
 
@@ -134,11 +150,11 @@ public class Arguments {
         return maxGpus;
     }
 
-    public boolean getIsSymbolic() {
+    public boolean isSymbolic() {
         return isSymbolic;
     }
 
-    public boolean getPreTrained() {
+    public boolean isPreTrained() {
         return preTrained;
     }
 
@@ -152,5 +168,9 @@ public class Arguments {
 
     public long getMaxIterations() {
         return maxIterations;
+    }
+
+    public Map<String, String> getCriteria() {
+        return criteria;
     }
 }
