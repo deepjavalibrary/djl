@@ -20,6 +20,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.util.PairList;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 class MxNDArrayEx implements NDArrayEx {
 
@@ -27,6 +28,37 @@ class MxNDArrayEx implements NDArrayEx {
 
     MxNDArrayEx(MxNDArray parent) {
         this.array = parent;
+    }
+
+    // TODO only used to calculate zero-dim numpy shape
+    // remove it once MXNet have all the np op that we support
+    private Shape deriveBroadcastedShape(Shape lhs, Shape rhs) {
+        long[] result = new long[Math.max(lhs.dimension(), rhs.dimension())];
+        long lDiff = result.length - lhs.dimension();
+        long rDiff = result.length - rhs.dimension();
+        for (int i = 0; i < result.length; i++) {
+            long l = 1;
+            long r = 1;
+            if (i >= lDiff) {
+                l = lhs.get(Math.toIntExact(i - lDiff));
+            }
+            if (i >= rDiff) {
+                r = rhs.get(Math.toIntExact(i - rDiff));
+            }
+            if (l != r) {
+                if (l != 1 && r != 1) {
+                    throw new IllegalArgumentException(
+                            "operands could not be broadcast together with shapes "
+                                    + lhs
+                                    + " "
+                                    + rhs);
+                }
+                result[i] = (l == 1) ? r : l;
+            } else {
+                result[i] = l;
+            }
+        }
+        return new Shape(result);
     }
 
     ////////////////////////////////////////
@@ -630,6 +662,77 @@ class MxNDArrayEx implements NDArrayEx {
         params.add("mode", mode);
         return getManager().invoke("pick", new NDList(array, index), params).singletonOrThrow();
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray where(NDArray condition, NDArray other) {
+        NDArray array1;
+        NDArray array2;
+        condition =
+                (condition.getDataType() == DataType.BOOLEAN)
+                        ? condition.asType(DataType.INT32, false)
+                        : condition;
+        if (!array.getShape().equals(other.getShape())) {
+            Shape res = deriveBroadcastedShape(array.getShape(), other.getShape());
+            array1 = (!res.equals(array.getShape())) ? array.broadcast(res) : array;
+            array2 = (!res.equals(other.getShape())) ? other.broadcast(res) : other;
+        } else {
+            array1 = array;
+            array2 = other;
+        }
+        try {
+            return getManager().invoke("where", new NDArray[] {condition, array1, array2}, null);
+        } finally {
+            if (array1 != array) {
+                array1.close();
+            }
+            if (array2 != other) {
+                array2.close();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stack(NDList arrays, int axis) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", axis);
+        NDArray[] srcArray = new NDArray[arrays.size() + 1];
+        srcArray[0] = array;
+        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
+        return getManager().invoke("_npi_stack", srcArray, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray concat(NDList list, int axis) {
+        NDArray[] arrays = list.toArray(new NDArray[0]);
+        if (Stream.of(arrays).allMatch(array -> array.getShape().dimension() == 0)) {
+            throw new IllegalArgumentException(
+                    "scalar(zero-dimensional) arrays cannot be concatenated");
+        }
+        int dimension = arrays[0].getShape().dimension();
+        for (int i = 1; i < arrays.length; i++) {
+            if (arrays[i].getShape().dimension() != dimension) {
+                throw new IllegalArgumentException(
+                        "all the input arrays must have same number of dimensions, but the array at index 0 has "
+                                + dimension
+                                + " dimension(s) and the array at index "
+                                + i
+                                + " has "
+                                + arrays[i].getShape().dimension()
+                                + " dimension(s)");
+            }
+        }
+        MxOpParams params = new MxOpParams();
+        // MXNet backend use dim as argument name
+        params.addParam("dim", axis);
+        NDArray[] srcArray = new NDArray[arrays.length + 1];
+        srcArray[0] = array;
+        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
+        return getManager().invoke("_npi_concatenate", srcArray, params);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDList multiBoxTarget(

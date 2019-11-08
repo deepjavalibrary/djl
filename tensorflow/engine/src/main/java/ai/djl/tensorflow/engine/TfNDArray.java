@@ -320,12 +320,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray where(NDArray condition, NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray add(Number n) {
         return null;
     }
@@ -793,18 +787,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray squeeze(int[] axes) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray stack(NDList arrays, int axis) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray concat(NDList arrays, int axis) {
         return null;
     }
 

@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class MxNDArray extends NativeResource implements NDArray {
 
@@ -569,35 +568,6 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray lte(NDArray other) {
         return manager.invoke("_npi_less_equal", new NDArray[] {this, other}, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray where(NDArray condition, NDArray other) {
-        NDArray array1;
-        NDArray array2;
-        condition =
-                (condition.getDataType() == DataType.BOOLEAN)
-                        ? condition.asType(DataType.INT32, false)
-                        : condition;
-        if (!getShape().equals(other.getShape())) {
-            Shape res = deriveBroadcastedShape(getShape(), other.getShape());
-            array1 = (!res.equals(getShape())) ? broadcast(res) : this;
-            array2 = (!res.equals(other.getShape())) ? other.broadcast(res) : other;
-        } else {
-            array1 = this;
-            array2 = other;
-        }
-        try {
-            return manager.invoke("where", new NDArray[] {condition, array1, array2}, null);
-        } finally {
-            if (array1 != this) {
-                array1.close();
-            }
-            if (array2 != other) {
-                array2.close();
-            }
-        }
     }
 
     /** {@inheritDoc} */
@@ -1172,47 +1142,6 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray stack(NDList arrays, int axis) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("axis", axis);
-        NDArray[] srcArray = new NDArray[arrays.size() + 1];
-        srcArray[0] = this;
-        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
-        return manager.invoke("_npi_stack", srcArray, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray concat(NDList list, int axis) {
-        NDArray[] arrays = list.toArray(new NDArray[0]);
-        if (Stream.of(arrays).allMatch(array -> array.getShape().dimension() == 0)) {
-            throw new IllegalArgumentException(
-                    "scalar(zero-dimensional) arrays cannot be concatenated");
-        }
-        int dimension = arrays[0].getShape().dimension();
-        for (int i = 1; i < arrays.length; i++) {
-            if (arrays[i].getShape().dimension() != dimension) {
-                throw new IllegalArgumentException(
-                        "all the input arrays must have same number of dimensions, but the array at index 0 has "
-                                + dimension
-                                + " dimension(s) and the array at index "
-                                + i
-                                + " has "
-                                + arrays[i].getShape().dimension()
-                                + " dimension(s)");
-            }
-        }
-        MxOpParams params = new MxOpParams();
-        // MXNet backend use dim as argument name
-        params.addParam("dim", axis);
-        NDArray[] srcArray = new NDArray[arrays.length + 1];
-        srcArray[0] = this;
-        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
-        return manager.invoke("_npi_concatenate", srcArray, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray logicalAnd(NDArray other) {
         // TODO switch to numpy op, although current op support zero-dim, scalar
         NDArray thisArr =
@@ -1660,37 +1589,6 @@ public class MxNDArray extends NativeResource implements NDArray {
             throw new IllegalArgumentException(
                     "array size (" + size + ") do not match NDArray shape: " + shape);
         }
-    }
-
-    // TODO only used to calculate zero-dim numpy shape
-    // remove it once MXNet have all the np op that we support
-    private Shape deriveBroadcastedShape(Shape lhs, Shape rhs) {
-        long[] result = new long[Math.max(lhs.dimension(), rhs.dimension())];
-        long lDiff = result.length - lhs.dimension();
-        long rDiff = result.length - rhs.dimension();
-        for (int i = 0; i < result.length; i++) {
-            long l = 1;
-            long r = 1;
-            if (i >= lDiff) {
-                l = lhs.get(Math.toIntExact(i - lDiff));
-            }
-            if (i >= rDiff) {
-                r = rhs.get(Math.toIntExact(i - rDiff));
-            }
-            if (l != r) {
-                if (l != 1 && r != 1) {
-                    throw new IllegalArgumentException(
-                            "operands could not be broadcast together with shapes "
-                                    + lhs
-                                    + " "
-                                    + rhs);
-                }
-                result[i] = (l == 1) ? r : l;
-            } else {
-                result[i] = l;
-            }
-        }
-        return new Shape(result);
     }
 
     public void waitToRead() {

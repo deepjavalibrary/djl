@@ -417,6 +417,74 @@ public interface NDArrayEx {
         return pick(index, axis, keepDims, "clip");
     }
 
+    /**
+     * Returns elements chosen from the {@code NDArray} or the other {@code NDArray} depending on
+     * condition.
+     *
+     * <p>Given three {@code NDArray}s, condition, this, and other, returns an {@code NDArray} with
+     * the elements from this or other, depending on whether the elements from condition {@code
+     * NDArray} are {@code true} or {@code false}. If condition has the same shape as this, each
+     * element in the output {@code NDArray} is from this if the corresponding element in the
+     * condition is {@code true}, and from other if {@code false}.
+     *
+     * <p>Note that all non-zero values are interpreted as {@code true} in condition {@link
+     * NDArray}.
+     *
+     * @param condition the condition {@code NDArray}
+     * @param other the other {@code NDArray}
+     * @return the result {@code NDArray}
+     */
+    NDArray where(NDArray condition, NDArray other);
+
+    /**
+     * Joins a sequence of {@code NDArray}s in {@link NDList} along a new axis.
+     *
+     * <p>The axis parameter specifies the index of the new axis in the dimensions of the result.
+     * For example, if axis=0 it will be the first dimension and if axis=-1 it will be the last
+     * dimension.
+     *
+     * @param arrays the input {@link NDList}. Each {@code NDArray} in the {@link NDList} must have
+     *     the same shape as the {@code NDArray}
+     * @param axis the axis in the result {@code NDArray} along which the input {@link NDList} are
+     *     stacked
+     * @return the result {@code NDArray}. The stacked {@code NDArray} has one more dimension than
+     *     the the {@code NDArray}
+     */
+    NDArray stack(NDList arrays, int axis);
+
+    /**
+     * Joins a sequence of {@code NDArray}s in {@link NDList} along first axis.
+     *
+     * @param arrays the input {@link NDList}. Each {@code NDArray} in the {@link NDList} must have
+     *     the same shape as the {@code NDArray}
+     * @return the result {@code NDArray}. The stacked {@code NDArray} has one more dimension than
+     *     the {@code NDArray}s in {@link NDList}
+     */
+    default NDArray stack(NDList arrays) {
+        return stack(arrays, 0);
+    }
+
+    /**
+     * Joins a {@link NDList} along an existing axis.
+     *
+     * @param arrays a {@link NDList} which have the same shape as the {@code NDArray}, except in
+     *     the dimension corresponding to axis
+     * @param axis the axis along which the {@link NDList} will be joined
+     * @return the concatenated {@code NDArray}
+     */
+    NDArray concat(NDList arrays, int axis);
+
+    /**
+     * Joins a {@link NDList} along first axis.
+     *
+     * @param arrays a {@link NDList} which have the same shape as the {@code NDArray}, except in
+     *     the dimension corresponding to axis
+     * @return the concatenated {@code NDArray}
+     */
+    default NDArray concat(NDList arrays) {
+        return concat(arrays, 0);
+    }
+
     // TODO Add default implementation
 
     /**

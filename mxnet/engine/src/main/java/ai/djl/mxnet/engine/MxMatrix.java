@@ -522,12 +522,6 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray where(NDArray condition, NDArray other) {
-        return array.where(condition, other);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray add(Number n) {
         return array.add(n);
     }
@@ -968,18 +962,6 @@ public class MxMatrix implements Matrix {
     @Override
     public NDArray squeeze(int[] axes) {
         return array.squeeze(axes);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray stack(NDList arrays, int axis) {
-        return array.stack(arrays, axis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray concat(NDList arrays, int axis) {
-        return array.concat(arrays, axis);
     }
 
     /** {@inheritDoc} */

@@ -198,21 +198,18 @@ public class NDArrayShapesManipulationOpTest {
             NDArray array1 = manager.create(new float[] {1f});
             NDArray array2 = manager.create(new float[] {2f});
             NDArray actual = manager.create(new float[] {1f, 2f});
-            Assert.assertEquals(actual, array1.concat(new NDList(array2), 0));
-            Assert.assertEquals(actual, NDArrays.concat(new NDList(array1, array2), 0));
+            //            Assert.assertEquals(actual, NDArrays.concat(new NDList(array1, array2),
+            // 0));
             Assert.assertEquals(actual, array1.concat(array2));
 
             array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             array2 = manager.create(new float[] {5f, 6f, 7f, 8f}, new Shape(2, 2));
             actual = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f, 7, 8f}, new Shape(4, 2));
-            Assert.assertEquals(actual, array1.concat(new NDList(array2)));
             Assert.assertEquals(actual, NDArrays.concat(new NDList(array1, array2)));
             Assert.assertEquals(actual, array1.concat(array2));
             actual = manager.create(new float[] {1f, 2f, 5f, 6f, 3f, 4f, 7f, 8f}, new Shape(2, 4));
-            Assert.assertEquals(actual, array1.concat(new NDList(array2), 1));
             Assert.assertEquals(actual, NDArrays.concat(new NDList(array1, array2), 1));
             actual = manager.create(new float[] {1f, 2f, 5f, 6f, 3f, 4f, 7f, 8f}, new Shape(2, 4));
-            Assert.assertEquals(actual, array1.concat(new NDList(array2), 1));
             Assert.assertEquals(actual, NDArrays.concat(new NDList(array1, array2), 1));
 
             // zero-dim

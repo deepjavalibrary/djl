@@ -25,6 +25,17 @@ public final class NDArrays {
     ////////////////////////////////////////
 
     /**
+     * Returns {@code true} if all elements in {@link NDArray} a are equal to {@link NDArray} b.
+     *
+     * @param a the {@link NDArray} to compare
+     * @param b the {@link NDArray} to compare
+     * @return the boolean result
+     */
+    public static boolean contenEquals(NDArray a, NDArray b) {
+        return a.contentEquals(b);
+    }
+
+    /**
      * Checks 2 {@link NDArray}s for equal shapes.
      *
      * <p>Shapes are considered equal if:
@@ -314,7 +325,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray where(NDArray condition, NDArray a, NDArray b) {
-        return a.where(condition, b);
+        return a.getNDArrayInternal().where(condition, b);
     }
 
     /**
@@ -885,7 +896,7 @@ public final class NDArrays {
      */
     public static NDArray stack(NDList arrays, int axis) {
         NDArray array = arrays.head();
-        return array.stack(arrays.subNDList(1), axis);
+        return array.getNDArrayInternal().stack(arrays.subNDList(1), axis);
     }
 
     /**
@@ -910,7 +921,7 @@ public final class NDArrays {
      */
     public static NDArray concat(NDList arrays, int axis) {
         NDArray array = arrays.head();
-        return array.concat(arrays.subNDList(1), axis);
+        return array.getNDArrayInternal().concat(arrays.subNDList(1), axis);
     }
 
     /**

@@ -323,12 +323,6 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray where(NDArray condition, NDArray other) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray add(Number n) {
         return null;
     }
@@ -798,19 +792,6 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray stack(NDList arrays, int axis) {
-        Shape newShape = new Shape(arrays.size() + 1).addAll(getShape());
-        return new MockNDArray(manager, device, newShape, dataType, sparseFormat);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray concat(NDList arrays, int axis) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray logicalAnd(NDArray other) {
         return null;
     }
@@ -1070,7 +1051,7 @@ public class MockNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArrayEx getNDArrayInternal() {
-        return null;
+        return new MockNDArrayEx(this);
     }
 
     /** {@inheritDoc} */
