@@ -600,6 +600,30 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray maximum(Number n) {
+        return array.maximum(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray maximum(NDArray other) {
+        return array.maximum(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray minimum(Number n) {
+        return array.maximum(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray minimum(NDArray other) {
+        return array.maximum(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray addi(Number n) {
         return array.addi(n);
     }

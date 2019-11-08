@@ -136,34 +136,6 @@ class MxNDArrayEx implements NDArrayEx {
         return array;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDArray max(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        return getManager().invoke("_npi_maximum_scalar", array, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray max(NDArray other) {
-        return getManager().invoke("_npi_maximum", new NDArray[] {array, other}, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray min(NDArray other) {
-        return getManager().invoke("_npi_minimum", new NDArray[] {array, other}, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray min(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        return getManager().invoke("_npi_minimum_scalar", array, params);
-    }
-
     ////////////////////////////////////////
     // Activations
     ////////////////////////////////////////

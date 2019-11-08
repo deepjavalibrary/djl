@@ -318,77 +318,73 @@ public final class NDArrays {
     }
 
     /**
-     * Returns element-wise maximum of the input arrays with broadcasting.
+     * Returns the maximum of a {@link NDArray} and a number element-wise.
      *
-     * @param a the NDArray holding the elements to be compared. They must have the same shape, or
-     *     shapes that can be broadcast to a single shape.
-     * @param n the number to be compared against
-     * @return the maximum of a and b, element-wise
+     * @param a the {@link NDArray} to be compared
+     * @param n the number to be compared
+     * @return the maximum of a {@link NDArray} and a number element-wise
      */
-    public static NDArray max(NDArray a, Number n) {
-        return a.getNDArrayInternal().max(n);
+    public static NDArray maximum(NDArray a, Number n) {
+        return a.maximum(n);
     }
 
     /**
-     * Returns element-wise maximum of the input arrays with broadcasting.
+     * Returns the maximum of a number and a {@link NDArray} element-wise.
      *
-     * @param n the number to be compared against
-     * @param a the NDArray holding the elements to be compared. They must have the same shape, or
-     *     shapes that can be broadcast to a single shape.
-     * @return the maximum of a and b, element-wise
+     * @param n the number to be compared
+     * @param a the {@link NDArray} to be compared
+     * @return the maximum of a number and a {@link NDArray} element-wise
      */
-    public static NDArray max(Number n, NDArray a) {
-        return max(a, n);
+    public static NDArray maximum(Number n, NDArray a) {
+        return maximum(a, n);
     }
 
     /**
-     * Returns element-wise maximum of the input arrays with broadcasting.
+     * Returns the maximum of {@link NDArray} a and {@link NDArray} b element-wise.
      *
-     * @param a the NDArray holding the elements to be compared. They must have the same shape, or
-     *     shapes that can be broadcast to a single shape.
-     * @param b the NDArray holding the elements to be compared. They must have the same shape, or
-     *     shapes that can be broadcast to a single shape.
-     * @return the maximum of a and b, element-wise
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * @param a the {@link NDArray} to be compared
+     * @param b the {@link NDArray} to be compared
+     * @return the maximum of {@link NDArray} a and {@link NDArray} b element-wise
      */
-    public static NDArray max(NDArray a, NDArray b) {
-        return a.getNDArrayInternal().max(b);
+    public static NDArray maximum(NDArray a, NDArray b) {
+        return a.maximum(b);
     }
 
     /**
-     * Returns element-wise minimum of the input arrays with broadcasting.
+     * Returns the minimum of a {@link NDArray} and a number element-wise.
      *
-     * @param a the NDArray holding the elements to be compared. They must have the same shape, or
-     *     shapes that can be broadcast to a single shape.
-     * @param n the number to be compared against
-     * @return the minimum of a and b, element-wise
+     * @param a the {@link NDArray} to be compared
+     * @param n the number to be compared
+     * @return the minimum of a {@link NDArray} and a number element-wise
      */
-    public static NDArray min(NDArray a, Number n) {
-        return a.getNDArrayInternal().min(n);
+    public static NDArray minimum(NDArray a, Number n) {
+        return a.minimum(n);
     }
 
     /**
-     * Returns element-wise minimum of the input arrays with broadcasting.
+     * Returns the minimum of a number and a {@link NDArray} element-wise.
      *
-     * @param n the number to be compared against
-     * @param a the NDArray holding the elements to be compared. They must have the same shape, or
-     *     shapes that can be broadcast to a single shape.
-     * @return the minimum of a and b, element-wise
+     * @param n the number to be compared
+     * @param a the {@link NDArray} to be compared
+     * @return the minimum of a number and a {@link NDArray} element-wise
      */
-    public static NDArray min(Number n, NDArray a) {
-        return min(a, n);
+    public static NDArray minimum(Number n, NDArray a) {
+        return minimum(a, n);
     }
 
     /**
-     * Returns element-wise minimum of the input arrays with broadcasting.
+     * Returns the minimum of {@link NDArray} a and {@link NDArray} b element-wise.
      *
-     * @param a the NDArray holding the elements to be compared. They must have the same shape, or
-     *     shapes that can be broadcast to a single shape.
-     * @param b the NDArray holding the elements to be compared. They must have the same shape, or
-     *     shapes that can be broadcast to a single shape.
-     * @return the minimum of a and b, element-wise
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * @param a the {@link NDArray} to be compared
+     * @param b the {@link NDArray} to be compared
+     * @return the minimum of {@link NDArray} a and {@link NDArray} b element-wise
      */
-    public static NDArray min(NDArray a, NDArray b) {
-        return a.getNDArrayInternal().min(b);
+    public static NDArray minimum(NDArray a, NDArray b) {
+        return a.minimum(b);
     }
 
     /**

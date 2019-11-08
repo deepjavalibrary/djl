@@ -999,6 +999,34 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray maximum(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return manager.invoke("_npi_maximum_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray maximum(NDArray other) {
+        return manager.invoke("_npi_maximum", new NDArray[] {this, other}, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray minimum(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        return manager.invoke("_npi_minimum_scalar", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray minimum(NDArray other) {
+        return manager.invoke("_npi_minimum", new NDArray[] {this, other}, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray max() {
         return manager.invoke("_np_max", this, null);
     }

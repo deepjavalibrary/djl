@@ -438,121 +438,171 @@ public class NDArrayElementComparisonOpTest {
     }
 
     @Test
-    public void testMaxScalar() {
+    public void testMaximumScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10);
-            NDArray result = NDArrays.max(array, 4);
+            NDArray result = array.maximum(4);
             NDArray actual = manager.create(new float[] {4f, 4f, 4f, 4f, 4f, 5f, 6f, 7f, 8f, 9f});
             Assert.assertEquals(actual, result);
+            result = NDArrays.maximum(array, 4);
+            Assert.assertEquals(actual, result);
+
             array = manager.create(new float[] {0.1f, 0.2f, 0.3f, 0.4f}, new Shape(2, 2, 1));
-            result = NDArrays.max(array, 0.2f);
+            result = array.maximum(0.2f);
             actual = manager.create(new float[] {0.2f, 0.2f, 0.3f, 0.4f}, new Shape(2, 2, 1));
             Assert.assertEquals(actual, result);
+            result = NDArrays.maximum(array, 0.2f);
+            Assert.assertEquals(actual, result);
+
             // test scalar
             array = manager.create(3.9999f);
-            result = NDArrays.max(array, 4);
+            result = array.maximum(4);
             actual = manager.create(4f);
             Assert.assertEquals(actual, result);
+            result = NDArrays.maximum(array, 4);
+            Assert.assertEquals(actual, result);
+
             // test zero-dim
             array = manager.create(new Shape(2, 0, 3, 0, 1, 0));
-            result = NDArrays.max(array, 2f);
+            result = array.maximum(2f);
             actual = manager.create(new Shape(2, 0, 3, 0, 1, 0));
+            Assert.assertEquals(actual, result);
+            result = NDArrays.maximum(array, 2f);
             Assert.assertEquals(actual, result);
         }
     }
 
     @Test
-    public void testMaxNDArray() {
+    public void testMaximumNDArray() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.create(new float[] {1f, 2f, 3f, 4f, 5f});
             NDArray array2 = manager.create(new float[] {5f, 4f, 3f, 2f, 1f});
-            NDArray result = NDArrays.max(array1, array2);
+            NDArray result = array1.maximum(array2);
             NDArray actual = manager.create(new float[] {5f, 4f, 3f, 4f, 5f});
             Assert.assertEquals(actual, result);
+            result = NDArrays.maximum(array1, array2);
+            Assert.assertEquals(actual, result);
+
             array1 = manager.arange(10).reshape(new Shape(2, 5));
             array2 = manager.create(new float[] {4f, 5f}, new Shape(2, 1));
-            result = NDArrays.max(array1, array2);
+            result = array1.maximum(array2);
             actual =
                     manager.create(
                             new float[] {4f, 4f, 4f, 4f, 4f, 5f, 6f, 7f, 8f, 9f}, new Shape(2, 5));
             Assert.assertEquals(actual, result);
+            result = NDArrays.maximum(array1, array2);
+            Assert.assertEquals(actual, result);
+
             // test scalar with scalar
             array1 = manager.create(0f);
             array2 = manager.create(1f);
-            result = NDArrays.max(array1, array2);
+            result = array1.maximum(array2);
             actual = manager.create(1f);
             Assert.assertEquals(actual, result);
+            result = NDArrays.maximum(array1, array2);
+            Assert.assertEquals(actual, result);
+
             // test NDArray with scalar
             array1 = manager.create(3f);
             array2 = manager.create(new float[] {3f, 3f, 3f, 2f}, new Shape(2, 2));
-            result = NDArrays.max(array1, array2);
+            result = array1.maximum(array2);
             actual = manager.ones(new Shape(2, 2)).mul(3);
             Assert.assertEquals(actual, result);
+            result = NDArrays.maximum(array1, array2);
+            Assert.assertEquals(actual, result);
+
             // test zero-dim with zero-dim
             array1 = manager.create(new Shape(0, 0, 1));
             array2 = manager.create(new Shape(1, 0, 0));
-            result = NDArrays.max(array1, array2);
+            result = array1.maximum(array2);
             actual = manager.create(new Shape(0, 0, 0));
             Assert.assertEquals(actual, result);
+            result = NDArrays.maximum(array1, array2);
+            Assert.assertEquals(actual, result);
         }
     }
 
     @Test
-    public void testMinScalar() {
+    public void testMinimumScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10);
-            NDArray result = NDArrays.min(array, 4);
+            NDArray result = array.minimum(4);
             NDArray actual = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 4f, 4f, 4f, 4f, 4f});
             Assert.assertEquals(actual, result);
+            result = NDArrays.minimum(array, 4);
+            Assert.assertEquals(actual, result);
+
             array = manager.create(new float[] {0.1f, 0.2f, 0.3f, 0.4f}, new Shape(2, 2, 1));
-            result = NDArrays.min(array, 0.2f);
+            result = array.minimum(0.2f);
             actual = manager.create(new float[] {0.1f, 0.2f, 0.2f, 0.2f}, new Shape(2, 2, 1));
             Assert.assertEquals(actual, result);
+            result = NDArrays.minimum(array, 0.2f);
+            Assert.assertEquals(actual, result);
+
             // test scalar
             array = manager.create(3.9999f);
-            result = NDArrays.min(array, 4);
+            result = array.minimum(4);
             actual = manager.create(3.9999f);
             Assert.assertEquals(actual, result);
+            result = NDArrays.minimum(array, 4);
+            Assert.assertEquals(actual, result);
+
             // test zero-dim
             array = manager.create(new Shape(1, 0));
-            result = NDArrays.min(array, 2f);
+            result = array.minimum(2f);
             actual = manager.create(new Shape(1, 0));
+            Assert.assertEquals(actual, result);
+            result = NDArrays.minimum(array, 2f);
             Assert.assertEquals(actual, result);
         }
     }
 
     @Test
-    public void testMinNDArray() {
+    public void testMinimumNDArray() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.create(new float[] {1f, 2f, 3f, 4f, 5f});
             NDArray array2 = manager.create(new float[] {5f, 4f, 3f, 2f, 1f});
-            NDArray result = NDArrays.min(array1, array2);
+            NDArray result = array1.minimum(array2);
             NDArray actual = manager.create(new float[] {1f, 2f, 3f, 2f, 1f});
             Assert.assertEquals(actual, result);
+            result = NDArrays.minimum(array1, array2);
+            Assert.assertEquals(actual, result);
+
             array1 = manager.arange(10).reshape(new Shape(2, 5));
             array2 = manager.create(new float[] {4f, 5f}, new Shape(2, 1));
-            result = NDArrays.min(array1, array2);
+            result = array1.minimum(array2);
             actual =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 5f, 5f, 5f, 5f}, new Shape(2, 5));
             Assert.assertEquals(actual, result);
+            result = NDArrays.minimum(array1, array2);
+            Assert.assertEquals(actual, result);
+
             // test scalar with scalar
             array1 = manager.create(0f);
             array2 = manager.create(1f);
-            result = NDArrays.min(array1, array2);
+            result = array1.minimum(array2);
             actual = manager.create(0f);
             Assert.assertEquals(actual, result);
+            result = NDArrays.minimum(array1, array2);
+            Assert.assertEquals(actual, result);
+
             // test NDArray with scalar
             array1 = manager.create(3f);
             array2 = manager.create(new float[] {3f, 3f, 3f, 2f}, new Shape(2, 2));
-            result = NDArrays.min(array1, array2);
+            result = array1.minimum(array2);
             actual = manager.create(new float[] {3f, 3f, 3f, 2f}, new Shape(2, 2));
             Assert.assertEquals(actual, result);
+            result = NDArrays.minimum(array1, array2);
+            Assert.assertEquals(actual, result);
+
             // test zero-dim with zero-dim
             array1 = manager.create(new Shape(0, 0, 1));
             array2 = manager.create(new Shape(1, 0, 0));
-            result = NDArrays.min(array1, array2);
+            result = array1.minimum(array2);
             actual = manager.create(new Shape(0, 0, 0));
+            Assert.assertEquals(actual, result);
+            result = NDArrays.minimum(array1, array2);
             Assert.assertEquals(actual, result);
         }
     }

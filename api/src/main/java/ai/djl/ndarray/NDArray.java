@@ -1061,6 +1061,42 @@ public interface NDArray extends AutoCloseable {
      */
     NDArray powi(NDArray other);
 
+    /**
+     * Returns the maximum of this {@code NDArray} and a number element-wise.
+     *
+     * @param n the number to be compared
+     * @return the maximum of this {@code NDArray} and a number element-wise.
+     */
+    NDArray maximum(Number n);
+
+    /**
+     * Returns the maximum of this {@code NDArray} and the other {@code NDArray} element-wise.
+     *
+     * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
+     * @param other the {@code NDArray} to be compared
+     * @return the maximum of this {@code NDArray} and the other {@code NDArray} element-wise
+     */
+    NDArray maximum(NDArray other);
+
+    /**
+     * Returns the minimum of this {@code NDArray} and a number element-wise.
+     *
+     * @param n the number to be compared
+     * @return the minimum of this {@code NDArray} and a number element-wise
+     */
+    NDArray minimum(Number n);
+
+    /**
+     * Returns the maximum of this {@code NDArray} and the other {@code NDArray} element-wise.
+     *
+     * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
+     * @param other the {@code NDArray} to be compared
+     * @return the maximum of this {@code NDArray} and the other {@code NDArray} element-wise
+     */
+    NDArray minimum(NDArray other);
+
     ////////////////////////////////////////
     // Operators: Basic Numeric
     ////////////////////////////////////////

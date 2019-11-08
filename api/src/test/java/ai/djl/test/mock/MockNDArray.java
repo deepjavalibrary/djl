@@ -401,6 +401,27 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray maximum(Number n) {
+        return null;
+    }
+    /** {@inheritDoc} */
+    @Override
+    public NDArray maximum(NDArray other) {
+        return null;
+    }
+    /** {@inheritDoc} */
+    @Override
+    public NDArray minimum(Number n) {
+        return null;
+    }
+    /** {@inheritDoc} */
+    @Override
+    public NDArray minimum(NDArray other) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray addi(Number n) {
         return null;
     }
