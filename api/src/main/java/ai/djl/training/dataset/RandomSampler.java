@@ -18,11 +18,23 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.stream.LongStream;
 
+/**
+ * {@code RandomSampler} is an implementation of the {@link
+ * ai.djl.training.dataset.Sampler.SubSampler} interface.
+ *
+ * <p>{@code RandomSampler} samples the data from [0, dataset.size) randomly.
+ */
 public class RandomSampler implements Sampler.SubSampler {
     private Integer seed;
 
+    /** Creates a new instance of {@code RandomSampler}. */
     public RandomSampler() {}
 
+    /**
+     * Creates a new instance of {@code RandomSampler} with the given seed.
+     *
+     * @param seed the value of the seed
+     */
     public RandomSampler(int seed) {
         this.seed = seed;
     }

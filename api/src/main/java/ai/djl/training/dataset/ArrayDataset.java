@@ -18,8 +18,9 @@ import ai.djl.ndarray.NDManager;
 import java.util.stream.Stream;
 
 /**
- * Dataset wrapping {@link NDArray}s. It is able to combine multiple data and labels. Each sample
- * will be retrieved by indexing {@link NDArray}s along the first dimension.
+ * {@code ArrayDataset} is an implementation of {@link RandomAccessDataset} that wraps {@link
+ * NDArray}s. It is able to combine multiple data and labels. Each sample will be retrieved by
+ * indexing {@link NDArray}s along the first dimension.
  *
  * <p>The following is an example of how to use ArrayDataset:
  *
@@ -40,12 +41,17 @@ public class ArrayDataset extends RandomAccessDataset {
     protected NDArray[] data;
     protected NDArray[] labels;
 
+    /**
+     * Creates a new instance of {@code ArrayDataset} with the arguments in {@link Builder}.
+     *
+     * @param builder a builder with the required arguments
+     */
     public ArrayDataset(BaseBuilder<?> builder) {
         super(builder);
         if (builder instanceof Builder) {
             Builder builder2 = (Builder) builder;
-            data = builder2.getData();
-            labels = builder2.getLabels();
+            data = builder2.data;
+            labels = builder2.labels;
 
             if (data != null && data.length != 0) {
                 size = data[0].size(0);
@@ -93,34 +99,55 @@ public class ArrayDataset extends RandomAccessDataset {
             return this;
         }
 
-        public NDArray[] getData() {
-            return data;
-        }
-
+        /**
+         * Sets the data as an {@link NDArray} for the {@code ArrayDataset}.
+         *
+         * @param data an {@link NDArray} that contains the data
+         * @return this Builder
+         */
         public Builder setData(NDArray data) {
             this.data = new NDArray[] {data};
             return self();
         }
 
+        /**
+         * Sets the data as an array of {@link NDArray} for the {@code ArrayDataset}.
+         *
+         * @param data an array of {@link NDArray} that contains the data
+         * @return this Builder
+         */
         public Builder setData(NDArray[] data) {
             this.data = data;
             return self();
         }
 
-        public NDArray[] getLabels() {
-            return labels;
-        }
-
+        /**
+         * Sets the label for the data in the {@code ArrayDataset}.
+         *
+         * @param labels an {@link NDArray} that contains the labels
+         * @return this Builder
+         */
         public Builder optLabels(NDArray labels) {
             this.labels = new NDArray[] {labels};
             return self();
         }
 
+        /**
+         * Sets the labels for the data in the {@code ArrayDataset}.
+         *
+         * @param labels an array of {@link NDArray} that contains the labels
+         * @return this Builder
+         */
         public Builder optLabels(NDArray[] labels) {
             this.labels = labels;
             return self();
         }
 
+        /**
+         * Builds a new instance of {@code ArrayDataset} with the specified data and labels.
+         *
+         * @return a new instance of {@code ArrayDataset}
+         */
         public ArrayDataset build() {
             return new ArrayDataset(this);
         }

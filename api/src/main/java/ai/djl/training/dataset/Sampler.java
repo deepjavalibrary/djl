@@ -18,10 +18,26 @@ import java.util.List;
 /** An interface for the indices sampler. */
 public interface Sampler {
 
+    /**
+     * Fetches an iterator that iterates through the given {@link RandomAccessDataset} in
+     * mini-batches of indices.
+     *
+     * @param dataset the {@link RandomAccessDataset} to sample from
+     * @return an iterator that iterates through the given {@link RandomAccessDataset} in
+     *     mini-batches of indices
+     */
     Iterator<List<Long>> sample(RandomAccessDataset dataset);
 
     interface SubSampler {
 
+        /**
+         * Fetches an iterator that iterates through the indices of the given {@link
+         * RandomAccessDataset}.
+         *
+         * @param dataset the {@link RandomAccessDataset} to sample from
+         * @return an iterator that iterates through the indices of the given {@link
+         *     RandomAccessDataset}
+         */
         Iterator<Long> sample(RandomAccessDataset dataset);
     }
 }

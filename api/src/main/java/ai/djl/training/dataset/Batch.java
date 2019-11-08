@@ -17,7 +17,19 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 
-/** Batch is used to get a batch of data and labels from {@link Dataset}. */
+/**
+ * {@code Batch} is used to get a batch of data and labels from {@link Dataset}.
+ *
+ * <p>In a {@code Batch}, data and label are each an {@link NDList}. The data {@link NDList}
+ * represents one batch of all different inputs. Similarly, the label {@link NDList} represents one
+ * batch of all different labels.
+ *
+ * <p>For example, a Discriminator, that discriminates between true and generated image, there are
+ * two inputs - true image, and generated image. In this case, the data in {@code Batch} will be an
+ * {@link NDList} of size 2, both of which will be {@link ai.djl.ndarray.NDArray} of shape (N, C, H,
+ * W). The label in {@code Batch} will be an {@link NDList} of size 1, which will be an {@link
+ * ai.djl.ndarray.NDArray} of layout (N, 2).
+ */
 public class Batch implements AutoCloseable {
 
     private NDManager manager;
@@ -25,6 +37,13 @@ public class Batch implements AutoCloseable {
     private NDList labels;
     private Batchifier batchifier;
 
+    /**
+     * Creates a new instance of {@code Batch} with the given manager, data and labels.
+     *
+     * @param manager the {@link NDManager} to be attached to data and labels
+     * @param data the {@link NDList} containing the data
+     * @param labels the {@link NDList} containing the labels
+     */
     public Batch(NDManager manager, NDList data, NDList labels) {
         this.manager = manager;
         data.attach(manager);
@@ -33,6 +52,14 @@ public class Batch implements AutoCloseable {
         this.labels = labels;
     }
 
+    /**
+     * Creates a new instance of {@code Batch} with the given manager, data and labels.
+     *
+     * @param manager the {@link NDManager} to be attached to data and labels
+     * @param data the {@link NDList} containing the data
+     * @param labels the {@link NDList} containing the labels
+     * @param batchifier the {@link Batchifier} that is used for split
+     */
     public Batch(NDManager manager, NDList data, NDList labels, Batchifier batchifier) {
         this.manager = manager;
         data.attach(manager);
@@ -42,14 +69,29 @@ public class Batch implements AutoCloseable {
         this.batchifier = batchifier;
     }
 
+    /**
+     * Gets the {@link NDManager} that is attached to this {@code Batch}.
+     *
+     * @return the {@link NDManager} attached to this {@code Batch}
+     */
     public NDManager getManager() {
         return manager;
     }
 
+    /**
+     * Gets the data of this {@code Batch}.
+     *
+     * @return an {@link NDList} that contains the data
+     */
     public NDList getData() {
         return data;
     }
 
+    /**
+     * Gets the labels corresponding to the data of this {@code Batch}.
+     *
+     * @return an {@link NDList} that contains the labels
+     */
     public NDList getLabels() {
         return labels;
     }
@@ -61,6 +103,16 @@ public class Batch implements AutoCloseable {
         manager = null;
     }
 
+    /**
+     * Splits the data and labels in the {@code Batch} across the given devices.
+     *
+     * <p>if {@code evenSplit} is {@code false}, that last device may have a smaller batch than the
+     * rest.
+     *
+     * @param devices an array of {@link Device} across which the data must be split
+     * @param evenSplit whether each slice must have the same shape
+     * @return an array of {@code Batch}, each of which corresponds to a {@link Device}
+     */
     public Batch[] split(Device[] devices, boolean evenSplit) {
         int size = devices.length;
         if (size == 1) {

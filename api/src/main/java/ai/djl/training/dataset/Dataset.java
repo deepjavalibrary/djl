@@ -14,9 +14,15 @@ package ai.djl.training.dataset;
 
 import ai.djl.ndarray.NDManager;
 
-/** An interface to represent Dataset. All the datasets should implement this interface. */
+/** An interface to represent a dataset. Every dataset must implement this interface. */
 public interface Dataset {
 
+    /**
+     * Fetches an iterator that can iterate through the {@link Dataset}.
+     *
+     * @param manager the dataset to iterate through
+     * @return an {@link Iterable} of {@link Batch} that contains batches of data from the dataset
+     */
     Iterable<Batch> getData(NDManager manager);
 
     enum Usage {

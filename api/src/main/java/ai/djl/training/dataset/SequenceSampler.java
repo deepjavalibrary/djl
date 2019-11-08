@@ -15,7 +15,12 @@ package ai.djl.training.dataset;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-/** Sampler the data from [0, dataset.size) sequentially. */
+/**
+ * {@code SequenceSampler} is an implementation of the {@link
+ * ai.djl.training.dataset.Sampler.SubSampler} interface.
+ *
+ * <p>{@code SequenceSampler} samples the data from [0, dataset.size) sequentially.
+ */
 public class SequenceSampler implements Sampler.SubSampler {
 
     /** {@inheritDoc} */

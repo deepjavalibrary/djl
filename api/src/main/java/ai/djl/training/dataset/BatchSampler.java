@@ -16,17 +16,41 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/** Wraps another subSampler to yield a mini-batch of indices. */
+/**
+ * {@code BatchSampler} is an implementation of the {@link Sampler} interface.
+ *
+ * <p>{@code BatchSampler} wraps another {@link ai.djl.training.dataset.Sampler.SubSampler} to yield
+ * a mini-batch of indices.
+ */
 public class BatchSampler implements Sampler {
 
     private Sampler.SubSampler subSampler;
     private long batchSize;
     private boolean dropLast;
 
+    /**
+     * Creates a new instance of {@code BatchSampler} that samples from the given {@link
+     * ai.djl.training.dataset.Sampler.SubSampler}, and yields a mini-batch of indices.
+     *
+     * <p>The last batch will not be dropped. The size of the last batch maybe smaller than batch
+     * size in case the size of the dataset is not a multiple of batch size.
+     *
+     * @param subSampler the {@link ai.djl.training.dataset.Sampler.SubSampler} to sample from
+     * @param batchSize the required batch size
+     */
     public BatchSampler(Sampler.SubSampler subSampler, long batchSize) {
         this(subSampler, batchSize, false);
     }
 
+    /**
+     * Creates a new instance of {@code BatchSampler} that samples from the given {@link
+     * ai.djl.training.dataset.Sampler.SubSampler}, and yields a mini-batch of indices.
+     *
+     * @param subSampler the {@link ai.djl.training.dataset.Sampler.SubSampler} to sample from
+     * @param batchSize the required batch size
+     * @param dropLast whether the {@code BatchSampler} should drop the last few samples in case the
+     *     size of the dataset is not a multiple of batch size
+     */
     public BatchSampler(Sampler.SubSampler subSampler, long batchSize, boolean dropLast) {
         this.subSampler = subSampler;
         this.batchSize = batchSize;

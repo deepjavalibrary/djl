@@ -14,21 +14,45 @@ package ai.djl.training.dataset;
 
 import ai.djl.ndarray.NDList;
 
-/** Record is used to get a single element of data and labels from {@link Dataset}. */
+/**
+ * {@code Record} represents a single element of data and labels from {@link Dataset}.
+ *
+ * <p>The data and labels in record are in the form of an {@link NDList}. This allows it to hold
+ * multiple types of data and labels. However, note that the {@link NDList} does not include a
+ * dimension for batch.
+ */
 public class Record {
 
     private NDList data;
     private NDList labels;
 
+    /**
+     * Creates a new instance of {@code Record} with a single element of data and its corresponding
+     * labels.
+     *
+     * @param data an {@link NDList} that contains a single element of data
+     * @param labels an {@link NDList} that contains the corresponding label
+     */
     public Record(NDList data, NDList labels) {
         this.data = data;
         this.labels = labels;
     }
 
+    /**
+     * Gets the data of this {@code Record}.
+     *
+     * @return an {@link NDList} that contains the data of this {@code Record}
+     */
     public NDList getData() {
         return data;
     }
 
+    /**
+     * Gets the labels that correspond to the data of this {@code Record}.
+     *
+     * @return an {@link NDList} that contains label that correspond to the data of this {@code
+     *     Record}
+     */
     public NDList getLabels() {
         return labels;
     }

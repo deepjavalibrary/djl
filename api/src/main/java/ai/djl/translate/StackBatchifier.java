@@ -19,8 +19,8 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /**
- * StackBatchifier is used to merge a list of samples to form a mini-batch of NDArray(s). The is
- * default Batchifier for data loading.
+ * {@code StackBatchifier} is used to merge a list of samples to form a mini-batch of NDArray(s).
+ * The is default {@link Batchifier} for data loading.
  */
 public class StackBatchifier implements Batchifier {
 
@@ -107,7 +107,7 @@ public class StackBatchifier implements Batchifier {
     }
 
     /**
-     * Splits an {@code NDArray} into `numOfSlice` slices along `batchAxis`.
+     * Splits an {@code NDArray} into the given number of slices along the given batch axis.
      *
      * <p>Usually used for data parallelism where each slices is sent to one device (i.e. GPU).
      *
