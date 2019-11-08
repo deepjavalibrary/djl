@@ -15,6 +15,7 @@ package ai.djl.nn;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.PairList;
 
 /**
  * {@code ParameterBlock} is an abstract implementation of {@link Block}. It is recommended that all
@@ -39,5 +40,66 @@ public abstract class ParameterBlock extends AbstractBlock {
     @Override
     public final BlockList getChildren() {
         return new BlockList();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        // FIXME: This is a quick hack for display in jupytor notebook.
+        StringBuilder sb = new StringBuilder(200);
+        String className = getClass().getSimpleName();
+        if (className.endsWith("Block")) {
+            className = className.substring(0, className.length() - 5);
+        }
+        sb.append(className).append('(');
+        if (initialized) {
+            PairList<String, Shape> inputShapes = describeInput();
+            appendShape(sb, inputShapes.values().toArray(new Shape[0]));
+            sb.append(" -> ");
+            Shape[] outputShapes =
+                    getOutputShapes(null, inputShapes.values().toArray(new Shape[0]));
+            appendShape(sb, outputShapes);
+        } else {
+            sb.append("Uninitialized");
+        }
+        sb.append(')');
+        return sb.toString();
+    }
+
+    private void appendShape(StringBuilder sb, Shape[] shapes) {
+        boolean first = true;
+        for (Shape shape : shapes) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(", ");
+            }
+            long[] sh = shape.getShape();
+            int length = sh.length;
+            if (length == 0) {
+                sb.append("()");
+            } else {
+                int index = 0;
+                if (sh[0] == -1) {
+                    --length;
+                    index = 1;
+                }
+
+                if (length == 0) {
+                    sb.append("()");
+                } else if (length == 1) {
+                    sb.append(sh[index]);
+                } else {
+                    sb.append('(');
+                    for (int i = index; i < sh.length; ++i) {
+                        if (i > index) {
+                            sb.append(", ");
+                        }
+                        sb.append(sh[i]);
+                    }
+                    sb.append(')');
+                }
+            }
+        }
     }
 }

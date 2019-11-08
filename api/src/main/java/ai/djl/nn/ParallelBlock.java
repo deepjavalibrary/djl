@@ -213,4 +213,16 @@ public class ParallelBlock extends AbstractBlock {
             block.loadParameters(manager, is);
         }
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("Parallel(\n");
+        for (Block block : blocks) {
+            sb.append('\t').append(block).append('\n');
+        }
+        sb.append(')');
+        return sb.toString();
+    }
 }

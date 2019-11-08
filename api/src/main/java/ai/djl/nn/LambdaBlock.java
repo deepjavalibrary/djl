@@ -97,4 +97,10 @@ public class LambdaBlock extends ParameterBlock {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
         }
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "Lambda()";
+    }
 }
