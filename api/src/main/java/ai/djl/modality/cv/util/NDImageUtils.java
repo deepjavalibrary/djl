@@ -16,46 +16,86 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
 
 /**
- * {@code NDImageUtils} is an image processing utility that can load, reshape, and convert images
- * using {@link NDArray} images.
+ * {@code NDImageUtils} is an image processing utility to load, reshape, and convert images using
+ * {@link NDArray} images.
  */
 public final class NDImageUtils {
 
     private NDImageUtils() {}
 
+    /**
+     * Resizes an image to the given size.
+     *
+     * @param image the image to resize
+     * @param size the new size to use for both height and width
+     * @return the resized NDList
+     */
     public static NDArray resize(NDArray image, int size) {
         return image.getNDArrayInternal().resize(size, size);
     }
 
+    /**
+     * Resizes an image to the given width and height.
+     *
+     * @param image the image to resize
+     * @param width the desired width
+     * @param height the desired height
+     * @return the resized NDList
+     */
     public static NDArray resize(NDArray image, int width, int height) {
         return image.getNDArrayInternal().resize(width, height);
     }
 
+    /**
+     * Normalizes an image NDArray of shape (C x H x W) or (N x C x H x W) with a single mean and
+     * standard deviation to apply to all channels.
+     *
+     * @param input the image to normalize
+     * @param mean the mean to normalize with (for all channels)
+     * @param std the standard deviation to normalize with (for all channels)
+     * @return the normalized NDArray
+     * @see NDImageUtils#normalize(NDArray, float[], float[])
+     */
     public static NDArray normalize(NDArray input, float mean, float std) {
         return normalize(input, new float[] {mean, mean, mean}, new float[] {std, std, std});
     }
 
     /**
-     * Normalizes a NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard
+     * Normalizes an image NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard
      * deviation.
      *
-     * <p>Given mean `(m1, ..., mn)` and std `(s\ :sub:`1`\ , ..., s\ :sub:`n`)` for `n` channels,
-     * this transform normalizes each channel of the input tensor with: output[i] = (input[i] - m\
-     * :sub:`i`\ ) / s\ :sub:`i`
+     * <p>Given mean {@code (m1, ..., mn)} and standard deviation {@code (s1, ..., sn} for {@code n}
+     * channels, this transform normalizes each channel of the input tensor with: {@code output[i] =
+     * (input[i] - m1) / (s1)}.
      *
-     * @param input the input image NDArray
-     * @param mean the mean value for each channel
-     * @param std the standard deviation for each channel
-     * @return the result of normalization
+     * @param input the image to normalize
+     * @param mean the mean to normalize with for each channel
+     * @param std the standard deviation to normalize with for each channel
+     * @return the normalized NDArray
      */
     public static NDArray normalize(NDArray input, float[] mean, float[] std) {
         return input.getNDArrayInternal().normalize(mean, std);
     }
 
+    /**
+     * Converts an image NDArray from preprocessing format to Neural Network format.
+     *
+     * <p>It converts the shape from NHWC to NCHW and divides by 255.
+     *
+     * @param image the image to convert
+     * @return the converted image
+     */
     public static NDArray toTensor(NDArray image) {
         return image.getNDArrayInternal().toTensor();
     }
 
+    /**
+     * Crops an image to a square of size {@code min(width, height)}.
+     *
+     * @param image the image to crop
+     * @return the cropped image
+     * @see NDImageUtils#centerCrop(NDArray, int, int)
+     */
     public static NDArray centerCrop(NDArray image) {
         Shape shape = image.getShape();
         int w = (int) shape.get(1);
@@ -72,6 +112,14 @@ public final class NDImageUtils {
         return centerCrop(image, w, w);
     }
 
+    /**
+     * Crops an image to a given width and height from the center of the image.
+     *
+     * @param image the image to crop
+     * @param width the desired width of the cropped image
+     * @param height the desired height of the cropped image
+     * @return the cropped image
+     */
     public static NDArray centerCrop(NDArray image, int width, int height) {
         Shape shape = image.getShape();
         int w = (int) shape.get(1);
@@ -97,10 +145,21 @@ public final class NDImageUtils {
         return crop(image, x, y, w, h);
     }
 
+    /**
+     * Crops an image with a given location and size.
+     *
+     * @param image the image to crop
+     * @param x the x coordinate of the top-left corner of the crop
+     * @param y the y coordinate of the top-left corner of the crop
+     * @param width the width of the cropped image
+     * @param height the height of the cropped image
+     * @return the cropped image
+     */
     public static NDArray crop(NDArray image, int x, int y, int width, int height) {
         return image.getNDArrayInternal().crop(x, y, width, height);
     }
 
+    /** Flag indicates the color channel options for images. */
     public enum Flag {
         GRAYSCALE,
         COLOR

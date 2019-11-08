@@ -26,8 +26,8 @@ import java.nio.file.Path;
 import javax.imageio.ImageIO;
 
 /**
- * {@code BufferedImageUtils} is an image processing utility that can load, reshape and convert
- * images using {@link BufferedImage}.
+ * {@code BufferedImageUtils} is an image processing utility to load, reshape and convert images
+ * using {@link BufferedImage}.
  */
 public final class BufferedImageUtils {
 
@@ -45,34 +45,39 @@ public final class BufferedImageUtils {
      *
      * @param path the path of the file to be loaded
      * @return a {@link BufferedImage}
-     * @throws IOException file is not found
+     * @throws IOException if file is not found
      */
     public static BufferedImage fromFile(Path path) throws IOException {
         return ImageIO.read(path.toAbsolutePath().toFile());
     }
 
+    /**
+     * Returns a random color.
+     *
+     * @return a random color
+     */
     public static Color randomColor() {
         return new Color(RandomUtils.nextInt(255));
     }
 
     /**
-     * Converts {@code BufferedImage} to RGB NDArray.
+     * Converts a {@code BufferedImage} to an RGB NDArray.
      *
-     * @param manager an {@link NDManager} to create the new NDArray with
+     * @param manager a {@link NDManager} to create the new NDArray with
      * @param image the buffered image to be converted
-     * @return a {@link NDArray}.
+     * @return the image {@link NDArray}
      */
     public static NDArray toNDArray(NDManager manager, BufferedImage image) {
         return toNDArray(manager, image, null);
     }
 
     /**
-     * Converts {@code BufferedImage} to NDArray with designated color mode.
+     * Converts a {@code BufferedImage} to an NDArray with designated color mode.
      *
-     * @param manager a {@link NDManager} to create a new NDArray with
+     * @param manager a {@link NDManager} to create the new NDArray with
      * @param image the buffered image to be converted
      * @param flag the color mode
-     * @return a {@link NDArray}
+     * @return the image {@link NDArray}
      */
     public static NDArray toNDArray(
             NDManager manager, BufferedImage image, NDImageUtils.Flag flag) {
@@ -120,10 +125,29 @@ public final class BufferedImageUtils {
         return array;
     }
 
+    /**
+     * Reads an image file and converts to NDArray.
+     *
+     * <p>Returns an image with Color mode.
+     *
+     * @param manager a {@link NDManager} to create the new NDArray with
+     * @param path the path to the image file
+     * @return the image NDArray
+     * @throws IOException if file is not found
+     */
     public static NDArray readFileToArray(NDManager manager, Path path) throws IOException {
         return readFileToArray(manager, path, null);
     }
 
+    /**
+     * Reads an image file and converts to NDArray.
+     *
+     * @param manager a {@link NDManager} to create the new NDArray with
+     * @param path the path to the image file
+     * @param flag the color option to load with
+     * @return the image NDArray
+     * @throws IOException if file is not found
+     */
     public static NDArray readFileToArray(NDManager manager, Path path, NDImageUtils.Flag flag)
             throws IOException {
         return toNDArray(manager, fromFile(path), flag);
