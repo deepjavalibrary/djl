@@ -67,6 +67,7 @@ public class MxModel implements Model {
     private static final int MODEL_VERSION = 1;
 
     private Path modelDir;
+    private String modelName;
     private MxNDManager manager;
     private Block block;
     private DataType dataType;
@@ -87,9 +88,9 @@ public class MxModel implements Model {
     /**
      * Load the MXNet model from specified location.
      *
-     * <p>MXNet engine looks for modelName.json and modelName-xxxx.params files in specified
-     * directory. By default, MXNet engine will pick up latest epoch of parameter file. However,
-     * user can explicitly an epoch to be loaded:
+     * <p>MXNet engine looks for MODEL_NAME-symbol.json and MODEL_NAME-xxxx.params files in
+     * specified directory. By default, MXNet engine will pick up latest epoch of parameter file.
+     * However, user can explicitly an epoch to be loaded:
      *
      * <pre>
      * Map&lt;String, String&gt; options = new HashMap&lt;&gt;()
@@ -106,6 +107,7 @@ public class MxModel implements Model {
     public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
+        this.modelName = modelName;
         if (block == null) {
             // load MxSymbolBlock
             Path symbolFile = modelDir.resolve(modelName + "-symbol.json");
@@ -164,6 +166,8 @@ public class MxModel implements Model {
 
             block.saveParameters(dos);
         }
+        this.modelName = modelName;
+        modelDir = modelPath.toAbsolutePath();
     }
 
     /** {@inheritDoc} */
@@ -412,7 +416,7 @@ public class MxModel implements Model {
                 throw new IOException("Unsupported model version: " + version);
             }
 
-            String modelName = dis.readUTF();
+            modelName = dis.readUTF();
             logger.debug("Loading model parameter: {}", modelName);
 
             dataType = DataType.valueOf(dis.readUTF());
@@ -436,5 +440,21 @@ public class MxModel implements Model {
             logger.debug("DJL model loaded successfully");
         }
         return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("Model (\n\tName: ").append(modelName);
+        if (modelDir != null) {
+            sb.append("\n\tModel location: ").append(modelDir.toAbsolutePath());
+        }
+        sb.append("\n\tData Type: ").append(dataType);
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            sb.append("\n\t").append(entry.getKey()).append(": ").append(entry.getValue());
+        }
+        sb.append("\n)");
+        return sb.toString();
     }
 }
