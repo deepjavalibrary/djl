@@ -14,6 +14,7 @@ package ai.djl.zoo.cv.classification;
 
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.LambdaBlock;
@@ -23,7 +24,6 @@ import ai.djl.nn.convolutional.Conv2D;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.pooling.Pool;
-import ai.djl.training.Activation;
 import java.util.Arrays;
 
 /**

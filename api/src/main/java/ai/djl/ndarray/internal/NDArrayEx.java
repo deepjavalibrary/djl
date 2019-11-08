@@ -16,8 +16,8 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Activation;
 import ai.djl.nn.pooling.PoolingConvention;
-import ai.djl.training.Activation;
 import ai.djl.util.PairList;
 
 /** An internal interface that encapsulates engine specific operator methods. */

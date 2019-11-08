@@ -12,10 +12,10 @@
  */
 package ai.djl.zoo.cv.classification;
 
+import ai.djl.nn.Activation;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
-import ai.djl.training.Activation;
 
 public class Mlp extends SequentialBlock {
 

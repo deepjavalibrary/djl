@@ -18,7 +18,7 @@ import ai.djl.basicdataset.Cifar10;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.training.Activation;
+import ai.djl.nn.Activation;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;

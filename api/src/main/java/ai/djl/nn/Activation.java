@@ -10,12 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.training;
+package ai.djl.nn;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.nn.Block;
-import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.core.Prelu;
 
 /** Utility class that provides activation functions and blocks. */

@@ -13,8 +13,8 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
+import ai.djl.nn.Activation;
 import ai.djl.repository.Repository;
-import ai.djl.training.Activation;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;

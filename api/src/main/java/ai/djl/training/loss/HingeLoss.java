@@ -14,7 +14,7 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
-import ai.djl.training.Activation;
+import ai.djl.nn.Activation;
 
 /**
  * {@code HingeLoss} is a type of {@link Loss}.
