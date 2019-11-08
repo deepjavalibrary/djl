@@ -68,10 +68,10 @@ public class MultithreadedInferenceExample extends AbstractInference<Classificat
         ZooModel<BufferedImage, Classification> model = loader.loadModel(criteria);
 
         int numOfThreads = Runtime.getRuntime().availableProcessors();
+        metrics.addMetric("thread", numOfThreads);
         List<PredictorCallable> callables =
                 Collections.nCopies(
                         numOfThreads, new PredictorCallable(model, img, metrics, iteration));
-
         Classification classification = null;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         try {

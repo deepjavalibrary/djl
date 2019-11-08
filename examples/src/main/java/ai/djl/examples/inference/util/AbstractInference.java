@@ -115,8 +115,17 @@ public abstract class AbstractInference<T> {
 
                 long begin = System.currentTimeMillis();
                 lastResult = predict(arguments, metrics, iteration);
+                long totalTime = System.currentTimeMillis() - begin;
 
                 logger.info("Inference result: {}", lastResult);
+                int totalRuns = iteration;
+                if (metrics.hasMetric("thread")) {
+                    totalRuns *= metrics.getMetric("thread").get(0).getValue().intValue();
+                }
+                logger.info(
+                        String.format(
+                                "total time: %d ms, total runs: %d iterations",
+                                totalTime, totalRuns));
 
                 if (metrics.hasMetric("Inference") && iteration > 1) {
                     float p50 =
