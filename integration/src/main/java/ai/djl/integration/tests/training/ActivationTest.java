@@ -38,7 +38,7 @@ public class ActivationTest {
             model.setBlock(Activation.reluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape[] {new Shape(3)});
+                trainer.initialize(new Shape(3));
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {-1, 0, 2});
@@ -195,7 +195,7 @@ public class ActivationTest {
             model.setBlock(Activation.preluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape[] {new Shape(3)});
+                trainer.initialize(new Shape(3));
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {-1, 0, 2});
                 NDArray expected = manager.create(new float[] {-1, 0, 2});

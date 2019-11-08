@@ -29,7 +29,7 @@ public class MockTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public void initialize(Shape[] shapes) {}
+    public void initialize(Shape... shapes) {}
 
     /** {@inheritDoc} */
     @Override

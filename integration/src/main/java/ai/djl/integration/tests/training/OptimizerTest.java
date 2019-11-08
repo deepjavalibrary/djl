@@ -57,7 +57,7 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape[] {new Shape(BATCH_SIZE, CHANNELS)});
+                trainer.initialize(new Shape(BATCH_SIZE, CHANNELS));
 
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);
@@ -88,7 +88,7 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape[] {new Shape(BATCH_SIZE, CHANNELS)});
+                trainer.initialize(new Shape(BATCH_SIZE, CHANNELS));
 
                 NDManager manager = trainer.getManager();
 
@@ -126,7 +126,7 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape[] {new Shape(BATCH_SIZE, CHANNELS)});
+                trainer.initialize(new Shape(BATCH_SIZE, CHANNELS));
 
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);
@@ -157,7 +157,7 @@ public class OptimizerTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape[] {new Shape(BATCH_SIZE, CHANNELS)});
+                trainer.initialize(new Shape(BATCH_SIZE, CHANNELS));
 
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);

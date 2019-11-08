@@ -84,7 +84,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 Shape inputShape = new Shape(1, 3, 32, 32);
 
                 // initialize trainer with proper input shape
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
                 TrainingUtils.fit(
                         trainer,
                         arguments.getEpoch(),

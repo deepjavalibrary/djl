@@ -142,7 +142,7 @@ public interface Block {
      * @param inputShapes theshapes of the inputs to the block
      * @return the shapes of the outputs of the block
      */
-    Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes);
+    Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes);
 
     /**
      * Returns a boolean whether the block is initialized.

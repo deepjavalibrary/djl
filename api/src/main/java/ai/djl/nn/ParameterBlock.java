@@ -25,7 +25,7 @@ public abstract class ParameterBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
+    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         if (!initialized) {
             beforeInitialize(inputShapes);
             for (Parameter parameter : getDirectParameters()) {

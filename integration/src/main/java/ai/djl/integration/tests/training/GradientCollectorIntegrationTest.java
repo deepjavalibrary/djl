@@ -101,7 +101,7 @@ public class GradientCollectorIntegrationTest {
             float lossValue;
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(batchSize, weight.size(0));
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 for (int epoch = 0; epoch < epochs; epoch++) {
                     trainer.resetTrainingMetrics();

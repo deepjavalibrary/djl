@@ -37,10 +37,7 @@ public class ModelTest {
         try (Model saveModel = Model.newInstance();
                 Model loadModel = Model.newInstance()) {
             block.setInitializer(new XavierInitializer());
-            block.initialize(
-                    saveModel.getNDManager(),
-                    DataType.FLOAT32,
-                    new Shape[] {new Shape(1, 3, 32, 32)});
+            block.initialize(saveModel.getNDManager(), DataType.FLOAT32, new Shape(1, 3, 32, 32));
             ParameterList savedParameters = block.getParameters();
             saveModel.setBlock(block);
             saveModel.save(Paths.get("build/tmp/test/models"), "saveAndLoad");

@@ -64,7 +64,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(2, 2);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
@@ -84,7 +84,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(2, 2);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
@@ -111,7 +111,7 @@ public class BlockCoreTest {
                         new Shape(
                                 new long[] {2, 2},
                                 new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL});
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
@@ -134,7 +134,7 @@ public class BlockCoreTest {
                         new Shape(
                                 new long[] {2, 2},
                                 new LayoutType[] {LayoutType.BATCH, LayoutType.CHANNEL});
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
@@ -157,7 +157,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(2, 2);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
@@ -180,7 +180,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(2, 2);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
@@ -207,7 +207,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(2);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 ParameterStore parameterStore = new ParameterStore(manager, false);
@@ -239,7 +239,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 4, 4);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data =
@@ -268,7 +268,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 1, 4, 4);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data =
@@ -298,7 +298,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 1, 3, 3, 3);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data =
@@ -340,7 +340,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(3, 4, 4);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.arange(0, 48, 1).reshape(inputShape);
@@ -367,7 +367,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 2, 4);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
@@ -398,7 +398,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 2, 4);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
@@ -432,7 +432,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 2, 4);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
@@ -471,7 +471,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 3);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.ones(new Shape(1, 3));
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
@@ -506,7 +506,7 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 3);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.ones(new Shape(1, 3));
                 NDList results = trainer.forward(new NDList(data));

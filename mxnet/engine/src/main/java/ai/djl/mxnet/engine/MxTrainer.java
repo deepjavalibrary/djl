@@ -90,7 +90,7 @@ public class MxTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public void initialize(Shape[] shapes) {
+    public void initialize(Shape... shapes) {
         model.getBlock().initialize(model.getNDManager(), model.getDataType(), shapes);
         // call getValue on all params to initialize on all devices
         model.getBlock()

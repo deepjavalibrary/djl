@@ -78,7 +78,7 @@ public class ResnetTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(100, 1, 28, 28);
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
 
@@ -122,7 +122,7 @@ public class ResnetTest {
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(16, 3, 32, 32);
 
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
                 Shape[] outputShape =

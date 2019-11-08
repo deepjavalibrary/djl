@@ -30,7 +30,7 @@ import ai.djl.training.metrics.TrainingMetric;
  */
 public interface Trainer extends AutoCloseable {
 
-    void initialize(Shape[] shapes);
+    void initialize(Shape... shapes);
 
     /**
      * Fetches an iterator that can iterate through the given {@link Dataset}.

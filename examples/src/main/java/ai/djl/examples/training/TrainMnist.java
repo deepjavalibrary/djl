@@ -70,7 +70,7 @@ public final class TrainMnist extends AbstractTraining {
                 Shape inputShape = new Shape(1, 28 * 28);
 
                 // initialize trainer with proper input shape
-                trainer.initialize(new Shape[] {inputShape});
+                trainer.initialize(inputShape);
 
                 TrainingUtils.fit(
                         trainer,

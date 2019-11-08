@@ -158,7 +158,7 @@ public class SymbolBlockTest {
 
     private Pair<NDArray, NDArray> train(NDManager manager, Trainer trainer, Block block) {
         Shape inputShape = new Shape(10, 28 * 28);
-        trainer.initialize(new Shape[] {inputShape});
+        trainer.initialize(inputShape);
 
         NDArray data = manager.ones(inputShape);
         NDArray label = manager.arange(0, 10);
