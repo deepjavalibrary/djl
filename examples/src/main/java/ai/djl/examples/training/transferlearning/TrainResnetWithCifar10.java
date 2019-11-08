@@ -193,9 +193,8 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                                 new float[] {0.2023f, 0.1994f, 0.2010f}));
         long maxIterations = arguments.getMaxIterations();
         Cifar10 cifar10 =
-                new Cifar10.Builder()
-                        .setManager(manager)
-                        .setUsage(usage)
+                Cifar10.builder(manager)
+                        .optUsage(usage)
                         .setRandomSampling(batchSize)
                         .optMaxIteration(maxIterations)
                         .optPipeline(pipeline)

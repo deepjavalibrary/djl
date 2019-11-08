@@ -18,7 +18,6 @@ import ai.djl.basicdataset.Mnist;
 import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.TrainingUtils;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -32,7 +31,6 @@ import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.FactorTracker;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
-import ai.djl.translate.Pipeline;
 import ai.djl.zoo.cv.classification.Mlp;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -122,17 +120,13 @@ public final class TrainMnist extends AbstractTraining {
 
     private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)
             throws IOException {
-        Pipeline pipeline = new Pipeline(new ToTensor());
-
         int batchSize = arguments.getBatchSize();
         long maxIterations = arguments.getMaxIterations();
 
         Mnist mnist =
-                new Mnist.Builder()
-                        .setManager(manager)
-                        .setUsage(usage)
+                Mnist.builder(manager)
+                        .optUsage(usage)
                         .setRandomSampling(batchSize)
-                        .optPipeline(pipeline)
                         .optMaxIteration(maxIterations)
                         .build();
         mnist.prepare();

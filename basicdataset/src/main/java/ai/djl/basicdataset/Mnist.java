@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -21,6 +22,7 @@ import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.ArrayDataset;
+import ai.djl.translate.Pipeline;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +49,10 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
         this.repository = builder.repository;
         this.artifact = builder.artifact;
         this.usage = builder.usage;
+    }
+
+    public static Builder builder(NDManager manager) {
+        return new Builder().setManager(manager);
     }
 
     /** {@inheritDoc} */
@@ -146,9 +152,15 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
     public static final class Builder extends BaseBuilder<Builder> {
 
         private NDManager manager;
-        private Repository repository = BasicDatasets.REPOSITORY;
+        private Repository repository;
         private Artifact artifact;
         private Usage usage;
+
+        public Builder() {
+            repository = BasicDatasets.REPOSITORY;
+            usage = Usage.TRAIN;
+            pipeline = new Pipeline(new ToTensor());
+        }
 
         /** {@inheritDoc} */
         @Override
@@ -171,7 +183,7 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
             return this;
         }
 
-        public Builder setUsage(Usage usage) {
+        public Builder optUsage(Usage usage) {
             this.usage = usage;
             return this;
         }

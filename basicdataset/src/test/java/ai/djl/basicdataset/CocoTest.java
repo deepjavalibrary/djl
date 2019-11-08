@@ -34,7 +34,7 @@ public class CocoTest {
         CocoDetection coco =
                 new CocoDetectionUnitTest(
                         new CocoDetection.Builder()
-                                .setUsage(Dataset.Usage.TEST)
+                                .optUsage(Dataset.Usage.TEST)
                                 .setRandomSampling(1));
         coco.prepare();
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES);

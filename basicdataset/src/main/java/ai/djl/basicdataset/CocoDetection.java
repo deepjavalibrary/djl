@@ -55,10 +55,10 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         flag = builder.flag;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
-        if (pipeline == null) {
-            pipeline = new Pipeline();
-            pipeline.add(new ToTensor());
-        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** {@inheritDoc} */
@@ -181,10 +181,17 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     @SuppressWarnings("rawtypes")
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private Flag flag = NDImageUtils.Flag.COLOR;
-        private Repository repository = BasicDatasets.REPOSITORY;
+        private Flag flag;
+        private Repository repository;
         private Artifact artifact;
         private Usage usage;
+
+        public Builder() {
+            repository = BasicDatasets.REPOSITORY;
+            usage = Usage.TRAIN;
+            pipeline = new Pipeline(new ToTensor());
+            flag = NDImageUtils.Flag.COLOR;
+        }
 
         /** {@inheritDoc} */
         @Override
@@ -192,7 +199,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
             return this;
         }
 
-        public Builder setUsage(Usage usage) {
+        public Builder optUsage(Usage usage) {
             this.usage = usage;
             return self();
         }

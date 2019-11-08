@@ -34,7 +34,7 @@ public class PikachuTest {
         PikachuDetection pikachu =
                 new PikachuDetectionUnitTest(
                         new PikachuDetection.Builder()
-                                .setUsage(Dataset.Usage.TEST)
+                                .optUsage(Dataset.Usage.TEST)
                                 .setRandomSampling(1));
         pikachu.prepare();
         TrainingConfig config = new DefaultTrainingConfig(new NormalInitializer(0.01));

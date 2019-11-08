@@ -14,7 +14,6 @@ package ai.djl.basicdataset;
 
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils.Flag;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -54,7 +53,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     private Artifact artifact;
     private Usage usage;
     private boolean prepared;
-    private Flag flag = NDImageUtils.Flag.COLOR;
+    private Flag flag;
 
     private List<Path> imagePaths;
     private List<float[]> labels;
@@ -64,12 +63,13 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         repository = builder.repository;
         artifact = builder.artifact;
         usage = builder.usage;
+        flag = builder.flag;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
-        if (pipeline == null) {
-            pipeline = new Pipeline();
-            pipeline.add(new ToTensor());
-        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** {@inheritDoc} */
@@ -170,9 +170,17 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
 
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private Repository repository = BasicDatasets.REPOSITORY;
-        private Artifact artifact;
-        private Usage usage;
+        Repository repository;
+        Artifact artifact;
+        Usage usage;
+        Flag flag;
+
+        public Builder() {
+            repository = BasicDatasets.REPOSITORY;
+            usage = Usage.TRAIN;
+            flag = Flag.COLOR;
+            pipeline = new Pipeline(new ToTensor());
+        }
 
         /** {@inheritDoc} */
         @Override
@@ -180,7 +188,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
             return this;
         }
 
-        public Builder setUsage(Usage usage) {
+        public Builder optUsage(Usage usage) {
             this.usage = usage;
             return self();
         }
@@ -192,6 +200,11 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
 
         public Builder optArtifact(Artifact artifact) {
             this.artifact = artifact;
+            return self();
+        }
+
+        public Builder optFlag(Flag flag) {
+            this.flag = flag;
             return self();
         }
 

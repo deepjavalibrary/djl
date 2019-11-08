@@ -72,14 +72,14 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
-        Sampler sampler;
-        Batchifier batchifier = Batchifier.STACK;
-        Pipeline pipeline;
-        Pipeline targetPipeline;
-        ExecutorService executor;
-        int prefetchNumber;
-        long maxIteration = Long.MAX_VALUE;
-        Device device;
+        protected Sampler sampler;
+        protected Batchifier batchifier = Batchifier.STACK;
+        protected Pipeline pipeline;
+        protected Pipeline targetPipeline;
+        protected ExecutorService executor;
+        protected int prefetchNumber;
+        protected long maxIteration = Long.MAX_VALUE;
+        protected Device device;
 
         public Sampler getSampler() {
             if (sampler == null) {

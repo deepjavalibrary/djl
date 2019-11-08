@@ -33,7 +33,7 @@ public class ImageNetTest {
                         "test", System.getProperty("user.home") + "/Desktop/testImagenet");
         ImageNet imagenet =
                 new ImageNet.Builder()
-                        .setUsage(Usage.VALIDATION)
+                        .optUsage(Usage.VALIDATION)
                         .setRepository(repository)
                         .setRandomSampling(32)
                         .build();

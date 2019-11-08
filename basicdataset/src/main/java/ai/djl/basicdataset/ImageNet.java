@@ -39,6 +39,10 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
         this.items = new PairList<>();
     }
 
+    public static ImageFolder.Builder builder() {
+        return new ImageFolder.Builder();
+    }
+
     public String[] getWordNetIds() {
         return wordNetIds;
     }
@@ -113,9 +117,9 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 
     public static class Builder extends ImageFolderBuilder<Builder> {
 
-        private Usage usage;
+        private Usage usage = Usage.TRAIN;
 
-        public Builder setUsage(Usage usage) {
+        public Builder optUsage(Usage usage) {
             this.usage = usage;
             return this;
         }

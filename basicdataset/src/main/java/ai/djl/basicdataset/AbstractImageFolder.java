@@ -55,10 +55,6 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         super(builder);
         this.flag = builder.flag;
         this.repository = builder.repository;
-        if (pipeline == null) {
-            pipeline = new Pipeline();
-            pipeline.add(new ToTensor());
-        }
         this.synsets = new ArrayList<>();
         this.items = new PairList<>();
     }
@@ -172,8 +168,14 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     @SuppressWarnings("rawtypes")
     public abstract static class ImageFolderBuilder<T extends ImageFolderBuilder>
             extends BaseBuilder<T> {
-        private Repository repository;
-        Flag flag = NDImageUtils.Flag.COLOR;
+
+        Repository repository;
+        Flag flag;
+
+        public ImageFolderBuilder() {
+            flag = NDImageUtils.Flag.COLOR;
+            pipeline = new Pipeline(new ToTensor());
+        }
 
         public T optFlag(Flag flag) {
             this.flag = flag;

@@ -19,8 +19,12 @@ import java.nio.file.Paths;
 /** A dataset for loading image files stored in a folder structure. */
 public final class ImageFolder extends AbstractImageFolder {
 
-    ImageFolder(Builder builder) {
+    ImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** {@inheritDoc} */

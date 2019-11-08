@@ -38,7 +38,7 @@ public class Cifar10Test {
             Cifar10 cifar10 =
                     new Cifar10.Builder()
                             .setManager(model.getNDManager())
-                            .setUsage(Usage.TEST)
+                            .optUsage(Usage.TEST)
                             .optRepository(repository)
                             .setRandomSampling(32)
                             .build();
@@ -64,7 +64,7 @@ public class Cifar10Test {
             Cifar10 cifar10 =
                     new Cifar10.Builder()
                             .setManager(model.getNDManager())
-                            .setUsage(Usage.TEST)
+                            .optUsage(Usage.TEST)
                             .setRandomSampling(32)
                             .build();
 
