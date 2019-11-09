@@ -42,6 +42,7 @@ import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
@@ -113,7 +114,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 criteria.put("layers", "50");
                 criteria.put("flavor", "v1");
             }
-            Model model = MxModelZoo.RESNET.loadModel(criteria);
+            Model model = MxModelZoo.RESNET.loadModel(criteria, new ProgressBar());
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
             block.removeLastBlock();

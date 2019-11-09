@@ -24,6 +24,7 @@ import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -59,7 +60,8 @@ public final class SsdExample extends AbstractInference<DetectedObjects> {
             criteria.put("flavor", "v1");
             criteria.put("dataset", "voc");
         }
-        ZooModel<BufferedImage, DetectedObjects> model = MxModelZoo.SSD.loadModel(criteria, device);
+        ZooModel<BufferedImage, DetectedObjects> model =
+                MxModelZoo.SSD.loadModel(criteria, device, new ProgressBar());
 
         DetectedObjects predictResult = null;
         try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
@@ -68,7 +70,7 @@ public final class SsdExample extends AbstractInference<DetectedObjects> {
             for (int i = 0; i < iteration; ++i) {
                 predictResult = predictor.predict(img);
 
-                progressBar.printProgress(i);
+                progressBar.update(i);
                 MemoryUtils.collectMemoryInfo(metrics);
             }
         }

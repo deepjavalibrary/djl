@@ -23,6 +23,7 @@ import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -50,7 +51,8 @@ public class InstanceSegmentationExample extends AbstractInference<DetectedObjec
         criteria.put("flavor", "v1b");
         criteria.put("backbone", "resnet18");
         criteria.put("dataset", "coco");
-        ZooModel<BufferedImage, DetectedObjects> model = MxModelZoo.MASK_RCNN.loadModel(criteria);
+        ZooModel<BufferedImage, DetectedObjects> model =
+                MxModelZoo.MASK_RCNN.loadModel(criteria, new ProgressBar());
 
         DetectedObjects result;
         try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {

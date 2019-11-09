@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import ai.djl.util.Progress;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,7 +79,7 @@ public abstract class AbstractRepository implements Repository {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Artifact artifact) throws IOException {
+    public void prepare(Artifact artifact, Progress progress) throws IOException {
         Path cacheDir = getCacheDirectory();
         URI resourceUri = artifact.getResourceUri();
         Path resourceDir = cacheDir.resolve(resourceUri.getPath());
@@ -95,15 +96,27 @@ public abstract class AbstractRepository implements Repository {
         if (parentDir == null) {
             throw new AssertionError("Parent path should never be null: " + resourceDir.toString());
         }
+
         Files.createDirectories(parentDir);
         Path tmp = Files.createTempDirectory(parentDir, resourceDir.toFile().getName());
+        if (progress != null) {
+            long totalSize = 0;
+            for (Artifact.Item item : files.values()) {
+                totalSize += item.getSize();
+            }
+            progress.reset("Downloading", totalSize);
+        }
+
         try {
             for (Artifact.Item item : files.values()) {
-                download(tmp, baseUri, item);
+                download(tmp, baseUri, item, progress);
             }
             Files.move(tmp, resourceDir, StandardCopyOption.ATOMIC_MOVE);
         } finally {
             Utils.deleteQuietly(tmp);
+            if (progress != null) {
+                progress.end();
+            }
         }
     }
 
@@ -128,61 +141,103 @@ public abstract class AbstractRepository implements Repository {
         return dir;
     }
 
-    private void download(Path tmp, URI baseUri, Artifact.Item item) throws IOException {
+    private void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
+            throws IOException {
         URI fileUri = URI.create(item.getUri());
         if (!fileUri.isAbsolute()) {
             fileUri = getBaseUri().resolve(baseUri).resolve(fileUri);
         }
 
-        String fileName = item.getName();
-        String extension = item.getExtension();
-        if ("dir".equals(item.getType())) {
-            Path dir;
-            if (!fileName.isEmpty()) {
-                // honer the name set in metadata.json
-                dir = tmp.resolve(fileName);
-                Files.createDirectories(dir);
-            } else {
-                dir = tmp;
-            }
-            if (!"zip".equals(extension)) {
-                throw new IOException("File type is not supported: " + extension);
-            }
-            try (InputStream is = fileUri.toURL().openStream()) {
-                ZipUtils.unzip(is, dir);
-            }
-            return;
-        }
-
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
-            throw new AssertionError("SHA1 algorithm not found.", e);
-        }
-
-        try (InputStream is = fileUri.toURL().openStream();
-                DigestInputStream dis = new DigestInputStream(is, md)) {
-            Path file = tmp.resolve(fileName);
-            if ("zip".equals(extension)) {
-                try (ZipInputStream zis = new ZipInputStream(dis)) {
-                    zis.getNextEntry();
-                    Files.copy(zis, file);
+        try (InputStream is = fileUri.toURL().openStream()) {
+            ProgressInputStream pis = new ProgressInputStream(is, progress);
+            String fileName = item.getName();
+            String extension = item.getExtension();
+            if ("dir".equals(item.getType())) {
+                Path dir;
+                if (!fileName.isEmpty()) {
+                    // honer the name set in metadata.json
+                    dir = tmp.resolve(fileName);
+                    Files.createDirectories(dir);
+                } else {
+                    dir = tmp;
                 }
-            } else if ("gzip".equals(extension)) {
-                try (GZIPInputStream zis = new GZIPInputStream(dis)) {
-                    Files.copy(zis, file);
+                if (!"zip".equals(extension)) {
+                    throw new IOException("File type is not supported: " + extension);
                 }
-            } else if (extension.isEmpty()) {
-                Files.copy(dis, file);
+                ZipUtils.unzip(pis, dir);
             } else {
-                throw new IOException("File type is not supported: " + extension);
+                Path file = tmp.resolve(fileName);
+                if ("zip".equals(extension)) {
+                    try (ZipInputStream zis = new ZipInputStream(pis)) {
+                        zis.getNextEntry();
+                        Files.copy(zis, file);
+                    }
+                } else if ("gzip".equals(extension)) {
+                    try (GZIPInputStream zis = new GZIPInputStream(pis)) {
+                        Files.copy(zis, file);
+                    }
+                } else if (extension.isEmpty()) {
+                    Files.copy(pis, file);
+                } else {
+                    throw new IOException("File type is not supported: " + extension);
+                }
+            }
+            pis.close();
+            pis.validateChecksum(item);
+        }
+    }
+
+    private static final class ProgressInputStream extends InputStream {
+
+        private DigestInputStream dis;
+        private Progress progress;
+
+        public ProgressInputStream(InputStream is, Progress progress) {
+            MessageDigest md;
+            try {
+                md = MessageDigest.getInstance("SHA1");
+            } catch (NoSuchAlgorithmException e) {
+                throw new AssertionError("SHA1 algorithm not found.", e);
+            }
+            dis = new DigestInputStream(is, md);
+            this.progress = progress;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public int read() throws IOException {
+            int ret = dis.read();
+            if (progress != null) {
+                if (ret >= 0) {
+                    progress.increment(1);
+                } else {
+                    progress.end();
+                }
+            }
+            return ret;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            int size = dis.read(b, off, len);
+            if (progress != null) {
+                progress.increment(size);
+            }
+            return size;
+        }
+
+        public void validateChecksum(Artifact.Item item) throws IOException {
+            String sha1 = Hex.toHexString(dis.getMessageDigest().digest());
+            if (!sha1.equalsIgnoreCase(item.getSha1Hash())) {
+                throw new IOException("Checksum error: " + item.getName() + ", sha1: " + sha1);
             }
         }
 
-        String sha1 = Hex.toHexString(md.digest());
-        if (!sha1.equalsIgnoreCase(item.getSha1Hash())) {
-            throw new IOException("Checksum error: " + item.getName() + ", sha1: " + sha1);
+        /** {@inheritDoc} */
+        @Override
+        public void close() throws IOException {
+            dis.close();
         }
     }
 }

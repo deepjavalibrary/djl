@@ -23,6 +23,7 @@ import ai.djl.modality.cv.Joints;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -62,7 +63,8 @@ public class PoseEstimationExample extends AbstractInference<List<Joints>> {
         criteria.put("backbone", "resnet50");
         criteria.put("flavor", "v1");
         criteria.put("dataset", "voc");
-        ZooModel<BufferedImage, DetectedObjects> ssd = MxModelZoo.SSD.loadModel(criteria);
+        ZooModel<BufferedImage, DetectedObjects> ssd =
+                MxModelZoo.SSD.loadModel(criteria, new ProgressBar());
 
         DetectedObjects ssdResult;
         try (Predictor<BufferedImage, DetectedObjects> predictor = ssd.newPredictor()) {

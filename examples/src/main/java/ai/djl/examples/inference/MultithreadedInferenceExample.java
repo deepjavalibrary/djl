@@ -22,6 +22,7 @@ import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -65,7 +66,8 @@ public class MultithreadedInferenceExample extends AbstractInference<Classificat
             criteria.put("flavor", "v1");
         }
         ModelLoader<BufferedImage, Classification> loader = MxModelZoo.getModelLoader(modelName);
-        ZooModel<BufferedImage, Classification> model = loader.loadModel(criteria);
+        ZooModel<BufferedImage, Classification> model =
+                loader.loadModel(criteria, new ProgressBar());
 
         int numOfThreads = Runtime.getRuntime().availableProcessors();
         metrics.addMetric("thread", numOfThreads);

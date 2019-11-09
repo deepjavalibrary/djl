@@ -140,7 +140,7 @@ public abstract class AbstractTraining implements TrainingListener {
         if (trainingProgressBar == null) {
             trainingProgressBar = new ProgressBar("Training", trainDataSize);
         }
-        trainingProgressBar.printProgress(trainingProgress++, getTrainingStatus(metrics));
+        trainingProgressBar.update(trainingProgress++, getTrainingStatus(metrics));
     }
 
     /** {@inheritDoc} */
@@ -150,7 +150,7 @@ public abstract class AbstractTraining implements TrainingListener {
         if (validateProgressBar == null) {
             validateProgressBar = new ProgressBar("Validating", validateDataSize);
         }
-        validateProgressBar.printProgress(validateProgress++);
+        validateProgressBar.update(validateProgress++);
     }
 
     /** {@inheritDoc} */

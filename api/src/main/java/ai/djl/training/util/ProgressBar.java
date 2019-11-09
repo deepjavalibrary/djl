@@ -12,36 +12,69 @@
  */
 package ai.djl.training.util;
 
-public final class ProgressBar {
+import ai.djl.util.Progress;
+
+public final class ProgressBar implements Progress {
 
     private static final int TOTAL_BAR_LENGTH = 40;
 
     private String message;
-    private int max;
-    private int current;
+    private long max;
+    private long progress;
+    private int currentPercent;
 
-    public ProgressBar(String message, int max) {
+    public ProgressBar() {
+        max = 1;
+    }
+
+    public ProgressBar(String message, long max) {
+        reset(message, max);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final void reset(String message, long max) {
         this.message = message;
         this.max = max;
+        currentPercent = 0;
+        progress = 0;
     }
 
-    @SuppressWarnings("PMD.SystemPrintln")
-    public void printProgress(int index) {
-        printProgress(index, null);
+    /** {@inheritDoc} */
+    @Override
+    public void start(long initialProgress) {
+        update(initialProgress);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void end() {
+        update(max - 1);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void increment(long increment) {
+        update(progress + increment);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     @SuppressWarnings("PMD.SystemPrintln")
-    public void printProgress(int index, String additionalMessage) {
+    public void update(long progress, String additionalMessage) {
         if (Boolean.getBoolean("disableProgressBar") || max <= 1) {
             return;
         }
 
-        int percent = (index + 1) * 100 / max;
-        if (percent == current && percent > 0) {
+        this.progress = progress;
+        int percent = (int) ((progress + 1) * 100 / max);
+        percent = Math.min(percent, 100);
+        if (percent == currentPercent && percent > 0) {
+            // no need to refresh
             return;
         }
 
-        current = percent;
+        currentPercent = percent;
         StringBuilder sb = new StringBuilder(100);
         sb.append('\r').append(message).append(':');
         for (int i = 0; i < 12 - message.length(); ++i) {
@@ -59,7 +92,7 @@ public final class ProgressBar {
         if (additionalMessage != null) {
             sb.append(' ').append(additionalMessage);
         }
-        if (index == max - 1) {
+        if (percent == 100) {
             System.out.println(sb);
         } else {
             System.out.print(sb);

@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import ai.djl.util.Progress;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class SimpleRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Artifact artifact) {
+    public void prepare(Artifact artifact, Progress progress) {
         // Do nothing
     }
 

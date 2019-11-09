@@ -174,6 +174,7 @@ public class Artifact {
         private String sha1Hash;
         private String name;
         private String type;
+        private long size;
         private String extension;
         private Artifact artifact;
 
@@ -207,6 +208,14 @@ public class Artifact {
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        public long getSize() {
+            return size;
+        }
+
+        public void setSize(long size) {
+            this.size = size;
         }
 
         public String getName() {

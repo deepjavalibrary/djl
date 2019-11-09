@@ -21,6 +21,7 @@ import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
 import ai.djl.repository.VersionRange;
 import ai.djl.translate.Translator;
+import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -44,25 +45,31 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     /** {@inheritDoc} */
     @Override
-    public ZooModel<I, O> loadModel(Map<String, String> criteria)
-            throws IOException, ModelNotFoundException, MalformedModelException {
-        return loadModel(criteria, Device.defaultDevice());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ZooModel<I, O> loadModel(Map<String, String> criteria, Device device)
+    public ZooModel<I, O> loadModel(Map<String, String> criteria, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {
         Artifact artifact = match(criteria);
         if (artifact == null) {
             throw new ModelNotFoundException("Model not found.");
         }
-        repository.prepare(artifact);
-        Path dir = repository.getCacheDirectory();
-        String relativePath = artifact.getResourceUri().getPath();
-        Path modelPath = dir.resolve(relativePath);
-        Model model = loadModel(artifact, modelPath, device);
-        return new ZooModel<>(model, getTranslator(artifact));
+
+        repository.prepare(artifact, progress);
+
+        if (progress != null) {
+            progress.reset("Loading", 2);
+            progress.update(1);
+        }
+        try {
+            Path dir = repository.getCacheDirectory();
+            String relativePath = artifact.getResourceUri().getPath();
+            Path modelPath = dir.resolve(relativePath);
+
+            Model model = loadModel(artifact, modelPath, device);
+            return new ZooModel<>(model, getTranslator(artifact));
+        } finally {
+            if (progress != null) {
+                progress.end();
+            }
+        }
     }
 
     protected Model loadModel(Artifact artifact, Path modelPath, Device device)

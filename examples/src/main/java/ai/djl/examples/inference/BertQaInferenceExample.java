@@ -22,6 +22,7 @@ import ai.djl.metric.Metrics;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.mxnet.zoo.nlp.qa.QAInput;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.Map;
@@ -49,7 +50,7 @@ public final class BertQaInferenceExample extends AbstractInference<String> {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("backbone", "bert");
         criteria.put("dataset", "book_corpus_wiki_en_uncased");
-        ZooModel<QAInput, String> model = MxModelZoo.BERT_QA.loadModel(criteria);
+        ZooModel<QAInput, String> model = MxModelZoo.BERT_QA.loadModel(criteria, new ProgressBar());
 
         QAInput input = new QAInput(arguments.question, arguments.answer, arguments.seqLength);
 
@@ -63,7 +64,7 @@ public final class BertQaInferenceExample extends AbstractInference<String> {
             for (int i = 0; i < iteration; ++i) {
                 predictResult = predictor.predict(input);
 
-                progressBar.printProgress(i);
+                progressBar.update(i);
                 MemoryUtils.collectMemoryInfo(metrics);
             }
         }

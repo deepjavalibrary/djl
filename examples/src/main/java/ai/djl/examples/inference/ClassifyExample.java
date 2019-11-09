@@ -24,6 +24,7 @@ import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import ai.djl.zoo.ModelZoo;
 import java.awt.image.BufferedImage;
@@ -69,7 +70,8 @@ public final class ClassifyExample extends AbstractInference<Classification> {
             loader = MxModelZoo.getModelLoader(modelName);
         }
 
-        ZooModel<BufferedImage, Classification> model = loader.loadModel(criteria, device);
+        ZooModel<BufferedImage, Classification> model =
+                loader.loadModel(criteria, device, new ProgressBar());
 
         Classification predictResult = null;
         try (Predictor<BufferedImage, Classification> predictor = model.newPredictor()) {
@@ -78,7 +80,7 @@ public final class ClassifyExample extends AbstractInference<Classification> {
             for (int i = 0; i < iteration; ++i) {
                 predictResult = predictor.predict(img);
 
-                progressBar.printProgress(i);
+                progressBar.update(i);
                 MemoryUtils.collectMemoryInfo(metrics);
             }
         }

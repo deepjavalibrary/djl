@@ -14,14 +14,37 @@ package ai.djl.repository.zoo;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.util.Progress;
 import java.io.IOException;
 import java.util.Map;
 
 public interface ModelLoader<I, O> {
 
-    ZooModel<I, O> loadModel(Map<String, String> criteria)
-            throws IOException, ModelNotFoundException, MalformedModelException;
+    default ZooModel<I, O> loadModel()
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        return loadModel(null, null, null);
+    }
 
-    ZooModel<I, O> loadModel(Map<String, String> criteria, Device device)
+    default ZooModel<I, O> loadModel(Progress progress)
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        return loadModel(null, null, progress);
+    }
+
+    default ZooModel<I, O> loadModel(Map<String, String> criteria)
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        return loadModel(criteria, null, null);
+    }
+
+    default ZooModel<I, O> loadModel(Map<String, String> criteria, Progress progress)
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        return loadModel(criteria, null, progress);
+    }
+
+    default ZooModel<I, O> loadModel(Map<String, String> criteria, Device device)
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        return loadModel(criteria, device, null);
+    }
+
+    ZooModel<I, O> loadModel(Map<String, String> criteria, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException;
 }

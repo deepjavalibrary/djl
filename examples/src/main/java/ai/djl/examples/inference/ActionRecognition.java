@@ -21,6 +21,7 @@ import ai.djl.modality.Classification;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class ActionRecognition extends AbstractInference<Classification> {
         criteria.put("backbone", "inceptionv3");
         criteria.put("dataset", "ucf101");
         ZooModel<BufferedImage, Classification> inception =
-                MxModelZoo.ACTION_RECOGNITION.loadModel(criteria);
+                MxModelZoo.ACTION_RECOGNITION.loadModel(criteria, new ProgressBar());
 
         Classification result;
         try (Predictor<BufferedImage, Classification> action = inception.newPredictor()) {
