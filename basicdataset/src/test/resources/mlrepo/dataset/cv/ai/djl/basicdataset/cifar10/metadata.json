@@ -19,14 +19,15 @@
       "files": {
         "data_batch.bin": {
           "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/cifar10/data_batch.bin.gz",
-          "sha1Hash": "7d419c355d2267b1f8e949af07cef073d26c590e"
+          "sha1Hash": "7d419c355d2267b1f8e949af07cef073d26c590e",
+          "size": 141317082
         },
         "test_batch.bin": {
           "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/cifar10/test_batch.bin.gz",
-          "sha1Hash": "e3211925febe953b7bce86a8cb3cca98724aceee"
+          "sha1Hash": "e3211925febe953b7bce86a8cb3cca98724aceee",
+          "size": 28259644
         }
       }
     }
-  ],
-  "snapshot": true
+  ]
 }

@@ -19,22 +19,25 @@
       "files": {
         "train_data": {
           "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/mnist/train-images-idx3-ubyte.gz",
-          "sha1Hash": "6c95f4b05d2bf285e1bfb0e7960c31bd3b3f8a7d"
+          "sha1Hash": "6c95f4b05d2bf285e1bfb0e7960c31bd3b3f8a7d",
+          "size": 9912422
         },
         "train_labels": {
           "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/mnist/train-labels-idx1-ubyte.gz",
-          "sha1Hash": "2a80914081dc54586dbdf242f9805a6b8d2a15fc"
+          "sha1Hash": "2a80914081dc54586dbdf242f9805a6b8d2a15fc",
+          "size": 28881
         },
         "test_data": {
           "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/mnist/t10k-images-idx3-ubyte.gz",
-          "sha1Hash": "c3a25af1f52dad7f726cce8cacb138654b760d48"
+          "sha1Hash": "c3a25af1f52dad7f726cce8cacb138654b760d48",
+          "size": 1648877
         },
         "test_labels": {
           "uri": "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/gluon/dataset/mnist/t10k-labels-idx1-ubyte.gz",
-          "sha1Hash": "763e7fa3757d93b0cdec073cef058b2004252c17"
+          "sha1Hash": "763e7fa3757d93b0cdec073cef058b2004252c17",
+          "size": 4542
         }
       }
     }
-  ],
-  "snapshot": true
+  ]
 }

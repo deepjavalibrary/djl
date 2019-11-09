@@ -19,14 +19,15 @@
       "files": {
         "train": {
           "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/pikachu/train.zip",
-          "sha1Hash": "9f5b61a3ca560e1913fca2bcf98079471e2eaa3d"
+          "sha1Hash": "9f5b61a3ca560e1913fca2bcf98079471e2eaa3d",
+          "size": 28387787
         },
         "test": {
           "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/pikachu/test.zip",
-          "sha1Hash": "1919809aa7295ef5e225a2926646367a2f535f44"
+          "sha1Hash": "1919809aa7295ef5e225a2926646367a2f535f44",
+          "size": 3170427
         }
       }
     }
-  ],
-  "snapshot": true
+  ]
 }

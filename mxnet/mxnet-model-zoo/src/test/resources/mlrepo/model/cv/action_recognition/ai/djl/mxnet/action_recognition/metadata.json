@@ -28,15 +28,18 @@
       "files": {
         "classes": {
           "uri": "classes.txt",
-          "sha1Hash": "d00d4f576ff529b0cc9e017be62b6b7b60908680"
+          "sha1Hash": "d00d4f576ff529b0cc9e017be62b6b7b60908680",
+          "size": 1188
         },
         "symbol": {
           "uri": "0.0.1/vgg16_ucf101-symbol.json",
-          "sha1Hash": "6cd91c2e0192cbe069be250137564749fffa15a4"
+          "sha1Hash": "6cd91c2e0192cbe069be250137564749fffa15a4",
+          "size": 438097
         },
         "parameters": {
-          "uri": "https://mlrepo.djl.ai/model/cv/action_recognition/ai/djl/mxnet/action_recognition/0.0.1/vgg16_ucf101-0000.params.gz",
-          "sha1Hash": "abcc2647be253bc6baefc52813b5dd9e1a1ef60f"
+          "uri": "0.0.1/vgg16_ucf101-0000.params.gz",
+          "sha1Hash": "abcc2647be253bc6baefc52813b5dd9e1a1ef60f",
+          "size": 498547967
         }
       }
     },
@@ -55,15 +58,18 @@
       "files": {
         "classes": {
           "uri": "classes.txt",
-          "sha1Hash": "d00d4f576ff529b0cc9e017be62b6b7b60908680"
+          "sha1Hash": "d00d4f576ff529b0cc9e017be62b6b7b60908680",
+          "size": 1188
         },
         "symbol": {
           "uri": "0.0.1/inceptionv3_ucf101-symbol.json",
-          "sha1Hash": "6c32d3c8415662327eb62c75fa9d5c26c95b0546"
+          "sha1Hash": "6c32d3c8415662327eb62c75fa9d5c26c95b0546",
+          "size": 1188
         },
         "parameters": {
-          "uri": "https://mlrepo.djl.ai/model/cv/action_recognition/ai/djl/mxnet/action_recognition/0.0.1/inceptionv3_ucf101-0000.params.gz",
-          "sha1Hash": "3f54c30fc86112bda6ad58e6c9bdc4a4b62db2b5"
+          "uri": "0.0.1/inceptionv3_ucf101-0000.params.gz",
+          "sha1Hash": "3f54c30fc86112bda6ad58e6c9bdc4a4b62db2b5",
+          "size": 81615250
         }
       }
     }

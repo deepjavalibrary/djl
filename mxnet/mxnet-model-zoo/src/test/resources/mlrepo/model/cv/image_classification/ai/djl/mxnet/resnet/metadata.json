@@ -29,15 +29,18 @@
       "files": {
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
-          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2"
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
         },
         "symbol": {
           "uri": "0.0.1/resnet18_v1-symbol.json",
-          "sha1Hash": "c642e3b97eb59ca580a4ae4098c3d93658b4178a"
+          "sha1Hash": "c642e3b97eb59ca580a4ae4098c3d93658b4178a",
+          "size": 61264
         },
         "parameters": {
-          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet18_v1-0000.params.gz",
-          "sha1Hash": "b669e1475b7a9368e9b3bc9869cc65a560387820"
+          "uri": "0.0.1/resnet18_v1-0000.params.gz",
+          "sha1Hash": "b669e1475b7a9368e9b3bc9869cc65a560387820",
+          "size": 43452245
         }
       }
     },
@@ -57,15 +60,18 @@
       "files": {
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
-          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2"
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
         },
         "symbol": {
           "uri": "0.0.1/resnet50_v2-symbol.json",
-          "sha1Hash": "ec0b80c19146a86b3f356ce051654832edfbe734"
+          "sha1Hash": "ec0b80c19146a86b3f356ce051654832edfbe734",
+          "size": 155869
         },
         "parameters": {
-          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet50_v2-0000.params.gz",
-          "sha1Hash": "158ce9eefe23ccf02c36320a540d99d3028c60e1"
+          "uri": "0.0.1/resnet50_v2-0000.params.gz",
+          "sha1Hash": "158ce9eefe23ccf02c36320a540d99d3028c60e1",
+          "size": 95092152
         }
       }
     },
@@ -85,15 +91,18 @@
       "files": {
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
-          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2"
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
         },
         "symbol": {
           "uri": "0.0.1/resnet152_v1d-symbol.json",
-          "sha1Hash": "83186e6c79b5c46d37236867caf2fd35132ce903"
+          "sha1Hash": "83186e6c79b5c46d37236867caf2fd35132ce903",
+          "size": 476437
         },
         "parameters": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet152_v1d-0000.params.gz",
-          "sha1Hash": "5fb89642f5c3d7764c68811f85b0feabb656f9f9"
+          "sha1Hash": "5fb89642f5c3d7764c68811f85b0feabb656f9f9",
+          "size": 224073866
         }
       }
     },
@@ -114,16 +123,19 @@
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset_cifar10.txt",
           "sha1Hash": "107a31d7b87d44ff07d50cfceb176add6d8b9518",
+          "size": 60,
           "name": "synset.txt"
         },
         "symbol": {
           "uri": "0.0.1/resnet50_v1-symbol.json",
           "name": "resnet50_v1_cifar10-symbol.json",
-          "sha1Hash": "a326bd546630fa171398ea33d0136f8e43530748"
+          "sha1Hash": "a326bd546630fa171398ea33d0136f8e43530748",
+          "size": 31675
         },
         "parameters": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet50_v1_cifar10-0000.params.gz",
-          "sha1Hash": "cf1f6660d73cd324c25ab04405b8b07c3a35fad3"
+          "sha1Hash": "cf1f6660d73cd324c25ab04405b8b07c3a35fad3",
+          "size": 87352464
         }
       }
     }

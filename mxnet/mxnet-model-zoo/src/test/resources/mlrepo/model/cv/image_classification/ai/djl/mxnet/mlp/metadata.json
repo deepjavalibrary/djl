@@ -28,15 +28,18 @@
       "files": {
         "synset": {
           "uri": "synset.txt",
-          "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1"
+          "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1",
+          "size": 19
         },
         "symbol": {
           "uri": "0.0.1/mlp-symbol.json",
-          "sha1Hash": "1660b18b452226e4f550f3de7164b51d1f798ab6"
+          "sha1Hash": "1660b18b452226e4f550f3de7164b51d1f798ab6",
+          "size": 3803
         },
         "parameters": {
-          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/mlp/0.0.1/mlp-0000.params",
-          "sha1Hash": "59a36647d05efbdf458a2fde0791c9c1cb9882ba"
+          "uri": "0.0.1/mlp-0000.params",
+          "sha1Hash": "59a36647d05efbdf458a2fde0791c9c1cb9882ba",
+          "size": 438044
         }
       }
     }

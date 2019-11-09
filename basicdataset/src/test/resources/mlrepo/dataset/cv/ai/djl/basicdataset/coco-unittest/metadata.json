@@ -19,18 +19,20 @@
       "files": {
         "train2017": {
           "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/coco-unittest/train2017.zip",
-          "sha1Hash": "923de950e12bb22c6373fdd53e6a8ef1cb0b01af"
+          "sha1Hash": "02f6cc19226e99d53c112b59ed562bc217e5bb54",
+          "size": 224397
         },
         "val2017": {
           "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/coco-unittest/val2017.zip",
-          "sha1Hash": "5643a1b4c5344fd9bdc9b0f7665e575edeff444a"
+          "sha1Hash": "66c5a67ea166208af5db5168198da8c0b55c3f86",
+          "size": 161961
         },
         "annotations": {
           "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/coco-unittest/annotations_trainval2017.zip",
-          "sha1Hash": "08bb4fb5394aa37ce8362f21689cbcb42f14b1e8"
+          "sha1Hash": "efdb9553edeec207396da9a23a68a80ff4a8fb47",
+          "size": 4973
         }
       }
     }
-  ],
-  "snapshot": true
+  ]
 }

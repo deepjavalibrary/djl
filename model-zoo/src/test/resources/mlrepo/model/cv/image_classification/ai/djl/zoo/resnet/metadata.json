@@ -5,7 +5,7 @@
   "type": "cv",
   "name": "Resnet",
   "description": "Resnet image classification",
-  "website": "http://www.djl.ai/mxnet/model-zoo",
+  "website": "http://www.djl.ai/model-zoo",
   "licenses": {
     "license": {
       "name": "The Apache License, Version 2.0",
@@ -35,11 +35,13 @@
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_cifar10.txt",
           "sha1Hash": "9e5321bb62ab5bb5ffb9c20fb8538c9466ce799e",
+          "size": 59,
           "name": "synset.txt"
         },
         "parameters": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/resnet/0.0.1/resnetv1-0000.params.gz",
-          "sha1Hash": "298b81702088f31d3348d7581eee47b21632cfd3"
+          "sha1Hash": "298b81702088f31d3348d7581eee47b21632cfd3",
+          "size": 87626602
         }
       }
     }

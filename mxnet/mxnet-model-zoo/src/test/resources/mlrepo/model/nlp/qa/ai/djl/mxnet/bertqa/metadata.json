@@ -24,15 +24,18 @@
       "files": {
         "vocabulary": {
           "uri": "https://mlrepo.djl.ai/model/nlp/qa/ai/djl/mxnet/bertqa/vocab.json",
-          "sha1Hash": "a66073971aa0b1a262453fe51342e57166a8abcf"
+          "sha1Hash": "a66073971aa0b1a262453fe51342e57166a8abcf",
+          "size": 861574
         },
         "symbol": {
           "uri": "0.0.1/static_bert_qa-symbol.json",
-          "sha1Hash": "0507f21bd3f73361dfcff72c20147cf25ce3623f"
+          "sha1Hash": "0507f21bd3f73361dfcff72c20147cf25ce3623f",
+          "size": 232706
         },
         "parameters": {
-          "uri": "https://mlrepo.djl.ai/model/nlp/qa/ai/djl/mxnet/bertqa/0.0.1/static_bert_qa-0002.params.gz",
-          "sha1Hash": "967db47d92fe7ef1b80d7dd89975effb1dbef1ef"
+          "uri": "0.0.1/static_bert_qa-0002.params.gz",
+          "sha1Hash": "967db47d92fe7ef1b80d7dd89975effb1dbef1ef",
+          "size": 403379565
         }
       }
     }
