@@ -16,11 +16,18 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
-/** Normalizes a tensor of shape (C, H, W). */
+/** A {@link Transform} that normalizes an image NDArray of shape CHW or NCHW. */
 public class Normalize implements Transform {
     private float[] mean;
     private float[] std;
 
+    /**
+     * Creates a {@code Normalize} {@link Transform} that normalizes.
+     *
+     * @param mean the mean to normalize with for each channel
+     * @param std the standard deviation to normalize with for each channel
+     * @see NDImageUtils#normalize(NDArray, float[], float[])
+     */
     public Normalize(float[] mean, float[] std) {
         this.mean = mean;
         this.std = std;

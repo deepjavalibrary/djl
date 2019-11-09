@@ -16,7 +16,7 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
-/** Crops the image. The input shape of the image is (H, W, C). */
+/** A {@link Transform} that crops the image to a given location and size. */
 public class Crop implements Transform {
 
     private int x;
@@ -24,6 +24,14 @@ public class Crop implements Transform {
     private int width;
     private int height;
 
+    /**
+     * Creates a {@code CenterCrop} {@link Transform}.
+     *
+     * @param x the x coordinate of the top-left corner of the crop
+     * @param y the y coordinate of the top-left corner of the crop
+     * @param width the width of the cropped image
+     * @param height the height of the cropped image
+     */
     public Crop(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;

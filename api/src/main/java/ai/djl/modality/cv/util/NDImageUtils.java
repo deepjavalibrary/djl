@@ -47,8 +47,8 @@ public final class NDImageUtils {
     }
 
     /**
-     * Normalizes an image NDArray of shape (C x H x W) or (N x C x H x W) with a single mean and
-     * standard deviation to apply to all channels.
+     * Normalizes an image NDArray of shape CHW or NCHW with a single mean and standard deviation to
+     * apply to all channels.
      *
      * @param input the image to normalize
      * @param mean the mean to normalize with (for all channels)
@@ -61,8 +61,7 @@ public final class NDImageUtils {
     }
 
     /**
-     * Normalizes an image NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard
-     * deviation.
+     * Normalizes an image NDArray of shape CHW or NCHW with mean and standard deviation.
      *
      * <p>Given mean {@code (m1, ..., mn)} and standard deviation {@code (s1, ..., sn} for {@code n}
      * channels, this transform normalizes each channel of the input tensor with: {@code output[i] =
@@ -80,7 +79,9 @@ public final class NDImageUtils {
     /**
      * Converts an image NDArray from preprocessing format to Neural Network format.
      *
-     * <p>It converts the shape from NHWC to NCHW and divides by 255.
+     * <p>Converts an image NDArray of shape HWC in the range {@code [0, 255]} to a {@link
+     * ai.djl.ndarray.types.DataType#FLOAT32} tensor NDArray of shape CHW in the range {@code [0,
+     * 1]}.
      *
      * @param image the image to convert
      * @return the converted image

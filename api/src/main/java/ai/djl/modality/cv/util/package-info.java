@@ -10,23 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.modality.cv.transform;
 
-import ai.djl.modality.cv.util.NDImageUtils;
-import ai.djl.ndarray.NDArray;
-import ai.djl.translate.Transform;
-
-/**
- * A {@link Transform} that converts an image NDArray from preprocessing format to Neural Network
- * format.
- *
- * @see NDImageUtils#toTensor(NDArray)
- */
-public class ToTensor implements Transform {
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray transform(NDArray array) {
-        return NDImageUtils.toTensor(array);
-    }
-}
+/** Contains utility classes for image manipulation. */
+package ai.djl.modality.cv.util;

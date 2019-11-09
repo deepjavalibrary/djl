@@ -16,17 +16,28 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
-/** Resizes the image. */
+/** A {@link Transform} that resizes the image. */
 public class Resize implements Transform {
 
     private int width;
     private int height;
 
+    /**
+     * Creates a {@code Resize} {@link Transform} that resizes to the given size.
+     *
+     * @param size the new size to use for both height and width
+     */
     public Resize(int size) {
         width = size;
         height = size;
     }
 
+    /**
+     * Creates a {@code Resize} {@link Transform} that resizes to the given width and height.
+     *
+     * @param width the desired width
+     * @param height the desired height
+     */
     public Resize(int width, int height) {
         this.width = width;
         this.height = height;

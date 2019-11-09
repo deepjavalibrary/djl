@@ -363,8 +363,7 @@ public interface NDArrayEx {
     ////////////////////////////////////////
 
     /**
-     * Normalizes a NDArray of shape (C x H x W) or (N x C x H x W) with mean and standard
-     * deviation.
+     * Normalizes a NDArray of shape CHW or NCHW with mean and standard deviation.
      *
      * <p>Given mean `(m1, ..., mn)` and std `(s\ :sub:`1`\ , ..., s\ :sub:`n`)` for `n` channels,
      * this transform normalizes each channel of the input tensor with: output[i] = (input[i] - m\

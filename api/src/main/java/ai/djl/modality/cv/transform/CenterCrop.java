@@ -16,16 +16,26 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
+/** A {@link Transform} that crops the center of an image. */
 public class CenterCrop implements Transform {
 
     private int width;
     private int height;
 
+    /**
+     * Creates a {@code CenterCrop} {@link Transform} that crops to size {@code min(width, height)}.
+     */
     public CenterCrop() {
         width = -1;
         height = -1;
     }
 
+    /**
+     * Creates a {@code CenterCrop} {@link Transform} that crops the given width and height.
+     *
+     * @param width the desired width of the cropped image
+     * @param height the desired height of the cropped image
+     */
     public CenterCrop(int width, int height) {
         this.width = width;
         this.height = height;
