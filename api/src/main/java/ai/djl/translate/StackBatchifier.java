@@ -29,29 +29,22 @@ public class StackBatchifier implements Batchifier {
     public NDList batchify(NDList[] inputs) {
         // each input as NDList might contain several data or labels
         // so those should be batchified with counterpart
-        int size = inputs[0].size();
+        int batchSize = inputs.length;
+        int numInputKinds = inputs[0].size();
         // if the NDList is empty
-        if (size == 0) {
+        if (numInputKinds == 0) {
             return new NDList();
-        }
-        // collect all the data0...n in batch into one NDList
-        NDList[] dataList = new NDList[size];
-        for (NDList input : inputs) {
-            for (int i = 0; i < size; i++) {
-                if (dataList[i] == null) {
-                    dataList[i] = new NDList();
-                }
-                dataList[i].add(input.get(i));
-            }
         }
 
         // stack all the data and labels together
-        NDList result = new NDList(size);
-        for (NDList list : dataList) {
-            NDArray stacked = NDArrays.stack(list);
+        NDList result = new NDList(numInputKinds);
+        for (int i = 0; i < numInputKinds; i++) {
+            NDList inputsOfKind = new NDList(batchSize);
+            for (NDList input : inputs) {
+                inputsOfKind.add(input.get(i));
+            }
+            NDArray stacked = NDArrays.stack(new NDList(inputsOfKind));
             result.add(stacked);
-            // close the intermediate NDArray
-            list.close();
         }
 
         return result;
@@ -60,22 +53,23 @@ public class StackBatchifier implements Batchifier {
     /** {@inheritDoc} */
     @Override
     public NDList[] unbatchify(NDList inputs) {
-        if (inputs.size() == 0) {
+        int numInputKinds = inputs.size();
+        if (numInputKinds == 0) {
             return new NDList[0];
         }
-        int size = Math.toIntExact(inputs.head().size(0));
-        if (size == 0) {
+        int batchSize = Math.toIntExact(inputs.head().size(0));
+        if (batchSize == 0) {
             return new NDList[0];
         }
 
-        NDList[] dataList = new NDList[size];
-        for (int i = 0; i < size; i++) {
+        NDList[] dataList = new NDList[batchSize];
+        for (int i = 0; i < batchSize; i++) {
             dataList[i] = new NDList();
         }
 
         for (NDArray input : inputs) {
-            NDList splitList = input.split(size);
-            for (int i = 0; i < size; i++) {
+            NDList splitList = input.split(batchSize);
+            for (int i = 0; i < batchSize; i++) {
                 NDArray array = splitList.get(i).squeeze(0);
                 array.setName(input.getName());
                 dataList[i].add(array);
@@ -117,16 +111,20 @@ public class StackBatchifier implements Batchifier {
      * @return an NDList even if `numOfSlice` is 1.
      */
     private NDList split(NDArray array, int numOfSlices, boolean evenSplit) {
-        int size = Math.toIntExact(array.size(0));
-        if (size < numOfSlices) {
+        int batchSize = Math.toIntExact(array.size(0));
+        if (batchSize < numOfSlices) {
             throw new IllegalArgumentException(
-                    "Batch size(" + size + ") is less then slice number(" + numOfSlices + ").");
+                    "Batch size("
+                            + batchSize
+                            + ") is less then slice number("
+                            + numOfSlices
+                            + ").");
         }
 
-        if (evenSplit && size % numOfSlices != 0) {
+        if (evenSplit && batchSize % numOfSlices != 0) {
             throw new IllegalArgumentException(
                     "data with shape "
-                            + size
+                            + batchSize
                             + " cannot be evenly split into "
                             + numOfSlices
                             + ". Use a batch size that's multiple of "
@@ -139,7 +137,7 @@ public class StackBatchifier implements Batchifier {
             return array.split(numOfSlices);
         }
 
-        int step = (int) Math.ceil((double) size / numOfSlices);
+        int step = (int) Math.ceil((double) batchSize / numOfSlices);
         int[] indices = IntStream.range(1, numOfSlices).map(i -> i * step).toArray();
         return array.split(indices);
     }
