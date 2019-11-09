@@ -1,15 +1,21 @@
-Jupyter notebook examples
-=========================
+# DeepJavaLibrary - Jupyter notebooks
 
 ## Overview
 
-This folder contains jupyter notebooks that demonstrate how to use djl.ai API in real world examples. 
+This folder contains tutorials that teach you how to achieve basic AI tasks with DeepJavaLibrary API.
+
+## List of tutorials
+
+- [Create your first neural network](create_your_first_network.ipynb)
+- [Train your first model](train_your_first_model.ipynb)
+- [Run image classification with your first model](image_classification_with_your_model.ipynb)
+- [Run object detection with model zoo](object_detection_with_model_zoo.ipynb)
 
 ## Setup
 
-### JDK 9 (not jre)
+### JDK 11 (not jre)
 
-JDK 9 (or above are required), the examples provided in this folder requires JDK 10+.
+JDK 11 (or above are required) to run the examples provided in this folder.
 
 to confirm the java path is configured properly:
 
@@ -23,7 +29,6 @@ java --list-modules | grep "jdk.jshell"
 
 ```bash
 pip3 install jupyter
-
 ```
 
 ### Install IJava kernel for jupyter
@@ -43,11 +48,12 @@ jupyter notebook
 
 ## Docker setup
 
-You may use Jupyter docker to have the same experience
+You may want to use docker for simple installation or you are using Windows.
 
 ### Create docker image
 
 ```
+cd jupyter
 docker build -t djl.ai .
 ```
 
@@ -57,5 +63,5 @@ docker build -t djl.ai .
 docker run -p 8888:8888 -it djl.ai
 ```
 
-You can open the `http://localhost:8888` to see the hosted instance on docker. 
-Passed in the tokens provided in the docker message, and the docker is ready to go.
+You can open the `http://localhost:8888` to see the hosted instance on docker.
+Pass in the tokens provided in the docker message, and the docker is ready to go.
