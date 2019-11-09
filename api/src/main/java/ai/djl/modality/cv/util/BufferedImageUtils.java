@@ -48,7 +48,7 @@ public final class BufferedImageUtils {
      * @throws IOException file is not found
      */
     public static BufferedImage fromFile(Path path) throws IOException {
-        return ImageIO.read(path.toFile());
+        return ImageIO.read(path.toAbsolutePath().toFile());
     }
 
     public static Color randomColor() {
