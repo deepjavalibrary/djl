@@ -27,7 +27,7 @@ dependencies {
 
     runtime "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
 
-    testCompile ("org.testng:testng:${testng_version}") {
+    testCompile("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
 }
@@ -82,7 +82,7 @@ application {
     mainClassName = System.getProperty("main", "ai.djl.examples.inference.ObjectDetection")
 }
 
-run{
+run {
     systemProperties System.getProperties()
     systemProperties.remove("user.dir");
 }

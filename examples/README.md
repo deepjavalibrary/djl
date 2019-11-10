@@ -1,53 +1,61 @@
-djl.ai - examples
-=================
+# DeepJavaLibrary - examples
 
-## Overview
+This module contains examples to demonstrate how developers can use the DeepJavaLibrary API.
 
-The djl.ai API is designed to be an extremely easy to use deep learning framework for Java
-developers. djl.ai does not require you to be a Machine Learning/Deep Learning expert to get
-started. You can use your existing Java expertise as an on-ramp to learn and use ML/DL. You can
-use your favorite IDE to build/train/deploy your models and integrate these models with your
-Java applications.
+The following is a list of examples:
 
-djl.ai API is deep learning framework agnostic, so you don't have to make a choice
-between frameworks when starting your project. You can switch to a different framework at any
-time you want. djl.ai also provides automatic CPU/GPU choice based on the hardware configuration
-to ensure the best performance.
+- [Image classification example](docs/image_classification.md)
+- [Single-shot Object detection example](docs/object_detection.md)
+- [Bert question and answer example](docs/BERT_question_and_answer.md)
 
-djl.ai API provides native Java development experience. It functions similarly to any other Java library.
-djl.ai's ergonomic API interface is designed to guide you with best practices to accomplish your
-deep learning task.
+## Prerequisite
 
-The following is an example of how to write inference code:
+* You need to have JDK 8 (or later) installed on your system. Read [here](../docs/development/setup.md) for more detail.
+* You should also be familiar with the API documentation: [Javadoc](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/index.html)
 
-```java
-    // Assume user uses a pre-trained model from model zoo, they just need to load it
-    Map<String, String> criteria = new HashMap<>();
-    criteria.put("layers", "18");
-    criteria.put("flavor", "v1");
 
-    // Load pre-trained model from model zoo
-    try (Model<BufferedImage, Classifications> model = MxModelZoo.RESNET.loadModel(criteria)) {
-        try (Predictor<BufferedImage, Classifications> predictor = model.newPredictor()) {
-            BufferedImage img = readImage(); // read image
-            Classifications result = predictor.predict(img);
+# Getting started: 30 seconds to run an example
 
-            // get the classification and probability
-            ...
-        }
-    }
+## Building with command line
+
+This example project supports building with both gradle and maven. To build, use the following:
+
+### gradle
+
+```sh
+cd examples
+./gradlew jar
 ```
 
-## djl.ai API reference
+### maven build
 
-You can find more information here: [Javadoc](https://djl-ai.s3.amazonaws.com/java-api/0.1.0/index.html)
+```sh
+cd examples
+mvn package
+```
 
-## Examples project
+### Run example code
+With the gradle `application` plugin you can execute example code directly.
+You can find how to run each example in each example's detail document.
+Here is an example that executes object detection example:
 
-Read [Examples project](examples.md) for more detail about how to setup development environment and dependencies.
+```sh
+cd examples
+./gradlew run
+```
 
-You can also read individual examples: 
+## Engine selection
 
-1. [Image classification example](CLASSIFY.md)
-2. [Single-shot Object detection example](SSD.md)
-3. [Bert question and answer example](BERTQA.md)
+djl.ai is engine agnostic, so you can choose different engine providers. We currently
+provide MXNet engine implementation.
+
+With MXNet, you can choose different flavors of the native MXNet library.
+In this example, we use `mxnet-native-mkl` for OSX platform. You might need to 
+change it for your platform in [pom.xml](pom.xml) or [build.gradle](build.gradle).
+
+Available MXNet versions are as follows:
+
+| Version              |
+| -------------------- |
+| mxnet-native-mkl     |
+| mxnet-native-cu101mkl|

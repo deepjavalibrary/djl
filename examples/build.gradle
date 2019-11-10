@@ -16,11 +16,11 @@ dependencies {
     compile "commons-cli:commons-cli:1.4"
     compile "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
     compile "com.google.code.gson:gson:2.8.5"
-    compile "ai.djl:api:0.1.0"
-    compile "ai.djl:basicdataset:0.1.0"
-    compile "ai.djl:model-zoo:0.1.0"
-    compile "ai.djl.mxnet:mxnet-model-zoo:0.1.0"
-    runtime "ai.djl.mxnet:mxnet-native-mkl:1.6.0:${classifier}"
+    compile "ai.djl:api:0.2.0-SNAPSHOT"
+    compile "ai.djl:basicdataset:0.2.0-SNAPSHOT"
+    compile "ai.djl:model-zoo:0.2.0-SNAPSHOT"
+    compile "ai.djl.mxnet:mxnet-model-zoo:0.2.0-SNAPSHOT"
+    runtime "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
 
     testImplementation 'org.testng:testng:6.14.3'
 }
@@ -35,7 +35,7 @@ application {
     mainClassName = System.getProperty("main", "ai.djl.examples.inference.ObjectDetection")
 }
 
-run{
+run {
     systemProperties System.getProperties()
 }
 

@@ -1,16 +1,15 @@
-Setup
-=====
+# Setup development environment
 
 ## Install jdk
 
-djl.ai requires JDK 8 (or later). We recommend use JDK8 since there are some known glitches with JDK 11+.
+Our project requires JDK 8 (or later). We recommend use JDK8 since there are some known glitches with JDK 11+.
 
 Verify Java is available in your $PATH environment variable. If you have multiple versions of Java installed,
 you can use $JAVA_HOME environment variable to control which version of Java to use.
 
 For ubuntu:
 ```bash
-sudo apt-get install openjdk-8-jre-headless
+sudo apt-get install openjdk-8-jdk-headless
 ```
 
 For centos
@@ -30,7 +29,14 @@ manually if you have trouble with the previous commands.
 
 ## Install IntelliJ (Optional)
 
-You can use the IDE of your choice. We recommend using IntelliJ since we are using IntelliJ for the examples in our documentation.
+You can use the IDE of your choice. We recommend using IntelliJ.
+
+### Import DJL project into IntelliJ
+
+1. Open IntelliJ and click `Import Project`.
+2. Navigate to the project root folder and click "Open".
+3. Choose `Import project from existing model`, you can select `Gradle`
+4. Use the default configuration and click `OK`.
 
 ## Gradle/Maven (Not required)
 

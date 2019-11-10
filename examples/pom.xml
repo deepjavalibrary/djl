@@ -38,33 +38,33 @@
     <dependency>
       <groupId>ai.djl</groupId>
       <artifactId>api</artifactId>
-      <version>0.1.0</version>
+      <version>0.2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>ai.djl</groupId>
       <artifactId>basicdataset</artifactId>
-      <version>0.1.0</version>
+      <version>0.2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>ai.djl</groupId>
       <artifactId>model-zoo</artifactId>
-      <version>0.1.0</version>
+      <version>0.2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-model-zoo</artifactId>
-      <version>0.1.0</version>
+      <version>0.2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-engine</artifactId>
-      <version>0.1.0</version>
+      <version>0.2.0-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.mxnet</groupId>
       <artifactId>mxnet-native-mkl</artifactId>
-      <version>1.6.0</version>
+      <version>1.6.0-SNAPSHOT</version>
       <classifier>osx-x86_64</classifier>
       <scope>runtime</scope>
     </dependency>
