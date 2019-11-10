@@ -75,7 +75,7 @@ public class PoseEstimation extends AbstractInference<List<Joints>> {
         // Get the cropped image
         List<BufferedImage> filtered =
                 ssdResult
-                        .items()
+                        .<DetectedObjects.BoundingBoxItem>items()
                         .stream()
                         .filter(obj -> obj.getClassName().equals("person"))
                         .map(obj -> obj.getBoundingBox().getBounds())

@@ -17,7 +17,7 @@ import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ZooModel;
@@ -29,7 +29,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ActionRecognition extends AbstractInference<Classification> {
+public class ActionRecognition extends AbstractInference<Classifications> {
 
     public static void main(String[] args) {
         new ActionRecognition().runExample(args);
@@ -37,18 +37,18 @@ public class ActionRecognition extends AbstractInference<Classification> {
 
     /** {@inheritDoc} */
     @Override
-    protected Classification predict(Arguments arguments, Metrics metrics, int iteration)
+    protected Classifications predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("backbone", "inceptionv3");
         criteria.put("dataset", "ucf101");
-        ZooModel<BufferedImage, Classification> inception =
+        ZooModel<BufferedImage, Classifications> inception =
                 MxModelZoo.ACTION_RECOGNITION.loadModel(criteria, new ProgressBar());
 
-        Classification result;
-        try (Predictor<BufferedImage, Classification> action = inception.newPredictor()) {
+        Classifications result;
+        try (Predictor<BufferedImage, Classifications> action = inception.newPredictor()) {
             action.setMetrics(metrics); // Let predictor collect metrics
             result = action.predict(img);
         }

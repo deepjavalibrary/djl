@@ -13,7 +13,7 @@
 package ai.djl.examples;
 
 import ai.djl.examples.inference.ActionRecognition;
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -27,8 +27,8 @@ public class ActionRecognitionTest {
 
         ActionRecognition test = new ActionRecognition();
         Assert.assertTrue(test.runExample(args));
-        Classification result = test.getPredictResult();
-        Classification.Item best = result.best();
+        Classifications result = test.getPredictResult();
+        Classifications.Item best = result.best();
         Assert.assertEquals(best.getClassName(), "ThrowDiscus");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }

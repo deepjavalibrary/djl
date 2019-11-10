@@ -16,7 +16,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.integration.util.Assertions;
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -103,7 +103,7 @@ public class ResnetTest {
     public void testLoadPredict()
             throws IOException, ModelNotFoundException, TranslateException,
                     MalformedModelException {
-        try (ZooModel<BufferedImage, Classification> model = getModel()) {
+        try (ZooModel<BufferedImage, Classifications> model = getModel()) {
             try (Predictor<NDList, NDList> predictor = model.newPredictor(new TestTranslator())) {
                 NDList input = new NDList(model.getNDManager().ones(new Shape(3, 32, 32)));
                 List<NDList> inputs = Collections.nCopies(16, input);
@@ -115,7 +115,7 @@ public class ResnetTest {
     @Test(enabled = false)
     public void testLoadTrain()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        try (ZooModel<BufferedImage, Classification> model = getModel()) {
+        try (ZooModel<BufferedImage, Classifications> model = getModel()) {
             TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l1Loss());
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(16, 3, 32, 32);
@@ -135,7 +135,7 @@ public class ResnetTest {
         }
     }
 
-    private ZooModel<BufferedImage, Classification> getModel()
+    private ZooModel<BufferedImage, Classifications> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("numLayers", "50");

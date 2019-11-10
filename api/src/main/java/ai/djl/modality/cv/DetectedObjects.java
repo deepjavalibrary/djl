@@ -12,12 +12,11 @@
  */
 package ai.djl.modality.cv;
 
-import ai.djl.modality.AbstractClassifications;
-import ai.djl.modality.cv.DetectedObjects.Item;
+import ai.djl.modality.Classifications;
 import java.util.List;
 
 /** A class representing the detected object in an object detection case. */
-public class DetectedObjects extends AbstractClassifications<Item> {
+public class DetectedObjects extends Classifications {
 
     private List<BoundingBox> boundingBoxes;
 
@@ -29,14 +28,20 @@ public class DetectedObjects extends AbstractClassifications<Item> {
 
     /** {@inheritDoc} */
     @Override
-    protected Item item(int index) {
-        return new Item(index);
+    @SuppressWarnings("unchecked")
+    public <T extends Item> T item(int index) {
+        return (T)
+                new BoundingBoxItem(
+                        classNames.get(index), probabilities.get(index), boundingBoxes.get(index));
     }
 
-    public class Item extends AbstractClassifications<Item>.Item {
+    public static final class BoundingBoxItem extends Item {
 
-        protected Item(int index) {
-            super(index);
+        private BoundingBox boundingBox;
+
+        public BoundingBoxItem(String className, double probability, BoundingBox boundingBox) {
+            super(className, probability);
+            this.boundingBox = boundingBox;
         }
 
         /**
@@ -45,7 +50,7 @@ public class DetectedObjects extends AbstractClassifications<Item> {
          * @return the {@link BoundingBox} of the detected object
          */
         public BoundingBox getBoundingBox() {
-            return boundingBoxes.get(index);
+            return boundingBox;
         }
 
         /** {@inheritDoc} */

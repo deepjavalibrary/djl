@@ -12,7 +12,7 @@
  */
 package ai.djl.mxnet.zoo.cv.classification;
 
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.Resize;
@@ -31,7 +31,7 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 public abstract class ImageClassificationModelLoader
-        extends BaseModelLoader<BufferedImage, Classification> {
+        extends BaseModelLoader<BufferedImage, Classifications> {
 
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -43,7 +43,7 @@ public abstract class ImageClassificationModelLoader
 
     /** {@inheritDoc} */
     @Override
-    public Translator<BufferedImage, Classification> getTranslator(Artifact artifact) {
+    public Translator<BufferedImage, Classifications> getTranslator(Artifact artifact) {
         Map<String, Object> arguments = artifact.getArguments();
         int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
         int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();

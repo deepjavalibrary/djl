@@ -15,7 +15,7 @@ package ai.djl.inference;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.metric.Metrics;
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
@@ -62,7 +62,7 @@ public class InferenceTest {
             ssd.setMetrics(metrics);
             DetectedObjects result = ssd.predict(image);
 
-            DetectedObjects.Item object = result.items().get(0);
+            DetectedObjects.BoundingBoxItem object = result.item(0);
             Assert.assertEquals("cat", object.getClassName());
             Assert.assertEquals(
                     Double.compare(object.getBoundingBox().getBounds().getHeight(), 1d), 0);
@@ -76,8 +76,8 @@ public class InferenceTest {
         model.load(modelDir);
 
         final String className = "cat";
-        Translator<String, Classification> translator =
-                new Translator<String, Classification>() {
+        Translator<String, Classifications> translator =
+                new Translator<String, Classifications>() {
 
                     /** {@inheritDoc} */
                     @Override
@@ -93,17 +93,17 @@ public class InferenceTest {
 
                     /** {@inheritDoc} */
                     @Override
-                    public Classification processOutput(TranslatorContext ctx, NDList list) {
-                        return new Classification(
+                    public Classifications processOutput(TranslatorContext ctx, NDList list) {
+                        return new Classifications(
                                 Collections.singletonList(className),
                                 Collections.singletonList(0.9d));
                     }
                 };
         Metrics metrics = new Metrics();
 
-        try (Predictor<String, Classification> classifier = model.newPredictor(translator)) {
+        try (Predictor<String, Classifications> classifier = model.newPredictor(translator)) {
             classifier.setMetrics(metrics);
-            Classification result = classifier.predict(className);
+            Classifications result = classifier.predict(className);
             Assert.assertEquals(Double.compare(result.get(className).getProbability(), 0.9d), 0);
         }
     }

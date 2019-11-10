@@ -12,7 +12,7 @@
  */
 package ai.djl.mxnet.zoo.cv.actionrecognition;
 
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
@@ -29,7 +29,7 @@ import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
-public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage, Classification> {
+public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
 
     private static final Anchor BASE_ANCHOR = CV.ACTION_RECOGNITION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -42,7 +42,7 @@ public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage,
 
     /** {@inheritDoc} */
     @Override
-    public Translator<BufferedImage, Classification> getTranslator(Artifact artifact) {
+    public Translator<BufferedImage, Classifications> getTranslator(Artifact artifact) {
         Map<String, Object> arguments = artifact.getArguments();
         // 299 is the minimum length for inception, 224 for vgg
         int width = ((Double) arguments.getOrDefault("width", 299d)).intValue();

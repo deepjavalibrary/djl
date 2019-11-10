@@ -15,7 +15,7 @@ package ai.djl.zoo.cv.classification;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.Resize;
@@ -38,7 +38,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classification> {
+public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
 
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = ModelZoo.GROUP_ID;
@@ -52,7 +52,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
-    public Translator<BufferedImage, Classification> getTranslator(Artifact artifact) {
+    public Translator<BufferedImage, Classifications> getTranslator(Artifact artifact) {
         Map<String, Object> arguments = artifact.getArguments();
         List<Double> shape = (List<Double>) arguments.get("imageShape");
         int width = shape.get(2).intValue();

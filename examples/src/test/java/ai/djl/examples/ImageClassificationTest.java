@@ -13,7 +13,7 @@
 package ai.djl.examples;
 
 import ai.djl.examples.inference.ImageClassification;
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -25,8 +25,8 @@ public class ImageClassificationTest {
 
         ImageClassification test = new ImageClassification();
         Assert.assertTrue(test.runExample(args));
-        Classification result = test.getPredictResult();
-        Classification.Item best = result.best();
+        Classifications result = test.getPredictResult();
+        Classifications.Item best = result.best();
         Assert.assertEquals(best.getClassName(), "n02123045 tabby, tabby cat");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.4) > 0);
     }

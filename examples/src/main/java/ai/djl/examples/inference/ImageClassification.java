@@ -19,7 +19,7 @@ import ai.djl.examples.inference.util.Arguments;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ModelLoader;
@@ -33,7 +33,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class ImageClassification extends AbstractInference<Classification> {
+public final class ImageClassification extends AbstractInference<Classifications> {
 
     public static void main(String[] args) {
         new ImageClassification().runExample(args);
@@ -41,7 +41,7 @@ public final class ImageClassification extends AbstractInference<Classification>
 
     /** {@inheritDoc} */
     @Override
-    public Classification predict(Arguments arguments, Metrics metrics, int iteration)
+    public Classifications predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {
         String modelName = arguments.getModelName();
         if (modelName == null) {
@@ -55,7 +55,7 @@ public final class ImageClassification extends AbstractInference<Classification>
         // Change to a specific device if needed.
         Device device = Device.defaultDevice();
 
-        ModelLoader<BufferedImage, Classification> loader;
+        ModelLoader<BufferedImage, Classifications> loader;
 
         Map<String, String> criteria = arguments.getCriteria();
 
@@ -70,11 +70,11 @@ public final class ImageClassification extends AbstractInference<Classification>
             loader = MxModelZoo.getModelLoader(modelName);
         }
 
-        ZooModel<BufferedImage, Classification> model =
+        ZooModel<BufferedImage, Classifications> model =
                 loader.loadModel(criteria, device, new ProgressBar());
 
-        Classification predictResult = null;
-        try (Predictor<BufferedImage, Classification> predictor = model.newPredictor()) {
+        Classifications predictResult = null;
+        try (Predictor<BufferedImage, Classifications> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {

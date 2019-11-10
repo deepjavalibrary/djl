@@ -20,6 +20,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 public final class ImageVisualization {
 
@@ -40,7 +41,8 @@ public final class ImageVisualization {
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-        for (DetectedObjects.Item result : detections.items()) {
+        List<DetectedObjects.BoundingBoxItem> list = detections.items();
+        for (DetectedObjects.BoundingBoxItem result : list) {
             String className = result.getClassName();
             BoundingBox box = result.getBoundingBox();
             g.setPaint(BufferedImageUtils.randomColor().darker());

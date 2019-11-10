@@ -12,42 +12,66 @@
  */
 package ai.djl.modality;
 
-import ai.djl.modality.AbstractClassifications.Item;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.types.DataType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@SuppressWarnings("rawtypes")
-public abstract class AbstractClassifications<I extends Item> {
+/** {@code Classification} is the container that stores the classification results. */
+public class Classifications {
 
     protected List<String> classNames;
     protected List<Double> probabilities;
 
-    public AbstractClassifications(List<String> classNames, List<Double> probabilities) {
+    public Classifications(List<String> classNames, List<Double> probabilities) {
         this.classNames = classNames;
         this.probabilities = probabilities;
     }
 
-    protected abstract I item(int index);
-
-    public List<I> items() {
-        List<I> is = new ArrayList<>(classNames.size());
-        for (int i = 0; i < classNames.size(); i++) {
-            is.add(item(i));
-        }
-        return is;
+    public Classifications(List<String> classNames, NDArray probabilities) {
+        this.classNames = classNames;
+        NDArray array = probabilities.asType(DataType.FLOAT64, false);
+        this.probabilities =
+                Arrays.stream(array.toDoubleArray()).boxed().collect(Collectors.toList());
+        array.close();
     }
 
-    public List<I> topK(int k) {
-        List<I> items = items();
-        items.sort(Comparator.<I>comparingDouble(Item::getProbability).reversed());
+    public <T extends Item> List<T> items() {
+        List<T> list = new ArrayList<>(classNames.size());
+        for (int i = 0; i < classNames.size(); i++) {
+            list.add(item(i));
+        }
+        return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Item> T item(int index) {
+        return (T) new Item(classNames.get(index), probabilities.get(index));
+    }
+
+    public <T extends Item> List<T> topK(int k) {
+        List<T> items = items();
+        items.sort(Comparator.comparingDouble(Item::getProbability).reversed());
         int count = Math.min(items.size(), k);
         return items.subList(0, count);
     }
 
-    public I best() {
+    public <T extends Item> T best() {
         return item(probabilities.indexOf(Collections.max(probabilities)));
+    }
+
+    public <T extends Item> T get(String className) {
+        int size = classNames.size();
+        for (int i = 0; i < size; i++) {
+            if (classNames.get(i).equals(className)) {
+                return item(i);
+            }
+        }
+        return null;
     }
 
     /** {@inheritDoc} */
@@ -55,19 +79,21 @@ public abstract class AbstractClassifications<I extends Item> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[').append(System.lineSeparator());
-        for (I item : topK(5)) {
+        for (Item item : topK(5)) {
             sb.append('\t').append(item).append(System.lineSeparator());
         }
         sb.append(']');
         return sb.toString();
     }
 
-    public class Item {
+    public static class Item {
 
-        protected int index;
+        private String className;
+        private double probability;
 
-        protected Item(int index) {
-            this.index = index;
+        public Item(String className, double probability) {
+            this.className = className;
+            this.probability = probability;
         }
 
         /**
@@ -76,7 +102,7 @@ public abstract class AbstractClassifications<I extends Item> {
          * @return the class name
          */
         public String getClassName() {
-            return classNames.get(index);
+            return className;
         }
 
         /**
@@ -87,14 +113,12 @@ public abstract class AbstractClassifications<I extends Item> {
          * @return the probability
          */
         public double getProbability() {
-            return probabilities.get(index);
+            return probability;
         }
 
         /** {@inheritDoc} */
         @Override
         public String toString() {
-            String className = getClassName();
-            double probability = getProbability();
             if (probability < 0.00001) {
                 return String.format("class: \"%s\", probability: %.1e", className, probability);
             }

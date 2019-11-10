@@ -17,7 +17,7 @@ import ai.djl.examples.inference.util.AbstractInference;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ModelLoader;
@@ -39,7 +39,7 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MultithreadedInference extends AbstractInference<Classification> {
+public class MultithreadedInference extends AbstractInference<Classifications> {
 
     private static final Logger logger = LoggerFactory.getLogger(MultithreadedInference.class);
 
@@ -49,7 +49,7 @@ public class MultithreadedInference extends AbstractInference<Classification> {
 
     /** {@inheritDoc} */
     @Override
-    public Classification predict(Arguments arguments, Metrics metrics, int iteration)
+    public Classifications predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
@@ -64,8 +64,8 @@ public class MultithreadedInference extends AbstractInference<Classification> {
             criteria.put("layers", "18");
             criteria.put("flavor", "v1");
         }
-        ModelLoader<BufferedImage, Classification> loader = MxModelZoo.getModelLoader(modelName);
-        ZooModel<BufferedImage, Classification> model =
+        ModelLoader<BufferedImage, Classifications> loader = MxModelZoo.getModelLoader(modelName);
+        ZooModel<BufferedImage, Classifications> model =
                 loader.loadModel(criteria, new ProgressBar());
 
         int numOfThreads = Runtime.getRuntime().availableProcessors();
@@ -73,11 +73,11 @@ public class MultithreadedInference extends AbstractInference<Classification> {
         List<PredictorCallable> callables =
                 Collections.nCopies(
                         numOfThreads, new PredictorCallable(model, img, metrics, iteration));
-        Classification classification = null;
+        Classifications classification = null;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         try {
-            List<Future<Classification>> futures = executorService.invokeAll(callables);
-            for (Future<Classification> future : futures) {
+            List<Future<Classifications>> futures = executorService.invokeAll(callables);
+            for (Future<Classifications> future : futures) {
                 classification = future.get();
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -88,15 +88,15 @@ public class MultithreadedInference extends AbstractInference<Classification> {
         return classification;
     }
 
-    private static class PredictorCallable implements Callable<Classification> {
+    private static class PredictorCallable implements Callable<Classifications> {
 
-        private Predictor<BufferedImage, Classification> predictor;
+        private Predictor<BufferedImage, Classifications> predictor;
         private BufferedImage img;
         private Metrics metrics;
         private int iteration;
 
         public PredictorCallable(
-                ZooModel<BufferedImage, Classification> model,
+                ZooModel<BufferedImage, Classifications> model,
                 BufferedImage img,
                 Metrics metrics,
                 int iteration) {
@@ -108,9 +108,9 @@ public class MultithreadedInference extends AbstractInference<Classification> {
 
         /** {@inheritDoc} */
         @Override
-        public Classification call() throws TranslateException {
+        public Classifications call() throws TranslateException {
             predictor.setMetrics(metrics);
-            Classification result = null;
+            Classifications result = null;
             for (int i = 0; i < iteration; i++) {
                 result = predictor.predict(img);
             }

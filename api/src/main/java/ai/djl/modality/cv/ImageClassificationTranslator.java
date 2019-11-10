@@ -14,7 +14,7 @@
 package ai.djl.modality.cv;
 
 import ai.djl.Model;
-import ai.djl.modality.Classification;
+import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.TranslatorContext;
@@ -22,7 +22,7 @@ import ai.djl.util.Utils;
 import java.io.IOException;
 import java.util.List;
 
-public class ImageClassificationTranslator extends ImageTranslator<Classification> {
+public class ImageClassificationTranslator extends ImageTranslator<Classifications> {
 
     private String synsetArtifactName;
 
@@ -33,12 +33,12 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
 
     /** {@inheritDoc} */
     @Override
-    public Classification processOutput(TranslatorContext ctx, NDList list) throws IOException {
+    public Classifications processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
 
         NDArray probabilitiesNd = list.singletonOrThrow().softmax(0);
         List<String> synset = model.getArtifact(synsetArtifactName, Utils::readLines);
-        return new Classification(synset, probabilitiesNd);
+        return new Classifications(synset, probabilitiesNd);
     }
 
     public static class Builder extends BaseBuilder<Builder> {
