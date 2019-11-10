@@ -13,25 +13,20 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.util.AbstractInference;
+import ai.djl.examples.inference.util.AbstractBenchmark;
 import ai.djl.examples.inference.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,12 +34,15 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MultithreadedInference extends AbstractInference<Classifications> {
+public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
 
-    private static final Logger logger = LoggerFactory.getLogger(MultithreadedInference.class);
+    private static final Logger logger = LoggerFactory.getLogger(MultithreadedBenchmark.class);
 
     public static void main(String[] args) {
-        new MultithreadedInference().runExample(args);
+        if (new MultithreadedBenchmark().runBenchmark(args)) {
+            System.exit(0); // NOPMD
+        }
+        System.exit(-1); // NOPMD
     }
 
     /** {@inheritDoc} */
@@ -54,25 +52,14 @@ public class MultithreadedInference extends AbstractInference<Classifications> {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
-        String modelName = arguments.getModelName();
-        if (modelName == null) {
-            modelName = "RESNET";
-        }
-        Map<String, String> criteria = arguments.getCriteria();
-        if (criteria == null) {
-            criteria = new ConcurrentHashMap<>();
-            criteria.put("layers", "18");
-            criteria.put("flavor", "v1");
-        }
-        ModelLoader<BufferedImage, Classifications> loader = MxModelZoo.getModelLoader(modelName);
-        ZooModel<BufferedImage, Classifications> model =
-                loader.loadModel(criteria, new ProgressBar());
+        ZooModel<BufferedImage, Classifications> model = loadModel(arguments);
 
         int numOfThreads = Runtime.getRuntime().availableProcessors();
         metrics.addMetric("thread", numOfThreads);
         List<PredictorCallable> callables =
                 Collections.nCopies(
                         numOfThreads, new PredictorCallable(model, img, metrics, iteration));
+
         Classifications classification = null;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         try {

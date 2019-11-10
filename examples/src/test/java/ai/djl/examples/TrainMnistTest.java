@@ -12,15 +12,20 @@
  */
 package ai.djl.examples;
 
+import ai.djl.ModelException;
+import ai.djl.examples.inference.ImageClassification;
 import ai.djl.examples.training.TrainMnist;
+import ai.djl.modality.Classifications;
+import ai.djl.translate.TranslateException;
+import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainMnistTest {
 
     @Test
-    public void testTrainMnist() {
-        String[] args = new String[] {"-e", "2", "-g", "1", "-o", "build/logs"};
+    public void testTrainMnist() throws ModelException, TranslateException, IOException {
+        String[] args = new String[] {"-e", "2", "-g", "1", "-o", "build/output"};
 
         TrainMnist test = new TrainMnist();
         Assert.assertTrue(test.runExample(args));
@@ -28,5 +33,10 @@ public class TrainMnistTest {
         Assert.assertTrue(test.getTrainingLoss() < 0.35f);
         Assert.assertTrue(test.getValidationAccuracy() > 0.9f);
         Assert.assertTrue(test.getValidationLoss() < 0.35f);
+
+        Classifications result = new ImageClassification().predict();
+        Classifications.Item best = result.best();
+        Assert.assertEquals(best.getClassName(), "0");
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }
 }

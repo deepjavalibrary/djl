@@ -12,22 +12,19 @@
  */
 package ai.djl.examples;
 
+import ai.djl.ModelException;
 import ai.djl.examples.inference.ActionRecognition;
 import ai.djl.modality.Classifications;
+import ai.djl.translate.TranslateException;
+import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ActionRecognitionTest {
 
     @Test
-    public void testActionRecognition() {
-        String[] args = {
-            "-i", "src/test/resources/action_discus_throw.png", "-c", "1", "-l", "build/logs"
-        };
-
-        ActionRecognition test = new ActionRecognition();
-        Assert.assertTrue(test.runExample(args));
-        Classifications result = test.getPredictResult();
+    public void testActionRecognition() throws ModelException, TranslateException, IOException {
+        Classifications result = new ActionRecognition().predict();
         Classifications.Item best = result.best();
         Assert.assertEquals(best.getClassName(), "ThrowDiscus");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);

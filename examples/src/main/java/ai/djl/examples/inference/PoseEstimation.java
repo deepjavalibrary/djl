@@ -13,13 +13,11 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.util.AbstractInference;
-import ai.djl.examples.inference.util.Arguments;
 import ai.djl.inference.Predictor;
-import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.Joints;
+import ai.djl.modality.cv.Rectangle;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ZooModel;
@@ -30,33 +28,26 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PoseEstimation extends AbstractInference<List<Joints>> {
+public class PoseEstimation {
 
     private static final Logger logger = LoggerFactory.getLogger(PoseEstimation.class);
 
-    public static void main(String[] args) {
-        new PoseEstimation().runExample(args);
+    public static void main(String[] args) throws IOException, ModelException, TranslateException {
+        Joints joints = new PoseEstimation().predict();
+        logger.info("{}", joints);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected List<Joints> predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException, TranslateException {
+    public Joints predict() throws IOException, ModelException, TranslateException {
         /* Section SSD */
-        Path imageFile = arguments.getImageFile();
+        Path imageFile = Paths.get("src/test/resources/pose_soccer.png");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
-        int imageWidth = img.getWidth();
-        int imageHeight = img.getHeight();
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("size", "512");
@@ -72,25 +63,26 @@ public class PoseEstimation extends AbstractInference<List<Joints>> {
         }
         ssd.close();
 
-        // Get the cropped image
-        List<BufferedImage> filtered =
-                ssdResult
-                        .<DetectedObjects.BoundingBoxItem>items()
-                        .stream()
-                        .filter(obj -> obj.getClassName().equals("person"))
-                        .map(obj -> obj.getBoundingBox().getBounds())
-                        .map(
-                                rect ->
-                                        img.getSubimage(
-                                                (int) (rect.getX() * imageWidth),
-                                                (int) (rect.getY() * imageHeight),
-                                                (int) (rect.getWidth() * imageWidth),
-                                                (int) (rect.getHeight() * imageHeight)))
-                        .collect(Collectors.toList());
+        BufferedImage person = null;
+        List<DetectedObjects.BoundingBoxItem> list = ssdResult.items();
+        for (DetectedObjects.BoundingBoxItem item : list) {
+            if ("person".equals(item.getClassName())) {
+                Rectangle rect = item.getBoundingBox().getBounds();
+                int width = img.getWidth();
+                int height = img.getHeight();
+                person =
+                        img.getSubimage(
+                                (int) (rect.getX() * width),
+                                (int) (rect.getY() * height),
+                                (int) (rect.getWidth() * width),
+                                (int) (rect.getHeight() * height));
+                break;
+            }
+        }
 
-        if (filtered.isEmpty()) {
+        if (person == null) {
             logger.warn("No person found in image.");
-            return Collections.emptyList();
+            return null;
         }
 
         /* Pose recognition */
@@ -99,31 +91,25 @@ public class PoseEstimation extends AbstractInference<List<Joints>> {
         criteria.put("backbone", "resnet18");
         criteria.put("dataset", "imagenet");
 
-        ZooModel<BufferedImage, Joints> pose = MxModelZoo.SIMPLE_POSE.loadModel(criteria);
-
-        List<Joints> poseResult = new ArrayList<>();
-        try (Predictor<BufferedImage, Joints> predictor = pose.newPredictor()) {
-            for (BufferedImage segmentedImg : filtered) {
-                poseResult.add(predictor.predict(segmentedImg));
+        try (ZooModel<BufferedImage, Joints> pose = MxModelZoo.SIMPLE_POSE.loadModel(criteria)) {
+            try (Predictor<BufferedImage, Joints> predictor = pose.newPredictor()) {
+                Joints joints = predictor.predict(person);
+                Path output = drawJoints(person, joints);
+                logger.info("Pose image has been saved in: {}", output);
+                return joints;
             }
         }
-        pose.close();
-
-        drawJoints(filtered.get(0), poseResult.get(0), arguments.getLogDir());
-        return poseResult;
     }
 
-    private void drawJoints(BufferedImage img, Joints joints, String logDir) throws IOException {
-        if (logDir == null) {
-            return;
-        }
-
-        Path dir = Paths.get(logDir);
+    private static Path drawJoints(BufferedImage img, Joints joints) throws IOException {
+        Path dir = Paths.get("build/output");
         Files.createDirectories(dir);
 
         ImageVisualization.drawJoints(img, joints);
 
-        Path out = Paths.get(logDir, "joint.png");
-        ImageIO.write(img, "png", out.toFile());
+        Path file = dir.resolve("joints.png");
+        // OpenJDK can't save jpg with alpha channel
+        ImageIO.write(img, "png", file.toFile());
+        return file;
     }
 }

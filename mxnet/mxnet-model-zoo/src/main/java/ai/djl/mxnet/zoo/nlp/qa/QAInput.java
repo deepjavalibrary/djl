@@ -15,12 +15,12 @@ package ai.djl.mxnet.zoo.nlp.qa;
 public class QAInput {
 
     private String question;
-    private String answer;
+    private String paragraph;
     private int seqLength;
 
-    public QAInput(String question, String answer, int seqLength) {
+    public QAInput(String question, String paragraph, int seqLength) {
         this.question = question;
-        this.answer = answer;
+        this.paragraph = paragraph;
         this.seqLength = seqLength;
     }
 
@@ -28,8 +28,8 @@ public class QAInput {
         return question;
     }
 
-    public String getAnswer() {
-        return answer;
+    public String getParagraph() {
+        return paragraph;
     }
 
     public int getSeqLength() {

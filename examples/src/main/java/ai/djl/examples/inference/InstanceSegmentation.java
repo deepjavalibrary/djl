@@ -13,11 +13,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.util.AbstractInference;
-import ai.djl.examples.inference.util.Arguments;
-import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
-import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.util.BufferedImageUtils;
@@ -33,52 +29,47 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class InstanceSegmentation extends AbstractInference<DetectedObjects> {
+public class InstanceSegmentation {
 
-    public static void main(String[] args) {
-        new InstanceSegmentation().runExample(args);
+    private static final Logger logger = LoggerFactory.getLogger(InstanceSegmentation.class);
+
+    public static void main(String[] args) throws IOException, ModelException, TranslateException {
+        DetectedObjects detection = new InstanceSegmentation().predict();
+        logger.info("{}", detection);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected DetectedObjects predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException, TranslateException {
-        Path imageFile = arguments.getImageFile();
+    public DetectedObjects predict() throws IOException, ModelException, TranslateException {
+        Path imageFile = Paths.get("src/test/resources/segmentation.jpg");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("flavor", "v1b");
         criteria.put("backbone", "resnet18");
         criteria.put("dataset", "coco");
-        ZooModel<BufferedImage, DetectedObjects> model =
-                MxModelZoo.MASK_RCNN.loadModel(criteria, new ProgressBar());
 
-        DetectedObjects result;
-        try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
-            predictor.setMetrics(metrics); // Let predictor collect metrics
-            result = predictor.predict(img);
-
-            MemoryUtils.collectMemoryInfo(metrics);
+        try (ZooModel<BufferedImage, DetectedObjects> model =
+                MxModelZoo.MASK_RCNN.loadModel(criteria, new ProgressBar())) {
+            try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
+                DetectedObjects detection = predictor.predict(img);
+                Path output = drawBoundingBox(img, detection);
+                logger.info("Segmentation result image has been saved in: {}", output);
+                return detection;
+            }
         }
-
-        model.close();
-        drawBoundingBox(img, result, arguments.getLogDir());
-        return result;
     }
 
-    private void drawBoundingBox(BufferedImage img, DetectedObjects predictResult, String logDir)
+    private static Path drawBoundingBox(BufferedImage img, DetectedObjects detection)
             throws IOException {
-        if (logDir == null) {
-            return;
-        }
-
-        Path dir = Paths.get(logDir);
+        Path dir = Paths.get("build/output");
         Files.createDirectories(dir);
 
-        ImageVisualization.drawBoundingBoxes(img, predictResult);
+        ImageVisualization.drawBoundingBoxes(img, detection);
 
-        Path out = Paths.get(logDir, "imgSeg.jpg");
-        ImageIO.write(img, "jpg", out.toFile());
+        Path file = dir.resolve("imgSeg.jpg");
+        ImageIO.write(img, "jpg", file.toFile());
+        return file;
     }
 }

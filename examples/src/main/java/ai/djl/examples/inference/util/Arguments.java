@@ -31,7 +31,7 @@ public class Arguments {
     private String modelDir;
     private String modelName;
     private String imageFile;
-    private String logDir;
+    private String outputDir;
     private Map<String, String> criteria;
     private int duration;
     private int iteration = 1;
@@ -41,7 +41,7 @@ public class Arguments {
     public Arguments(CommandLine cmd) {
         modelDir = cmd.getOptionValue("model-dir");
         modelName = cmd.getOptionValue("model-name");
-        logDir = cmd.getOptionValue("log-dir");
+        outputDir = cmd.getOptionValue("output-dir");
         imageFile = cmd.getOptionValue("image");
         if (cmd.hasOption("duration")) {
             duration = Integer.parseInt(cmd.getOptionValue("duration"));
@@ -94,10 +94,10 @@ public class Arguments {
                         .desc("Number of iterations in each test.")
                         .build());
         options.addOption(
-                Option.builder("l")
-                        .longOpt("log-dir")
+                Option.builder("o")
+                        .longOpt("output-dir")
                         .hasArg()
-                        .argName("LOG-DIR")
+                        .argName("OUTPUT-DIR")
                         .desc("Directory for output logs.")
                         .build());
         options.addOption(
@@ -159,8 +159,8 @@ public class Arguments {
         return iteration;
     }
 
-    public String getLogDir() {
-        return logDir;
+    public String getOutputDir() {
+        return outputDir;
     }
 
     public Map<String, String> getCriteria() {

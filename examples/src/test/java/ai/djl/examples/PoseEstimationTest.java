@@ -12,23 +12,19 @@
  */
 package ai.djl.examples;
 
+import ai.djl.ModelException;
 import ai.djl.examples.inference.PoseEstimation;
 import ai.djl.modality.cv.Joints;
-import java.util.List;
+import ai.djl.translate.TranslateException;
+import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PoseEstimationTest {
 
     @Test
-    public void testPoseEstimation() {
-        String[] args = {"-i", "src/test/resources/pose_soccer.png", "-c", "1", "-l", "build/logs"};
-
-        PoseEstimation test = new PoseEstimation();
-        Assert.assertTrue(test.runExample(args));
-        List<Joints> result = test.getPredictResult();
-        Joints current = result.get(0);
-        Assert.assertEquals(result.size(), 3);
-        Assert.assertTrue(current.getJoints().get(0).getConfidence() > 0.6d);
+    public void testPoseEstimation() throws ModelException, TranslateException, IOException {
+        Joints result = new PoseEstimation().predict();
+        Assert.assertTrue(result.getJoints().get(0).getConfidence() > 0.6d);
     }
 }

@@ -17,14 +17,17 @@ import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.metric.Metrics;
+import ai.djl.modality.Classifications;
+import ai.djl.mxnet.zoo.MxModelZoo;
+import ai.djl.repository.zoo.ModelLoader;
+import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import ai.djl.util.Utils;
+import ai.djl.zoo.ModelZoo;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -34,9 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Abstract class that encapsulate command line options for example project. */
-public abstract class AbstractInference<T> {
+public abstract class AbstractBenchmark<T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractInference.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractBenchmark.class);
 
     private T lastResult;
 
@@ -85,7 +88,7 @@ public abstract class AbstractInference<T> {
      * @param args input raw arguments
      * @return if example execution complete successfully
      */
-    public final boolean runExample(String[] args) {
+    public final boolean runBenchmark(String[] args) {
         Options options = getOptions();
         try {
             DefaultParser parser = new DefaultParser();
@@ -166,7 +169,7 @@ public abstract class AbstractInference<T> {
                                     postP50, postP90, postP99));
                 }
 
-                MemoryUtils.dumpMemoryInfo(metrics, arguments.getLogDir());
+                MemoryUtils.dumpMemoryInfo(metrics, arguments.getOutputDir());
                 long delta = System.currentTimeMillis() - begin;
                 duration = duration.minus(Duration.ofMillis(delta));
             }
@@ -183,22 +186,6 @@ public abstract class AbstractInference<T> {
     }
 
     /**
-     * Load MXNet synset.txt file into array of string.
-     *
-     * @param inputStream sysnet.txt input
-     * @return array of string
-     */
-    public static String[] loadSynset(InputStream inputStream) {
-        List<String> output = Utils.readLines(inputStream);
-        ListIterator<String> it = output.listIterator();
-        while (it.hasNext()) {
-            String synsetLemma = it.next();
-            it.set(synsetLemma.substring(synsetLemma.indexOf(' ') + 1));
-        }
-        return output.toArray(new String[0]);
-    }
-
-    /**
      * Returns last predict result.
      *
      * <p>This method is used for unit test only.
@@ -207,5 +194,22 @@ public abstract class AbstractInference<T> {
      */
     public T getPredictResult() {
         return lastResult;
+    }
+
+    protected ZooModel<BufferedImage, Classifications> loadModel(Arguments arguments)
+            throws ModelException, IOException {
+        String modelName = arguments.getModelName();
+        if (modelName == null) {
+            modelName = "RESNET";
+        }
+
+        Map<String, String> criteria = arguments.getCriteria();
+        ModelLoader<BufferedImage, Classifications> loader;
+        if (arguments.isImperative()) {
+            loader = ModelZoo.getModelLoader(modelName);
+        } else {
+            loader = MxModelZoo.getModelLoader(modelName);
+        }
+        return loader.loadModel(criteria, new ProgressBar());
     }
 }

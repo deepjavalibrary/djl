@@ -41,7 +41,7 @@ public class BertQATranslator implements Translator<QAInput, String> {
         BertDataParser parser = ctx.getModel().getArtifact("vocab.json", BertDataParser::parse);
         // pre-processing - tokenize sentence
         List<String> tokenQ = BertDataParser.tokenizer(input.getQuestion().toLowerCase());
-        List<String> tokenA = BertDataParser.tokenizer(input.getAnswer().toLowerCase());
+        List<String> tokenA = BertDataParser.tokenizer(input.getParagraph().toLowerCase());
         int validLength = tokenQ.size() + tokenA.size();
         List<Float> tokenTypes = BertDataParser.getTokenTypes(tokenQ, tokenA, input.getSeqLength());
         tokens = BertDataParser.formTokens(tokenQ, tokenA, input.getSeqLength());

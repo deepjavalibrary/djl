@@ -12,20 +12,19 @@
  */
 package ai.djl.examples;
 
+import ai.djl.ModelException;
 import ai.djl.examples.inference.ObjectDetection;
 import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.translate.TranslateException;
+import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ObjectDetectionTest {
 
     @Test
-    public void testSsdExample() {
-        String[] args = {"-i", "src/test/resources/3dogs.jpg", "-c", "1", "-l", "build/logs"};
-
-        ObjectDetection test = new ObjectDetection();
-        Assert.assertTrue(test.runExample(args));
-        DetectedObjects result = test.getPredictResult();
+    public void testObjectDetection() throws ModelException, TranslateException, IOException {
+        DetectedObjects result = new ObjectDetection().predict();
         DetectedObjects.Item best = result.best();
         Assert.assertEquals(best.getClassName(), "dog");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.8) > 0);

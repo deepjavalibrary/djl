@@ -12,13 +12,8 @@
  */
 package ai.djl.examples.inference;
 
-import ai.djl.Device;
 import ai.djl.ModelException;
-import ai.djl.examples.inference.util.AbstractInference;
-import ai.djl.examples.inference.util.Arguments;
-import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
-import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.util.BufferedImageUtils;
@@ -34,64 +29,49 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public final class ObjectDetection extends AbstractInference<DetectedObjects> {
+public final class ObjectDetection {
 
-    public static void main(String[] args) {
-        new ObjectDetection().runExample(args);
+    private static final Logger logger = LoggerFactory.getLogger(ObjectDetection.class);
+
+    public static void main(String[] args) throws IOException, ModelException, TranslateException {
+        DetectedObjects detection = new ObjectDetection().predict();
+        logger.info("{}", detection);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public DetectedObjects predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException, TranslateException {
-        Path imageFile = arguments.getImageFile();
+    public DetectedObjects predict() throws IOException, ModelException, TranslateException {
+        Path imageFile = Paths.get("src/test/resources/3dogs.jpg");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
-        // Device is not not required, default device will be used by Model if not provided.
-        // Change to a specific device if needed.
-        Device device = Device.defaultDevice();
+        Map<String, String> criteria = new ConcurrentHashMap<>();
+        criteria.put("size", "512");
+        criteria.put("backbone", "resnet50");
+        criteria.put("flavor", "v1");
+        criteria.put("dataset", "voc");
 
-        Map<String, String> criteria = arguments.getCriteria();
-        if (criteria == null) {
-            criteria = new ConcurrentHashMap<>();
-            criteria.put("size", "512");
-            criteria.put("backbone", "resnet50");
-            criteria.put("flavor", "v1");
-            criteria.put("dataset", "voc");
-        }
-        ZooModel<BufferedImage, DetectedObjects> model =
-                MxModelZoo.SSD.loadModel(criteria, device, new ProgressBar());
-
-        DetectedObjects predictResult = null;
-        try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
-            predictor.setMetrics(metrics); // Let predictor collect metrics
-
-            for (int i = 0; i < iteration; ++i) {
-                predictResult = predictor.predict(img);
-
-                progressBar.update(i);
-                MemoryUtils.collectMemoryInfo(metrics);
+        try (ZooModel<BufferedImage, DetectedObjects> model =
+                MxModelZoo.SSD.loadModel(criteria, new ProgressBar())) {
+            try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
+                DetectedObjects detection = predictor.predict(img);
+                Path output = drawBoundingBox(img, detection);
+                logger.info("Detected objects image has been saved in: {}", output);
+                return detection;
             }
         }
-        drawBoundingBox(img, predictResult, arguments.getLogDir());
-
-        model.close();
-        return predictResult;
     }
 
-    private void drawBoundingBox(BufferedImage img, DetectedObjects predictResult, String logDir)
+    private static Path drawBoundingBox(BufferedImage img, DetectedObjects detection)
             throws IOException {
-        if (logDir == null) {
-            return;
-        }
-
-        Path dir = Paths.get(logDir);
+        Path dir = Paths.get("build/output");
         Files.createDirectories(dir);
 
-        ImageVisualization.drawBoundingBoxes(img, predictResult);
+        ImageVisualization.drawBoundingBoxes(img, detection);
 
-        Path out = Paths.get(logDir, "ssd.jpg");
-        ImageIO.write(img, "jpg", out.toFile());
+        Path file = dir.resolve("ssd.png");
+        // OpenJDK can't save jpg with alpha channel
+        ImageIO.write(img, "png", file.toFile());
+        return file;
     }
 }

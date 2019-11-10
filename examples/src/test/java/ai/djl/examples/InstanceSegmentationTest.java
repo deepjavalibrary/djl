@@ -12,22 +12,19 @@
  */
 package ai.djl.examples;
 
+import ai.djl.ModelException;
 import ai.djl.examples.inference.InstanceSegmentation;
 import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.translate.TranslateException;
+import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class InstanceSegmentationTest {
 
     @Test
-    public void testInstanceSegmentation() {
-        String[] args = {
-            "-i", "src/test/resources/segmentation.jpg", "-c", "1", "-l", "build/logs"
-        };
-
-        InstanceSegmentation test = new InstanceSegmentation();
-        Assert.assertTrue(test.runExample(args));
-        DetectedObjects result = test.getPredictResult();
+    public void testInstanceSegmentation() throws ModelException, TranslateException, IOException {
+        DetectedObjects result = new InstanceSegmentation().predict();
         DetectedObjects.Item best = result.best();
         Assert.assertEquals(best.getClassName(), "person");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);

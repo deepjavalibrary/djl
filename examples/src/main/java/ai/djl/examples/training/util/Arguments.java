@@ -37,7 +37,7 @@ public class Arguments {
         if (cmd.hasOption("epoch")) {
             epoch = Integer.parseInt(cmd.getOptionValue("epoch"));
         } else {
-            epoch = 10;
+            epoch = 2;
         }
         maxGpus = Engine.getInstance().getGpuCount();
         if (cmd.hasOption("max-gpus")) {

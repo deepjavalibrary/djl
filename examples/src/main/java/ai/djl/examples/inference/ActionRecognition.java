@@ -13,10 +13,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.util.AbstractInference;
-import ai.djl.examples.inference.util.Arguments;
 import ai.djl.inference.Predictor;
-import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
@@ -26,34 +23,35 @@ import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ActionRecognition extends AbstractInference<Classifications> {
+public class ActionRecognition {
 
-    public static void main(String[] args) {
-        new ActionRecognition().runExample(args);
+    private static final Logger logger = LoggerFactory.getLogger(ActionRecognition.class);
+
+    public static void main(String[] args) throws IOException, ModelException, TranslateException {
+        Classifications classification = new ActionRecognition().predict();
+        logger.info("{}", classification);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected Classifications predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException, TranslateException {
-        Path imageFile = arguments.getImageFile();
+    public Classifications predict() throws IOException, ModelException, TranslateException {
+        Path imageFile = Paths.get("src/test/resources/action_discus_throw.png");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
+
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("backbone", "inceptionv3");
         criteria.put("dataset", "ucf101");
-        ZooModel<BufferedImage, Classifications> inception =
-                MxModelZoo.ACTION_RECOGNITION.loadModel(criteria, new ProgressBar());
 
-        Classifications result;
-        try (Predictor<BufferedImage, Classifications> action = inception.newPredictor()) {
-            action.setMetrics(metrics); // Let predictor collect metrics
-            result = action.predict(img);
+        try (ZooModel<BufferedImage, Classifications> inception =
+                MxModelZoo.ACTION_RECOGNITION.loadModel(criteria, new ProgressBar())) {
+
+            try (Predictor<BufferedImage, Classifications> action = inception.newPredictor()) {
+                return action.predict(img);
+            }
         }
-
-        inception.close();
-        return result;
     }
 }
