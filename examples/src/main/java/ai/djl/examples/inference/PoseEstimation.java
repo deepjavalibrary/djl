@@ -40,12 +40,12 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PoseEstimationExample extends AbstractInference<List<Joints>> {
+public class PoseEstimation extends AbstractInference<List<Joints>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(PoseEstimationExample.class);
+    private static final Logger logger = LoggerFactory.getLogger(PoseEstimation.class);
 
     public static void main(String[] args) {
-        new PoseEstimationExample().runExample(args);
+        new PoseEstimation().runExample(args);
     }
 
     /** {@inheritDoc} */

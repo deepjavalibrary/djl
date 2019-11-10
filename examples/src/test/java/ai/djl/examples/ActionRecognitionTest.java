@@ -12,22 +12,24 @@
  */
 package ai.djl.examples;
 
-import ai.djl.examples.inference.ClassifyExample;
+import ai.djl.examples.inference.ActionRecognition;
 import ai.djl.modality.Classification;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ClassifyExampleTest {
+public class ActionRecognitionTest {
 
     @Test
-    public void testClassifyExample() {
-        String[] args = {"-i", "src/test/resources/kitten.jpg", "-c", "1", "-l", "build/logs"};
+    public void testActionRecognition() {
+        String[] args = {
+            "-i", "src/test/resources/action_discus_throw.png", "-c", "1", "-l", "build/logs"
+        };
 
-        ClassifyExample test = new ClassifyExample();
+        ActionRecognition test = new ActionRecognition();
         Assert.assertTrue(test.runExample(args));
         Classification result = test.getPredictResult();
         Classification.Item best = result.best();
-        Assert.assertEquals(best.getClassName(), "n02123045 tabby, tabby cat");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.4) > 0);
+        Assert.assertEquals(best.getClassName(), "ThrowDiscus");
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }
 }

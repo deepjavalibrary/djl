@@ -12,23 +12,22 @@
  */
 package ai.djl.examples;
 
-import ai.djl.examples.inference.PoseEstimationExample;
-import ai.djl.modality.cv.Joints;
-import java.util.List;
+import ai.djl.examples.inference.ObjectDetection;
+import ai.djl.modality.cv.DetectedObjects;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class PoseEstimationExampleTest {
+public class ObjectDetectionTest {
 
     @Test
-    public void testPoseEstimation() {
-        String[] args = {"-i", "src/test/resources/pose_soccer.png", "-c", "1", "-l", "build/logs"};
+    public void testSsdExample() {
+        String[] args = {"-i", "src/test/resources/3dogs.jpg", "-c", "1", "-l", "build/logs"};
 
-        PoseEstimationExample test = new PoseEstimationExample();
+        ObjectDetection test = new ObjectDetection();
         Assert.assertTrue(test.runExample(args));
-        List<Joints> result = test.getPredictResult();
-        Joints current = result.get(0);
-        Assert.assertEquals(result.size(), 3);
-        Assert.assertTrue(current.getJoints().get(0).getConfidence() > 0.6d);
+        DetectedObjects result = test.getPredictResult();
+        DetectedObjects.Item best = result.best();
+        Assert.assertEquals(best.getClassName(), "dog");
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.8) > 0);
     }
 }

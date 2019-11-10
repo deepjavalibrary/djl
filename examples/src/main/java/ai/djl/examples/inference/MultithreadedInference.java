@@ -39,13 +39,12 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MultithreadedInferenceExample extends AbstractInference<Classification> {
+public class MultithreadedInference extends AbstractInference<Classification> {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(MultithreadedInferenceExample.class);
+    private static final Logger logger = LoggerFactory.getLogger(MultithreadedInference.class);
 
     public static void main(String[] args) {
-        new MultithreadedInferenceExample().runExample(args);
+        new MultithreadedInference().runExample(args);
     }
 
     /** {@inheritDoc} */

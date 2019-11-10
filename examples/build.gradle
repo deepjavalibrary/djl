@@ -32,7 +32,7 @@ test {
 }
 
 application {
-    mainClassName = System.getProperty("main", "ai.djl.examples.inference.ClassifyExample")
+    mainClassName = System.getProperty("main", "ai.djl.examples.inference.ObjectDetection")
 }
 
 run{

@@ -48,6 +48,6 @@ You can type the following to run inference:
 
 ```
 cd examples
-./gradlew -Dmain=ai.djl.examples.inference.BertQaInferenceExample run --args="-p build/ -n static_bert_qa"
+./gradlew -Dmain=ai.djl.examples.inference.BertQaInference run --args="-p build/ -n static_bert_qa"
 ```
 

@@ -12,22 +12,24 @@
  */
 package ai.djl.examples;
 
-import ai.djl.examples.inference.SsdExample;
+import ai.djl.examples.inference.InstanceSegmentation;
 import ai.djl.modality.cv.DetectedObjects;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class SsdExampleTest {
+public class InstanceSegmentationTest {
 
     @Test
-    public void testSsdExample() {
-        String[] args = {"-i", "src/test/resources/3dogs.jpg", "-c", "1", "-l", "build/logs"};
+    public void testInstanceSegmentation() {
+        String[] args = {
+            "-i", "src/test/resources/segmentation.jpg", "-c", "1", "-l", "build/logs"
+        };
 
-        SsdExample test = new SsdExample();
+        InstanceSegmentation test = new InstanceSegmentation();
         Assert.assertTrue(test.runExample(args));
         DetectedObjects result = test.getPredictResult();
         DetectedObjects.Item best = result.best();
-        Assert.assertEquals(best.getClassName(), "dog");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.8) > 0);
+        Assert.assertEquals(best.getClassName(), "person");
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }
 }

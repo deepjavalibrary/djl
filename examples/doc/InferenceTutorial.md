@@ -192,7 +192,7 @@ The model, input image, output directory can all be provided as input. The avail
 You can navigate to the source folder, and simply type the following command to run the inference:
  
  ```
- ./gradlew -Dmain=ai.djl.examples.inference.SsdExample run --args="-i {PATH_TO_IMAGE} -l {OUTPUT_DIR}" 
+ ./gradlew -Dmain=ai.djl.examples.inference.ObjectDetection run --args="-i {PATH_TO_IMAGE} -l {OUTPUT_DIR}" 
  ```
  
  When you run inference on the image of the dog and the cat, this is the output generated. 

@@ -12,24 +12,23 @@
  */
 package ai.djl.examples;
 
-import ai.djl.examples.inference.ActionRecognition;
-import ai.djl.modality.Classification;
+import ai.djl.examples.inference.PoseEstimation;
+import ai.djl.modality.cv.Joints;
+import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ActionRecognitionExampleTest {
+public class PoseEstimationTest {
 
     @Test
-    public void testActionRecognition() {
-        String[] args = {
-            "-i", "src/test/resources/action_discus_throw.png", "-c", "1", "-l", "build/logs"
-        };
+    public void testPoseEstimation() {
+        String[] args = {"-i", "src/test/resources/pose_soccer.png", "-c", "1", "-l", "build/logs"};
 
-        ActionRecognition test = new ActionRecognition();
+        PoseEstimation test = new PoseEstimation();
         Assert.assertTrue(test.runExample(args));
-        Classification result = test.getPredictResult();
-        Classification.Item best = result.best();
-        Assert.assertEquals(best.getClassName(), "ThrowDiscus");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
+        List<Joints> result = test.getPredictResult();
+        Joints current = result.get(0);
+        Assert.assertEquals(result.size(), 3);
+        Assert.assertTrue(current.getJoints().get(0).getConfidence() > 0.6d);
     }
 }

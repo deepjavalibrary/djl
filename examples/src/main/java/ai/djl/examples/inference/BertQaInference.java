@@ -33,12 +33,12 @@ import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class BertQaInferenceExample extends AbstractInference<String> {
+public final class BertQaInference extends AbstractInference<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(BertQaInferenceExample.class);
+    private static final Logger logger = LoggerFactory.getLogger(BertQaInference.class);
 
     public static void main(String[] args) {
-        new BertQaInferenceExample().runExample(args);
+        new BertQaInference().runExample(args);
     }
 
     /** {@inheritDoc} */

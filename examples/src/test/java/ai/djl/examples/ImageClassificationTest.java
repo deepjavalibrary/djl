@@ -12,24 +12,22 @@
  */
 package ai.djl.examples;
 
-import ai.djl.examples.inference.InstanceSegmentationExample;
-import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.examples.inference.ImageClassification;
+import ai.djl.modality.Classification;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class InstanceSegmentationExampleTest {
+public class ImageClassificationTest {
 
     @Test
-    public void testInstanceSegmentation() {
-        String[] args = {
-            "-i", "src/test/resources/segmentation.jpg", "-c", "1", "-l", "build/logs"
-        };
+    public void testClassifyExample() {
+        String[] args = {"-i", "src/test/resources/kitten.jpg", "-c", "1", "-l", "build/logs"};
 
-        InstanceSegmentationExample test = new InstanceSegmentationExample();
+        ImageClassification test = new ImageClassification();
         Assert.assertTrue(test.runExample(args));
-        DetectedObjects result = test.getPredictResult();
-        DetectedObjects.Item best = result.best();
-        Assert.assertEquals(best.getClassName(), "person");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
+        Classification result = test.getPredictResult();
+        Classification.Item best = result.best();
+        Assert.assertEquals(best.getClassName(), "n02123045 tabby, tabby cat");
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.4) > 0);
     }
 }

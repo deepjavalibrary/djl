@@ -19,62 +19,52 @@ import ai.djl.examples.inference.util.Arguments;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
-import ai.djl.modality.Classification;
+import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import ai.djl.zoo.ModelZoo;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.imageio.ImageIO;
 
-public final class ClassifyExample extends AbstractInference<Classification> {
+public final class ObjectDetection extends AbstractInference<DetectedObjects> {
 
     public static void main(String[] args) {
-        new ClassifyExample().runExample(args);
+        new ObjectDetection().runExample(args);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Classification predict(Arguments arguments, Metrics metrics, int iteration)
+    public DetectedObjects predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {
-        String modelName = arguments.getModelName();
-        if (modelName == null) {
-            modelName = "RESNET";
-        }
-
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
-        // Device is not required, default device will be used by Model if not provided.
+        // Device is not not required, default device will be used by Model if not provided.
         // Change to a specific device if needed.
         Device device = Device.defaultDevice();
 
-        ModelLoader<BufferedImage, Classification> loader;
-
         Map<String, String> criteria = arguments.getCriteria();
-
-        if (arguments.isImperative()) {
-            loader = ModelZoo.RESNET;
-        } else {
-            if (criteria == null) {
-                criteria = new ConcurrentHashMap<>();
-                criteria.put("layers", "18");
-                criteria.put("flavor", "v1");
-            }
-            loader = MxModelZoo.getModelLoader(modelName);
+        if (criteria == null) {
+            criteria = new ConcurrentHashMap<>();
+            criteria.put("size", "512");
+            criteria.put("backbone", "resnet50");
+            criteria.put("flavor", "v1");
+            criteria.put("dataset", "voc");
         }
+        ZooModel<BufferedImage, DetectedObjects> model =
+                MxModelZoo.SSD.loadModel(criteria, device, new ProgressBar());
 
-        ZooModel<BufferedImage, Classification> model =
-                loader.loadModel(criteria, device, new ProgressBar());
-
-        Classification predictResult = null;
-        try (Predictor<BufferedImage, Classification> predictor = model.newPredictor()) {
+        DetectedObjects predictResult = null;
+        try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
             predictor.setMetrics(metrics); // Let predictor collect metrics
 
             for (int i = 0; i < iteration; ++i) {
@@ -84,8 +74,24 @@ public final class ClassifyExample extends AbstractInference<Classification> {
                 MemoryUtils.collectMemoryInfo(metrics);
             }
         }
+        drawBoundingBox(img, predictResult, arguments.getLogDir());
 
         model.close();
         return predictResult;
+    }
+
+    private void drawBoundingBox(BufferedImage img, DetectedObjects predictResult, String logDir)
+            throws IOException {
+        if (logDir == null) {
+            return;
+        }
+
+        Path dir = Paths.get(logDir);
+        Files.createDirectories(dir);
+
+        ImageVisualization.drawBoundingBoxes(img, predictResult);
+
+        Path out = Paths.get(logDir, "ssd.jpg");
+        ImageIO.write(img, "jpg", out.toFile());
     }
 }

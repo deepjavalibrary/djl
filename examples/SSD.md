@@ -50,7 +50,7 @@ To execute the SSD example, you need to specify a different Main class with Syst
 
 ```sh
 cd examples
-./gradlew -Dmain=ai.djl.examples.inference.SsdExample run --args="-l build/logs -i src/test/resources/3dogs.jpg"
+./gradlew -Dmain=ai.djl.examples.inference.ObjectDetection run --args="-l build/logs -i src/test/resources/3dogs.jpg"
 ```
 
 With the previous command, an output image with bounding box will be saved at: build/logs/ssd.jpg.
