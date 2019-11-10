@@ -13,8 +13,11 @@
 package ai.djl.zoo;
 
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.ModelLoader;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.zoo.cv.classification.MlpModelLoader;
 import ai.djl.zoo.cv.classification.ResNetModelLoader;
+import java.lang.reflect.Field;
 
 public interface ModelZoo {
 
@@ -24,4 +27,15 @@ public interface ModelZoo {
 
     ResNetModelLoader RESNET = new ResNetModelLoader(REPOSITORY);
     MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
+
+    @SuppressWarnings("unchecked")
+    static <I, O> ModelLoader<I, O> getModelLoader(String name) throws ModelNotFoundException {
+        try {
+            Field field = ModelZoo.class.getDeclaredField(name);
+            return (ModelLoader<I, O>) field.get(null);
+        } catch (ReflectiveOperationException e) {
+            throw new ModelNotFoundException(
+                    "Model: " + name + " is not defined in MxModelZoo.", e);
+        }
+    }
 }
