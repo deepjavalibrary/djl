@@ -22,12 +22,9 @@ import ai.djl.repository.MRL;
 import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 public class SingleShotDetectionModelLoader
@@ -58,17 +55,5 @@ public class SingleShotDetectionModelLoader
                 .optThreshold((float) threshold)
                 .setSynsetArtifactName("classes.txt")
                 .build();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Artifact match(Map<String, String> criteria) throws IOException, ModelNotFoundException {
-        List<Artifact> list = search(criteria);
-        if (list.isEmpty()) {
-            return null;
-        }
-
-        list.sort(Artifact.COMPARATOR);
-        return list.get(list.size() - 1);
     }
 }

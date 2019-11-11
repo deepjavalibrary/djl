@@ -84,8 +84,6 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         if (list.isEmpty()) {
             return null;
         }
-
-        list.sort(Artifact.COMPARATOR);
         return list.get(0);
     }
 
