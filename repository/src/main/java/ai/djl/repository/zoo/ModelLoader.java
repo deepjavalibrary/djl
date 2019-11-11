@@ -14,8 +14,10 @@ package ai.djl.repository.zoo;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.repository.Artifact;
 import ai.djl.util.Progress;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public interface ModelLoader<I, O> {
@@ -47,4 +49,6 @@ public interface ModelLoader<I, O> {
 
     ZooModel<I, O> loadModel(Map<String, String> criteria, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException;
+
+    List<Artifact> listModels() throws IOException, ModelNotFoundException;
 }

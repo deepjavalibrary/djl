@@ -79,6 +79,12 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         return model;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public List<Artifact> listModels() throws IOException, ModelNotFoundException {
+        return getMetadata().getArtifacts();
+    }
+
     public Artifact match(Map<String, String> criteria) throws IOException, ModelNotFoundException {
         List<Artifact> list = search(criteria);
         if (list.isEmpty()) {
@@ -100,5 +106,26 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
             }
         }
         return metadata;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append(repository.getName())
+                .append(':')
+                .append(mrl.getGroupId())
+                .append(':')
+                .append(mrl.getArtifactId())
+                .append(" [\n");
+        try {
+            for (Artifact artifact : listModels()) {
+                sb.append('\t').append(artifact).append('\n');
+            }
+        } catch (IOException | ModelNotFoundException e) {
+            sb.append("\tFailed load metadata.");
+        }
+        sb.append("\n]");
+        return sb.toString();
     }
 }

@@ -26,6 +26,8 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 public interface MxModelZoo {
 
@@ -53,5 +55,20 @@ public interface MxModelZoo {
             throw new ModelNotFoundException(
                     "Model: " + name + " is not defined in MxModelZoo.", e);
         }
+    }
+
+    static List<ModelLoader<?, ?>> listModels() {
+        List<ModelLoader<?, ?>> list = new ArrayList<>();
+        try {
+            Field[] fields = MxModelZoo.class.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getType().isAssignableFrom(ModelLoader.class)) {
+                    list.add((ModelLoader<?, ?>) field.get(null));
+                }
+            }
+        } catch (ReflectiveOperationException e) {
+            // ignore
+        }
+        return list;
     }
 }
