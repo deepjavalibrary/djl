@@ -15,6 +15,7 @@ package ai.djl.basicdataset;
 import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.util.PairList;
+import ai.djl.util.Progress;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,10 +58,19 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare() throws IOException {
+    public void prepare(Progress progress) throws IOException {
         if (!prepared) {
-            prepareClasses();
-            prepareItems();
+            if (progress != null) {
+                progress.reset("Preparing", 2);
+                prepareClasses();
+                progress.start(0);
+                prepareItems();
+                progress.end();
+            } else {
+                prepareClasses();
+                prepareItems();
+            }
+
             prepared = true;
         }
     }

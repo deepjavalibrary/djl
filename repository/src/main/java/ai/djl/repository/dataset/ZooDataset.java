@@ -16,6 +16,7 @@ import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.util.Progress;
 import java.io.IOException;
 
 public interface ZooDataset extends Dataset, PreparedDataset {
@@ -38,7 +39,7 @@ public interface ZooDataset extends Dataset, PreparedDataset {
 
     /** {@inheritDoc} */
     @Override
-    default void prepare() throws IOException {
+    default void prepare(Progress progress) throws IOException {
         if (!isPrepared()) {
             if (getArtifact() == null) {
                 useDefaultArtifact();
@@ -46,7 +47,7 @@ public interface ZooDataset extends Dataset, PreparedDataset {
                     throw new IOException(getMrl() + " dataset not found.");
                 }
             }
-            getRepository().prepare(getArtifact());
+            getRepository().prepare(getArtifact(), progress);
             prepareData(getUsage());
             setPrepared(true);
         }

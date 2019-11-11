@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,7 +36,7 @@ public final class ImageFolder extends AbstractImageFolder {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare() throws IOException {
+    public void prepare(Progress progress) throws IOException {
         Path root = Paths.get(repository.getBaseUri());
         listImages(root.toString());
     }

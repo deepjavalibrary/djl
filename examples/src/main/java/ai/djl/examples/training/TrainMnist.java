@@ -31,6 +31,7 @@ import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.FactorTracker;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.zoo.cv.classification.Mlp;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -126,7 +127,7 @@ public final class TrainMnist extends AbstractTraining {
                         .setRandomSampling(batchSize)
                         .optMaxIteration(maxIterations)
                         .build();
-        mnist.prepare();
+        mnist.prepare(new ProgressBar());
         if (usage == Dataset.Usage.TRAIN) {
             trainDataSize = (int) Math.min(mnist.size() / batchSize, maxIterations);
         } else {

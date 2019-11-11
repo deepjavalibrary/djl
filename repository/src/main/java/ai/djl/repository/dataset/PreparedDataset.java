@@ -12,9 +12,14 @@
  */
 package ai.djl.repository.dataset;
 
+import ai.djl.util.Progress;
 import java.io.IOException;
 
 public interface PreparedDataset {
 
-    void prepare() throws IOException;
+    default void prepare() throws IOException {
+        prepare(null);
+    }
+
+    void prepare(Progress progress) throws IOException;
 }

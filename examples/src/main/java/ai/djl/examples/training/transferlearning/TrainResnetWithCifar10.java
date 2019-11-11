@@ -200,7 +200,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                         .optMaxIteration(maxIterations)
                         .optPipeline(pipeline)
                         .build();
-        cifar10.prepare();
+        cifar10.prepare(new ProgressBar());
         int dataSize = (int) Math.min(cifar10.size() / batchSize, maxIterations);
         if (usage == Dataset.Usage.TRAIN) {
             trainDataSize = dataSize;
