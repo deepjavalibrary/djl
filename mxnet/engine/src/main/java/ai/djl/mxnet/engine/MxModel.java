@@ -184,6 +184,12 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public String getName() {
+        return modelName;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         Initializer initializer = trainingConfig.getInitializer();
         block.setInitializer(initializer);

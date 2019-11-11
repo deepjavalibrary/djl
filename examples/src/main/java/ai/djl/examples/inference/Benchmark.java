@@ -42,7 +42,7 @@ public final class Benchmark extends AbstractBenchmark<Classifications> {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
-        try (ZooModel<BufferedImage, Classifications> model = loadModel(arguments)) {
+        try (ZooModel<BufferedImage, Classifications> model = loadModel(arguments, metrics)) {
             Classifications predictResult = null;
             try (Predictor<BufferedImage, Classifications> predictor = model.newPredictor()) {
                 predictor.setMetrics(metrics); // Let predictor collect metrics

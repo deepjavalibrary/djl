@@ -84,6 +84,7 @@ application {
 
 run{
     systemProperties System.getProperties()
+    systemProperties.remove("user.dir");
 }
 
 tasks.distTar.enabled = false

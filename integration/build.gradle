@@ -36,6 +36,7 @@ application {
 
 run{
     systemProperties System.getProperties()
+    systemProperties.remove("user.dir");
 }
 
 jacoco {

@@ -138,6 +138,8 @@ public interface Model extends AutoCloseable {
 
     void setBlock(Block block);
 
+    String getName();
+
     String getProperty(String key);
 
     void setProperty(String key, String value);

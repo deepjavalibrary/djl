@@ -65,6 +65,12 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public String getName() {
+        return model.getName();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getProperty(String key) {
         return null;
     }

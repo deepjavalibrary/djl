@@ -23,6 +23,7 @@ import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Progress;
 import ai.djl.zoo.ModelZoo;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -130,6 +131,14 @@ public abstract class AbstractBenchmark<T> {
                                 "total time: %d ms, total runs: %d iterations",
                                 totalTime, totalRuns));
 
+                if (metrics.hasMetric("LoadModel")) {
+                    long loadModelTime =
+                            metrics.getMetric("LoadModel").get(0).getValue().longValue();
+                    logger.info(
+                            "Model loading time: {} ms.",
+                            String.format("%.3f", loadModelTime / 1_000_000f));
+                }
+
                 if (metrics.hasMetric("Inference") && iteration > 1) {
                     float p50 =
                             metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
@@ -196,8 +205,10 @@ public abstract class AbstractBenchmark<T> {
         return lastResult;
     }
 
-    protected ZooModel<BufferedImage, Classifications> loadModel(Arguments arguments)
-            throws ModelException, IOException {
+    protected ZooModel<BufferedImage, Classifications> loadModel(
+            Arguments arguments, Metrics metrics) throws ModelException, IOException {
+        long begin = System.nanoTime();
+
         String modelName = arguments.getModelName();
         if (modelName == null) {
             modelName = "RESNET";
@@ -210,6 +221,15 @@ public abstract class AbstractBenchmark<T> {
         } else {
             loader = MxModelZoo.getModelLoader(modelName);
         }
-        return loader.loadModel(criteria, new ProgressBar());
+
+        Progress progress = new ProgressBar();
+        ZooModel<BufferedImage, Classifications> model = loader.loadModel(criteria, progress);
+        long delta = System.nanoTime() - begin;
+        logger.info(
+                "Model {} loaded in: {} ms.",
+                model.getName(),
+                String.format("%.3f", delta / 1_000_000f));
+        metrics.addMetric("LoadModel", delta);
+        return model;
     }
 }

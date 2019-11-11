@@ -69,6 +69,12 @@ public class MockModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public String getName() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getProperty(String key) {
         return null;
     }
