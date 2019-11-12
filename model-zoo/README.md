@@ -5,6 +5,17 @@
 The djl.ai model zoo contains framework agnostic models. All of the models have built-in Translator, and
 can be used for inference out of the box.
 
+## Installation
+You can pull it from the central Maven repositories:
+
+```xml
+<dependency>
+    <groupId>ai.djl</groupId>
+    <artifactId>model-zoo</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
 ## Pre-trained models
 
 In 0.2.0 release, we only provide MLP and Resnet50 in our model zoo.
@@ -24,8 +35,8 @@ The following is an example to find resnet50-v1 that trained on imagenet dataset
     criteria.put("flavor", "v1");
     criteria.put("dataset", "cifar10");
 
-    ZooModel<BufferedImage, Classification> model = ModelZoo.RESNET.loadModel(criteria, device);
-``` 
+    ZooModel<BufferedImage, Classification> model = ModelZoo.RESNET.loadModel(criteria);
+```
 
 ## List of search criteria of each model
 
