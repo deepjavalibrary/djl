@@ -12,7 +12,6 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.basicdataset.utils.ThrowingFunction;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;
@@ -20,7 +19,6 @@ import ai.djl.modality.cv.util.NDImageUtils.Flag;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -36,26 +34,23 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** A dataset for loading image files stored in a folder structure. */
 public abstract class AbstractImageFolder extends RandomAccessDataset implements PreparedDataset {
 
     private static final Set<String> EXT =
             new HashSet<>(Arrays.asList(".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"));
-    private static final Logger logger = LoggerFactory.getLogger(AbstractImageFolder.class);
 
     protected Repository repository;
     protected Flag flag;
-    protected List<String> synsets;
+    protected List<String> synset;
     protected PairList<String, Integer> items;
 
     public AbstractImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
         this.flag = builder.flag;
         this.repository = builder.repository;
-        this.synsets = new ArrayList<>();
+        this.synset = new ArrayList<>();
         this.items = new PairList<>();
     }
 
@@ -65,7 +60,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
 
         Path imagePath = getImagePath(item.getKey());
-        NDArray array = BufferedImageUtils.readFileToArray(manager, imagePath);
+        NDArray array = BufferedImageUtils.readFileToArray(manager, imagePath, flag);
         NDList d = new NDList(array);
         NDList l = new NDList(manager.create(item.getValue()));
         return new Record(d, l);
@@ -83,93 +78,37 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
      * @return a list that contains synsets
      */
     public List<String> getSynset() {
-        if (synsets.isEmpty()) {
-            throw new IllegalStateException("Please call prepare() first");
-        }
-        return synsets;
+        return synset;
     }
 
-    protected void listImages(String root) throws IOException {
-        File[] dir = new File(root).listFiles(f -> f.isDirectory() && !f.getName().startsWith("."));
-        if (dir == null || dir.length == 0) {
-            throw new IllegalArgumentException(root + " not found or didn't have any file in it");
-        }
-        Arrays.sort(dir);
-        String[] classes = new String[dir.length];
-        for (int i = 0; i < dir.length; i++) {
-            classes[i] = dir[i].getName();
-        }
-        listImages(root, classes);
-    }
-
-    protected void listImages(String root, String[] classes) throws IOException {
-        ThrowingFunction<String, String[], IOException> listClass =
-                className -> {
-                    File classFolder = new File(root + "/" + className);
-                    if (!classFolder.exists() || !classFolder.isDirectory()) {
-                        return new String[0];
-                    }
-                    File[] files =
-                            classFolder.listFiles(
-                                    f ->
-                                            !f.isDirectory()
-                                                    && !f.isHidden()
-                                                    && !f.getName().startsWith("."));
-                    if (files == null) {
-                        return new String[0];
-                    }
-
-                    String[] images = new String[files.length];
-                    for (int i = 0; i < files.length; i++) {
-                        images[i] = files[i].getAbsolutePath();
-                    }
-                    return images;
-                };
-        listImages(classes, listClass);
-    }
-
-    protected void listImages(Repository repository, Artifact.Item item) throws IOException {
-        String[] classes = repository.listDirectory(item, "");
-        if (classes.length == 0) {
-            throw new IllegalArgumentException("No classes found in " + item.getName());
-        }
-        listImages(repository, item, classes);
-    }
-
-    protected void listImages(Repository repository, Artifact.Item item, String[] classes)
-            throws IOException {
-        ThrowingFunction<String, String[], IOException> listClass =
-                className ->
-                        Arrays.stream(repository.listDirectory(item, className))
-                                .map(image -> className + "/" + image)
-                                .toArray(String[]::new);
-        listImages(classes, listClass);
-    }
-
-    private void listImages(
-            String[] classes, ThrowingFunction<String, String[], IOException> listClass)
-            throws IOException {
-        for (int label = 0; label < classes.length; label++) {
-            String className = classes[label];
-            synsets.add(className);
-            String[] images = listClass.apply(className);
-            if (images == null || images.length == 0) {
-                logger.warn("Bad class folder: {}", className);
+    protected void listImages(File root, List<String> classes) {
+        int label = 0;
+        for (String className : classes) {
+            File classFolder = new File(root, className);
+            if (!classFolder.exists() || !classFolder.isDirectory()) {
                 continue;
             }
-            for (String image : images) {
-                if (isImage(image)) {
-                    items.add(new Pair<>(image, label));
-                } else {
-                    logger.warn("ImageIO didn't support {} Ignoring... ", image);
-                }
+            File[] files = classFolder.listFiles(this::isImage);
+            if (files == null) {
+                continue;
             }
+
+            for (File file : files) {
+                String path = file.getAbsolutePath();
+                items.add(new Pair<>(path, label));
+            }
+            ++label;
         }
     }
 
     protected abstract Path getImagePath(String key);
 
-    private boolean isImage(String path) {
+    private boolean isImage(File file) {
+        String path = file.getName();
+        if (!file.isFile() || file.isHidden() || path.startsWith(".")) {
+            return false;
+        }
+
         int extensionIndex = path.lastIndexOf('.');
         if (extensionIndex < 0) {
             return false;

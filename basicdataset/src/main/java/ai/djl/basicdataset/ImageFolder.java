@@ -13,9 +13,10 @@
 package ai.djl.basicdataset;
 
 import ai.djl.util.Progress;
-import java.io.IOException;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 /**
  * A dataset for loading image files stored in a folder structure.
@@ -36,8 +37,11 @@ import java.nio.file.Paths;
  */
 public final class ImageFolder extends AbstractImageFolder {
 
+    private boolean prepared;
+
     ImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
+        loadSynset();
     }
 
     public static Builder builder() {
@@ -52,9 +56,32 @@ public final class ImageFolder extends AbstractImageFolder {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Progress progress) throws IOException {
-        Path root = Paths.get(repository.getBaseUri());
-        listImages(root.toString());
+    public void prepare(Progress progress) {
+        if (!prepared) {
+            File root = new File(repository.getBaseUri());
+            if (progress != null) {
+                progress.reset("Preparing", 2);
+                progress.start(0);
+                listImages(root, synset);
+                progress.end();
+            } else {
+                listImages(root, synset);
+            }
+
+            prepared = true;
+        }
+    }
+
+    private void loadSynset() {
+        File root = new File(repository.getBaseUri());
+        File[] dir = root.listFiles(f -> f.isDirectory() && !f.getName().startsWith("."));
+        if (dir == null || dir.length == 0) {
+            throw new IllegalArgumentException(root + " not found or didn't have any file in it");
+        }
+        Arrays.sort(dir);
+        for (File file : dir) {
+            synset.add(file.getName());
+        }
     }
 
     public static final class Builder extends ImageFolderBuilder<Builder> {

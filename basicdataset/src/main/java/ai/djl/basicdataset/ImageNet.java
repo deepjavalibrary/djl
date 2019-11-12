@@ -16,14 +16,13 @@ import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.util.Progress;
 import com.google.gson.Gson;
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * ImageNet is an image classification dataset from http://image-net.org 2012 Classification
@@ -42,6 +41,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
     ImageNet(Builder builder) {
         super(builder);
         this.usage = builder.usage;
+        loadSynset();
     }
 
     public static ImageFolder.Builder builder() {
@@ -77,24 +77,23 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Progress progress) throws IOException {
+    public void prepare(Progress progress) {
         if (!prepared) {
+            File root = Paths.get(repository.getBaseUri()).resolve(getUsagePath(usage)).toFile();
             if (progress != null) {
                 progress.reset("Preparing", 2);
-                prepareClasses();
                 progress.start(0);
-                prepareItems();
+                listImages(root, Arrays.asList(wordNetIds));
                 progress.end();
             } else {
-                prepareClasses();
-                prepareItems();
+                listImages(root, Arrays.asList(wordNetIds));
             }
 
             prepared = true;
         }
     }
 
-    private void prepareClasses() {
+    private void loadSynset() {
         InputStream classStream =
                 Thread.currentThread()
                         .getContextClassLoader()
@@ -114,16 +113,8 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
             wordNetIds[i] = classes[i][0];
             classNames[i] = classes[i][1];
             classFull[i] = classes[i][2];
+            synset.add(wordNetIds[i] + ", " + classNames[i] + ", " + classFull[i]);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<String> getSynset() {
-        if (!prepared) {
-            throw new IllegalStateException("Please call prepare() first");
-        }
-        return Arrays.asList(classNames);
     }
 
     private String getUsagePath(Dataset.Usage usage) {
@@ -140,11 +131,6 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
             default:
                 throw new UnsupportedOperationException("Data not available.");
         }
-    }
-
-    private void prepareItems() throws IOException {
-        Path root = Paths.get(repository.getBaseUri()).resolve(getUsagePath(usage));
-        listImages(root.toString(), wordNetIds);
     }
 
     /** {@inheritDoc} */
