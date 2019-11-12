@@ -31,7 +31,9 @@ import ai.djl.training.loss.Loss;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -58,6 +60,9 @@ public class ImageFolderTest {
                                 .build();
                 dataset.prepare();
 
+                List<String> synsets = Arrays.asList("cat", "dog", "misc");
+                Assert.assertEquals(synsets, dataset.getSynset());
+
                 try (Trainer trainer = model.newTrainer(config)) {
                     NDManager manager = trainer.getManager();
                     NDArray cat =
@@ -68,6 +73,11 @@ public class ImageFolderTest {
                             BufferedImageUtils.readFileToArray(
                                     manager,
                                     Paths.get("src/test/resources/imagefolder/dog/puppy1.jpg"));
+
+                    NDArray pikachu =
+                            BufferedImageUtils.readFileToArray(
+                                    manager,
+                                    Paths.get("src/test/resources/imagefolder/misc/pikachu.png"));
 
                     Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
 
@@ -86,6 +96,16 @@ public class ImageFolderTest {
                     Assert.assertEquals(
                             manager.create(new int[] {1}), dogBatch.getLabels().singletonOrThrow());
                     dogBatch.close();
+
+                    Batch pikachuBatch = ds.next();
+                    Assertions.assertAlmostEquals(
+                            NDImageUtils.toTensor(NDImageUtils.resize(pikachu, 100, 100))
+                                    .expandDims(0),
+                            pikachuBatch.getData().singletonOrThrow());
+                    Assert.assertEquals(
+                            manager.create(new int[] {2}),
+                            pikachuBatch.getLabels().singletonOrThrow());
+                    pikachuBatch.close();
                 }
             }
         }

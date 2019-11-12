@@ -77,6 +77,18 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         return items.size();
     }
 
+    /**
+     * Returns the synsets of the ImageFolder dataset.
+     *
+     * @return a list that contains synsets
+     */
+    public List<String> getSynset() {
+        if (synsets.isEmpty()) {
+            throw new IllegalStateException("Please call prepare() first");
+        }
+        return synsets;
+    }
+
     protected void listImages(String root) throws IOException {
         File[] dir = new File(root).listFiles(f -> f.isDirectory() && !f.getName().startsWith("."));
         if (dir == null || dir.length == 0) {

@@ -14,7 +14,6 @@ package ai.djl.basicdataset;
 
 import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.training.dataset.Dataset;
-import ai.djl.util.PairList;
 import ai.djl.util.Progress;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -23,7 +22,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 
@@ -36,8 +36,6 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
     ImageNet(Builder builder) {
         super(builder);
         this.usage = builder.usage;
-        this.synsets = new ArrayList<>();
-        this.items = new PairList<>();
     }
 
     public static ImageFolder.Builder builder() {
@@ -96,6 +94,15 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
             classNames[i] = classes[i][1];
             classFull[i] = classes[i][2];
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<String> getSynset() {
+        if (!prepared) {
+            throw new IllegalStateException("Please call prepare() first");
+        }
+        return Arrays.asList(classNames);
     }
 
     private String getUsagePath(Dataset.Usage usage) {
