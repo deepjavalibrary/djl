@@ -40,9 +40,9 @@ public class ParameterStoreTest {
             } else {
                 numDevices = 4;
             }
-            int numWeights = 10;
-            // TODO: this test is currently flaky with large numUpdates
-            int numUpdates = 100;
+            int numWeights = 2;
+            // TODO: this test is currently flaky with large numUpdates and large numWeights
+            int numUpdates = 10;
             NDArray[][] weights = new NDArray[numWeights][numDevices];
             NDArray[][] grads = new NDArray[numWeights][numDevices];
             NDArray[] expected = new NDArray[numWeights];
