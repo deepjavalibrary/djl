@@ -14,6 +14,12 @@ package ai.djl.translate;
 
 import ai.djl.ndarray.NDArray;
 
+/**
+ * An interface to apply various transforms to the input.
+ *
+ * <p>A transform can be any function that modifies the input. Some examples of transform are crop
+ * and resize.
+ */
 public interface Transform {
 
     NDArray transform(NDArray array);

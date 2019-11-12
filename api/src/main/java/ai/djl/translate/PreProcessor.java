@@ -14,6 +14,11 @@ package ai.djl.translate;
 
 import ai.djl.ndarray.NDList;
 
+/**
+ * An interface that provides pre-processing functionality.
+ *
+ * @param <I> the type of the input object
+ */
 public interface PreProcessor<I> {
 
     default Pipeline getPipeline() {
@@ -25,7 +30,7 @@ public interface PreProcessor<I> {
      *
      * @param ctx the toolkit for creating the input NDArray
      * @param input the input object
-     * @return an {@link NDList}
+     * @return the {@link NDList} after pre-processing
      * @throws Exception if an error occurs during processing input
      */
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")

@@ -66,8 +66,8 @@ import ai.djl.inference.Predictor;
  * }
  * </pre>
  *
- * @param <I> input type
- * @param <O> output type
+ * @param <I> the input type
+ * @param <O> the output type
  */
 public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
 

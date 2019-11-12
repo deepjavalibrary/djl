@@ -14,6 +14,10 @@ package ai.djl.training.util;
 
 import ai.djl.util.Progress;
 
+/**
+ * {@code ProgressBar} is an implementation of {@link Progress}. It can be used to display the
+ * progress of a task in the form a bar.
+ */
 public final class ProgressBar implements Progress {
 
     private static final int TOTAL_BAR_LENGTH = 40;
@@ -23,10 +27,18 @@ public final class ProgressBar implements Progress {
     private long progress;
     private int currentPercent;
 
+    /** Creates an instance of {@code ProgressBar} with a maximum value of 1. */
     public ProgressBar() {
         max = 1;
     }
 
+    /**
+     * Creates an instance of {@code ProgressBar} with the given maximum value, and displays the
+     * given message.
+     *
+     * @param message the message to be displayed
+     * @param max the maximum value
+     */
     public ProgressBar(String message, long max) {
         reset(message, max);
     }

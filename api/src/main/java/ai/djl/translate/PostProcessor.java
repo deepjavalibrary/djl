@@ -14,14 +14,19 @@ package ai.djl.translate;
 
 import ai.djl.ndarray.NDList;
 
+/**
+ * An interface that provides post-processing functionality.
+ *
+ * @param <O> the type of the output object expected
+ */
 public interface PostProcessor<O> {
 
     /**
      * Processes the output NDList to the corresponding output object.
      *
-     * @param ctx the toolkit used for postprocessing
-     * @param list the output NDList
-     * @return the output object
+     * @param ctx the toolkit used for post-processing
+     * @param list the output NDList after inference
+     * @return the output object of expected type
      * @throws Exception if an error occurs during processing output
      */
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")

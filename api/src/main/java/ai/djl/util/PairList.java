@@ -92,8 +92,8 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Inserts the specified element at the specified position in this list (optional operation).
-     * Shifts the element currently at that position (if any) and any subsequent elements to the
+     * Inserts the specified element at the specified position in this list (optional operation),
+     * and shifts the element currently at that position (if any) and any subsequent elements to the
      * right (adds one to their indices).
      *
      * @param index the index at which the specified element is to be inserted
@@ -148,9 +148,9 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Returns true if size() is 0.
+     * Checks whether the list is empty.
      *
-     * @return true if size() is 0, otherwise false.
+     * @return whether the list is empty
      */
     public boolean isEmpty() {
         return size() == 0;
@@ -260,7 +260,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Returns a view of the portion of this PairList between the specified <tt>fromIndex</tt>.
+     * Returns a view of the portion of this PairList between the specified {@code fromIndex}
      * inclusive, and to the end.
      *
      * @param fromIndex the start index (inclusive)
@@ -271,8 +271,8 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Returns a view of the portion of this PairList between the specified <tt>fromIndex</tt>.
-     * inclusive, and <tt>toIndex</tt>, exclusive.
+     * Returns a view of the portion of this PairList between the specified {@code fromIndex}
+     * inclusive, and {@code toIndex}, exclusive.
      *
      * @param fromIndex the start index (inclusive)
      * @param toIndex the end index (exclusive)
@@ -306,7 +306,8 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     /**
      * Removes all duplicate values from the list.
      *
-     * @return a new list with the duplicate values removed, taking the latest value for each key
+     * @return a new {@code PairList} with the duplicate values removed, taking the latest value for
+     *     each key
      */
     public PairList<K, V> unique() {
         return new PairList<>(toMap(false));
@@ -319,19 +320,19 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
-     * Returns a Map that contains a key-value mapping of this list.
+     * Returns a {@code Map} that contains the key-value mappings of this list.
      *
-     * @return a Map that contains a key-value mapping of this list
+     * @return a {@code Map} that contains the key-value mappings of this list
      */
     public Map<K, V> toMap() {
         return toMap(true);
     }
 
     /**
-     * Returns a Map that contains key value mapping of this list.
+     * Returns a {@code Map} that contains the key-value mappings of this list.
      *
-     * @param checkDuplicate {@code true} to make sure not duplicated keys in the list
-     * @return a Map that contains a key-value mapping of this list
+     * @param checkDuplicate whether to check for duplicated keys in the list
+     * @return a {@code Map} that contains the key-value mappings of this list
      */
     public Map<K, V> toMap(boolean checkDuplicate) {
         int size = keys.size();
