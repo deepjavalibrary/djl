@@ -14,14 +14,29 @@ package ai.djl.modality.cv;
 
 import java.util.List;
 
+/**
+ * A result of all joints found during Human Pose Estimation on a single image.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Articulated_body_pose_estimation">Wikipedia</a>
+ */
 public class Joints {
 
     private List<Joint> joints;
 
+    /**
+     * Constructs the {@code Joints} with the provided joints.
+     *
+     * @param joints the joints
+     */
     public Joints(List<Joint> joints) {
         this.joints = joints;
     }
 
+    /**
+     * Gets the joints for the image.
+     *
+     * @return the list of joints
+     */
     public List<Joint> getJoints() {
         return joints;
     }
@@ -44,14 +59,31 @@ public class Joints {
         return sb.toString();
     }
 
+    /**
+     * A joint that was detected using Human Pose Estimation on an image.
+     *
+     * @see Joints
+     */
     public static class Joint extends Point {
         private double confidence;
 
+        /**
+         * Constructs a Joint with given data.
+         *
+         * @param x the x coordinate of the joint
+         * @param y the y coordinate of the joint
+         * @param confidence the confidence probability for the joint
+         */
         public Joint(double x, double y, double confidence) {
             super(x, y);
             this.confidence = confidence;
         }
 
+        /**
+         * Returns the confidence probability for the joint.
+         *
+         * @return the confidence
+         */
         public double getConfidence() {
             return confidence;
         }

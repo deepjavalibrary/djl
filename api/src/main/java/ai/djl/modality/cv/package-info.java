@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains utility classes for image processing. */
+/** Contains utility classes for computer vision tasks and image processing. */
 package ai.djl.modality.cv;

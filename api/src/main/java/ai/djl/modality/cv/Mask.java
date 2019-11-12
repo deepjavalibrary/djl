@@ -14,15 +14,34 @@ package ai.djl.modality.cv;
 
 import java.awt.Graphics2D;
 
+/**
+ * A mask with a probability for each pixel within a bounding rectangle.
+ *
+ * <p>This class is usually used to record the results of an Image Segmentation task.
+ */
 public class Mask extends Rectangle {
 
     private float[][] probDist;
 
+    /**
+     * Constructs a Mask with the given data.
+     *
+     * @param x the left coordinate of the bounding rectangle
+     * @param y the top coordinate of the bounding rectangle
+     * @param width the width of the bounding rectangle
+     * @param height the height of the bounding rectangle
+     * @param dist the probability distribution for each pixel in the rectangle
+     */
     public Mask(double x, double y, double width, double height, float[][] dist) {
         super(x, y, width, height);
         this.probDist = dist;
     }
 
+    /**
+     * Returns the probability for each pixel.
+     *
+     * @return the probability for each pixel.
+     */
     public float[][] getProbDist() {
         return probDist;
     }

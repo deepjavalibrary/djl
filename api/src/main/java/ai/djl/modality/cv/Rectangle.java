@@ -115,18 +115,38 @@ public class Rectangle implements BoundingBox {
         g.drawRect(x, y, w, h);
     }
 
+    /**
+     * Returns the left x-coordinate of the Rectangle.
+     *
+     * @return the left x-coordinate of the Rectangle.
+     */
     public double getX() {
         return point.getX();
     }
 
+    /**
+     * Returns the top y-coordinate of the Rectangle.
+     *
+     * @return the top y-coordinate of the Rectangle.
+     */
     public double getY() {
         return point.getY();
     }
 
+    /**
+     * Returns the width of the Rectangle.
+     *
+     * @return the width of the Rectangle.
+     */
     public double getWidth() {
         return width;
     }
 
+    /**
+     * Returns the height of the Rectangle.
+     *
+     * @return the height of the Rectangle.
+     */
     public double getHeight() {
         return height;
     }

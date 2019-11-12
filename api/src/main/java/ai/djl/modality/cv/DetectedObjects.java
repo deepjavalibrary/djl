@@ -15,11 +15,22 @@ package ai.djl.modality.cv;
 import ai.djl.modality.Classifications;
 import java.util.List;
 
-/** A class representing the detected object in an object detection case. */
+/**
+ * A class representing the detected objects results for a single image in an object detection case.
+ */
 public class DetectedObjects extends Classifications {
 
     private List<BoundingBox> boundingBoxes;
 
+    /**
+     * Constructs a DetectedObjects, usually during post-processing.
+     *
+     * <p>All three inputs(classNames, probabilities, boundingBoxes) should be parallel lists.
+     *
+     * @param classNames the names of the objects that were detected
+     * @param probabilities the probability of the objects that were detected
+     * @param boundingBoxes the bounding boxes of the objects that were detected
+     */
     public DetectedObjects(
             List<String> classNames, List<Double> probabilities, List<BoundingBox> boundingBoxes) {
         super(classNames, probabilities);
@@ -39,10 +50,18 @@ public class DetectedObjects extends Classifications {
         return boundingBoxes.size();
     }
 
+    /** A {@code DetectedObject} represents a single potential detected Object for an image. */
     public static final class DetectedObject extends Classification {
 
         private BoundingBox boundingBox;
 
+        /**
+         * Constructs a bounding box with the given data.
+         *
+         * @param className name of the type of object
+         * @param probability probability that the object is correct
+         * @param boundingBox the location of the object
+         */
         public DetectedObject(String className, double probability, BoundingBox boundingBox) {
             super(className, probability);
             this.boundingBox = boundingBox;

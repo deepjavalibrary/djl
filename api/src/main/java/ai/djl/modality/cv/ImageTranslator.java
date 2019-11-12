@@ -31,6 +31,11 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
     private NDImageUtils.Flag flag;
     private Pipeline pipeline;
 
+    /**
+     * Constructs an ImageTranslator with the provided builder.
+     *
+     * @param builder the data to build with
+     */
     public ImageTranslator(BaseBuilder<?> builder) {
         flag = builder.flag;
         pipeline = builder.pipeline;
@@ -55,17 +60,35 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
         return pipeline.transform(new NDList(array));
     }
 
+    /**
+     * A builder to extend for all classes extending the {@link ImageTranslator}.
+     *
+     * @param <T> the concrete builder type
+     */
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
         protected NDImageUtils.Flag flag = NDImageUtils.Flag.COLOR;
         protected Pipeline pipeline;
 
+        /**
+         * Sets the optional {@link ai.djl.modality.cv.util.NDImageUtils.Flag} (default is {@link
+         * NDImageUtils.Flag#COLOR}).
+         *
+         * @param flag the color mode for the images
+         * @return this builder
+         */
         public T optFlag(NDImageUtils.Flag flag) {
             this.flag = flag;
             return self();
         }
 
+        /**
+         * Sets the {@link Pipeline} to use for pre-processing the image.
+         *
+         * @param pipeline the pre-processing pipeline
+         * @return this builder
+         */
         public T setPipeline(Pipeline pipeline) {
             this.pipeline = pipeline;
             return self();

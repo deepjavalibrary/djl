@@ -13,9 +13,9 @@
 package ai.djl.modality.cv;
 
 /**
- * The {@code PathIterator} interface provides the mechanism for objects that implement the {@link
- * BoundingBox BoundingBox} interface to return the geometry of their boundary. It does this by
- * allowing a caller to retrieve the path of that boundary one segment at a time.
+ * A sequence of points used to outline an object in an image.
+ *
+ * <p>The primary use is to return the boundaries in a {@link BoundingBox} object.
  *
  * @see Rectangle
  * @see BoundingBox

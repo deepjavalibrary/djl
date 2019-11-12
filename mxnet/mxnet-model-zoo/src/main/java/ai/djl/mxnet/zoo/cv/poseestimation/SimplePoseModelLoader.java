@@ -34,7 +34,7 @@ import java.util.Map;
  * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
  * href="https://arxiv.org/pdf/1804.06208.pdf">Simple Pose</a>.
  *
- * @see ai.djl.mxnet.nn.MxSymbolBlock
+ * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
 public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints> {
 

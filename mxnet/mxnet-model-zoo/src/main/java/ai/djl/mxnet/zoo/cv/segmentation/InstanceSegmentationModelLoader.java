@@ -32,7 +32,7 @@ import java.awt.image.BufferedImage;
  * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
  * href="https://arxiv.org/pdf/1703.06870.pdf">Mask R-CNN used in the model</a>.
  *
- * @see ai.djl.mxnet.nn.MxSymbolBlock
+ * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
 public class InstanceSegmentationModelLoader
         extends BaseModelLoader<BufferedImage, DetectedObjects> {

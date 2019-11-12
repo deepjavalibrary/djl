@@ -20,7 +20,7 @@ import ai.djl.repository.Repository;
  * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
  * href="https://en.wikipedia.org/wiki/Multilayer_perceptron">Multilayer Perceptron</a>.
  *
- * @see ai.djl.mxnet.nn.MxSymbolBlock
+ * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
 public class Mlp extends ImageClassificationModelLoader {
 

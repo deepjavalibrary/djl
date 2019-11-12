@@ -22,6 +22,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+/** A Collection of utilities for visualizing the results of Computer Vision tasks. */
 public final class ImageVisualization {
 
     private ImageVisualization() {}

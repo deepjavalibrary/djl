@@ -33,7 +33,7 @@ import java.util.Map;
  * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
  * href="https://arxiv.org/pdf/1512.02325.pdf">SSD</a>.
  *
- * @see ai.djl.mxnet.nn.MxSymbolBlock
+ * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
 public class SingleShotDetectionModelLoader
         extends BaseModelLoader<BufferedImage, DetectedObjects> {

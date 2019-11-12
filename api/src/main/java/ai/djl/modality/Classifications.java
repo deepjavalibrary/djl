@@ -21,17 +21,33 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** {@code Classification} is the container that stores the classification results. */
+/**
+ * {@code Classifications} is the container that stores the classification results for
+ * classification on a single input.
+ */
 public class Classifications {
 
     protected List<String> classNames;
     protected List<Double> probabilities;
 
+    /**
+     * Constructs a {@code Classifications} using a parallel list of classNames and probabilities.
+     *
+     * @param classNames the names of the classes
+     * @param probabilities the probabilities for each class for the input
+     */
     public Classifications(List<String> classNames, List<Double> probabilities) {
         this.classNames = classNames;
         this.probabilities = probabilities;
     }
 
+    /**
+     * Constructs a {@code Classifications} using list of classNames parallel to an NDArray of
+     * probabilities.
+     *
+     * @param classNames the names of the classes
+     * @param probabilities the probabilities for each class for the input
+     */
     public Classifications(List<String> classNames, NDArray probabilities) {
         this.classNames = classNames;
         NDArray array = probabilities.asType(DataType.FLOAT64, false);
@@ -40,6 +56,12 @@ public class Classifications {
         array.close();
     }
 
+    /**
+     * Returns a classification item for each potential class for the input.
+     *
+     * @param <T> the type of classification item for the task
+     * @return the list of classification items
+     */
     public <T extends Classification> List<T> items() {
         List<T> list = new ArrayList<>(classNames.size());
         for (int i = 0; i < classNames.size(); i++) {
@@ -48,11 +70,26 @@ public class Classifications {
         return list;
     }
 
+    /**
+     * Returns the item at a given index based on the order used to construct the {@link
+     * Classifications}.
+     *
+     * @param index the index of the item to return
+     * @param <T> the type of classification item for the task
+     * @return the item at the given index, equivalent to {@code classifications.items().get(index)}
+     */
     @SuppressWarnings("unchecked")
     public <T extends Classification> T item(int index) {
         return (T) new Classification(classNames.get(index), probabilities.get(index));
     }
 
+    /**
+     * Returns a list of the top {@code k} best classes.
+     *
+     * @param k the number of classes to return
+     * @param <T> the type of the classification item for the task
+     * @return the list of classification items for the best classes in order of best to worst
+     */
     public <T extends Classification> List<T> topK(int k) {
         List<T> items = items();
         items.sort(Comparator.comparingDouble(Classification::getProbability).reversed());
@@ -60,10 +97,23 @@ public class Classifications {
         return items.subList(0, count);
     }
 
+    /**
+     * Returns the most likely class for the classification.
+     *
+     * @param <T> the type of the classification item for the task
+     * @return the classification item
+     */
     public <T extends Classification> T best() {
         return item(probabilities.indexOf(Collections.max(probabilities)));
     }
 
+    /**
+     * Returns the result for a particular class name.
+     *
+     * @param className the class name to get results for
+     * @param <T> the type of the classification item for the task
+     * @return the (first if multiple) classification item
+     */
     public <T extends Classification> T get(String className) {
         int size = classNames.size();
         for (int i = 0; i < size; i++) {
@@ -91,6 +141,12 @@ public class Classifications {
         private String className;
         private double probability;
 
+        /**
+         * Constructs a single class result for a classification.
+         *
+         * @param className the class name of the result
+         * @param probability the probability of the result
+         */
         public Classification(String className, double probability) {
             this.className = className;
             this.probability = probability;

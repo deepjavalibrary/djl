@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * MxModelZoo is a repository that contains all MXNet models in {@link
- * ai.djl.mxnet.nn.MxSymbolBlock} for DJL.
+ * ai.djl.mxnet.engine.MxSymbolBlock} for DJL.
  */
 public interface MxModelZoo {
 

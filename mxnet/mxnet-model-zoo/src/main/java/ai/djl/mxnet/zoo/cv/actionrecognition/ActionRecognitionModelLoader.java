@@ -35,7 +35,7 @@ import java.util.Map;
  * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
  * href="https://arxiv.org/pdf/1608.00859.pdf">Reference paper</a>.
  *
- * @see ai.djl.mxnet.nn.MxSymbolBlock
+ * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
 public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
 
