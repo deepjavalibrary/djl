@@ -33,6 +33,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Coco image detection dataset from http://cocodataset.org/#home.
+ *
+ * <p>Each image might have different {@link ai.djl.ndarray.types.Shape}s.
+ */
 public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     private static final String ARTIFACT_ID = "coco";

@@ -14,6 +14,7 @@ package ai.djl.basicdataset;
 
 import ai.djl.repository.Repository;
 
+/** An interface which contains datasets that are hosted on https://mlrepo.djl.ai/. */
 public interface BasicDatasets {
 
     String MXNET_REPO_URL = "https://mlrepo.djl.ai/";

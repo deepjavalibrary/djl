@@ -23,6 +23,7 @@ import com.google.gson.annotations.SerializedName;
 import java.lang.reflect.Type;
 import java.util.List;
 
+/** A metadata class that represents the structure of annotations in Coco. */
 public class CocoMetadata {
 
     public static final Gson GSON =
@@ -34,14 +35,29 @@ public class CocoMetadata {
     private List<Annotation> annotations;
     private List<Category> categories;
 
+    /**
+     * Returns a list of all annotations.
+     *
+     * @return a list of all annotations
+     */
     public List<Annotation> getAnnotations() {
         return annotations;
     }
 
+    /**
+     * Returns a list of all categories.
+     *
+     * @return a list of all categories
+     */
     public List<Category> getCategories() {
         return categories;
     }
 
+    /**
+     * Returns a list of all images.
+     *
+     * @return a list of all images
+     */
     public List<Image> getImages() {
         return images;
     }
@@ -65,18 +81,38 @@ public class CocoMetadata {
             return imageId;
         }
 
+        /**
+         * Returns the id of this annotation.
+         *
+         * @return the id of this annotation
+         */
         public long getId() {
             return id;
         }
 
+        /**
+         * Returns the bounding box of this annotation.
+         *
+         * @return the bounding box of this annotation
+         */
         public Rectangle getBoundingBox() {
             return bBox;
         }
 
+        /**
+         * Returns the category id of this annotation.
+         *
+         * @return the category id of this annotation
+         */
         public long getCategoryId() {
             return categoryId;
         }
 
+        /**
+         * Returns the area of this annotation.
+         *
+         * @return the area of this annotation
+         */
         public double getArea() {
             return area;
         }
@@ -92,18 +128,38 @@ public class CocoMetadata {
         private int height;
         private int width;
 
+        /**
+         * Returns the id of this image.
+         *
+         * @return the id of this image
+         */
         public long getId() {
             return id;
         }
 
+        /**
+         * Returns the url of this image.
+         *
+         * @return the url of this image
+         */
         public String getCocoUrl() {
             return cocoUrl;
         }
 
+        /**
+         * Returns the height of this image.
+         *
+         * @return the height of this image
+         */
         public int getHeight() {
             return height;
         }
 
+        /**
+         * Returns the width of this image.
+         *
+         * @return the width of this image
+         */
         public int getWidth() {
             return width;
         }
@@ -113,6 +169,11 @@ public class CocoMetadata {
 
         private long id;
 
+        /**
+         * Returns the id of this category.
+         *
+         * @return the id of this category
+         */
         public long getId() {
             return id;
         }

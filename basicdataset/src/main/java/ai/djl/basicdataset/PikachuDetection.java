@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/** Pikachu image detection dataset that contains multiple Pikachus in each image. */
 public class PikachuDetection extends RandomAccessDataset implements ZooDataset {
 
     private static final String ARTIFACT_ID = "pikachu";

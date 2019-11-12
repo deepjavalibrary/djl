@@ -17,7 +17,23 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/** A dataset for loading image files stored in a folder structure. */
+/**
+ * A dataset for loading image files stored in a folder structure.
+ *
+ * <pre>
+ *  The image folder should be structured as follows:
+ *       root/shoes/Aerobic Shoes1.png
+ *       root/shoes/Aerobic Shose2.png
+ *       ...
+ *       root/boots/Black Boots.png
+ *       root/boots/White Boots.png
+ *       ...
+ *       root/pumps/Red Pumps
+ *       root/pumps/Pink Pumps
+ *       ...
+ *  here shoes, boots, pumps are your labels
+ *  </pre>
+ */
 public final class ImageFolder extends AbstractImageFolder {
 
     ImageFolder(ImageFolderBuilder<?> builder) {

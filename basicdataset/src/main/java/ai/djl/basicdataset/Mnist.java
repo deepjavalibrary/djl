@@ -29,9 +29,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * MNIST handwritten digits dataset from http://yann.lecun.com/exdb/mnist
+ * MNIST handwritten digits dataset from http://yann.lecun.com/exdb/mnist.
  *
- * <p>Each sample is an image (in 3D NDArray) with shape (28, 28, 1).
+ * <p>Each sample is an image (in 3-D NDArray) with shape (28, 28, 1).
  */
 public final class Mnist extends ArrayDataset implements ZooDataset {
 

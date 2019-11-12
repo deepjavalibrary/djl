@@ -29,8 +29,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * CIFAR10 image classification dataset from https://www.cs.toronto.edu/~kriz/cifar.html Each sample
- * is an image (in 3D NDArray) with shape (32, 32, 3).
+ * CIFAR10 image classification dataset from https://www.cs.toronto.edu/~kriz/cifar.html.
+ *
+ * <p>Each sample is an image (in 3-D {@link NDArray}) with shape (32, 32, 3).
  */
 public final class Cifar10 extends ArrayDataset implements ZooDataset {
 

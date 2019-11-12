@@ -14,6 +14,7 @@ package ai.djl.basicdataset;
 
 import ai.djl.ndarray.NDArray;
 
+/** A utility class which provides methods to compare two {@link NDArray}s. */
 public final class Assertions {
 
     private static final double RTOL = 1e-5;
@@ -39,10 +40,30 @@ public final class Assertions {
         return sb.toString();
     }
 
+    /**
+     * Tests that the actual {@link NDArray} and the expected {@link NDArray} are approximately
+     * equal with rtol=1e-5 and atol=1e-3.
+     *
+     * <p>the formula is absolute(a - b) <= (atol + rtol * absolute(b))
+     *
+     * @param actual the {@link NDArray} to compare to
+     * @param expected the {@link NDArray} to compare
+     */
     public static void assertAlmostEquals(NDArray actual, NDArray expected) {
         assertAlmostEquals(actual, expected, RTOL, ATOL);
     }
 
+    /**
+     * Tests that the actual {@link NDArray} and the expected {@link NDArray} are approximately
+     * equal given rtol and atol.
+     *
+     * <p>the formula is absolute(a - b) <= (atol + rtol * absolute(b))
+     *
+     * @param actual the {@link NDArray} to compare to
+     * @param expected the {@link NDArray} to compare
+     * @param rtol the relative tolerance parameter
+     * @param atol The absolute tolerance parameter
+     */
     public static void assertAlmostEquals(
             NDArray actual, NDArray expected, double rtol, double atol) {
         if (!actual.allClose(expected, rtol, atol, false)) {

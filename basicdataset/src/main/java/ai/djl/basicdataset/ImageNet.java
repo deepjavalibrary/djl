@@ -25,6 +25,12 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * ImageNet is an image classification dataset from http://image-net.org 2012 Classification
+ * dataset.
+ *
+ * <p>Each image might have different {@link ai.djl.ndarray.types.Shape}s.
+ */
 public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 
     private Usage usage;
@@ -42,14 +48,29 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
         return new ImageFolder.Builder();
     }
 
+    /**
+     * Returns all WordNet ids of this ImageNet dataset.
+     *
+     * @return all WordNet ids of this ImageNet dataset
+     */
     public String[] getWordNetIds() {
         return wordNetIds;
     }
 
+    /**
+     * Returns all class names of this ImageNet dataset.
+     *
+     * @return all class names of this ImageNet dataset
+     */
     public String[] getClassNames() {
         return classNames;
     }
 
+    /**
+     * Returns all full class names of this ImageNet dataset.
+     *
+     * @return all full class names of this ImageNet dataset
+     */
     public String[] getClassFull() {
         return classFull;
     }

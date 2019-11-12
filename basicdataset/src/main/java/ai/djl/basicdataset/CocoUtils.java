@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/** A utility class that assists in loading and parsing the annotations in Coco. */
 public class CocoUtils {
 
     private Path annotationPath;
@@ -42,6 +43,11 @@ public class CocoUtils {
         categoryIdMap = new HashMap<>();
     }
 
+    /**
+     * Prepares and indexes the annotation file in memory.
+     *
+     * @throws IOException if reading the annotation file fails
+     */
     public void prepare() throws IOException {
         if (!prepared) {
             CocoMetadata metadata;
@@ -81,10 +87,21 @@ public class CocoUtils {
         Collections.sort(imageIds);
     }
 
+    /**
+     * Returns all image ids in the annotation file.
+     *
+     * @return all image ids in the annotation file
+     */
     public List<Long> getImageIds() {
         return imageIds;
     }
 
+    /**
+     * Returns the relative path of an image given an image id.
+     *
+     * @param imageId the image id to retrieve the path for
+     * @return the relative path of an image
+     */
     public Path getRelativeImagePath(long imageId) {
         CocoMetadata.Image image = imageMap.get(imageId);
         String[] cocoUrl = image.getCocoUrl().split("/");
@@ -92,14 +109,33 @@ public class CocoUtils {
                 .resolve(Paths.get(cocoUrl[cocoUrl.length - 1]));
     }
 
+    /**
+     * Returns all ids of the annotation that correspond to a given image id.
+     *
+     * @param imageId the image id to retrieve annotations for
+     * @return all ids of the annotation
+     */
     public List<Long> getAnnotationIdByImageId(long imageId) {
         return imageToAnn.get(imageId);
     }
 
+    /**
+     * Returns an {@link ai.djl.basicdataset.CocoMetadata.Annotation} that corresponds to a given
+     * annotation id.
+     *
+     * @param annotationId the annotation id to retrieve an annotation for
+     * @return an {@link ai.djl.basicdataset.CocoMetadata.Annotation}
+     */
     public CocoMetadata.Annotation getAnnotationById(long annotationId) {
         return annotationMap.get(annotationId);
     }
 
+    /**
+     * Returns the continuous category id given an original category id.
+     *
+     * @param originalCategoryId the original category id to retrieve the continuous category id for
+     * @return the continuous category id
+     */
     public int mapCategoryId(long originalCategoryId) {
         return categoryIdMap.get(originalCategoryId);
     }
