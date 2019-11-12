@@ -19,6 +19,17 @@ MXNet model zoo contains two major categories, CV and NLP. All of the models are
 * NLP
   * Question and Answer
 
+## Installation
+You can pull the MXNet Engine from the central Maven repositories by including the following dependency:
+
+```xml
+<dependency>
+    <groupId>ai.djl.mxnet</groupId>
+    <artifactId>mxnet-model-zoo</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
 ## How to find a pre-trained model in model zoo
 
 In a model zoo repository, there can be many pre-trained that belongs to the same model family.
