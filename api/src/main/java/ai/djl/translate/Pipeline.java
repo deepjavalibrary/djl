@@ -19,14 +19,26 @@ import ai.djl.util.PairList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** {@code Pipeline} allows applying multiple transforms on an input {@link NDList}. */
 public class Pipeline {
 
     private PairList<IndexKey, Transform> transforms;
 
+    /** Creates a new instance of {@code Pipeline} that has no {@link Transform} defined yet. */
     public Pipeline() {
         transforms = new PairList<>();
     }
 
+    /**
+     * Creates a new instance of {@code Pipeline} that can apply the given transforms on its input.
+     *
+     * <p>Since no keys are provided for these transforms, they will be applied to the first element
+     * in the input {@link NDList} when the {@link #transform(NDList) transform} method is called on
+     * this object.
+     *
+     * @param transforms the transforms to be applied when the {@link #transform(NDList) transform}
+     *     method is called on this object
+     */
     public Pipeline(Transform... transforms) {
         this.transforms = new PairList<>();
         for (Transform transform : transforms) {
@@ -34,36 +46,106 @@ public class Pipeline {
         }
     }
 
+    /**
+     * Adds the given {@link Transform} to the list of transforms to be applied on the input when
+     * the {@link #transform(NDList) transform} method is called on this object.
+     *
+     * <p>Since no keys are provided for this {@link Transform}, it will be applied to the first
+     * element in the input {@link NDList}.
+     *
+     * @param transform the {@link Transform} to be added
+     * @return this {@code Pipeline}
+     */
     public Pipeline add(Transform transform) {
         transforms.add(new IndexKey(0), transform);
         return this;
     }
 
+    /**
+     * Adds the given {@link Transform} to the list of transforms to be applied on the {@link
+     * NDArray} at the given index in the input {@link NDList}.
+     *
+     * @param index the index corresponding to the {@link NDArray} in the input {@link NDList} on
+     *     which the given transform must be applied to
+     * @param transform the {@link Transform} to be added
+     * @return this {@code Pipeline}
+     */
     public Pipeline add(int index, Transform transform) {
-        transforms.add(index, new IndexKey(0), transform);
+        transforms.add(new IndexKey(index), transform);
         return this;
     }
 
+    /**
+     * Adds the given {@link Transform} to the list of transforms to be applied on the {@link
+     * NDArray} with the given key as name in the input {@link NDList}.
+     *
+     * @param name the key corresponding to the {@link NDArray} in the input {@link NDList} on which
+     *     the given transform must be applied to
+     * @param transform the {@code Transform} to be applied when the {@link #transform(NDList)
+     *     transform} method is called on this object
+     * @return this {@code Pipeline}
+     */
     public Pipeline add(String name, Transform transform) {
         transforms.add(new IndexKey(name), transform);
         return this;
     }
 
+    /**
+     * Inserts the given {@link Transform} to the list of transforms at the given position.
+     *
+     * <p>Since no keys or indices are provided for this {@link Transform}, it will be applied to
+     * the first element in the input {@link NDList} when the {@link #transform(NDList) transform}
+     * method is called on this object.
+     *
+     * @param position the position at which the {@link Transform} must be inserted
+     * @param transform the {@code Transform} to be inserted
+     * @return this {@code Pipeline}
+     */
     public Pipeline insert(int position, Transform transform) {
         transforms.add(position, new IndexKey(0), transform);
         return this;
     }
 
+    /**
+     * Inserts the given {@link Transform} to the list of transforms at the given position to be
+     * applied on the {@link NDArray} at the given index in the input {@link NDList}.
+     *
+     * @param position the position at which the {@link Transform} must be inserted
+     * @param index the index corresponding to the {@link NDArray} in the input {@link NDList} on
+     *     which the given transform must be applied to
+     * @param transform the {@code Transform} to be inserted
+     * @return this {@code Pipeline}
+     */
     public Pipeline insert(int position, int index, Transform transform) {
         transforms.add(position, new IndexKey(index), transform);
         return this;
     }
 
+    /**
+     * Inserts the given {@link Transform} to the list of transforms at the given position to be
+     * applied on the {@link NDArray} with the given name in the input {@link NDList}.
+     *
+     * @param position the position at which the {@link Transform} must be inserted
+     * @param name the key corresponding to the {@link NDArray} in the input {@link NDList} on which
+     *     the given transform must be applied to
+     * @param transform the {@code Transform} to be inserted
+     * @return this {@code Pipeline}
+     */
     public Pipeline insert(int position, String name, Transform transform) {
         transforms.add(position, new IndexKey(name), transform);
         return this;
     }
 
+    /**
+     * Applies the transforms configured in this object on the input {@link NDList}.
+     *
+     * <p>If a key is specified with the transform, those tranforms will only be applied to the
+     * {@link NDArray} in the input {@link NDList}. If a key is not specified, it will be applied to
+     * the first element in the input {@link NDList}.
+     *
+     * @param input the input {@link NDList} on which the tranforms are to be applied
+     * @return the output {@link NDList} after applying the tranforms
+     */
     public NDList transform(NDList input) {
         if (transforms.isEmpty() || input.isEmpty()) {
             return input;
