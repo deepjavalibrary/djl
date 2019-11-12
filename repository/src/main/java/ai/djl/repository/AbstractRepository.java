@@ -230,7 +230,13 @@ public abstract class AbstractRepository implements Repository {
         public void validateChecksum(Artifact.Item item) throws IOException {
             String sha1 = Hex.toHexString(dis.getMessageDigest().digest());
             if (!sha1.equalsIgnoreCase(item.getSha1Hash())) {
-                throw new IOException("Checksum error: " + item.getName() + ", sha1: " + sha1);
+                throw new IOException(
+                        "Checksum error: "
+                                + item.getName()
+                                + ", expected sha1: "
+                                + item.getSha1Hash()
+                                + ", actual sha1: "
+                                + sha1);
             }
         }
 

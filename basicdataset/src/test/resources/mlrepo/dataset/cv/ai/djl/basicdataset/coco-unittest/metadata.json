@@ -29,8 +29,8 @@
         },
         "annotations": {
           "uri": "https://mlrepo.djl.ai/dataset/cv/ai/djl/basicdataset/coco-unittest/annotations_trainval2017.zip",
-          "sha1Hash": "efdb9553edeec207396da9a23a68a80ff4a8fb47",
-          "size": 4973
+          "sha1Hash": "ad941f0db195712709d94741bdb8a02e0e1affeb",
+          "size": 5838
         }
       }
     }

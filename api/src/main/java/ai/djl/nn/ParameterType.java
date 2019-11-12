@@ -24,7 +24,7 @@ public enum ParameterType {
     RUNNING_VAR(Initializer.ONES),
     OTHER(null);
 
-    private final Initializer initializer;
+    private final transient Initializer initializer;
 
     ParameterType(Initializer initializer) {
         this.initializer = initializer;
