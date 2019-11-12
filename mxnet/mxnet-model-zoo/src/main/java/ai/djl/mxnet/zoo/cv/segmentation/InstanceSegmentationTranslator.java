@@ -59,7 +59,7 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
     @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage image) {
         Pipeline pipeline = getPipeline();
-        pipeline.add(0, null, this);
+        pipeline.insert(0, null, this);
         return super.processInput(ctx, image);
     }
 
