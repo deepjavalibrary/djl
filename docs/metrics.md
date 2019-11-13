@@ -1,4 +1,4 @@
-# Metrics in DJL   
+# Metrics in DJL
 DJL comes with utility classes to make it easy to capture performance and other metrics during runtime that could be used to analyze and monitor inference and/or training performance and stability. [Metrics](../api/src/main/java/ai/djl/metric/Metrics.java) is the class that enables that. It is built as a collection of individual [Metric](../api/src/main/java/ai/djl/metric/Metric.java) classes.
 
 As a container for individual metrics class **Metrics** stores them as a time series data so that metric-vs-timeline analysis could be performed. It also provides convenient statistical methods for getting aggregated information, such as _mean_ and _percentile_.
