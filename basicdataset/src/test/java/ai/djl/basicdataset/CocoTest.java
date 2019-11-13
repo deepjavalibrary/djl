@@ -36,7 +36,7 @@ public class CocoTest {
                 new CocoDetectionUnitTest(
                         new CocoDetection.Builder()
                                 .optUsage(Dataset.Usage.TEST)
-                                .setRandomSampling(1));
+                                .setSampling(1, true));
         coco.prepare();
         TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
         try (Model model = Model.newInstance()) {

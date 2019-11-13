@@ -196,7 +196,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         Cifar10 cifar10 =
                 Cifar10.builder(manager)
                         .optUsage(usage)
-                        .setRandomSampling(batchSize)
+                        .setSampling(batchSize, true)
                         .optMaxIteration(maxIterations)
                         .optPipeline(pipeline)
                         .build();

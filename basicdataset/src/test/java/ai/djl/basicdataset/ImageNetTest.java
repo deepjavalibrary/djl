@@ -36,7 +36,7 @@ public class ImageNetTest {
                 new ImageNet.Builder()
                         .optUsage(Usage.VALIDATION)
                         .setRepository(repository)
-                        .setRandomSampling(32)
+                        .setSampling(32, true)
                         .build();
         imagenet.prepare();
 

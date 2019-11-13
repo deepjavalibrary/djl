@@ -56,7 +56,7 @@ public class ImageFolderTest {
                                         new Pipeline()
                                                 .add(new Resize(100, 100))
                                                 .add(new ToTensor()))
-                                .setSequenceSampling(1, false)
+                                .setSampling(1, false)
                                 .build();
                 dataset.prepare();
 

@@ -124,7 +124,7 @@ public final class TrainMnist extends AbstractTraining {
         Mnist mnist =
                 Mnist.builder(manager)
                         .optUsage(usage)
-                        .setRandomSampling(batchSize)
+                        .setSampling(batchSize, true)
                         .optMaxIteration(maxIterations)
                         .build();
         mnist.prepare(new ProgressBar());

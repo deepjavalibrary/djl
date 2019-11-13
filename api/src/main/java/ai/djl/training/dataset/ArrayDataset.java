@@ -28,7 +28,7 @@ import java.util.stream.Stream;
  *     ArrayDataset dataset = new ArrayDataset.Builder()
  *                              .setData(data)
  *                              .optLabels(label)
- *                              .setSequenceSampling(20)
+ *                              .setSampling(20, false)
  *                              .build();
  * </pre>
  *

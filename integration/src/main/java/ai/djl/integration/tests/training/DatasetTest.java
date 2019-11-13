@@ -58,7 +58,7 @@ public class DatasetTest {
                             .setData(
                                     manager.arange(
                                             0, 100, 1, DataType.INT64, Device.defaultDevice()))
-                            .setSampler(new BatchSampler(new SequenceSampler(), 1, false))
+                            .setSampling(new BatchSampler(new SequenceSampler(), 1, false))
                             .build();
 
             List<Long> original = new ArrayList<>();
@@ -87,7 +87,7 @@ public class DatasetTest {
                             .setData(
                                     manager.arange(
                                             0, 10, 1, DataType.INT64, Device.defaultDevice()))
-                            .setSampler(new BatchSampler(new RandomSampler(), 1, false))
+                            .setSampling(new BatchSampler(new RandomSampler(), 1, false))
                             .build();
             List<Long> original = new ArrayList<>();
             try (Trainer trainer = model.newTrainer(config)) {
@@ -114,7 +114,7 @@ public class DatasetTest {
             ArrayDataset dataset =
                     new ArrayDataset.Builder()
                             .setData(data)
-                            .setSampler(new BatchSampler(new SequenceSampler(), 27, false))
+                            .setSampling(new BatchSampler(new SequenceSampler(), 27, false))
                             .build();
             List<long[]> originalList = new ArrayList<>();
             try (Trainer trainer = model.newTrainer(config)) {
@@ -134,7 +134,7 @@ public class DatasetTest {
             ArrayDataset dataset2 =
                     new ArrayDataset.Builder()
                             .setData(data)
-                            .setSampler(new BatchSampler(new RandomSampler(), 33, true))
+                            .setSampling(new BatchSampler(new RandomSampler(), 33, true))
                             .build();
             List<long[]> originalList2 = new ArrayList<>();
             try (Trainer trainer = model.newTrainer(config)) {
@@ -151,7 +151,7 @@ public class DatasetTest {
             ArrayDataset dataset3 =
                     new ArrayDataset.Builder()
                             .setData(data)
-                            .setSampler(new BatchSampler(new SequenceSampler(), 101, true))
+                            .setSampling(new BatchSampler(new SequenceSampler(), 101, true))
                             .build();
             List<long[]> originalList3 = new ArrayList<>();
             try (Trainer trainer = model.newTrainer(config)) {
@@ -168,7 +168,7 @@ public class DatasetTest {
             ArrayDataset dataset4 =
                     new ArrayDataset.Builder()
                             .setData(data)
-                            .setSampler(new BatchSampler(new SequenceSampler(), 101, false))
+                            .setSampling(new BatchSampler(new SequenceSampler(), 101, false))
                             .build();
             List<long[]> originalList4 = new ArrayList<>();
             try (Trainer trainer = model.newTrainer(config)) {
@@ -198,7 +198,7 @@ public class DatasetTest {
                     new ArrayDataset.Builder()
                             .setData(data)
                             .optLabels(label)
-                            .setSequenceSampling(20)
+                            .setSampling(20, false)
                             .build();
 
             int index = 0;
@@ -217,7 +217,7 @@ public class DatasetTest {
                         new ArrayDataset.Builder()
                                 .setData(data)
                                 .optLabels(label)
-                                .setSequenceSampling(15)
+                                .setSampling(15, false)
                                 .build();
                 index = 0;
                 for (Batch batch : trainer.iterateDataset(dataset)) {
@@ -245,7 +245,7 @@ public class DatasetTest {
                 dataset =
                         new ArrayDataset.Builder()
                                 .setData(data, data2)
-                                .setSequenceSampling(10)
+                                .setSampling(10, false)
                                 .build();
 
                 for (Batch batch : trainer.iterateDataset(dataset)) {
@@ -274,7 +274,7 @@ public class DatasetTest {
             Cifar10 cifar10 =
                     new Cifar10.Builder()
                             .setManager(manager)
-                            .setRandomSampling(100)
+                            .setSampling(100, true)
                             .optUsage(Dataset.Usage.TEST)
                             // you could start trying prefetchNumber with 2 * number of threads.
                             // This number should be adjusted based on your machines and data.

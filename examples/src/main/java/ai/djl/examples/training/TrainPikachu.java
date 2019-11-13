@@ -92,7 +92,7 @@ public final class TrainPikachu extends AbstractTraining {
             PikachuDetection pikachuDetectionTrainingSet =
                     new PikachuDetection.Builder()
                             .optUsage(Dataset.Usage.TRAIN)
-                            .setSampler(new BatchSampler(new RandomSampler(), batchSize, false))
+                            .setSampling(new BatchSampler(new RandomSampler(), batchSize, false))
                             .build();
             pikachuDetectionTrainingSet.prepare();
 

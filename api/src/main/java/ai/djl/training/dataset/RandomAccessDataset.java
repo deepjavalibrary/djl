@@ -88,21 +88,20 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
             return sampler;
         }
 
-        public T setRandomSampling(long batchSize) {
-            sampler = new BatchSampler(new RandomSampler(), batchSize, true);
+        public T setSampling(long batchSize, boolean random) {
+            return setSampling(batchSize, random, false);
+        }
+
+        public T setSampling(long batchSize, boolean random, boolean dropLast) {
+            if (random) {
+                sampler = new BatchSampler(new RandomSampler(), batchSize, dropLast);
+            } else {
+                sampler = new BatchSampler(new SequenceSampler(), batchSize, dropLast);
+            }
             return self();
         }
 
-        public T setSequenceSampling(long batchSize) {
-            return setSequenceSampling(batchSize, false);
-        }
-
-        public T setSequenceSampling(long batchSize, boolean dropLast) {
-            sampler = new BatchSampler(new SequenceSampler(), batchSize, dropLast);
-            return self();
-        }
-
-        public T setSampler(Sampler sampler) {
+        public T setSampling(Sampler sampler) {
             this.sampler = sampler;
             return self();
         }

@@ -44,7 +44,7 @@ public class MnistTest {
                             .setManager(manager)
                             .optUsage(Dataset.Usage.TEST)
                             .optRepository(repository)
-                            .setRandomSampling(32)
+                            .setSampling(32, true)
                             .build();
 
             mnist.prepare();
@@ -71,7 +71,7 @@ public class MnistTest {
                     new Mnist.Builder()
                             .setManager(manager)
                             .optUsage(Dataset.Usage.TEST)
-                            .setRandomSampling(32)
+                            .setSampling(32, true)
                             .build();
 
             mnist.prepare();
