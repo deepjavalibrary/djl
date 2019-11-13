@@ -13,11 +13,11 @@ ResNet-50 SSD model.
 Before you start, please see the JavaDoc for the following classes.
 These are the core components we are using to load the pre-trained model and do inference.
 
-- [Model](https://djl-ai.s3.amazonaws.com/java-api/0.1.0/ai/djl/Model.html)
-- [Predictor](https://djl-ai.s3.amazonaws.com/java-api/0.1.0/ai/djl/inference/Predictor.html)
-- [Translator](https://djl-ai.s3.amazonaws.com/java-api/0.1.0/ai/djl/Translator.html)
-- [NDArray](https://djl-ai.s3.amazonaws.com/java-api/0.1.0/ai/djl/ndarray/NDArray.html) and 
-[NDList](https://djl-ai.s3.amazonaws.com/java-api/0.1.0/ai/djl/ndarray/NDList.html)
+- [Model](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/ai/djl/Model.html)
+- [Predictor](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/ai/djl/inference/Predictor.html)
+- [Translator](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/ai/djl/Translator.html)
+- [NDArray](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/ai/djl/ndarray/NDArray.html) and 
+[NDList](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/ai/djl/ndarray/NDList.html)
 
 ## WorkFlow
 The workflow looks like the following:
