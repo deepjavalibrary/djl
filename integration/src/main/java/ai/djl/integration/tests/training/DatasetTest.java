@@ -191,7 +191,7 @@ public class DatasetTest {
             model.setBlock(Activation.IDENTITY_BLOCK);
 
             NDManager manager = model.getNDManager();
-
+            // single case: one data, one label
             NDArray data = manager.arange(200).reshape(100, 2);
             NDArray label = manager.arange(100).reshape(100);
             ArrayDataset dataset =
@@ -238,6 +238,26 @@ public class DatasetTest {
                                 manager.arange(index, index + 10).reshape(10));
                     }
                     index += 15;
+                }
+                // multiple data, 0 labels test case
+                NDArray data2 = manager.arange(300).reshape(100, 3);
+                index = 0;
+                dataset =
+                        new ArrayDataset.Builder()
+                                .setData(data, data2)
+                                .setSequenceSampling(10)
+                                .build();
+
+                for (Batch batch : trainer.iterateDataset(dataset)) {
+                    Assert.assertEquals(batch.getData().size(), 2);
+                    Assert.assertEquals(
+                            batch.getData().head(),
+                            manager.arange(2 * index, 2 * index + 20).reshape(10, 2));
+                    Assert.assertEquals(
+                            batch.getData().get(1),
+                            manager.arange(3 * index, 3 * index + 30).reshape(10, 3));
+                    Assert.assertEquals(batch.getLabels().size(), 0);
+                    index += 10;
                 }
             }
         }

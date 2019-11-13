@@ -100,33 +100,11 @@ public class ArrayDataset extends RandomAccessDataset {
         /**
          * Sets the data as an {@link NDArray} for the {@code ArrayDataset}.
          *
-         * @param data an {@link NDArray} that contains the data
-         * @return this Builder
-         */
-        public Builder setData(NDArray data) {
-            this.data = new NDArray[] {data};
-            return self();
-        }
-
-        /**
-         * Sets the data as an array of {@link NDArray} for the {@code ArrayDataset}.
-         *
          * @param data an array of {@link NDArray} that contains the data
          * @return this Builder
          */
-        public Builder setData(NDArray[] data) {
+        public Builder setData(NDArray... data) {
             this.data = data;
-            return self();
-        }
-
-        /**
-         * Sets the label for the data in the {@code ArrayDataset}.
-         *
-         * @param labels an {@link NDArray} that contains the labels
-         * @return this Builder
-         */
-        public Builder optLabels(NDArray labels) {
-            this.labels = new NDArray[] {labels};
             return self();
         }
 
@@ -136,7 +114,7 @@ public class ArrayDataset extends RandomAccessDataset {
          * @param labels an array of {@link NDArray} that contains the labels
          * @return this Builder
          */
-        public Builder optLabels(NDArray[] labels) {
+        public Builder optLabels(NDArray... labels) {
             this.labels = labels;
             return self();
         }
