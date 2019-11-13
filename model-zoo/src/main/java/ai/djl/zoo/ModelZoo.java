@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Model Zoo is a repository that contains all models for DJL. */
 public interface ModelZoo {
 
     String REPO_URL = "https://mlrepo.djl.ai/";
@@ -30,6 +31,15 @@ public interface ModelZoo {
     ResNetModelLoader RESNET = new ResNetModelLoader(REPOSITORY);
     MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
 
+    /**
+     * Gets the {@link ModelLoader} based on the model name.
+     *
+     * @param name the name of the model
+     * @param <I> the input data type for preprocessing
+     * @param <O> the output data type after postprocessing
+     * @return the {@link ModelLoader} of the model
+     * @throws ModelNotFoundException when the model cannot be found
+     */
     @SuppressWarnings("unchecked")
     static <I, O> ModelLoader<I, O> getModelLoader(String name) throws ModelNotFoundException {
         try {
@@ -41,6 +51,11 @@ public interface ModelZoo {
         }
     }
 
+    /**
+     * Lists the available models in the ModelZoo.
+     *
+     * @return the list of all available models in loader format
+     */
     static List<ModelLoader<?, ?>> listModels() {
         List<ModelLoader<?, ?>> list = new ArrayList<>();
         try {

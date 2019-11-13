@@ -38,6 +38,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+/** Model loader for ResNet_V1. */
 public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
 
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
@@ -45,6 +46,11 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
     private static final String ARTIFACT_ID = "resnet";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public ResNetModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }

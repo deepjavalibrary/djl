@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 
+/** Model loader for MLP models. */
 public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
 
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
@@ -42,6 +43,11 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
     private static final String ARTIFACT_ID = "mlp";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public MlpModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }
