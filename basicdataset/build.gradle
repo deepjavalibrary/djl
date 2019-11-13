@@ -20,7 +20,7 @@ dependencies {
     }
     testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
 
-    testCompile project(":mxnet:engine")
+    testCompile project(":mxnet:mxnet-engine")
     testRuntime "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
 }
 

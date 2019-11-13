@@ -115,7 +115,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             groupId project.getGroup()
-            artifactId "mxnet-engine"
+            artifactId project.getName()
             version rootProject.getVersion()
             from components.java
             artifacts = [jar, javadocJar, sourcesJar]

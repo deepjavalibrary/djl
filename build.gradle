@@ -68,7 +68,7 @@ configure(javaProjects()) {
     }
 }
 
-configure([project(':api'), project(':basicdataset'), project(':model-zoo'), project(':repository'), project(':mxnet:engine'), project(':mxnet:mxnet-model-zoo') ]) {
+configure([project(':api'), project(':basicdataset'), project(':model-zoo'), project(':repository'), project(':mxnet:mxnet-engine'), project(':mxnet:mxnet-model-zoo') ]) {
     javadoc {
         title "Deeplearning Java Library ${version} - ${project.name} API"
         options.addBooleanOption("-allow-script-in-comments", true)

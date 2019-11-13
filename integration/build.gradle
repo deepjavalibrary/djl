@@ -16,7 +16,7 @@ dependencies {
     compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
     compile project(":basicdataset")
     compile project(":model-zoo")
-    compile project(":mxnet:engine")
+    compile project(":mxnet:mxnet-engine")
     compile project(":mxnet:mxnet-model-zoo")
     compile ("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
