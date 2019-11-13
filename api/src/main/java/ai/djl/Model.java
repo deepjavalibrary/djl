@@ -133,12 +133,37 @@ public interface Model extends AutoCloseable {
      */
     Block getBlock();
 
+    /**
+     * Sets the block for the Model for training and inference.
+     *
+     * @param block the {@link Block} used in Model
+     */
     void setBlock(Block block);
 
+    /**
+     * Gets the model name.
+     *
+     * @return name of the model
+     */
     String getName();
 
+    /**
+     * Gets the property of the model based on property name.
+     *
+     * @param key the name of the property
+     * @return the value of the property
+     */
     String getProperty(String key);
 
+    /**
+     * Sets a property to the model.
+     *
+     * <p>properties will be saved/loaded with model, user can store some information about the
+     * model in here.
+     *
+     * @param key the name of the property
+     * @param value the value of the property
+     */
     void setProperty(String key, String value);
 
     /**
