@@ -17,7 +17,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.mxnet.jna.JnaUtils;
-import ai.djl.mxnet.nn.MxSymbolBlock;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -77,6 +76,11 @@ public class MxModel implements Model {
     // the variable is used to avoid ParameterStore copy for the first time
     private AtomicBoolean first;
 
+    /**
+     * Constructs a new Model on a given device.
+     *
+     * @param device the device the model should be located on
+     */
     MxModel(Device device) {
         device = Device.defaultIfNull(device);
         dataType = DataType.FLOAT32;
@@ -88,9 +92,9 @@ public class MxModel implements Model {
     /**
      * Loads the MXNet model from a specified location.
      *
-     * <p>MXNet engine looks for MODEL_NAME-symbol.json and MODEL_NAME-xxxx.params files in the
-     * specified directory. By default, MXNet engine will pick up the latest epoch of the parameter
-     * file. However, users can explicitly specify an epoch to be loaded:
+     * <p>MXNet engine looks for {MODEL_NAME}-symbol.json and {MODEL_NAME}-{EPOCH}.params files in
+     * the specified directory. By default, MXNet engine will pick up the latest epoch of the
+     * parameter file. However, users can explicitly specify an epoch to be loaded:
      *
      * <pre>
      * Map&lt;String, String&gt; options = new HashMap&lt;&gt;()

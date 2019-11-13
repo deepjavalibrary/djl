@@ -13,6 +13,7 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.mxnet.jna.NativeResource;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
@@ -25,6 +26,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * {@code Symbol} is an internal helper for symbolic model graphs used by the {@link
+ * ai.djl.nn.SymbolBlock}.
+ *
+ * @see ai.djl.nn.SymbolBlock
+ * @see <a href="https://mxnet.incubator.apache.org/api/python/docs/api/symbol/index.html">MXNet
+ *     Symbol</a>
+ */
 public class Symbol extends NativeResource {
 
     //    private String[] argParams;
@@ -33,6 +42,12 @@ public class Symbol extends NativeResource {
     //    private List<Integer> outputLayouts;
     private MxNDManager manager;
 
+    /**
+     * Constructs a {@code Symbol}.
+     *
+     * @param manager the manager to attach the symbol to
+     * @param pointer the symbol's native data location
+     */
     Symbol(MxNDManager manager, Pointer pointer) {
         super(pointer);
         this.manager = manager;
@@ -41,23 +56,50 @@ public class Symbol extends NativeResource {
         //        auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }
 
+    /**
+     * Loads a symbol from a path.
+     *
+     * @param manager the manager to load the symbol to
+     * @param path the path to the symbol file
+     * @return the new symbol
+     */
     public static Symbol load(MxNDManager manager, String path) {
         Pointer pointer = JnaUtils.createSymbolFromFile(path);
         return new Symbol(manager, pointer);
     }
 
+    /**
+     * Returns the symbol argument names.
+     *
+     * @return the symbol argument names
+     */
     public String[] getArgNames() {
         return JnaUtils.listSymbolArguments(getHandle());
     }
 
+    /**
+     * Returns the MXNet auxiliary states for the symbol.
+     *
+     * @return the MXNet auxiliary states for the symbol
+     */
     public String[] getAuxNames() {
         return JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }
 
+    /**
+     * Returns the symbol names.
+     *
+     * @return the symbol names
+     */
     public String[] getAllNames() {
         return JnaUtils.listSymbolNames(getHandle());
     }
 
+    /**
+     * Returns the symbol outputs.
+     *
+     * @return the symbol outputs
+     */
     public String[] getOutputNames() {
         if (outputs == null) {
             outputs = JnaUtils.listSymbolOutputs(getHandle());
@@ -93,15 +135,33 @@ public class Symbol extends NativeResource {
 
      */
 
+    /**
+     * Copies the symbol.
+     *
+     * @return a new copy of the symbol
+     */
     public Symbol copy() {
-        return this;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
+    /**
+     * Returns the output symbol by index.
+     *
+     * @param index the index of the output
+     * @return the symbol output as a new symbol
+     */
     public Symbol get(int index) {
         Pointer pointer = JnaUtils.getSymbolOutput(getInternals().getHandle(), index);
         return new Symbol(manager, pointer);
     }
 
+    /**
+     * Returns the output symbol with the given name.
+     *
+     * @param name the name of the symbol to return
+     * @return the output symbol
+     * @throws IllegalArgumentException Thrown if no output matches the name
+     */
     public Symbol get(String name) {
         String[] out = getInternalOutputNames();
         int index = Utils.indexOf(out, name);
@@ -111,11 +171,21 @@ public class Symbol extends NativeResource {
         return get(index);
     }
 
+    /**
+     * Returns the symbol internals.
+     *
+     * @return the symbol internals symbol
+     */
     public Symbol getInternals() {
         Pointer pointer = JnaUtils.getSymbolInternals(getHandle());
         return new Symbol(manager, pointer);
     }
 
+    /**
+     * Returns the list of names for all internal outputs.
+     *
+     * @return a list of names
+     */
     public List<String> getLayerNames() {
         String[] outputNames = getInternalOutputNames();
         String[] allNames = getAllNames();
@@ -127,7 +197,7 @@ public class Symbol extends NativeResource {
     }
 
     /**
-     * Infers the shapes for all parameters inside a symbol from given input shapes.
+     * Infers the shapes for all parameters inside a symbol from the given input shapes.
      *
      * @param pairs the given input name and shape
      * @return a map of arguments with names and shapes

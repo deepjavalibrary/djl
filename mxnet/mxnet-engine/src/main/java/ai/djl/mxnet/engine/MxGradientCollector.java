@@ -17,8 +17,13 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.GradientCollector;
 
+/** {@code MxGradientCollector} is the MXNet implementation of {@link GradientCollector}. */
 public class MxGradientCollector implements GradientCollector {
 
+    /**
+     * Constructs an {@code MxGradientCollector} and enables training data collection for
+     * backpropogation.
+     */
     public MxGradientCollector() {
         boolean prevRecordingState = setRecording(true);
         if (prevRecordingState) {

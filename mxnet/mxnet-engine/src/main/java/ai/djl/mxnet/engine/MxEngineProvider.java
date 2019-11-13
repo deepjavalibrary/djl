@@ -15,6 +15,7 @@ package ai.djl.mxnet.engine;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineProvider;
 
+/** {@code MxEngineProvider} is the MXNet implementation of {@link EngineProvider}. */
 public class MxEngineProvider implements EngineProvider {
 
     private static final Engine ENGINE = new MxEngine();

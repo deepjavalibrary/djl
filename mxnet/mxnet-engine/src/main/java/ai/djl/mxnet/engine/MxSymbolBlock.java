@@ -11,12 +11,9 @@
  * and limitations under the License.
  */
 
-package ai.djl.mxnet.nn;
+package ai.djl.mxnet.engine;
 
 import ai.djl.MalformedModelException;
-import ai.djl.mxnet.engine.CachedOp;
-import ai.djl.mxnet.engine.MxNDManager;
-import ai.djl.mxnet.engine.Symbol;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -40,6 +37,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 // TODO: Need to add Memory management for all params
+/**
+ * {@code MxSymbolBlock} is the MXNet implementation of {@link SymbolBlock}.
+ *
+ * <p>You can create a {@code MxSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
+ * String)}.
+ */
 public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     private static final byte VERSION = 2;
 
@@ -50,6 +53,15 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     private Map<String, Shape> paramShapes;
     private Shape[] outputShapes;
 
+    /**
+     * Constructs a {@code MxSymbolBlock} for a {@link Symbol}.
+     *
+     * <p>You can create a {@code MxSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
+     * String)}.
+     *
+     * @param manager the manager to use for the block
+     * @param symbol the symbol containing the block's symbolic graph
+     */
     public MxSymbolBlock(NDManager manager, Symbol symbol) {
         this.manager = manager;
         this.symbol = symbol;
@@ -67,10 +79,20 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         }
     }
 
+    /**
+     * Sets the names of the input data.
+     *
+     * @param inputNames the names of the input data
+     */
     public void setInputNames(List<String> inputNames) {
         this.inputNames = inputNames;
     }
 
+    /**
+     * Returns the list of inputs and parameter NDArrays.
+     *
+     * @return the list of inputs and parameter NDArrays
+     */
     public List<Parameter> getAllParameters() {
         return params;
     }

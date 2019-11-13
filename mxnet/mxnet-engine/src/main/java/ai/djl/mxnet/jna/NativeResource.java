@@ -10,13 +10,17 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.engine;
+package ai.djl.mxnet.jna;
 
 import com.sun.jna.Pointer;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * {@code NativeResource} is an internal class for {@link AutoCloseable} blocks of memory created in
+ * the MXNet Engine.
+ */
 public abstract class NativeResource implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeResource.class);

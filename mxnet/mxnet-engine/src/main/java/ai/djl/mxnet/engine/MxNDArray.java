@@ -14,6 +14,7 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.mxnet.jna.NativeResource;
 import ai.djl.ndarray.Matrix;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -43,6 +44,7 @@ import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
+/** {@code MxNDArray} is the MXNet implementation of {@link NDArray}. */
 public class MxNDArray extends NativeResource implements NDArray {
 
     private String name;
@@ -56,6 +58,16 @@ public class MxNDArray extends NativeResource implements NDArray {
     // Whether the NDArray should be freed on closing. Used for callbacks like kvstore update
     private boolean shouldFree = true;
 
+    /**
+     * Constructs an MxNDArray from a native handle and metadata (internal. Use {@link NDManager}
+     * instead).
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native MxNDArray memory
+     * @param device the device the new array will be located on
+     * @param shape the shape of the new array
+     * @param dataType the dataType of the new array
+     */
     MxNDArray(MxNDManager manager, Pointer handle, Device device, Shape shape, DataType dataType) {
         this(manager, handle);
         this.device = device;
@@ -67,12 +79,25 @@ public class MxNDArray extends NativeResource implements NDArray {
         this.dataType = dataType;
     }
 
+    /**
+     * Constructs an MxNDArray from a native handle (internal. Use {@link NDManager} instead).
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native MxNDArray memory
+     */
     MxNDArray(MxNDManager manager, Pointer handle) {
         super(handle);
         this.manager = manager;
         this.mxNDArrayEx = new MxNDArrayEx(this);
     }
 
+    /**
+     * Constructs a sparse MxNDArray from a native handle (internal. Use {@link NDManager} instead).
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native MxNDArray memory
+     * @param fmt the sparse format
+     */
     MxNDArray(MxNDManager manager, Pointer handle, SparseFormat fmt) {
         this(manager, handle);
         this.sparseFormat = fmt;
@@ -181,10 +206,11 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     /**
-     * Sets whether to free the MxNDArray when it is closed.
+     * Sets whether to free the MxNDArray when it is closed (internal).
      *
      * <p>It should not be freed in cases such as MxParameterServer optimizer callback where the
-     * NDArray is merely intended to be read, not freed.
+     * NDArray is merely intended to be read, not freed. Otherwise, leave it as the deafult (should
+     * free).
      *
      * @param shouldFree {@code true} if the MxNDArray should be freed on close
      */
@@ -1591,14 +1617,17 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
     }
 
+    /** Runs the current NDArray and sleeps until the value is ready to read. */
     public void waitToRead() {
         JnaUtils.waitToRead(getHandle());
     }
 
+    /** Runs the current NDArray and sleeps until the value is ready to write. */
     public void waitToWrite() {
         JnaUtils.waitToWrite(getHandle());
     }
 
+    /** Runs all NDArrays and sleeps until their values are fully computed. */
     public void waitAll() {
         JnaUtils.waitToRead(getHandle());
     }

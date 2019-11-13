@@ -16,6 +16,7 @@ import ai.djl.ndarray.types.DataType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** Helper to convert between {@link DataType} an the MXNet internal DataTypes. */
 public final class MxDataType {
 
     private static Map<DataType, String> toMx = createMapToMx();
@@ -43,10 +44,22 @@ public final class MxDataType {
         return map;
     }
 
+    /**
+     * Converts a MXNet type String into a {@link DataType}.
+     *
+     * @param mxType the type String to convert
+     * @return the {@link DataType}
+     */
     public static DataType fromMx(String mxType) {
         return fromMx.get(mxType);
     }
 
+    /**
+     * Converts a {@link DataType} into the corresponding MXNet type String.
+     *
+     * @param jType the java {@link DataType} to convert
+     * @return the converted MXNet type string
+     */
     public static String toMx(DataType jType) {
         return toMx.get(jType);
     }

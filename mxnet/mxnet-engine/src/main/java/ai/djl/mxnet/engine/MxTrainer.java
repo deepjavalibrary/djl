@@ -37,7 +37,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** {@code MxTrainer} is an implementation of the {@link Trainer} interface. */
+/** {@code MxTrainer} is the MXNet implementation of the {@link Trainer}. */
 public class MxTrainer implements Trainer {
 
     private static final Logger logger = LoggerFactory.getLogger(MxTrainer.class);
@@ -57,7 +57,7 @@ public class MxTrainer implements Trainer {
     private boolean gradientsChecked;
 
     /**
-     * Creates a instance of {@code MxTrainer} with the given {@link MxModel} and {@link
+     * Creates an instance of {@code MxTrainer} with the given {@link MxModel} and {@link
      * TrainingConfig}.
      *
      * @param model the model the trainer will train on

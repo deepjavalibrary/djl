@@ -18,8 +18,8 @@ import ai.djl.mxnet.engine.CachedOp;
 import ai.djl.mxnet.engine.DeviceType;
 import ai.djl.mxnet.engine.MxNDArray;
 import ai.djl.mxnet.engine.MxNDManager;
+import ai.djl.mxnet.engine.MxSymbolBlock;
 import ai.djl.mxnet.engine.Symbol;
-import ai.djl.mxnet.nn.MxSymbolBlock;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
@@ -44,6 +44,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * A class containing utilities to interact with the MXNet Engine's Java Native Access (JNA) layer.
+ */
 public final class JnaUtils {
 
     public static final String[] EMPTY_ARRAY = new String[0];

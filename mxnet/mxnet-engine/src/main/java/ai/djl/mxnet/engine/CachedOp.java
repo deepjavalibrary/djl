@@ -14,7 +14,7 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
-import ai.djl.mxnet.nn.MxSymbolBlock;
+import ai.djl.mxnet.jna.NativeResource;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
@@ -29,11 +29,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@code CachedOp} class provides the core functionality to execute a graph with MXNet.
+ * The {@code CachedOp} is an internal helper that provides the core functionality to execute a
+ * {@link MxSymbolBlock}.
  *
  * <p>We don't recommended users interact with this class directly. Users should use {@link
- * ai.djl.inference.Predictor} instead. CachedOp is an operator that simplifies the input by
- * self-analyzing the input shape. It requires minimum input to do inference because most of the
+ * ai.djl.inference.Predictor} instead. CachedOp is an operator that simplifies calling and
+ * analyzing the input shape. It requires minimum input to do inference because most of the
  * information can be obtained from the model itself.
  */
 public class CachedOp extends NativeResource {

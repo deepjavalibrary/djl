@@ -13,6 +13,7 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
+import ai.djl.engine.EngineException;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -31,6 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/** {@code MxNDManager} is the MXNet implementation of {@link NDManager}. */
 public class MxNDManager implements NDManager {
 
     /**
@@ -67,12 +69,25 @@ public class MxNDManager implements NDManager {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
+    /**
+     * Creates an MxNDArray with the given Native Memory Pointer and attaches to this manager.
+     *
+     * @param handle the array's native memory pointer
+     * @return the created array
+     */
     public MxNDArray create(Pointer handle) {
         MxNDArray array = new MxNDArray(this, handle);
         attach(array.getUid(), array);
         return array;
     }
 
+    /**
+     * Creates a sparse MxNDArray with the given Native Memory Pointer and attaches to this manager.
+     *
+     * @param handle the array's native memory pointer
+     * @param fmt the sparse format to use
+     * @return the created array
+     */
     public MxSparseNDArray create(Pointer handle, SparseFormat fmt) {
         MxSparseNDArray array = new MxSparseNDArray(this, handle, fmt);
         attach(array.getUid(), array);
@@ -304,18 +319,73 @@ public class MxNDManager implements NDManager {
         return new NDList(JnaUtils.op(operation).invoke(this, src.toArray(EMPTY), params));
     }
 
+    /**
+     * An engine specific generic invocation to native operator.
+     *
+     * <p>You should avoid using this function if possible. Since this function is engine specific,
+     * using this API may cause portability issues. A native operation may not be compatible between
+     * each version.
+     *
+     * @param operation the native operation to perform
+     * @param src the {@link NDList} of source {@link NDArray}
+     * @param dest the {@link NDList} to save output to
+     * @param params the parameters to be passed to the native operator
+     * @throws IllegalArgumentException if operation is not supported by Engine
+     * @throws EngineException if operation failed in native engine
+     */
     public void invoke(String operation, NDList src, NDList dest, PairList<String, ?> params) {
         invoke(operation, src.toArray(EMPTY), dest.toArray(EMPTY), params);
     }
 
+    /**
+     * An engine specific generic invocation to native operator.
+     *
+     * <p>You should avoid using this function if possible. Since this function is engine specific,
+     * using this API may cause portability issues. A native operation may not be compatible between
+     * each version.
+     *
+     * @param operation the native operation to perform
+     * @param src the array of source {@link NDArray}
+     * @param params the parameters to be passed to the native operator
+     * @return the output array of {@link NDArray}
+     * @throws IllegalArgumentException if operation is not supported by Engine
+     * @throws EngineException if operation failed in native engine
+     */
     public NDArray invoke(String operation, NDArray[] src, PairList<String, ?> params) {
         return JnaUtils.op(operation).invoke(this, src, params)[0];
     }
 
+    /**
+     * An engine specific generic invocation to native operator.
+     *
+     * <p>You should avoid using this function if possible. Since this function is engine specific,
+     * using this API may cause portability issues. A native operation may not be compatible between
+     * each version.
+     *
+     * @param operation the native operation to perform
+     * @param src the source {@link NDArray}
+     * @param params the parameters to be passed to the native operator
+     * @return the output array of {@link NDArray}
+     * @throws IllegalArgumentException if operation is not supported by Engine
+     * @throws EngineException if operation failed in native engine
+     */
     public NDArray invoke(String operation, NDArray src, PairList<String, ?> params) {
         return invoke(operation, new NDArray[] {src}, params);
     }
 
+    /**
+     * An engine specific generic invocation to native operator.
+     *
+     * <p>You should avoid using this function if possible. Since this function is engine specific,
+     * using this API may cause portability issues. A native operation may not be compatible between
+     * each version.
+     *
+     * @param operation the native operation to perform
+     * @param params the parameters to be passed to the native operator
+     * @return the output array of {@link NDArray}
+     * @throws IllegalArgumentException if operation is not supported by Engine
+     * @throws EngineException if operation failed in native engine
+     */
     public NDArray invoke(String operation, PairList<String, ?> params) {
         return invoke(operation, EMPTY, params);
     }
@@ -368,6 +438,7 @@ public class MxNDManager implements NDManager {
         return invoke(opName, params);
     }
 
+    /** The SystemManager is the root {@link MxNDManager} of which all others are children. */
     private static final class SystemManager extends MxNDManager {
 
         SystemManager() {

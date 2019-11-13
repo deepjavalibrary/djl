@@ -26,10 +26,16 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.function.Predicate;
 
+/** {@code MxMatrix} is the MXNet implementation of {@link Matrix}. */
 public class MxMatrix implements Matrix {
 
     private MxNDArray array;
 
+    /**
+     * Constructs the MXMatrix given a 2-D {@link MxNDArray}.
+     *
+     * @param array the corresponding {@link NDArray}
+     */
     public MxMatrix(MxNDArray array) {
         this.array = array;
     }

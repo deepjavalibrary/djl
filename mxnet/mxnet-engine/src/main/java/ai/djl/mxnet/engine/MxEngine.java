@@ -30,6 +30,7 @@ public class MxEngine extends Engine {
 
     public static final String ENGINE_NAME = "MXNet";
 
+    /** Constructs an MXNet Engine. */
     MxEngine() {
         // Workaround MXNet engine lazy initialization issue
         JnaUtils.getAllOpNames();

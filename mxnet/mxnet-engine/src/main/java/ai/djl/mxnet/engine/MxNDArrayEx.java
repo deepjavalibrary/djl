@@ -23,10 +23,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+/** {@code MxNDArrayEx} is the MXNet implementation of the {@link NDArrayEx}. */
 class MxNDArrayEx implements NDArrayEx {
 
     private MxNDArray array;
 
+    /**
+     * Constructs an {@code MxNDArrayEx} given an NDArray.
+     *
+     * @param parent the NDArray to extend
+     */
     MxNDArrayEx(MxNDArray parent) {
         this.array = parent;
     }

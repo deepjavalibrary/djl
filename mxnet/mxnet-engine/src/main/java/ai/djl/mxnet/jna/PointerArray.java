@@ -12,14 +12,27 @@
  */
 package ai.djl.mxnet.jna;
 
+import com.sun.jna.Function;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
+/**
+ * An abstraction for a native pointer array data type ({@code void**}).
+ *
+ * @see Pointer
+ * @see com.sun.jna.ptr.PointerByReference
+ * @see Function
+ */
 public class PointerArray extends Memory {
 
     private int length;
 
+    /**
+     * Constructs a {@link Memory} buffer PointerArray given the Pointers to include in it.
+     *
+     * @param arg the pointers to include in the array
+     */
     public PointerArray(Pointer... arg) {
         super(Native.POINTER_SIZE * (arg.length + 1));
         length = arg.length;
@@ -29,6 +42,11 @@ public class PointerArray extends Memory {
         setPointer(Native.POINTER_SIZE * arg.length, null);
     }
 
+    /**
+     * Returns the number of array elements.
+     *
+     * @return the number of array elements
+     */
     public int numElements() {
         return length;
     }

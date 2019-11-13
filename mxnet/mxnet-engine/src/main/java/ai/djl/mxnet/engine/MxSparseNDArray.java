@@ -19,8 +19,25 @@ import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+/**
+ * {@code MxSparseNDArray} is an instance of {@link MxNDArray} and {@link NDArray} for sparse
+ * NDArrays.
+ *
+ * <p>{@code MxSparseNDArray}s are created automatically when the Engine creates Arrays that are
+ * sparse. They can be created deliberately by specifying the {@link SparseFormat}. Some operations
+ * may not be supported with Sparse NDArrays in MXNet.
+ *
+ * @see SparseFormat
+ */
 public class MxSparseNDArray extends MxNDArray {
 
+    /**
+     * Constructs a {@code MxSparseNDArray} for the given data.
+     *
+     * @param manager the manager to attach the array to
+     * @param handle the pointer to the native memory of the MXNDArray
+     * @param fmt the sparse format
+     */
     MxSparseNDArray(MxNDManager manager, Pointer handle, SparseFormat fmt) {
         super(manager, handle, fmt);
     }

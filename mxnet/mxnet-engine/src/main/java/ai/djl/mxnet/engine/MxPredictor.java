@@ -22,15 +22,21 @@ import org.slf4j.LoggerFactory;
 /**
  * {@code MxPredictor} is the MXNet implementation of {@link Predictor}.
  *
- * <p>MxPredictor contains all methods in the Predictor class and MXNet specific implementations.
- *
  * @param <I> the input object
  * @param <O> the output object
+ * @see Predictor
  */
 public class MxPredictor<I, O> extends BasePredictor<I, O> {
 
     private static final Logger logger = LoggerFactory.getLogger(MxPredictor.class);
 
+    /**
+     * Constructs a {@code MxPredictor}.
+     *
+     * @param model the model to predict with
+     * @param translator the translator to convert with input and output
+     * @param first true if this is the first predictor created for the model (for thread safety)
+     */
     MxPredictor(MxModel model, Translator<I, O> translator, boolean first) {
         super(model, translator, first);
     }

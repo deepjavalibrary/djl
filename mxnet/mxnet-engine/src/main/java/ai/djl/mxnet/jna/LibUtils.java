@@ -36,6 +36,19 @@ import org.slf4j.LoggerFactory;
 
 // CHECKSTYLE:OFF:FinalClass
 @SuppressWarnings("PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal")
+/**
+ * Utilities for finding the MXNet Engine binary on the System.
+ *
+ * <p>The Engine will be searched for in a variety of locations in the following order:
+ *
+ * <ol>
+ *   <li>In the path specified by the MXNET_LIBRARY_PATH environment variable
+ *   <li>In a jar file location in the classpath. These jars can be created with the mxnet-native
+ *       module.
+ *   <li>In the python3 path. These can be installed using pip.
+ *   <li>In the python path. These can be installed using pip.
+ * </ol>
+ */
 public class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);

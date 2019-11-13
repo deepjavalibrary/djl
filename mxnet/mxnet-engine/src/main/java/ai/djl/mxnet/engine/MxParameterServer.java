@@ -15,6 +15,7 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.MxnetLibrary;
+import ai.djl.mxnet.jna.NativeResource;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.ParameterServer;
@@ -22,8 +23,14 @@ import ai.djl.training.optimizer.Optimizer;
 import com.sun.jna.Pointer;
 import java.util.Arrays;
 
+/** {@code MxParameterServer} is the MXNet implementation of {@link ParameterServer}. */
 public class MxParameterServer extends NativeResource implements ParameterServer {
 
+    /**
+     * Constructs a new {@code MxParameterServer}.
+     *
+     * @param optimizer the optimizer to use for the parameter server updates
+     */
     public MxParameterServer(Optimizer optimizer) {
         super(createdKVStore());
         JnaUtils.parameterStoreSetUpdater(
@@ -70,6 +77,7 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         }
     }
 
+    /** A helper to wrap the optimizer so it can be called by the MXNet KVStore. */
     private static final class OptimizerCallback implements MxnetLibrary.MXKVStoreStrUpdater {
 
         private Optimizer optimizer;

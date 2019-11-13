@@ -14,12 +14,19 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
 
+/** DeviceType is the MXNet equivalent of the types in {@link Device}. */
 public final class DeviceType {
 
     private static final String CPU_PINNED = "cpu_pinned";
 
     private DeviceType() {}
 
+    /**
+     * Converts a {@link Device} to the corresponding MXNet device number.
+     *
+     * @param device the java {@link Device}
+     * @return the MXNet device number
+     */
     public static int toDeviceType(Device device) {
         String deviceType = device.getDeviceType();
 
@@ -34,6 +41,12 @@ public final class DeviceType {
         }
     }
 
+    /**
+     * Converts from an MXNet device number to {@link Device}.
+     *
+     * @param deviceType the MXNet device number
+     * @return the corresponding {@link Device}
+     */
     public static String fromDeviceType(int deviceType) {
         switch (deviceType) {
             case 1:

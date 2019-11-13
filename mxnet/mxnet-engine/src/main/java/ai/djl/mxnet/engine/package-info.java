@@ -10,14 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.nn;
 
 /**
- * {@code SymbolBlock} is a {@link Block} is used to load models that were exported directly from
- * the engine in its native format.
+ * Contains implementations of interfaces within the DJL API for the MXNet Engine.
+ *
+ * @see ai.djl.mxnet.engine.MxEngine
  */
-public interface SymbolBlock extends Block {
-
-    /** Removes the last block in the symbolic graph. */
-    void removeLastBlock();
-}
+package ai.djl.mxnet.engine;
