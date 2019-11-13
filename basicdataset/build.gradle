@@ -60,7 +60,7 @@ publishing {
             artifacts = [jar, javadocJar, sourcesJar]
             pom standardPom({
                 name = "Basic Dataset"
-                delegate.description = "Basic Dataset for djl.ai"
+                delegate.description = "Basic Dataset for DJL"
                 url = url.get() + "basicdataset"
             })
         }

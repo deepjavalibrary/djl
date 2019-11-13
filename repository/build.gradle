@@ -42,7 +42,7 @@ publishing {
             pom standardPom({
                 name = "Repository API"
                 // Set delegate.description due to name conflict between MavenPom.description and Project.description
-                delegate.description = "A respository specification for Deeplearning resources"
+                delegate.description = "A respository specification for Deep Learning resources"
                 url = url.get() + "repository"
             })
         }

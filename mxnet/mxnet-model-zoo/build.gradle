@@ -52,7 +52,7 @@ publishing {
             artifacts = [jar, javadocJar, sourcesJar]
             pom standardPom({
                 name = "MXNet model zoo"
-                delegate.description = "MXNet model zoo for djl.ai"
+                delegate.description = "MXNet model zoo for DJL"
                 url = url.get() + "mxnet/model-zoo"
             })
         }

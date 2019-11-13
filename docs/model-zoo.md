@@ -1,6 +1,6 @@
-# djl.ai - Model Zoo
+# DJL - Model Zoo
 
-djl.ai's Model Zoo is more than a collection of pre-trained models. It's a bridge between model vendor and consumer.
+Deep Java Library's (DJL) Model Zoo is more than a collection of pre-trained models. It's a bridge between model vendor and consumer.
 
 We provide a framework for developers to create and publish their model in an organized way. A ZooModel has the following
 characteristic:
@@ -10,9 +10,9 @@ characteristic:
 allows the user to run inference with a plain java object. 
 - A ZooModel can be published to anywhere, whether its a S3 bucket, a web server, or a local folder.
 
-## [djl.ai model zoo](../model-zoo/README.md)
+## [DJL model zoo](../model-zoo/README.md)
 
-We provide framework agnostic `ZooModel`s in our model zoo. They can be used on any djl-ai backend engine.
+We provide framework agnostic `ZooModel`s in our model zoo. They can be used on any DJL backend engine.
 
 ## [MXNet symbolic model zoo](../mxnet/mxnet-model-zoo/README.md)
 

@@ -1,11 +1,11 @@
 # Build your first Inference Application
 
 ## Introduction
-Welcome to the djl.ai world.
-djl.ai is an API designed to deal with all kinds of Deep Learning tasks.
+Welcome to the Deep Java Library (DJL) world.
+DJL is an API designed to deal with all kinds of Deep Learning tasks.
 You are able to create, train and do inference with Deep Learning models.
 
-In this tutorial, you create your first application to use djl.ai for Deep Learning Inference.
+In this tutorial, you create your first application to use DJL for Deep Learning Inference.
 You implement an [Object Detection application](https://en.wikipedia.org/wiki/Object_detection) based on pre-trained 
 ResNet-50 SSD model.
 
@@ -25,24 +25,24 @@ The workflow looks like the following:
 ![image](img/workFlow.png)
 
 Inference in Deep Learning is the process of predicting the output for a given input based on a
-pre-defined model. djl.ai abstracts the whole process away from you. It can load the model, perform
-inference on the input, and provide output. djl.ai also allows you to provide user-defined inputs. 
+pre-defined model. DJL abstracts the whole process away from you. It can load the model, perform
+inference on the input, and provide output. DJL also allows you to provide user-defined inputs. 
 
-The red block ("Images") in the workflow is the input that djl.ai expects from you. The green block
-("Images bounding box") is the output that you expect. Since djl.ai does not know what input to
-expect and what format of output that you prefer, djl.ai provides the `Translator` interface so you
+The red block ("Images") in the workflow is the input that DJL expects from you. The green block
+("Images bounding box") is the output that you expect. Since DJL does not know what input to
+expect and what format of output that you prefer, DJL provides the `Translator` interface so you
 can define your own input and output.  
 
 The `Translator` interface encompasses the two white blocks: Pre-processing and Post-processing.
 The pre-processing component converts the user-defined input objects into an NDList, so that the
-`Predictor` in djl.ai can understand the input and make its prediction. Similarly, the
+`Predictor` in DJL can understand the input and make its prediction. Similarly, the
 post-processing block receives an NDList as the output from the `Predictor`. The post-processing
 block allows you to convert the output from the `Predictor` to the desired output format. 
 
-In this tutorial, we are going to provide a step-by-step guide on using the djl.ai inference module
+In this tutorial, we are going to provide a step-by-step guide on using the DJL inference module
 to run inference on an image, based on the MxNet ResNet-50 SSD model for object detection. The code
 for the example can be found in SsdExample.java in the example module. The goal is to be able to
-run inference on the following image, and verify that djl.ai is able to detect the cat in this
+run inference on the following image, and verify that DJL is able to detect the cat in this
 image of a cute dog and cat couple. 
 
 
@@ -52,7 +52,7 @@ image of a cute dog and cat couple.
 
 ### Step 0 Include Dependencies
 
-To include djl.ai in your project, add the following dependencies to your `build.gradle` file, or corresponding entry in
+To include DJL in your project, add the following dependencies to your `build.gradle` file, or corresponding entry in
 `pom.xml`.
 
 ~~~
@@ -139,7 +139,7 @@ for each of the objects  detected in the given input image. Each bounding box ha
 width, height]. The class value corresponds to the index of the corresponding category in the synset file. You can use 
 this information to create any output object. 
 
-The SsdExample will return a list of `DetectedObject` as its output. djl.ai API has a submodule called `cv` which 
+The SsdExample will return a list of `DetectedObject` as its output. DJL API has a submodule called `cv` which 
 offers utility classes and methods, that can be used to load images, and draw bounding boxes among other things. The 
 SsdExample also showcases the use of these utilities. 
 

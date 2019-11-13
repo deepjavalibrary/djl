@@ -1,8 +1,8 @@
-# DeepJavaLibrary - Basic Dataset
+# DJL - Basic Dataset
 
 ## Overview
 
-This module contains basic datasets that can be used to learn how to train your deep learning models.
+This module contains Deep Java Library's (DJL) basic datasets that can be used to learn how to train your deep learning models.
 
 ## List of datasets
 

@@ -1,5 +1,5 @@
 /**
- * This build file is used by djl.ai project internally.
+ * This build file is used by Deep Java Library (DJL) project internally.
  */
 
 plugins {
@@ -60,7 +60,7 @@ publishing {
             artifacts = [jar, sourcesJar, javadocJar]
             pom standardPom({
                 name = "Examples"
-                delegate.description = "Examples for djl.ai"
+                delegate.description = "Examples for DJL"
                 url = url.get() + "examples"
             })
             pom.withXml {

@@ -1,8 +1,8 @@
-# DeepJavaLibrary - core API
+# DJL - core API
 
 ## Overview
 
-This module is core API of the djl.ai project. It include the following packages:
+This module is core API of the Deep Java Library (DJL) project. It include the following packages:
 
 - engine - Contains classes responsible for loading a deep learning framework
 - inference - Contains classes to implement inference tasks

@@ -2,7 +2,7 @@
 
 Image classification refers to the task of extracting information classes from an image.
 
-In this example, we will show you how to implement inference code with DJL API to recognize handwritten digit from an image.
+In this example, we will show you how to implement inference code with Deep Java Library (DJL) to recognize handwritten digit from an image.
 
 The following is the image classification example source code: [ImageClassification.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ImageClassification.java).
 

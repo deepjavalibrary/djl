@@ -15,7 +15,7 @@ dependencies {
 }
 
 javadoc {
-    title "Deeplearning Java Library ${project.version} API specification"
+    title "Deep Java Library ${project.version} API specification"
     exclude "ai/djl/util/**"
     exclude "ai/djl/ndarray/internal/**"
     options.overview "src/main/javadoc/overview.html"
@@ -48,7 +48,7 @@ publishing {
             artifacts = [jar, javadocJar, sourcesJar]
             pom standardPom({
                 name = "Core API"
-                delegate.description = "A Deeplearning API in Java"
+                delegate.description = "A Deep Learning API in Java"
                 url = url.get() + "api"
             })
         }

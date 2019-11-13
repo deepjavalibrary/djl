@@ -1,8 +1,8 @@
-# djl.ai - model zoo
+# DJL - model zoo
 
 ## Introduction
 
-The djl.ai model zoo contains framework agnostic models. All of the models have built-in Translator, and
+The Deep Java Library (DJL) model zoo contains framework agnostic models. All of the models have built-in Translator, and
 can be used for inference out of the box.
 
 ## Installation

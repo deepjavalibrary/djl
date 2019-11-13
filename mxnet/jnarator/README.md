@@ -1,9 +1,9 @@
-djl.ai - JNA generator
+DJL - JNA generator
 ======================
 
 ## Overview
 
-This module is a tool that used by djl.ai to generate JNA code that used to call Native
+This module is a tool that used by Deep Java Library (DJL) to generate JNA code that used to call Native
 C_API.
 
 Most of C API call requires developer write code to convert java data type to C data type.

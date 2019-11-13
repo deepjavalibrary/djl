@@ -49,7 +49,7 @@ publishing {
             artifacts = [jar, javadocJar, sourcesJar]
             pom standardPom({
                 name = "Model Zoo"
-                delegate.description = "A built-in model zoo gallary for djl.ai"
+                delegate.description = "A built-in model zoo gallary for DJL"
                 url = url.get() + "model-zoo"
             })
         }

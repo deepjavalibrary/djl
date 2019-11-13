@@ -59,10 +59,9 @@ import java.nio.LongBuffer;
  * <p>NDManager has a hierarchical structure; it has a single parent NDManager and has child
  * NDManagers. When the parent NDManager is closed, all children will be closed as well.
  *
- * <p>The djl.ai framework manages NDManager's lifecycle by default. You only need to manage the
- * user created child NDManager. The child NDManager becomes useful when you create a large number
- * of temporary NDArrays and want to free the resources earlier than the parent NDManager's
- * lifecycle.
+ * <p>The DJL framework manages NDManager's lifecycle by default. You only need to manage the user
+ * created child NDManager. The child NDManager becomes useful when you create a large number of
+ * temporary NDArrays and want to free the resources earlier than the parent NDManager's lifecycle.
  *
  * <p>The following is an example of such a use case:
  *

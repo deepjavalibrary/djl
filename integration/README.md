@@ -1,3 +1,3 @@
-# DeepJavaLibrary - Integration Test
+# DJL - Integration Test
 
-This folder contains integration test source code.
+This folder contains Deep Java Library (DJL) integration test source code.

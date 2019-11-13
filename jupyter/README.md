@@ -1,8 +1,8 @@
-# DeepJavaLibrary - Jupyter notebooks
+# DJL - Jupyter notebooks
 
 ## Overview
 
-This folder contains tutorials that teach you how to achieve basic AI tasks with DeepJavaLibrary API.
+This folder contains tutorials that teach you how to achieve basic AI tasks with Deep Java Library (DJL).
 
 ## List of tutorials
 

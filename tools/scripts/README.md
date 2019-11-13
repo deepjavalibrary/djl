@@ -1,6 +1,6 @@
 # Start your benchmark with DJL
 
-This is the documentation to setup benchmark for DJL on Deep Learning Benchmark.
+This is the documentation to setup benchmark for Deep Java Library (DJL) on Deep Learning Benchmark.
 
 ## `create_with_nvidia_docker.sh`
 run the `create_with_nvidia_docker.sh` script in an machine to create your base environment.

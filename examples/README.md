@@ -1,6 +1,6 @@
-# DeepJavaLibrary - examples
+# DJL - examples
 
-This module contains examples to demonstrate how developers can use the DeepJavaLibrary API.
+This module contains examples to demonstrate how developers can use the Deep Java Library (DJL).
 
 The following is a list of examples:
 
@@ -46,7 +46,7 @@ cd examples
 
 ## Engine selection
 
-djl.ai is engine agnostic, so you can choose different engine providers. We currently
+DJL is engine agnostic, so you can choose different engine providers. We currently
 provide MXNet engine implementation.
 
 With MXNet, you can choose different flavors of the native MXNet library.

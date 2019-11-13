@@ -14,9 +14,9 @@
 /**
  * Contains classes responsible for loading a deep learning framework.
  *
- * <p>djl.ai is a higher level API that is used alongside implementations built on other Deep
- * Learning Frameworks. By using only the higher level abstractions defined in the core djl.ai API,
- * it makes it easy to switch between underlying frameworks.
+ * <p>Deep Java Library (DJL) is a higher level API that is used alongside implementations built on
+ * other Deep Learning Frameworks. By using only the higher level abstractions defined in the core
+ * DJL API, it makes it easy to switch between underlying frameworks.
  *
  * <p>Each deep learning framework is implemented as a {@link java.util.ServiceLoader} and supplies
  * an implementation of the {@link ai.djl.engine.Engine} interface.

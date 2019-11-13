@@ -1,6 +1,6 @@
 # FAQ
 
-## Why DeepJavaLibrary?
+## Why Deep Java Library (DJL)?
 
 - We prioritizes java developer's experience
 - Easy for non machine learning developer to on board
