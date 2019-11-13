@@ -25,13 +25,11 @@ import java.util.stream.Stream;
  * <p>The following is an example of how to use ArrayDataset:
  *
  * <pre>
- *     ArrayDataset.Builder builder = new Arrayset.Builder()
- *     ArrayDataset dataset = new ArrayDataset(
- *                      new NDArray[]{data1, data2},
- *                      new NDArray[]{label1, label2, label3},
- *                      new DataLoadingConfiguration.builder
- *                              .setBatchSize(20)
- *                              .build())
+ *     ArrayDataset dataset = new ArrayDataset.Builder()
+ *                              .setData(data)
+ *                              .optLabels(label)
+ *                              .setSequenceSampling(20)
+ *                              .build();
  * </pre>
  *
  * @see Dataset

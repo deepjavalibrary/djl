@@ -30,8 +30,13 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO abstract a interface that could be inherited by this and Stream DataIterable
-// where the random reads is expensive
+/**
+ * DataIterable is a data loader that combines {@link Dataset}, {@link Batchifier}, {@link
+ * Pipeline}, and {@link Sampler} to provide an iterable over the given {@link RandomAccessDataset}.
+ *
+ * <p>We don't recommended using DataIterable directly. Instead use {@link RandomAccessDataset}
+ * combined with {@link ai.djl.training.Trainer} to iterate over the {@link RandomAccessDataset}}
+ */
 public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
 
     private static final Logger logger = LoggerFactory.getLogger(DataIterable.class);
