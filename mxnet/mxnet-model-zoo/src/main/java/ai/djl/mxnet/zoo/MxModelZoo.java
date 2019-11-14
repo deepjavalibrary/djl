@@ -18,6 +18,7 @@ import ai.djl.mxnet.zoo.cv.classification.Resnet;
 import ai.djl.mxnet.zoo.cv.classification.Resnext;
 import ai.djl.mxnet.zoo.cv.classification.SeResnext;
 import ai.djl.mxnet.zoo.cv.classification.Senet;
+import ai.djl.mxnet.zoo.cv.classification.Squeezenet;
 import ai.djl.mxnet.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
 import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
 import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
@@ -41,6 +42,7 @@ public interface MxModelZoo {
     Resnext RESNEXT = new Resnext(REPOSITORY);
     Senet SENET = new Senet(REPOSITORY);
     SeResnext SE_RESNEXT = new SeResnext(REPOSITORY);
+    Squeezenet SQUEEZENET = new Squeezenet(REPOSITORY);
     SimplePoseModelLoader SIMPLE_POSE = new SimplePoseModelLoader(REPOSITORY);
     InstanceSegmentationModelLoader MASK_RCNN = new InstanceSegmentationModelLoader(REPOSITORY);
     ActionRecognitionModelLoader ACTION_RECOGNITION = new ActionRecognitionModelLoader(REPOSITORY);
