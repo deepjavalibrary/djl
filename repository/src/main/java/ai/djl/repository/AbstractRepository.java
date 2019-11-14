@@ -172,9 +172,7 @@ public abstract class AbstractRepository implements Repository {
                     zis.getNextEntry();
                     Files.copy(zis, file);
                 } else if ("gzip".equals(extension)) {
-                    try (GZIPInputStream zis = new GZIPInputStream(pis)) {
-                        Files.copy(zis, file);
-                    }
+                    Files.copy(new GZIPInputStream(pis), file);
                 } else if (extension.isEmpty()) {
                     Files.copy(pis, file);
                 } else {
