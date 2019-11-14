@@ -24,22 +24,21 @@ public final class ZipUtils {
     private ZipUtils() {}
 
     public static void unzip(InputStream is, Path dest) throws IOException {
-        try (ZipInputStream zis = new ZipInputStream(is)) {
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
-                String name = entry.getName();
-                Path file = dest.resolve(name).toAbsolutePath();
-                if (entry.isDirectory()) {
-                    Files.createDirectories(file);
-                } else {
-                    Path parentFile = file.getParent();
-                    if (parentFile == null) {
-                        throw new AssertionError(
-                                "Parent path should never be null: " + file.toString());
-                    }
-                    Files.createDirectories(parentFile);
-                    Files.copy(zis, file);
+        ZipInputStream zis = new ZipInputStream(is);
+        ZipEntry entry;
+        while ((entry = zis.getNextEntry()) != null) {
+            String name = entry.getName();
+            Path file = dest.resolve(name).toAbsolutePath();
+            if (entry.isDirectory()) {
+                Files.createDirectories(file);
+            } else {
+                Path parentFile = file.getParent();
+                if (parentFile == null) {
+                    throw new AssertionError(
+                            "Parent path should never be null: " + file.toString());
                 }
+                Files.createDirectories(parentFile);
+                Files.copy(zis, file);
             }
         }
     }

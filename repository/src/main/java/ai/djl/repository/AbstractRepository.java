@@ -168,10 +168,9 @@ public abstract class AbstractRepository implements Repository {
             } else {
                 Path file = tmp.resolve(fileName);
                 if ("zip".equals(extension)) {
-                    try (ZipInputStream zis = new ZipInputStream(pis)) {
-                        zis.getNextEntry();
-                        Files.copy(zis, file);
-                    }
+                    ZipInputStream zis = new ZipInputStream(pis);
+                    zis.getNextEntry();
+                    Files.copy(zis, file);
                 } else if ("gzip".equals(extension)) {
                     try (GZIPInputStream zis = new GZIPInputStream(pis)) {
                         Files.copy(zis, file);
@@ -182,7 +181,6 @@ public abstract class AbstractRepository implements Repository {
                     throw new IOException("File type is not supported: " + extension);
                 }
             }
-            pis.close();
             pis.validateChecksum(item);
         }
     }
@@ -228,6 +226,8 @@ public abstract class AbstractRepository implements Repository {
         }
 
         public void validateChecksum(Artifact.Item item) throws IOException {
+            // drain InputSteam to get correct sha1 hash
+            Utils.toByteArray(dis);
             String sha1 = Hex.toHexString(dis.getMessageDigest().digest());
             if (!sha1.equalsIgnoreCase(item.getSha1Hash())) {
                 throw new IOException(
