@@ -475,7 +475,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(NDArray other) {
-        if (other == null || (!getShape().equals(other.getShape()))) {
+        if (other == null || (!shapeEquals(other))) {
             return false;
         }
         if (getDataType() != other.getDataType()) {

@@ -444,8 +444,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public boolean allClose(NDArray other, double rtol, double atol, boolean equalNan) {
-        return array.allClose(other, rtol, atol, equalNan);
+    public boolean allclose(NDArray other, double rtol, double atol, boolean equalNan) {
+        return array.allclose(other, rtol, atol, equalNan);
     }
 
     /** {@inheritDoc} */

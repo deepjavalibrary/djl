@@ -673,7 +673,7 @@ class MxNDArrayEx implements NDArrayEx {
                 (condition.getDataType() == DataType.BOOLEAN)
                         ? condition.asType(DataType.INT32, false)
                         : condition;
-        if (!array.getShape().equals(other.getShape())) {
+        if (!array.shapeEquals(other)) {
             Shape res = deriveBroadcastedShape(array.getShape(), other.getShape());
             array1 = (!res.equals(array.getShape())) ? array.broadcast(res) : array;
             array2 = (!res.equals(other.getShape())) ? other.broadcast(res) : other;

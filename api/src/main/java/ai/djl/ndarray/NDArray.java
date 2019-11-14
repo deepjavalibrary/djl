@@ -619,6 +619,22 @@ public interface NDArray extends AutoCloseable {
      * Returns an {@code NDArray} of zeros with the same {@link Shape}, {@link DataType} and {@link
      * SparseFormat} as the input {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
+     * jshell&gt; array
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * jshell&gt; array.zeros_like();
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 0., 0.],
+     *  [0., 0., 0.],
+     * ]
+     * </pre>
+     *
      * @return a {@code NDArray} filled with zeros
      */
     NDArray zerosLike();
@@ -627,6 +643,22 @@ public interface NDArray extends AutoCloseable {
      * Returns an {@code NDArray} of ones with the same {@link Shape}, {@link DataType} and {@link
      * SparseFormat} as the input {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
+     * jshell&gt; array
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * jshell&gt; array.zeros_like();
+     * ND: (2, 3) cpu(0) float32
+     * [[1., 1., 1.],
+     *  [1., 1., 1.],
+     * ]
+     * </pre>
+     *
      * @return a {@code NDArray} filled with ones
      */
     NDArray onesLike();
@@ -634,6 +666,22 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns an uninitialized {@code NDArray} with the same {@link Shape}, {@link DataType} and
      * {@link SparseFormat} as the input {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
+     * jshell&gt; array
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * jshell&gt; array.like(); // uninitialized NDArray
+     * ND: (2, 3) cpu(0) float32
+     * [[ 9.80908925e-45,  0.00000000e+00,  0.00000000e+00],
+     *  [ 0.00000000e+00,  7.61595174e-07,  2.80259693e-44],
+     * ]
+     * </pre>
      *
      * @return the result {@code NDArray}
      */
@@ -654,6 +702,14 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns {@code true} if all elements in this {@code NDArray} are equal to the {@link Number}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.ones(new Shape(2, 3));
+     * jshell&gt; array.contentEquals(1); // return true instead of boolean NDArray
+     * true
+     * </pre>
+     *
      * @param number the number to compare
      * @return the boolean result
      */
@@ -662,6 +718,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns {@code true} if all elements in this {@code NDArray} are equal to the other {@link
      * NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(6).reshape(2, 3);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f}, new Shape(2, 3));
+     * jshell&gt; array1.contentEquals(array2); // return true instead of boolean NDArray
+     * true
+     * </pre>
      *
      * @param other the other {@code NDArray} to compare
      * @return the boolean result
@@ -678,6 +743,15 @@ public interface NDArray extends AutoCloseable {
      *   <li>size(0)...size(rank()-1) are equal for both {@code NDArray}s
      * </ul>
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.ones(new Shape(1, 2, 3));
+     * jshell&gt; NDArray array2 = manager.create(new Shape(1, 2, 3));
+     * jshell&gt; array1.shapeEquals(array2); // return true instead of boolean NDArray
+     * true
+     * </pre>
+     *
      * @param other the other {@code NDArray}
      * @return {@code true} if the {@link Shape}s are the same
      */
@@ -688,15 +762,45 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns {@code true} if two {@code NDArray}s are element-wise equal within a tolerance.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-7});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-8});
+     * jshell&gt; array1.allclose(array2); // return false instead of boolean NDArray
+     * false
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-8});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-9});
+     * jshell&gt; array1.allclose(array2); // return true instead of boolean NDArray
+     * true
+     * </pre>
+     *
      * @param other the {@code NDArray} to compare with
      * @return the boolean result
      */
-    default boolean allClose(NDArray other) {
-        return allClose(other, 1e-5, 1e-08, false);
+    default boolean allclose(NDArray other) {
+        return allclose(other, 1e-5, 1e-08, false);
     }
 
     /**
      * Returns {@code true} if two {@code NDArray} are element-wise equal within a tolerance.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-7});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-8});
+     * jshell&gt; array1.allclose(array2, 1e-05, 1e-08, false); // return false instead of boolean NDArray
+     * false
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-8});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-9});
+     * jshell&gt; array1.allclose(array2, 1e-05, 1e-08, false); // return true instead of boolean NDArray
+     * true
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, Float.NaN});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1f, Float.NaN});
+     * jshell&gt; array1.allclose(array2, 1e-05, 1e-08, true); // return true instead of boolean NDArray
+     * true
+     * </pre>
      *
      * @param other the {@code NDArray} to compare with
      * @param rtol the relative tolerance parameter
@@ -705,8 +809,8 @@ public interface NDArray extends AutoCloseable {
      *     NDArray} will be considered equal to NaN’s in the other {@code NDArray}
      * @return the boolean result
      */
-    default boolean allClose(NDArray other, double rtol, double atol, boolean equalNan) {
-        if (!getShape().equals(other.getShape())) {
+    default boolean allclose(NDArray other, double rtol, double atol, boolean equalNan) {
+        if (!shapeEquals(other)) {
             return false;
         }
         Number[] actualDoubleArray = toArray();
@@ -730,6 +834,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the boolean {@code NDArray} for element-wise "Equals" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.ones(new Shape(1));
+     * jshell&gt; array1.eq(1);
+     * ND: (1) cpu(0) boolean
+     * [ true]
+     * </pre>
+     *
      * @param other the number to compare
      * @return the boolean {@code NDArray} for element-wise "Equals" comparison
      */
@@ -737,6 +850,16 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f, 3f});
+     * jshell&gt; NDArray array2 = manager.arange(3);
+     * jshell&gt; array1.eq(array2);
+     * ND: (3) cpu(0) boolean
+     * [ true,  true, false]
+     * </pre>
      *
      * @param other the {@code NDArray} to compare
      * @return the boolean {@code NDArray} for element-wise "Equals" comparison
@@ -746,6 +869,17 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the boolean {@code NDArray} for element-wise "Not equals" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(4).reshape(2, 2);
+     * jshell&gt; array1.neq(1);
+     * ND: (2, 2) cpu(0) boolean
+     * [[ true, false],
+     *  [ true,  true],
+     * ]
+     * </pre>
+     *
      * @param other the number to compare
      * @return the boolean {@code NDArray} for element-wise "Not equals" comparison
      */
@@ -753,6 +887,23 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Not equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 3f});
+     * jshell&gt; array1.neq(array2);
+     * ND: (2) cpu(0) boolean
+     * [false,  true]
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 3f, 1f, 4f}, new Shape(2, 2));
+     * jshell&gt; array1.neq(array2); // broadcasting
+     * ND: (2, 2) cpu(0) boolean
+     * [[false,  true],
+     *  [false,  true],
+     * ]
+     * </pre>
      *
      * @param other the {@code NDArray} to compare
      * @return the boolean {@code NDArray} for element-wise "Not equals" comparison
@@ -762,6 +913,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the boolean {@code NDArray} for element-wise "Greater" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
+     * jshell&gt; array1.gt(2f);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
      * @param other the number to compare
      * @return the boolean {@code NDArray} for element-wise "Greater" comparison
      */
@@ -769,6 +929,16 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Greater Than" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
+     * jshell&gt; array1.neq(array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
      *
      * @param other the {@code NDArray} to compare
      * @return the boolean {@code NDArray} for element-wis "Greater Than" comparison
@@ -778,6 +948,13 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the boolean {@code NDArray} for element-wise "Greater or equals" comparison.
      *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
+     * jshell&gt; array1.gte(2f);
+     * ND: (2) cpu(0) boolean
+     * [ true, true]
+     * </pre>
+     *
      * @param other the {@code NDArray} to compare
      * @return the boolean {@code NDArray} for element-wise "Greater or equals" comparison
      */
@@ -785,6 +962,16 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Greater or equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
+     * jshell&gt; array1.neq(array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, true]
+     * </pre>
      *
      * @param other the number to compare
      * @return the boolean {@code NDArray} for "Greater or equals" comparison
@@ -794,6 +981,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the boolean {@code NDArray} for element-wise "Less" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array.lt(2f);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
      * @param other the number to compare
      * @return the boolean {@code NDArray} for element-wise "Less" comparison
      */
@@ -801,6 +997,16 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Less" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
+     * jshell&gt; array1.lt(array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
      *
      * @param other the {@code NDArray} to compare
      * @return the boolean {@code NDArray} for element-wise "Less" comparison
@@ -810,6 +1016,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the boolean {@code NDArray} for element-wise "Less or equals" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array.lte(2f)
+     * ND: (2) cpu(0) boolean
+     * [ true, true]
+     * </pre>
+     *
      * @param other the number to compare
      * @return the boolean {@code NDArray} for element-wise "Less or equals" comparison
      */
@@ -817,6 +1032,16 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Less or equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
+     * jshell&gt; array1.lte(array2)
+     * ND: (2) cpu(0) boolean
+     * [ true, true]
+     * </pre>
      *
      * @param other the {@code NDArray} to compare
      * @return the boolean {@code NDArray} for element-wise "Less or equals" comparison
