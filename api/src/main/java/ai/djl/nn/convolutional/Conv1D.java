@@ -73,7 +73,7 @@ public class Conv1D extends Convolution {
     }
 
     /** The Builder to construct a {@link Conv1D} type of {@link Block}. */
-    public static final class Builder extends BaseBuilder<Builder> {
+    public static final class Builder extends ConvolutionBuilder<Builder> {
 
         /** Creates a builder that can build a {@link Conv1D} block. */
         public Builder() {

@@ -27,19 +27,29 @@ import ai.djl.nn.pooling.Pool;
 import java.util.Arrays;
 
 /**
- * Generic implementation of ResNet adapted from
+ * {@code ResNetV1} contains a generic implementation of ResNet adapted from
  * https://github.com/tornadomeet/ResNet/blob/master/symbol_resnet.py (Original author Wei Wu) by
- * Antti-Pekka Hynninen
+ * Antti-Pekka Hynninen.
  *
- * <p>Implementing the original resnet ILSVRC 2015 winning network from:
- *
- * <p>Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun. "Deep Residual Learning for Image
- * Recognition"
+ * <p>Implementing the original resnet ILSVRC 2015 winning network from Kaiming He, Xiangyu Zhang,
+ * Shaoqing Ren, Jian Sun. "Deep Residual Learning for Image Recognition"
  */
 public final class ResNetV1 {
 
     private ResNetV1() {}
 
+    /**
+     * Builds a {@link Block} that represents a residual unit used in the implementation of the
+     * Resnet model.
+     *
+     * @param numFilters the number of output channels
+     * @param stride the stride of the convolution in each dimension
+     * @param dimMatch whether the number of channels between input and output has to remain the
+     *     same
+     * @param bottleneck whether to use bottleneck architecture
+     * @param batchNormMomentum the momentum to be used for {@link BatchNorm}
+     * @return a {@link Block} that represents a residual unit
+     */
     public static Block residualUnit(
             int numFilters,
             final Shape stride,
@@ -150,6 +160,13 @@ public final class ResNetV1 {
                 Arrays.asList(resUnit, shortcut));
     }
 
+    /**
+     * Creates a new {@link Block} of {@code ResNetV1} with the arguments from the given {@link
+     * Builder}.
+     *
+     * @param builder the {@link Builder} with the necessary arguments
+     * @return a {@link Block} that represents the required ResNet model
+     */
     public static Block resnet(Builder builder) {
         int numStages = builder.units.length;
         long height = builder.imageShape.get(1);
@@ -216,6 +233,7 @@ public final class ResNetV1 {
                 .add(Blocks.batchFlattenBlock());
     }
 
+    /** The Builder to construct a {@link ResNetV1} object. */
     public static final class Builder {
 
         int numLayers;
@@ -228,10 +246,10 @@ public final class ResNetV1 {
         int[] filters;
 
         /**
-         * Sets the <b>Required</b> number of layers in the network.
+         * Sets the number of layers in the network.
          *
          * @param numLayers the number of layers
-         * @return this Builder
+         * @return this {@code Builder}
          */
         public Builder setNumLayers(int numLayers) {
             this.numLayers = numLayers;
@@ -239,10 +257,10 @@ public final class ResNetV1 {
         }
 
         /**
-         * Sets the <b>Required</b> size of the output.
+         * Sets the size of the output.
          *
          * @param outSize the number of layers
-         * @return this Builder
+         * @return this {@code Builder}
          */
         public Builder setOutSize(long outSize) {
             this.outSize = outSize;
@@ -250,10 +268,10 @@ public final class ResNetV1 {
         }
 
         /**
-         * Sets the <b>Required</b> size of the output.
+         * Sets the size of the output.
          *
          * @param batchNormMomemtum the number of layers
-         * @return this Builder
+         * @return this {@code Builder}
          */
         public Builder optBatchNormMomemtum(float batchNormMomemtum) {
             this.batchNormMomentum = batchNormMomemtum;
@@ -264,13 +282,18 @@ public final class ResNetV1 {
          * Sets the shape of the image.
          *
          * @param imageShape the shape of the image
-         * @return this Builder
+         * @return this {@code Builder}
          */
         public Builder setImageShape(Shape imageShape) {
             this.imageShape = imageShape;
             return this;
         }
 
+        /**
+         * Builds a {@link ResNetV1} block.
+         *
+         * @return the {@link ResNetV1} block
+         */
         public Block build() {
             if (imageShape == null) {
                 throw new IllegalArgumentException("Must set imageShape");

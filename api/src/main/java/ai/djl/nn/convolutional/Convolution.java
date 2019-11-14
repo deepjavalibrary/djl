@@ -46,7 +46,7 @@ public abstract class Convolution extends ParameterBlock {
     protected Parameter weight;
     protected Parameter bias;
 
-    public Convolution(BaseBuilder<?> builder) {
+    public Convolution(ConvolutionBuilder<?> builder) {
         kernel = builder.kernel;
         stride = builder.stride;
         pad = builder.pad;
@@ -191,7 +191,7 @@ public abstract class Convolution extends ParameterBlock {
     }
 
     @SuppressWarnings("rawtypes")
-    public abstract static class BaseBuilder<T extends BaseBuilder> {
+    public abstract static class ConvolutionBuilder<T extends ConvolutionBuilder> {
 
         protected Shape kernel;
         protected Shape stride;

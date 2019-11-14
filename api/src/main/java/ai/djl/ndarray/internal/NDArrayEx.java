@@ -526,15 +526,15 @@ public interface NDArrayEx {
             boolean clip);
 
     /**
-     * Converts multibox detection predictions.
+     * Converts multi-box detection predictions.
      *
-     * @param inputs a NDList of (anchors, labels, and class prediction)
-     * @param clip the clip out-of-boundary boxes
+     * @param inputs a NDList of (anchors, labels, and class prediction) in that order
+     * @param clip whether to clip out-of-boundary boxes
      * @param threshold the threshold to be a positive prediction
      * @param backgroundId the background id
-     * @param nmsThreashold the non-maximum suppression threshold
-     * @param forceSuppress suppress all detections regardless of class_id
-     * @param nmsTopK keep maximum top k detections before nms, -1 for no limit
+     * @param nmsThreshold the non-maximum suppression threshold
+     * @param forceSuppress whether to suppress all detections regardless of class_id
+     * @param nmsTopK the number of detections to keep before NMS, -1 for no limit
      * @return an NDList
      */
     NDList multiBoxDetection(
@@ -542,7 +542,7 @@ public interface NDArrayEx {
             boolean clip,
             float threshold,
             int backgroundId,
-            float nmsThreashold,
+            float nmsThreshold,
             boolean forceSuppress,
             int nmsTopK);
 

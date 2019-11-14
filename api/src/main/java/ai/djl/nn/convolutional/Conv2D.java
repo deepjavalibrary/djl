@@ -74,7 +74,7 @@ public class Conv2D extends Convolution {
     }
 
     /** The Builder to construct a {@link Conv2D} type of {@link Block}. */
-    public static final class Builder extends BaseBuilder<Builder> {
+    public static final class Builder extends ConvolutionBuilder<Builder> {
         /** Creates a builder that can build a {@link Conv2D} block. */
         public Builder() {
             stride = new Shape(1, 1);
