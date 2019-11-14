@@ -27,6 +27,14 @@ import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
+/**
+ * Model loader for Single Shot Detection (SSD) models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://arxiv.org/pdf/1512.02325.pdf">SSD</a>.
+ *
+ * @see ai.djl.mxnet.nn.MxSymbolBlock
+ */
 public class SingleShotDetectionModelLoader
         extends BaseModelLoader<BufferedImage, DetectedObjects> {
 
@@ -35,6 +43,11 @@ public class SingleShotDetectionModelLoader
     private static final String ARTIFACT_ID = "ssd";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public SingleShotDetectionModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }

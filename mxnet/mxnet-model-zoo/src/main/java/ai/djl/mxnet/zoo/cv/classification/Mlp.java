@@ -14,11 +14,24 @@ package ai.djl.mxnet.zoo.cv.classification;
 
 import ai.djl.repository.Repository;
 
+/**
+ * Model loader for MLP Symbolic models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://en.wikipedia.org/wiki/Multilayer_perceptron">Multilayer Perceptron</a>.
+ *
+ * @see ai.djl.mxnet.nn.MxSymbolBlock
+ */
 public class Mlp extends ImageClassificationModelLoader {
 
     private static final String ARTIFACT_ID = "mlp";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public Mlp(Repository repository) {
         super(repository, ARTIFACT_ID, VERSION);
     }

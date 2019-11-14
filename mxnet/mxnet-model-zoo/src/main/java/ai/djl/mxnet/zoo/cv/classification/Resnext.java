@@ -14,11 +14,24 @@ package ai.djl.mxnet.zoo.cv.classification;
 
 import ai.djl.repository.Repository;
 
+/**
+ * Model loader for Resnext Symbolic models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://arxiv.org/pdf/1611.05431.pdf">Resnext</a>.
+ *
+ * @see ai.djl.mxnet.nn.MxSymbolBlock
+ */
 public class Resnext extends ImageClassificationModelLoader {
 
     private static final String ARTIFACT_ID = "resnext";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public Resnext(Repository repository) {
         super(repository, ARTIFACT_ID, VERSION);
     }

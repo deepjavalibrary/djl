@@ -12,12 +12,20 @@
  */
 package ai.djl.mxnet.zoo.nlp.qa;
 
+/** The input container for BERT QA model. */
 public class QAInput {
 
     private String question;
     private String paragraph;
     private int seqLength;
 
+    /**
+     * Creates the BERT QA model.
+     *
+     * @param question the question for the model
+     * @param paragraph the answer paragraph that contains the answer
+     * @param seqLength the maximum length of the sentence
+     */
     public QAInput(String question, String paragraph, int seqLength) {
         this.question = question;
         this.paragraph = paragraph;

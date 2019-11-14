@@ -29,6 +29,14 @@ import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
+/**
+ * Model loader for Action Recognition models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://arxiv.org/pdf/1608.00859.pdf">Reference paper</a>.
+ *
+ * @see ai.djl.mxnet.nn.MxSymbolBlock
+ */
 public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
 
     private static final Anchor BASE_ANCHOR = CV.ACTION_RECOGNITION;
@@ -36,6 +44,11 @@ public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage,
     private static final String ARTIFACT_ID = "action_recognition";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public ActionRecognitionModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }

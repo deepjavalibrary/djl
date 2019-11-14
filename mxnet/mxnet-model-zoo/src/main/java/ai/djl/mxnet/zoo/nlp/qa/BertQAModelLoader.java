@@ -21,6 +21,14 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Translator;
 
+/**
+ * Model loader for BERT QA models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://arxiv.org/pdf/1810.04805.pdf">BERT</a>.
+ *
+ * @see ai.djl.mxnet.nn.MxSymbolBlock
+ */
 public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
 
     private static final Anchor BASE_ANCHOR = NLP.QUESTION_ANSWER;
@@ -28,6 +36,11 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
     private static final String ARTIFACT_ID = "bertqa";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public BertQAModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }

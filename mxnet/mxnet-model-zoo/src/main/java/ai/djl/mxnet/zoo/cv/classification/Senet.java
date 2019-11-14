@@ -14,11 +14,24 @@ package ai.djl.mxnet.zoo.cv.classification;
 
 import ai.djl.repository.Repository;
 
+/**
+ * Model loader for Senet Symbolic models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://arxiv.org/pdf/1709.01507.pdf">Senet</a>.
+ *
+ * @see ai.djl.mxnet.nn.MxSymbolBlock
+ */
 public class Senet extends ImageClassificationModelLoader {
 
     private static final String ARTIFACT_ID = "senet";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public Senet(Repository repository) {
         super(repository, ARTIFACT_ID, VERSION);
     }

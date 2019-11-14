@@ -25,11 +25,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/** The translator for {@link SingleShotDetectionModelLoader}. */
 public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjects> {
 
     private float threshold;
     private String synsetArtifactName;
 
+    /**
+     * Creates the SSD translator from the given builder.
+     *
+     * @param builder the builder for the translator
+     */
     public SingleShotDetectionTranslator(Builder builder) {
         super(builder);
         this.threshold = builder.threshold;
@@ -74,16 +80,33 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         return new DetectedObjects(retNames, retProbs, retBB);
     }
 
+    /** The builder for SSD translator. */
     public static class Builder extends BaseBuilder<Builder> {
 
         private float threshold = 0.2f;
         private String synsetArtifactName;
 
+        /**
+         * Sets the threshold for prediction accuracy.
+         *
+         * <p>Predictions below the threshold will be dropped.
+         *
+         * @param threshold the threshold for the prediction accuracy
+         * @return the builder
+         */
         public Builder optThreshold(float threshold) {
             this.threshold = threshold;
             return this;
         }
 
+        /**
+         * Sets the name for the synset.
+         *
+         * <p>Synset is used to convert the prediction classes to their actual names.
+         *
+         * @param synsetArtifactName the name of synset
+         * @return the builder
+         */
         public Builder setSynsetArtifactName(String synsetArtifactName) {
             this.synsetArtifactName = synsetArtifactName;
             return this;

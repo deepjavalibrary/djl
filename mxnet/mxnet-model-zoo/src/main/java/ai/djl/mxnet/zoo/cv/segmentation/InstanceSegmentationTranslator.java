@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/** The translator for {@link InstanceSegmentationModelLoader}. */
 public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObjects>
         implements Transform {
 
@@ -41,6 +42,11 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
     private int rescaledWidth;
     private int rescaledHeight;
 
+    /**
+     * Creates the Instance Segmentation translator from the given builder.
+     *
+     * @param builder the builder for the translator
+     */
     public InstanceSegmentationTranslator(Builder builder) {
         super(builder);
         synsetArtifactName = builder.synsetArtifactName;
@@ -132,6 +138,7 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
         return NDImageUtils.resize(image, rescaledWidth, rescaledHeight);
     }
 
+    /** The builder for Instance Segmentation translator. */
     public static class Builder extends BaseBuilder<Builder> {
 
         private String synsetArtifactName;
@@ -139,21 +146,49 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
         private int shortEdge = 600;
         private int maxEdge = 1000;
 
+        /**
+         * Sets the name for the synset.
+         *
+         * <p>synset is used to convert the prediction classes to their actual names.
+         *
+         * @param synsetArtifactName the name of synset
+         * @return the builder
+         */
         public Builder setSynsetArtifactName(String synsetArtifactName) {
             this.synsetArtifactName = synsetArtifactName;
             return this;
         }
 
+        /**
+         * Sets the threshold for prediction accuracy.
+         *
+         * <p>Predictions below the threshold will be dropped.
+         *
+         * @param threshold the threshold for prediction accuracy
+         * @return the builder
+         */
         public Builder optThreshold(float threshold) {
             this.threshold = threshold;
             return this;
         }
 
+        /**
+         * Sets the shorter edge length of the rescaled image.
+         *
+         * @param shortEdge the length of the short edge
+         * @return the builder
+         */
         public Builder optShortEdge(int shortEdge) {
             this.shortEdge = shortEdge;
             return this;
         }
 
+        /**
+         * Sets the maximum edge length of the rescaled image.
+         *
+         * @param maxEdge the length of the longest edge
+         * @return the builder
+         */
         public Builder optMaxEdge(int maxEdge) {
             this.maxEdge = maxEdge;
             return this;

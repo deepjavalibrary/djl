@@ -24,10 +24,16 @@ import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
 
+/** The translator for Pose Estimation {@link SimplePoseModelLoader}. */
 public class SimplePoseTranslator extends ImageTranslator<Joints> {
 
     private float threshold;
 
+    /**
+     * Creates the Pose Estimation translator from the given builder.
+     *
+     * @param builder the builder for the translator
+     */
     public SimplePoseTranslator(Builder builder) {
         super(builder);
         this.threshold = builder.threshold;
@@ -72,6 +78,7 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
         return new Joints(joints);
     }
 
+    /** The builder for Pose Estimation translator. */
     public static class Builder extends BaseBuilder<Builder> {
 
         float threshold;
@@ -82,6 +89,14 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
             return this;
         }
 
+        /**
+         * Sets the threshold for prediction accuracy.
+         *
+         * <p>Predictions below the threshold will be dropped.
+         *
+         * @param threshold the threshold for prediction accuracy
+         * @return the builder
+         */
         public Builder optThreshold(float threshold) {
             this.threshold = threshold;
             return self();

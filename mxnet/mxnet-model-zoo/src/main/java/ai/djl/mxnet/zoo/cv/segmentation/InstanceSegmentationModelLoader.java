@@ -26,6 +26,14 @@ import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 
+/**
+ * Model loader for Instance Segmentation models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://arxiv.org/pdf/1703.06870.pdf">Mask R-CNN used in the model</a>.
+ *
+ * @see ai.djl.mxnet.nn.MxSymbolBlock
+ */
 public class InstanceSegmentationModelLoader
         extends BaseModelLoader<BufferedImage, DetectedObjects> {
 
@@ -34,6 +42,11 @@ public class InstanceSegmentationModelLoader
     private static final String ARTIFACT_ID = "mask_rcnn";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public InstanceSegmentationModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }

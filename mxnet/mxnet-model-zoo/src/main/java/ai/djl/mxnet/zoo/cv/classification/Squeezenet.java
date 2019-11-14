@@ -14,6 +14,14 @@ package ai.djl.mxnet.zoo.cv.classification;
 
 import ai.djl.repository.Repository;
 
+/**
+ * Model loader for Squeezenet Symbolic models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://arxiv.org/pdf/1602.07360.pdf">Squeezenet</a>.
+ *
+ * @see ai.djl.mxnet.nn.MxSymbolBlock
+ */
 public class Squeezenet extends ImageClassificationModelLoader {
 
     private static final String ARTIFACT_ID = "squeezenet";

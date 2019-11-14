@@ -30,12 +30,20 @@ import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
+/** Model loader for Image Classification models. */
 public abstract class ImageClassificationModelLoader
         extends BaseModelLoader<BufferedImage, Classifications> {
 
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     * @param artifactId the artifact id of the model
+     * @param version the version number of the model
+     */
     public ImageClassificationModelLoader(
             Repository repository, String artifactId, String version) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, artifactId), version);

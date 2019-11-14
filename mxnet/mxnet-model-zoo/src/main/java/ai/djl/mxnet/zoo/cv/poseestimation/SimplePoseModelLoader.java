@@ -28,6 +28,14 @@ import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
+/**
+ * The translator for Simple Pose models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://arxiv.org/pdf/1804.06208.pdf">Simple Pose</a>.
+ *
+ * @see ai.djl.mxnet.nn.MxSymbolBlock
+ */
 public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints> {
 
     private static final Anchor BASE_ANCHOR = CV.POSE_ESTIMATION;
@@ -35,6 +43,11 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
     private static final String ARTIFACT_ID = "simple_pose";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates the Model loader from the given repository.
+     *
+     * @param repository the repository to load the model from
+     */
     public SimplePoseModelLoader(Repository repository) {
         super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
     }
