@@ -28,6 +28,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * {@code BasePredictor} is an implementation of the {@link Predictor} interface.
+ *
+ * @param <I> the type of the input
+ * @param <O> the type of the output
+ */
 public class BasePredictor<I, O> implements Predictor<I, O> {
 
     private static final Logger logger = LoggerFactory.getLogger(BasePredictor.class);
@@ -40,12 +46,20 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     private Block block;
     private ParameterStore parameterStore;
 
-    public BasePredictor(Model model, Translator<I, O> translator, boolean first) {
+    /**
+     * Creates a new instance of {@code BasePredictor} with the given {@link Model} and {@link
+     * Translator}.
+     *
+     * @param model the model on which the predictions are based
+     * @param translator the translator to be used
+     * @param copy whether to copy the parameters to the parameter store
+     */
+    public BasePredictor(Model model, Translator<I, O> translator, boolean copy) {
         this.model = model;
         this.manager = model.getNDManager().newSubManager();
         this.translator = translator;
         block = model.getBlock();
-        parameterStore = new ParameterStore(manager, !first);
+        parameterStore = new ParameterStore(manager, copy);
     }
 
     /** {@inheritDoc} */

@@ -45,8 +45,8 @@ public interface Predictor<I, O> extends AutoCloseable {
     /**
      * Predicts an item for inference.
      *
-     * @param input Input follows the inputObject
-     * @return the Output object defined by user
+     * @param input the input
+     * @return the output object defined by the user
      * @throws TranslateException if an error occurs during prediction
      */
     O predict(I input) throws TranslateException;
@@ -54,8 +54,8 @@ public interface Predictor<I, O> extends AutoCloseable {
     /**
      * Predicts a batch for inference.
      *
-     * @param inputs Inputs follows the inputObject
-     * @return the Output objects defined by user
+     * @param inputs a list of inputs
+     * @return a list of output objects defined by the user
      * @throws TranslateException if an error occurs during prediction
      */
     List<O> batchPredict(List<I> inputs) throws TranslateException;

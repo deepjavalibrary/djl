@@ -18,7 +18,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-/** MXNet helper containing base implementations for optimizers. */
+/**
+ * An {@code Optimizer} updates the weight parameters to minimize the loss function. {@code
+ * Optimizer} is an abstract class that provides the base implemenation for optimizers.
+ */
 public abstract class Optimizer {
 
     protected float rescaleGrad;
@@ -28,30 +31,58 @@ public abstract class Optimizer {
     private int numUpdate;
     private Map<String, Integer> updateCounts = new ConcurrentHashMap<>();
 
-    public Optimizer(BaseBuilder<?> builder) {
-        this.rescaleGrad = builder.getRescaleGrad();
-        this.weightDecays = builder.getWeightDecays();
-        this.clipGrad = builder.getClipGrad();
-        this.beginNumUpdate = builder.getBeginNumUpdate();
+    /**
+     * Creates a new instance of {@code Optimizer}.
+     *
+     * @param builder the builder used to create an instance of {@code Optimizer}
+     */
+    public Optimizer(OptimizerBuilder<?> builder) {
+        this.rescaleGrad = builder.rescaleGrad;
+        this.weightDecays = builder.weightDecays;
+        this.clipGrad = builder.clipGrad;
+        this.beginNumUpdate = builder.beginNumUpdate;
 
         if (rescaleGrad == 0) {
             throw new IllegalArgumentException("The rescaleGrad should be set");
         }
     }
 
+    /**
+     * Returns a new instance of {@link ai.djl.training.optimizer.Sgd.Builder} that can build an
+     * {@link Sgd} optimizer.
+     *
+     * @return the {@link Sgd} {@link ai.djl.training.optimizer.Sgd.Builder}
+     */
     public static Sgd.Builder sgd() {
         return new Sgd.Builder();
     }
 
+    /**
+     * Returns a new instance of {@link ai.djl.training.optimizer.Nag.Builder} that can build an
+     * {@link Nag} optimizer.
+     *
+     * @return the {@link Nag} {@link ai.djl.training.optimizer.Nag.Builder}
+     */
     public static Nag.Builder nag() {
         return new Nag.Builder();
     }
 
+    /**
+     * Returns a new instance of {@link ai.djl.training.optimizer.Adam.Builder} that can build an
+     * {@link Adam} optimizer.
+     *
+     * @return the {@link Adam} {@link ai.djl.training.optimizer.Adam.Builder}
+     */
     public static Adam.Builder adam() {
         return new Adam.Builder();
     }
 
-    protected float getWeightDecay(String parameterId) {
+    /**
+     * Gets the value of weight decay.
+     *
+     * @return the value of weight decay
+     */
+    protected float getWeightDecay() {
         return weightDecays;
     }
 
@@ -93,47 +124,60 @@ public abstract class Optimizer {
     }
 
     @SuppressWarnings("rawtypes")
-    public abstract static class BaseBuilder<T extends BaseBuilder> {
+    public abstract static class OptimizerBuilder<T extends OptimizerBuilder> {
 
         private float rescaleGrad;
         private float weightDecays;
         private float clipGrad = -1;
         private int beginNumUpdate;
 
+        /**
+         * Sets the value used to rescale the gradient. This is used to alleviate the effect of
+         * batching on the loss. Usually, the value is set to \( 1/batch_size \). Defaults to 1.
+         *
+         * @param rescaleGrad the value used to rescale the gradient
+         * @return this {@code Builder}
+         */
         public T setRescaleGrad(float rescaleGrad) {
             this.rescaleGrad = rescaleGrad;
             return self();
         }
 
+        /**
+         * Sets the value of weight decay. Weight decay augments the objective function with a
+         * regularization term that penalizes large weights.
+         *
+         * @param weightDecays the value of weight decay to be set
+         * @return this {@code Builder}
+         */
         public T optWeightDecays(float weightDecays) {
             this.weightDecays = weightDecays;
             return self();
         }
 
+        /**
+         * Sets the value of the \(clipGrad\). Clips the gradient to the range of \([-clipGrad,
+         * clipGrad]\). If \(clipGrad \lt 0\), gradient clipping is turned off.
+         *
+         * <p>\(grad = max(min(grad, clipGrad), -clipGrad)\)
+         *
+         * @param clipGrad the value of \(clipGrad\)
+         * @return this {@code Builder}
+         */
         public T optClipGrad(float clipGrad) {
             this.clipGrad = clipGrad;
             return self();
         }
 
+        /**
+         * Sets the initial value of the number of updates.
+         *
+         * @param beginNumUpdate the initial value of the number of updates
+         * @return this {@code Builder}
+         */
         public T optBeginNumUpdate(int beginNumUpdate) {
             this.beginNumUpdate = beginNumUpdate;
             return self();
-        }
-
-        public float getRescaleGrad() {
-            return rescaleGrad;
-        }
-
-        public float getWeightDecays() {
-            return weightDecays;
-        }
-
-        public float getClipGrad() {
-            return clipGrad;
-        }
-
-        public int getBeginNumUpdate() {
-            return beginNumUpdate;
         }
 
         protected abstract T self();

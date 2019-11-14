@@ -12,6 +12,7 @@
  */
 package ai.djl.training.optimizer.learningrate;
 
+/** An enum that enumerates the types of warm-up modes for a {@link LearningRateTracker}. */
 public enum WarmUpMode {
     LINEAR,
     CONSTANT

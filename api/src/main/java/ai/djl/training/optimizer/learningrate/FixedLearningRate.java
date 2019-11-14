@@ -12,8 +12,17 @@
  */
 package ai.djl.training.optimizer.learningrate;
 
+/**
+ * {@code FixedLearningRate} is an implementation of {@link LearningRateTracker} which returns a
+ * fixed value for the learning rate.
+ */
 class FixedLearningRate extends LearningRateTracker {
 
+    /**
+     * Creates a new instance of {@code FixedLearningRate}.
+     *
+     * @param builder the builder used to build this object
+     */
     public FixedLearningRate(Builder builder) {
         super(builder);
     }
@@ -23,7 +32,7 @@ class FixedLearningRate extends LearningRateTracker {
     public float getNewLearningRate(int numUpdate) {
         return baseLearningRate;
     }
-
+    /** The Builder to construct an {@link FixedLearningRate} object. */
     public static final class Builder extends LrBaseBuilder<Builder> {
 
         /** {@inheritDoc} */
@@ -32,6 +41,11 @@ class FixedLearningRate extends LearningRateTracker {
             return this;
         }
 
+        /**
+         * Builds a {@link FixedLearningRate} block.
+         *
+         * @return the {@link FixedLearningRate} block
+         */
         public FixedLearningRate build() {
             return new FixedLearningRate(this);
         }

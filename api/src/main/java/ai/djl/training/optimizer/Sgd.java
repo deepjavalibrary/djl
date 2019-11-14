@@ -20,27 +20,41 @@ import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** An SGD optimizer. Build with {@link Sgd.Builder}. */
+/**
+ * {@code Sgd} is a Stochastic Gradient Descent (SDG) optimizer.
+ *
+ * <p>If momentum is not set, it updates weights using the following update function:<br>
+ * \( weight = weight - learning_rate * (gradient + wd * weight) \).
+ *
+ * <p>If momentum is set, it updates weights using the following update function:<br>
+ * \( v = momentum * v - learning_rate * gradient \)<br>
+ * \( weight += v \)<br>
+ * Momentum update has better convergence rates on neural networks.
+ */
 public class Sgd extends Optimizer {
 
     private LearningRateTracker learningRateTracker;
     private float momentum;
-    private boolean lazyUpdate;
     private Map<String, Map<Device, NDArray>> momentumStates;
 
+    /**
+     * Creates a new instance of {@code Sgd}.
+     *
+     * @param builder the builder to create a new instance of {@link Sgd}
+     */
     protected Sgd(Builder builder) {
         super(builder);
-        learningRateTracker = builder.getLearningRateTracker();
-        momentum = builder.getMomentum();
-        lazyUpdate = builder.isLazyUpdate();
+        learningRateTracker = builder.learningRateTracker;
+        momentum = builder.momentum;
         momentumStates = new ConcurrentHashMap<>();
     }
 
     // TODO: make this protected after integrate with PS store
+    /** {@inheritDoc} */
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
-        float weightDecay = getWeightDecay(parameterId);
+        float weightDecay = getWeightDecay();
         float learningRate = learningRateTracker.getNewLearningRate(updateCount(parameterId));
         NDList inputs;
         if (momentum != 0f) {
@@ -58,21 +72,14 @@ public class Sgd extends Optimizer {
 
         NDArrayEx ex = weight.getNDArrayInternal();
         ex.sgdUpdate(
-                inputs,
-                weights,
-                learningRate,
-                weightDecay,
-                rescaleGrad,
-                clipGrad,
-                momentum,
-                lazyUpdate);
+                inputs, weights, learningRate, weightDecay, rescaleGrad, clipGrad, momentum, true);
     }
 
-    public static final class Builder extends BaseBuilder<Builder> {
+    /** The Builder to construct an {@link Sgd} object. */
+    public static final class Builder extends OptimizerBuilder<Builder> {
 
         private LearningRateTracker learningRateTracker;
         private float momentum;
-        private boolean lazyUpdate = true;
 
         /** {@inheritDoc} */
         @Override
@@ -80,33 +87,33 @@ public class Sgd extends Optimizer {
             return this;
         }
 
+        /**
+         * Sets the {@link LearningRateTracker} for this optimizer.
+         *
+         * @param learningRateTracker the {@link LearningRateTracker} to be set
+         * @return this {@code Builder}
+         */
         public Builder setLearningRateTracker(LearningRateTracker learningRateTracker) {
             this.learningRateTracker = learningRateTracker;
             return this;
         }
 
+        /**
+         * Sets the momentum for {@link Sgd}.
+         *
+         * @param momentum the value of momentum
+         * @return this {@code Builder}
+         */
         public Builder optMomentum(float momentum) {
             this.momentum = momentum;
             return this;
         }
 
-        public Builder optLazyUpdate(boolean lazyUpdate) {
-            this.lazyUpdate = lazyUpdate;
-            return this;
-        }
-
-        public LearningRateTracker getLearningRateTracker() {
-            return learningRateTracker;
-        }
-
-        public float getMomentum() {
-            return momentum;
-        }
-
-        public boolean isLazyUpdate() {
-            return lazyUpdate;
-        }
-
+        /**
+         * Builds a {@link Sgd} block.
+         *
+         * @return the {@link Sgd} block
+         */
         public Sgd build() {
             if (learningRateTracker == null) {
                 throw new IllegalArgumentException("No lrTracker set");

@@ -25,8 +25,8 @@ import org.tensorflow.Tensor;
 
 public class TfPredictor<I, O> extends BasePredictor<I, O> {
 
-    public TfPredictor(TfModel model, Translator<I, O> translator, boolean first) {
-        super(model, translator, first);
+    public TfPredictor(TfModel model, Translator<I, O> translator, boolean copy) {
+        super(model, translator, copy);
     }
 
     /** {@inheritDoc} */

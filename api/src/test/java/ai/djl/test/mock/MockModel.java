@@ -92,7 +92,7 @@ public class MockModel implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new BasePredictor<>(this, translator, first.getAndSet(false));
+        return new BasePredictor<>(this, translator, !first.getAndSet(false));
     }
 
     /** {@inheritDoc} */

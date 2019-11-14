@@ -16,6 +16,11 @@ package ai.djl.training.optimizer.learningrate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * {@code MultiFactorTracker} is an implementation of {@link LearningRateTracker} which is updated
+ * by a multiplicative factor, at an uneven interval of steps, until it reaches a specified stop
+ * value.
+ */
 public class MultiFactorTracker extends LearningRateTracker {
     private static final Logger logger = LoggerFactory.getLogger(FactorTracker.class);
 
@@ -23,10 +28,15 @@ public class MultiFactorTracker extends LearningRateTracker {
     private float factor;
     private int stepIndex;
 
+    /**
+     * Creates a new instance of {@code MultiFactorTracker}.
+     *
+     * @param builder the builder to create a new instance of {@code MultiFactorTracker}
+     */
     public MultiFactorTracker(Builder builder) {
         super(builder);
-        this.steps = builder.getSteps();
-        this.factor = builder.getFactor();
+        this.steps = builder.steps;
+        this.factor = builder.factor;
     }
 
     /** {@inheritDoc} */
@@ -52,6 +62,7 @@ public class MultiFactorTracker extends LearningRateTracker {
         return baseLearningRate;
     }
 
+    /** The Builder to construct an {@link MultiFactorTracker} object. */
     public static final class Builder extends LrBaseBuilder<Builder> {
         private int[] steps;
         private float factor = 1;
@@ -62,6 +73,13 @@ public class MultiFactorTracker extends LearningRateTracker {
             return this;
         }
 
+        /**
+         * Sets an array of integers indicating when the learning rate should be changed, usually in
+         * an uneven interval of steps.
+         *
+         * @param steps an array of integers indicating when the learning rate should be change
+         * @return this {@code Builder}
+         */
         public Builder setSteps(int[] steps) {
             if (steps.length <= 1) {
                 throw new IllegalArgumentException(
@@ -81,6 +99,12 @@ public class MultiFactorTracker extends LearningRateTracker {
             return this;
         }
 
+        /**
+         * Set the value of the multiplicative factor.
+         *
+         * @param factor the value of the multiplicative factor
+         * @return this {@code Builder}
+         */
         public Builder optFactor(float factor) {
             if (factor > 1f) {
                 throw new IllegalArgumentException("factor should be no more than 1");
@@ -89,14 +113,11 @@ public class MultiFactorTracker extends LearningRateTracker {
             return this;
         }
 
-        public int[] getSteps() {
-            return steps;
-        }
-
-        public float getFactor() {
-            return factor;
-        }
-
+        /**
+         * Builds a {@link MultiFactorTracker} block.
+         *
+         * @return the {@link MultiFactorTracker} block
+         */
         public MultiFactorTracker build() {
             if (steps == null) {
                 throw new IllegalArgumentException("Steps must be set to change learning rate");

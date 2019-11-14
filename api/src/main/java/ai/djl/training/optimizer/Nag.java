@@ -21,26 +21,38 @@ import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** An NAG optimizer. Build with {@link Nag.Builder}. */
+/**
+ * {@code Nag} is a Nesterov accelerated gradient optimizer.
+ *
+ * <p>This optimizer updates each weight by:<br>
+ * \( state = momentum * state + grad + wd *weight\)<br>
+ * \( weight = weight - (lr * (grad + momentum * state))<br>
+ */
 public class Nag extends Optimizer {
 
     private LearningRateTracker learningRateTracker;
     private float momentum;
     private Map<String, Map<Device, NDArray>> momentumStates;
 
+    /**
+     * Creates a new instance of {@code Nag} optimizer.
+     *
+     * @param builder the builder to create a new instance of {@code Nag} optimizer
+     */
     protected Nag(Builder builder) {
         super(builder);
-        learningRateTracker = builder.getLearningRateTracker();
-        momentum = builder.getMomentum();
+        learningRateTracker = builder.learningRateTracker;
+        momentum = builder.momentum;
         momentumStates = new ConcurrentHashMap<>();
     }
 
     // TODO: make this protected after integrate with PS store
+    /** {@inheritDoc} */
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
         float newLearningRate = learningRateTracker.getNewLearningRate(updateCount(parameterId));
-        float weightDecay = getWeightDecay(parameterId);
+        float weightDecay = getWeightDecay();
         NDList inputs;
         if (momentum != 0f) {
             inputs =
@@ -62,27 +74,32 @@ public class Nag extends Optimizer {
                 inputs, weights, newLearningRate, weightDecay, rescaleGrad, clipGrad, momentum);
     }
 
-    public static final class Builder extends BaseBuilder<Builder> {
+    /** The Builder to construct an {@link Nag} object. */
+    public static final class Builder extends OptimizerBuilder<Builder> {
 
         private LearningRateTracker learningRateTracker;
         private float momentum;
 
+        /**
+         * Sets the {@link LearningRateTracker} for this optimizer.
+         *
+         * @param learningRateTracker the {@link LearningRateTracker} to be set
+         * @return this {@code Builder}
+         */
         public Builder setLearningRateTracker(LearningRateTracker learningRateTracker) {
             this.learningRateTracker = learningRateTracker;
             return this;
         }
 
+        /**
+         * Sets the momentum for {@link Nag}.
+         *
+         * @param momentum the value of momentum
+         * @return this {@code Builder}
+         */
         public Builder setMomentum(float momentum) {
             this.momentum = momentum;
             return this;
-        }
-
-        public LearningRateTracker getLearningRateTracker() {
-            return learningRateTracker;
-        }
-
-        public float getMomentum() {
-            return momentum;
         }
 
         /** {@inheritDoc} */
@@ -91,6 +108,11 @@ public class Nag extends Optimizer {
             return this;
         }
 
+        /**
+         * Builds a {@link Nag} block.
+         *
+         * @return the {@link Nag} block
+         */
         public Nag build() {
             if (learningRateTracker == null) {
                 throw new IllegalArgumentException("No lrTracker set");

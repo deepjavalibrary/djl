@@ -35,10 +35,10 @@ public class MxPredictor<I, O> extends BasePredictor<I, O> {
      *
      * @param model the model to predict with
      * @param translator the translator to convert with input and output
-     * @param first true if this is the first predictor created for the model (for thread safety)
+     * @param copy true if this is the first predictor created for the model (for thread safety)
      */
-    MxPredictor(MxModel model, Translator<I, O> translator, boolean first) {
-        super(model, translator, first);
+    MxPredictor(MxModel model, Translator<I, O> translator, boolean copy) {
+        super(model, translator, copy);
     }
 
     /** {@inheritDoc} */

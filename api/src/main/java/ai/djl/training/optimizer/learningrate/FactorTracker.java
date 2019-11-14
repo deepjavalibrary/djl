@@ -15,6 +15,10 @@ package ai.djl.training.optimizer.learningrate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * {@code FactorTracker} is an implementation of {@link LearningRateTracker} which is updated by a
+ * multiplicative factor, at a constant interval of steps, until it reaches a specified stop value.
+ */
 public class FactorTracker extends LearningRateTracker {
 
     private static final Logger logger = LoggerFactory.getLogger(FactorTracker.class);
@@ -24,11 +28,16 @@ public class FactorTracker extends LearningRateTracker {
     private float stopFactorLearningRate;
     private int count;
 
+    /**
+     * Creates a new instance of {@code FactorTracker}.
+     *
+     * @param builder the builder to create a new instance of {@code FactorTracker}
+     */
     public FactorTracker(Builder builder) {
         super(builder);
-        this.step = builder.getStep();
-        this.factor = builder.getFactor();
-        this.stopFactorLearningRate = builder.getStopFactorLearningRate();
+        this.step = builder.step;
+        this.factor = builder.factor;
+        this.stopFactorLearningRate = builder.stopFactorLearningRate;
         this.count = 0;
     }
 
@@ -58,6 +67,7 @@ public class FactorTracker extends LearningRateTracker {
         return baseLearningRate;
     }
 
+    /** The Builder to construct an {@link FactorTracker} object. */
     public static final class Builder extends LrBaseBuilder<Builder> {
         private int step;
         private float factor = 1;
@@ -69,14 +79,27 @@ public class FactorTracker extends LearningRateTracker {
             return this;
         }
 
+        /**
+         * Sets the number of steps after which the multiplicative factor must be applied once.
+         *
+         * @param step the number of steps after which the multiplicative factor must be applied
+         *     once
+         * @return this {@code Builder}
+         */
         public Builder setStep(int step) {
             if (step < 1) {
-                throw new IllegalArgumentException("step should be larger or equal than 1");
+                throw new IllegalArgumentException("step should be larger or equal to 1");
             }
             this.step = step;
             return this;
         }
 
+        /**
+         * Sets the value of the multiplicative factor.
+         *
+         * @param factor the value of the multiplicative factor
+         * @return this {@code Builder}
+         */
         public Builder optFactor(float factor) {
             if (factor > 1f) {
                 throw new IllegalArgumentException("factor should be no more than 1");
@@ -85,23 +108,23 @@ public class FactorTracker extends LearningRateTracker {
             return this;
         }
 
+        /**
+         * Sets the stop value after which the learning rate should remain constant.
+         *
+         * @param stopFactorLearningRate the stop value after which the learning rate should remain
+         *     constant
+         * @return this {@code Builder}
+         */
         public Builder optStopFactorLearningRate(float stopFactorLearningRate) {
             this.stopFactorLearningRate = stopFactorLearningRate;
             return this;
         }
 
-        public float getStopFactorLearningRate() {
-            return stopFactorLearningRate;
-        }
-
-        public int getStep() {
-            return step;
-        }
-
-        public float getFactor() {
-            return factor;
-        }
-
+        /**
+         * Builds a {@link FactorTracker} block.
+         *
+         * @return the {@link FactorTracker} block
+         */
         public FactorTracker build() {
             if (step == 0) {
                 throw new IllegalArgumentException(

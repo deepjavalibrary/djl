@@ -418,13 +418,8 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("wd", weightDecay);
         params.addParam("rescale_grad", rescaleGrad);
         params.addParam("clip_gradient", clipGrad);
-
-        if (momentum != 0) {
-            params.addParam("momentum", momentum);
-            getManager().invoke("nag_mom_update", inputs, weights, params);
-        } else {
-            getManager().invoke("sgd_update", inputs, weights, params);
-        }
+        params.addParam("momentum", momentum);
+        getManager().invoke("nag_mom_update", inputs, weights, params);
     }
 
     /** {@inheritDoc} */

@@ -120,7 +120,7 @@ public class ParameterStoreTest {
             updateCount++;
         }
 
-        public static final class Builder extends BaseBuilder<TestOptimizer.Builder> {
+        public static final class Builder extends OptimizerBuilder<Builder> {
 
             private LearningRateTracker learningRateTracker;
 
