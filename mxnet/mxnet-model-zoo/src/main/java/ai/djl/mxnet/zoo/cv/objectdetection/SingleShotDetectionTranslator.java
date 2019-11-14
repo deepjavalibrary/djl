@@ -30,6 +30,9 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
 
     private float threshold;
     private String synsetArtifactName;
+    private List<String> classes;
+    private double imageWidth;
+    private double imageHeight;
 
     /**
      * Creates the SSD translator from the given builder.
@@ -40,13 +43,18 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         super(builder);
         this.threshold = builder.threshold;
         this.synsetArtifactName = builder.synsetArtifactName;
+        this.classes = builder.classes;
+        this.imageWidth = builder.imageWidth;
+        this.imageHeight = builder.imageHeight;
     }
 
     /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
-        List<String> classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+        if (classes == null) {
+            classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+        }
 
         float[] classIds = list.get(0).toFloatArray();
         float[] probabilities = list.get(1).toFloatArray();
@@ -59,16 +67,18 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         for (int i = 0; i < classIds.length; ++i) {
             int classId = (int) classIds[i];
             double probability = probabilities[i];
-            if (classId > 0 && probability > threshold) {
+            // classId starts from 0, -1 means background
+            if (classId >= 0 && probability > threshold) {
                 if (classId >= classes.size()) {
                     throw new AssertionError("Unexpected index: " + classId);
                 }
                 String className = classes.get(classId);
                 float[] box = boundingBoxes.get(i).toFloatArray();
-                double x = box[0] / 512;
-                double y = box[1] / 512;
-                double w = box[2] / 512 - x;
-                double h = box[3] / 512 - y;
+                // rescale box coordinates by imageWidth and imageHeight
+                double x = imageWidth > 0 ? box[0] / imageWidth : box[0];
+                double y = imageHeight > 0 ? box[1] / imageHeight : box[1];
+                double w = imageWidth > 0 ? box[2] / imageWidth - x : box[2] - x;
+                double h = imageHeight > 0 ? box[3] / imageHeight - y : box[3] - y;
 
                 Rectangle rect = new Rectangle(x, y, w, h);
                 retNames.add(className);
@@ -85,6 +95,9 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
 
         private float threshold = 0.2f;
         private String synsetArtifactName;
+        private List<String> classes;
+        private double imageWidth;
+        private double imageHeight;
 
         /**
          * Sets the threshold for prediction accuracy.
@@ -112,6 +125,17 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
             return this;
         }
 
+        public Builder setClasses(List<String> classes) {
+            this.classes = classes;
+            return this;
+        }
+
+        public Builder optRescaleSize(double imageWidth, double imageHeight) {
+            this.imageWidth = imageWidth;
+            this.imageHeight = imageHeight;
+            return this;
+        }
+
         /** {@inheritDoc} */
         @Override
         protected Builder self() {
@@ -119,8 +143,12 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         }
 
         public SingleShotDetectionTranslator build() {
-            if (synsetArtifactName == null) {
-                throw new IllegalArgumentException("You must specify a synset artifact name");
+            if (synsetArtifactName == null && classes == null) {
+                throw new IllegalArgumentException(
+                        "You must specify a synset artifact name or classes");
+            } else if (synsetArtifactName != null && classes != null) {
+                throw new IllegalArgumentException(
+                        "You can only specify one of: synset artifact name or classes");
             }
             return new SingleShotDetectionTranslator(this);
         }

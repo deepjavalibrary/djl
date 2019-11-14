@@ -12,19 +12,21 @@
  */
 package ai.djl.training.loss;
 
+import ai.djl.modality.cv.MultiBoxTarget;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 
-public class SSDMultiBoxLoss extends Loss {
-    Loss softmaxLoss = Loss.softmaxCrossEntropyLoss();
-    Loss l1Loss = Loss.l1Loss();
+public class SingleShotDetectionLoss extends Loss {
+    private Loss softmaxLoss = Loss.softmaxCrossEntropyLoss();
+    private Loss l1Loss = Loss.l1Loss();
+    private MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
 
     /**
      * Base class for metric with abstract update methods.
      *
      * @param name The display name of the Loss
      */
-    public SSDMultiBoxLoss(String name) {
+    public SingleShotDetectionLoss(String name) {
         super(name);
     }
 
@@ -40,19 +42,22 @@ public class SSDMultiBoxLoss extends Loss {
      */
     @Override
     public NDArray getLoss(NDList labels, NDList predictions) {
-        NDArray offsetLabels = labels.head();
-        NDArray masks = labels.get(1);
-        NDArray classLabels = labels.get(2);
-
-        NDArray classPredictions = predictions.get(0);
-        NDArray offsetPredictions = predictions.get(1);
+        NDArray anchors = predictions.get(0);
+        NDArray classPredictions = predictions.get(1);
+        NDArray boundingBoxPredictions = predictions.get(2);
+        NDList targets =
+                multiBoxTarget.target(
+                        new NDList(anchors, labels.head(), classPredictions.transpose(0, 2, 1)));
+        NDArray boundingBoxLabels = targets.get(0);
+        NDArray boundingBoxMasks = targets.get(1);
+        NDArray classLabels = targets.get(2);
 
         NDArray classLoss =
                 softmaxLoss.getLoss(new NDList(classLabels), new NDList(classPredictions));
-        NDArray bBoxLoss =
+        NDArray boundingBoxLoss =
                 l1Loss.getLoss(
-                        new NDList(offsetLabels.mul(masks)),
-                        new NDList(offsetPredictions.mul(masks)));
-        return classLoss.add(bBoxLoss);
+                        new NDList(boundingBoxLabels.mul(boundingBoxMasks)),
+                        new NDList(boundingBoxPredictions.mul(boundingBoxMasks)));
+        return classLoss.add(boundingBoxLoss);
     }
 }

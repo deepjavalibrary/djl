@@ -76,7 +76,8 @@ public final class TrainMnist extends AbstractTraining {
                         arguments.getEpoch(),
                         trainingSet,
                         validateSet,
-                        arguments.getOutputDir());
+                        arguments.getOutputDir(),
+                        "mlp");
             }
 
             // save model

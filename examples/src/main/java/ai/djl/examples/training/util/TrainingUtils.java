@@ -39,7 +39,8 @@ public final class TrainingUtils {
             int numEpoch,
             Dataset trainingDataset,
             Dataset validateDataset,
-            String outputDir)
+            String outputDir,
+            String modelName)
             throws IOException {
         for (int epoch = 0; epoch < numEpoch; epoch++) {
             for (Batch batch : trainer.iterateDataset(trainingDataset)) {
@@ -60,7 +61,7 @@ public final class TrainingUtils {
             if (outputDir != null) {
                 Model model = trainer.getModel();
                 model.setProperty("Epoch", String.valueOf(epoch));
-                model.save(Paths.get(outputDir), "resnetv1");
+                model.save(Paths.get(outputDir), modelName);
             }
         }
     }

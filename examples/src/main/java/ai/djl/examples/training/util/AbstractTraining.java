@@ -35,10 +35,10 @@ public abstract class AbstractTraining implements TrainingListener {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractTraining.class);
 
-    private float trainingAccuracy;
-    private float trainingLoss;
-    private float validationAccuracy;
-    private float validationLoss;
+    protected float trainingAccuracy;
+    protected float trainingLoss;
+    protected float validationAccuracy;
+    protected float validationLoss;
 
     protected int batchSize;
     protected int trainDataSize;
@@ -184,7 +184,7 @@ public abstract class AbstractTraining implements TrainingListener {
         return validationLoss;
     }
 
-    private String getTrainingStatus(Metrics metrics) {
+    public String getTrainingStatus(Metrics metrics) {
         StringBuilder sb = new StringBuilder();
         List<Metric> list = metrics.getMetric("train_" + loss.getName());
         trainingLoss = list.get(list.size() - 1).getValue().floatValue();
@@ -202,7 +202,7 @@ public abstract class AbstractTraining implements TrainingListener {
         return sb.toString();
     }
 
-    private void printTrainingStatus(Metrics metrics) {
+    public void printTrainingStatus(Metrics metrics) {
         List<Metric> list = metrics.getMetric("train_" + loss.getName());
         trainingLoss = list.get(list.size() - 1).getValue().floatValue();
 

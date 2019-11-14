@@ -35,6 +35,10 @@ public class DetectedObjects extends Classifications {
                         classNames.get(index), probabilities.get(index), boundingBoxes.get(index));
     }
 
+    public int getNumberOfObjects() {
+        return boundingBoxes.size();
+    }
+
     public static final class DetectedObject extends Classification {
 
         private BoundingBox boundingBox;

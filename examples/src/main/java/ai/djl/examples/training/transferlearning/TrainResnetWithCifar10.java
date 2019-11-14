@@ -87,7 +87,8 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                         arguments.getEpoch(),
                         trainDataset,
                         validationDataset,
-                        arguments.getOutputDir());
+                        arguments.getOutputDir(),
+                        "resnetv1");
             }
 
             // save model

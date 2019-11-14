@@ -12,23 +12,26 @@
  */
 package ai.djl.zoo.cv.object_detection.ssd;
 
+import ai.djl.MalformedModelException;
 import ai.djl.modality.cv.MultiBoxPrior;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
+import ai.djl.nn.BlockList;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2D;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.pooling.Pool;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
-import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -36,86 +39,63 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class SingleShotDetection extends ParameterBlock {
+public final class SingleShotDetection extends AbstractBlock {
     private static final byte VERSION = 1;
     private List<Block> features;
     private List<Block> classPredictionBlocks;
     private List<Block> anchorPredictionBlocks;
 
-    private List<List<Float>> sizes;
-    private List<List<Float>> ratios;
+    private List<MultiBoxPrior> multiBoxPriors;
     private int numClasses;
-    private boolean useBatchNorm;
-    private NDArray anchorBoxes;
 
     private SingleShotDetection(Builder builder) {
-        this.features = builder.features;
-        this.sizes = builder.sizes;
-        this.ratios = builder.ratios;
-        this.numClasses = builder.numClasses;
-        this.useBatchNorm = builder.useBatchNorm;
+        features = builder.features;
+        numClasses = builder.numClasses;
         classPredictionBlocks = builder.classPredictionBlocks;
         anchorPredictionBlocks = builder.anchorPredictionBlocks;
+        multiBoxPriors = builder.multiBoxPriors;
     }
 
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         NDList networkOutput = inputs;
-        NDArray classOutput = null;
-        NDArray anchorOutput = null;
+        NDArray[] anchorsOutputs = new NDArray[features.size()];
+        NDArray[] classOutputs = new NDArray[features.size()];
+        NDArray[] boundingBoxOutputs = new NDArray[features.size()];
         for (int i = 0; i < features.size(); i++) {
             networkOutput = features.get(i).forward(parameterStore, networkOutput);
 
-            MultiBoxPrior multiBoxPriors =
-                    new MultiBoxPrior.Builder()
-                            .setSizes(sizes.get(i))
-                            .setRatios(ratios.get(i))
-                            .build();
-            if (i == 0) {
-                anchorBoxes = multiBoxPriors.generateAnchorBoxes(networkOutput.head());
-            } else {
-                anchorBoxes =
-                        anchorBoxes.concat(
-                                multiBoxPriors.generateAnchorBoxes(networkOutput.head()), 1);
-            }
-            Block classPredictionBlock = classPredictionBlocks.get(i);
-            NDArray classPrediction =
-                    classPredictionBlock.forward(parameterStore, networkOutput).head();
-            classPrediction = classPrediction.transpose(0, 2, 3, 1);
-            Block anchorPredictionBlock = anchorPredictionBlocks.get(i);
-            NDArray anchorPrediction =
-                    anchorPredictionBlock.forward(parameterStore, networkOutput).head();
-            anchorPrediction = anchorPrediction.transpose(0, 2, 3, 1);
-            if (i == 0) {
-                classOutput =
-                        classPrediction.reshape(classPredictionShape(classPrediction.getShape()));
-                anchorOutput =
-                        anchorPrediction.reshape(
-                                anchorPredictionShape(anchorPrediction.getShape()));
-            } else {
-                classOutput =
-                        classOutput.concat(
-                                classPrediction.reshape(
-                                        classPredictionShape(classPrediction.getShape())),
-                                1);
-                anchorOutput =
-                        anchorOutput.concat(
-                                anchorPrediction.reshape(
-                                        anchorPredictionShape(anchorPrediction.getShape())),
-                                1);
-            }
-            if (useBatchNorm) {
-                Block batchNorm = new BatchNorm.Builder().optEpsilon(2E-5f).build();
-                networkOutput = batchNorm.forward(parameterStore, networkOutput);
-            }
-            networkOutput = Activation.reluBlock().forward(parameterStore, networkOutput);
+            MultiBoxPrior multiBoxPrior = multiBoxPriors.get(i);
+
+            anchorsOutputs[i] = multiBoxPrior.generateAnchorBoxes(networkOutput.singletonOrThrow());
+            classOutputs[i] =
+                    classPredictionBlocks
+                            .get(i)
+                            .forward(parameterStore, networkOutput)
+                            .singletonOrThrow();
+            boundingBoxOutputs[i] =
+                    anchorPredictionBlocks
+                            .get(i)
+                            .forward(parameterStore, networkOutput)
+                            .singletonOrThrow();
         }
-        return new NDList(classOutput, anchorOutput);
+        NDArray anchors = NDArrays.concat(new NDList(anchorsOutputs), 1);
+        NDArray classPredictions = concatPredictions(new NDList(classOutputs));
+        NDArray boundingBoxPredictions = concatPredictions(new NDList(boundingBoxOutputs));
+        return new NDList(
+                anchors,
+                classPredictions.reshape(classPredictions.size(0), -1, numClasses + 1),
+                boundingBoxPredictions);
     }
 
-    public NDArray getAnchorBoxes() {
-        return anchorBoxes;
+    private NDArray concatPredictions(NDList output) {
+        // transpose and batch flatten
+        NDArray[] flattenOutput =
+                output.stream()
+                        .map(array -> array.transpose(0, 2, 3, 1).reshape(array.size(0), -1))
+                        .toArray(NDArray[]::new);
+        return NDArrays.concat(new NDList(flattenOutput), 1);
     }
 
     private Shape anchorPredictionShape(Shape shape) {
@@ -151,6 +131,7 @@ public final class SingleShotDetection extends ParameterBlock {
 
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+        // TODO: output shape is wrong
         Shape[] childInputShapes = inputShapes;
         Shape classPredictionShape = new Shape();
         Shape anchorPredictionShape = new Shape();
@@ -197,15 +178,74 @@ public final class SingleShotDetection extends ParameterBlock {
     }
 
     @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
+    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
+        if (!initialized) {
+            beforeInitialize(inputShapes);
+            Shape[] shapes = inputShapes;
+            for (int i = 0; i < features.size(); i++) {
+                shapes = features.get(i).initialize(manager, dataType, shapes);
+                classPredictionBlocks.get(i).initialize(manager, dataType, shapes);
+                anchorPredictionBlocks.get(i).initialize(manager, dataType, shapes);
+            }
+            initialized = true;
+        }
+        return getOutputShapes(manager, inputShapes);
     }
 
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
+    public BlockList getChildren() {
+        int size = features.size() + classPredictionBlocks.size() + anchorPredictionBlocks.size();
+        BlockList children = new BlockList(size);
+        int precision = (int) Math.log10(size) + 1;
+        String format = "%0" + precision + "d:%s";
+        int i = 0;
+        for (Block block : features) {
+            String name = String.format(format, i, block.getClass().getSimpleName());
+            children.add(name, block);
+            i++;
+        }
+        for (Block block : classPredictionBlocks) {
+            String name = String.format(format, i, block.getClass().getSimpleName());
+            children.add(name, block);
+            i++;
+        }
+        for (Block block : anchorPredictionBlocks) {
+            String name = String.format(format, i, block.getClass().getSimpleName());
+            children.add(name, block);
+            i++;
+        }
+        return children;
+    }
+
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        for (Block block : features) {
+            block.saveParameters(os);
+        }
+        for (Block block : classPredictionBlocks) {
+            block.saveParameters(os);
+        }
+        for (Block block : anchorPredictionBlocks) {
+            block.saveParameters(os);
+        }
+    }
+
+    @Override
+    public void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException {
         byte version = is.readByte();
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        }
+        for (Block block : features) {
+            block.loadParameters(manager, is);
+        }
+        for (Block block : classPredictionBlocks) {
+            block.loadParameters(manager, is);
+        }
+        for (Block block : anchorPredictionBlocks) {
+            block.loadParameters(manager, is);
         }
     }
 
@@ -219,7 +259,7 @@ public final class SingleShotDetection extends ParameterBlock {
                                     .setNumFilters(numFilters)
                                     .optPad(new Shape(1, 1))
                                     .build())
-                    .add(new BatchNorm.Builder().optEpsilon(2E-5f).build())
+                    .add(new BatchNorm.Builder().build())
                     .add(Activation.reluBlock());
         }
         sequentialBlock.add(
@@ -251,7 +291,6 @@ public final class SingleShotDetection extends ParameterBlock {
     }
 
     public static class Builder {
-        private NDManager manager;
         private Block network;
         private int numFeatures = -1;
         private List<Block> features;
@@ -259,14 +298,9 @@ public final class SingleShotDetection extends ParameterBlock {
         private List<List<Float>> ratios;
         private List<Block> classPredictionBlocks = new ArrayList<>();
         private List<Block> anchorPredictionBlocks = new ArrayList<>();
+        private List<MultiBoxPrior> multiBoxPriors = new ArrayList<>();
         private int numClasses;
-        private boolean useBatchNorm;
         private boolean globalPool = true;
-
-        public Builder setManager(NDManager manager) {
-            this.manager = manager;
-            return this;
-        }
 
         /**
          * Sets the list of sizes of generated anchor boxes.
@@ -307,7 +341,7 @@ public final class SingleShotDetection extends ParameterBlock {
          * @param network Base network
          * @return Returns this Builder
          */
-        public Builder optNetwork(Block network) {
+        public Builder setBaseNetwork(Block network) {
             this.network = network;
             return this;
         }
@@ -337,18 +371,6 @@ public final class SingleShotDetection extends ParameterBlock {
         }
 
         /**
-         * Sets the boolean whether to use BatchNorm layer after each attached convolutional layer.
-         *
-         * @param useBatchNorm Whether to use BatchNorm layer after each attached convolutional
-         *     layer
-         * @return Returns this Builder
-         */
-        public Builder optUseBatchNorm(boolean useBatchNorm) {
-            this.useBatchNorm = useBatchNorm;
-            return this;
-        }
-
-        /**
          * Sets the boolean whether to attach a global average pooling layer as the last output
          * layer.
          *
@@ -362,23 +384,6 @@ public final class SingleShotDetection extends ParameterBlock {
         }
 
         public SingleShotDetection build() {
-            if (manager == null) {
-                throw new IllegalArgumentException("Manager must be set");
-            }
-            if (network == null) {
-                SequentialBlock resnet =
-                        (SequentialBlock)
-                                new ResNetV1.Builder()
-                                        .setImageShape(new Shape(1, 28, 28))
-                                        .setNumLayers(50)
-                                        .setOutSize(10)
-                                        .build();
-                resnet.removeLastBlock();
-                resnet.removeLastBlock();
-                resnet.removeLastBlock();
-                resnet.removeLastBlock();
-                network = resnet;
-            }
             if (features == null && numFeatures < 0) {
                 throw new IllegalArgumentException("Either numFeatures or features must be set");
             } else if (features == null) {
@@ -390,17 +395,24 @@ public final class SingleShotDetection extends ParameterBlock {
             }
             if (globalPool) {
                 features.add(
-                        new LambdaBlock(arrays -> new NDList(Pool.globalMaxPool(arrays.head()))));
+                        new LambdaBlock(
+                                arrays ->
+                                        new NDList(Pool.globalMaxPool(arrays.singletonOrThrow()))));
             }
             int numberOfFeatureMaps = features.size();
-            if (sizes.size() != ratios.size() && sizes.size() != numberOfFeatureMaps) {
+            if (sizes.size() != ratios.size() || sizes.size() != numberOfFeatureMaps) {
                 throw new IllegalArgumentException(
                         "Sizes and ratios must be of size: " + numberOfFeatureMaps);
             }
             for (int i = 0; i < numberOfFeatureMaps; i++) {
-                int numAnchors = sizes.get(i).size() + ratios.get(i).size() - 1;
+                List<Float> size = sizes.get(i);
+                List<Float> ratio = ratios.get(i);
+
+                int numAnchors = size.size() + ratio.size() - 1;
                 classPredictionBlocks.add(getClassPredictionBlock(numAnchors, numClasses));
                 anchorPredictionBlocks.add(getAnchorPredictionBlock(numAnchors));
+                multiBoxPriors.add(
+                        new MultiBoxPrior.Builder().setSizes(size).setRatios(ratio).build());
             }
             return new SingleShotDetection(this);
         }

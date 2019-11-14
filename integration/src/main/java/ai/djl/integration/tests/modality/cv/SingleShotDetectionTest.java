@@ -12,10 +12,18 @@
  */
 package ai.djl.integration.tests.modality.cv;
 
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.SequentialBlock;
+import ai.djl.training.ParameterStore;
+import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.zoo.cv.object_detection.ssd.SingleShotDetection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -56,6 +64,52 @@ public class SingleShotDetectionTest {
                     sequentialBlock
                             .getOutputShapes(manager, new Shape[] {new Shape(2, 3, 20, 20)})[0],
                     new Shape(2, 10, 10, 10));
+        }
+    }
+
+    @Test
+    public void testSingleShotDetectionShape() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+
+            int[] numFilters = {16, 32, 64};
+            SequentialBlock block = new SequentialBlock();
+            for (int numFilter : numFilters) {
+                block.add(SingleShotDetection.getDownSamplingBlock(numFilter));
+            }
+
+            List<List<Float>> sizes = new ArrayList<>();
+            List<List<Float>> ratios = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                ratios.add(Arrays.asList(1f, 2f, 0.5f));
+            }
+            sizes.add(Arrays.asList(0.2f, 0.272f));
+            sizes.add(Arrays.asList(0.37f, 0.447f));
+            sizes.add(Arrays.asList(0.54f, 0.619f));
+            sizes.add(Arrays.asList(0.71f, 0.79f));
+            sizes.add(Arrays.asList(0.88f, 0.961f));
+
+            SingleShotDetection ssd =
+                    new SingleShotDetection.Builder()
+                            .setNumClasses(1)
+                            .setNumFeatures(3)
+                            .optGlobalPool(true)
+                            .setRatios(ratios)
+                            .setSizes(sizes)
+                            .setBaseNetwork(block)
+                            .build();
+            ssd.setInitializer(new XavierInitializer());
+            ssd.initialize(manager, DataType.FLOAT32, new Shape(32, 3, 256, 256));
+            ParameterStore ps = new ParameterStore(manager, false);
+            NDList output = ssd.forward(ps, new NDList(manager.ones(new Shape(32, 3, 256, 256))));
+            Assert.assertEquals(output.get(0).getShape(), new Shape(1, 5444, 4));
+            Assert.assertEquals(output.get(1).getShape(), new Shape(32, 5444, 2));
+            Assert.assertEquals(output.get(2).getShape(), new Shape(32, 21776));
+            // TODO: fix output shape
+            //            Shape[] outputShapes = ssd.getOutputShapes(manager, new Shape[]{new
+            // Shape(32, 3, 256, 256)});
+            //            Assert.assertEquals(outputShapes[0], new Shape(1, 5444, 4));
+            //            Assert.assertEquals(outputShapes[0], new Shape(32, 5444, 2));
+            //            Assert.assertEquals(outputShapes[0], new Shape(32, 21776));
         }
     }
 }

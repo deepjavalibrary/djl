@@ -65,8 +65,9 @@ public class SingleShotDetectionModelLoader
 
         return new SingleShotDetectionTranslator.Builder()
                 .setPipeline(pipeline)
-                .optThreshold((float) threshold)
                 .setSynsetArtifactName("classes.txt")
+                .optThreshold((float) threshold)
+                .optRescaleSize(width, height)
                 .build();
     }
 }
