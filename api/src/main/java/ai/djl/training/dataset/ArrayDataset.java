@@ -51,20 +51,21 @@ public class ArrayDataset extends RandomAccessDataset {
             data = builder2.data;
             labels = builder2.labels;
 
-            if (data != null && data.length != 0) {
-                size = data[0].size(0);
-            } else if (labels != null && labels.length != 0) {
-                size = labels[0].size(0);
-            }
-
             // check data and labels have the same size
-            if (data != null && Stream.of(data).anyMatch(array -> array.size(0) != size)) {
+            long size = data[0].size(0);
+            if (Stream.of(data).anyMatch(array -> array.size(0) != size)) {
                 throw new IllegalArgumentException("All the NDArray must have the same length!");
             }
             if (labels != null && Stream.of(labels).anyMatch(array -> array.size(0) != size)) {
                 throw new IllegalArgumentException("All the NDArray must have the same length!");
             }
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long size() {
+        return data[0].size(0);
     }
 
     /** {@inheritDoc} */
@@ -125,6 +126,9 @@ public class ArrayDataset extends RandomAccessDataset {
          * @return a new instance of {@code ArrayDataset}
          */
         public ArrayDataset build() {
+            if (data == null || data.length == 0) {
+                throw new IllegalArgumentException("Please pass in at least one data");
+            }
             return new ArrayDataset(this);
         }
     }

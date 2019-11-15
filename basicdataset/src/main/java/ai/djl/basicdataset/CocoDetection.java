@@ -148,9 +148,12 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
                 labels.add(labelOfImageId.toArray(new double[0][]));
             }
         }
+    }
 
-        // set the size
-        size = imagePaths.size();
+    /** {@inheritDoc} */
+    @Override
+    public long size() {
+        return imagePaths.size();
     }
 
     private double[] convertRecToList(Rectangle rect) {

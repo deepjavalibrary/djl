@@ -117,8 +117,7 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
                 throw new UnsupportedOperationException("Validation data not available.");
         }
         labels = new NDArray[] {readLabel(labelItem)};
-        size = labels[0].size();
-        data = new NDArray[] {readData(imageItem, size)};
+        data = new NDArray[] {readData(imageItem, labels[0].size())};
     }
 
     private NDArray readData(Artifact.Item item, long length) throws IOException {

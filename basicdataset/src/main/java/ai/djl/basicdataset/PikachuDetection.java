@@ -157,7 +157,6 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
                 labels.add(labelArray);
             }
         }
-        size = imagePaths.size();
     }
 
     /** {@inheritDoc} */
@@ -169,6 +168,12 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         NDArray label = manager.create(labels.get(idx));
         NDList l = new NDList(label.reshape(new Shape(1).addAll(label.getShape())));
         return new Record(d, l);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long size() {
+        return imagePaths.size();
     }
 
     public static final class Builder extends BaseBuilder<Builder> {

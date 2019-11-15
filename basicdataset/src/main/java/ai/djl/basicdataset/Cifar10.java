@@ -129,7 +129,6 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
                             + " didn't match with the size of labels "
                             + labels[0].size(0));
         }
-        size = labels[0].size();
     }
 
     private NDArray readData(Artifact.Item item) throws IOException {

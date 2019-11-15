@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutorService;
  */
 public abstract class RandomAccessDataset implements Dataset, RandomAccess {
 
-    protected long size;
     protected Sampler sampler;
     protected Batchifier batchifier;
     protected Pipeline pipeline;
@@ -37,7 +36,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     protected Device device;
 
     public RandomAccessDataset(BaseBuilder<?> builder) {
-        this.sampler = builder.sampler;
+        this.sampler = builder.getSampler();
         this.batchifier = builder.batchifier;
         this.pipeline = builder.pipeline;
         this.targetPipeline = builder.targetPipeline;
@@ -65,9 +64,12 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
                 device);
     }
 
-    public long size() {
-        return size;
-    }
+    /**
+     * Returns the size of this {@code Dataset}.
+     *
+     * @return the size of this {@code Dataset}
+     */
+    public abstract long size();
 
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
