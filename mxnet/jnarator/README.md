@@ -1,5 +1,4 @@
-DJL - JNA generator
-======================
+# DJL - JNA code generator
 
 ## Overview
 

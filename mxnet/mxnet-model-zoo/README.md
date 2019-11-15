@@ -1,4 +1,4 @@
-# MXNet model zoo
+# DJL - MXNet model zoo
 
 ## Introduction
 

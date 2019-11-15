@@ -1,8 +1,7 @@
 
 ![DeepJavaLibrary](docs/website/img/deepjavalibrary.png?raw=true "Deep Java Library")
 
-Deep Java Library (DJL)
-==================================
+# Deep Java Library (DJL)
 
 ## Overview
 

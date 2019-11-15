@@ -15,7 +15,7 @@ This module is core API of the Deep Java Library (DJL) project. It include the f
 
 ## Documentation
 
-The Javadoc can be found [here](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/index.html).
+The Javadoc can be found [here](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/index.html).
 
 You can build latest javadoc use the following command:
 

@@ -11,7 +11,7 @@ The following is a list of examples:
 ## Prerequisite
 
 * You need to have JDK 8 (or later) installed on your system. Read [here](../docs/development/setup.md) for more detail.
-* You should also be familiar with the API documentation: [Javadoc](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/index.html)
+* You should also be familiar with the API documentation: [Javadoc](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/index.html)
 
 
 # Getting started: 30 seconds to run an example

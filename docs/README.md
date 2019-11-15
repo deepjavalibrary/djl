@@ -6,7 +6,7 @@
 - [Basic Dataset](../basicdataset/README.md) - Built-in dataset
 - [Model Zoo](../model-zoo/README.md) - Built-in Engine agnostic model zoo
 - [Repository API](../repository/README.md) - Repository utilities to build model zoo and dataset
-- [MXNet Engine](../mxnet/engine/README.md) - MXNet Engine implementation
+- [MXNet Engine](../mxnet/mxnet-engine/README.md) - MXNet Engine implementation
 - [MXNet Model Zoo](../mxnet/mxnet-model-zoo/README.md) - MXNet symbolic model zoo
 
 ## Jupyter notebook tutorials
@@ -18,9 +18,9 @@
 
 ## [API Examples](../examples/README.md)
 
-- [Image classification example](docs/image_classification.md)
-- [Single-shot Object detection example](docs/object_detection.md)
-- [Bert question and answer example](docs/BERT_question_and_answer.md)
+- [Image classification example](../examples/docs/image_classification.md)
+- [Single-shot Object detection example](../examples/docs/object_detection.md)
+- [Bert question and answer example](../examples/docs/BERT_question_and_answer.md)
 
 ## Development guide
 

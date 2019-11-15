@@ -1,5 +1,4 @@
-BERT QA Example
-==============
+# BERT QA Example
 
 In this tutorial, you'll walk through the BERT QA model trained by MXNet. 
 You can provide a question and a paragraph containing the answer to the model. The model is then able to find the best answer from the answer paragraph.
