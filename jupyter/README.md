@@ -57,18 +57,20 @@ jupyter notebook
 
 You may want to use docker for simple installation or you are using Windows.
 
-### Create docker image
-
-```
-cd jupyter
-docker build -t djl.ai .
-```
-
 ### Run docker image
 
 ```
-docker run -p 8888:8888 -it djl.ai
+cd jupyter
+docker run -itd -p 127.0.0.1:8888:8888 -v $PWD:/home/jupyter deepjavalibrary/jupyter
 ```
 
 You can open the `http://localhost:8888` to see the hosted instance on docker.
-Pass in the tokens provided in the docker message, and the docker is ready to go.
+
+### Build docker image by yourself
+
+You can read [Dockerfile](Dockerfile) for detail. To build docker image:
+```
+cd jupyter
+docker build -t deepjavalibrary/jupyter .
+```
+
