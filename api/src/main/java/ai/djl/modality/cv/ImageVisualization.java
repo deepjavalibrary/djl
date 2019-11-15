@@ -41,8 +41,8 @@ public final class ImageVisualization {
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-        List<DetectedObjects.BoundingBoxItem> list = detections.items();
-        for (DetectedObjects.BoundingBoxItem result : list) {
+        List<DetectedObjects.DetectedObject> list = detections.items();
+        for (DetectedObjects.DetectedObject result : list) {
             String className = result.getClassName();
             BoundingBox box = result.getBoundingBox();
             g.setPaint(BufferedImageUtils.randomColor().darker());

@@ -25,7 +25,7 @@ public class ActionRecognitionTest {
     @Test
     public void testActionRecognition() throws ModelException, TranslateException, IOException {
         Classifications result = new ActionRecognition().predict();
-        Classifications.Item best = result.best();
+        Classifications.Classification best = result.best();
         Assert.assertEquals(best.getClassName(), "ThrowDiscus");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }

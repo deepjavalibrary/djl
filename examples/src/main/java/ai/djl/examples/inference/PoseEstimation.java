@@ -64,8 +64,8 @@ public class PoseEstimation {
         ssd.close();
 
         BufferedImage person = null;
-        List<DetectedObjects.BoundingBoxItem> list = ssdResult.items();
-        for (DetectedObjects.BoundingBoxItem item : list) {
+        List<DetectedObjects.DetectedObject> list = ssdResult.items();
+        for (DetectedObjects.DetectedObject item : list) {
             if ("person".equals(item.getClassName())) {
                 Rectangle rect = item.getBoundingBox().getBounds();
                 int width = img.getWidth();

@@ -14,6 +14,7 @@ package ai.djl.examples;
 
 import ai.djl.ModelException;
 import ai.djl.examples.inference.InstanceSegmentation;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class InstanceSegmentationTest {
     @Test
     public void testInstanceSegmentation() throws ModelException, TranslateException, IOException {
         DetectedObjects result = new InstanceSegmentation().predict();
-        DetectedObjects.Item best = result.best();
+        Classifications.Classification best = result.best();
         Assert.assertEquals(best.getClassName(), "person");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }

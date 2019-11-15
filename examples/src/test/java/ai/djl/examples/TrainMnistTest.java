@@ -35,7 +35,7 @@ public class TrainMnistTest {
         Assert.assertTrue(test.getValidationLoss() < 0.35f);
 
         Classifications result = new ImageClassification().predict();
-        Classifications.Item best = result.best();
+        Classifications.Classification best = result.best();
         Assert.assertEquals(best.getClassName(), "0");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }

@@ -40,7 +40,7 @@ public class Classifications {
         array.close();
     }
 
-    public <T extends Item> List<T> items() {
+    public <T extends Classification> List<T> items() {
         List<T> list = new ArrayList<>(classNames.size());
         for (int i = 0; i < classNames.size(); i++) {
             list.add(item(i));
@@ -49,22 +49,22 @@ public class Classifications {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Item> T item(int index) {
-        return (T) new Item(classNames.get(index), probabilities.get(index));
+    public <T extends Classification> T item(int index) {
+        return (T) new Classification(classNames.get(index), probabilities.get(index));
     }
 
-    public <T extends Item> List<T> topK(int k) {
+    public <T extends Classification> List<T> topK(int k) {
         List<T> items = items();
-        items.sort(Comparator.comparingDouble(Item::getProbability).reversed());
+        items.sort(Comparator.comparingDouble(Classification::getProbability).reversed());
         int count = Math.min(items.size(), k);
         return items.subList(0, count);
     }
 
-    public <T extends Item> T best() {
+    public <T extends Classification> T best() {
         return item(probabilities.indexOf(Collections.max(probabilities)));
     }
 
-    public <T extends Item> T get(String className) {
+    public <T extends Classification> T get(String className) {
         int size = classNames.size();
         for (int i = 0; i < size; i++) {
             if (classNames.get(i).equals(className)) {
@@ -79,19 +79,19 @@ public class Classifications {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[').append(System.lineSeparator());
-        for (Item item : topK(5)) {
+        for (Classification item : topK(5)) {
             sb.append('\t').append(item).append(System.lineSeparator());
         }
         sb.append(']');
         return sb.toString();
     }
 
-    public static class Item {
+    public static class Classification {
 
         private String className;
         private double probability;
 
-        public Item(String className, double probability) {
+        public Classification(String className, double probability) {
             this.className = className;
             this.probability = probability;
         }

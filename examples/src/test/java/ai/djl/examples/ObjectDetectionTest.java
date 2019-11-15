@@ -14,6 +14,7 @@ package ai.djl.examples;
 
 import ai.djl.ModelException;
 import ai.djl.examples.inference.ObjectDetection;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class ObjectDetectionTest {
     @Test
     public void testObjectDetection() throws ModelException, TranslateException, IOException {
         DetectedObjects result = new ObjectDetection().predict();
-        DetectedObjects.Item best = result.best();
+        Classifications.Classification best = result.best();
         Assert.assertEquals(best.getClassName(), "dog");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.8) > 0);
     }

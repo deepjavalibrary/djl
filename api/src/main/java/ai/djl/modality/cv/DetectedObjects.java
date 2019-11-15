@@ -29,17 +29,17 @@ public class DetectedObjects extends Classifications {
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Item> T item(int index) {
+    public <T extends Classification> T item(int index) {
         return (T)
-                new BoundingBoxItem(
+                new DetectedObject(
                         classNames.get(index), probabilities.get(index), boundingBoxes.get(index));
     }
 
-    public static final class BoundingBoxItem extends Item {
+    public static final class DetectedObject extends Classification {
 
         private BoundingBox boundingBox;
 
-        public BoundingBoxItem(String className, double probability, BoundingBox boundingBox) {
+        public DetectedObject(String className, double probability, BoundingBox boundingBox) {
             super(className, probability);
             this.boundingBox = boundingBox;
         }
