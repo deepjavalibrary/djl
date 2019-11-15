@@ -15,6 +15,7 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.examples.inference.util.AbstractBenchmark;
 import ai.djl.examples.inference.util.Arguments;
+import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
@@ -31,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,11 +56,13 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
 
         ZooModel<BufferedImage, Classifications> model = loadModel(arguments, metrics);
 
-        int numOfThreads = Runtime.getRuntime().availableProcessors();
+        int numOfThreads = Math.min(Runtime.getRuntime().availableProcessors(), 16);
         metrics.addMetric("thread", numOfThreads);
+        AtomicBoolean collectMem = new AtomicBoolean(true);
         List<PredictorCallable> callables =
                 Collections.nCopies(
-                        numOfThreads, new PredictorCallable(model, img, metrics, iteration));
+                        numOfThreads,
+                        new PredictorCallable(model, img, metrics, iteration, collectMem));
 
         Classifications classification = null;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
@@ -81,16 +85,19 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
         private BufferedImage img;
         private Metrics metrics;
         private int iteration;
+        private boolean collectMemory;
 
         public PredictorCallable(
                 ZooModel<BufferedImage, Classifications> model,
                 BufferedImage img,
                 Metrics metrics,
-                int iteration) {
+                int iteration,
+                AtomicBoolean collectMemory) {
             this.predictor = model.newPredictor();
             this.img = img;
             this.metrics = metrics;
             this.iteration = iteration;
+            this.collectMemory = collectMemory.getAndSet(false);
         }
 
         /** {@inheritDoc} */
@@ -100,6 +107,9 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
             Classifications result = null;
             for (int i = 0; i < iteration; i++) {
                 result = predictor.predict(img);
+                if (collectMemory) {
+                    MemoryUtils.collectMemoryInfo(metrics);
+                }
             }
             return result;
         }
