@@ -80,14 +80,14 @@ task checkHeaderFile() {
     checkForUpdate("mxnet/c_api.h", "${mxnetUrl}/include/mxnet/c_api.h")
     def content = new URL("https://github.com/apache/incubator-mxnet/tree/master/3rdparty").text
 
-    Pattern pattern = Pattern.compile("href=\"/dmlc/tvm/tree/([a-z0-9]+)\"")
+    Pattern pattern = Pattern.compile("href=\"/apache/incubator-tvm/tree/([a-z0-9]+)\"")
     Matcher m = pattern.matcher(content);
     if (!m.find()) {
         throw new GradleException("Failed to retrieve submodule hash for tvm from github")
     }
     String hash = m.group(1);
 
-    def nnvmUrl = "https://raw.githubusercontent.com/dmlc/tvm/${hash}"
+    def nnvmUrl = "https://raw.githubusercontent.com/apache/incubator-tvm/${hash}"
     checkForUpdate("nnvm/c_api.h", "${nnvmUrl}/nnvm/include/nnvm/c_api.h")
 }
 
