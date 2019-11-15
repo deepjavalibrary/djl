@@ -83,7 +83,7 @@ public class TopKAccuracy extends Accuracy {
             IntStream.range(0, topK)
                     .forEach(
                             j -> {
-                                // get from last index as argsort is ascending
+                                // get from last index as argSort is ascending
                                 NDArray jPrediction =
                                         topKPrediction.get(":, " + (numClasses - j - 1));
                                 // TODO replace nonzero with sum

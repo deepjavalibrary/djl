@@ -314,7 +314,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
-    public void testArgsort() {
+    public void testArgSort() {
         // TODO switch to numpy argsort
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {-1f, 2f, 0f, 999f, -998f});
@@ -656,7 +656,7 @@ public class NDArrayOtherOpTest {
     }
 
     @Test(expectedExceptions = EngineException.class)
-    public void testArgmax() {
+    public void testArgMax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array =
                     manager.create(
@@ -665,17 +665,17 @@ public class NDArrayOtherOpTest {
                                 3
                             },
                             new Shape(4, 5));
-            NDArray argmax = array.argMax();
+            NDArray argMax = array.argMax();
             NDArray actual = manager.create(9f);
-            Assert.assertEquals(actual, argmax, "Argmax: Incorrect value");
+            Assert.assertEquals(actual, argMax, "Argmax: Incorrect value");
 
-            argmax = array.argMax(0);
+            argMax = array.argMax(0);
             actual = manager.create(new float[] {2, 2, 2, 1, 1});
-            Assert.assertEquals(actual, argmax, "Argmax: Incorrect value");
+            Assert.assertEquals(actual, argMax, "Argmax: Incorrect value");
 
-            argmax = array.argMax(1);
+            argMax = array.argMax(1);
             actual = manager.create(new float[] {3, 4, 0, 2});
-            Assert.assertEquals(actual, argmax, "Argmax: Incorrect value");
+            Assert.assertEquals(actual, argMax, "Argmax: Incorrect value");
 
             // scalar
             array = manager.create(5f);
@@ -688,12 +688,12 @@ public class NDArrayOtherOpTest {
             // TODO MXNet engine crash
             // zero-dim
             // array = manager.create(new Shape(2, 0, 1));
-            // array.argmax();
+            // array.argMax();
         }
     }
 
     @Test
-    public void testArgmin() {
+    public void testArgMin() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array =
                     manager.create(
@@ -702,28 +702,28 @@ public class NDArrayOtherOpTest {
                                 -54, 4, 3
                             },
                             new Shape(4, 5));
-            NDArray argmin = array.argMin();
+            NDArray argMin = array.argMin();
             NDArray actual = manager.create(8f);
-            Assert.assertEquals(actual, argmin, "Argmin: Incorrect value");
+            Assert.assertEquals(actual, argMin, "ArgMin: Incorrect value");
 
-            argmin = array.argMin(0);
+            argMin = array.argMin(0);
             actual = manager.create(new float[] {0, 2, 3, 1, 2});
-            Assert.assertEquals(actual, argmin, "Argmin: Incorrect value");
+            Assert.assertEquals(actual, argMin, "ArgMin: Incorrect value");
 
-            argmin = array.argMin(1);
+            argMin = array.argMin(1);
             actual = manager.create(new float[] {0, 3, 4, 2});
-            Assert.assertEquals(actual, argmin, "Argmin: Incorrect value");
+            Assert.assertEquals(actual, argMin, "ArgMin: Incorrect value");
 
             // scalar
             array = manager.create(1f);
             actual = manager.create(0f);
-            Assert.assertEquals(actual, array.argMin(), "Argmin: Incorrect value");
-            Assert.assertEquals(actual, array.argMin(0), "Argmin: Incorrect value");
+            Assert.assertEquals(actual, array.argMin(), "ArgMin: Incorrect value");
+            Assert.assertEquals(actual, array.argMin(0), "ArgMin: Incorrect value");
 
             // zero-dim
             array = manager.create(new Shape(0, 1, 0));
             actual = manager.create(new Shape(0, 0));
-            Assert.assertEquals(actual, array.argMin(1), "Argmin: Incorrect value");
+            Assert.assertEquals(actual, array.argMin(1), "ArgMin: Incorrect value");
         }
     }
 }

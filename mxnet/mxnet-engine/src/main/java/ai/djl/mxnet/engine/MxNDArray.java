@@ -1489,7 +1489,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray argMin() {
         // TODO switch to MXNet numpy argmin
         if (isEmpty()) {
-            throw new IllegalArgumentException("attempt to get argmin of an empty NDArray");
+            throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");
         }
         NDArray array = (isScalar()) ? reshape(1) : this;
         try (NDArray temp = manager.invoke("argmin", array, null)) {
