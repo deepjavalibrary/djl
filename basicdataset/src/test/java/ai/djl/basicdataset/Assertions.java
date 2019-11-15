@@ -66,7 +66,7 @@ public final class Assertions {
      */
     public static void assertAlmostEquals(
             NDArray actual, NDArray expected, double rtol, double atol) {
-        if (!actual.allclose(expected, rtol, atol, false)) {
+        if (!actual.allClose(expected, rtol, atol, false)) {
             throw new AssertionError(getDefaultErrorMessage(actual, expected));
         }
     }

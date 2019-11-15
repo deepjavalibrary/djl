@@ -767,19 +767,19 @@ public interface NDArray extends AutoCloseable {
      * <pre>
      * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-7});
      * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-8});
-     * jshell&gt; array1.allclose(array2); // return false instead of boolean NDArray
+     * jshell&gt; array1.allClose(array2); // return false instead of boolean NDArray
      * false
      * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-8});
      * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-9});
-     * jshell&gt; array1.allclose(array2); // return true instead of boolean NDArray
+     * jshell&gt; array1.allClose(array2); // return true instead of boolean NDArray
      * true
      * </pre>
      *
      * @param other the {@code NDArray} to compare with
      * @return the boolean result
      */
-    default boolean allclose(NDArray other) {
-        return allclose(other, 1e-5, 1e-08, false);
+    default boolean allClose(NDArray other) {
+        return allClose(other, 1e-5, 1e-08, false);
     }
 
     /**
@@ -809,7 +809,7 @@ public interface NDArray extends AutoCloseable {
      *     NDArray} will be considered equal to NaN’s in the other {@code NDArray}
      * @return the boolean result
      */
-    default boolean allclose(NDArray other, double rtol, double atol, boolean equalNan) {
+    default boolean allClose(NDArray other, double rtol, double atol, boolean equalNan) {
         if (!shapeEquals(other)) {
             return false;
         }
@@ -2262,10 +2262,10 @@ public interface NDArray extends AutoCloseable {
      *
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
      *     axis, the output DataType is always {@link DataType#INT32}
-     * @see NDArray#argsort(int, boolean)
+     * @see NDArray#argSort(int, boolean)
      */
-    default NDArray argsort() {
-        return argsort(-1, true);
+    default NDArray argSort() {
+        return argSort(-1, true);
     }
 
     /**
@@ -2274,10 +2274,10 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis to sort along
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
      *     axis, the output DataType is always {@link DataType#INT32}
-     * @see NDArray#argsort(int, boolean)
+     * @see NDArray#argSort(int, boolean)
      */
-    default NDArray argsort(int axis) {
-        return argsort(axis, true);
+    default NDArray argSort(int axis) {
+        return argSort(axis, true);
     }
 
     /**
@@ -2288,7 +2288,7 @@ public interface NDArray extends AutoCloseable {
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
      *     axis, the output DataType is always {@link DataType#INT32}
      */
-    NDArray argsort(int axis, boolean ascending);
+    NDArray argSort(int axis, boolean ascending);
 
     /**
      * Sorts this {@code NDArray} along the given axis.
@@ -2360,14 +2360,14 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which the cumulative sum is computed
      * @return the cumulative sum along the specified axis
      */
-    NDArray cumsum(int axis);
+    NDArray cumSum(int axis);
 
     /**
      * Returns the cumulative sum of the elements in the flattened {@code NDArray}.
      *
      * @return the cumulative sum of the elements in the flattened {@code NDArray}
      */
-    NDArray cumsum();
+    NDArray cumSum();
 
     /**
      * Return the cumulative sum of the elements along a given axis in place.
@@ -2375,14 +2375,14 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which the cumulative sum is computed
      * @return the cumulative sum along the specified axis
      */
-    NDArray cumsumi(int axis);
+    NDArray cumSumi(int axis);
 
     /**
      * Returns the cumulative sum of the elements in the flattened {@code NDArray} in place.
      *
      * @return the cumulative sum of the elements in the flattened {@code NDArray}
      */
-    NDArray cumsumi();
+    NDArray cumSumi();
 
     /**
      * Returns the boolean {@code NDArray} with value {@code true} where this {@code NDArray}'s
@@ -2540,7 +2540,7 @@ public interface NDArray extends AutoCloseable {
      * @param axis2 the second axis
      * @return the swapped axes {@code NDArray}
      */
-    default NDArray swapaxes(int axis1, int axis2) {
+    default NDArray swapAxes(int axis1, int axis2) {
         int[] dims = IntStream.range(0, getShape().dimension()).toArray();
         int tmp = dims[axis1];
         dims[axis1] = dims[axis2];
@@ -2588,7 +2588,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return a {@code NDArray} containing indices
      */
-    NDArray argmax();
+    NDArray argMax();
 
     /**
      * Returns the indices of the maximum values along given axis.
@@ -2596,14 +2596,14 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which to find maximum values
      * @return a {@code NDArray} containing indices
      */
-    NDArray argmax(int axis);
+    NDArray argMax(int axis);
 
     /**
      * Returns the indices of the minimum values into the flattened {@code NDArray}.
      *
      * @return a {@code NDArray} containing indices
      */
-    NDArray argmin();
+    NDArray argMin();
 
     /**
      * Returns the indices of the minimum values along given axis.
@@ -2611,7 +2611,7 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which to find minimum values
      * @return a {@code NDArray} containing indices
      */
-    NDArray argmin(int axis);
+    NDArray argMin(int axis);
 
     /**
      * Returns percentile for this {@code NDArray}.

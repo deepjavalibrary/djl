@@ -89,7 +89,7 @@ public final class NDArrays {
      * @return the boolean result
      */
     public static boolean allClose(NDArray a, NDArray b) {
-        return a.allclose(b);
+        return a.allClose(b);
     }
 
     /**
@@ -105,7 +105,7 @@ public final class NDArrays {
      */
     public static boolean allClose(
             NDArray a, NDArray b, double rtol, double atol, boolean equalNan) {
-        return a.allclose(b, rtol, atol, equalNan);
+        return a.allClose(b, rtol, atol, equalNan);
     }
 
     /**

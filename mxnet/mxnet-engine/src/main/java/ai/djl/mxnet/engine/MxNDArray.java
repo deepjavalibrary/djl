@@ -1190,7 +1190,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argsort(int axis, boolean ascending) {
+    public NDArray argSort(int axis, boolean ascending) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         // be careful that MXNet numpy argsort op didn't officially support this param
@@ -1259,7 +1259,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi(int axis) {
+    public NDArray cumSumi(int axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         params.setDataType(getDataType());
@@ -1269,14 +1269,14 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi() {
+    public NDArray cumSumi() {
         manager.invoke("_np_cumsum", new NDArray[] {this}, new NDArray[] {this}, null);
         return this;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum(int axis) {
+    public NDArray cumSum(int axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         params.setDataType(getDataType());
@@ -1285,7 +1285,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum() {
+    public NDArray cumSum() {
         return manager.invoke("_np_cumsum", this, null);
     }
 
@@ -1430,7 +1430,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapaxes(int axis1, int axis2) {
+    public NDArray swapAxes(int axis1, int axis2) {
         MxOpParams params = new MxOpParams();
         params.addParam("dim1", axis1);
         params.addParam("dim2", axis2);
@@ -1472,13 +1472,13 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmax() {
+    public NDArray argMax() {
         return manager.invoke("_npi_argmax", this, null);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmax(int axis) {
+    public NDArray argMax(int axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         return manager.invoke("_npi_argmax", this, params);
@@ -1486,7 +1486,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmin() {
+    public NDArray argMin() {
         // TODO switch to MXNet numpy argmin
         if (isEmpty()) {
             throw new IllegalArgumentException("attempt to get argmin of an empty NDArray");
@@ -1499,7 +1499,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmin(int axis) {
+    public NDArray argMin(int axis) {
         // TODO switch to MXNet numpy argmin
         NDArray array = (isScalar()) ? reshape(1) : this;
         MxOpParams params = new MxOpParams();

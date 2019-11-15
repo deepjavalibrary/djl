@@ -73,7 +73,7 @@ public class TopKAccuracy extends Accuracy {
             throw new IllegalStateException("Prediction should be less than 2 dimensions");
         }
         // ascending by default
-        NDArray topKPrediction = predictions.argsort(axis);
+        NDArray topKPrediction = predictions.argSort(axis);
         int numDims = topKPrediction.getShape().dimension();
         if (numDims == 1) {
             addCorrectInstances(topKPrediction.flatten().eq(labels.flatten()).countNonzero());

@@ -444,8 +444,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public boolean allclose(NDArray other, double rtol, double atol, boolean equalNan) {
-        return array.allclose(other, rtol, atol, equalNan);
+    public boolean allClose(NDArray other, double rtol, double atol, boolean equalNan) {
+        return array.allClose(other, rtol, atol, equalNan);
     }
 
     /** {@inheritDoc} */
@@ -990,8 +990,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argsort(int axis, boolean ascending) {
-        return array.argsort(axis, ascending);
+    public NDArray argSort(int axis, boolean ascending) {
+        return array.argSort(axis, ascending);
     }
 
     /** {@inheritDoc} */
@@ -1014,26 +1014,26 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi(int axis) {
-        return array.cumsumi(axis);
+    public NDArray cumSumi(int axis) {
+        return array.cumSumi(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi() {
-        return array.cumsumi();
+    public NDArray cumSumi() {
+        return array.cumSumi();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum(int axis) {
-        return array.cumsum(axis);
+    public NDArray cumSum(int axis) {
+        return array.cumSum(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum() {
-        return array.cumsum();
+    public NDArray cumSum() {
+        return array.cumSum();
     }
 
     /** {@inheritDoc} */
@@ -1122,8 +1122,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapaxes(int axis1, int axis2) {
-        return array.swapaxes(axis1, axis2);
+    public NDArray swapAxes(int axis1, int axis2) {
+        return array.swapAxes(axis1, axis2);
     }
 
     /** {@inheritDoc} */
@@ -1152,26 +1152,26 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmax() {
-        return array.argmax();
+    public NDArray argMax() {
+        return array.argMax();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmax(int axis) {
-        return array.argmax(axis);
+    public NDArray argMax(int axis) {
+        return array.argMax(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmin() {
-        return array.argmin();
+    public NDArray argMin() {
+        return array.argMin();
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmin(int axis) {
-        return array.argmin(axis);
+    public NDArray argMin(int axis) {
+        return array.argMin(axis);
     }
 
     /** {@inheritDoc} */

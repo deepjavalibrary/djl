@@ -816,7 +816,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argsort(int axis, boolean ascending) {
+    public NDArray argSort(int axis, boolean ascending) {
         return null;
     }
 
@@ -840,25 +840,25 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi(int axis) {
+    public NDArray cumSumi(int axis) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsumi() {
+    public NDArray cumSumi() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum(int axis) {
+    public NDArray cumSum(int axis) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumsum() {
+    public NDArray cumSum() {
         return null;
     }
 
@@ -960,7 +960,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapaxes(int axis1, int axis2) {
+    public NDArray swapAxes(int axis1, int axis2) {
         return null;
     }
 
@@ -990,25 +990,25 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmax() {
+    public NDArray argMax() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmax(int axis) {
+    public NDArray argMax(int axis) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmin() {
+    public NDArray argMin() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argmin(int axis) {
+    public NDArray argMin(int axis) {
         return null;
     }
 

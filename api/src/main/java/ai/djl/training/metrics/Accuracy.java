@@ -75,7 +75,7 @@ public class Accuracy extends TrainingMetric {
         checkLabelShapes(labels, predictions);
         NDArray predictionReduced;
         if (!labels.getShape().equals(predictions.getShape())) {
-            predictionReduced = predictions.argmax(axis);
+            predictionReduced = predictions.argMax(axis);
         } else {
             predictionReduced = predictions;
         }

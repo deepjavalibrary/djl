@@ -146,7 +146,7 @@ public final class TrainPikachu extends AbstractTraining {
                             classEval =
                                     classEval
                                             + pred[i].get(0)
-                                                    .argmax(-1)
+                                                    .argMax(-1)
                                                     .eq(classLabels[i])
                                                     .sum()
                                                     .toFloatArray()[0];

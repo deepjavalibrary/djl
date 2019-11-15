@@ -319,22 +319,22 @@ public class NDArrayOtherOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {-1f, 2f, 0f, 999f, -998f});
             NDArray actual = manager.create(new int[] {4, 0, 2, 1, 3});
-            Assert.assertEquals(actual, array.argsort());
+            Assert.assertEquals(actual, array.argSort());
             // multi-dim
             array =
                     manager.create(
                             new float[] {-1.000f, -0.009f, -0.0001f, 0.0001f, 0.12f, 0.1201f},
                             new Shape(2, 1, 1, 3, 1));
             actual = manager.zeros(new Shape(2, 1, 1, 3, 1), DataType.INT32);
-            Assert.assertEquals(actual, array.argsort());
+            Assert.assertEquals(actual, array.argSort());
             // test axis
             array = manager.arange(10).reshape(2, 1, 5);
             actual = manager.create(new int[] {0, 0, 0, 0, 0, 1, 1, 1, 1, 1}, new Shape(2, 1, 5));
-            Assert.assertEquals(actual, array.argsort(0));
+            Assert.assertEquals(actual, array.argSort(0));
             actual = manager.zeros(new Shape(2, 1, 5), DataType.INT32);
-            Assert.assertEquals(actual, array.argsort(1));
+            Assert.assertEquals(actual, array.argSort(1));
             actual = manager.create(new int[] {0, 1, 2, 3, 4, 0, 1, 2, 3, 4}, new Shape(2, 1, 5));
-            Assert.assertEquals(actual, array.argsort(2));
+            Assert.assertEquals(actual, array.argSort(2));
         }
     }
 
@@ -419,13 +419,13 @@ public class NDArrayOtherOpTest {
             NDArray array = manager.arange(10);
             NDArray actual =
                     manager.create(new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f});
-            Assert.assertEquals(actual, array.cumsum());
-            Assertions.assertInPlaceEquals(actual, array.cumsumi(), array);
+            Assert.assertEquals(actual, array.cumSum());
+            Assertions.assertInPlaceEquals(actual, array.cumSumi(), array);
 
             array = manager.create(new float[] {1f, 2f, 3f, 5f, 8f, 13f});
             actual = manager.create(new float[] {1f, 3f, 6f, 11f, 19f, 32f});
-            Assert.assertEquals(actual, array.cumsum(0));
-            Assertions.assertInPlaceEquals(actual, array.cumsumi(0), array);
+            Assert.assertEquals(actual, array.cumSum(0));
+            Assertions.assertInPlaceEquals(actual, array.cumSumi(0), array);
 
             // test multi-dim
             array = manager.arange(10).reshape(2, 1, 5, 1);
@@ -433,42 +433,42 @@ public class NDArrayOtherOpTest {
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 7f, 9f, 11f, 13f},
                             new Shape(2, 1, 5, 1));
-            Assert.assertEquals(actual, array.cumsum(0));
-            Assertions.assertInPlaceEquals(actual, array.cumsumi(0), array);
+            Assert.assertEquals(actual, array.cumSum(0));
+            Assertions.assertInPlaceEquals(actual, array.cumSumi(0), array);
 
             array = manager.arange(10).reshape(2, 1, 5, 1);
             actual =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
                             new Shape(2, 1, 5, 1));
-            Assert.assertEquals(actual, array.cumsum(1));
-            Assertions.assertInPlaceEquals(actual, array.cumsumi(1), array);
+            Assert.assertEquals(actual, array.cumSum(1));
+            Assertions.assertInPlaceEquals(actual, array.cumSumi(1), array);
 
             array = manager.arange(10).reshape(2, 1, 5, 1);
             actual =
                     manager.create(
                             new float[] {0f, 1f, 3f, 6f, 10f, 5f, 11f, 18f, 26f, 35f},
                             new Shape(2, 1, 5, 1));
-            Assert.assertEquals(actual, array.cumsum(2));
-            Assertions.assertInPlaceEquals(actual, array.cumsumi(2), array);
+            Assert.assertEquals(actual, array.cumSum(2));
+            Assertions.assertInPlaceEquals(actual, array.cumSumi(2), array);
 
             array = manager.arange(10).reshape(2, 1, 5, 1);
             actual =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
                             new Shape(2, 1, 5, 1));
-            Assert.assertEquals(actual, array.cumsum(3));
-            Assertions.assertInPlaceEquals(actual, array.cumsumi(3), array);
+            Assert.assertEquals(actual, array.cumSum(3));
+            Assertions.assertInPlaceEquals(actual, array.cumSumi(3), array);
 
             // Note that shape after cumsum op with zero-dim and scalar case change
             // test scalar
             array = manager.create(1f);
             actual = manager.create(new float[] {1f});
-            Assert.assertEquals(actual, array.cumsum());
+            Assert.assertEquals(actual, array.cumSum());
             // test zero-dim
             array = manager.create(new Shape(2, 0));
             actual = manager.create(new Shape(0));
-            Assert.assertEquals(actual, array.cumsum());
+            Assert.assertEquals(actual, array.cumSum());
         }
     }
 
@@ -586,7 +586,7 @@ public class NDArrayOtherOpTest {
             NDArray array = manager.arange(10).reshape(new Shape(2, 5));
             NDArray actual =
                     manager.create(new float[] {0, 5, 1, 6, 2, 7, 3, 8, 4, 9}, new Shape(5, 2));
-            Assert.assertEquals(actual, array.swapaxes(0, 1));
+            Assert.assertEquals(actual, array.swapAxes(0, 1));
 
             // TODO MXNet engine crash
             // scalar
@@ -596,7 +596,7 @@ public class NDArrayOtherOpTest {
             // test zero-dim
             array = manager.create(new Shape(2, 0));
             actual = manager.create(new Shape(0, 2));
-            Assert.assertEquals(actual, array.swapaxes(0, 1));
+            Assert.assertEquals(actual, array.swapAxes(0, 1));
         }
     }
 
@@ -613,7 +613,7 @@ public class NDArrayOtherOpTest {
             NDArray transpose = original.transpose(1, 0, 2);
             NDArray transposeActual = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 1, 2));
             Assert.assertEquals(transposeActual, transpose, "Incorrect transpose all");
-            Assert.assertEquals(transposeActual, original.swapaxes(0, 1), "Incorrect swap axes");
+            Assert.assertEquals(transposeActual, original.swapAxes(0, 1), "Incorrect swap axes");
 
             // scalar
             original = manager.create(5f);
@@ -665,15 +665,15 @@ public class NDArrayOtherOpTest {
                                 3
                             },
                             new Shape(4, 5));
-            NDArray argmax = array.argmax();
+            NDArray argmax = array.argMax();
             NDArray actual = manager.create(9f);
             Assert.assertEquals(actual, argmax, "Argmax: Incorrect value");
 
-            argmax = array.argmax(0);
+            argmax = array.argMax(0);
             actual = manager.create(new float[] {2, 2, 2, 1, 1});
             Assert.assertEquals(actual, argmax, "Argmax: Incorrect value");
 
-            argmax = array.argmax(1);
+            argmax = array.argMax(1);
             actual = manager.create(new float[] {3, 4, 0, 2});
             Assert.assertEquals(actual, argmax, "Argmax: Incorrect value");
 
@@ -682,8 +682,8 @@ public class NDArrayOtherOpTest {
             // TODO the dtype should be int instead of float
             // Bug in MXNet to fix
             actual = manager.create(0f);
-            Assert.assertEquals(actual, array.argmax());
-            Assert.assertEquals(actual, array.argmax(0));
+            Assert.assertEquals(actual, array.argMax());
+            Assert.assertEquals(actual, array.argMax(0));
 
             // TODO MXNet engine crash
             // zero-dim
@@ -702,28 +702,28 @@ public class NDArrayOtherOpTest {
                                 -54, 4, 3
                             },
                             new Shape(4, 5));
-            NDArray argmin = array.argmin();
+            NDArray argmin = array.argMin();
             NDArray actual = manager.create(8f);
             Assert.assertEquals(actual, argmin, "Argmin: Incorrect value");
 
-            argmin = array.argmin(0);
+            argmin = array.argMin(0);
             actual = manager.create(new float[] {0, 2, 3, 1, 2});
             Assert.assertEquals(actual, argmin, "Argmin: Incorrect value");
 
-            argmin = array.argmin(1);
+            argmin = array.argMin(1);
             actual = manager.create(new float[] {0, 3, 4, 2});
             Assert.assertEquals(actual, argmin, "Argmin: Incorrect value");
 
             // scalar
             array = manager.create(1f);
             actual = manager.create(0f);
-            Assert.assertEquals(actual, array.argmin(), "Argmin: Incorrect value");
-            Assert.assertEquals(actual, array.argmin(0), "Argmin: Incorrect value");
+            Assert.assertEquals(actual, array.argMin(), "Argmin: Incorrect value");
+            Assert.assertEquals(actual, array.argMin(0), "Argmin: Incorrect value");
 
             // zero-dim
             array = manager.create(new Shape(0, 1, 0));
             actual = manager.create(new Shape(0, 0));
-            Assert.assertEquals(actual, array.argmin(1), "Argmin: Incorrect value");
+            Assert.assertEquals(actual, array.argMin(1), "Argmin: Incorrect value");
         }
     }
 }
