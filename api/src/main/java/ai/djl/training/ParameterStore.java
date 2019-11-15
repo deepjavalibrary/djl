@@ -18,6 +18,8 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Parameter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -53,7 +55,11 @@ public class ParameterStore {
             String parameterId = entry.getKey();
             ParameterData data = entry.getValue();
             if (data.requireGradient()) {
-                NDArray[] grads = data.stream().map(NDArray::getGradient).toArray(NDArray[]::new);
+                NDArray[] grads =
+                        data.getNDArrays()
+                                .stream()
+                                .map(NDArray::getGradient)
+                                .toArray(NDArray[]::new);
                 parameterServer.push(parameterId, grads, -priority);
                 ++priority;
             }
@@ -64,7 +70,7 @@ public class ParameterStore {
             String parameterId = entry.getKey();
             ParameterData data = entry.getValue();
             if (data.requireGradient()) {
-                NDArray[] values = data.toArray(new NDArray[0]);
+                NDArray[] values = data.toArray();
                 parameterServer.pull(parameterId, values, -priority);
                 ++priority;
             }
@@ -115,14 +121,34 @@ public class ParameterStore {
         }
     }
 
-    private final class ParameterData extends ArrayList<NDArray> {
-
-        private static final long serialVersionUID = 1L;
+    private final class ParameterData {
 
         private Parameter parameter;
+        private List<NDArray> list;
 
         public ParameterData(Parameter parameter) {
             this.parameter = parameter;
+            list = Collections.synchronizedList(new ArrayList<>());
+        }
+
+        public List<NDArray> getNDArrays() {
+            return list;
+        }
+
+        public boolean isEmpty() {
+            return list.isEmpty();
+        }
+
+        public void add(NDArray array) {
+            list.add(array);
+        }
+
+        public NDArray get(int index) {
+            return list.get(index);
+        }
+
+        public NDArray[] toArray() {
+            return list.toArray(new NDArray[0]);
         }
 
         public boolean requireGradient() {
@@ -134,7 +160,7 @@ public class ParameterStore {
             Device device = array.getDevice();
             if (!deviceMap.containsKey(device)) {
                 // model's parameters maybe loaded on different device than any of training devices.
-                get(0).copyTo(array);
+                list.get(0).copyTo(array);
             }
         }
     }
