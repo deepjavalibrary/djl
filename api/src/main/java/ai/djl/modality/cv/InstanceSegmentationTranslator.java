@@ -10,13 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.zoo.cv.segmentation;
+package ai.djl.modality.cv;
 
 import ai.djl.Model;
-import ai.djl.modality.cv.BoundingBox;
-import ai.djl.modality.cv.DetectedObjects;
-import ai.djl.modality.cv.ImageTranslator;
-import ai.djl.modality.cv.Mask;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -30,7 +26,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** The translator for {@link InstanceSegmentationModelLoader}. */
+/**
+ * A {@link ImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects} with
+ * boundaries at the detailed pixel level.
+ */
 public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObjects>
         implements Transform {
 

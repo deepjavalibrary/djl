@@ -13,6 +13,7 @@
 package ai.djl.mxnet.zoo.cv.segmentation;
 
 import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.modality.cv.InstanceSegmentationTranslator;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;

@@ -10,10 +10,8 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.zoo.cv.poseestimation;
+package ai.djl.modality.cv;
 
-import ai.djl.modality.cv.ImageTranslator;
-import ai.djl.modality.cv.Joints;
 import ai.djl.modality.cv.Joints.Joint;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -24,7 +22,7 @@ import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
 
-/** The translator for Pose Estimation {@link SimplePoseModelLoader}. */
+/** A {@link ImageTranslator} that post-process the {@link NDArray} into human {@link Joints}. */
 public class SimplePoseTranslator extends ImageTranslator<Joints> {
 
     private float threshold;

@@ -13,6 +13,7 @@
 package ai.djl.mxnet.zoo.cv.objectdetection;
 
 import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.modality.cv.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;

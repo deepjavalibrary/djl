@@ -13,6 +13,7 @@
 package ai.djl.mxnet.zoo.cv.poseestimation;
 
 import ai.djl.modality.cv.Joints;
+import ai.djl.modality.cv.SimplePoseTranslator;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
