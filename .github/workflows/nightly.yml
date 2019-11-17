@@ -1,6 +1,8 @@
-name: DJL continuous build
+name: DJL nightly CI
 
-on: [push, pull_request]
+on:
+  schedule:
+    - cron:  '0 10 * * *'
 
 jobs:
   build:
@@ -13,7 +15,9 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew -Dnightly=true build
+    - name: Publish to staging
+      run: ./gradlew pubish -PpublishTo=local
     - name: API test results
       uses: actions/upload-artifact@v1
       if: always()
