@@ -1,4 +1,4 @@
-name: DJL continuous build
+name: continuous build
 
 on: [push, pull_request]
 

@@ -1,4 +1,4 @@
-name: DJL nightly CI
+name: nightly build
 
 on:
   schedule:
