@@ -27,7 +27,7 @@ task javadocJar(type: Jar) {
 
 
 def flavorNames = file("src/main/resources/binaries").list() ?: []
-flavorNames.each{ flavor ->
+flavorNames.each { flavor ->
 
     def platformNames = file("src/main/resources/binaries/${flavor}").list() ?: []
 

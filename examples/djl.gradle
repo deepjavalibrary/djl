@@ -17,17 +17,17 @@ repositories {
 def classifier = getClassifier()
 
 dependencies {
-    compile "commons-cli:commons-cli:${commons_cli_version}"
-    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
-    compile "com.google.code.gson:gson:${gson_version}"
-    compile project(":api")
-    compile project(":basicdataset")
-    compile project(":model-zoo")
-    compile project(":mxnet:mxnet-model-zoo")
+    implementation "commons-cli:commons-cli:${commons_cli_version}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
+    implementation "com.google.code.gson:gson:${gson_version}"
+    implementation project(":api")
+    implementation project(":basicdataset")
+    implementation project(":model-zoo")
+    implementation project(":mxnet:mxnet-model-zoo")
 
-    runtime "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
+    runtimeOnly "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
 
-    testCompile("org.testng:testng:${testng_version}") {
+    testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
 }

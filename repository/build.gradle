@@ -4,14 +4,14 @@ plugins {
 }
 
 dependencies {
-    compile "org.slf4j:slf4j-api:${slf4j_version}"
-    compile "com.google.code.gson:gson:${gson_version}"
-    compile project(":api")
+    api "org.slf4j:slf4j-api:${slf4j_version}"
+    api "com.google.code.gson:gson:${gson_version}"
+    api project(":api")
 
-    testCompile ("org.testng:testng:${testng_version}") {
+    testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
-    testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 
 task sourcesJar(type: Jar) {

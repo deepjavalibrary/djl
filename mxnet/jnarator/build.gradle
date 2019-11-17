@@ -5,11 +5,11 @@ plugins {
 dependencies {
     antlr "org.antlr:antlr4:${antlr_version}"
 
-    compile "commons-cli:commons-cli:${commons_cli_version}"
-    compile "org.antlr:antlr4-runtime:${antlr_version}"
-    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
+    api "commons-cli:commons-cli:${commons_cli_version}"
+    api "org.antlr:antlr4-runtime:${antlr_version}"
+    api "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
 
-    testCompile ("org.testng:testng:${testng_version}") {
+    testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
 }
@@ -22,5 +22,5 @@ jar {
         attributes 'Main-Class': 'ai.djl.mxnet.jnarator.Main'
     }
     includeEmptyDirs = false
-    from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 }

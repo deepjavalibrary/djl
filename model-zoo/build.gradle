@@ -4,13 +4,12 @@ plugins {
 }
 
 dependencies {
-    compile project(":api")
-    compile project(":repository")
+    api project(":repository")
 
-    testCompile ("org.testng:testng:${testng_version}") {
+    testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
-    testCompile "org.slf4j:slf4j-simple:${slf4j_version}"
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 
 task sourcesJar(type: Jar) {
@@ -30,7 +29,7 @@ if (shouldSign()) {
     }
 }
 
-task syncS3(type:Exec) {
+task syncS3(type: Exec) {
     commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync src/test/resources/mlrepo s3://djl-ai/mlrepo --acl public-read"
 
     standardOutput = new ByteArrayOutputStream()
