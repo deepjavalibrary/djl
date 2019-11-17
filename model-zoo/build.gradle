@@ -12,16 +12,6 @@ dependencies {
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    archiveClassifier = 'sources'
-}
-
-task javadocJar(type: Jar) {
-    from javadoc
-    archiveClassifier = 'javadoc'
-}
-
 task syncS3(type: Exec) {
     commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync src/test/resources/mlrepo s3://djl-ai/mlrepo --acl public-read"
 

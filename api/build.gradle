@@ -21,16 +21,6 @@ javadoc {
     options.overview "src/main/javadoc/overview.html"
 }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    archiveClassifier = 'sources'
-}
-
-task javadocJar(type: Jar) {
-    from javadoc
-    archiveClassifier = 'javadoc'
-}
-
 publishing {
     publications {
         maven(MavenPublication) {

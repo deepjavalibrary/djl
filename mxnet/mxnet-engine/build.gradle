@@ -94,16 +94,6 @@ task checkHeaderFile() {
 compileJava.dependsOn(jnarator)
 check.dependsOn checkHeaderFile
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    archiveClassifier = 'sources'
-}
-
-task javadocJar(type: Jar) {
-    from javadoc
-    archiveClassifier = 'javadoc'
-}
-
 publishing {
     publications {
         maven(MavenPublication) {

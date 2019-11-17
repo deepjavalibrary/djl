@@ -15,17 +15,6 @@ tasks.create(name: "PlaceholderJar", type: Jar) {
     archiveClassifier = ""
 }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    archiveClassifier = 'sources'
-}
-
-task javadocJar(type: Jar) {
-    from javadoc
-    archiveClassifier = 'javadoc'
-}
-
-
 def flavorNames = file("src/main/resources/binaries").list() ?: []
 flavorNames.each { flavor ->
 
