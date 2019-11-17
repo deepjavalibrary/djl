@@ -23,6 +23,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -49,7 +50,7 @@ public class MxNDManager implements NDManager {
     private NDManager parent;
     private String uid;
     private Device device;
-    private Map<String, WeakReference<AutoCloseable>> resources;
+    private Map<String, Reference<AutoCloseable>> resources;
     private AtomicBoolean closed = new AtomicBoolean(false);
 
     private MxNDManager(NDManager parent, Device device) {
@@ -408,7 +409,7 @@ public class MxNDManager implements NDManager {
     @Override
     public synchronized void close() {
         if (!closed.getAndSet(true)) {
-            for (WeakReference<AutoCloseable> resource : resources.values()) {
+            for (Reference<AutoCloseable> resource : resources.values()) {
                 AutoCloseable closeable = resource.get();
                 if (closeable != null) {
                     try {
@@ -420,6 +421,25 @@ public class MxNDManager implements NDManager {
             }
             parent.detach(uid);
             resources.clear();
+        }
+    }
+
+    public void debugDump(int level) {
+        StringBuilder sb = new StringBuilder(100);
+        for (int i = 0; i < level; ++i) {
+            sb.append("    ");
+        }
+        sb.append("\\--- NDManager(")
+                .append(uid.substring(24))
+                .append(") resource count: ")
+                .append(resources.size());
+
+        System.out.println(sb.toString()); // NOPMD
+        for (Reference<AutoCloseable> ref : resources.values()) {
+            AutoCloseable c = ref.get();
+            if (c instanceof MxNDManager) {
+                ((MxNDManager) c).debugDump(level + 1);
+            }
         }
     }
 
