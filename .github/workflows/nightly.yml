@@ -16,8 +16,8 @@ jobs:
         java-version: 1.8
     - name: Build with Gradle
       run: ./gradlew -Dnightly=true build
-    - name: Publish to staging
-      run: ./gradlew pubish -PpublishTo=local
+    - name: Publish to snapshot repository
+      run: ./gradlew publish -PpublishTo=snapshot
     - name: API test results
       uses: actions/upload-artifact@v1
       if: always()
