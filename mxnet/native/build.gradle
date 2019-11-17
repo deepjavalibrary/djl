@@ -82,13 +82,6 @@ flavorNames.each { flavor ->
     }
 }
 
-if (shouldSign()) {
-    signing {
-        useGpgCmd()
-        sign publishing.publications
-    }
-}
-
 publishing.repositories {
     maven publishRepository()
 }

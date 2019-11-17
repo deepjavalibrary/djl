@@ -43,13 +43,6 @@ task javadocJar(type: Jar) {
     archiveClassifier = 'javadoc'
 }
 
-if (shouldSign()) {
-    signing {
-        useGpgCmd()
-        sign publishing.publications
-    }
-}
-
 publishing {
     publications {
         maven(MavenPublication) {

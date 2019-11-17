@@ -81,6 +81,23 @@ configure([project(':api'), project(':basicdataset'), project(':model-zoo'), pro
     }
 }
 
+subprojects {
+    plugins.withType(SigningPlugin.class) {
+        if (project.findProperty("publishTo") in ["staging", "snapshot", "local"]) {
+            signing {
+                def signingKey = findProperty("signingKey")
+                def signingPassword = findProperty("signingPassword")
+                useInMemoryPgpKeys(signingKey, signingPassword)
+                sign publishing.publications
+            }
+        }
+    }
+
+    project.tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
+}
+
 def getClassifier() {
     String osName = System.getProperty("os.name")
     String osPrefix;
@@ -96,12 +113,8 @@ def getClassifier() {
     return osPrefix + "-x86_64"
 }
 
-def shouldSign() {
-    return project.findProperty("publishTo") in ["staging", "snapshot"]
-}
-
 Closure publishRepository() {
-    def publishTo = project.findProperty("publishTo")
+    def publishTo = findProperty("publishTo")
 
     if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
         if (publishTo != null || gradle.startParameter.taskNames.contains("publish")) {
@@ -113,7 +126,7 @@ Closure publishRepository() {
     switch (publishTo) {
         case "local": return {
             name "local"
-            url project.rootProject.buildDir.toPath().resolve("repo").toAbsolutePath().toString()
+            url "build/repo"
         }
         case "S3": return {
             name = "s3"
@@ -126,16 +139,16 @@ Closure publishRepository() {
             name = "snapshot"
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
             credentials {
-                username = ossrhUsername
-                password = ossrhPassword
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
             }
         }
         case "staging": return {
             name = "staging"
             url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials {
-                username = ossrhUsername
-                password = ossrhPassword
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
             }
         }
         default:
