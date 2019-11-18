@@ -41,11 +41,10 @@ do the followings to prepare your package:
 
 ```bash
 cd mxnet/native
-./gradlew publish
-```
 
-Supported classifier names are:
-- osx-x86_64
-- win-x86_64
-- linux-x86_64
-- linux-arm
+# Publish to build/repo folder
+./gradlew publish
+
+# Publish to DJL s3 bucket
+./gradlew publish -Ps3
+```

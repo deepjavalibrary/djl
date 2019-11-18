@@ -1,8 +1,3 @@
-plugins {
-    id 'maven-publish'
-    id 'signing'
-}
-
 repositories {
     maven {
         url 'https://djl-ai.s3.amazonaws.com/dev'
@@ -30,25 +25,5 @@ task syncS3(type: Exec) {
     standardOutput = new ByteArrayOutputStream()
     ext.output = {
         return standardOutput.toString()
-    }
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId project.getGroup()
-            artifactId project.getName()
-            version rootProject.getVersion()
-            from components.java
-            artifacts = [jar, javadocJar, sourcesJar]
-            pom standardPom({
-                name = "Basic Dataset"
-                delegate.description = "Basic Dataset for DJL"
-                url = url.get() + "basicdataset"
-            })
-        }
-    }
-    repositories {
-        maven publishRepository()
     }
 }

@@ -4,8 +4,6 @@
 
 plugins {
     id 'application'
-    id 'maven-publish'
-    id 'signing'
 }
 
 repositories {
@@ -29,34 +27,6 @@ dependencies {
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
-    }
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId project.getGroup()
-            artifactId project.getName()
-            version rootProject.getVersion()
-            from components.java
-            artifacts = [jar, sourcesJar, javadocJar]
-            pom standardPom({
-                name = "Examples"
-                delegate.description = "Examples for DJL"
-                url = url.get() + "examples"
-            })
-            pom.withXml {
-                Node pomNode = asNode()
-                pomNode.dependencies.'*'.findAll() {
-                    it.artifactId.text() == 'mxnet-native-mkl'
-                }.each() {
-                    it.parent().remove(it)
-                }
-            }
-        }
-    }
-    repositories {
-        maven publishRepository()
     }
 }
 

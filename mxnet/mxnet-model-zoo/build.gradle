@@ -1,8 +1,3 @@
-plugins {
-    id 'maven-publish'
-    id 'signing'
-}
-
 group 'ai.djl.mxnet'
 
 dependencies {
@@ -28,19 +23,10 @@ task syncS3(type: Exec) {
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId project.getGroup()
-            artifactId project.getName()
-            version rootProject.getVersion()
-            from components.java
-            artifacts = [jar, javadocJar, sourcesJar]
-            pom standardPom({
+            pom {
                 name = "MXNet model zoo"
-                delegate.description = "MXNet model zoo for DJL"
-                url = url.get() + "mxnet/model-zoo"
-            })
+                description = "MXNet model zoo for DJL"
+            }
         }
-    }
-    repositories {
-        maven publishRepository()
     }
 }

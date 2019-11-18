@@ -1,0 +1,110 @@
+configure([project(':api'), project(':basicdataset'), project(':examples'), project(':model-zoo'), project(':repository'), project(':mxnet:mxnet-engine'), project(':mxnet:mxnet-model-zoo')]) {
+    apply plugin: "maven-publish"
+    apply plugin: "signing"
+
+    project.tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    javadoc {
+        title "Deep Java Library ${version} - ${project.name} API"
+        options.addBooleanOption("-allow-script-in-comments", true)
+        options.header "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>"
+    }
+
+    task uploadJavadoc(type: Exec) {
+        enabled = (project.name != ":mxnet:native")
+        commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync build/docs/javadoc s3://djl-ai/java-api/${version}/${project.name} > build/upload.log"
+    }
+
+    signing {
+        required(project.hasProperty("staging") || project.hasProperty("snapshot"))
+        def signingKey = findProperty("signingKey")
+        def signingPassword = findProperty("signingPassword")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications
+    }
+
+    if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+        if (gradle.startParameter.taskNames.contains("publish")) {
+            throw new GradleException("JDK 1.8 is required to run publish task.")
+        }
+        return
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId project.getGroup()
+                artifactId project.getName()
+                version rootProject.getVersion()
+                from components.java
+                artifacts = [jar, javadocJar, sourcesJar]
+                pom {
+                    name = "Deep Java Library - ${project.name}"
+                    description = "Deep Java Library - ${project.name}"
+                    url = "http://www.djl.ai/${project.name.replaceAll(":", "/")}"
+
+                    packaging = "jar"
+
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                        }
+                    }
+
+                    scm {
+                        connection = "scm:git:git@github.com:awslabs/djl.git"
+                        developerConnection = "scm:git:git@github.com:awslabs/djl.git"
+                        url = "https://github.com/awslabs/djl"
+                        tag = "HEAD"
+                    }
+
+                    developers {
+                        developer {
+                            name = "DJL.AI Team"
+                            email = "djl-dev@amazon.com"
+                            organization = "Amazon AI"
+                            organizationUrl = "https://amazon.com"
+                        }
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                if (project.hasProperty("s3")) {
+                    name = "s3"
+                    url = "s3://djl-ai/dev"
+                    authentication {
+                        awsIm(AwsImAuthentication)
+                    }
+                } else if (project.hasProperty("snapshot")) {
+                    name = "snapshot"
+                    url = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    credentials {
+                        username = findProperty("ossrhUsername")
+                        password = findProperty("ossrhPassword")
+                    }
+                } else if (project.hasProperty("staging")) {
+                    name = "staging"
+                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    credentials {
+                        username = findProperty("ossrhUsername")
+                        password = findProperty("ossrhPassword")
+                    }
+                } else {
+                    name = "local"
+                    url = "build/repo"
+                }
+            }
+        }
+    }
+}

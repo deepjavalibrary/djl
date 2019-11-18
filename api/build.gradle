@@ -1,8 +1,3 @@
-plugins {
-    id 'maven-publish'
-    id 'signing'
-}
-
 dependencies {
     api "org.slf4j:slf4j-api:${slf4j_version}"
 
@@ -19,24 +14,4 @@ javadoc {
     exclude "ai/djl/util/**"
     exclude "ai/djl/ndarray/internal/**"
     options.overview "src/main/javadoc/overview.html"
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId project.getGroup()
-            artifactId project.getName()
-            version rootProject.getVersion()
-            from components.java
-            artifacts = [jar, javadocJar, sourcesJar]
-            pom standardPom({
-                name = "Core API"
-                delegate.description = "A Deep Learning API in Java"
-                url = url.get() + "api"
-            })
-        }
-    }
-    repositories {
-        maven publishRepository()
-    }
 }

@@ -17,7 +17,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew -Dnightly=true build
     - name: Publish to snapshot repository
-      run: ./gradlew publish -PpublishTo=snapshot
+      run: ./gradlew publish -Psnapshot
     - name: API test results
       uses: actions/upload-artifact@v1
       if: always()

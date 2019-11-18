@@ -1,8 +1,3 @@
-plugins {
-    id 'maven-publish'
-    id 'signing'
-}
-
 dependencies {
     api "org.slf4j:slf4j-api:${slf4j_version}"
     api "com.google.code.gson:gson:${gson_version}"
@@ -17,20 +12,10 @@ dependencies {
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId project.getGroup()
-            artifactId project.getName()
-            version rootProject.getVersion()
-            from components.java
-            artifacts = [jar, javadocJar, sourcesJar]
-            pom standardPom({
+            pom {
                 name = "Repository API"
-                // Set delegate.description due to name conflict between MavenPom.description and Project.description
-                delegate.description = "A respository specification for Deep Learning resources"
-                url = url.get() + "repository"
-            })
+                description = "A respository specification for Deep Learning resources"
+            }
         }
-    }
-    repositories {
-        maven publishRepository()
     }
 }

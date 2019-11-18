@@ -9,7 +9,7 @@ defaultTasks 'build'
 
 allprojects {
     group 'ai.djl'
-    boolean isRelease = project.hasProperty("release") || project.findProperty("publishTo") == "staging"
+    boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
     version = "0.2.0" + (isRelease ? "" : "-SNAPSHOT")
 
     repositories {
@@ -60,11 +60,6 @@ configure(javaProjects()) {
         }
     }
 
-    java {
-        withJavadocJar()
-        withSourcesJar()
-    }
-
     compileJava {
         options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static" << "-Werror"
     }
@@ -74,34 +69,7 @@ configure(javaProjects()) {
     }
 }
 
-configure([project(':api'), project(':basicdataset'), project(':model-zoo'), project(':repository'), project(':mxnet:mxnet-engine'), project(':mxnet:mxnet-model-zoo')]) {
-    javadoc {
-        title "Deep Java Library ${version} - ${project.name} API"
-        options.addBooleanOption("-allow-script-in-comments", true)
-        options.header "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>"
-    }
-
-    task uploadJavadoc(type: Exec) {
-        commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync build/docs/javadoc s3://djl-ai/java-api/${version}/${project.name} > build/upload.log"
-    }
-}
-
-subprojects {
-    plugins.withType(SigningPlugin.class) {
-        if (project.findProperty("publishTo") in ["staging", "snapshot", "local"]) {
-            signing {
-                def signingKey = findProperty("signingKey")
-                def signingPassword = findProperty("signingPassword")
-                useInMemoryPgpKeys(signingKey, signingPassword)
-                sign publishing.publications
-            }
-        }
-    }
-
-    project.tasks.withType(GenerateModuleMetadata) {
-        enabled = false
-    }
-}
+apply from: file("${rootProject.projectDir}/tools/gradle/publish.gradle")
 
 def getClassifier() {
     String osName = System.getProperty("os.name")
@@ -118,87 +86,3 @@ def getClassifier() {
     return osPrefix + "-x86_64"
 }
 
-Closure publishRepository() {
-    def publishTo = findProperty("publishTo")
-
-    if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
-        if (publishTo != null || gradle.startParameter.taskNames.contains("publish")) {
-            throw new GradleException("JDK 1.8 is required to implementation java class to be published.")
-        }
-        return {}
-    }
-
-    switch (publishTo) {
-        case "local": return {
-            name "local"
-            url "build/repo"
-        }
-        case "S3": return {
-            name = "s3"
-            url = "s3://djl-ai/dev"
-            authentication {
-                awsIm(AwsImAuthentication)
-            }
-        }
-        case "snapshot": return {
-            name = "snapshot"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-            credentials {
-                username = findProperty("ossrhUsername")
-                password = findProperty("ossrhPassword")
-            }
-        }
-        case "staging": return {
-            name = "staging"
-            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username = findProperty("ossrhUsername")
-                password = findProperty("ossrhPassword")
-            }
-        }
-        default:
-            if (gradle.startParameter.taskNames.contains("publish")) {
-                if (publishTo == null) {
-                    throw new GradleException("Please specify publishTo property for publish task: gradle publish -PpublishTo=XXX")
-                }
-                throw new GradleException("Unknown publishTo: ${publishTo}. Supported target: [staging, snapshot, s3, local]")
-            }
-            return {}
-    }
-}
-
-Closure standardPom(Closure base) {
-    return {
-
-        packaging = "jar"
-        url = "http://www.djl.ai/"
-
-        base.setDelegate(delegate)
-        base()
-
-        licenses {
-            license {
-                name = 'The Apache License, Version 2.0'
-                url = 'https://www.apache.org/licenses/LICENSE-2.0'
-            }
-        }
-
-        scm {
-            connection = "scm:git:git@github.com:awslabs/djl.git"
-            developerConnection = "scm:git:git@github.com:awslabs/djl.git"
-            url = "https://github.com/awslabs/djl"
-            tag = "HEAD"
-        }
-
-        developers {
-            developer {
-                name = "DJL.AI Team"
-                email = "djl-dev@amazon.com"
-                organization = "Amazon"
-                organizationUrl = "https://amazon.com"
-            }
-        }
-
-        name = "Deep Java Library - " + name.get()
-    }
-}
