@@ -139,7 +139,7 @@ public class Pipeline {
     /**
      * Applies the transforms configured in this object on the input {@link NDList}.
      *
-     * <p>If a key is specified with the transform, those tranforms will only be applied to the
+     * <p>If a key is specified with the transform, those transforms will only be applied to the
      * {@link NDArray} in the input {@link NDList}. If a key is not specified, it will be applied to
      * the first element in the input {@link NDList}.
      *

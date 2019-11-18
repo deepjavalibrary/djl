@@ -139,7 +139,7 @@ public interface Block {
      *
      * @param manager the NDManager to initialize the parameters
      * @param dataType the datatype of the parameters
-     * @param inputShapes theshapes of the inputs to the block
+     * @param inputShapes the shapes of the inputs to the block
      * @return the shapes of the outputs of the block
      */
     Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes);

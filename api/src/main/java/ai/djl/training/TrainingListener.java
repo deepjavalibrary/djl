@@ -14,7 +14,7 @@ package ai.djl.training;
 
 /**
  * {@code TrainingListener} offers an interface that allows performing some actions when certain
- * events have occured in the {@link Trainer}.
+ * events have occurred in the {@link Trainer}.
  *
  * <p>The methods {@link #onEpoch() onEpoch}, {@link #onTrainingBatch() onTrainingBatch}, {@link
  * #onValidationBatch() onValidationBatch} are called during training. Adding an implementation of

@@ -45,7 +45,7 @@ public abstract class ParameterBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        // FIXME: This is a quick hack for display in jupytor notebook.
+        // FIXME: This is a quick hack for display in jupyter notebook.
         StringBuilder sb = new StringBuilder(200);
         String className = getClass().getSimpleName();
         if (className.endsWith("Block")) {

@@ -47,7 +47,7 @@ public interface Batchifier {
     /**
      * Splits the given {@link NDList} into the given number of slices.
      *
-     * <p>This function un-batchifies the input {@link NDList}, redistributes them into the given
+     * <p>This function unbatchifies the input {@link NDList}, redistributes them into the given
      * number of slices, and then batchify each of the slices to form an array of {@link NDList}.
      *
      * @param list the {@link NDList} that needs to be split

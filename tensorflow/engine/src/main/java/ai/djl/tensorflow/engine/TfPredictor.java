@@ -38,7 +38,7 @@ public class TfPredictor<I, O> extends BasePredictor<I, O> {
         for (NDArray array : ndList) {
             runner.feed(array.getName(), ((TfNDArray) array).getTensor());
         }
-        // TODO We can extract input name from decribeInput in Model if NDList doesn't have names
+        // TODO We can extract input name from describeInput in Model if NDList doesn't have names
         PairList<String, Shape> dataDescs = model.describeOutput();
         for (Pair<String, Shape> pair : dataDescs) {
             runner.fetch(pair.getKey());

@@ -49,7 +49,7 @@ Run the following command to upload to the S3 bucket:
 $ ./gradlew syncS3
 ```
 
-### Step 5: Checkin your ModelLoader and metadata files to git
+### Step 5: Check in your ModelLoader and metadata files to git
 You need to register this model in the model zoo. Make all necessary changes to load and use your model.
 
 **Note"**: Avoid checking in binary files to git. Binary files should only be uploaded to S3 bucket.

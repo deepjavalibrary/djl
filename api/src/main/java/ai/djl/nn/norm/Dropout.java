@@ -32,7 +32,7 @@ import java.util.List;
  * <p>During training, each element of the input is set to zero with probability p. The whole array
  * is rescaled by 1/(1−p) to keep the expected sum of the input unchanged. During testing, this
  * operator does not change the input if mode is ‘training’. If mode is ‘always’, the same
- * computaion as during training will be applied.
+ * computation as during training will be applied.
  */
 public class Dropout extends ParameterBlock {
 

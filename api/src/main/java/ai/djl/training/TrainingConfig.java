@@ -33,7 +33,7 @@ public interface TrainingConfig {
     /**
      * Gets the {@link Device} that are available for computation.
      *
-     * <p>This is necesary for a {@link Trainer} as it needs to know what kind of device it is
+     * <p>This is necessary for a {@link Trainer} as it needs to know what kind of device it is
      * running on, and how many devices it is running on.
      *
      * @return an array of {@link Device}

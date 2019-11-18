@@ -33,7 +33,7 @@ public final class BufferedImageUtils {
 
     static {
         if (System.getProperty("apple.awt.UIElement") == null) {
-            // disable annoying coffee cup show up on macos
+            // disables coffee cup image showing up on Mac OS
             System.setProperty("apple.awt.UIElement", "true");
         }
     }

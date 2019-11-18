@@ -42,7 +42,7 @@ import java.util.List;
  * <p>With ReLU activation function: \(h_t = relu(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} +
  * b_{hh})\)
  *
- * <p>With Tanh activtion function: \(h_t = \tanh(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} +
+ * <p>With Tanh activation function: \(h_t = \tanh(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} +
  * b_{hh})\)
  */
 public class RNN extends RecurrentCell {

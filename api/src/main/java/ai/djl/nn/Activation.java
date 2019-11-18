@@ -84,7 +84,7 @@ public final class Activation {
     }
 
     /**
-     * Applies tanh activation on the input singleton {@link NDList}.
+     * Applies Tanh activation on the input singleton {@link NDList}.
      *
      * <p>Tanh is defined by: \( y = (e^x - e^{-x}) / (e^x + e^{-x}) \)
      *
