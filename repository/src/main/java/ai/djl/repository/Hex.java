@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+/** {@code Hex} is a set of utilities for working with Hexadecimal Strings. */
 public final class Hex {
 
     private static final char[] HEX_CHARS = {
@@ -20,6 +21,12 @@ public final class Hex {
 
     private Hex() {}
 
+    /**
+     * Converts a byte array to a hex string.
+     *
+     * @param block the bytes to convert
+     * @return the converted hex String
+     */
     public static String toHexString(byte[] block) {
         if (block == null) {
             return null;
@@ -36,6 +43,12 @@ public final class Hex {
         return buf.toString();
     }
 
+    /**
+     * Converts a hex string to a byte array.
+     *
+     * @param s the string to convert
+     * @return the converted byte array
+     */
     public static byte[] toByteArray(String s) {
         int len = s.length();
 

@@ -14,6 +14,9 @@ package ai.djl.repository;
 
 import java.util.Objects;
 
+/**
+ * A {@code Restriction} is a set of bounds on a {@link Version} that form a {@link VersionRange}.
+ */
 class Restriction {
 
     public static final Restriction EVERYTHING = new Restriction(null, false, null, false);
@@ -23,6 +26,14 @@ class Restriction {
     private Version upperBound;
     private boolean upperBoundInclusive;
 
+    /**
+     * Constructs a Restriction from the bounds.
+     *
+     * @param lowerBound the lower bound
+     * @param lowerBoundInclusive true if the lower bound is inclusive and not exclusive
+     * @param upperBound the upper bound
+     * @param upperBoundInclusive true if the upper bound is inclusive and not exclusive
+     */
     public Restriction(
             Version lowerBound,
             boolean lowerBoundInclusive,
@@ -34,22 +45,50 @@ class Restriction {
         this.upperBoundInclusive = upperBoundInclusive;
     }
 
+    /**
+     * Returns the lower bound version (inclusive/exclusive depends on {@link
+     * Restriction#isLowerBoundInclusive()}).
+     *
+     * @return the lower bound
+     */
     public Version getLowerBound() {
         return lowerBound;
     }
 
+    /**
+     * Returns true if the lower bound is inclusive.
+     *
+     * @return true if the lower bound is inclusive
+     */
     public boolean isLowerBoundInclusive() {
         return lowerBoundInclusive;
     }
 
+    /**
+     * Returns the upper bound version (inclusive/exclusive depends on {@link
+     * Restriction#isUpperBoundInclusive()}).
+     *
+     * @return the upper bound
+     */
     public Version getUpperBound() {
         return upperBound;
     }
 
+    /**
+     * Returns true if the upper bound is inclusive.
+     *
+     * @return true if the upper bound is inclusive
+     */
     public boolean isUpperBoundInclusive() {
         return upperBoundInclusive;
     }
 
+    /**
+     * Returns true if the given version lies within the restriction bounds.
+     *
+     * @param version the version to check against
+     * @return true if the version fits the bounds
+     */
     public boolean containsVersion(Version version) {
         if (lowerBound != null) {
             int comparison = lowerBound.compareTo(version);

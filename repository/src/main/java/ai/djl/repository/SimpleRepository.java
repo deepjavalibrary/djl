@@ -17,15 +17,36 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
 
+/**
+ * A {@code SimpleRepository} is a {@link Repository} containing only a single artifact without
+ * requiring a "metadata.json" file.
+ *
+ * @see Repository
+ */
 public class SimpleRepository extends AbstractRepository {
 
     private String name;
     private Path path;
 
+    /**
+     * (Internal) Constructs a SimpleRepository.
+     *
+     * <p>Use {@link Repository#newInstance(String, String)}.
+     *
+     * @param path the path to the repository
+     */
     public SimpleRepository(Path path) {
         this(path.toFile().getName(), path);
     }
 
+    /**
+     * (Internal) Constructs a SimpleRepository.
+     *
+     * <p>Use {@link Repository#newInstance(String, String)}.
+     *
+     * @param name the name of the repository
+     * @param path the path to the repository
+     */
     public SimpleRepository(String name, Path path) {
         this.name = name;
         this.path = path;

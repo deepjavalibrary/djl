@@ -19,6 +19,11 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * An {@code Artifact} is a set of data files such as a model or dataset.
+ *
+ * @see Repository
+ */
 @SuppressWarnings("PMD.LooseCoupling")
 public class Artifact {
     private transient String metadataVersion;
@@ -34,54 +39,124 @@ public class Artifact {
     private transient Metadata metadata;
     private transient Version cache;
 
+    /**
+     * Returns the metadata format version.
+     *
+     * @return the metadata format version
+     */
     public String getMetadataVersion() {
         return metadataVersion;
     }
 
+    /**
+     * Sets the metadata format version.
+     *
+     * @param metadataVersion the new version
+     */
     public void setMetadataVersion(String metadataVersion) {
         this.metadataVersion = metadataVersion;
     }
 
+    /**
+     * Returns the groupId.
+     *
+     * @return the groupId
+     */
     public String getGroupId() {
         return groupId;
     }
 
+    /**
+     * Sets the groupId.
+     *
+     * @param groupId the new groupId
+     */
     public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
+    /**
+     * Returns the artifactId.
+     *
+     * @return the artifactId
+     */
     public String getArtifactId() {
         return artifactId;
     }
 
+    /**
+     * Sets the artifactId.
+     *
+     * @param artifactId the new artifactId
+     */
     public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
     }
 
+    /**
+     * Returns the artifact version.
+     *
+     * @return the artifact version
+     * @see Version
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * Sets the artifact version.
+     *
+     * @param version the new version
+     * @see Version
+     */
     public void setVersion(String version) {
         this.version = version;
     }
 
+    /**
+     * Returns true if the artifact is a snapshot.
+     *
+     * @return true if the artifact is a snapshot
+     * @see Version
+     */
     public boolean isSnapshot() {
         return snapshot;
     }
 
+    /**
+     * Sets if the artifact is a snapshot.
+     *
+     * @param snapshot true to make the artifact a snapshot
+     * @see Version
+     */
     public void setSnapshot(boolean snapshot) {
         this.snapshot = snapshot;
     }
 
+    /**
+     * Returns the artifact name.
+     *
+     * @return the artifact name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the artifact name.
+     *
+     * @param name the new name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the artifact properties.
+     *
+     * @return the artifact properties
+     * @see Repository
+     */
     public Map<String, String> getProperties() {
         if (properties == null) {
             return Collections.emptyMap();
@@ -89,10 +164,22 @@ public class Artifact {
         return properties;
     }
 
+    /**
+     * Sets the artifact properties.
+     *
+     * @param properties the new properties
+     * @see Repository
+     */
     public void setProperties(LinkedHashMap<String, String> properties) {
         this.properties = properties;
     }
 
+    /**
+     * Returns the artifact arguments.
+     *
+     * @return the artifact arguments
+     * @see Repository
+     */
     public Map<String, Object> getArguments() {
         if (arguments == null) {
             return Collections.emptyMap();
@@ -100,18 +187,41 @@ public class Artifact {
         return arguments;
     }
 
+    /**
+     * Sets the artifact arguments.
+     *
+     * @param arguments the new arguments
+     * @see Repository
+     */
     public void setArguments(LinkedHashMap<String, Object> arguments) {
         this.arguments = arguments;
     }
 
+    /**
+     * Returns the metadata containing this artifact.
+     *
+     * @return the metadata containing this artifact
+     * @see Repository
+     */
     public Metadata getMetadata() {
         return metadata;
     }
 
+    /**
+     * Sets the associated metadata.
+     *
+     * @param metadata the new metadata
+     * @see Repository
+     */
     public void setMetadata(Metadata metadata) {
         this.metadata = metadata;
     }
 
+    /**
+     * Returns the location of the resource directory.
+     *
+     * @return the location of the resource directory
+     */
     public URI getResourceUri() {
         URI uri = metadata.getRepositoryUri();
         if (properties != null) {
@@ -122,6 +232,11 @@ public class Artifact {
         return uri.resolve(version + '/');
     }
 
+    /**
+     * Returns all the file items in the artifact.
+     *
+     * @return all the file items in the artifact
+     */
     public Map<String, Item> getFiles() {
         if (files == null) {
             return Collections.emptyMap();
@@ -135,10 +250,22 @@ public class Artifact {
         return files;
     }
 
+    /**
+     * Sets the file items.
+     *
+     * @param files the replacement file items
+     */
     public void setFiles(Map<String, Item> files) {
         this.files = files;
     }
 
+    /**
+     * Returns true if every filter matches the corresponding property.
+     *
+     * @param filter the values to check against the properties
+     * @return true if every filter matches the corresponding property
+     * @see Repository
+     */
     public boolean hasProperties(Map<String, String> filter) {
         if (filter == null || filter.isEmpty()) {
             return true;
@@ -158,6 +285,12 @@ public class Artifact {
         return true;
     }
 
+    /**
+     * Returns the artifact version as a {@link Version}.
+     *
+     * @return the artifact version as a {@link Version}
+     * @see Version
+     */
     public Version getParsedVersion() {
         if (cache == null) {
             cache = new Version(version);
@@ -187,6 +320,7 @@ public class Artifact {
         return sb.toString();
     }
 
+    /** A file (possibly compressed) within an {@link Artifact}. */
     public static final class Item {
 
         private String uri;
@@ -197,22 +331,56 @@ public class Artifact {
         private String extension;
         private Artifact artifact;
 
+        /**
+         * Returns the URI of the item.
+         *
+         * @return the URI of the item
+         */
         public String getUri() {
             return uri;
         }
 
+        /**
+         * Sets the URI of the item.
+         *
+         * @param uri the new URI
+         */
         public void setUri(String uri) {
             this.uri = uri;
         }
 
+        /**
+         * Returns the hash of the item.
+         *
+         * <p>This value is from the metadata, but should be checked when the item is downloaded.
+         *
+         * @return the sha1 hash
+         */
         public String getSha1Hash() {
             return sha1Hash;
         }
 
+        /**
+         * Sets the sha1hash of the item.
+         *
+         * @param sha1Hash the new hash
+         */
         public void setSha1Hash(String sha1Hash) {
             this.sha1Hash = sha1Hash;
         }
 
+        /**
+         * Sets the type of the item.
+         *
+         * <p>The valid types are:
+         *
+         * <ul>
+         *   <li>"file" - used for single files and gzip compressed files
+         *   <li>"dir" - used for extracted zip folders
+         * </ul>
+         *
+         * @return the type string
+         */
         public String getType() {
             if (type == null) {
                 getExtension();
@@ -225,18 +393,39 @@ public class Artifact {
             return type;
         }
 
+        /**
+         * Sets the type of the item.
+         *
+         * @param type the type
+         * @see Item#getType()
+         */
         public void setType(String type) {
             this.type = type;
         }
 
+        /**
+         * Returns the file size.
+         *
+         * @return the file size in bytes
+         */
         public long getSize() {
             return size;
         }
 
+        /**
+         * Sets the file size.
+         *
+         * @param size the new size in bytes
+         */
         public void setSize(long size) {
             this.size = size;
         }
 
+        /**
+         * Returns the item name.
+         *
+         * @return the item name
+         */
         public String getName() {
             if (name == null) {
                 if ("dir".equals(getType())) {
@@ -259,10 +448,20 @@ public class Artifact {
             return name;
         }
 
+        /**
+         * Sets the item name.
+         *
+         * @param name the new name
+         */
         public void setName(String name) {
             this.name = name;
         }
 
+        /**
+         * Returns the type of file extension.
+         *
+         * @return the type as "zip", "gzip", or "" for other
+         */
         public String getExtension() {
             if (extension == null) {
                 if (uri.endsWith(".zip")) {
@@ -276,19 +475,35 @@ public class Artifact {
             return extension;
         }
 
+        /**
+         * Sets the file extension.
+         *
+         * @param extension the new extension
+         */
         public void setExtension(String extension) {
             this.extension = extension;
         }
 
+        /**
+         * Returns the artifact associated with this item.
+         *
+         * @return the artifact
+         */
         public Artifact getArtifact() {
             return artifact;
         }
 
+        /**
+         * Sets the artifact associated with this item.
+         *
+         * @param artifact the new artifact
+         */
         public void setArtifact(Artifact artifact) {
             this.artifact = artifact;
         }
     }
 
+    /** A {@link Comparator} to compare artifacts based on their version numbers. */
     public static final class VersionComparator implements Comparator<Artifact>, Serializable {
 
         private static final long serialVersionUID = 1L;

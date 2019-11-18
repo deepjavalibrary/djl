@@ -18,6 +18,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A {@code VersionRange} is a set of {@link Restriction}s that match some {@link Version}s.
+ *
+ * <p>A {@code VersionRange} should be constructed using {@link VersionRange#parse(String)}. The
+ * format used by the version ranges matches the <a
+ * href="https://cwiki.apache.org/confluence/display/MAVENOLD/Dependency+Mediation+and+Conflict+Resolution#DependencyMediationandConflictResolution-DependencyVersionRanges">maven
+ * version range syntax</a>.
+ */
 public final class VersionRange {
 
     private static final VersionRange ANY = new VersionRange(null, Collections.emptyList());
@@ -30,14 +38,30 @@ public final class VersionRange {
         this.restrictions = restrictions;
     }
 
+    /**
+     * Returns the recommended version in the range.
+     *
+     * @return the recommended version in the range
+     */
     public Version getRecommendedVersion() {
         return recommendedVersion;
     }
 
+    /**
+     * Returns the restrictions that compose the range.
+     *
+     * @return the restrictions that compose the range
+     */
     public List<Restriction> getRestrictions() {
         return restrictions;
     }
 
+    /**
+     * Creates a new version range from a string version range.
+     *
+     * @param spec the string version range
+     * @return the {@link VersionRange}
+     */
     public static VersionRange parse(String spec) {
         if (spec == null || spec.isEmpty()) {
             return ANY;
@@ -147,10 +171,22 @@ public final class VersionRange {
         return restriction;
     }
 
+    /**
+     * Filters the provided artifacts to those that match the version range.
+     *
+     * @param artifacts the artifacts to filter
+     * @return the filtered artifacts
+     */
     public List<Artifact> matches(List<Artifact> artifacts) {
         return artifacts.stream().filter(this::contains).collect(Collectors.toList());
     }
 
+    /**
+     * Returns true if a version falls within this range.
+     *
+     * @param version the version to test
+     * @return true if the version falls within this range
+     */
     public boolean contains(Version version) {
         if (recommendedVersion != null) {
             return recommendedVersion.equals(version);
@@ -163,6 +199,12 @@ public final class VersionRange {
         return false;
     }
 
+    /**
+     * Returns true if the artifact's version falls within this range.
+     *
+     * @param artifact the artifact to test
+     * @return true if the artifact's version falls within this range
+     */
     public boolean contains(Artifact artifact) {
         return contains(artifact.getParsedVersion());
     }

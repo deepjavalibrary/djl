@@ -269,6 +269,17 @@ public interface Model extends AutoCloseable {
      */
     void cast(DataType dataType);
 
+    /**
+     * Converts the model to use a lower precision quantized network.
+     *
+     * <p>Quantization converts the network to use int8 data type where possible for smaller model
+     * size and faster computation without too large a drop in accuracy. See <a
+     * href="https://arxiv.org/abs/1412.6115">original paper</a>.
+     */
+    default void quantize() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
     /** {@inheritDoc} */
     @Override
     void close();

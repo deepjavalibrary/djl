@@ -28,6 +28,12 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
+/**
+ * The {@code AbstractRepository} is the shared base for implementers of the {@link Repository}
+ * interface.
+ *
+ * @see Repository
+ */
 public abstract class AbstractRepository implements Repository {
 
     /** {@inheritDoc} */
@@ -183,11 +189,21 @@ public abstract class AbstractRepository implements Repository {
         }
     }
 
+    /**
+     * A {@code ProgressInputStream} is a wrapper around an {@link InputStream} that also uses
+     * {@link Progress}.
+     */
     private static final class ProgressInputStream extends InputStream {
 
         private DigestInputStream dis;
         private Progress progress;
 
+        /**
+         * Constructs a new ProgressInputStream with an input stream and progress.
+         *
+         * @param is the input stream
+         * @param progress the (optionally null) progress tracker
+         */
         public ProgressInputStream(InputStream is, Progress progress) {
             MessageDigest md;
             try {
@@ -223,7 +239,7 @@ public abstract class AbstractRepository implements Repository {
             return size;
         }
 
-        public void validateChecksum(Artifact.Item item) throws IOException {
+        private void validateChecksum(Artifact.Item item) throws IOException {
             // drain InputSteam to get correct sha1 hash
             Utils.toByteArray(dis);
             String sha1 = Hex.toHexString(dis.getMessageDigest().digest());

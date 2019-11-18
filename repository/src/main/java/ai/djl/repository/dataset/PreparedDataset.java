@@ -15,11 +15,28 @@ package ai.djl.repository.dataset;
 import ai.djl.util.Progress;
 import java.io.IOException;
 
+/**
+ * A {@code PreparedDataset} is a {@link ai.djl.training.dataset.Dataset} that requires an
+ * additional preparation step before use.
+ *
+ * <p>The preparation steps can be run by calling {@link PreparedDataset#prepare()}.
+ */
 public interface PreparedDataset {
 
+    /**
+     * Prepares the dataset for use.
+     *
+     * @throws IOException for various exceptions depending on the dataset
+     */
     default void prepare() throws IOException {
         prepare(null);
     }
 
+    /**
+     * Prepares the dataset for use with tracked progress.
+     *
+     * @param progress the progress tracker
+     * @throws IOException for various exceptions depending on the dataset
+     */
     void prepare(Progress progress) throws IOException;
 }

@@ -20,15 +20,35 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A {@code LocalRepository} is a {@link Repository} located in a filesystem directory.
+ *
+ * @see Repository
+ */
 public class LocalRepository extends AbstractRepository {
 
     private String name;
     private Path path;
 
+    /**
+     * (Internal) Constructs a {@code LocalRepository} from the path with inferred name.
+     *
+     * <p>Use {@link Repository#newInstance(String, String)}.
+     *
+     * @param path the path to the repository
+     */
     public LocalRepository(Path path) {
         this(path.toFile().getName(), path);
     }
 
+    /**
+     * (Internal) Constructs a {@code LocalRepository} from the path with inferred name.
+     *
+     * <p>Use {@link Repository#newInstance(String, String)}.
+     *
+     * @param name the name of the repository
+     * @param path the path to the repository
+     */
     public LocalRepository(String name, Path path) {
         this.name = name;
         this.path = path;

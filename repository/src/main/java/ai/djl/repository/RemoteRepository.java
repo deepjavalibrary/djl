@@ -25,6 +25,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A {@code RemoteRepository} is a {@link Repository} located on a remote web server.
+ *
+ * @see Repository
+ */
 public class RemoteRepository extends AbstractRepository {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
@@ -32,6 +37,14 @@ public class RemoteRepository extends AbstractRepository {
     private String name;
     private URI uri;
 
+    /**
+     * (Internal) Constructs a remote repository.
+     *
+     * <p>Use {@link Repository#newInstance(String, String)}.
+     *
+     * @param name the repository name
+     * @param uri the repository location
+     */
     public RemoteRepository(String name, URI uri) {
         this.name = name;
         this.uri = uri;

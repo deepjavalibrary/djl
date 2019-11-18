@@ -18,12 +18,24 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A {@link Version} is used for the versioning of an {@link Artifact}.
+ *
+ * <p>The version should be a series of "." separated numbers and strings. For a development
+ * version, the version should end with "-SNAPSHOT". The most common case is semantic versioning
+ * which follows the format "major.minor.incremental".
+ */
 public class Version implements Comparable<Version> {
 
     private String version;
     private boolean snapshot;
     private List<Object> comparable;
 
+    /**
+     * Constructs a version with the version string.
+     *
+     * @param version the version string
+     */
     public Version(String version) {
         this.version = version;
         comparable = new ArrayList<>();
@@ -78,22 +90,48 @@ public class Version implements Comparable<Version> {
         return Objects.hash(comparable);
     }
 
+    /**
+     * Returns the major version (assuming major.minor.incremental...) of the version.
+     *
+     * @return the major version
+     */
     public int getMajorVersion() {
         return get(0);
     }
 
+    /**
+     * Returns the minor version (assuming major.minor.incremental...) of the version.
+     *
+     * @return the minor version
+     */
     public int getMinorVersion() {
         return get(1);
     }
 
+    /**
+     * Returns the incremental version (assuming major.minor.incremental...) of the version.
+     *
+     * @return the incremental version
+     */
     public int getIncrementalVersion() {
         return get(2);
     }
 
+    /**
+     * Returns true if this is a snapshot version.
+     *
+     * @return true if this is a snapshot version
+     */
     public boolean isSnapshot() {
         return snapshot;
     }
 
+    /**
+     * Returns the dot separated part at a given index if it is an integer.
+     *
+     * @param index the index for dot separated parts (not characters in the string)
+     * @return the integer parsed to an int if it exists, or zero otherwise
+     */
     private int get(int index) {
         if (comparable.size() > index) {
             Object c = comparable.get(index);
@@ -122,6 +160,7 @@ public class Version implements Comparable<Version> {
         return version;
     }
 
+    /** A version component that can be either an integer or string. */
     private static final class Comp implements Comparator<Object>, Serializable {
 
         private static final long serialVersionUID = 1L;

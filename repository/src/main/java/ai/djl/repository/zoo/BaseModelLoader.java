@@ -27,6 +27,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Shared code for the {@link ModelLoader} implementations.
+ *
+ * @param <I> the input type to the loaded model
+ * @param <O> the output type of the loaded model
+ */
 public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     protected Repository repository;
@@ -35,12 +41,25 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     private Metadata metadata;
 
+    /**
+     * Constructs a {@link ModelLoader} given the repository, mrl, and version.
+     *
+     * @param repository the repository to load the model from
+     * @param mrl the mrl of the model to load
+     * @param version the version of the model to load
+     */
     protected BaseModelLoader(Repository repository, MRL mrl, String version) {
         this.repository = repository;
         this.mrl = mrl;
         this.version = version;
     }
 
+    /**
+     * Returns the default {@link Translator} to use for the loaded model.
+     *
+     * @param artifact the artifact of the model to load that informs the default translator
+     * @return the default translator
+     */
     public abstract Translator<I, O> getTranslator(Artifact artifact);
 
     /** {@inheritDoc} */

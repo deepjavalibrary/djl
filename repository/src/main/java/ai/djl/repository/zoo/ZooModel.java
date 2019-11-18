@@ -29,11 +29,24 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * A {@code ZooModel} is a {@link Model} loaded from a model zoo and includes a default {@link
+ * Translator}.
+ *
+ * @param <I> the model input type
+ * @param <O> the model output type
+ */
 public class ZooModel<I, O> implements Model {
 
     private Model model;
     private Translator<I, O> translator;
 
+    /**
+     * Constructs a {@code ZooModel} given the model and translator.
+     *
+     * @param model the model to wrap
+     * @param translator the translator
+     */
     public ZooModel(Model model, Translator<I, O> translator) {
         this.model = model;
         this.translator = translator;
@@ -85,6 +98,11 @@ public class ZooModel<I, O> implements Model {
         return model.newTrainer(trainingConfig);
     }
 
+    /**
+     * Creates a new Predictor based on the model with the default translator.
+     *
+     * @return an instance of {@code Predictor}
+     */
     public Predictor<I, O> newPredictor() {
         return newPredictor(translator);
     }
@@ -95,12 +113,13 @@ public class ZooModel<I, O> implements Model {
         return model.newPredictor(translator);
     }
 
+    /**
+     * Returns the default translator.
+     *
+     * @return the default translator
+     */
     public Translator<I, O> getTranslator() {
         return translator;
-    }
-
-    public void quantize() {
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /** {@inheritDoc} */
