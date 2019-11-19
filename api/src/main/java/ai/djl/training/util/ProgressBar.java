@@ -46,7 +46,7 @@ public final class ProgressBar implements Progress {
     /** {@inheritDoc} */
     @Override
     public final void reset(String message, long max) {
-        this.message = message;
+        this.message = trimMessage(message);
         this.max = max;
         currentPercent = 0;
         progress = 0;
@@ -109,5 +109,13 @@ public final class ProgressBar implements Progress {
         } else {
             System.out.print(sb);
         }
+    }
+
+    private String trimMessage(String message) {
+        int len = message.length();
+        if (len < 13) {
+            return message;
+        }
+        return message.substring(0, 4) + "..." + message.substring(len - 5);
     }
 }
