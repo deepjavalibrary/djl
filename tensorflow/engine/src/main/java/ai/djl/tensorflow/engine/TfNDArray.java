@@ -326,7 +326,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray add(NDArray... others) {
+    public NDArray add(NDArray other) {
         return null;
     }
 
@@ -350,7 +350,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mul(NDArray... others) {
+    public NDArray mul(NDArray other) {
         return null;
     }
 

@@ -606,17 +606,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray add(NDArray... others) {
-        NDArray[] toAdd = new NDArray[others.length + 1];
-        toAdd[0] = this;
-        System.arraycopy(others, 0, toAdd, 1, others.length);
-        if (others.length == 0) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        } else if (others.length == 1) {
-            return manager.invoke("_npi_add", toAdd, null);
-        } else {
-            return manager.invoke("add_n", toAdd, null);
-        }
+    public NDArray add(NDArray other) {
+        return manager.invoke("_npi_add", new NDArray[] {this, other}, null);
     }
 
     /** {@inheritDoc} */
@@ -643,19 +634,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mul(NDArray... others) {
-        if (others == null || others.length == 0) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        }
-        NDArray current = this;
-        for (NDArray other : others) {
-            NDArray next = manager.invoke("_npi_multiply", new NDArray[] {current, other}, null);
-            if (current != this) {
-                current.close();
-            }
-            current = next;
-        }
-        return current;
+    public NDArray mul(NDArray other) {
+        return manager.invoke("_npi_multiply", new NDArray[] {this, other}, null);
     }
 
     /** {@inheritDoc} */

@@ -450,19 +450,16 @@ public final class NDArrays {
     }
 
     /**
-     * Adds all of the {@link NDArray}s together element-wise.
+     * Adds a {@link NDArray} to a {@link NDArray} element-wise.
      *
-     * <p>The shapes of all of the {@link NDArray}s must be broadcastable.
+     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
      *
-     * @param arrays the {@link NDArray}s to add together
+     * @param a the {@link NDArray} to be added to
+     * @param b the {@link NDArray} to add
      * @return the result {@link NDArray}
-     * @throws IllegalArgumentException arrays must have at least two elements
      */
-    public static NDArray add(NDArray... arrays) {
-        if (arrays == null || arrays.length < 2) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        }
-        return arrays[0].add(Arrays.stream(arrays).skip(1).toArray(NDArray[]::new));
+    public static NDArray add(NDArray a, NDArray b) {
+        return a.add(b);
     }
 
     /**
@@ -514,7 +511,7 @@ public final class NDArrays {
     /**
      * Multiplies a number by a {@link NDArray} element-wise.
      *
-     * @param n the number to multiply by
+     * @param n the number to be multiplied
      * @param a the {@link NDArray} to multiply by
      * @return the result {@link NDArray}
      */
@@ -527,15 +524,12 @@ public final class NDArrays {
      *
      * <p>The shapes of all of the {@link NDArray}s must be broadcastable.
      *
-     * @param arrays the {@link NDArray}s to multiply together
+     * @param a the {@link NDArray} to be multiplied
+     * @param b the {@link NDArray} to multiply by
      * @return the result {@link NDArray}
-     * @throws IllegalArgumentException arrays must have at least two elements
      */
-    public static NDArray mul(NDArray... arrays) {
-        if (arrays == null || arrays.length < 2) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        }
-        return arrays[0].mul(Arrays.stream(arrays).skip(1).toArray(NDArray[]::new));
+    public static NDArray mul(NDArray a, NDArray b) {
+        return a.mul(b);
     }
 
     /**
