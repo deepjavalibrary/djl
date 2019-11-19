@@ -176,6 +176,7 @@ public abstract class AbstractBenchmark<T> {
             }
 
             MemoryUtils.dumpMemoryInfo(metrics, arguments.getOutputDir());
+            return true;
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.setLeftPadding(1);
