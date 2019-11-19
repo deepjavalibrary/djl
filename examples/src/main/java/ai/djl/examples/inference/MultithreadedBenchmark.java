@@ -58,7 +58,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
 
         int numOfThreads = arguments.getThreads();
 
-        logger.error("Multithreaded inference with {} threads.", numOfThreads);
+        logger.info("Multithreaded inference with {} threads.", numOfThreads);
 
         metrics.addMetric("thread", numOfThreads);
         AtomicBoolean collectMem = new AtomicBoolean(true);
