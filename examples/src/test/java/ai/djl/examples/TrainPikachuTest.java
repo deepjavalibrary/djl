@@ -29,14 +29,14 @@ public class TrainPikachuTest {
         int expectedMinNumber = 0;
         int expectedMaxNumber = 0;
         if (Engine.getInstance().getGpuCount() > 0) {
-            args = new String[] {"-e", "20", "-b", "32", "-o", "build/output"};
+            args = new String[] {"-e", "20", "-b", "32"};
             expectedLoss = 2.5e-3f;
             expectedMaxNumber = 15;
             expectedMinNumber = 6;
 
         } else {
             // test train 1 epoch and predict workflow works on CPU
-            args = new String[] {"-e", "1", "-m", "1", "-b", "32", "-o", "build/output"};
+            args = new String[] {"-e", "1", "-m", "1", "-b", "32"};
             // only check loss after 5 batches
             expectedLoss = 2.5e-2f;
         }
@@ -46,7 +46,7 @@ public class TrainPikachuTest {
         Assert.assertTrue(trainPikachu.getValidationLoss() < expectedLoss);
         // test predict
         int numberOfPikachus =
-                trainPikachu.predict("build/output", "src/test/resources/pikachu.jpg");
+                trainPikachu.predict("build/model", "src/test/resources/pikachu.jpg");
         if (expectedMinNumber > 0) {
             Assert.assertTrue(numberOfPikachus >= expectedMinNumber);
             Assert.assertTrue(numberOfPikachus <= expectedMaxNumber);

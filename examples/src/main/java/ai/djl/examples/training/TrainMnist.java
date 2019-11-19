@@ -85,7 +85,7 @@ public final class TrainMnist extends AbstractTraining {
             model.setProperty("Accuracy", String.format("%.2f", getValidationAccuracy()));
             // TODO: Add more property into model: Throughput, Memory, mAP, Dataset etc.
 
-            model.save(Paths.get("build/model"), "mlp");
+            model.save(Paths.get(arguments.getOutputDir()), "mlp");
         }
     }
 

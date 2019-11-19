@@ -16,7 +16,7 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 ## Run handwritten digit recognition example
 
 ### Build the project and run
-You can run the following command directly and the model will be trained for 2 epochs. The model is saved in the following folder: `build/model`.
+The following command will train the model for 2 epochs. The trained model is saved in the following folder: `build/model`.
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainMnist
@@ -47,12 +47,12 @@ Validating:  100% |████████████████████�
 
 The results show that we reached 96.93% validation accuracy at the end of the second epoch.
 
-You can also run the example with your own arguments, for example, to train 5 epochs using batch size 64, and save to a specified folder `/mlp_model`:
+You can also run the example with your own arguments, for example, to train 5 epochs using batch size 64, and save it to a specified folder `/mlp_model`:
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainMnist --args="-e 5 -b 64 -o /mlp_model"
 ```
-Here is the list of available arguments
+The following table shows the list of available arguments:
 
  | Argument   | Comments                                 |
  | ---------- | ---------------------------------------- |

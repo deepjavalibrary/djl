@@ -25,7 +25,7 @@ public class TrainMnistTest {
 
     @Test
     public void testTrainMnist() throws ModelException, TranslateException, IOException {
-        String[] args = new String[] {"-e", "2", "-g", "1", "-o", "build/output"};
+        String[] args = new String[] {"-g", "1"};
 
         TrainMnist test = new TrainMnist();
         Assert.assertTrue(test.runExample(args));

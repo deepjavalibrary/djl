@@ -54,7 +54,7 @@ public class Arguments {
         if (cmd.hasOption("output-dir")) {
             outputDir = cmd.getOptionValue("output-dir");
         } else {
-            outputDir = null;
+            outputDir = "build/model";
         }
         if (cmd.hasOption("max-iterations")) {
             maxIterations = Long.parseLong(cmd.getOptionValue("max-iterations"));

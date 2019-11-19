@@ -21,9 +21,6 @@ import java.util.Map;
 
 @SuppressWarnings("PMD.LooseCoupling")
 public class Artifact {
-
-    public static final VersionComparator COMPARATOR = new VersionComparator();
-
     private transient String metadataVersion;
     private transient String groupId;
     private transient String artifactId;
