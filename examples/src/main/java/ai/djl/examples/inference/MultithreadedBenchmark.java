@@ -66,15 +66,24 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
 
         Classifications classification = null;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
+        int successThreads = 0;
         try {
             List<Future<Classifications>> futures = executorService.invokeAll(callables);
             for (Future<Classifications> future : futures) {
-                classification = future.get();
+                try {
+                    classification = future.get();
+                    ++successThreads;
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error("", e);
+                }
             }
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             logger.error("", e);
         } finally {
             executorService.shutdown();
+        }
+        if (successThreads != numOfThreads) {
+            logger.error("Only {}/{} threads finished.", successThreads, numOfThreads);
         }
         return classification;
     }
