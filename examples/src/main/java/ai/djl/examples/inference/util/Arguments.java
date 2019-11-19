@@ -34,6 +34,7 @@ public class Arguments {
     private String outputDir;
     private Map<String, String> criteria;
     private int iteration = 1;
+    private int threads;
 
     private boolean isImperative;
 
@@ -44,6 +45,11 @@ public class Arguments {
         imageFile = cmd.getOptionValue("image");
         if (cmd.hasOption("iteration")) {
             iteration = Integer.parseInt(cmd.getOptionValue("iteration"));
+        }
+        if (cmd.hasOption("threads")) {
+            threads = Integer.parseInt(cmd.getOptionValue("threads"));
+        } else {
+            threads = Runtime.getRuntime().availableProcessors() * 2 - 1;
         }
         if (cmd.hasOption("criteria")) {
             Type type = new TypeToken<Map<String, String>>() {}.getType();
@@ -81,6 +87,13 @@ public class Arguments {
                         .hasArg()
                         .argName("ITERATION")
                         .desc("Number of iterations in each test.")
+                        .build());
+        options.addOption(
+                Option.builder("t")
+                        .longOpt("threads")
+                        .hasArg()
+                        .argName("NUMBER_THREADS")
+                        .desc("Number of inference threads.")
                         .build());
         options.addOption(
                 Option.builder("o")
@@ -142,6 +155,10 @@ public class Arguments {
 
     public int getIteration() {
         return iteration;
+    }
+
+    public int getThreads() {
+        return threads;
     }
 
     public String getOutputDir() {

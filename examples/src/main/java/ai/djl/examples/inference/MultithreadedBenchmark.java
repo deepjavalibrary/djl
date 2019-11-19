@@ -56,7 +56,10 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
 
         ZooModel<BufferedImage, Classifications> model = loadModel(arguments, metrics);
 
-        int numOfThreads = Math.min(Runtime.getRuntime().availableProcessors(), 16);
+        int numOfThreads = arguments.getThreads();
+
+        logger.error("Multithreaded inference with {} threads.", numOfThreads);
+
         metrics.addMetric("thread", numOfThreads);
         AtomicBoolean collectMem = new AtomicBoolean(true);
         List<PredictorCallable> callables =
