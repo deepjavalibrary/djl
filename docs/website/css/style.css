@@ -27,15 +27,33 @@ p {
   color: #26a69a;
 }
 
+canvas {
+  display: block;
+  vertical-align: bottom;
+}
+
 .parallax-container {
   min-height: 380px;
   line-height: 0;
   height: auto;
   color: rgba(255,255,255,.9);
 }
-  .parallax-container .section {
+.parallax-container .section {
     width: 100%;
   }
+
+.graph-container {
+    color: #fff;
+    left: 0;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    max-width: 850px;
+    margin: 0 auto;
+}
 
 @media only screen and (max-width : 992px) {
   .parallax-container .section {
@@ -62,4 +80,15 @@ p {
 
 footer.page-footer {
   margin: 0;
+}
+
+#particles-js {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: grey;
+  background-image: url("../img/stars-in-the-night-sky.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
 }

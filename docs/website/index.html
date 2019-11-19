@@ -13,27 +13,29 @@
     <link href="./css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
 </head>
 <body data-gr-c-s-loaded="true">
-<div class="navbar-fixed">
-    <nav class="blue-grey lighten-5" role="navigation">
-        <div class="container">
-            <div class="nav-wrapper">
-                <a href="#Main" class="logo">
-                    <img src="./img/djl.png">
-                </a>
-                <a href="#" data-activates="mobile-demo" class="button-collapse button right"><span
-                        class="btn-open"></span></a>
-                <ul class="right hide-on-med-and-down">
-                    <li><a href="#link1">JavaDoc</a></li>
-                    <li><a href="https://github.com/awslabs/djl">GitHub</a></li>
-                </ul>
-            </div>
+<nav class="white" role="navigation">
+    <div class="container">
+        <div class="nav-wrapper container">
+            <a href="#Main" class="logo" id="logo-container">
+                <img src="./img/djl.png">
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="https://djl.ai/javadoc">JavaDoc</a></li>
+                <li><a href="https://github.com/awslabs/djl">GitHub</a></li>
+            </ul>
+            <ul id="nav-mobile" class="sidenav">
+                <li><a href="https://djl.ai/javadoc">JavaDoc</a></li>
+                <li><a href="https://github.com/awslabs/djl">GitHub</a></li>
+            </ul>
+            <a href="https://materializecss.com/templates/parallax-template/preview.html#" data-target="nav-mobile"
+               class="sidenav-trigger"><i class="material-icons">menu</i></a>
         </div>
-    </nav>
-</div>
+    </div>
+</nav>
 
 <div id="index-banner" class="parallax-container">
-    <div class="section no-pad-bot">
-        <div class="container">
+    <div id="particles-js">
+        <div class="container graph-container">
             <br><br>
             <h1 class="header center light-blue-text text-accent-2">Deep Java Library</h1>
             <div class="row center">
@@ -44,11 +46,8 @@
                    class="btn-large waves-effect waves-light light-blue accent-2">Get Started</a>
             </div>
             <br><br>
-
         </div>
     </div>
-    <div class="parallax"><img src="./img/background1.png" alt="Unsplashed background img 1"
-                               style="transform: translate3d(-50%, 257.137px, 0px); opacity: 1;"></div>
 </div>
 
 
@@ -62,25 +61,27 @@
                     <h2 class="center brown-text"><i class="material-icons">flash_on</i></h2>
                     <h5 class="center">Engine Agnostic</h5>
 
-                    <p class="light">DJL is a universal front-end for deep learning engines.</p>
+                    <p class="light">DJL is a universal front-end for deep learning engines. Backed it up with your
+                        favourite engines.</p>
                 </div>
             </div>
 
             <div class="col s12 m4">
                 <div class="icon-block">
                     <h2 class="center brown-text"><i class="material-icons">group</i></h2>
-                    <h5 class="center">Focused on Java</h5>
+                    <h5 class="center">Focused on Developer Experience</h5>
 
-                    <p class="light">We prioritize the java developer's experience</p>
+                    <p class="light">DJL designed to be simple and easy to learn.</p>
                 </div>
             </div>
 
             <div class="col s12 m4">
                 <div class="icon-block">
                     <h2 class="center brown-text"><i class="material-icons">settings</i></h2>
-                    <h5 class="center">Production Ready</h5>
+                    <h5 class="center">Easy for Deployment</h5>
 
-                    <p class="light">With enhanced memory control, we ensure stability in production environments.</p>
+                    <p class="light">With enhanced memory control and multi-thread support, it's never been so easy to
+                        deploy your work with high performance.</p>
                 </div>
             </div>
         </div>
@@ -108,7 +109,10 @@
             <div class="col s12 center">
                 <h3><i class="mdi-content-send brown-text"></i></h3>
                 <h4>Why DJL?</h4>
-                <p class="left-align light">Simple and efficient implementation</p>
+                <p class="left-align light">Leverage existing Java knowledge to instantly get started with ML</p>
+                <p class="left-align light">Simplifies development by abstracting commonly used functions and
+                    infrastructure orchestration</p>
+                <p class="left-align light">Pre-trained models to quickly prototype and accelerate development</p>
             </div>
         </div>
     </div>
@@ -140,7 +144,8 @@
     </div>
     <div class="footer-copyright">
         <div class="container">
-            Copyright 2019 <a class="brown-text text-lighten-3" href="http://aws.com/">Amazon Web Services</a>
+            Copyright 2019 <a class="brown-text text-lighten-3" href="http://aws.com/">Amazon.com, Inc.</a> or its
+            affiliates. All Rights Reserved.
         </div>
     </div>
 </footer>
@@ -150,6 +155,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script src="js/init.js"></script>
+<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>
+<script src="js/script.js"></script>
 
 
 <div class="sidenav-overlay"></div>
