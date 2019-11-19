@@ -40,15 +40,12 @@ configure([project(':api'), project(':basicdataset'), project(':examples'), proj
     publishing {
         publications {
             maven(MavenPublication) {
-                groupId project.getGroup()
-                artifactId project.getName()
-                version rootProject.getVersion()
                 from components.java
                 artifacts = [jar, javadocJar, sourcesJar]
                 pom {
                     name = "Deep Java Library - ${project.name}"
                     description = "Deep Java Library - ${project.name}"
-                    url = "http://www.djl.ai/${project.name.replaceAll(":", "/")}"
+                    url = "http://www.djl.ai/${project.name}"
 
                     packaging = "jar"
 

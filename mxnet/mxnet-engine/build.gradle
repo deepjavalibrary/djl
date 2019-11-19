@@ -95,6 +95,7 @@ publishing {
             pom {
                 name = "MXNet Engine Adapter"
                 description = "MXNet Engine Adapter for DJL"
+                url = "http://www.djl.ai/mxnet/${project.name}"
             }
         }
     }

@@ -26,6 +26,7 @@ publishing {
             pom {
                 name = "MXNet model zoo"
                 description = "MXNet model zoo for DJL"
+                url = "http://www.djl.ai/mxnet/${project.name}"
             }
         }
     }
