@@ -1,11 +1,12 @@
 # Documentation
 
+This module contains examples and documentation for the Deep Java Library (DJL) project.
 ## Modules
 
-- [Core API](../api/README.md) - Engine agnostic API
-- [Basic Dataset](../basicdataset/README.md) - Built-in dataset
-- [Model Zoo](../model-zoo/README.md) - Built-in Engine agnostic model zoo
-- [Repository API](../repository/README.md) - Repository utilities to build model zoo and dataset
+- [Core API](../api/README.md) - Engine-agnostic API
+- [Basic Dataset](../basicdataset/README.md) - Built-in datasets
+- [Model Zoo](../model-zoo/README.md) - Built-in engine-agnostic model zoo
+- [Repository API](../repository/README.md) - Repository utilities to build the model zoo and dataset
 - [MXNet Engine](../mxnet/mxnet-engine/README.md) - MXNet Engine implementation
 - [MXNet Model Zoo](../mxnet/mxnet-model-zoo/README.md) - MXNet symbolic model zoo
 

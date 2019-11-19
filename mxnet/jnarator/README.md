@@ -2,20 +2,20 @@
 
 ## Overview
 
-This module is a tool that used by Deep Java Library (DJL) to generate JNA code that used to call Native
+This module is used by the Deep Java Library (DJL) project to generate Java Native Access (JNA) code. This code is used to call Native
 C_API.
 
-Most of C API call requires developer write code to convert java data type to C data type.
-The goal of this module is to generate the mapping code based in C header file. 
+Most C API calls require developers to write code to convert from the Java data type to the C data type.
+The goal of this module is to generate the mapping code based on the C header file. 
 
-This module's output is a jar file that can be executed from command line.
-It takes a list of C header files, and optional a data type mapping file.
+This module's output is a .jar file that can be executed from the command line.
+It takes a list of C header files and, optionally, a data type mapping file.
 
-jnarator module uses antlr to create a customized C language parser, the parser
-read the C header file, and parse it into a AST tree. Then the code in this module 
-walk through the tree find C API calls and generate corresponding Java methods.
+The jnarator module uses antlr to create a customized C language parser. This parser
+reads the C header file, and parses it into an AST tree. The module then
+walks through the tree to find C API calls and generates their corresponding Java methods.
 
-Here is how we use this module in mxnet module:
+The following example demonstrates how to use this module in the MXNet module:
 
 ```
 task jnarator(dependsOn: ":jnarator:jar") {

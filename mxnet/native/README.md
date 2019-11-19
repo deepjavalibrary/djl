@@ -1,12 +1,12 @@
 # DJL - MXNet native library
 
-## Instruction
+## Building the library
 
-### Step 1: Copy library
+### Step 1: Copy the library
 
-Copy the library files and all dependencies in `<path_to_your_DJL>/mxnet/native/src/main/resources/binaries/<flavor>/<osName>/native/lib`.
+Copy the library files and all dependencies to `<path_to_your_DJL>/mxnet/native/src/main/resources/binaries/<flavor>/<osName>/native/lib`.
 
-Make sure to upload all the libmxnet.so dependencies by command
+Use the following commands include all the libmxnet.so dependencies:
 ```bash
 # osx
 otool -L libmxnet.dylib
@@ -14,13 +14,13 @@ otool -L libmxnet.dylib
 ldd libmxnet.so
 ```
 
-The example dependencies list for osx are
+The example dependencies list for macOS is:
 - libiomp5.dylib
 - libmkldnn.0.dylib
 - libmklml.dylib
-- libmxnet.dylib(please make sure rename libmxnet.so to libmxnet.dylib for osx)
+- libmxnet.dylib(Be sure to rename libmxnet.so to libmxnet.dylib for macOS)
 
-The available flavor names are:
+The available MXNet native versions are:
 - cu101mkl
 - cu101
 - cu92mkl
@@ -37,7 +37,7 @@ The valid OS names are:
 
 ### Step 2: Publish
 
-do the followings to prepare your package:
+Run the following commands to prepare your package:
 
 ```bash
 cd mxnet/native

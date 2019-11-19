@@ -2,13 +2,14 @@
 
 ## Introduction
 
-MXNet model zoo contains most of the Symbolic model that can be used for inference and training.
+The MXNet model zoo contains most of the symbolic models that can be used for inference and training.
 
 All of the models in this model zoo contain pre-trained parameters for their specific datasets.
 
 ## Pre-trained models
 
-MXNet model zoo contains two major categories, CV and NLP. All of the models are grouped by their application under these categories:
+The MXNet model zoo contains two major categories, Computer Vision (CV) and Natural Language Processing (NLP). All of the models are grouped by their application under these two categories as follows:
+
 
 * CV
   * Action Recognition
@@ -20,7 +21,7 @@ MXNet model zoo contains two major categories, CV and NLP. All of the models are
   * Question and Answer
 
 ## Installation
-You can pull the MXNet Engine from the central Maven repositories by including the following dependency:
+You can pull the MXNet engine from the central Maven repository by including the following dependency in you `pom.xml` file:
 
 ```xml
 <dependency>
@@ -32,13 +33,13 @@ You can pull the MXNet Engine from the central Maven repositories by including t
 
 ## How to find a pre-trained model in model zoo
 
-In a model zoo repository, there can be many pre-trained that belongs to the same model family.
-You can use the `MxModelZoo` class to search for the model that you need.
-First, you need to decide which model family you want to use, then define key/values search criteria
+In a model zoo repository, there can be many pre-trained models that belong to the same model family.
+You can use the `ModelZoo` class to search for the model that you need.
+First, decide which model family you want to use. Then, define your key/values search criteria
 to narrow down the model you want. If there are multiple models that match your search criteria, the first
-model found will be returned. *ModelNotFoundException* will be thrown if no matching model is found.
+model found is returned. *ModelNotFoundException* will be thrown if no matching model is found.
 
-The following is an example of criteria to find a resnet50-v1 model that is trained on the imagenet dataset:
+The following is an example of the criteria to find a Resnet50-v1 model that has been trained on the imagenet dataset:
 ```java
     Map<String, String> criteria = new HashMap<>();
     criteria.put("layers", "50");
@@ -49,6 +50,7 @@ The following is an example of criteria to find a resnet50-v1 model that is trai
 ``` 
 
 ## List of search criteria for each model
+The following table illustrates the possible search criteria for all models in the model zoo:
 
 | Category | Application           | Model Family      | Criteria | Possible values                                            |
 |----------|-----------------------|-------------------|----------|------------------------------------------------------------|
@@ -79,8 +81,8 @@ The following is an example of criteria to find a resnet50-v1 model that is trai
 | NLP      | Question and Answer   | BertQA            | backbone | bert                                                       |
 |          |                       |                   | dataset  | book_corpus_wiki_en_uncased                                |
 
-**Note:** Not all combinations in the above table are available. Please check `metadata.json` files
-in `src/test/resources/mlrepo/model` folder for detail.
+**Note:** Not all combinations in the above table are available. For more information, see the `metadata.json` file
+in the `src/test/resources/mlrepo/model` folder.
 
 ## Developer guide
 

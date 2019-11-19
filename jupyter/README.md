@@ -2,29 +2,17 @@
 
 ## Overview
 
-This folder contains tutorials that teach you how to achieve basic AI tasks with Deep Java Library (DJL).
+This folder contains tutorials that illustrate how to accomplish basic AI tasks with Deep Java Library (DJL).
 
 ## List of tutorials
 
-### Create your first neural network
+### [Create your first neural network](create_your_first_network.ipynb)
 
-See [here](create_your_first_network.ipynb).
+### [Train your first model](train_your_first_model.ipynb)
 
-### Train your first model
+### [Run image classification with your first model](image_classification_with_your_model.ipynb)
 
-See [here](train_your_first_model.ipynb).
-
-### Run image classification with your first model
-
-See [here](image_classification_with_your_model.ipynb).
-
-### Run object detection with model zoo
-
-See [here](object_detection_with_model_zoo.ipynb).
-
-### Load pre-trained MXNet model
-
-See [here](load_mxnet_model.ipynb).
+### [Run object detection with model zoo](object_detection_with_model_zoo.ipynb)
 
 ## Setup
 

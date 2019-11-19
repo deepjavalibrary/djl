@@ -4,13 +4,10 @@
 
 This module contains the MXNet implementation of the Deep Java Library (DJL) EngineProvider.
 
-It's not recommended for developer to use classes in this module directly. It will make your code
-coupled with MXNet. However developer is not restricted from using Engine specific features. See
-[NDManager#invoke()](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/ai/djl/ndarray/NDManager.html#invoke-java.lang.String-ai.djl.ndarray.NDList-ai.djl.ndarray.NDList-ai.djl.util.PairList-)
-for detail.
+We don't recommend that developers use classes in this module directly. Use of these classes will couple your code with MXNet and make switching between frameworks difficult. Even so, developers are not restricted from using engine-specific features. For more information, see [NDManager#invoke()](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/ai/djl/ndarray/NDManager.html#invoke-java.lang.String-ai.djl.ndarray.NDList-ai.djl.ndarray.NDList-ai.djl.util.PairList-).
 
 ## Installation
-You can pull the MXNet Engine from the central Maven repositories by including the following dependency:
+You can pull the MXNet engine from the central Maven repository by including the following dependency:
 
 ```xml
 <dependency>
@@ -21,11 +18,11 @@ You can pull the MXNet Engine from the central Maven repositories by including t
 </dependency>
 ```
 
-Besides `mxnet-engine` library, you may also need to include MXNet native library into your project.
-Choose a proper a native library based on your needs and platform:
+Besides the `mxnet-engine` library, you may also need to include the MXNet native library in your project.
+Choose a native library based on your platform and needs:
 
-### Mac OS
-For the Mac OS, you can choose between the following two libraries:
+### macOS
+For macOS, you can choose between the following two libraries:
 
 - org.apache.mxnet:mxnet-native-mkl:1.6.0:osx-x86_64
 

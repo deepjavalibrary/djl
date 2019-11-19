@@ -7,21 +7,20 @@
 
 ## Overview
 
-DJL is designed to be extremely easy to get started and simple to
-use deep learning framework for Java developers. DJL does not required user to be ML/DL experts to get started
-and can start from their existing Java expertise as an on-ramp to learn and use ML/DL. They can
-use their favorite IDE to build/train/deploy their models and integrate these models with their
-Java applications.
+Deep Java Library (DJL) is an open-source, high-level, framework-agnostic Java API for deep learning. DJL is designed to be easy to get started with and simple to
+use for Java developers. DJL provides a native Java development experience and functions like any other regular Java library.
 
-DJL is deep learning engine agnostic, developer does not have to make a choice
-between framework while they started their project. They can switch to different framework at any
-time they want. DJL also provides automatic CPU/GPU chosen based on the hardware configuration to ensure the best performance.
+You don't have to be machine learning/deep learning expert to get started. You can use your existing Java expertise as an on-ramp to learn and use machine learning and deep learning. You can
+use your favorite IDE to build, train, and deploy your models. DJL makes it easy to integrate these models with your
+Java applications. 
 
-DJL provide native Java development experience, just another regular java library.
-DJL's ergonomic API interface is designed to guide developer with best practice to accomplish
-deep learning task.
+Because DJL is deep learning framework agnostic, you don't have to make a choice
+between frameworks when creating your projects. You can switch frameworks at any
+point. To ensure the best performance, DJL also provides automatic CPU/GPU choice based on hardware configuration.
 
-The following is pseudo code of how to write inference code:
+DJL's ergonomic API interface is designed to guide you with best practices to accomplish
+deep learning tasks.
+The following pseudocode demonstrates running inference:
 
 ```java
     // Assume user uses a pre-trained model from model zoo, they just need to load it
@@ -41,7 +40,7 @@ The following is pseudo code of how to write inference code:
     }
 ```
 
-The following is pseudo code of how to write training code:
+The following pseudocode demonstrates running training:
 
 ```java
     // Construct your neural network with built-in blocks
@@ -79,18 +78,19 @@ The following is pseudo code of how to write training code:
 
 ## Building From Source
 
-Once you check out the code, you can build it using gradle:
+To build from source, begin by checking out the code. 
+Once you have checked out the code locally, you can build it as follows using Gradle:
 
 ```sh
 ./gradlew build
 ```
 
-If you want to skip unit test:
+To increase build speed, you can use the following command to skip unit tests:
 ```sh
 ./gradlew build -x test
 ```
 
-**Note:** SpotBugs is not compatible with JDK 11+, SpotBugs will not be executed if you are using JDK 11+.
+**Note:** SpotBugs is not compatible with JDK 11+. SpotBugs will not be executed if you are using JDK 11+.
 
 ## License
 
