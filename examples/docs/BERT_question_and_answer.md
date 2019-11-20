@@ -1,7 +1,7 @@
 # BERT QA Example
 
-In this tutorial, you'll walk through the BERT QA model trained by MXNet. 
-You can provide a question and a paragraph containing the answer to the model. The model is then able to find the best answer from the answer paragraph.
+In this tutorial, you'll learn how to use the BERT QA model trained by MXNet. 
+You can provide the model with a question and a paragraph containing an answer. The model is then able to find the best answer from the answer paragraph.
 
 Example:
 ```text
@@ -31,9 +31,9 @@ curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/stat
 curl https://s3.us-east-2.amazonaws.com/mxnet-scala/scala-example-ci/BertQA/static_bert_qa-symbol.json -O
 ```
 
-### Step 2: Do Inference
+### Step 2: Run Inference
 
-The available arguments are as follows:
+The following table shows the available arguments:
 
 | Argument   | Comments                                 |
 | ---------- | ---------------------------------------- |
@@ -43,7 +43,8 @@ The available arguments are as follows:
 | `-p`      | Path to the model directory |
 | `-n`      |  Model name prefix |
 
-You can type the following to run inference:
+
+Use the following command to run inference:
 
 ```
 cd examples

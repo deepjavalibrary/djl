@@ -1,33 +1,34 @@
-# Object detection using model zoo model
+# Object detection using a model zoo model
 
 [Object detection](https://en.wikipedia.org/wiki/Object_detection) is a computer vision technique
 for locating instances of objects in images or videos.
 
-In this example we will show you how to implement inference code with [ModelZoo model](../../docs/model-zoo.md) to detect dogs in an image.
+In this example, we will show you how to implement inference code with a [ModelZoo model](../../docs/model-zoo.md) to detect dogs in an image.
 
-The following is the example source code: [ObjectDetection.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ObjectDetection.java).
+The source code can be found at [ObjectDetection.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ObjectDetection.java).
 
-You can also find jupyter notebook tutorial [here](../../jupyter/README.md#run-object-detection-with-model-zoo).
-The jupyter notebook will explain the key concept in detail.
+You can also find the jupyter notebook tutorial [here](../../jupyter/README.md#run-object-detection-with-model-zoo).
+The jupyter notebook explains the key concepts in detail.
 
 ## Setup Guide
 
-Please follow [setup](../../docs/development/setup.md) to configure your development environment.
+Follow [setup](../../docs/development/setup.md) to configure your development environment.
 
 ## Run object detection example
 
 ### Input image file
-You can find the image used in this example in project test resource folder: `src/test/resources/3dogs.jpg`
+You can find the image used in this example in the project test resource folder: `src/test/resources/3dogs.jpg`
 
 ![dogs](../src/test/resources/3dogs.jpg)
 
 ### Build the project and run
-
+Use the following command to run the project:
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.ObjectDetection
 ```
 
+Your output should look like the following:
 ```text
 [INFO ] - Detected objects image has been saved in: build/output/ssd.jpg
 [INFO ] - [
@@ -37,6 +38,6 @@ cd examples
 ]
 ```
 
-With the previous command, an output image with bounding box will be saved at: build/output/ssd.jpg:
+An output image with bounding box will be saved as build/output/ssd.jpg:
 
 ![detected-dogs](img/detected-dogs.jpg)

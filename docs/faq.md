@@ -2,11 +2,10 @@
 
 ## Why Deep Java Library (DJL)?
 
-- We prioritizes java developer's experience
-- Easy for non machine learning developer to on board
-- We allows developer write modularity and reusable code
-- Easy to turn a model into products
-- Reduce friction for deploying to production environment
-- Model Zoo connects model developer with their consumer
-- Engine agnostic API design allows developer write code once and run on any engine
-- Doesn't have restriction on using engine specific features
+- Prioritizes the Java developer's experience
+- Makes it easy for new machine learning developers to get started
+- Allows developers to write modular, reusable code
+- Reduces friction for deploying to a production environment
+- Connects model developers with their consumers using the Model Zoo
+- Allows developers to write code once and run it on any deep learning engine
+- Allows the use of engine specific features

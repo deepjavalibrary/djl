@@ -4,7 +4,7 @@ Training a handwritten digit dataset([MNIST](http://yann.lecun.com/exdb/mnist/))
 
 In this example, we will show you how to train the MNIST dataset with DeepJavaLibrary (DJL) to recognize handwritten digits from an image.
 
-Here is the example source code: [TrainMnist.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainMnist.java).
+The source code for this example can be found at [TrainMnist.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainMnist.java).
 
 You can also find the jupyter notebook tutorial [here](../../jupyter/README.md#train-your-first-model).
 The jupyter notebook explains the key concepts in detail.
@@ -16,7 +16,9 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 ## Run handwritten digit recognition example
 
 ### Build the project and run
-The following command will train the model for 2 epochs. The trained model is saved in the following folder: `build/model`.
+
+The following command will train the model for 2 epochs. The trained model is saved in the `build/model` folder.
+
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainMnist
@@ -47,12 +49,16 @@ Validating:  100% |████████████████████�
 
 The results show that we reached 96.93% validation accuracy at the end of the second epoch.
 
-You can also run the example with your own arguments, for example, to train 5 epochs using batch size 64, and save it to a specified folder `/mlp_model`:
+
+You can also run the example with your own arguments. For example, you can train for 5 epochs using batch size 64 and save the model to a specified folder `/mlp_model` using the following command:
+
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainMnist --args="-e 5 -b 64 -o /mlp_model"
 ```
+
 The following table shows the list of available arguments:
+
 
  | Argument   | Comments                                 |
  | ---------- | ---------------------------------------- |
