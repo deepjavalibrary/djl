@@ -2,7 +2,7 @@
 
 Training a handwritten digit dataset([MNIST](http://yann.lecun.com/exdb/mnist/)) is like the "Hello World!" program of the deep learning world.
 
-In this example, we will show you how to train the MNIST dataset with DeepJavaLibrary (DJL) to recognize handwritten digits from an image.
+In this example, we will show you how to train the MNIST dataset with Deep Java Library (DJL) to recognize handwritten digits in an image.
 
 The source code for this example can be found at [TrainMnist.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainMnist.java).
 
