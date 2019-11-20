@@ -23,11 +23,12 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import java.io.IOException;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class ImageNetTest {
 
     // ImageNet requires running manual download so can't be automatically tested
-    // @Test
+    @Test(enabled = false)
     public void testImageNetLocal() throws IOException {
         Repository repository =
                 Repository.newInstance(
