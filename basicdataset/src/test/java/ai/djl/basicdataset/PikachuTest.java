@@ -14,7 +14,7 @@ package ai.djl.basicdataset;
 
 import ai.djl.Model;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Activation;
+import ai.djl.nn.Blocks;
 import ai.djl.repository.MRL;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -42,7 +42,7 @@ public class PikachuTest {
                 new DefaultTrainingConfig(
                         new NormalInitializer(0.01), Loss.softmaxCrossEntropyLoss());
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
             try (Trainer trainer = model.newTrainer(config)) {
                 Iterator<Batch> ds = trainer.iterateDataset(pikachu).iterator();
                 Batch batch = ds.next();

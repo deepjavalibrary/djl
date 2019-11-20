@@ -202,6 +202,11 @@ public class GRU extends RecurrentCell {
             return this;
         }
 
+        /**
+         * Builds a {@link GRU} block.
+         *
+         * @return the {@link GRU} block
+         */
         public GRU build() {
             if (stateSize == -1 || numStackedLayers == -1) {
                 throw new IllegalArgumentException("Must set stateSize and numStackedLayers");

@@ -13,7 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
-import ai.djl.nn.Activation;
+import ai.djl.nn.Blocks;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -38,7 +38,7 @@ public class CocoTest {
         coco.prepare();
         try (Model model = Model.newInstance()) {
             TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(coco)) {
                     Assert.assertEquals(batch.getData().size(), 1);

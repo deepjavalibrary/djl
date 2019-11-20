@@ -418,6 +418,11 @@ public class Shape {
         return LayoutType.toString(layout);
     }
 
+    /**
+     * Gets the byte array representation of this {@code Shape} for serialization.
+     *
+     * @return a byte array representation of this {@code Shape}
+     */
     public byte[] getEncoded() {
         int length = 8 + shape.length * 8 + layout.length * 2;
         ByteBuffer bb = ByteBuffer.allocate(length);
@@ -466,6 +471,14 @@ public class Shape {
         return sb.toString();
     }
 
+    /**
+     * Decodes the data in the given {@link DataInputStream} and converts it into the corresponding
+     * {@link Shape} object.
+     *
+     * @param dis the inputstream to read from
+     * @return the corresponding {@link Shape} object
+     * @throws IOException when an I/O error occurs
+     */
     public static Shape decode(DataInputStream dis) throws IOException {
         // Shape
         int length = dis.readInt();

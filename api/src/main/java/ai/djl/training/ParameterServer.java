@@ -15,8 +15,15 @@ package ai.djl.training;
 
 import ai.djl.ndarray.NDArray;
 
+/** An interface for a key-value store to store parameters, and their corresponding gradients. */
 public interface ParameterServer extends AutoCloseable {
 
+    /**
+     * Initializes the {@code ParameterStore} for the given parameter.
+     *
+     * @param parameterId the parameter ID
+     * @param value the values to be set for the given parameter
+     */
     void init(String parameterId, NDArray[] value);
 
     /**

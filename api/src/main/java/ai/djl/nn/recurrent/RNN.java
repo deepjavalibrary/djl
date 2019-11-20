@@ -204,6 +204,7 @@ public class RNN extends RecurrentCell {
         }
     }
 
+    /** An enum that enumerates the type of activation. */
     public enum Activation {
         RELU,
         TANH

@@ -16,6 +16,12 @@ import ai.djl.modality.cv.MultiBoxTarget;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 
+/**
+ * {@code SingleShotDetectionLoss} is an implementation of {@link Loss}. It is used to compute the
+ * loss while training a Single Shot Detection (SSD) model for object detection. It involves
+ * computing the targets given the generated anchors, labels and predictions, and then computing the
+ * sum of class predictions and bounding box predictions.
+ */
 public class SingleShotDetectionLoss extends Loss {
     private Loss softmaxLoss = Loss.softmaxCrossEntropyLoss();
     private Loss l1Loss = Loss.l1Loss();

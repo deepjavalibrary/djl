@@ -62,7 +62,7 @@ public class Linear extends ParameterBlock {
     Linear(Builder builder) {
         outChannels = builder.outChannels;
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
-        if (builder.isBias()) {
+        if (builder.bias) {
             bias = new Parameter("bias", this, ParameterType.BIAS);
         }
     }
@@ -194,10 +194,6 @@ public class Linear extends ParameterBlock {
         public Builder setOutChannels(long outChannels) {
             this.outChannels = outChannels;
             return this;
-        }
-
-        public boolean isBias() {
-            return bias;
         }
 
         /**

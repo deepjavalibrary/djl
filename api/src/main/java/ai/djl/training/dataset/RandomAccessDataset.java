@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * RandomAccessDataset represent the dataset that support random access reads. i.e. it could access
- * certain data item given the index
+ * a specific data item given the index.
  */
 public abstract class RandomAccessDataset implements Dataset, RandomAccess {
 
@@ -35,6 +35,12 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     private long maxIteration;
     protected Device device;
 
+    /**
+     * Creates a new instance of {@link RandomAccessDataset} with the given necessary
+     * configurations.
+     *
+     * @param builder a builder with the necessary configurations
+     */
     public RandomAccessDataset(BaseBuilder<?> builder) {
         this.sampler = builder.getSampler();
         this.batchifier = builder.batchifier;
@@ -46,6 +52,14 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         this.device = builder.device;
     }
 
+    /**
+     * Gets the {@link Record} for the given index from the dataset.
+     *
+     * @param manager the manager used to create the arrays
+     * @param index the index of the requested data item
+     * @return a {@link Record} that contains the data and label of the requested data item
+     * @throws IOException if an I/O error occurs
+     */
     public abstract Record get(NDManager manager, long index) throws IOException;
 
     /** {@inheritDoc} */
@@ -71,6 +85,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
      */
     public abstract long size();
 
+    /** The Builder to construct a {@link RandomAccessDataset}. */
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
@@ -83,6 +98,11 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         protected long maxIteration = Long.MAX_VALUE;
         protected Device device;
 
+        /**
+         * Gets the {@link Sampler} for the dataset.
+         *
+         * @return the {@code Sampler}
+         */
         public Sampler getSampler() {
             if (sampler == null) {
                 throw new IllegalArgumentException("The sampler must be set");
@@ -90,10 +110,25 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
             return sampler;
         }
 
+        /**
+         * Sets the {@link Sampler} with the given batch size.
+         *
+         * @param batchSize the batch size
+         * @param random whether the sampling has to be random
+         * @return this {@code BaseBuilder}
+         */
         public T setSampling(long batchSize, boolean random) {
             return setSampling(batchSize, random, false);
         }
 
+        /**
+         * Sets the {@link Sampler} with the given batch size.
+         *
+         * @param batchSize the batch size
+         * @param random whether the sampling has to be random
+         * @param dropLast whether to drop the last incomplete batch
+         * @return this {@code BaseBuilder}
+         */
         public T setSampling(long batchSize, boolean random, boolean dropLast) {
             if (random) {
                 sampler = new BatchSampler(new RandomSampler(), batchSize, dropLast);
@@ -103,42 +138,94 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
             return self();
         }
 
+        /**
+         * Sets the {@link Sampler} for the dataset.
+         *
+         * @param sampler the {@link Sampler} to be set
+         * @return this {@code BaseBuilder}
+         */
         public T setSampling(Sampler sampler) {
             this.sampler = sampler;
             return self();
         }
 
+        /**
+         * Sets the {@link Batchifier} for the dataset.
+         *
+         * @param batchier the {@link Batchifier} to be set
+         * @return this {@code BaseBuilder}
+         */
         public T optBatchier(Batchifier batchier) {
             this.batchifier = batchier;
             return self();
         }
 
+        /**
+         * Sets the {@link Pipeline} of {@link ai.djl.translate.Transform} to be applied on the
+         * data.
+         *
+         * @param pipeline the {@link Pipeline} of {@link ai.djl.translate.Transform} to be applied
+         *     on the data
+         * @return this {@code BaseBuilder}
+         */
         public T optPipeline(Pipeline pipeline) {
             this.pipeline = pipeline;
             return self();
         }
 
+        /**
+         * Sets the {@link Pipeline} of {@link ai.djl.translate.Transform} to be applied on the
+         * labels.
+         *
+         * @param targetPipeline the {@link Pipeline} of {@link ai.djl.translate.Transform} to be
+         *     applied on the labels
+         * @return this {@code BaseBuilder}
+         */
         public T optTargetPipeline(Pipeline targetPipeline) {
             this.targetPipeline = targetPipeline;
             return self();
         }
 
+        /**
+         * Sets the {@link ExecutorService} to spawn threads to fetch data.
+         *
+         * @param executor the {@link ExecutorService} to spawn threads
+         * @param prefetchNumber the number of samples to prefetch at once
+         * @return this {@code BaseBuilder}
+         */
         public T optExcutor(ExecutorService executor, int prefetchNumber) {
             this.executor = executor;
             this.prefetchNumber = prefetchNumber;
             return self();
         }
 
+        /**
+         * Sets the {@link Device}.
+         *
+         * @param device the device
+         * @return this {@code BaseBuilder}
+         */
         public T optDevice(Device device) {
             this.device = device;
             return self();
         }
 
+        /**
+         * Sets the maximum number of iterations.
+         *
+         * @param maxIteration the maximum number of iterations
+         * @return this {@code BaseBuilder}
+         */
         public T optMaxIteration(long maxIteration) {
             this.maxIteration = maxIteration;
             return self();
         }
 
+        /**
+         * Returns this {code Builder} object.
+         *
+         * @return this {@code BaseBuilder}
+         */
         protected abstract T self();
     }
 }

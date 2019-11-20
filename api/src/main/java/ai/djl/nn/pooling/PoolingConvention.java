@@ -12,10 +12,21 @@
  */
 package ai.djl.nn.pooling;
 
+/** An enum that enumerates the different pooling conventions. */
 public enum PoolingConvention {
     VALID,
     FULL;
 
+    /**
+     * Computes the size of the output in the given input dimension for this {@code
+     * PoolingConvention}.
+     *
+     * @param input the input size in the dimension
+     * @param kernel the kernel size in the dimension
+     * @param stride the stride size in the dimension
+     * @param pad the pad size in the dimension
+     * @return the output size in the given input dimension
+     */
     public long getOutput(long input, long kernel, long stride, long pad) {
         double output = input + 2 * pad - kernel / stride;
         switch (this) {

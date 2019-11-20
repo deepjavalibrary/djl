@@ -25,6 +25,7 @@ public interface Dataset {
      */
     Iterable<Batch> getData(NDManager manager);
 
+    /** An enum that indicates the mode - training, test or validation. */
     enum Usage {
         TRAIN,
         TEST,

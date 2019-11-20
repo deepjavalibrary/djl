@@ -40,6 +40,11 @@ public interface Progress {
      */
     void increment(long increment);
 
+    /**
+     * Updates the progress tracking indicator to the given value.
+     *
+     * @param progress the value of the progress tracking indicator
+     */
     default void update(long progress) {
         update(progress, null);
     }

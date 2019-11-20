@@ -30,6 +30,11 @@ import ai.djl.training.metrics.TrainingMetric;
  */
 public interface Trainer extends AutoCloseable {
 
+    /**
+     * Initializes the {@link Model} that the {@code Trainer} is going to train.
+     *
+     * @param shapes an array of {@code Shape} of the inputs
+     */
     void initialize(Shape... shapes);
 
     /**
@@ -42,6 +47,11 @@ public interface Trainer extends AutoCloseable {
         return dataset.getData(getManager());
     }
 
+    /**
+     * Returns a new instance of {@link GradientCollector}.
+     *
+     * @return a new instance of {@link GradientCollector}
+     */
     GradientCollector newGradientCollector();
 
     /**

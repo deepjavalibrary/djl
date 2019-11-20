@@ -46,6 +46,11 @@ public abstract class Convolution extends ParameterBlock {
     protected Parameter weight;
     protected Parameter bias;
 
+    /**
+     * Creates a {@link Convolution} object.
+     *
+     * @param builder the {@code Builder} that has the necessary configurations
+     */
     public Convolution(ConvolutionBuilder<?> builder) {
         kernel = builder.kernel;
         stride = builder.stride;
@@ -61,6 +66,11 @@ public abstract class Convolution extends ParameterBlock {
         }
     }
 
+    /**
+     * Gets the version of the {@code Convolution} block.
+     *
+     * @return the version
+     */
     protected abstract byte getVersion();
 
     /**
@@ -190,6 +200,11 @@ public abstract class Convolution extends ParameterBlock {
         return ret;
     }
 
+    /**
+     * A builder that can build any {@code Convolution} block.
+     *
+     * @param <T> the type of {@code Convolution} block to build
+     */
     @SuppressWarnings("rawtypes")
     public abstract static class ConvolutionBuilder<T extends ConvolutionBuilder> {
 

@@ -71,7 +71,11 @@ import ai.djl.inference.Predictor;
  */
 public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
 
-    // Default to Stack batchifier
+    /**
+     * Gets the {@link Batchifier}.
+     *
+     * @return the {@link Batchifier}
+     */
     default Batchifier getBatchifier() {
         return Batchifier.STACK;
     }

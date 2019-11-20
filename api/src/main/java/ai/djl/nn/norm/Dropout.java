@@ -87,6 +87,7 @@ public class Dropout extends ParameterBlock {
         }
     }
 
+    /** The Builder to construct a {@link Dropout} type of {@link ai.djl.nn.Block}. */
     public static final class Builder {
 
         private float probability = 0.5f;

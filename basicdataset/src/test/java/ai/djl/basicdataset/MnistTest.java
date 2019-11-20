@@ -14,7 +14,7 @@ package ai.djl.basicdataset;
 
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
-import ai.djl.nn.Activation;
+import ai.djl.nn.Blocks;
 import ai.djl.repository.Repository;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -35,7 +35,7 @@ public class MnistTest {
                 new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
             Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
@@ -64,7 +64,7 @@ public class MnistTest {
                 new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
             Mnist mnist =

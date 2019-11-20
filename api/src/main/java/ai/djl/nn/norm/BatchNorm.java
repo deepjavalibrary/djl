@@ -144,6 +144,7 @@ public class BatchNorm extends ParameterBlock {
         runningVar.load(manager, is);
     }
 
+    /** The Builder to construct a {@link BatchNorm} type of {@link ai.djl.nn.Block}. */
     public static final class Builder {
 
         private int axis = 1;

@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 /**
  * An {@code Optimizer} updates the weight parameters to minimize the loss function. {@code
- * Optimizer} is an abstract class that provides the base implemenation for optimizers.
+ * Optimizer} is an abstract class that provides the base implementation for optimizers.
  */
 public abstract class Optimizer {
 
@@ -95,6 +95,13 @@ public abstract class Optimizer {
         return numUpdate;
     }
 
+    /**
+     * Updates the parameters according to the gradients.
+     *
+     * @param parameterId the parameter to be updated
+     * @param weight the weights of the parameter
+     * @param grad the gradients
+     */
     // TODO: make this protected after integrate with PS store
     public abstract void update(String parameterId, NDArray weight, NDArray grad);
 
@@ -123,6 +130,7 @@ public abstract class Optimizer {
                 device, k -> ((NDArray) arrayMap.values().toArray()[0]).asInDevice(device, true));
     }
 
+    /** The Builder to construct an {@link Optimizer}. */
     @SuppressWarnings("rawtypes")
     public abstract static class OptimizerBuilder<T extends OptimizerBuilder> {
 

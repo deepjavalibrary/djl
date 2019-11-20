@@ -102,6 +102,7 @@ public abstract class LearningRateTracker {
         return new FixedLearningRate.Builder().optBaseLearningRate(learningRate).build();
     }
 
+    /** The Builder to construct a {@link LearningRateTracker}. */
     @SuppressWarnings("rawtypes")
     public abstract static class LrBaseBuilder<T extends LrBaseBuilder> {
 

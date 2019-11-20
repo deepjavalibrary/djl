@@ -30,6 +30,11 @@ public enum ParameterType {
         this.initializer = initializer;
     }
 
+    /**
+     * Gets the {@link Initializer} of this {@code ParameterType}.
+     *
+     * @return the {@link Initializer} of this {@code ParameterType}
+     */
     public Initializer getInitializer() {
         return initializer;
     }

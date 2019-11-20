@@ -22,5 +22,11 @@ import ai.djl.ndarray.NDArray;
  */
 public interface Transform {
 
+    /**
+     * Applies the {@code Transform} to the given {@link NDArray}.
+     *
+     * @param array the {@link NDArray} on which the {@link Transform} is applied
+     * @return the output of the {@code Transform}
+     */
     NDArray transform(NDArray array);
 }

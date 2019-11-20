@@ -28,6 +28,7 @@ public interface Sampler {
      */
     Iterator<List<Long>> sample(RandomAccessDataset dataset);
 
+    /** An interface that samples a single data item at a time. */
     interface SubSampler {
 
         /**

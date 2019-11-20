@@ -13,7 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
-import ai.djl.nn.Activation;
+import ai.djl.nn.Blocks;
 import ai.djl.repository.Repository;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -34,7 +34,7 @@ public class Cifar10Test {
                 new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
 
             Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
             Cifar10 cifar10 =
@@ -62,7 +62,7 @@ public class Cifar10Test {
                 new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
 
             Cifar10 cifar10 =
                     new Cifar10.Builder()

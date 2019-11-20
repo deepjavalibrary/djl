@@ -131,7 +131,7 @@ public final class ResNetV1 {
         }
         SequentialBlock shortcut = new SequentialBlock();
         if (dimMatch) {
-            shortcut.add(Activation.IDENTITY_BLOCK);
+            shortcut.add(Blocks.identityBlock());
         } else {
             shortcut.add(
                             new Conv2D.Builder()

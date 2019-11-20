@@ -18,7 +18,7 @@ import ai.djl.basicdataset.Cifar10;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.nn.Activation;
+import ai.djl.nn.Blocks;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -49,7 +49,7 @@ public class DatasetTest {
     @Test
     public void testSequenceSampler() {
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
 
@@ -78,7 +78,7 @@ public class DatasetTest {
     @Test
     public void testRandomSampler() {
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
 
@@ -105,7 +105,7 @@ public class DatasetTest {
     @Test
     public void testBatchSampler() {
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
 
@@ -188,7 +188,7 @@ public class DatasetTest {
     @Test
     public void testArrayDataset() {
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
             // single case: one data, one label
@@ -266,7 +266,7 @@ public class DatasetTest {
     @Test
     public void testMultithreading() throws IOException, InterruptedException {
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
             NDManager manager = model.getNDManager();
 
             ExecutorService executor = Executors.newFixedThreadPool(5);

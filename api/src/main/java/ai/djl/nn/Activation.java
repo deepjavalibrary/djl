@@ -19,8 +19,6 @@ import ai.djl.nn.core.Prelu;
 /** Utility class that provides activation functions and blocks. */
 public final class Activation {
 
-    public static final Block IDENTITY_BLOCK = new LambdaBlock(x -> x);
-
     private Activation() {}
 
     /**

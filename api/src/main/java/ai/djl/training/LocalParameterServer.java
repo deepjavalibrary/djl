@@ -19,11 +19,17 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** {@code LocalParameterServer} is an implementation of the {@code ParameterServer} interface. */
 public class LocalParameterServer implements ParameterServer {
 
     private Optimizer optimizer;
     private Map<String, NDArray[]> gradMap;
 
+    /**
+     * Create a new instance of {@code LocalParameterServer} for the given optimizer.
+     *
+     * @param optimizer an optimizer
+     */
     public LocalParameterServer(Optimizer optimizer) {
         this.optimizer = optimizer;
         gradMap = new ConcurrentHashMap<>();

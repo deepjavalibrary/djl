@@ -30,6 +30,11 @@ public abstract class TrainingMetric implements Cloneable {
         this.name = name;
     }
 
+    /**
+     * Creates and returns a copy of this object.
+     *
+     * @return a copy of this {@code TrainingMetric}
+     */
     public TrainingMetric duplicate() {
         try {
             return (TrainingMetric) clone();
@@ -50,6 +55,11 @@ public abstract class TrainingMetric implements Cloneable {
     /** Resets metric values. */
     public abstract void reset();
 
+    /**
+     * Gets the name of this {@code TrainingMetric}.
+     *
+     * @return the name of this {@code TrainingMetric}
+     */
     public String getName() {
         return name;
     }

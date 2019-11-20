@@ -18,9 +18,20 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 
+/**
+ * {@code SingleShotDetectionAccuracy} is an implementation of {@link Accuracy}. It is used while
+ * training a Single Shot Detection (SSD) model for object detection. It uses the targets computed
+ * by {@link MultiBoxTarget}, and computes the class prediction accuracy against the computed
+ * targets.
+ */
 public class SingleShotDetectionAccuracy extends Accuracy {
     private MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
 
+    /**
+     * Creates a new instance of {@link SingleShotDetectionAccuracy} with the given name.
+     *
+     * @param name the name given to the accuracy
+     */
     public SingleShotDetectionAccuracy(String name) {
         super(name, 0);
     }

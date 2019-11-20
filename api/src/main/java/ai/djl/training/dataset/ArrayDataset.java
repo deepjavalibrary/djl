@@ -86,6 +86,7 @@ public class ArrayDataset extends RandomAccessDataset {
         return new Record(datum, label);
     }
 
+    /** The Builder to construct an {@link ArrayDataset}. */
     @SuppressWarnings("rawtypes")
     public static final class Builder extends BaseBuilder<Builder> {
 

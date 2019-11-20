@@ -15,6 +15,7 @@ package ai.djl.nn.pooling;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
 
+/** Utility class that provides {@code Block} and methods for different pooling functions. */
 public final class Pool {
 
     private Pool() {}

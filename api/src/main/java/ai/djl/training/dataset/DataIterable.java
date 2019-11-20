@@ -55,6 +55,20 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
     private Queue<Future<Batch>> queue;
     private long count;
 
+    /**
+     * Creates a new instance of {@code DataIterable} with the given parameters.
+     *
+     * @param dataset the dataset to iterate on
+     * @param manager the manager to create the arrays
+     * @param sampler a sampler to sample data with
+     * @param batchifier a batchifier
+     * @param pipeline the pipeline of transforms to apply on the data
+     * @param targetPipeline the pipeline of transforms to apply on the labels
+     * @param executor an {@link ExecutorService}
+     * @param preFetchNumber the number of samples to prefetch
+     * @param maxIteration the maximum number of iterations
+     * @param device the {@link Device}
+     */
     public DataIterable(
             RandomAccessDataset dataset,
             NDManager manager,

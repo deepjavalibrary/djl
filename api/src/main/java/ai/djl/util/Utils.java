@@ -184,6 +184,14 @@ public final class Utils {
         return ret;
     }
 
+    /**
+     * Gets the current epoch number.
+     *
+     * @param modelDir the path to the directory where the model files are stored
+     * @param modelName the name of the model
+     * @return the current epoch number
+     * @throws IOException if an I/O error occurs
+     */
     public static int getCurrentEpoch(Path modelDir, String modelName) throws IOException {
         final Pattern pattern = Pattern.compile(Pattern.quote(modelName) + "-(\\d{4}).params");
         List<Integer> checkpoints =

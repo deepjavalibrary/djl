@@ -14,6 +14,7 @@ package ai.djl.nn;
 
 import ai.djl.ndarray.NDList;
 
+/** Utility class that provides some useful blocks. */
 public final class Blocks {
 
     private Blocks() {}
@@ -72,5 +73,14 @@ public final class Blocks {
      */
     public static Block batchFlattenBlock(long batch, long size) {
         return new LambdaBlock(arrays -> batchFlatten(arrays, batch, size));
+    }
+
+    /**
+     * Creates a {@link LambdaBlock} that performs the identity function.
+     *
+     * @return an identity {@link Block}
+     */
+    public static Block identityBlock() {
+        return new LambdaBlock(x -> x);
     }
 }

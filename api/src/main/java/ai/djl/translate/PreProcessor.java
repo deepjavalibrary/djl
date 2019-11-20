@@ -21,6 +21,11 @@ import ai.djl.ndarray.NDList;
  */
 public interface PreProcessor<I> {
 
+    /**
+     * Gets the {@link Pipeline} applied to the input.
+     *
+     * @return the {@link Pipeline}
+     */
     default Pipeline getPipeline() {
         throw new UnsupportedOperationException("Not implemented.");
     }

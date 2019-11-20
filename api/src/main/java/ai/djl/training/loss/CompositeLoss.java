@@ -17,15 +17,26 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import java.util.Arrays;
 
+/**
+ * {@code CompositeLoss} is an implementation of the {@link Loss} abstract class that can combine
+ * different {@link Loss} functions by adding the individual losses together.
+ */
 public class CompositeLoss extends Loss {
 
     private Loss[] components;
 
+    /**
+     * Creates a new instance of {@code CompositeLoss} that can combine the given {@link Loss}
+     * components.
+     *
+     * @param components the {@code Loss} objects that form the composite loss
+     */
     public CompositeLoss(Loss... components) {
         super("CompositeLoss");
         this.components = components;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray getLoss(NDList label, NDList prediction) {
         NDArray[] losses =
@@ -37,12 +48,14 @@ public class CompositeLoss extends Loss {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Loss duplicate() {
         return new CompositeLoss(
                 Arrays.stream(components).map(Loss::duplicate).toArray(Loss[]::new));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void update(NDList labels, NDList predictions) {
         for (Loss component : components) {
@@ -50,6 +63,7 @@ public class CompositeLoss extends Loss {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void reset() {
         for (Loss component : components) {
@@ -57,6 +71,7 @@ public class CompositeLoss extends Loss {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public float getValue() {
         return (float) Arrays.stream(components).mapToDouble(Loss::getValue).sum();

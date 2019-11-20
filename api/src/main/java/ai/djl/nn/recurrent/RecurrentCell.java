@@ -29,6 +29,11 @@ public abstract class RecurrentCell extends ParameterBlock {
     protected boolean useBidirectional;
     protected boolean stateOutputs;
 
+    /**
+     * Creates a {@code RecurrentCell} object.
+     *
+     * @param builder the {@code Builder} that has the necessary configurations
+     */
     public RecurrentCell(BaseBuilder<?> builder) {
         stateSize = builder.stateSize;
         dropRate = builder.dropRate;
@@ -52,6 +57,7 @@ public abstract class RecurrentCell extends ParameterBlock {
         }
     }
 
+    /** The Builder to construct a {@link RecurrentCell} type of {@link ai.djl.nn.Block}. */
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 

@@ -69,6 +69,7 @@ public class XavierInitializer implements Initializer {
         this.magnitude = magnitude;
     }
 
+    /** Creates a new instance of {@code XavierInitializer}. */
     public XavierInitializer() {
         this(RandomType.UNIFORM, FactorType.AVG, 3);
     }

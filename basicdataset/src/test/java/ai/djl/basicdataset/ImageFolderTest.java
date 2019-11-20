@@ -19,7 +19,7 @@ import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.nn.Activation;
+import ai.djl.nn.Blocks;
 import ai.djl.repository.Repository;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -45,7 +45,7 @@ public class ImageFolderTest {
                 new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance()) {
-            model.setBlock(Activation.IDENTITY_BLOCK);
+            model.setBlock(Blocks.identityBlock());
 
             ImageFolder dataset =
                     new ImageFolder.Builder()
