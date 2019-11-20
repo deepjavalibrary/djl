@@ -15,6 +15,11 @@ package ai.djl.ndarray.index;
 import ai.djl.ndarray.types.Shape;
 import java.util.List;
 
+/**
+ * An index as a slice on all dimensions where some dimensions can be squeezed.
+ *
+ * <p>Create using {@link NDIndex#getAsFullSlice(Shape)}.
+ */
 public class NDIndexFullSlice {
     private long[] min;
     private long[] max;
@@ -23,7 +28,7 @@ public class NDIndexFullSlice {
     private Shape shape;
     private Shape squeezedShape;
 
-    public NDIndexFullSlice(
+    NDIndexFullSlice(
             long[] min,
             long[] max,
             long[] step,
@@ -38,26 +43,56 @@ public class NDIndexFullSlice {
         this.squeezedShape = squeezedShape;
     }
 
+    /**
+     * Returns the slice min for each axis.
+     *
+     * @return the slice min for each axis
+     */
     public long[] getMin() {
         return min;
     }
 
+    /**
+     * Returns the slice max for each axis.
+     *
+     * @return the slice max for each axis
+     */
     public long[] getMax() {
         return max;
     }
 
+    /**
+     * Returns the slice step for each axis.
+     *
+     * @return the slice step for each axis.
+     */
     public long[] getStep() {
         return step;
     }
 
+    /**
+     * Returns the list of axis to squeeze.
+     *
+     * @return the list of axis to squeeze
+     */
     public List<Integer> getToSqueeze() {
         return toSqueeze;
     }
 
+    /**
+     * Returns the slice shape without squeezing.
+     *
+     * @return the slice shape without squeezing
+     */
     public Shape getShape() {
         return shape;
     }
 
+    /**
+     * Returns the slice shape with squeezing.
+     *
+     * @return the slice shape with squeezing
+     */
     public Shape getSqueezedShape() {
         return squeezedShape;
     }

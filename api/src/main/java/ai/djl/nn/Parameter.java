@@ -148,7 +148,7 @@ public class Parameter implements AutoCloseable {
     /**
      * Checks if this {@code Parameter} is initialized.
      *
-     * @return true if this {@code Parameter} is initialized
+     * @return {@code true} if this {@code Parameter} is initialized
      */
     public boolean isInitialized() {
         return array != null;

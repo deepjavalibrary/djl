@@ -46,6 +46,11 @@ public class DetectedObjects extends Classifications {
                         classNames.get(index), probabilities.get(index), boundingBoxes.get(index));
     }
 
+    /**
+     * Returns the number of objects found in an image.
+     *
+     * @return the number of objects found in an image
+     */
     public int getNumberOfObjects() {
         return boundingBoxes.size();
     }

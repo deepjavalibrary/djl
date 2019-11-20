@@ -104,7 +104,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
          * <p>Predictions below the threshold will be dropped.
          *
          * @param threshold the threshold for the prediction accuracy
-         * @return the builder
+         * @return this builder
          */
         public Builder optThreshold(float threshold) {
             this.threshold = threshold;
@@ -116,19 +116,36 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
          *
          * <p>Synset is used to convert the prediction classes to their actual names.
          *
+         * <p>Set either the synset or the classes.
+         *
          * @param synsetArtifactName the name of synset
-         * @return the builder
+         * @return this builder
          */
         public Builder setSynsetArtifactName(String synsetArtifactName) {
             this.synsetArtifactName = synsetArtifactName;
             return this;
         }
 
+        /**
+         * Sets the class list.
+         *
+         * <p>Set either the synset or the classes.
+         *
+         * @param classes the list of classes
+         * @return this builder
+         */
         public Builder setClasses(List<String> classes) {
             this.classes = classes;
             return this;
         }
 
+        /**
+         * Sets the optional rescale size.
+         *
+         * @param imageWidth the width to rescale images to
+         * @param imageHeight the height to rescale images to
+         * @return this builder
+         */
         public Builder optRescaleSize(double imageWidth, double imageHeight) {
             this.imageWidth = imageWidth;
             this.imageHeight = imageHeight;
@@ -141,6 +158,11 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
             return this;
         }
 
+        /**
+         * Builds the translator.
+         *
+         * @return the new translator
+         */
         public SingleShotDetectionTranslator build() {
             if (synsetArtifactName == null && classes == null) {
                 throw new IllegalArgumentException(

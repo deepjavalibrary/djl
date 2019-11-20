@@ -154,6 +154,12 @@ public class Device {
         return Engine.getInstance().defaultDevice();
     }
 
+    /**
+     * Returns the given device or the default if it is null.
+     *
+     * @param device the device to try to return
+     * @return the given device or the default if it is null
+     */
     public static Device defaultIfNull(Device device) {
         if (device != null) {
             return device;
@@ -161,6 +167,13 @@ public class Device {
         return Engine.getInstance().defaultDevice();
     }
 
+    /**
+     * Returns the given device or the passed in default if it is null.
+     *
+     * @param device the device to try to return
+     * @param def the default device to return if device is null
+     * @return the given device or the passed in default if it is null
+     */
     public static Device defaultIfNull(Device device, Device def) {
         if (device != null) {
             return device;

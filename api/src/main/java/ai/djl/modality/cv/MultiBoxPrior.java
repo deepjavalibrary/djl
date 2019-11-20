@@ -56,6 +56,12 @@ public class MultiBoxPrior {
         this.clip = builder.clip;
     }
 
+    /**
+     * Generates the anchorBoxes array in the input's manager and device.
+     *
+     * @param input the input whose manager and device to put the generated boxes in
+     * @return the generated boxes
+     */
     public NDArray generateAnchorBoxes(NDArray input) {
         return input.getNDArrayInternal().multiBoxPrior(sizes, ratios, steps, offsets, clip).head();
     }

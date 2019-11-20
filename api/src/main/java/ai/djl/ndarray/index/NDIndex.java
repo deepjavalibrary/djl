@@ -247,6 +247,12 @@ public class NDIndex {
         }
     }
 
+    /**
+     * Returns this index as a full slice if it can be represented as one.
+     *
+     * @param target the shape to index
+     * @return the full slice if it can be represented as one
+     */
     public Optional<NDIndexFullSlice> getAsFullSlice(Shape target) {
         if (!stream().allMatch(
                         ie ->

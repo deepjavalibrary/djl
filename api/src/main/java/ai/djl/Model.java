@@ -256,8 +256,18 @@ public interface Model extends AutoCloseable {
      */
     InputStream getArtifactAsStream(String name) throws IOException;
 
+    /**
+     * Sets the standard data type used within the model.
+     *
+     * @param dataType the standard data type to use
+     */
     void setDataType(DataType dataType);
 
+    /**
+     * Returns the standard data type used within the model.
+     *
+     * @return the standard data type used within the model
+     */
     DataType getDataType();
 
     /**

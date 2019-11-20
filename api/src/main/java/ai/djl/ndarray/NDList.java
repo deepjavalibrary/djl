@@ -49,6 +49,11 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
         super(Arrays.asList(arrays));
     }
 
+    /**
+     * Constructs and initiates an NDList with the specified {@link NDArray}s.
+     *
+     * @param other the {@link NDArray}s
+     */
     public NDList(Collection<NDArray> other) {
         super(other);
     }
@@ -161,10 +166,21 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
         return newNDList;
     }
 
+    /**
+     * Attaches each ndarray in this list to the specified manager.
+     *
+     * @param manager the manager to attach the lists to
+     * @see NDArray#attach(NDManager)
+     */
     public void attach(NDManager manager) {
         forEach(a -> a.attach(manager));
     }
 
+    /**
+     * Detaches each ndarray in this list from their current managers.
+     *
+     * @see NDArray#detach()
+     */
     public void detach() {
         forEach(NDArray::detach);
     }

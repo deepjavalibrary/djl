@@ -72,6 +72,12 @@ public class Metrics {
         addMetric(new Metric(name, value, unit));
     }
 
+    /**
+     * Returns {@code true} if the metrics object has a metric with the given name.
+     *
+     * @param name the name to check for
+     * @return {@code true} if the metrics object has a metric with the given name
+     */
     public boolean hasMetric(String name) {
         return metrics.containsKey(name);
     }

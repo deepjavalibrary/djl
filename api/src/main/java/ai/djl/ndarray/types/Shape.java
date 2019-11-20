@@ -400,10 +400,20 @@ public class Shape {
         return !Arrays.stream(layout).allMatch(l -> l == LayoutType.UNKNOWN);
     }
 
+    /**
+     * Returns the layout type for each axis in this shape.
+     *
+     * @return the layout type for each axis in this shape
+     */
     public LayoutType[] getLayout() {
         return layout;
     }
 
+    /**
+     * Returns the string layout type for each axis in this shape.
+     *
+     * @return the string layout type for each axis in this shape
+     */
     public String toLayoutString() {
         return LayoutType.toString(layout);
     }

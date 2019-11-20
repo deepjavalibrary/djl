@@ -100,6 +100,11 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
             return self();
         }
 
+        /**
+         * Builds the translator.
+         *
+         * @return the new translator
+         */
         public SimplePoseTranslator build() {
             return new SimplePoseTranslator(this);
         }

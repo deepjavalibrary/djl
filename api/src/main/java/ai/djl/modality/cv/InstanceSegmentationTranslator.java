@@ -199,6 +199,11 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
             return this;
         }
 
+        /**
+         * Builds the translator.
+         *
+         * @return the new translator
+         */
         public InstanceSegmentationTranslator build() {
             if (synsetArtifactName == null) {
                 throw new IllegalArgumentException("You must specify a synset artifact name");

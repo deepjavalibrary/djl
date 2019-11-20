@@ -32,6 +32,7 @@ public enum DataType {
     BOOLEAN(Format.BOOLEAN, 1),
     UNKNOWN(Format.UNKNOWN, 0);
 
+    /** The general data type format categories. */
     public enum Format {
         FLOATING,
         UINT,
@@ -84,6 +85,12 @@ public enum DataType {
         return format == Format.UINT || format == Format.INT;
     }
 
+    /**
+     * Returns the data type to use for a data buffer.
+     *
+     * @param data the buffer to analyze
+     * @return the data type for the buffer
+     */
     public static DataType fromBuffer(Buffer data) {
         if (data instanceof FloatBuffer) {
             return DataType.FLOAT32;
@@ -101,6 +108,12 @@ public enum DataType {
         }
     }
 
+    /**
+     * Converts a {@link ByteBuffer} to a buffer for this data type.
+     *
+     * @param data the buffer to convert
+     * @return the converted buffer
+     */
     public Buffer asDataType(ByteBuffer data) {
         switch (this) {
             case FLOAT32:

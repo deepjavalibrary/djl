@@ -136,6 +136,10 @@ public class Classifications {
         return sb.toString();
     }
 
+    /**
+     * A {@code Classification} stores the classification result for a single class on a single
+     * input.
+     */
     public static class Classification {
 
         private String className;

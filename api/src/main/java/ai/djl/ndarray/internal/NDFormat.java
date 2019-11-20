@@ -19,6 +19,7 @@ import ai.djl.util.Utils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/** A helper for printing an {@link NDArray}. */
 public abstract class NDFormat {
 
     private static final int MAX_DEPTH = 10;
@@ -28,6 +29,12 @@ public abstract class NDFormat {
     private static final String LF = System.getProperty("line.separator");
     private static final Pattern PATTERN = Pattern.compile("\\s*\\d\\.(\\d*?)0*e[+-](\\d+)");
 
+    /**
+     * Formats the contents of an array as a pretty printable string.
+     *
+     * @param array the array to print
+     * @return the string representation of the array
+     */
     public static String format(NDArray array) {
         NDFormat format;
         DataType dataType = array.getDataType();
