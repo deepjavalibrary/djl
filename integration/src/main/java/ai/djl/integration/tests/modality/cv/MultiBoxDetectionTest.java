@@ -55,7 +55,9 @@ public class MultiBoxDetectionTest {
                                             offsetPreds.expandDims(0),
                                             anchors.expandDims(0)))
                             .head();
-            Assertions.assertAlmostEquals(actual, expected);
+            // orders of detection results is not the same on CPU and GPU
+            // but does not affect detection correctness
+            Assertions.assertAlmostEquals(actual.sort(1), expected.sort(1));
         }
     }
 }

@@ -24,18 +24,32 @@ public class TrainPikachuTest {
 
     @Test
     public void testDetection() throws IOException, MalformedModelException, TranslateException {
-        // only test on gpu
+        String[] args;
+        float expectedLoss;
+        int expectedMinNumber = 0;
+        int expectedMaxNumber = 0;
         if (Engine.getInstance().getGpuCount() > 0) {
-            // test train
-            String[] args = {"-e", "20", "-b", "32", "-g", "1", "-o", "build/output"};
-            TrainPikachu trainPikachu = new TrainPikachu();
-            Assert.assertTrue(trainPikachu.runExample(args));
-            Assert.assertTrue(trainPikachu.getValidationLoss() < 2.5e-3);
-            // test predict
-            int numberOfPikachus =
-                    trainPikachu.predict("build/output", "src/test/resources/pikachu.jpg");
-            Assert.assertTrue(numberOfPikachus >= 6);
-            Assert.assertTrue(numberOfPikachus <= 9);
+            args = new String[] {"-e", "20", "-b", "32", "-o", "build/output"};
+            expectedLoss = 2.5e-3f;
+            expectedMaxNumber = 15;
+            expectedMinNumber = 6;
+
+        } else {
+            // test train 1 epoch and predict workflow works on CPU
+            args = new String[] {"-e", "1", "-m", "1", "-b", "32", "-o", "build/output"};
+            // only check loss after 5 batches
+            expectedLoss = 2.5e-2f;
+        }
+        // test train
+        TrainPikachu trainPikachu = new TrainPikachu();
+        Assert.assertTrue(trainPikachu.runExample(args));
+        Assert.assertTrue(trainPikachu.getValidationLoss() < expectedLoss);
+        // test predict
+        int numberOfPikachus =
+                trainPikachu.predict("build/output", "src/test/resources/pikachu.jpg");
+        if (expectedMinNumber > 0) {
+            Assert.assertTrue(numberOfPikachus >= expectedMinNumber);
+            Assert.assertTrue(numberOfPikachus <= expectedMaxNumber);
         }
     }
 }

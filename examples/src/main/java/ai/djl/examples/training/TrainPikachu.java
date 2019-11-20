@@ -109,7 +109,7 @@ public final class TrainPikachu extends AbstractTraining {
     public int predict(String outputDir, String imageFile)
             throws IOException, MalformedModelException, TranslateException {
         try (Model model = Model.newInstance()) {
-            float detectionThreshold = 0.75f;
+            float detectionThreshold = 0.6f;
             // load parameters back to original training block
             model.setBlock(getSsdTrainBlock());
             model.load(Paths.get(outputDir), "ssd");
