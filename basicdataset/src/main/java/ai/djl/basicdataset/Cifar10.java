@@ -53,6 +53,12 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         this.usage = builder.usage;
     }
 
+    /**
+     * Creates a builder to build a {@link Cifar10}.
+     *
+     * @param manager the manager to use in the builder
+     * @return a new builder
+     */
     public static Builder builder(NDManager manager) {
         return new Builder().setManager(manager);
     }
@@ -143,6 +149,7 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         }
     }
 
+    /** A builder to construct a {@link Cifar10}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
         private NDManager manager;
@@ -150,6 +157,7 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         private Artifact artifact;
         private Usage usage;
 
+        /** Constructs a new builder. */
         public Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
@@ -162,26 +170,55 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
             return this;
         }
 
+        /**
+         * Sets the manager for the dataset.
+         *
+         * @param manager the new manager
+         * @return this builder
+         */
         public Builder setManager(NDManager manager) {
             this.manager = manager;
             return this;
         }
 
+        /**
+         * Sets the optional repository for the dataset.
+         *
+         * @param repository the new repository
+         * @return this builder
+         */
         public Builder optRepository(Repository repository) {
             this.repository = repository;
             return this;
         }
 
+        /**
+         * Sets the optional artifact containing the data.
+         *
+         * @param artifact the artifact
+         * @return this builder
+         */
         public Builder optArtifact(Artifact artifact) {
             this.artifact = artifact;
             return this;
         }
 
+        /**
+         * Sets the optional usage for the dataset.
+         *
+         * @param usage the usage
+         * @return this builder
+         */
         public Builder optUsage(Usage usage) {
             this.usage = usage;
             return this;
         }
 
+        /**
+         * Builds a new {@link Cifar10}.
+         *
+         * @return the new {@link Cifar10}
+         */
         public Cifar10 build() {
             return new Cifar10(this);
         }

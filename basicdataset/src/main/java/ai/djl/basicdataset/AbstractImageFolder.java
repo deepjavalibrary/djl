@@ -46,7 +46,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     protected List<String> synset;
     protected PairList<String, Integer> items;
 
-    public AbstractImageFolder(ImageFolderBuilder<?> builder) {
+    protected AbstractImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
         this.flag = builder.flag;
         this.repository = builder.repository;
@@ -116,6 +116,11 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         return EXT.contains(path.substring(extensionIndex).toLowerCase());
     }
 
+    /**
+     * Used to build an {@link AbstractImageFolder}.
+     *
+     * @param <T> the builder type
+     */
     @SuppressWarnings("rawtypes")
     public abstract static class ImageFolderBuilder<T extends ImageFolderBuilder>
             extends BaseBuilder<T> {
@@ -123,16 +128,28 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         Repository repository;
         Flag flag;
 
-        public ImageFolderBuilder() {
+        protected ImageFolderBuilder() {
             flag = NDImageUtils.Flag.COLOR;
             pipeline = new Pipeline(new ToTensor());
         }
 
+        /**
+         * Sets the optional color mode flag.
+         *
+         * @param flag the color mode flag
+         * @return this builder
+         */
         public T optFlag(Flag flag) {
             this.flag = flag;
             return self();
         }
 
+        /**
+         * Sets the repository containing the image folder.
+         *
+         * @param repository the repository containing the image folder
+         * @return this builder
+         */
         public T setRepository(Repository repository) {
             this.repository = repository;
             return self();

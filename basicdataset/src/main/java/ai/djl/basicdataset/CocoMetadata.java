@@ -23,7 +23,7 @@ import com.google.gson.annotations.SerializedName;
 import java.lang.reflect.Type;
 import java.util.List;
 
-/** A metadata class that represents the structure of annotations in Coco. */
+/** A metadata class to represent the structure of annotations in Coco. */
 public class CocoMetadata {
 
     public static final Gson GSON =
@@ -62,6 +62,7 @@ public class CocoMetadata {
         return images;
     }
 
+    /** An annotation applied to an image in the coco dataset. */
     public static final class Annotation {
 
         @SerializedName("image_id")
@@ -77,6 +78,11 @@ public class CocoMetadata {
         @SerializedName("category_id")
         private long categoryId;
 
+        /**
+         * Returns the id of the image this annotation applies to.
+         *
+         * @return the id of the image this annotation applies to
+         */
         public long getImageId() {
             return imageId;
         }
@@ -118,6 +124,7 @@ public class CocoMetadata {
         }
     }
 
+    /** An image in the coco dataset. */
     public static final class Image {
 
         private int id;
@@ -165,6 +172,7 @@ public class CocoMetadata {
         }
     }
 
+    /** An annotation category in the coco dataset. */
     public static final class Category {
 
         private long id;
@@ -179,6 +187,7 @@ public class CocoMetadata {
         }
     }
 
+    /** A {@link JsonDeserializer} for the {@link Rectangle} class. */
     public static final class RectangleDeserializer implements JsonDeserializer<Rectangle> {
 
         /** {@inheritDoc} */

@@ -39,11 +39,16 @@ public final class ImageFolder extends AbstractImageFolder {
 
     private boolean prepared;
 
-    ImageFolder(ImageFolderBuilder<?> builder) {
+    private ImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
         loadSynset();
     }
 
+    /**
+     * Creates a new builder to build a {@link ImageFolder}.
+     *
+     * @return a new builder
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -84,6 +89,7 @@ public final class ImageFolder extends AbstractImageFolder {
         }
     }
 
+    /** A builder for the {@link ImageFolder}. */
     public static final class Builder extends ImageFolderBuilder<Builder> {
 
         /** {@inheritDoc} */
@@ -92,6 +98,11 @@ public final class ImageFolder extends AbstractImageFolder {
             return this;
         }
 
+        /**
+         * Builds the {@link ImageFolder}.
+         *
+         * @return the {@link ImageFolder}
+         */
         public ImageFolder build() {
             return new ImageFolder(this);
         }

@@ -59,7 +59,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     private List<Path> imagePaths;
     private List<float[]> labels;
 
-    PikachuDetection(Builder builder) {
+    protected PikachuDetection(Builder builder) {
         super(builder);
         repository = builder.repository;
         artifact = builder.artifact;
@@ -69,6 +69,11 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         labels = new ArrayList<>();
     }
 
+    /**
+     * Creates a new builder to build a {@link PikachuDetection}.
+     *
+     * @return a new builder
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -176,6 +181,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         return imagePaths.size();
     }
 
+    /** A builder for a {@link PikachuDetection}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
         Repository repository;
@@ -183,6 +189,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         Usage usage;
         Flag flag;
 
+        /** Constructs a new builder. */
         public Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
@@ -196,26 +203,55 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
             return this;
         }
 
+        /**
+         * Sets the optional usage.
+         *
+         * @param usage the usage
+         * @return this builder
+         */
         public Builder optUsage(Usage usage) {
             this.usage = usage;
             return self();
         }
 
+        /**
+         * Sets the optional repository.
+         *
+         * @param repository the repository
+         * @return this builder
+         */
         public Builder optRepository(Repository repository) {
             this.repository = repository;
             return self();
         }
 
+        /**
+         * Sets the optional artifact.
+         *
+         * @param artifact the artifact
+         * @return this builder
+         */
         public Builder optArtifact(Artifact artifact) {
             this.artifact = artifact;
             return self();
         }
 
+        /**
+         * Sets the optional color mode flag.
+         *
+         * @param flag the color mode flag
+         * @return this builder
+         */
         public Builder optFlag(Flag flag) {
             this.flag = flag;
             return self();
         }
 
+        /**
+         * Builds the {@link PikachuDetection}.
+         *
+         * @return the {@link PikachuDetection}
+         */
         public PikachuDetection build() {
             return new PikachuDetection(this);
         }

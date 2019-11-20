@@ -44,6 +44,11 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
         loadSynset();
     }
 
+    /**
+     * Creates a new builder to build a {@link ImageNet}.
+     *
+     * @return a new builder
+     */
     public static ImageFolder.Builder builder() {
         return new ImageFolder.Builder();
     }
@@ -139,10 +144,17 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
         return Paths.get(repository.getBaseUri()).resolve(getUsagePath(usage)).resolve(key);
     }
 
+    /** A builder for a {@link ImageNet}. */
     public static class Builder extends ImageFolderBuilder<Builder> {
 
         private Usage usage = Usage.TRAIN;
 
+        /**
+         * Sets the optional usage.
+         *
+         * @param usage the usage
+         * @return this builder
+         */
         public Builder optUsage(Usage usage) {
             this.usage = usage;
             return this;
@@ -154,6 +166,11 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
             return this;
         }
 
+        /**
+         * Builds the {@link ImageNet}.
+         *
+         * @return the {@link ImageNet}
+         */
         public ImageNet build() {
             return new ImageNet(this);
         }

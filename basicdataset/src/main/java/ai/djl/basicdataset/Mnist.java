@@ -43,7 +43,7 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
     private Usage usage;
     private boolean prepared;
 
-    Mnist(Builder builder) {
+    private Mnist(Builder builder) {
         super(builder);
         this.manager = builder.manager;
         this.repository = builder.repository;
@@ -51,6 +51,12 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
         this.usage = builder.usage;
     }
 
+    /**
+     * Creates a builder to build a {@link Mnist}.
+     *
+     * @param manager the manager to use for the {@link Mnist} data
+     * @return a new builder
+     */
     public static Builder builder(NDManager manager) {
         return new Builder().setManager(manager);
     }
@@ -148,6 +154,7 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
         }
     }
 
+    /** A builder for a {@link Mnist}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
         private NDManager manager;
@@ -155,6 +162,7 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
         private Artifact artifact;
         private Usage usage;
 
+        /** Constructs a new builder. */
         public Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
@@ -167,26 +175,55 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
             return this;
         }
 
+        /**
+         * Sets the manager for the dataset.
+         *
+         * @param manager the manager
+         * @return this builder
+         */
         public Builder setManager(NDManager manager) {
             this.manager = manager.newSubManager();
             return this;
         }
 
+        /**
+         * Sets the optional repository.
+         *
+         * @param repository the repository
+         * @return this builder
+         */
         public Builder optRepository(Repository repository) {
             this.repository = repository;
             return this;
         }
 
+        /**
+         * Sets the optional artifact.
+         *
+         * @param artifact the artifact
+         * @return this builder
+         */
         public Builder optArtifact(Artifact artifact) {
             this.artifact = artifact;
             return this;
         }
 
+        /**
+         * Sets the optional usage.
+         *
+         * @param usage the usage
+         * @return this builder
+         */
         public Builder optUsage(Usage usage) {
             this.usage = usage;
             return this;
         }
 
+        /**
+         * Builds the {@link Mnist}.
+         *
+         * @return the {@link Mnist}
+         */
         public Mnist build() {
             return new Mnist(this);
         }

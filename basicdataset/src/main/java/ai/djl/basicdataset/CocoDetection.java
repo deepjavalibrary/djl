@@ -62,6 +62,11 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         labels = new ArrayList<>();
     }
 
+    /**
+     * Creates a builder to build a {@link CocoDetection}.
+     *
+     * @return a new builder
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -186,6 +191,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         return label;
     }
 
+    /** A builder to construct a {@link CocoDetection}. */
     @SuppressWarnings("rawtypes")
     public static final class Builder extends BaseBuilder<Builder> {
 
@@ -194,6 +200,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         private Artifact artifact;
         private Usage usage;
 
+        /** Constructs a new builder. */
         public Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
@@ -207,26 +214,55 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
             return this;
         }
 
+        /**
+         * Sets the optional usage.
+         *
+         * @param usage the new usage
+         * @return this builder
+         */
         public Builder optUsage(Usage usage) {
             this.usage = usage;
             return self();
         }
 
+        /**
+         * Sets the optional repository.
+         *
+         * @param repository the repository
+         * @return this builder
+         */
         public Builder optRepository(Repository repository) {
             this.repository = repository;
             return self();
         }
 
+        /**
+         * Sets the optional artifact.
+         *
+         * @param artifact the artifact
+         * @return this builder
+         */
         public Builder optArtifact(Artifact artifact) {
             this.artifact = artifact;
             return self();
         }
 
+        /**
+         * Sets the optional color mode flag.
+         *
+         * @param flag the color mode flag
+         * @return this builder
+         */
         public Builder optFlag(Flag flag) {
             this.flag = flag;
             return self();
         }
 
+        /**
+         * Builds the new {@link CocoDetection}.
+         *
+         * @return the new {@link CocoDetection}
+         */
         public CocoDetection build() {
             return new CocoDetection(this);
         }

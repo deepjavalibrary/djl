@@ -34,7 +34,7 @@ public class CocoUtils {
     private Map<Long, List<Long>> imageToAnn;
     private Map<Long, Integer> categoryIdMap;
 
-    public CocoUtils(Path annotationPath) {
+    CocoUtils(Path annotationPath) {
         this.annotationPath = annotationPath;
         imageIds = new ArrayList<>();
         imageMap = new HashMap<>();
