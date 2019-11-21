@@ -11,5 +11,11 @@
  * and limitations under the License.
  */
 
-/** Contains classes to download and prepare training and testing data. */
+/**
+ * Contains classes to download and prepare training and testing data.
+ *
+ * <p>The central class to work with in this package is the {@link ai.djl.training.dataset.Dataset}.
+ * In practice, most of the implementations of {@link ai.djl.training.dataset.Dataset} will actually
+ * extend {@link ai.djl.training.dataset.RandomAccessDataset} instead.
+ */
 package ai.djl.training.dataset;

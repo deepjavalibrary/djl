@@ -12,8 +12,7 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
- *
- * @see ai.djl.training.Trainer
+ * Contains classes that define convolutional operations extending {@link
+ * ai.djl.nn.convolutional.Convolution}.
  */
-package ai.djl.training;
+package ai.djl.nn.convolutional;

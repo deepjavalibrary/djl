@@ -12,8 +12,10 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
+ * Contains classes for having a gradually changing learning rate.
  *
- * @see ai.djl.training.Trainer
+ * <p>It contains a main interface {@link
+ * ai.djl.training.optimizer.learningrate.LearningRateTracker} and various learning rate options
+ * that extend it.
  */
-package ai.djl.training;
+package ai.djl.training.optimizer.learningrate;

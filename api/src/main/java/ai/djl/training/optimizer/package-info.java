@@ -12,8 +12,10 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
+ * Contains classes for optimizing a neural network {@link ai.djl.nn.Block}.
  *
- * @see ai.djl.training.Trainer
+ * <p>It contains a main interface {@link ai.djl.training.optimizer.Optimizer} and various
+ * optimizers that extend it. There are also the helpers for learning rates in {@link
+ * ai.djl.training.optimizer.learningrate}.
  */
-package ai.djl.training;
+package ai.djl.training.optimizer;

@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains concrete classes that define neural network operators. */
+/** Contains classes that define simple neural network operations. */
 package ai.djl.nn.core;

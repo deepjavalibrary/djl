@@ -12,8 +12,7 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
- *
- * @see ai.djl.training.Trainer
+ * Contains classes for the computer vision section ({@link ai.djl.repository.MRL.Model.CV}) of the
+ * {@link ai.djl.zoo.ModelZoo}.
  */
-package ai.djl.training;
+package ai.djl.zoo.cv;

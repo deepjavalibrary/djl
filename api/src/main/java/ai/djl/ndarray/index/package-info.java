@@ -11,5 +11,9 @@
  * and limitations under the License.
  */
 
-/** Contains classes that help access {@link ai.djl.ndarray.NDArray}'s indices. */
+/**
+ * Contains classes that help access {@link ai.djl.ndarray.NDArray}'s indices.
+ *
+ * @see ai.djl.ndarray.index.NDIndex
+ */
 package ai.djl.ndarray.index;

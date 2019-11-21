@@ -11,9 +11,5 @@
  * and limitations under the License.
  */
 
-/**
- * Contains classes and implementations to train a neural network.
- *
- * @see ai.djl.training.Trainer
- */
-package ai.djl.training;
+/** Contains internal helpers for {@link ai.djl.ndarray.NDArray}. */
+package ai.djl.ndarray.internal;

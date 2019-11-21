@@ -12,8 +12,10 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
+ * Contains classes for monitoring the performance of models.
  *
- * @see ai.djl.training.Trainer
+ * <p>It contains a main interface {@link ai.djl.training.metrics.TrainingMetric} and various
+ * metrics that extend it. More metrics are located within {@link ai.djl.training.loss} which have
+ * the additional property that those metrics are suited for training.
  */
-package ai.djl.training;
+package ai.djl.training.metrics;

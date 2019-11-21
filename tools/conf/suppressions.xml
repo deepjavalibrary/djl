@@ -7,7 +7,7 @@
 
     <suppress checks="(AvoidStaticImport|ImportOrder)" files="src[\\/]test[\\/]java[\\/]"/>
 
-    <suppress checks="(MissingJavadocMethod|MissingJavadocType|MissingJavadocPackage)" files="src[\\/](test|it)[\\/].*"/>
+    <suppress checks="(MissingJavadocMethod|MissingJavadocType|JavadocPackage)" files="src[\\/](test|it)[\\/].*"/>
 
     <!--    Suppress javadoc in modules-->
     <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="ai[\\/]djl[\\/]integration[\\/]"/>

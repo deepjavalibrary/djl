@@ -12,8 +12,8 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
+ * Contains implementations of interfaces within the DJL API for the Tensorflow Engine.
  *
- * @see ai.djl.training.Trainer
+ * @see ai.djl.tensorflow.engine.TfEngine
  */
-package ai.djl.training;
+package ai.djl.tensorflow.engine;

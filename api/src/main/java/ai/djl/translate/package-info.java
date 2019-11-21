@@ -11,5 +11,11 @@
  * and limitations under the License.
  */
 
-/** Contains classes and interfaces that translate between java objects and NDArrays. */
+/**
+ * Contains classes and interfaces that translate between java objects and NDArrays.
+ *
+ * @see ai.djl.translate.Translator
+ * @see ai.djl.translate.Batchifier
+ * @see ai.djl.translate.Pipeline
+ */
 package ai.djl.translate;

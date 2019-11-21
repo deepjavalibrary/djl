@@ -12,8 +12,10 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
+ * Contains the main Tensorflow implementation of the DJL API.
  *
- * @see ai.djl.training.Trainer
+ * <p>There is also a demo/test application in {@link ai.djl.tensorflow.HelloWorld}.
+ *
+ * @see ai.djl.tensorflow.engine.TfEngine
  */
-package ai.djl.training;
+package ai.djl.tensorflow;

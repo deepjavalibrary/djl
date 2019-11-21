@@ -12,8 +12,7 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
- *
- * @see ai.djl.training.Trainer
+ * Contains classes for the {@link ai.djl.repository.MRL.Model.CV#OBJECT_DETECTION} models in the
+ * {@link ai.djl.zoo.ModelZoo}.
  */
-package ai.djl.training;
+package ai.djl.zoo.cv.object_detection.ssd;

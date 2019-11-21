@@ -11,9 +11,5 @@
  * and limitations under the License.
  */
 
-/**
- * Contains classes and implementations to train a neural network.
- *
- * @see ai.djl.training.Trainer
- */
-package ai.djl.training;
+/** Contains classes that define normalizing neural network operations. */
+package ai.djl.nn.norm;

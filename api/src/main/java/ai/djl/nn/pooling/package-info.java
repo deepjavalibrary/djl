@@ -12,8 +12,6 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
- *
- * @see ai.djl.training.Trainer
+ * Contains pooling neural network operations in {@link ai.djl.nn.pooling.Pool} and helpers for it.
  */
-package ai.djl.training;
+package ai.djl.nn.pooling;

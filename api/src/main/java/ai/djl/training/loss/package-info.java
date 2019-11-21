@@ -12,8 +12,9 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
+ * Contains classes for measuring the {@link ai.djl.training.loss.Loss} of a model.
  *
- * @see ai.djl.training.Trainer
+ * <p>It contains a main interface {@link ai.djl.training.loss.Loss} and various losses that extend
+ * it.
  */
-package ai.djl.training;
+package ai.djl.training.loss;

@@ -12,8 +12,8 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
+ * Contains a library of built-in datasets.
  *
- * @see ai.djl.training.Trainer
+ * <p>The basic datasets all extend {@link ai.djl.basicdataset.BasicDatasets}.
  */
-package ai.djl.training;
+package ai.djl.basicdataset;

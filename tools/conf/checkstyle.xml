@@ -108,6 +108,7 @@
         <property name="eachLine" value="false"/>
     </module>
     -->
+    <module name="JavadocPackage"/>
 
     <module name="TreeWalker">
         <!--
@@ -297,7 +298,6 @@
         <module name="MissingJavadocPackage"/>
         <module name="MissingJavadocType"/>
         <!--
-        <module name="JavadocPackage" />
         <module name="JavadocType">
             <property name="allowUnknownTags" value="true"/>
         </module>

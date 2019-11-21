@@ -11,5 +11,22 @@
  * and limitations under the License.
  */
 
-/** Contains classes that define neural network operators. */
+/**
+ * Contains classes to construct neural networks.
+ *
+ * <p>The primary construct used to build up the networks is the {@link ai.djl.nn.Block} (see for
+ * details). This package contains a number of implementations of blocks as well as helpers for
+ * blocks.
+ *
+ * <p>The following subpackages also contain a number of standard neural network operations to use
+ * with blocks:
+ *
+ * <ul>
+ *   <li>{@link ai.djl.nn.convolutional}
+ *   <li>{@link ai.djl.nn.core}
+ *   <li>{@link ai.djl.nn.norm}
+ *   <li>{@link ai.djl.nn.pooling}
+ *   <li>{@link ai.djl.nn.recurrent}
+ * </ul>
+ */
 package ai.djl.nn;

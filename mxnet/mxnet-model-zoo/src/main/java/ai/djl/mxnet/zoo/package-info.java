@@ -11,9 +11,5 @@
  * and limitations under the License.
  */
 
-/**
- * Contains classes and implementations to train a neural network.
- *
- * @see ai.djl.training.Trainer
- */
-package ai.djl.training;
+/** Contains the built-in {@link ai.djl.mxnet.zoo.MxModelZoo}. */
+package ai.djl.mxnet.zoo;

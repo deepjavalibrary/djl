@@ -12,8 +12,8 @@
  */
 
 /**
- * Contains classes and implementations to train a neural network.
+ * Contains classes for recurrent neural network operations.
  *
- * @see ai.djl.training.Trainer
+ * @see ai.djl.nn.recurrent.RecurrentCell
  */
-package ai.djl.training;
+package ai.djl.nn.recurrent;

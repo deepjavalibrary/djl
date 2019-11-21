@@ -11,5 +11,10 @@
  * and limitations under the License.
  */
 
-/** Contains classes and interfaces that define an n-dimensional array. */
+/**
+ * Contains classes and interfaces that define an n-dimensional array.
+ *
+ * @see ai.djl.ndarray.NDArray
+ * @see ai.djl.ndarray.NDManager
+ */
 package ai.djl.ndarray;
