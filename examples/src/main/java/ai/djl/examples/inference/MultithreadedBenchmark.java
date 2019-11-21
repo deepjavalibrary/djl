@@ -25,7 +25,7 @@ import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -62,11 +62,10 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
 
         metrics.addMetric("thread", numOfThreads);
         AtomicBoolean collectMem = new AtomicBoolean(true);
-        List<PredictorCallable> callables =
-                Collections.nCopies(
-                        numOfThreads,
-                        new PredictorCallable(model, img, metrics, iteration, collectMem));
-
+        List<PredictorCallable> callables = new ArrayList<>(numOfThreads);
+        for (int i = 0; i < numOfThreads; i++) {
+            callables.add(new PredictorCallable(model, img, metrics, iteration, collectMem));
+        }
         Classifications classification = null;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         int successThreads = 0;
