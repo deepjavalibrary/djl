@@ -1055,6 +1055,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Adds a number to this {@code NDArray} element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array.add(2f);
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * </pre>
+     *
      * @param n the number to add
      * @return the result {@code NDArray}
      */
@@ -1065,6 +1074,19 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and other {@code NDArray} must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.arange(3);
+     * jshell&gt; array1.add(array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[ 0.,  2.,  4.],
+     *  [ 3.,  5.,  7.],
+     *  [ 6.,  8., 10.],
+     * ]
+     * </pre>
+     *
      * @param other the other {@code NDArray}s to add
      * @return the result {@code NDArray}
      * @throws IllegalArgumentException others arrays must have at least one element
@@ -1073,6 +1095,15 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Subtracts a number from this {@code NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array.sub(2f);
+     * ND: (2) cpu(0) float32
+     * [-1.,  0.]
+     * </pre>
      *
      * @param n the number to subtract from
      * @return the result {@code NDArray}
@@ -1084,6 +1115,19 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.arange(3);
+     * jshell&gt; array1.sub(array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[0., 0., 0.],
+     *  [3., 3., 3.],
+     *  [6., 6., 6.],
+     * ]
+     * </pre>
+     *
      * @param other the other {@code NDArray} to subtract from
      * @return the result {@code NDArray}
      */
@@ -1091,6 +1135,15 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Multiplies this {@code NDArray} by a number element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array.mul(3f);
+     * ND: (2) cpu(0) float32
+     * [3., 6.]
+     * </pre>
      *
      * @param n the number to multiply by
      * @return the result {@code NDArray}
@@ -1102,6 +1155,19 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and other {@code NDArray} must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.arange(3);
+     * jshell&gt; array1.mul(array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[ 0.,  1.,  4.],
+     *  [ 0.,  4., 10.],
+     *  [ 0.,  7., 16.],
+     * ]
+     * </pre>
+     *
      * @param other the other {@code NDArray}s to multiply by
      * @return the result {@code NDArray}
      * @throws IllegalArgumentException others arrays must have at least one element
@@ -1110,6 +1176,15 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Divides this {@code NDArray} by a number element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.div(4f);
+     * ND: (5) cpu(0) float32
+     * [0.  , 0.25, 0.5 , 0.75, 1.  ]
+     * </pre>
      *
      * @param n the number to divide by
      * @return the result {@code NDArray}
@@ -1121,6 +1196,19 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.ones(new Shape(3)).mul(10);
+     * jshell&gt; array1.div(array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[0. , 0.1, 0.2],
+     *  [0.3, 0.4, 0.5],
+     *  [0.6, 0.7, 0.8],
+     * ]
+     * </pre>
+     *
      * @param other the other {@code NDArray} to divide by
      * @return the result {@code NDArray}
      */
@@ -1128,6 +1216,15 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns element-wise remainder of division.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(7);
+     * jshell&gt; array.mod(5f);
+     * ND: (7) cpu(0) float32
+     * [0., 1., 2., 3., 4., 0., 1.]
+     * </pre>
      *
      * @param n the divisor number
      * @return the result {@code NDArray}
@@ -1139,6 +1236,16 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 7f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array1.mod(array2);
+     * ND: (2) cpu(0) float32
+     * [0., 1.]
+     * </pre>
+     *
      * @param other the divisor {@code NDArray}
      * @return the result {@code NDArray}
      */
@@ -1146,6 +1253,15 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Takes the power of this {@code NDArray} with a number element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.pow(4f);
+     * ND: (6) cpu(0) float32
+     * [  0.,   1.,   8.,  27.,  64., 125.]
+     * </pre>
      *
      * @param n the number to take the power with
      * @return the result {@code NDArray}
@@ -1155,6 +1271,19 @@ public interface NDArray extends AutoCloseable {
     /**
      * Takes the power of this {@code NDArray} with the other {@code NDArray} element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(6).reshape(3, 2);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array1.pow(array2); // broadcasting
+     * ND: (3, 2) cpu(0) float32
+     * [[  0.,   1.],
+     *  [  4.,  27.],
+     *  [ 16., 125.],
+     * ]
+     * </pre>
+     *
      * @param other the other {@code NDArray} to take the power with
      * @return the result {@code NDArray}
      */
@@ -1162,6 +1291,18 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Adds a number to this {@code NDArray} element-wise in place.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array.addi(2f);
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * </pre>
      *
      * @param n the number to add
      * @return the result {@code NDArray}
@@ -1182,6 +1323,18 @@ public interface NDArray extends AutoCloseable {
     /**
      * Subtracts a number from this {@code NDArray} element-wise in place.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array.subi(2f);
+     * ND: (2) cpu(0) float32
+     * [-1.,  0.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [-1.,  0.]
+     * </pre>
+     *
      * @param n the number to subtract
      * @return the result {@code NDArray}
      */
@@ -1192,6 +1345,24 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.arange(3);
+     * jshell&gt; array1.subi(array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[0., 0., 0.],
+     *  [3., 3., 3.],
+     *  [6., 6., 6.],
+     * ]
+     * jshell&gt; array1;
+     * [[0., 0., 0.],
+     *  [3., 3., 3.],
+     *  [6., 6., 6.],
+     * ]
+     * </pre>
+     *
      * @param other the other {@code NDArray} to subtract from
      * @return the result {@code NDArray}
      */
@@ -1199,6 +1370,18 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Multiplies this {@code NDArray} by a number element-wise in place.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array.muli(3f);
+     * ND: (2) cpu(0) float32
+     * [3., 6.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [3., 6.]
+     * </pre>
      *
      * @param n the number to multiply by
      * @return the result {@code NDArray}
@@ -1210,6 +1393,25 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.arange(3);
+     * jshell&gt; array1.muli(array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[ 0.,  1.,  4.],
+     *  [ 0.,  4., 10.],
+     *  [ 0.,  7., 16.],
+     * ]
+     * jshell&gt; array1;
+     * ND: (3, 3) cpu(0) float32
+     * [[ 0.,  1.,  4.],
+     *  [ 0.,  4., 10.],
+     *  [ 0.,  7., 16.],
+     * ]
+     * </pre>
+     *
      * @param others the other NDArrays to multiply with
      * @return the result {@code NDArray}
      * @throws IllegalArgumentException others arrays must have at least one element
@@ -1218,6 +1420,18 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Divides this {@code NDArray} by a number element-wise in place.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.divi(4f);
+     * ND: (5) cpu(0) float32
+     * [0.  , 0.25, 0.5 , 0.75, 1.  ]
+     * jshell&gt; array;
+     * ND: (5) cpu(0) float32
+     * [0.  , 0.25, 0.5 , 0.75, 1.  ]
+     * </pre>
      *
      * @param n the number to divide values by
      * @return the array after applying division operation
@@ -1229,6 +1443,24 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.ones(new Shape(3)).mul(10);
+     * jshell&gt; array1.divi(array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[0. , 0.1, 0.2],
+     *  [0.3, 0.4, 0.5],
+     *  [0.6, 0.7, 0.8],
+     * ]
+     * jshell&gt; array1;
+     * [[0. , 0.1, 0.2],
+     *  [0.3, 0.4, 0.5],
+     *  [0.6, 0.7, 0.8],
+     * ]
+     * </pre>
+     *
      * @param other the other {@code NDArray} to divide by
      * @return the result of the divide
      */
@@ -1236,6 +1468,18 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns element-wise remainder of division in place.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(7);
+     * jshell&gt; array.modi(5f);
+     * ND: (7) cpu(0) float32
+     * [0., 1., 2., 3., 4., 0., 1.]
+     * jshell&gt; array;
+     * ND: (7) cpu(0) float32
+     * [0., 1., 2., 3., 4., 0., 1.]
+     * </pre>
      *
      * @param n the divisor number
      * @return the result {@code NDArray}
@@ -1247,6 +1491,19 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 7f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array1.modi(array2);
+     * ND: (2) cpu(0) float32
+     * [0., 1.]
+     * jshell&gt; array1;
+     * ND: (2) cpu(0) float32
+     * [0., 1.]
+     * </pre>
+     *
      * @param other the divisor {@code NDArray}
      * @return the result of the divide
      */
@@ -1254,6 +1511,18 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Takes the power of this {@code NDArray} with a number element-wise in place.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.powi(4f);
+     * ND: (6) cpu(0) float32
+     * [  0.,   1.,   8.,  27.,  64., 125.]
+     * jshell&gt; array;
+     * ND: (6) cpu(0) float32
+     * [  0.,   1.,   8.,  27.,  64., 125.]
+     * </pre>
      *
      * @param n the number to raise the power to
      * @return the result {@code NDArray}
@@ -1265,6 +1534,25 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(6).reshape(3, 2);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array1.powi(array2); // broadcasting
+     * ND: (3, 2) cpu(0) float32
+     * [[  0.,   1.],
+     *  [  4.,  27.],
+     *  [ 16., 125.],
+     * ]
+     * jshell&gt; array1;
+     * ND: (3, 2) cpu(0) float32
+     * [[  0.,   1.],
+     *  [  4.,  27.],
+     *  [ 16., 125.],
+     * ]
+     * </pre>
+     *
      * @param other the other {@code NDArray} to take the power with
      * @return the result {@code NDArray}
      */
@@ -1272,6 +1560,15 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the maximum of this {@code NDArray} and a number element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; array.maximum(3f);
+     * ND: (3) cpu(0) float32
+     * [3., 3., 4.]
+     * </pre>
      *
      * @param n the number to be compared
      * @return the maximum of this {@code NDArray} and a number element-wise.
@@ -1283,6 +1580,23 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 5f, 2f});
+     * jshell&gt; array1.maximum(array2);
+     * ND: (3) cpu(0) float32
+     * [2., 5., 4.]
+     * jshell&gt; NDArray array1 = manager.eye(2);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {0.5f, 2f});
+     * jshell&gt; array1.maximum(array2); // broadcasting
+     * ND: (2, 2) cpu(0) float32
+     * [[1. , 2. ],
+     *  [0.5, 2. ],
+     * ]
+     * </pre>
+     *
      * @param other the {@code NDArray} to be compared
      * @return the maximum of this {@code NDArray} and the other {@code NDArray} element-wise
      */
@@ -1290,6 +1604,15 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the minimum of this {@code NDArray} and a number element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; array.minimum(3f);
+     * ND: (3) cpu(0) float32
+     * [2., 3., 3.]
+     * </pre>
      *
      * @param n the number to be compared
      * @return the minimum of this {@code NDArray} and a number element-wise
@@ -1300,6 +1623,23 @@ public interface NDArray extends AutoCloseable {
      * Returns the maximum of this {@code NDArray} and the other {@code NDArray} element-wise.
      *
      * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 5f, 2f});
+     * jshell&gt; array1.minimum(array2);
+     * ND: (3) cpu(0) float32
+     * [1., 3., 2.]
+     * jshell&gt; NDArray array1 = manager.eye(2);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {0.5f, 2f});
+     * jshell&gt; array1.minimum(array2); // broadcasting
+     * ND: (2, 2) cpu(0) float32
+     * [[0.5, 0. ],
+     *  [0. , 1. ],
+     * ]
+     * </pre>
      *
      * @param other the {@code NDArray} to be compared
      * @return the maximum of this {@code NDArray} and the other {@code NDArray} element-wise

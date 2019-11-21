@@ -3,4 +3,5 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
     <suppress checks="." files="MockMxnetLibrary.java" />
+    <suppress checks="FileLength" files="NDArray.java" />
 </suppressions>
