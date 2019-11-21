@@ -13,5 +13,4 @@ javadoc {
     title "Deep Java Library ${project.version} API specification"
     exclude "ai/djl/util/**"
     exclude "ai/djl/ndarray/internal/**"
-    options.overview "src/main/javadoc/overview.html"
 }

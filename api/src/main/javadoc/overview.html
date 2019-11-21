@@ -3,7 +3,7 @@
   <meta charset="UTF-8">
 </head>
 <body>
-<p>This document is the API specification for Deep Java Library (DJL).</p>
+<p>This document is the API specification for the Deep Java Library (DJL).</p>
 
 <p>The key design goal for the DJL is to simplify the use of deep learning frameworks for Java
   developers. Developers don't need to be Machine Learning/Deep Learning experts to get started.
@@ -18,7 +18,7 @@
   between frameworks when they start their project. They can switch to a different framework at any
   time.
 
-<p>DJL provides a native Java development experience and functions as any other regular Java
+<p>DJL provides a native Java development experience and functions just like any other regular Java
   library would.
   DJL's ergonomic API interface is designed to guide developers with best practices to accomplish
   deep learning tasks.
@@ -36,35 +36,16 @@
     // User can specify GPU/CPU <a href="ai/djl/Device.html"><b>Device</b></a> to run inference session.
     // This device is optional, <a
     href="ai/djl/inference/Predictor.html"><b>Predictor</b></a> can pick up default Device if not specified.
-    // See <a
-    href="ai/djl/Device.html#defaultDevice--"><b>Device.defaultDevice()</b></a>
-    Device device = Device.defaultDevice();
 
     // Next user need create a <b>Predictor</b>, and use <a
     href="ai/djl/inference/Predictor.html#predict-I-"><b>Predictor.predict()</b></a>
     // to get prediction.
-    try (Predictor&lt;BufferedImage, List&lt;DetectedObject&gt;&gt; predictor = <b>model.newPredictor</b>(translator, device)) {
-        List&lt;DetectedObject&gt; result = predictor.<b>predict</b>(img);
+    try (Predictor&lt;BufferedImage, List&lt;DetectedObjects&gt;&gt; predictor = <b>model.newPredictor</b>(translator)) {
+        List&lt;DetectedObjects&gt; result = predictor.<b>predict</b>(img);
     }
 </pre>
 
-<p>The following is an example of how to write training code.
+<p>More tutorials, documents, and examples can be on our <a href="https://github.com/awslabs/djl/tree/master/docs">GitHub repository</a>.
 
-<p>DJL contains following packages:
-<ul>
-  <li>ai.djl - This package contains common top level classes shared by both inference
-    and training.
-  <li>ai.djl.engine - This package contains classes responsible for loading deep
-    learning frameworks.
-  <li>ai.djl.inference - This package contains classes to implement inference tasks.
-  <li>ai.djl.metric - This package contains classes to collect metrics information.
-  <li>ai.djl.modality.* - These packages contain utility classes for each predefined
-    modalities.
-  <li>ai.djl.ndarray.* _ These packages contain classes and interfaces that define
-    n-dimensional arrays.
-  <li>ai.djl.nn.* - These packages contain classes define neural network operators.
-  <li>ai.djl.training.* - These packages contain classes to implement training tasks.
-  <li>ai.djl.translate.* - These packages contain classes that help translate between java objects and NDArrays.
-</ul>
 </body>
 </html>
