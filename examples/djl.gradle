@@ -8,7 +8,7 @@ plugins {
 
 repositories {
     maven {
-        url 'https://djl-ai.s3.amazonaws.com/dev'
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
     }
 }
 
