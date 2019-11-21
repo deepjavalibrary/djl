@@ -39,6 +39,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * {@code SingleShotDetection} is an implementation of {@link Block} that implements a Single Shot
+ * Detection (SSD) model for object detection.
+ */
 public final class SingleShotDetection extends AbstractBlock {
     private static final byte VERSION = 1;
     private List<Block> features;
@@ -249,6 +253,12 @@ public final class SingleShotDetection extends AbstractBlock {
         }
     }
 
+    /**
+     * Creates a {@link Block} that reduces the size of a convolutional block by half.
+     *
+     * @param numFilters the number of filters
+     * @return a {@link Block} that reduces the size of a convolutional block by half
+     */
     public static SequentialBlock getDownSamplingBlock(int numFilters) {
         SequentialBlock sequentialBlock = new SequentialBlock();
         for (int i = 0; i < 2; i++) {
@@ -274,6 +284,13 @@ public final class SingleShotDetection extends AbstractBlock {
         return sequentialBlock;
     }
 
+    /**
+     * Creates a class prediction block used in an SSD.
+     *
+     * @param numAnchors the number of anchors
+     * @param numClasses the number of classes
+     * @return a class prediction block used in an SSD
+     */
     public static Conv2D getClassPredictionBlock(int numAnchors, int numClasses) {
         return new Conv2D.Builder()
                 .setKernel(new Shape(3, 3))
@@ -282,6 +299,12 @@ public final class SingleShotDetection extends AbstractBlock {
                 .build();
     }
 
+    /**
+     * Creates a anchor prediction block used in an SSD.
+     *
+     * @param numAnchors the number of anchors
+     * @return a anchor prediction block used in an SSD
+     */
     public static Conv2D getAnchorPredictionBlock(int numAnchors) {
         return new Conv2D.Builder()
                 .setKernel(new Shape(3, 3))
@@ -290,6 +313,7 @@ public final class SingleShotDetection extends AbstractBlock {
                 .build();
     }
 
+    /** The Builder to construct a {@link SingleShotDetection}. */
     public static class Builder {
         private Block network;
         private int numFeatures = -1;
@@ -383,6 +407,11 @@ public final class SingleShotDetection extends AbstractBlock {
             return this;
         }
 
+        /**
+         * Builds a {@link SingleShotDetection} block.
+         *
+         * @return the {@link SingleShotDetection} block
+         */
         public SingleShotDetection build() {
             if (features == null && numFeatures < 0) {
                 throw new IllegalArgumentException("Either numFeatures or features must be set");

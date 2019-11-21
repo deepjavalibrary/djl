@@ -23,7 +23,7 @@ public class QAInput {
      * Creates the BERT QA model.
      *
      * @param question the question for the model
-     * @param paragraph the answer paragraph that contains the answer
+     * @param paragraph the resource document that contains the answer
      * @param seqLength the maximum length of the sentence
      */
     public QAInput(String question, String paragraph, int seqLength) {
@@ -32,14 +32,29 @@ public class QAInput {
         this.seqLength = seqLength;
     }
 
+    /**
+     * Gets the question for the model.
+     *
+     * @return the question for the model
+     */
     public String getQuestion() {
         return question;
     }
 
+    /**
+     * Gets the resource document that contains the answer.
+     *
+     * @return the resource document that contains the answer
+     */
     public String getParagraph() {
         return paragraph;
     }
 
+    /**
+     * Gets the sequence length.
+     *
+     * @return the sequence length
+     */
     public int getSeqLength() {
         return seqLength;
     }

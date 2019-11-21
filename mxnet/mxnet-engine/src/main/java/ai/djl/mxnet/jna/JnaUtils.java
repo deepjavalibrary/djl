@@ -51,6 +51,7 @@ public final class JnaUtils {
 
     public static final String[] EMPTY_ARRAY = new String[0];
 
+    /** An enum that enumerates the statuses of numpy mode. */
     public enum NumpyMode {
         OFF,
         THREAD_LOCAL_ON,

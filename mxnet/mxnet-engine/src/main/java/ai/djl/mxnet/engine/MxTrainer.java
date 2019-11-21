@@ -251,6 +251,11 @@ public class MxTrainer implements Trainer {
         return model;
     }
 
+    /**
+     * Gets the {@link ai.djl.metric.Metrics} associated with this {@code Trainer}.
+     *
+     * @return the {@link ai.djl.metric.Metrics} associated with this {@code Trainer}
+     */
     public Metrics getMetrics() {
         return metrics;
     }

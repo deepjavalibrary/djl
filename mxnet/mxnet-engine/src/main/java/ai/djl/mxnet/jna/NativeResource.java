@@ -37,10 +37,20 @@ public abstract class NativeResource implements AutoCloseable {
         }
     }
 
+    /**
+     * Gets the boolean that indicates whether this resource has been released.
+     *
+     * @return whether this resource has been released
+     */
     public boolean isReleased() {
         return handle.get() == null;
     }
 
+    /**
+     * Gets the {@link Pointer} to this resource.
+     *
+     * @return the {@link Pointer} to this resource
+     */
     public Pointer getHandle() {
         Pointer pointer = handle.get();
         if (pointer == null) {
@@ -49,6 +59,11 @@ public abstract class NativeResource implements AutoCloseable {
         return pointer;
     }
 
+    /**
+     * Gets the unique ID of this resource.
+     *
+     * @return the unique ID of this resource
+     */
     public final String getUid() {
         return uid;
     }

@@ -27,6 +27,11 @@ public class Squeezenet extends ImageClassificationModelLoader {
     private static final String ARTIFACT_ID = "squeezenet";
     private static final String VERSION = "0.0.1";
 
+    /**
+     * Creates a new instance of {@code SqueezeNet}.
+     *
+     * @param repository the repository to load the model from
+     */
     public Squeezenet(Repository repository) {
         super(repository, ARTIFACT_ID, VERSION);
     }

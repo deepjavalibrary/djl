@@ -424,6 +424,11 @@ public class MxNDManager implements NDManager {
         }
     }
 
+    /**
+     * Prints information about this {@link NDManager} and all sub-managers to the console.
+     *
+     * @param level the level of this {@link NDManager} in the hierarchy
+     */
     public void debugDump(int level) {
         StringBuilder sb = new StringBuilder(100);
         for (int i = 0; i < level; ++i) {
