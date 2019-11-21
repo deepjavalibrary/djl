@@ -15,6 +15,11 @@ tasks.create(name: "PlaceholderJar", type: Jar) {
     archiveClassifier = ""
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 def flavorNames = file("src/main/resources/binaries").list() ?: []
 flavorNames.each { flavor ->
 
@@ -95,7 +100,7 @@ flavorNames.each { flavor ->
     }
 }
 
-repositories {
+publishing.repositories {
     maven {
         if (project.hasProperty("s3")) {
             name = "s3"
