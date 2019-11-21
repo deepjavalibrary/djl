@@ -1,5 +1,5 @@
 
-![DeepJavaLibrary](docs/website/img/deepjavalibrary.png?raw=true "Deep Java Library")
+![DeepJavaLibrary](website/img/deepjavalibrary.png?raw=true "Deep Java Library")
 
 ![](https://github.com/awslabs/djl/workflows/nightly%20build/badge.svg)
 
