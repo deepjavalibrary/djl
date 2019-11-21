@@ -32,7 +32,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,15 +56,14 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
         ZooModel<BufferedImage, Classifications> model = loadModel(arguments, metrics);
 
         int numOfThreads = arguments.getThreads();
-
         logger.info("Multithreaded inference with {} threads.", numOfThreads);
 
         metrics.addMetric("thread", numOfThreads);
-        AtomicBoolean collectMem = new AtomicBoolean(true);
         List<PredictorCallable> callables = new ArrayList<>(numOfThreads);
-        for (int i = 0; i < numOfThreads; i++) {
-            callables.add(new PredictorCallable(model, img, metrics, iteration, collectMem));
+        for (int i = 0; i < numOfThreads; ++i) {
+            callables.add(new PredictorCallable(model, img, metrics, iteration, i, i == 0));
         }
+
         Classifications classification = null;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         int successThreads = 0;
@@ -87,6 +85,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
         if (successThreads != numOfThreads) {
             logger.error("Only {}/{} threads finished.", successThreads, numOfThreads);
         }
+
         return classification;
     }
 
@@ -96,6 +95,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
         private BufferedImage img;
         private Metrics metrics;
         private int iteration;
+        private String workerId;
         private boolean collectMemory;
 
         public PredictorCallable(
@@ -103,25 +103,29 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
                 BufferedImage img,
                 Metrics metrics,
                 int iteration,
-                AtomicBoolean collectMemory) {
+                int workerId,
+                boolean collectMemory) {
             this.predictor = model.newPredictor();
             this.img = img;
             this.metrics = metrics;
             this.iteration = iteration;
-            this.collectMemory = collectMemory.getAndSet(false);
+            this.workerId = String.format("%02d", workerId);
+            this.collectMemory = collectMemory;
+            predictor.setMetrics(metrics);
         }
 
         /** {@inheritDoc} */
         @Override
         public Classifications call() throws TranslateException {
-            predictor.setMetrics(metrics);
             Classifications result = null;
             for (int i = 0; i < iteration; i++) {
                 result = predictor.predict(img);
                 if (collectMemory) {
                     MemoryUtils.collectMemoryInfo(metrics);
                 }
+                logger.trace("Worker-{}: {} iteration finished.", workerId, i + 1);
             }
+            logger.debug("Worker-{}: finished.", workerId);
             return result;
         }
     }
