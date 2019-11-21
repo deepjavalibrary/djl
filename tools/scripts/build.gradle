@@ -19,4 +19,9 @@ application {
     mainClassName = System.getProperty("main", "ai.djl.examples.inference.Benchmark")
 }
 
+run {
+    systemProperties System.getProperties()
+    systemProperties.remove("user.dir");
+}
+
 tasks.distTar.enabled = false
