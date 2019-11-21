@@ -15,6 +15,7 @@ package ai.djl.examples;
 import ai.djl.MalformedModelException;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.TrainPikachu;
+import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
@@ -33,7 +34,6 @@ public class TrainPikachuTest {
             expectedLoss = 2.5e-3f;
             expectedMaxNumber = 15;
             expectedMinNumber = 6;
-
         } else {
             // test train 1 epoch and predict workflow works on CPU
             args = new String[] {"-e", "1", "-m", "1", "-b", "32"};
@@ -44,9 +44,11 @@ public class TrainPikachuTest {
         TrainPikachu trainPikachu = new TrainPikachu();
         Assert.assertTrue(trainPikachu.runExample(args));
         Assert.assertTrue(trainPikachu.getValidationLoss() < expectedLoss);
+
+        JnaUtils.waitAll();
         // test predict
         int numberOfPikachus =
-                trainPikachu.predict("build/model", "src/test/resources/pikachu.jpg");
+                new TrainPikachu().predict("build/model", "src/test/resources/pikachu.jpg");
         if (expectedMinNumber > 0) {
             Assert.assertTrue(numberOfPikachus >= expectedMinNumber);
             Assert.assertTrue(numberOfPikachus <= expectedMaxNumber);

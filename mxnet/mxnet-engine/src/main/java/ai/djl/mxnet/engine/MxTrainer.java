@@ -127,13 +127,6 @@ public class MxTrainer implements Trainer {
                 addMetric("backward", time);
                 time = System.nanoTime();
 
-                if (loss != null) {
-                    NDArray result = loss.isNaN();
-                    if (result.any()) {
-                        throw new TrainingDivergedException("The Loss NDArray has NaNs");
-                    }
-                }
-
                 updateTrainingMetrics(labels, preds);
                 addMetric("training-metrics", time);
             }
@@ -211,6 +204,11 @@ public class MxTrainer implements Trainer {
         trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
         // TODO: this can be done during onBatch listener
         addMetric("train", trainingLoss);
+        if (Float.isNaN(trainingLoss.getValue())) {
+            throw new TrainingDivergedException(
+                    "The Loss became NaN, try reduce learning rate,"
+                            + "add clipGradient option to your optimizer, check input data and loss calculation.");
+        }
         trainingMetrics.forEach(metric -> addMetric("train", metric));
         // turn gradient recording back on
         MxGradientCollector.setRecording(true);
