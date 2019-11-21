@@ -58,3 +58,15 @@ The following table shows the list of available arguments:
  | `-b`       | Batch size to use for training. |
  | `-g`       | Maximum number of GPUs to use. Default will use all detected GPUs. |
  | `-o`       | Directory to save the trained model. |
+ 
+ 
+### Run prediction
+
+There is a `predict` method available in the `TrainPikachu` class.
+Just pass the directory of saved models and the path to the image for prediction.
+For example:
+
+```java
+TrainPikachu trainPikachu = new TrainPikachu();
+trainPikachu.predict("build/model", "src/test/resources/pikachu.jpg");
+```
