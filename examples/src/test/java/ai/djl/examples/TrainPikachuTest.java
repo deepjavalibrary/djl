@@ -30,7 +30,7 @@ public class TrainPikachuTest {
         int expectedMinNumber = 0;
         int expectedMaxNumber = 0;
         if (Engine.getInstance().getGpuCount() > 0) {
-            args = new String[] {"-e", "20", "-b", "32"};
+            args = new String[] {"-e", "20", "-b", "32", "-g", "1"};
             expectedLoss = 2.5e-3f;
             expectedMaxNumber = 15;
             expectedMinNumber = 6;

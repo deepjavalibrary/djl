@@ -120,20 +120,22 @@ public final class TrainPikachu extends AbstractTraining {
             Pipeline pipeline = new Pipeline(new ToTensor());
             List<String> classes = new ArrayList<>();
             classes.add("pikachu");
-            Predictor<BufferedImage, DetectedObjects> predictor =
-                    model.newPredictor(
-                            new SingleShotDetectionTranslator.Builder()
-                                    .setPipeline(pipeline)
-                                    .setClasses(classes)
-                                    .optThreshold(detectionThreshold)
-                                    .build());
-            BufferedImage image = BufferedImageUtils.fromFile(imagePath);
-            DetectedObjects detectedObjects = predictor.predict(image);
-            ImageVisualization.drawBoundingBoxes(image, detectedObjects);
-            Path out = Paths.get(outputDir).resolve("pikachu_output.png");
-            ImageIO.write(image, "png", out.toFile());
-            // return number of pikachu detected
-            return detectedObjects.getNumberOfObjects();
+            SingleShotDetectionTranslator translator =
+                    new SingleShotDetectionTranslator.Builder()
+                            .setPipeline(pipeline)
+                            .setClasses(classes)
+                            .optThreshold(detectionThreshold)
+                            .build();
+            try (Predictor<BufferedImage, DetectedObjects> predictor =
+                    model.newPredictor(translator)) {
+                BufferedImage image = BufferedImageUtils.fromFile(imagePath);
+                DetectedObjects detectedObjects = predictor.predict(image);
+                ImageVisualization.drawBoundingBoxes(image, detectedObjects);
+                Path out = Paths.get(outputDir).resolve("pikachu_output.png");
+                ImageIO.write(image, "png", out.toFile());
+                // return number of pikachu detected
+                return detectedObjects.getNumberOfObjects();
+            }
         }
     }
 

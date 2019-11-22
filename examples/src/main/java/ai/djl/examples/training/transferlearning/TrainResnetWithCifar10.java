@@ -44,6 +44,7 @@ import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
+import ai.djl.zoo.ModelZoo;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -104,7 +105,6 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
             throws IOException, ModelNotFoundException, MalformedModelException {
         boolean isSymbolic = arguments.isSymbolic();
         boolean preTrained = arguments.isPreTrained();
-        String path = arguments.getModelDir();
         Map<String, String> criteria = arguments.getCriteria();
         if (isSymbolic) {
             // load the model
@@ -128,26 +128,27 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
             return model;
         }
         // imperative resnet50
-        Model model = Model.newInstance();
-
-        Block resNet50 =
-                new ResNetV1.Builder()
-                        .setImageShape(new Shape(3, 32, 32))
-                        .setNumLayers(50)
-                        .setOutSize(10)
-                        .build();
-        model.setBlock(resNet50);
-
         if (preTrained) {
-            if (path == null) {
-                throw new IllegalArgumentException(
-                        "You specified pre-trained "
-                                + "imperative model, please provide local model dir using "
-                                + "command line option -d");
+            if (criteria == null) {
+                criteria = new ConcurrentHashMap<>();
+                criteria.put("layers", "50");
+                criteria.put("flavor", "v1");
+                criteria.put("dataset", "cifar10");
             }
-            model.load(Paths.get(path), "resnetv1");
+            // load pre-trained imperative ResNet50 from DJL model zoo
+            return ModelZoo.RESNET.loadModel(criteria, new ProgressBar());
+        } else {
+            // construct new ResNet50 without pre-trained weights
+            Model model = Model.newInstance();
+            Block resNet50 =
+                    new ResNetV1.Builder()
+                            .setImageShape(new Shape(3, 32, 32))
+                            .setNumLayers(50)
+                            .setOutSize(10)
+                            .build();
+            model.setBlock(resNet50);
+            return model;
         }
-        return model;
     }
 
     private TrainingConfig setupTrainingConfig(Arguments arguments) {

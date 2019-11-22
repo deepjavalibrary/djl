@@ -52,7 +52,7 @@ import org.testng.annotations.Test;
 
 public class ResnetTest {
 
-    @Test(enabled = false)
+    @Test
     public void testTrain() {
         Optimizer optimizer =
                 new Nag.Builder()
@@ -89,8 +89,8 @@ public class ResnetTest {
                 trainer.trainBatch(batch);
                 trainer.step();
                 NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
-                NDArray expectedAtIndex1 = manager.ones(new Shape(16)).muli(.8577);
-                NDArray expectedAtIndex87 = manager.ones(new Shape(32, 32, 3, 3));
+                NDArray expectedAtIndex1 = manager.ones(new Shape(16, 16, 3, 3));
+                NDArray expectedAtIndex87 = manager.ones(new Shape(32));
                 Assert.assertEquals(parameters.get(0).getValue().getArray(), expectedAtIndex0);
                 Assertions.assertAlmostEquals(
                         parameters.get(1).getValue().getArray(), expectedAtIndex1);
@@ -99,7 +99,7 @@ public class ResnetTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     public void testLoadPredict()
             throws IOException, ModelNotFoundException, TranslateException,
                     MalformedModelException {
@@ -112,7 +112,7 @@ public class ResnetTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     public void testLoadTrain()
             throws IOException, ModelNotFoundException, MalformedModelException {
         try (ZooModel<BufferedImage, Classifications> model = getModel()) {
@@ -138,7 +138,7 @@ public class ResnetTest {
     private ZooModel<BufferedImage, Classifications> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
         Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("numLayers", "50");
+        criteria.put("layers", "50");
         criteria.put("dataset", "cifar10");
         return ModelZoo.RESNET.loadModel(criteria);
     }

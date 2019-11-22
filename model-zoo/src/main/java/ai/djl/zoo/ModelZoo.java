@@ -17,6 +17,7 @@ import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.zoo.cv.classification.MlpModelLoader;
 import ai.djl.zoo.cv.classification.ResNetModelLoader;
+import ai.djl.zoo.cv.object_detection.ssd.SingleShotDetectionModelLoader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public interface ModelZoo {
 
     ResNetModelLoader RESNET = new ResNetModelLoader(REPOSITORY);
     MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
+    SingleShotDetectionModelLoader SSD = new SingleShotDetectionModelLoader(REPOSITORY);
 
     /**
      * Gets the {@link ModelLoader} based on the model name.

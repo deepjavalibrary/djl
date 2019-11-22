@@ -1,0 +1,62 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.zoo",
+  "artifactId": "ssd",
+  "type": "cv",
+  "name": "SingleShotDetection",
+  "description": "Single Shot Detection for Object Detection",
+  "website": "http://www.djl.ai/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd",
+      "arguments": {
+        "numFeatures": 3,
+        "numFilters": [
+          16,
+          32,
+          64
+        ],
+        "ratios": [
+          1,
+          2,
+          0.5
+        ],
+        "sizes": [
+          [0.2, 0.272],
+          [0.37, 0.447],
+          [0.54, 0.619],
+          [0.71, 0.79],
+          [0.88, 0.961]
+        ],
+        "outSize": 1,
+        "globalPool": true,
+        "threshold": 0.6
+      },
+      "properties": {
+        "flavor": "tiny",
+        "dataset": "pikachu"
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/zoo/synset_pikachu.txt",
+          "sha1Hash": "e4409822ba1d95bebcec2dfaf8f8b3d2e7c8291e",
+          "size": 7,
+          "name": "synset.txt"
+        },
+        "parameters": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/zoo/ssd/0.0.1/ssd-0030.params.gz",
+          "sha1Hash": "c5df670c13f609007a955b7cbc6e1625452a8808",
+          "size": 3742997
+        }
+      }
+    }
+  ]
+}

@@ -38,7 +38,7 @@ public class MultiBoxTargetTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     public void testMultiBoxTargetValues() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray groundTruth =
@@ -82,20 +82,20 @@ public class MultiBoxTargetTest {
                                         0.00e+00f,
                                         1.40e+00f,
                                         1.00e+01f,
-                                        2.59e+00f,
-                                        7.18e+00f,
+                                        2.593e+00f,
+                                        7.175e+00f,
                                         -1.20e+00f,
-                                        2.69e-01f,
-                                        1.68e+00f,
-                                        -1.57e+00f,
+                                        2.688e-01f,
+                                        1.6823e+00f,
+                                        -1.5654e+00f,
                                         0.00e+00f,
                                         0.00e+00f,
                                         0.00e+00f,
                                         0.00e+00f,
-                                        -5.71e-01f,
+                                        -5.714e-01f,
                                         -1.00e+00f,
                                         -8.94e-07f,
-                                        6.26e-01f
+                                        6.258e-01f
                                     })
                             .reshape(new Shape(1, 20)));
         }
