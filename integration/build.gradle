@@ -9,8 +9,6 @@ repositories {
     }
 }
 
-def classifier = getClassifier()
-
 dependencies {
     api "commons-cli:commons-cli:${commons_cli_version}"
     api "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
@@ -22,7 +20,7 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
 
-    runtimeOnly "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
+    runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
 }
 
 task copyDependencies(type: Copy) {

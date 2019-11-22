@@ -71,7 +71,7 @@ configure(javaProjects()) {
 
 apply from: file("${rootProject.projectDir}/tools/gradle/publish.gradle")
 
-def getClassifier() {
+def getMXNetNativeLib() {
     String osName = System.getProperty("os.name")
     String osPrefix;
     if (osName.startsWith("Win")) {
@@ -83,6 +83,15 @@ def getClassifier() {
     } else {
         throw new GradleException("Unsupported os: " + osName)
     }
-    return osPrefix + "-x86_64"
-}
 
+    try {
+        exec {
+            commandLine "nvcc", "-V"
+        }
+        return "mxnet-native-cu101mkl:1.6.0-SNAPSHOT:${osPrefix}-x86_64"
+    } catch (Exception e) {
+        project.logger.debug("No cuda is detected");
+    }
+
+    return "mxnet-native-mkl:1.6.0-SNAPSHOT:${osPrefix}-x86_64"
+}

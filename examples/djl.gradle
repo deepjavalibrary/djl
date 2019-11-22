@@ -12,8 +12,6 @@ repositories {
     }
 }
 
-def classifier = getClassifier()
-
 dependencies {
     implementation "commons-cli:commons-cli:${commons_cli_version}"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
@@ -23,7 +21,7 @@ dependencies {
     implementation project(":model-zoo")
     implementation project(":mxnet:mxnet-model-zoo")
 
-    runtimeOnly "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
+    runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

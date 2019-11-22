@@ -1,5 +1,5 @@
 plugins {
-    id "java-library"
+    id "java"
     id 'application'
 }
 
@@ -10,17 +10,16 @@ repositories {
     }
 }
 
-def classifier = getClassifier()
-
 dependencies {
-    api "commons-cli:commons-cli:1.4"
-    api "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
-    api "com.google.code.gson:gson:2.8.5"
-    api "ai.djl:api:0.2.0-SNAPSHOT"
-    api "ai.djl:basicdataset:0.2.0-SNAPSHOT"
-    api "ai.djl:model-zoo:0.2.0-SNAPSHOT"
-    api "ai.djl.mxnet:mxnet-model-zoo:0.2.0-SNAPSHOT"
-    runtimeOnly "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
+    implementation "commons-cli:commons-cli:1.4"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
+    implementation "com.google.code.gson:gson:2.8.5"
+    implementation "ai.djl:api:0.2.0-SNAPSHOT"
+    implementation "ai.djl:basicdataset:0.2.0-SNAPSHOT"
+    implementation "ai.djl:model-zoo:0.2.0-SNAPSHOT"
+    implementation "ai.djl.mxnet:mxnet-model-zoo:0.2.0-SNAPSHOT"
+
+    runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
 
     testImplementation 'org.testng:testng:6.14.3'
 }
@@ -41,7 +40,7 @@ run {
 
 tasks.distTar.enabled = false
 
-def getClassifier() {
+def getMXNetNativeLib() {
     String osName = System.getProperty("os.name")
     String osPrefix;
     if (osName.startsWith("Win")) {
@@ -53,5 +52,15 @@ def getClassifier() {
     } else {
         throw new GradleException("Unsupported os: " + osName)
     }
-    return osPrefix + "-x86_64"
+
+    try {
+        exec {
+            commandLine "nvcc", "-V"
+        }
+        return "mxnet-native-cu101mkl:1.6.0-SNAPSHOT:${osPrefix}-x86_64"
+    } catch (Exception e) {
+        project.logger.debug("No cuda is detected");
+    }
+
+    return "mxnet-native-mkl:1.6.0-SNAPSHOT:${osPrefix}-x86_64"
 }

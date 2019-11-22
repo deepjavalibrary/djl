@@ -4,8 +4,6 @@ repositories {
     }
 }
 
-def classifier = getClassifier()
-
 dependencies {
     api "org.slf4j:slf4j-api:${slf4j_version}"
     api project(":repository")
@@ -16,7 +14,7 @@ dependencies {
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 
     testImplementation project(":mxnet:mxnet-engine")
-    testRuntimeOnly "ai.djl.mxnet:mxnet-native-mkl:1.6.0-SNAPSHOT:${classifier}"
+    testRuntimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
 }
 
 task syncS3(type: Exec) {
