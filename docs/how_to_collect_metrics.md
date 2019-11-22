@@ -1,6 +1,6 @@
 # Metrics in DJL
 
-Deep Java Library (DJL) comes with utility classes to make it easy to capture performance metrics and other metrics during runtime. These metrics can be used to analyze and monitor inference and/or training performance and stability. [Metrics](../api/src/main/java/ai/djl/metric/Metrics.java) is the class that enables collecting metrics information. It is built as a collection of individual [Metric](../api/src/main/java/ai/djl/metric/Metric.java) classes.
+Deep Java Library (DJL) comes with utility classes to make it easy to capture performance metrics and other metrics during runtime. These metrics can be used to analyze and monitor inference and/or training performance and stability. [Metrics](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/metric/Metrics.java) is the class that enables collecting metrics information. It is built as a collection of individual [Metric](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/metric/Metric.java) classes.
 
 As a container for individual metrics classes, **Metrics** stores them as time series data so that metric-vs-timeline analysis could be performed. It also provides convenient statistical methods for getting aggregated information, such as _mean_ and _percentile_.
 
@@ -68,6 +68,6 @@ metrics.addMetric("end_to_end_latency", (end-begin) / 1_000_000f, "ms");
 
 ## More information
 For more examples of metrics use, as well as convenient utils provided by DJL, see:
-- [MemoryUtils](../examples/src/main/java/ai/djl/examples/util/MemoryUtils.java) for memory consumption metrics
-- [MxTrainer](../mxnet/engine/src/main/java/ai/djl/mxnet/engine/MxTrainer.java) for training metrics
-- [BasePredictor](../api/src/main/java/ai/djl/inference/BasePredictor.java) for inference metrics
+- [MemoryUtils](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/util/MemoryUtils.java) for memory consumption metrics
+- [MxTrainer](https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/src/main/java/ai/djl/mxnet/engine/MxTrainer.java) for training metrics
+- [BasePredictor](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/inference/BasePredictor.java) for inference metrics

@@ -19,5 +19,5 @@ We provide framework agnostic `ZooModel`s in our model zoo. They can be used on 
 MXNet has a large number of existing pre-trained models. We created a MXNet model zoo to make it easy for users to consume them.
 
 ## Publish your own model zoo
-You can create your own model zoo so customers can easily consume it.
-For more information, see [Add a new Model to the model zoo ](development/add_model_to_model-zoo.md).
+You can create your own model zoo so that customers can easily consume it.
+For more information, see [Add a new Model to model zoo ](development/add_model_to_model-zoo.md).

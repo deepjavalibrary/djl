@@ -7,7 +7,7 @@ You can easily customize your own dataset by extending RandomAccessDataset.
 
 We provide several well-known datasets that you can use. 
 
-[MNIST](http://yann.lecun.com/exdb/mnist) - a handwritten digits dataset
+[MNIST](http://yann.lecun.com/exdb/mnist) - a handwritten digits dataset    
 [CIFAR10](https://www.cs.toronto.edu/~kriz/cifar.html) - an image classification dataset
 
 We also provide several built-in datasets that you can easily wrap around existing NDArrays and images.
@@ -97,10 +97,11 @@ Let's take CSVDataset, which can load a csv file, for example.
 For this example, we'll use [malicious_url_data.csv](https://github.com/incertum/cyber-matrix-ai/blob/master/Malicious-URL-Detection-Deep-Learning/data/url_data_mega_deep_learning.csv).
 
 The CSV file has the following format.
-|url | isMalicious |
-|--- | --- |
+
+| URL      | isMalicious |
+| ----------- | ----------- |
 | sample.url.good.com | 0 |
-| sample.url.bad.com | 1 |
+| sample.url.bad.com | 1  |
 
 We'll also use the 3rd party [Apache Commons](https://commons.apache.org/) library to read the CSV file. To use the library, include the following dependency:
 ```
