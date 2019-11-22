@@ -48,9 +48,4 @@ the value to set log level can be found [here](https://logging.apache.org/log4j/
 
 ## Common Problems
 
-### MXNet Engine not found in intelliJ
-
-You may see this issue if you update the code in intelliJ and try to rerun the test or example.
-	
-To fix this, navigate to the `mxnet/mxnet-engine/src/main/resources` folder and right click on the resources folder. 
-Then, select the `Rebuild <default>` option.
+Please follow the [Troubleshooting](troubleshooting.md) document for common problems and their solutions.
