@@ -20,19 +20,17 @@ The following examples are included:
 
 This example supports building with both Gradle and Maven. To build, use either of the following commands:
 
-### Gradle build
+* Gradle build
+    ```sh
+    cd examples
+    ./gradlew jar
+    ```
 
-```sh
-cd examples
-./gradlew jar
-```
-
-### Maven build
-
-```sh
-cd examples
-mvn package
-```
+* Maven build
+    ```sh
+    cd examples
+    mvn package -DskipTests
+    ```
 
 ### Run example code
 With the gradle `application` plugin you can execute example code directly.
@@ -40,10 +38,17 @@ For more information on running each example, see the example's documentation.
 
 The following command executes an object detection example:
 
-```sh
-cd examples
-./gradlew run
-```
+* Gradle
+    ```sh
+    cd examples
+    ./gradlew run
+    ```
+
+* Maven
+    ```sh
+    cd examples
+    mvn exec:java -Dexec.mainClass="ai.djl.examples.inference.ObjectDetection"
+    ```
 
 ## Engine selection
 
@@ -51,9 +56,9 @@ DJL is engine agnostic, so it's capable of supporting different backends. Only
 the MXNet engine backend implementation is currently supported.
 
 With MXNet, you can choose different versions of the native MXNet library.
-The supplied examples use `mxnet-native-mkl` for macOS. You may need to 
-change the MXNet library version to match your platform in [pom.xml](pom.xml) or [build.gradle](build.gradle).
+The supplied examples use `mxnet-native-mkl`. You may need to 
+change the MXNet library version for GPU support in [pom.xml](pom.xml) or [build.gradle](build.gradle).
 
 The following MXNet versions are available:
 * mxnet-native-mkl
-* mxnet-native-cu101mkl
+* mxnet-native-cu101mkl - Linux only
