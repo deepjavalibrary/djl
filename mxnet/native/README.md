@@ -47,4 +47,7 @@ cd mxnet/native
 
 # Publish to DJL s3 bucket
 ./gradlew publish -Ps3
+
+# If the artifact is large, increase the socket timeout
+./gradlew publish -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000
 ```
