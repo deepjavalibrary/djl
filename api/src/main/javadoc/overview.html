@@ -29,19 +29,15 @@
     // Assume user has a pre-trained already, they just need load it
     Model model = <b>Model.load</b>(modelDir, modelName);
 
-    // User must implement <a href="ai/djl/translate/Translator.html"><b>Translator</b></a> interface, read <a
+    // User can implement <a href="ai/djl/translate/Translator.html"><b>Translator</b></a> interface, read <a
     href="ai/djl/translate/Translator.html"><b>Translator</b></a> for detail.
     Translator translator = new <b>MyTranslator</b>();
-
-    // User can specify GPU/CPU <a href="ai/djl/Device.html"><b>Device</b></a> to run inference session.
-    // This device is optional, <a
-    href="ai/djl/inference/Predictor.html"><b>Predictor</b></a> can pick up default Device if not specified.
 
     // Next user need create a <b>Predictor</b>, and use <a
     href="ai/djl/inference/Predictor.html#predict-I-"><b>Predictor.predict()</b></a>
     // to get prediction.
-    try (Predictor&lt;BufferedImage, List&lt;DetectedObjects&gt;&gt; predictor = <b>model.newPredictor</b>(translator)) {
-        List&lt;DetectedObjects&gt; result = predictor.<b>predict</b>(img);
+    try (Predictor&lt;BufferedImage, DetectedObjects&gt; predictor = <b>model.newPredictor</b>(translator)) {
+        DetectedObjects result = predictor.<b>predict</b>(img);
     }
 </pre>
 
