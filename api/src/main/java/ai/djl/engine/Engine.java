@@ -107,7 +107,7 @@ public abstract class Engine {
      * @param device the GPU {@link Device} to retrieve
      * @return the {@link MemoryUsage} of the specified GPU device
      * @throws EngineException if operation is not supported
-     * @throws IllegalArgumentException if Device is not GPU device
+     * @throws IllegalArgumentException if {@link Device} is not GPU device
      */
     public abstract MemoryUsage getGpuMemory(Device device);
 

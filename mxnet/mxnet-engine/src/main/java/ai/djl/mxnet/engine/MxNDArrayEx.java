@@ -31,7 +31,7 @@ class MxNDArrayEx implements NDArrayEx {
     /**
      * Constructs an {@code MxNDArrayEx} given an NDArray.
      *
-     * @param parent the NDArray to extend
+     * @param parent the {@link NDArray} to extend
      */
     MxNDArrayEx(MxNDArray parent) {
         this.array = parent;

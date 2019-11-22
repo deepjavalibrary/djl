@@ -17,8 +17,8 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
 /**
- * A {@link Transform} that converts an image NDArray from preprocessing format to Neural Network
- * format.
+ * A {@link Transform} that converts an image {@link NDArray} from preprocessing format to Neural
+ * Network format.
  *
  * @see NDImageUtils#toTensor(NDArray)
  */

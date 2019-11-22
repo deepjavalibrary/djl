@@ -167,7 +167,7 @@ public interface Model extends AutoCloseable {
     void setProperty(String key, String value);
 
     /**
-     * Gets the NDArray Manager from the model.
+     * Gets the {@link NDManager} from the model.
      *
      * @return the {@link NDManager}
      */

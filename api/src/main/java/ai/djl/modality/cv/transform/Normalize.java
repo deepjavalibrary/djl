@@ -16,7 +16,7 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
-/** A {@link Transform} that normalizes an image NDArray of shape CHW or NCHW. */
+/** A {@link Transform} that normalizes an image {@link NDArray} of shape CHW or NCHW. */
 public class Normalize implements Transform {
     private float[] mean;
     private float[] std;

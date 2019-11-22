@@ -16,10 +16,11 @@ import ai.djl.engine.Engine;
 import java.util.Objects;
 
 /**
- * The {@code Device} class provides the specified assignment for CPU/GPU processing on the NDArray.
+ * The {@code Device} class provides the specified assignment for CPU/GPU processing on the {@code
+ * NDArray}.
  *
- * <p>Users can use this to specify whether to load/compute the NDArray on CPU/GPU with deviceType
- * and deviceId provided
+ * <p>Users can use this to specify whether to load/compute the {@code NDArray} on CPU/GPU with
+ * deviceType and deviceId provided
  */
 public class Device {
 
@@ -94,10 +95,10 @@ public class Device {
     }
 
     /**
-     * Returns a new instance of CPU Device with the specified {@code deviceId}.
+     * Returns a new instance of CPU {@code Device} with the specified {@code deviceId}.
      *
      * @param deviceId the CPU device ID
-     * @return a new instance of CPU Device with the specified {@code deviceId}
+     * @return a new instance of CPU {@code Device} with the specified {@code deviceId}
      */
     public static Device cpu(int deviceId) {
         return new Device("cpu", deviceId);
@@ -113,10 +114,10 @@ public class Device {
     }
 
     /**
-     * Returns a new instance of GPU Device with the specified {@code deviceId}.
+     * Returns a new instance of GPU {@code Device} with the specified {@code deviceId}.
      *
      * @param deviceId the GPU device ID
-     * @return a new instance of GPU Device with specified {@code deviceId}
+     * @return a new instance of GPU {@code Device} with specified {@code deviceId}
      */
     public static Device gpu(int deviceId) {
         return new Device("gpu", deviceId);

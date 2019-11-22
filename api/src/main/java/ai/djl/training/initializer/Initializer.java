@@ -31,10 +31,10 @@ public interface Initializer {
     /**
      * Initializes a single {@link NDArray}.
      *
-     * @param manager the {@link NDManager} to create the new NDArray in
+     * @param manager the {@link NDManager} to create the new {@link NDArray} in
      * @param shape the {@link Shape} for the new NDArray
      * @param dataType the {@link DataType} for the new NDArray
-     * @return the NDArray initialized with the manager and shape
+     * @return the {@link NDArray} initialized with the manager and shape
      */
     NDArray initialize(NDManager manager, Shape shape, DataType dataType);
 }

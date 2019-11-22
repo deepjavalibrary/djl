@@ -1728,8 +1728,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the floor of this {@code NDArray} element-wise.
      *
-     * <p>The floor of the scalar x is the largest integer i, such that i &lt;= x. It is often
-     * denoted as \lfloor x \rfloor.
+     * <p>The floor of the scalar x is the largest integer i, such that i &lt;= x.
      *
      * <p>Examples
      *
@@ -1747,8 +1746,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the ceiling of this {@code NDArray} element-wise.
      *
-     * <p>The ceil of the scalar x is the smallest integer i, such that i &gt;= x. It is often
-     * denoted as \lceil x \rceil.
+     * <p>The ceil of the scalar x is the smallest integer i, such that i &gt;= x.
      *
      * <p>Examples
      *
@@ -1862,7 +1860,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the trigonometric sine of this {@code NDArray} element-wise.
      *
-     * <p>The input should be in radians (2𝜋 radians equals 360 degrees).
+     * <p>The input should be in radians (2 Pi radians equals 360 degrees).
      *
      * <p>Examples
      *
@@ -1881,7 +1879,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the trigonometric cosine of this {@code NDArray} element-wise.
      *
-     * <p>The input should be in radians (2𝜋 radians equals 360 degrees).
+     * <p>The input should be in radians (2 Pi radians equals 360 degrees).
      *
      * <p>Examples
      *
@@ -1899,7 +1897,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the trigonometric tangent of this {@code NDArray} element-wise.
      *
-     * <p>The input should be in radians (2𝜋 radians equals 360 degrees).
+     * <p>The input should be in radians (2 Pi radians equals 360 degrees).
      *
      * <p>Examples
      *
@@ -1917,8 +1915,8 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the inverse trigonometric sine of this {@code NDArray} element-wise.
      *
-     * <p>The input should be in the range [-1, 1]. The output is in the closed interval of [−𝜋/2,
-     * 𝜋/2].
+     * <p>The input should be in the range [-1, 1]. The output is in the closed interval of [-Pi/2,
+     * Pi/2].
      *
      * <p>Examples
      *
@@ -1936,8 +1934,8 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the inverse trigonometric cosine of this {@code NDArray} element-wise.
      *
-     * <p>The input should be in the range [-1, 1]. The output is in the closed interval of [−𝜋/2,
-     * 𝜋/2].
+     * <p>The input should be in the range [-1, 1]. The output is in the closed interval of [-Pi/2,
+     * Pi/2].
      *
      * <p>Examples
      *
@@ -1955,8 +1953,8 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the inverse trigonometric tangent of this {@code NDArray} element-wise.
      *
-     * <p>The input should be in the range [-1, 1]. The output is in the closed interval of [−𝜋/2,
-     * 𝜋/2].
+     * <p>The input should be in the range [-1, 1]. The output is in the closed interval of [-Pi/2,
+     * Pi/2].
      *
      * <p>Examples
      *
@@ -1974,7 +1972,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the hyperbolic sine of this {@code NDArray} element-wise.
      *
-     * <p>𝑠𝑖𝑛ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)−𝑒𝑥𝑝(−𝑥))
+     * <p>sinh(x)=0.5*(exp(x) - exp(-x))
      *
      * <p>Examples
      *
@@ -1992,7 +1990,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the hyperbolic cosine of this {@code NDArray} element-wise.
      *
-     * <p>𝑐𝑜𝑠ℎ(𝑥)=0.5×(𝑒𝑥𝑝(𝑥)+𝑒𝑥𝑝(−𝑥))
+     * <p>cosh(x)=0.5*(exp(x)+exp(-x))
      *
      * <p>Examples
      *
@@ -2010,7 +2008,7 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the hyperbolic tangent of this {@code NDArray} element-wise.
      *
-     * <p>𝑡𝑎𝑛ℎ(𝑥)=𝑠𝑖𝑛ℎ(𝑥)/𝑐𝑜𝑠ℎ(𝑥)
+     * <p>tanh(x)=sinh(x)/cosh(x)
      *
      * <p>Examples
      *
@@ -2076,8 +2074,6 @@ public interface NDArray extends AutoCloseable {
     /**
      * Converts this {@code NDArray} from radians to degrees element-wise.
      *
-     * <p>𝑑𝑒𝑔𝑟𝑒𝑒𝑠([0, 𝜋/2, 𝜋, 3𝜋/2, 2𝜋]) = [0, 90, 180, 270, 360].
-     *
      * <p>Examples
      *
      * <pre>
@@ -2093,8 +2089,6 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Converts this {@code NDArray} from degrees to radians element-wise.
-     *
-     * <p>𝑟𝑎𝑑𝑖𝑎𝑛𝑠([0, 90, 180, 270, 360])=[0, 𝜋/2, 𝜋, 3𝜋/2, 2𝜋]
      *
      * <p>Examples
      *
