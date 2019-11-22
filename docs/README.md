@@ -22,6 +22,7 @@ This module contains examples and documentation for the Deep Java Library (DJL) 
 - [Image classification example](../examples/docs/image_classification.md)
 - [Single-shot Object detection example](../examples/docs/object_detection.md)
 - [Bert question and answer example](../examples/docs/BERT_question_and_answer.md)
+- [Multi-threaded inference](../examples/docs/multithread_inference.md)
 
 ## Development guide
 

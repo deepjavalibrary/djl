@@ -24,10 +24,8 @@ A: December 2004
 Follow [setup](../../docs/development/setup.md) to configure your development environment.
 
 ### Run Inference
-Use the following command to run inference:
 
 ```
 cd examples
-./gradlew -Dmain=ai.djl.examples.inference.BertQaInference"
+./gradlew -Dmain=ai.djl.examples.inference.BertQaInference run
 ```
-
