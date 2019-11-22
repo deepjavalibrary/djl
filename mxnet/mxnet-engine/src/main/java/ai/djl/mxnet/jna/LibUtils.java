@@ -109,6 +109,23 @@ public class LibUtils {
             }
             String version = prop.getProperty("version");
             String classifier = prop.getProperty("classifier", "");
+            if (!classifier.isEmpty()) {
+                String osName = System.getProperty("os.name");
+                String osPrefix;
+                if (osName.startsWith("Win")) {
+                    osPrefix = "win";
+                } else if (osName.startsWith("Mac")) {
+                    osPrefix = "osx";
+                } else if (osName.startsWith("Linux")) {
+                    osPrefix = "linux";
+                } else {
+                    throw new AssertionError("Unsupported platform: " + osName);
+                }
+                if (!osPrefix.equals(classifier.split("-")[1])) {
+                    throw new IllegalStateException(
+                            "Your MXNet native library jar does not match your operating system. Make sure that the Maven Dependency Classifier matches your system type.");
+                }
+            }
             String libs = prop.getProperty("libraries");
             String[] files = libs.split(",");
 
