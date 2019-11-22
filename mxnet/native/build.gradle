@@ -38,7 +38,7 @@ flavorNames.each { flavor ->
                 def versionName = String.format("${VERSION}-%s", new Date().format('yyyyMMdd'))
                 def dir = file("src/main/resources/binaries/${flavor}/${osName}/native/lib")
                 def sb = new StringBuilder()
-                sb.append("version=${versionName}\nlibraries=")
+                sb.append("version=${versionName}\nclassifier=${flavor}-${osName}-x86_64\nlibraries=")
                 def first = true
                 for (String name : dir.list().sort()) {
                     if (first) {
@@ -60,7 +60,7 @@ flavorNames.each { flavor ->
     // This means that publishing from the main project does not publish the native jars
     // and the native jars have to be published separately
     if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
-        publishing.publications.create("publication-${flavor}", MavenPublication) {
+        publishing.publications.create("${flavor}", MavenPublication) {
             artifactId "mxnet-native-${flavor}"
             from components.java
             artifacts = artifactsNames

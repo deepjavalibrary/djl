@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // CHECKSTYLE:OFF:FinalClass
-@SuppressWarnings("PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal")
 /**
  * Utilities for finding the MXNet Engine binary on the System.
  *
@@ -49,6 +48,7 @@ import org.slf4j.LoggerFactory;
  *   <li>In the python path. These can be installed using pip.
  * </ol>
  */
+@SuppressWarnings("PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal")
 public class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
@@ -108,12 +108,13 @@ public class LibUtils {
                         "You are using a placeholder jar. Make sure that the Maven Dependency Classifier includes your system type");
             }
             String version = prop.getProperty("version");
+            String classifier = prop.getProperty("classifier", "");
             String libs = prop.getProperty("libraries");
             String[] files = libs.split(",");
 
             String userHome = System.getProperty("user.home");
             String libName = System.mapLibraryName(LIB_NAME);
-            Path dir = Paths.get(userHome, ".mxnet/cache/" + version);
+            Path dir = Paths.get(userHome, ".mxnet/cache/" + version + classifier);
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
                 return path.toAbsolutePath().toString();
