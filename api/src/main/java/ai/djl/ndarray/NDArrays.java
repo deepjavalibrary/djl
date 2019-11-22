@@ -20,6 +20,16 @@ public final class NDArrays {
 
     private NDArrays() {}
 
+    private static void checkInputs(NDArray[] arrays) {
+        if (arrays == null || arrays.length < 2) {
+            throw new IllegalArgumentException("Passed in arrays must have at least one element");
+        }
+        if (arrays.length > 2
+                && Arrays.stream(arrays).skip(1).anyMatch(array -> !arrays[0].shapeEquals(array))) {
+            throw new IllegalArgumentException("The shape of all inputs must be the same");
+        }
+    }
+
     ////////////////////////////////////////
     // Operators: Element Comparison
     ////////////////////////////////////////
@@ -452,14 +462,21 @@ public final class NDArrays {
     /**
      * Adds a {@link NDArray} to a {@link NDArray} element-wise.
      *
-     * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     * <p>The shapes of all of the {@link NDArray}s must be the same.
      *
-     * @param a the {@link NDArray} to be added to
-     * @param b the {@link NDArray} to add
+     * @param arrays the {@link NDArray}s to add together
      * @return the result {@link NDArray}
+     * @throws IllegalArgumentException arrays must have at least two elements
+     * @throws IllegalArgumentException the shape of all inputs must be the same
      */
-    public static NDArray add(NDArray a, NDArray b) {
-        return a.add(b);
+    public static NDArray add(NDArray... arrays) {
+        checkInputs(arrays);
+        if (arrays.length == 2) {
+            return arrays[0].add(arrays[1]);
+        }
+        try (NDArray array = NDArrays.stack(new NDList(arrays))) {
+            return array.sum(new int[] {0});
+        }
     }
 
     /**
@@ -522,14 +539,21 @@ public final class NDArrays {
     /**
      * Multiplies all of the {@link NDArray}s together element-wise.
      *
-     * <p>The shapes of all of the {@link NDArray}s must be broadcastable.
+     * <p>The shapes of all of the {@link NDArray}s must be the same.
      *
-     * @param a the {@link NDArray} to be multiplied
-     * @param b the {@link NDArray} to multiply by
+     * @param arrays the {@link NDArray}s to multiply together
      * @return the result {@link NDArray}
+     * @throws IllegalArgumentException arrays must have at least two elements
+     * @throws IllegalArgumentException the shape of all inputs must be the same
      */
-    public static NDArray mul(NDArray a, NDArray b) {
-        return a.mul(b);
+    public static NDArray mul(NDArray... arrays) {
+        checkInputs(arrays);
+        if (arrays.length == 2) {
+            return arrays[0].mul(arrays[1]);
+        }
+        try (NDArray array = NDArrays.stack(new NDList(arrays))) {
+            return array.prod(new int[] {0});
+        }
     }
 
     /**
@@ -660,17 +684,16 @@ public final class NDArrays {
     /**
      * Adds all of the {@link NDArray}s together element-wise in place.
      *
-     * <p>The shapes of all of the {@link NDArray}s must be broadcastable.
+     * <p>The shapes of all of the {@link NDArray}s must be the same.
      *
      * @param arrays the {@link NDArray}s to add together
      * @return the result {@link NDArray}
      * @throws IllegalArgumentException arrays must have at least two elements
      */
     public static NDArray addi(NDArray... arrays) {
-        if (arrays == null || arrays.length < 2) {
-            throw new IllegalArgumentException("Passed in arrays must have at least two elements");
-        }
-        return arrays[0].addi(Arrays.stream(arrays).skip(1).toArray(NDArray[]::new));
+        checkInputs(arrays);
+        Arrays.stream(arrays).skip(1).forEachOrdered(array -> arrays[0].addi(array));
+        return arrays[0];
     }
 
     /**
@@ -733,17 +756,16 @@ public final class NDArrays {
     /**
      * Multiplies all of the {@link NDArray}s together element-wise in place.
      *
-     * <p>The shapes of all of the {@link NDArray}s must be broadcastable.
+     * <p>The shapes of all of the {@link NDArray}s must be the same.
      *
      * @param arrays the {@link NDArray}s to multiply together
      * @return the result {@link NDArray}
      * @throws IllegalArgumentException arrays must have at least two elements
      */
     public static NDArray muli(NDArray... arrays) {
-        if (arrays == null || arrays.length < 2) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        }
-        return arrays[0].muli(Arrays.stream(arrays).skip(1).toArray(NDArray[]::new));
+        checkInputs(arrays);
+        Arrays.stream(arrays).skip(1).forEachOrdered(array -> arrays[0].muli(array));
+        return arrays[0];
     }
 
     /**

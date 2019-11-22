@@ -172,6 +172,22 @@ public class NDArrayElementArithmeticOpTest {
             NDArray actual = manager.create(new float[] {3f, 5f, 7f, 9f});
             Assertions.assertInPlaceEquals(actual, result, addend);
 
+            NDArray[] toAddAll = {
+                manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
+                manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2)),
+                manager.create(new float[] {2, 2, 2, 2}, new Shape(2, 2))
+            };
+
+            NDArray addAll = NDArrays.add(toAddAll);
+            Assert.assertNotEquals(
+                    toAddAll[0], addAll, "None in-place operator returned in-place result");
+
+            addAll = NDArrays.addi(toAddAll);
+            Assert.assertEquals(toAddAll[0], addAll, "In-place summation failed");
+
+            actual = manager.create(new float[] {7, 7, 7, 7}, new Shape(2, 2));
+            Assert.assertEquals(actual, addAll, "Incorrect value in summed array");
+
             testCornerCase(manager, NDArrays::add, Float::sum, false);
             testCornerCase(manager, NDArrays::addi, Float::sum, true);
         }
@@ -298,6 +314,20 @@ public class NDArrayElementArithmeticOpTest {
                     result,
                     "Element wise multiplication: Incorrect value in result ndarray");
             Assertions.assertInPlaceEquals(actual, inPlaceResult, multiplicand);
+
+            NDArray[] toMulAll = {
+                manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2)),
+                manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2)),
+                manager.create(new float[] {2, 2, 2, 2}, new Shape(2, 2))
+            };
+            NDArray mulAll = NDArrays.mul(toMulAll);
+            NDArray mulAllInPlace = NDArrays.muli(toMulAll);
+            Assert.assertNotSame(
+                    mulAll, toMulAll[0], "None in-place operator returned in-place result");
+            Assert.assertEquals(toMulAll[0], mulAllInPlace, "In-place summation failed");
+            actual = manager.create(new float[] {8, 12, 12, 8}, new Shape(2, 2));
+            Assert.assertEquals(actual, mulAll, "Incorrect value in summed array");
+            Assert.assertEquals(actual, mulAllInPlace, "Incorrect value in summed array");
 
             testCornerCase(manager, NDArrays::mul, (x, y) -> x * y, false);
             testCornerCase(manager, NDArrays::muli, (x, y) -> x * y, true);

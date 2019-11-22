@@ -709,17 +709,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray addi(NDArray... others) {
-        NDArray[] toAdd = new NDArray[others.length + 1];
-        toAdd[0] = this;
-        System.arraycopy(others, 0, toAdd, 1, others.length);
-        if (others.length == 0) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        } else if (others.length == 1) {
-            manager.invoke("_npi_add", toAdd, new NDArray[] {this}, null);
-        } else {
-            manager.invoke("add_n", toAdd, new NDArray[] {this}, null);
-        }
+    public NDArray addi(NDArray other) {
+        manager.invoke("_npi_add", new NDArray[] {this, other}, new NDArray[] {this}, null);
         return this;
     }
 
@@ -741,23 +732,17 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(NDArray... others) {
-        if (others == null || others.length == 0) {
-            throw new IllegalArgumentException("Passed in arrays must have at least one element");
-        }
-        for (NDArray other : others) {
-            manager.invoke(
-                    "_npi_multiply", new NDArray[] {this, other}, new NDArray[] {this}, null);
-        }
+    public NDArray muli(Number n) {
+        MxOpParams params = new MxOpParams();
+        params.add("scalar", n.toString());
+        manager.invoke("_npi_multiply_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
         return this;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(Number n) {
-        MxOpParams params = new MxOpParams();
-        params.add("scalar", n.toString());
-        manager.invoke("_npi_multiply_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
+    public NDArray muli(NDArray other) {
+        manager.invoke("_npi_multiply", new NDArray[] {this, other}, new NDArray[] {this}, null);
         return this;
     }
 

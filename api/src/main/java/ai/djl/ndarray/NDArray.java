@@ -1314,11 +1314,10 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
      *
-     * @param others the other {@code NDArray}s to add
+     * @param other the other {@code NDArray}s to add
      * @return the result {@code NDArray}
-     * @throws IllegalArgumentException others arrays must have at least one element
      */
-    NDArray addi(NDArray... others);
+    NDArray addi(NDArray other);
 
     /**
      * Subtracts a number from this {@code NDArray} element-wise in place.
@@ -1414,9 +1413,8 @@ public interface NDArray extends AutoCloseable {
      *
      * @param others the other NDArrays to multiply with
      * @return the result {@code NDArray}
-     * @throws IllegalArgumentException others arrays must have at least one element
      */
-    NDArray muli(NDArray... others);
+    NDArray muli(NDArray others);
 
     /**
      * Divides this {@code NDArray} by a number element-wise in place.

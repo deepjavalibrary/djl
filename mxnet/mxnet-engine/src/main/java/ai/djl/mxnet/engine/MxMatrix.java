@@ -630,8 +630,8 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray addi(NDArray... others) {
-        return array.addi(others);
+    public NDArray addi(NDArray other) {
+        return array.addi(other);
     }
 
     /** {@inheritDoc} */
@@ -654,7 +654,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(NDArray... others) {
+    public NDArray muli(NDArray others) {
         return array.muli(others);
     }
 

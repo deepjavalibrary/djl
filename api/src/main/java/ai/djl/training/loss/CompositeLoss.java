@@ -39,13 +39,10 @@ public class CompositeLoss extends Loss {
     /** {@inheritDoc} */
     @Override
     public NDArray getLoss(NDList label, NDList prediction) {
-        NDArray[] losses =
+        return NDArrays.add(
                 Arrays.stream(components)
                         .map(component -> component.getLoss(label, prediction))
-                        .toArray(NDArray[]::new);
-        try (NDArray loss = NDArrays.stack(new NDList(losses))) {
-            return loss.sum(new int[] {0});
-        }
+                        .toArray(NDArray[]::new));
     }
 
     /** {@inheritDoc} */

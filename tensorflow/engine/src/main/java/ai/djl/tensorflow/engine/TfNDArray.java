@@ -422,7 +422,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray addi(NDArray... others) {
+    public NDArray addi(NDArray other) {
         return null;
     }
 
@@ -446,7 +446,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(NDArray... others) {
+    public NDArray muli(NDArray others) {
         return null;
     }
 
