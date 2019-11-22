@@ -1,0 +1,73 @@
+name: release
+
+on:
+  release:
+    types: [prereleased]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Build with Gradle
+        run: ./gradlew build
+      - name: Publish to staging repository
+        run: ./gradlew publish -Pstaging
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
+          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
+      - name: API test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: api
+          path: api/build/reports
+      - name: basicdataset test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: basicdataset
+          path: basicdataset/build/reports
+      - name: examples test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: examples
+          path: examples/build/reports
+      - name: integration test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: integration
+          path: integration/build/reports
+      - name: model-zoo test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: model-zoo
+          path: model-zoo/build/reports
+      - name: mxnet-engine test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: mxnet-engine
+          path: mxnet/mxnet-engine/build/reports
+      - name: mxnet-model-zoo test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: mxnet-model-zoo
+          path: mxnet/mxnet-model-zoo/build/reports
+      - name: repository test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: repository
+          path: repository/build/reports
