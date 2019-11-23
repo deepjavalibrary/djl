@@ -18,17 +18,24 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 
 /**
- * {@code Batch} is used to get a batch of data and labels from {@link Dataset}.
+ * A {@code Batch} is used to hold multiple items (data and labels) from a {@link Dataset}.
+ *
+ * <p>When training and performing inference, it is often more efficient to run multiple items
+ * through a network simultaneously rather than one at a time. For this reason, much of the API is
+ * oriented around the {@code Batch} class.
  *
  * <p>In a {@code Batch}, data and label are each an {@link NDList}. The data {@link NDList}
- * represents one batch of all different inputs. Similarly, the label {@link NDList} represents one
- * batch of all different labels.
+ * represents the data for each input in the batch. The number of {@link ai.djl.ndarray.NDArray}s in
+ * the NDList is based on the number of different kinds of inputs, not the batch size. Similarly,
+ * the label {@link NDList} represents the labels for each output.
  *
- * <p>For example, a Discriminator, that discriminates between true and generated image, there are
- * two inputs - true image, and generated image. In this case, the data in {@code Batch} will be an
- * {@link NDList} of size 2, both of which will be {@link ai.djl.ndarray.NDArray} of shape (N, C, H,
- * W). The label in {@code Batch} will be an {@link NDList} of size 1, which will be an {@link
- * ai.djl.ndarray.NDArray} of layout (N, 2).
+ * <p>For example, an Image Question and Answer dataset has two inputs: an image and the question.
+ * In this case, the data in the {@code Batch} will be an {@link NDList} containing a NCHW image
+ * {@link ai.djl.ndarray.NDArray} and a NTC question {@link ai.djl.ndarray.NDArray}. The label will
+ * be an {@link NDList} containing only a NTC answer {@link ai.djl.ndarray.NDArray}.
+ *
+ * <p>In order to differentiate a batch vs a single record (despite them both consisting of two
+ * {@link NDList}s), we have the {@link Batch} and the {@link Record} respectively.
  */
 public class Batch implements AutoCloseable {
 

@@ -18,9 +18,9 @@ import ai.djl.ndarray.NDManager;
 import java.util.stream.Stream;
 
 /**
- * {@code ArrayDataset} is an implementation of {@link RandomAccessDataset} that wraps {@link
- * NDArray}s. It is able to combine multiple data and labels. Each sample will be retrieved by
- * indexing {@link NDArray}s along the first dimension.
+ * {@code ArrayDataset} is an implementation of {@link RandomAccessDataset} that consist entirely of
+ * large {@link NDArray}s. There can be multiple data and label {@link NDArray}s within the dataset.
+ * Each sample will be retrieved by indexing each {@link NDArray} along the first dimension.
  *
  * <p>The following is an example of how to use ArrayDataset:
  *

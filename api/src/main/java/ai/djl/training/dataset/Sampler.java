@@ -15,7 +15,17 @@ package ai.djl.training.dataset;
 import java.util.Iterator;
 import java.util.List;
 
-/** An interface for the indices sampler. */
+/**
+ * An interface for sampling data items from a {@link RandomAccessDataset}.
+ *
+ * <p>A {@code Sampler} implementation returns an iterator of batches for the {@link
+ * RandomAccessDataset}. Instead of returning the actual items, it returns the item indices.
+ * Different samplers can have different ways of sampling such as sampling with or without
+ * replacement.
+ *
+ * <p>Many of the samplers may also make use of {@link SubSampler}s which sample not in batches but
+ * in individual data item indices.
+ */
 public interface Sampler {
 
     /**

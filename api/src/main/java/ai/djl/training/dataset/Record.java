@@ -20,6 +20,18 @@ import ai.djl.ndarray.NDList;
  * <p>The data and labels in record are in the form of an {@link NDList}. This allows it to hold
  * multiple types of data and labels. However, note that the {@link NDList} does not include a
  * dimension for batch.
+ *
+ * <p>In a {@code Record}, data and label are each an {@link NDList}. The data {@link NDList}
+ * represents the data for each input in the batch. Similarly, the label {@link NDList} represents
+ * the labels for each output.
+ *
+ * <p>For example, an Image Question and Answer dataset has two inputs: an image and the question.
+ * In this case, the data in the {@code Record} will be an {@link NDList} containing a CHW image
+ * {@link ai.djl.ndarray.NDArray} and a TC question {@link ai.djl.ndarray.NDArray}. The label will
+ * be an {@link NDList} containing only a TC answer {@link ai.djl.ndarray.NDArray}.
+ *
+ * <p>In order to differentiate a batch vs a single record (despite them both consisting of two
+ * {@link NDList}s), we have the {@link Batch} and the {@link Record} respectively.
  */
 public class Record {
 

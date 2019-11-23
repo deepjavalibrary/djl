@@ -21,12 +21,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@code Adam} is a Adam optimizer. Adam is seen as a generalization of AdaGrad.
+ * {@code Adam} is a generalization of the AdaGrad {@link Optimizer}.
  *
  * <p>Adam updates the weights using:<br>
+ * <br>
  * \( m = beta1 * m + (1 - beta1) * grad\)<br>
  * \( v = beta2 * v + (1 - beta2) * grad^2 \)<br>
  * \( w += - learning_rate * m / (sqrt(v) + epsilon) \)<br>
+ * <br>
  * where g represents the gradient, and m/v are 1st and 2nd order moment estimates (mean and
  * variance).
  */

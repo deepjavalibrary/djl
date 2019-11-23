@@ -29,7 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code BasePredictor} is an implementation of the {@link Predictor} interface.
+ * {@code BasePredictor} contains common code for implementations of the {@link Predictor}
+ * interface.
  *
  * @param <I> the type of the input
  * @param <O> the type of the output

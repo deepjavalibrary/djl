@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * {@code BatchSampler} is an implementation of the {@link Sampler} interface.
+ * {@code BatchSampler} is a {@link Sampler} that returns a single epoch over the data.
  *
  * <p>{@code BatchSampler} wraps another {@link ai.djl.training.dataset.Sampler.SubSampler} to yield
  * a mini-batch of indices.

@@ -16,7 +16,18 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.nn.core.Prelu;
 
-/** Utility class that provides activation functions and blocks. */
+/**
+ * Utility class that provides activation functions and blocks.
+ *
+ * <p>Many networks make use of the {@link ai.djl.nn.core.Linear} block and other similar linear
+ * transformations. However, any number of linear transformations that are composed will only result
+ * in a different linear transformation. In order to represent non-linear data, non-linear functions
+ * called activation functions are interspersed between the linear transformations. This allows the
+ * network to represent non-linear data of increasing complexity.
+ *
+ * <p>See <a href="https://en.wikipedia.org/wiki/Activation_function">wikipedia</a> for more
+ * details.
+ */
 public final class Activation {
 
     private Activation() {}

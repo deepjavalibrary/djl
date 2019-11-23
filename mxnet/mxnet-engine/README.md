@@ -6,6 +6,18 @@ This module contains the MXNet implementation of the Deep Java Library (DJL) Eng
 
 We don't recommend that developers use classes in this module directly. Use of these classes will couple your code with MXNet and make switching between frameworks difficult. Even so, developers are not restricted from using engine-specific features. For more information, see [NDManager#invoke()](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/ai/djl/ndarray/NDManager.html#invoke-java.lang.String-ai.djl.ndarray.NDList-ai.djl.ndarray.NDList-ai.djl.util.PairList-).
 
+## Documentation
+
+The latest javadocs can be found on the [djl.ai website](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/mxnet-engine/index.html).
+
+You can also build the latest javadocs locally using the following command:
+
+```sh
+./gradlew javadoc
+```
+The javadocs output is built in the build/doc/javadoc folder.
+
+
 ## Installation
 You can pull the MXNet engine from the central Maven repository by including the following dependency:
 
@@ -53,6 +65,7 @@ For macOS, you can choose between the following two libraries:
 ### Linux
 For the Linux platform, you can choose between CPU, MKL, CUDA and CUDA+MKL combinations:
 
+CUDA+MKL:
 - org.apache.mxnet:mxnet-native-cu101mkl:1.6.0:linux-x86_64
 - org.apache.mxnet:mxnet-native-cu92mkl:1.6.0:linux-x86_64
 - org.apache.mxnet:mxnet-native-cu90mkl:1.6.0:linux-x86_64
@@ -87,6 +100,7 @@ For the Linux platform, you can choose between CPU, MKL, CUDA and CUDA+MKL combi
     </dependency>
 ```
 
+CUDA:
 - org.apache.mxnet:mxnet-native-cu101:1.6.0:linux-x86_64
 - org.apache.mxnet:mxnet-native-cu92:1.6.0:linux-x86_64
 - org.apache.mxnet:mxnet-native-cu90:1.6.0:linux-x86_64
@@ -121,6 +135,7 @@ For the Linux platform, you can choose between CPU, MKL, CUDA and CUDA+MKL combi
     </dependency>
 ```
 
+CPU and MKL
 - org.apache.mxnet:mxnet-native-mkl:1.6.0:linux-x86_64
 - org.apache.mxnet:mxnet-native:1.6.0:linux-x86_64
 

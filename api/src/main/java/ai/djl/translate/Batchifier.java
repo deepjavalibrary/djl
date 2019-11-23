@@ -17,8 +17,13 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /**
- * An interface that provides methods to convert un-batched {@link NDList} into batched {@link
+ * An interface that provides methods to convert an un-batched {@link NDList} into a batched {@link
  * NDList} and vice versa.
+ *
+ * <p>Different implementations of {@code Batchifier} represent different ways of creating batches.
+ * The most common would be the {@link StackBatchifier} that batchifies by creating a new batch axis
+ * as axis 0. Another implementation could be a concatenated batchifier for sequence elements that
+ * will concatenate the data elements along the time axis.
  */
 public interface Batchifier {
 

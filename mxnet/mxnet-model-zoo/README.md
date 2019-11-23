@@ -2,23 +2,19 @@
 
 ## Introduction
 
-The MXNet model zoo contains most of the symbolic models that can be used for inference and training.
+The MXNet model zoo contains symbolic models that can be used for inference and training. All the models in this model zoo contain pre-trained parameters for their specific datasets.
 
-All of the models in this model zoo contain pre-trained parameters for their specific datasets.
+## Documentation
 
-## Pre-trained models
+The latest javadocs can be found on the [djl.ai website](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/mxnet-model-zoo/index.html).
 
-The MXNet model zoo contains two major categories, Computer Vision (CV) and Natural Language Processing (NLP). All of the models are grouped by their application under these two categories as follows:
+You can also build the latest javadocs locally using the following command:
 
+```sh
+./gradlew javadoc
+```
+The javadocs output is built in the build/doc/javadoc folder.
 
-* CV
-  * Action Recognition
-  * Image Classification
-  * Object Detection
-  * Pose Estimation
-  * Semantic Segmentation/Instance Segmentation
-* NLP
-  * Question and Answer
 
 ## Installation
 You can pull the MXNet engine from the central Maven repository by including the following dependency in you `pom.xml` file:
@@ -31,7 +27,21 @@ You can pull the MXNet engine from the central Maven repository by including the
 </dependency>
 ```
 
-## How to find a pre-trained model in model zoo
+## Pre-trained models
+
+The MXNet model zoo contains two major categories: Computer Vision (CV) and Natural Language Processing (NLP). All the models are grouped by task under these two categories as follows:
+
+
+* CV
+  * Action Recognition
+  * Image Classification
+  * Object Detection
+  * Pose Estimation
+  * Semantic Segmentation/Instance Segmentation
+* NLP
+  * Question and Answer
+
+### How to find a pre-trained model in model zoo
 
 In a model zoo repository, there can be many pre-trained models that belong to the same model family.
 You can use the `ModelZoo` class to search for the model that you need.
@@ -49,7 +59,7 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
     ZooModel<BufferedImage, Classification> model = MxModelZoo.RESNET.loadModel(criteria, device);
 ``` 
 
-## List of search criteria for each model
+### List of search criteria for each model
 The following table illustrates the possible search criteria for all models in the model zoo:
 
 | Category | Application           | Model Family      | Criteria | Possible values                                            |

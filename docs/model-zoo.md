@@ -1,6 +1,6 @@
 # DJL - Model Zoo
 
-Deep Java Library's (DJL) Model Zoo is more than a collection of pre-trained models. It's a bridge between model vendor and consumer. It provides a framework for developers to create and publish their own models. 
+Deep Java Library's (DJL) Model Zoo is more than a collection of pre-trained models. It's a bridge between a model vendor and a consumer. It provides a framework for developers to create and publish their own models. 
 
 A ZooModel has the following
 characteristics:
@@ -8,7 +8,7 @@ characteristics:
 - Versioned: the model version scheme allows developers to continuously update their model without causing a backward compatibility issue.
 - Ready to use out of box: the model contains predefined pre-process and post-process functionality, which
 allows the user to run inference with a plain java object. 
-- Can be published anywhere: models can be published to a S3 bucket, a web server, or a local folder.
+- Can be published anywhere: models can be published to an S3 bucket, a web server, or a local folder.
 
 ## [DJL model zoo](../model-zoo/README.md)
 

@@ -32,6 +32,9 @@ import java.util.List;
 
 /**
  * Normalizes a data batch by mean and variance, and applies a scale gamma as well as offset beta.
+ *
+ * <p>See <a href="https://en.wikipedia.org/wiki/Batch_normalization">wikipedia</a> or the original
+ * <a href="https://arxiv.org/abs/1502.03167">paper</a>.
  */
 public class BatchNorm extends ParameterBlock {
 
@@ -144,7 +147,7 @@ public class BatchNorm extends ParameterBlock {
         runningVar.load(manager, is);
     }
 
-    /** The Builder to construct a {@link BatchNorm} type of {@link ai.djl.nn.Block}. */
+    /** The Builder to construct a {@link BatchNorm}. */
     public static final class Builder {
 
         private int axis = 1;

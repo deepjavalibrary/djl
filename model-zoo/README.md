@@ -5,6 +5,17 @@
 The Deep Java Library (DJL) model zoo contains framework-agnostic models. All of the models have a built-in Translator and
 can be used for inference out of the box.
 
+## Documentation
+
+The latest javadocs can be found on the [djl.ai website](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/model-zoo/index.html).
+
+You can also build the latest javadocs locally using the following command:
+
+```sh
+./gradlew javadoc
+```
+The javadocs output is built in the build/doc/javadoc folder.
+
 ## Installation
 You can pull the model zoo from the central Maven repository by including the following dependency in your `pom.xml` file:
 
@@ -16,17 +27,18 @@ You can pull the model zoo from the central Maven repository by including the fo
 </dependency>
 ```
 
+
 ## Pre-trained models
 
 In the 0.2.0 release, you can find the Multilayer Perceptrons (MLP) and Resnet50 pre-trained models in the model zoo.
 
-## How to find a pre-trained model in the model zoo
+### How to find a pre-trained model in the model zoo
 
 In a model zoo repository, there can be many pre-trained models that belong to the same model family.
 You can use the `ModelZoo` class to search for the model you need.
 First, decide which model family you want to use. Then, define your key/values search criteria
 to narrow down the model you want. If there are multiple models that match your search criteria, the first
-model found is returned. *ModelNotFoundException* will be thrown if no matching model is found.
+model found is returned. A *ModelNotFoundException* will be thrown if no matching model is found.
 
 The following is an example of the criteria to find a Resnet50-v1 model that has been trained on the imagenet dataset:
 ```java
@@ -38,7 +50,7 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
     ZooModel<BufferedImage, Classification> model = ModelZoo.RESNET.loadModel(criteria);
 ```
 
-## List of search criteria of each model
+### List of search criteria of each model
 
 The following table illustrates the possible search criteria for all models in the model zoo:
 
