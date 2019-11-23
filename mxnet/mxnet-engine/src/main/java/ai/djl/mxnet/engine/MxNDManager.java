@@ -32,9 +32,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** {@code MxNDManager} is the MXNet implementation of {@link NDManager}. */
 public class MxNDManager implements NDManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(MxTrainer.class);
 
     /**
      * A global {@link NDManager} singleton instance.
@@ -302,7 +306,8 @@ public class MxNDManager implements NDManager {
     @Override
     public synchronized void detach(String resourceId) {
         if (closed.get()) {
-            throw new IllegalStateException("NDManager has been closed already.");
+            // This may happen in the middle of MxNDManager.close()
+            return;
         }
         resources.remove(resourceId);
     }
@@ -414,8 +419,8 @@ public class MxNDManager implements NDManager {
                 if (closeable != null) {
                     try {
                         closeable.close();
-                    } catch (Exception ignore) {
-                        // ignore
+                    } catch (Exception e) {
+                        logger.error("Resource close failed.", e);
                     }
                 }
             }
