@@ -22,9 +22,6 @@ import java.util.regex.Pattern;
 /** A helper for printing an {@link NDArray}. */
 public abstract class NDFormat {
 
-    private static final int MAX_DEPTH = 10;
-    private static final int MAX_PRINT_ROWS = 10;
-    private static final int MAX_PRINT_ITEMS = 20;
     private static final int PRECISION = 8;
     private static final String LF = System.getProperty("line.separator");
     private static final Pattern PATTERN = Pattern.compile("\\s*\\d\\.(\\d*?)0*e[+-](\\d+)");
@@ -33,9 +30,14 @@ public abstract class NDFormat {
      * Formats the contents of an array as a pretty printable string.
      *
      * @param array the array to print
+     * @param maxSize the maximum elements to print out
+     * @param maxDepth the maximum depth to print out
+     * @param maxRows the maximum rows to print out
+     * @param maxColumns the maximum columns to print out
      * @return the string representation of the array
      */
-    public static String format(NDArray array) {
+    public static String format(
+            NDArray array, int maxSize, int maxDepth, int maxRows, int maxColumns) {
         NDFormat format;
         DataType dataType = array.getDataType();
 
@@ -48,12 +50,12 @@ public abstract class NDFormat {
         } else {
             format = new FloatFormat(array);
         }
-        return format.dump(array);
+        return format.dump(array, maxSize, maxDepth, maxRows, maxColumns);
     }
 
     protected abstract CharSequence format(Number value);
 
-    private String dump(NDArray array) {
+    private String dump(NDArray array, int maxSize, int maxDepth, int maxRows, int maxColumns) {
         StringBuilder sb = new StringBuilder(1000);
         String name = array.getName();
         if (name != null) {
@@ -67,38 +69,45 @@ public abstract class NDFormat {
                 .append(' ')
                 .append(array.getDataType())
                 .append(LF);
-        // corner case: 0 dimension
-        if (array.size() == 0) {
+
+        long size = array.size();
+        long dimension = array.getShape().dimension();
+        if (size == 0) {
+            // corner case: 0 dimension
             sb.append("[]").append(LF);
-            return sb.toString();
-        }
-        // scalar case
-        if (array.getShape().dimension() == 0) {
+        } else if (dimension == 0) {
+            // scalar case
             sb.append(format(array.toArray()[0])).append(LF);
-            return sb.toString();
-        }
-        if (array.getShape().dimension() < MAX_DEPTH) {
-            dump(sb, array, 0, true);
-        } else {
+        } else if (size > maxSize) {
+            sb.append("[ Exceed max print size ]");
+        } else if (dimension > maxDepth) {
             sb.append("[ Exceed max print dimension ]");
+        } else {
+            dump(sb, array, 0, true, maxRows, maxColumns);
         }
         return sb.toString();
     }
 
-    private void dump(StringBuilder sb, NDArray array, int depth, boolean first) {
+    private void dump(
+            StringBuilder sb,
+            NDArray array,
+            int depth,
+            boolean first,
+            int maxRows,
+            int maxColumns) {
         if (!first) {
             Utils.pad(sb, ' ', depth);
         }
         sb.append('[');
         Shape shape = array.getShape();
         if (shape.dimension() == 1) {
-            append(sb, array.toArray());
+            append(sb, array.toArray(), maxColumns);
         } else {
             long len = shape.head();
-            long limit = Math.min(len, MAX_PRINT_ROWS);
+            long limit = Math.min(len, maxRows);
             for (int i = 0; i < limit; ++i) {
                 try (NDArray nd = array.get(i)) {
-                    dump(sb, nd, depth + 1, i == 0);
+                    dump(sb, nd, depth + 1, i == 0, maxRows, maxColumns);
                 }
             }
             long remaining = len - limit;
@@ -116,11 +125,11 @@ public abstract class NDFormat {
         }
     }
 
-    private void append(StringBuilder sb, Number[] values) {
+    private void append(StringBuilder sb, Number[] values, int maxColumns) {
         if (values.length == 0) {
             return;
         }
-        long limit = Math.min(values.length, MAX_PRINT_ITEMS);
+        long limit = Math.min(values.length, maxColumns);
         sb.append(format(values[0]));
         for (int i = 1; i < limit; ++i) {
             sb.append(", ");

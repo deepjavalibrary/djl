@@ -29,7 +29,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.GradReq;
-import ai.djl.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
@@ -46,6 +45,11 @@ import java.util.stream.IntStream;
 
 /** {@code MxNDArray} is the MXNet implementation of {@link NDArray}. */
 public class MxNDArray extends NativeResource implements NDArray {
+
+    private static final int MAX_SIZE = 100;
+    private static final int MAX_DEPTH = 10;
+    private static final int MAX_ROWS = 10;
+    private static final int MAX_COLUMNS = 20;
 
     private String name;
     private Device device;
@@ -1619,27 +1623,23 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String toString() {
+        return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
+    }
+
+    /**
+     * Runs the debug string representation of this {@code NDArray}.
+     *
+     * @param maxSize the maximum elements to print out
+     * @param maxDepth the maximum depth to print out
+     * @param maxRows the maximum rows to print out
+     * @param maxColumns the maximum columns to print out
+     * @return the debug string representation of this {@code NDArray}
+     */
+    public String toDebugString(int maxSize, int maxDepth, int maxRows, int maxColumns) {
         if (isReleased()) {
             return "This array is already closed";
         }
-        if (Utils.DEBUG) {
-            return NDFormat.format(this);
-        }
-        StringBuilder sb = new StringBuilder(100);
-        sb.append('[');
-        if (name != null) {
-            sb.append(name).append(": ");
-        } else {
-            sb.append("ND: ");
-        }
-        sb.append(getShape())
-                .append(' ')
-                .append(getDevice())
-                .append(' ')
-                .append(getDataType())
-                .append("]@")
-                .append(getUid());
-        return sb.toString();
+        return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns);
     }
 
     /** {@inheritDoc} */

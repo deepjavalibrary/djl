@@ -34,8 +34,6 @@ import org.slf4j.Logger;
 /** A class containing utility methods. */
 public final class Utils {
 
-    public static final boolean DEBUG = true;
-
     private Utils() {}
 
     /**
