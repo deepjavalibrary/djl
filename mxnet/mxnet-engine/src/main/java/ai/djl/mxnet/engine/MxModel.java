@@ -382,8 +382,8 @@ public class MxModel implements Model {
             return;
         }
         logger.debug("DJL formatted model not found, try to find MXNet model");
-        NDList paramNDlist = JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath());
-        Device device = manager.getDevice();
+        NDList paramNDlist =
+                JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath(), manager.getDevice());
 
         MxSymbolBlock symbolBlock = (MxSymbolBlock) block;
 
@@ -399,20 +399,13 @@ public class MxModel implements Model {
 
             String paramName = key.split(":", 2)[1];
             Parameter parameter = map.remove(paramName);
-
-            NDArray array = nd.asInDevice(device, false);
-            parameter.setArray(array);
+            parameter.setArray(nd);
         }
         symbolBlock.setInputNames(new ArrayList<>(map.keySet()));
 
         // TODO: Find a better to infer model DataType from SymbolBlock.
         dataType = paramNDlist.head().getDataType();
-        logger.debug("Model data type is: {}", dataType);
-        if (!device.equals(Device.cpu())) {
-            // MXNet always load parameters on CPU, we only close parameters if we copied them.
-            paramNDlist.close();
-        }
-        logger.debug("MXNet Model loaded successfully");
+        logger.debug("MXNet Model {} ({}) loaded successfully.", modelName, dataType);
     }
 
     private boolean readParameters(Path paramFile) throws IOException, MalformedModelException {

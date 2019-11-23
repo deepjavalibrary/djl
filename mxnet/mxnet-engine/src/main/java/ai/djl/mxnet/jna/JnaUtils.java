@@ -369,7 +369,7 @@ public final class JnaUtils {
     }
      */
 
-    public static NDList loadNdArray(MxNDManager manager, Path path) {
+    public static NDList loadNdArray(MxNDManager manager, Path path, Device device) {
         IntBuffer handlesSize = IntBuffer.allocate(1);
         PointerByReference handlesRef = new PointerByReference();
         PointerByReference namesRef = new PointerByReference();
@@ -395,7 +395,15 @@ public final class JnaUtils {
                 ndList.add(array);
             }
         }
-        return ndList;
+
+        // MXNet always load NDArray on CPU
+        if (Device.cpu().equals(device)) {
+            return ndList;
+        }
+
+        NDList ret = ndList.asInDevice(device, true);
+        ndList.close();
+        return ret;
     }
 
     /* Need tests
