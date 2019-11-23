@@ -5,9 +5,8 @@ plugins {
 
 group = "ai.djl.mxnet"
 
-def VERSION = "1.6.0"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = VERSION + (isRelease ? "" : "-SNAPSHOT")
+version = "1.6.0" + (isRelease ? "" : "-SNAPSHOT")
 
 // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
 tasks.create(name: "PlaceholderJar", type: Jar) {
@@ -35,7 +34,7 @@ flavorNames.each { flavor ->
                 def dsStore = file("src/main/resources/binaries/${flavor}/${osName}/native/lib/.DS_Store")
                 dsStore.delete()
 
-                def versionName = String.format("${VERSION}-%s", new Date().format('yyyyMMdd'))
+                def versionName = String.format("${version}-%s", new Date().format('yyyyMMdd'))
                 def dir = file("src/main/resources/binaries/${flavor}/${osName}/native/lib")
                 def sb = new StringBuilder()
                 sb.append("version=${versionName}\nclassifier=${flavor}-${osName}-x86_64\nlibraries=")
