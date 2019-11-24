@@ -1073,6 +1073,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray trace(int offset, int axis1, int axis2) {
         MxOpParams params = new MxOpParams();
+        params.addParam("offset", offset);
         params.addParam("axis1", axis1);
         params.addParam("axis2", axis2);
         return manager.invoke("_np_trace", this, params);

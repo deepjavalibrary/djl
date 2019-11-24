@@ -2119,9 +2119,11 @@ public interface NDArray extends AutoCloseable {
      * [[0., 1.],
      *  [2., 3.],
      * ]
-     * jshell&gt; array.max() // Maximum of the flattened array
+     * jshell&gt; array.max(); // Maximum of the flattened array
      * ND: () cpu(0) float32
      * 3.
+     * jshell&gt; array.max().getFloat() // Use getFloat to get native float
+     * 3.0
      * </pre>
      *
      * @return the maximum of this {@code NDArray}
@@ -2143,7 +2145,7 @@ public interface NDArray extends AutoCloseable {
      * jshell&gt; array.max(new int[]{0}) // Maximum along the first axis
      * ND: (2) cpu(0) float32
      * [2., 3.]
-     * jshell&gt; array.max(new int[]{1}) // Maximum along the first axis
+     * jshell&gt; array.max(new int[]{1}) // Maximum along the second axis
      * ND: (2) cpu(0) float32
      * [1., 3.]
      * </pre>
@@ -2173,7 +2175,7 @@ public interface NDArray extends AutoCloseable {
      * ND: (1, 2) cpu(0) float32
      * [[2., 3.],
      * ]
-     * jshell&gt; array.max(new int[]{1}, true) // Maximum along the first axis and keep dimension
+     * jshell&gt; array.max(new int[]{1}, true) // Maximum along the second axis and keep dimension
      * ND: (2, 1) cpu(0) float32
      * [[1.],
      *  [3.],
@@ -2190,12 +2192,45 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the minimum of this {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
+     * jshell&gt; array
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [2., 3.],
+     * ]
+     * jshell&gt; array.min(); // Minimum of the flattened array
+     * ND: () cpu(0) float32
+     * 0.
+     * jshell&gt; array.min().getFloat() // Use getFloat to get native float
+     * 0.0
+     * </pre>
+     *
      * @return the minimum of this {@code NDArray}
      */
     NDArray min();
 
     /**
      * Returns the minimum of this {@code NDArray} along given axes.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [2., 3.],
+     * ]
+     * jshell&gt; array.min(new int[]{0}); // Minimum along the first axis
+     * ND: (2) cpu(0) float32
+     * [0., 1.]
+     * jshell&gt; array.min(new int[]{1}); // Minimum along the second axis
+     * ND: (2) cpu(0) float32
+     * [0., 2.]
+     * </pre>
      *
      * @param axes the axes along which to operate
      * @return the minimum of this {@code NDArray} with the specified axes removed from the Shape
@@ -2209,6 +2244,26 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the minimum of this {@code NDArray} along given axes.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
+     * jshell&gt; array
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [2., 3.],
+     * ]
+     * jshell&gt; array.min(new int[]{0}, true) // Minimum along the first axis and keep dimension
+     * ND: (1, 2) cpu(0) float32
+     * [[0., 1.],
+     * ]
+     * jshell&gt; array.min(new int[]{1}, true) // Minimum along the second axis and keep dimension
+     * ND: (2, 1) cpu(0) float32
+     * [[0.],
+     *  [2.],
+     * ]
+     * </pre>
+     *
      * @param axes the axes along which to operate
      * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
      *     false} to squeeze the values out of the output array
@@ -2219,12 +2274,44 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the sum of this {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0.5f, 1.5f});
+     * jshell&gt; array.sum();
+     * ND: () cpu(0) float32
+     * 2.
+     * jshell&gt; array.sum().getFloat(); // Use getFloat to get native float
+     * 2.0
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 0f, 5f}, new Shape(2, 2));
+     * jshell&gt; array.sum();
+     * ND: () cpu(0) float32
+     * 6.
+     * </pre>
+     *
      * @return the sum of this {@code NDArray}
      */
     NDArray sum();
 
     /**
      * Returns the minimum of this {@code NDArray} along given axes.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 0f, 5f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [0., 5.],
+     * ]
+     * jshell&gt; array.sum(new int[] {0});
+     * ND: (2) cpu(0) float32
+     * [0., 6.]
+     * jshell&gt; array.sum(new int[] {1});
+     * ND: (2) cpu(0) float32
+     * [1., 5.]
+     * </pre>
      *
      * @param axes the axes along which to operate
      * @return the sum of this {@code NDArray} with the specified axes removed from the Shape
@@ -2238,6 +2325,26 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the minimum of this {@code NDArray} along given axes.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 0f, 5f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [0., 5.],
+     * ]
+     * jshell&gt; array.sum(new int[] {0}, true);
+     * ND: (1, 2) cpu(0) float32
+     * [[0., 6.],
+     * ]
+     * jshell&gt; array.sum(new int[] {1}, true);
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [0., 5.],
+     * ]
+     * </pre>
+     *
      * @param axes the axes along which to operate
      * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
      *     false} to squeeze the values out of the output array
@@ -2248,12 +2355,44 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the product of this {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array.prod();
+     * ND: () cpu(0) float32
+     * 6.
+     * jshell&gt; array.prod().getFloat(); // Use getFloat to get native float
+     * 6.0
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.prod();
+     * ND: () cpu(0) float32
+     * 24.
+     * </pre>
+     *
      * @return the product of this {@code NDArray}
      */
     NDArray prod();
 
     /**
      * Returns the product of this {@code NDArray} elements over the given axes.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [3., 4.],
+     * ]
+     * jshell&gt; array.prod(new int[] {0});
+     * ND: (2) cpu(0) float32
+     * [3., 8.]
+     * jshell&gt; array.prod(new int[] {1});
+     * ND: (2) cpu(0) float32
+     * [ 2., 12.]
+     * </pre>
      *
      * @param axes the axes along which to operate
      * @return the product of this {@code NDArray} with the specified axes removed from the Shape
@@ -2267,6 +2406,26 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the product of this {@code NDArray} elements over the given axes.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [3., 4.],
+     * ]
+     * jshell&gt; array.prod(new int[] {0}, true);
+     * ND: (1, 2) cpu(0) float32
+     * [[3., 8.],
+     * ]
+     * jshell&gt; array.prod(new int[] {1}, true);
+     * ND: (2, 1) cpu(0) float32
+     * [[ 2.],
+     *  [12.],
+     * ]
+     * </pre>
+     *
      * @param axes the axes along which to operate
      * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
      *     false} to squeeze the values out of the output array
@@ -2277,12 +2436,44 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the average of this {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array.mean();
+     * ND: () cpu(0) float32
+     * 2.5
+     * jshell&gt; array.mean().getFloat(); // Use getFloat to get native float
+     * 2.5
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.prod();
+     * ND: () cpu(0) float32
+     * 2.5
+     * </pre>
+     *
      * @return the average of this {@code NDArray}
      */
     NDArray mean();
 
     /**
      * Returns the average of this {@code NDArray} along given axes.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [3., 4.],
+     * ]
+     * jshell&gt; array.mean(new int[] {0});
+     * ND: (2) cpu(0) float32
+     * [2., 3.]
+     * jshell&gt; array.mean(new int[] {1});
+     * ND: (2) cpu(0) float32
+     * [1.5, 3.5]
+     * </pre>
      *
      * @param axes the axes along which to operate
      * @return the average of this {@code NDArray} with the specified axes removed from the Shape
@@ -2295,6 +2486,26 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Returns the average of this {@code NDArray} along given axes.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [3., 4.],
+     * ]
+     * jshell&gt; array.mean(new int[] {0}, true);
+     * ND: (1, 2) cpu(0) float32
+     * [[2., 3.],
+     * ]
+     * jshell&gt; array.mean(new int[] {1}, true);
+     * ND: (2, 1) cpu(0) float32
+     * [[1.5],
+     *  [3.5],
+     * ]
+     * </pre>
      *
      * @param axes the axes along which to operate
      * @param keepDims {@code true} to keep the specified axes as size 1 in the output array, {@code
@@ -2311,6 +2522,34 @@ public interface NDArray extends AutoCloseable {
      * determine the 2-D sub-arrays whose traces are returned. The {@link Shape} of the resulting
      * {@link NDArray} is the same as that of a with axis1 and axis2 removed.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.eye(3);
+     * jshell&gt; array;
+     * ND: (3, 3) cpu(0) float32
+     * [[1., 0., 0.],
+     *  [0., 1., 0.],
+     *  [0., 0., 1.],
+     * ]
+     * jshell&gt; array.trace();
+     * ND: () cpu(0) float32
+     * 3.
+     * jshell&gt; NDArray array = manager.arange(8).reshape(2, 2, 2);
+     * jshell&gt; array;
+     * ND: (2, 2, 2) cpu(0) float32
+     * [[[0., 1.],
+     *   [2., 3.],
+     *  ],
+     *  [[4., 5.],
+     *   [6., 7.],
+     *  ],
+     * ]
+     * jshell&gt; array.trace();
+     * ND: (2) cpu(0) float32
+     * [6., 8.]
+     * </pre>
+     *
      * @return the sum along diagonals of this {@code NDArray}
      */
     default NDArray trace() {
@@ -2325,6 +2564,34 @@ public interface NDArray extends AutoCloseable {
      * than two dimensions, then the axes specified by axis1 and axis2 are used to determine the 2-D
      * sub-arrays whose traces are returned. The {@link Shape} of the resulting array is the same as
      * this {@code NDArray} with axis1 and axis2 removed.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.eye(3);
+     * jshell&gt; array;
+     * ND: (3, 3) cpu(0) float32
+     * [[1., 0., 0.],
+     *  [0., 1., 0.],
+     *  [0., 0., 1.],
+     * ]
+     * jshell&gt; array.trace(1);
+     * ND: () cpu(0) float32
+     * 0.
+     * jshell&gt; NDArray array = manager.arange(8).reshape(2, 2, 2);
+     * jshell&gt; array;
+     * ND: (2, 2, 2) cpu(0) float32
+     * [[[0., 1.],
+     *   [2., 3.],
+     *  ],
+     *  [[4., 5.],
+     *   [6., 7.],
+     *  ],
+     * ]
+     * jshell&gt; array.trace(1);
+     * ND: (2) cpu(0) float32
+     * [2., 3.]
+     * </pre>
      *
      * @param offset offset of the diagonal from the main diagonal. Can be both positive and
      *     negative.
@@ -2342,6 +2609,24 @@ public interface NDArray extends AutoCloseable {
      * than two dimensions, then the axes specified by axis1 and axis2 are used to determine the 2-D
      * sub-arrays whose traces are returned. The {@link Shape} of the resulting array is the same as
      * this {@code NDArray} with axis1 and axis2 removed.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(8).reshape(2, 2, 2);
+     * jshell&gt; array;
+     * ND: (2, 2, 2) cpu(0) float32
+     * [[[0., 1.],
+     *   [2., 3.],
+     *  ],
+     *  [[4., 5.],
+     *   [6., 7.],
+     *  ],
+     * ]
+     * jshell&gt; array.trace(1,1,2);
+     * ND: (2) cpu(0) float32
+     * [1., 5.]
+     * </pre>
      *
      * @param offset offset of the diagonal from the main diagonal. Can be both positive and
      *     negative.
