@@ -13,6 +13,7 @@
 
 package ai.djl.examples;
 
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -27,7 +28,41 @@ public class TrainResNetTest {
 
         TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
         Assert.assertTrue(test.runExample(args));
-        // Assert.assertTrue(test.getTrainingAccuracy() > .7f);
-        // Assert.assertTrue(test.getTrainingLoss() < .8f);
+    }
+
+    @Test
+    public void testTrainResNetSymbolicNightly() {
+        // this is nightly test
+        if (Boolean.getBoolean("nightly")) {
+            return;
+        }
+        if (Engine.getInstance().getGpuCount() > 0) {
+            // Limit max 4 gpu for cifar10 training to make it converge faster.
+            // and only train 10 batch for unit test.
+            String[] args = {"-e", "10", "-g", "4", "-s", "-p"};
+
+            TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
+            Assert.assertTrue(test.runExample(args));
+            Assert.assertTrue(test.getTrainingAccuracy() > .7f);
+            Assert.assertTrue(test.getTrainingLoss() < .8f);
+        }
+    }
+
+    @Test
+    public void testTrainResNetImperativeNightly() {
+        // this is nightly test
+        if (Boolean.getBoolean("nightly")) {
+            return;
+        }
+        if (Engine.getInstance().getGpuCount() > 0) {
+            // Limit max 4 gpu for cifar10 training to make it converge faster.
+            // and only train 10 batch for unit test.
+            String[] args = {"-e", "10", "-g", "4"};
+
+            TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
+            Assert.assertTrue(test.runExample(args));
+            Assert.assertTrue(test.getTrainingAccuracy() > .7f);
+            Assert.assertTrue(test.getTrainingLoss() < .8f);
+        }
     }
 }
