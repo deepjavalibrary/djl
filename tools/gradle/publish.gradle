@@ -19,7 +19,7 @@ configure([project(':api'), project(':basicdataset'), project(':examples'), proj
     }
 
     task uploadJavadoc(type: Exec) {
-        enabled = (project.name != ":mxnet:native")
+        enabled = (project.name != ":mxnet:native" && project.name != ":examples")
         commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync build/docs/javadoc s3://djl-ai/java-api/${version}/${project.name} > build/upload.log"
     }
 
