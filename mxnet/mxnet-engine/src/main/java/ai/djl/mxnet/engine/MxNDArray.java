@@ -1258,19 +1258,8 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumSumi(int axis) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("axis", axis);
-        params.setDataType(getDataType());
-        manager.invoke("_np_cumsum", new NDArray[] {this}, new NDArray[] {this}, params);
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cumSumi() {
-        manager.invoke("_np_cumsum", new NDArray[] {this}, new NDArray[] {this}, null);
-        return this;
+    public NDArray cumSum() {
+        return manager.invoke("_np_cumsum", this, null);
     }
 
     /** {@inheritDoc} */
@@ -1278,14 +1267,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray cumSum(int axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
-        params.setDataType(getDataType());
         return manager.invoke("_np_cumsum", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cumSum() {
-        return manager.invoke("_np_cumsum", this, null);
     }
 
     /** {@inheritDoc} */

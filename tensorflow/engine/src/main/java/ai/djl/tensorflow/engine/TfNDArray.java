@@ -860,18 +860,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumSumi(int axis) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cumSumi() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray cumSum(int axis) {
         return null;
     }

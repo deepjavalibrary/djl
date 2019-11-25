@@ -1020,18 +1020,6 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumSumi(int axis) {
-        return array.cumSumi(axis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cumSumi() {
-        return array.cumSumi();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray cumSum(int axis) {
         return array.cumSum(axis);
     }
@@ -1081,7 +1069,7 @@ public class MxMatrix implements Matrix {
     /** {@inheritDoc} */
     @Override
     public NDArray tile(long[] repeats) {
-        return array.repeat(repeats);
+        return array.tile(repeats);
     }
 
     /** {@inheritDoc} */

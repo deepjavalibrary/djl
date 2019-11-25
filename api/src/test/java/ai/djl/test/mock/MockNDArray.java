@@ -822,31 +822,19 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sort(int axis) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray sort() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sort(int axis) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray softmax(int[] axes, double temperature) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cumSumi(int axis) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray cumSumi() {
         return null;
     }
 

@@ -13,7 +13,6 @@
 package ai.djl.integration.tests.ndarray;
 
 import ai.djl.engine.EngineException;
-import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -420,12 +419,10 @@ public class NDArrayOtherOpTest {
             NDArray actual =
                     manager.create(new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f});
             Assert.assertEquals(actual, array.cumSum());
-            Assertions.assertInPlaceEquals(actual, array.cumSumi(), array);
 
             array = manager.create(new float[] {1f, 2f, 3f, 5f, 8f, 13f});
             actual = manager.create(new float[] {1f, 3f, 6f, 11f, 19f, 32f});
             Assert.assertEquals(actual, array.cumSum(0));
-            Assertions.assertInPlaceEquals(actual, array.cumSumi(0), array);
 
             // test multi-dim
             array = manager.arange(10).reshape(2, 1, 5, 1);
@@ -434,7 +431,6 @@ public class NDArrayOtherOpTest {
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 7f, 9f, 11f, 13f},
                             new Shape(2, 1, 5, 1));
             Assert.assertEquals(actual, array.cumSum(0));
-            Assertions.assertInPlaceEquals(actual, array.cumSumi(0), array);
 
             array = manager.arange(10).reshape(2, 1, 5, 1);
             actual =
@@ -442,7 +438,6 @@ public class NDArrayOtherOpTest {
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
                             new Shape(2, 1, 5, 1));
             Assert.assertEquals(actual, array.cumSum(1));
-            Assertions.assertInPlaceEquals(actual, array.cumSumi(1), array);
 
             array = manager.arange(10).reshape(2, 1, 5, 1);
             actual =
@@ -450,7 +445,6 @@ public class NDArrayOtherOpTest {
                             new float[] {0f, 1f, 3f, 6f, 10f, 5f, 11f, 18f, 26f, 35f},
                             new Shape(2, 1, 5, 1));
             Assert.assertEquals(actual, array.cumSum(2));
-            Assertions.assertInPlaceEquals(actual, array.cumSumi(2), array);
 
             array = manager.arange(10).reshape(2, 1, 5, 1);
             actual =
@@ -458,7 +452,6 @@ public class NDArrayOtherOpTest {
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
                             new Shape(2, 1, 5, 1));
             Assert.assertEquals(actual, array.cumSum(3));
-            Assertions.assertInPlaceEquals(actual, array.cumSumi(3), array);
 
             // Note that shape after cumsum op with zero-dim and scalar case change
             // test scalar
@@ -500,19 +493,13 @@ public class NDArrayOtherOpTest {
 
             // scalar
             array = manager.create(5f);
-            tileAllActual = manager.create(new float[] {5f, 5f, 5f});
-            Assert.assertEquals(tileAllActual, array.tile(3));
 
-            array.tile(0, 3);
-        }
-    }
+            tileAxis = manager.create(new float[] {5f, 5f, 5f}, new Shape(1, 3));
+            Assert.assertEquals(tileAxis, array.tile(1, 3));
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testTileZeroDim() {
-        try (NDManager manager = NDManager.newBaseManager()) {
             // zero-dim
-            NDArray array = manager.create(new Shape(2, 0));
-            NDArray tileAllActual = manager.create(new Shape(2, 0));
+            array = manager.create(new Shape(2, 0));
+            tileAllActual = manager.create(new Shape(2, 0));
             Assert.assertEquals(tileAllActual, array.tile(5));
             tileAllActual = manager.create(new Shape(10, 0));
             Assert.assertEquals(tileAllActual, array.tile(0, 5));

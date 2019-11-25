@@ -3216,7 +3216,26 @@ public interface NDArray extends AutoCloseable {
     ////////////////////////////////////////
 
     /**
-     * Performs an indirect sort of this {@code NDArray} ascending on the last axis.
+     * Returns the indices that would sort this {@code NDArray}.
+     *
+     * <p>Perform an indirect sort along the given axis. It returns a {@code NDArray} of indices of
+     * the same {@link Shape} as this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {3f, 1f, 2f});
+     * jshell&gt; array.argSort();
+     * ND: (3) cpu(0) int32
+     * [ 1,  2,  0]
+     *
+     * jshell&gt; array = manager.create(new float[] {0f, 3f, 2f, 2f}, new Shape(2, 2));
+     * jshell&gt; array.argSort();
+     * ND: (2, 2) cpu(0) int32
+     * [[ 0,  1],
+     *  [ 0,  1],
+     * ]
+     * </pre>
      *
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
      *     axis, the output DataType is always {@link DataType#INT32}
@@ -3227,7 +3246,26 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Performs an indirect sort of this {@code NDArray} ascending on the given axis.
+     * Returns the indices that would sort this {@code NDArray} given the axis.
+     *
+     * <p>Perform an indirect sort along the given axis. It returns a {@code NDArray} of indices of
+     * the same {@link Shape} as this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 3f, 2f, 2f}, new Shape(2, 2));
+     * jshell&gt; array.argSort(0);
+     * ND: (2, 2) cpu(0) int32
+     * [[ 0,  1],
+     *  [ 1,  0],
+     * ]
+     * jshell&gt; array.argSort(1);
+     * ND: (2, 2) cpu(0) int32
+     * [[ 0,  1],
+     *  [ 0,  1],
+     * ]
+     * </pre>
      *
      * @param axis the axis to sort along
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
@@ -3239,7 +3277,21 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Performs an indirect sort of this {@code NDArray} on the given axis.
+     * Returns the indices that would sort this {@code NDArray} given the axis.
+     *
+     * <p>Perform an indirect sort along the given axis. It returns a {@code NDArray} of indices of
+     * the same {@link Shape} as this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 4f, 3f, 1f}, new Shape(2, 2));
+     * jshell&gt; array.sort();
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 4.],
+     *  [1., 3.],
+     * ]
+     * </pre>
      *
      * @param axis the axis to sort along
      * @param ascending whether to sort ascending
@@ -3249,19 +3301,51 @@ public interface NDArray extends AutoCloseable {
     NDArray argSort(int axis, boolean ascending);
 
     /**
-     * Sorts this {@code NDArray} along the given axis.
-     *
-     * @param axis the axis along which to sort
-     * @return the sorted {@code NDArray}
-     */
-    NDArray sort(int axis);
-
-    /**
      * Sorts the flattened {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 4f, 3f, 1f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 4.],
+     *  [3., 1.],
+     * ]
+     * jshell&gt; array.sort(); // sort the flattened array
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 4.],
+     *  [1., 3.],
+     * ]
+     * </pre>
      *
      * @return the sorted {@code NDArray}
      */
     NDArray sort();
+
+    /**
+     * Sorts the flattened {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 4f, 3f, 1f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 4.],
+     *  [3., 1.],
+     * ]
+     * jshell&gt; array.sort(0); // sort along the first axis
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 4.],
+     *  [1., 3.],
+     * ]
+     * </pre>
+     *
+     * @param axis the axis to sort along
+     * @return the sorted {@code NDArray}
+     */
+    NDArray sort(int axis);
 
     /**
      * Applies the softmax function along the given axis.
@@ -3313,34 +3397,54 @@ public interface NDArray extends AutoCloseable {
     NDArray softmax(int[] axes, double temperature);
 
     /**
-     * Return the cumulative sum of the elements along a given axis.
-     *
-     * @param axis the axis along which the cumulative sum is computed
-     * @return the cumulative sum along the specified axis
-     */
-    NDArray cumSum(int axis);
-
-    /**
      * Returns the cumulative sum of the elements in the flattened {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(2, 3));
+     * jshell&gt; array;
+     * ND: (2, 3) cpu(0) float32
+     * [[1., 2., 3.],
+     *  [4., 5., 6.],
+     * ]
+     * jshell&gt; array.cumSum(); // cumSum on flattened array
+     * ND: (6) cpu(0) float32
+     * [ 1.,  3.,  6., 10., 15., 21.]
+     * </pre>
      *
      * @return the cumulative sum of the elements in the flattened {@code NDArray}
      */
     NDArray cumSum();
 
     /**
-     * Return the cumulative sum of the elements along a given axis in place.
+     * Return the cumulative sum of the elements along a given axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(2, 3));
+     * jshell&gt; array;
+     * ND: (2, 3) cpu(0) float32
+     * [[1., 2., 3.],
+     *  [4., 5., 6.],
+     * ]
+     * jshell&gt; array.cumSum(0);
+     * ND: (2, 3) cpu(0) float32
+     * [[1., 2., 3.],
+     *  [5., 7., 9.],
+     * ]
+     * jshell&gt; array.cumSum(1);
+     * ND: (2, 3) cpu(0) float32
+     * [[ 1.,  3.,  6.],
+     *  [ 4.,  9., 15.],
+     * ]
+     * </pre>
      *
      * @param axis the axis along which the cumulative sum is computed
      * @return the cumulative sum along the specified axis
      */
-    NDArray cumSumi(int axis);
-
-    /**
-     * Returns the cumulative sum of the elements in the flattened {@code NDArray} in place.
-     *
-     * @return the cumulative sum of the elements in the flattened {@code NDArray}
-     */
-    NDArray cumSumi();
+    NDArray cumSum(int axis);
 
     /**
      * Returns the boolean {@code NDArray} with value {@code true} where this {@code NDArray}'s
@@ -3354,6 +3458,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the boolean {@code NDArray} with value {@code true} where this {@code NDArray}'s
      * entries are NaN, or {@code false} where they are not NaN.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {Float.POSITIVE_INFINITY, 0, Float.NaN});
+     * jshell&gt; array.isNaN();
+     * ND: (3) cpu(0) boolean
+     * [false, false,  true]
+     * </pre>
      *
      * @return the boolean {@code NDArray} with value {@code true} if this {@code NDArray}'s {@link
      *     NDArray} are NaN
@@ -3381,6 +3494,15 @@ public interface NDArray extends AutoCloseable {
      * Constructs a {@code NDArray} by repeating this {@code NDArray} the number of times given
      * repeats.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f});
+     * jshell&gt; array.tile(2);
+     * ND: (6) cpu(0) float32
+     * [0., 1., 2., 0., 1., 2.]
+     * </pre>
+     *
      * @param repeats the number of times to repeat for each dimension
      * @return a NDArray that has been tiled
      */
@@ -3390,16 +3512,37 @@ public interface NDArray extends AutoCloseable {
      * Constructs a {@code NDArray} by repeating this {@code NDArray} the number of times given by
      * repeats along given axis.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f});
+     * jshell&gt; array.tile(1, 2);
+     * ND: (1, 6) cpu(0) float32
+     * [[0., 1., 2., 0., 1., 2.],
+     * ]
+     * </pre>
+     *
      * @param axis the axis to repeat
      * @param repeats the number of times to repeat for each axis
      * @return a {@code NDArray} that has been tiled
-     * @throws IllegalArgumentException Thrown for invalid axis
+     * @throws IllegalArgumentException thrown for invalid axis
      */
     NDArray tile(int axis, long repeats);
 
     /**
      * Constructs a {@code NDArray} by repeating this {@code NDArray} the number of times given by
      * repeats.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f});
+     * jshell&gt; array.tile(new long[] {2, 2});
+     * ND: (2, 6) cpu(0) float32
+     * [[0., 1., 2., 0., 1., 2.],
+     *  [0., 1., 2., 0., 1., 2.],
+     * ]
+     * </pre>
      *
      * @param repeats the number of times to repeat along each axis
      * @return a {@code NDArray} that has been tiled
@@ -3413,6 +3556,15 @@ public interface NDArray extends AutoCloseable {
      * <p>If the desired {@link Shape}has fewer dimensions than this {@code NDArray}, it will tile
      * against the last axis.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f});
+     * jshell&gt; array.tile(new Shape(6));
+     * ND: (6) cpu(0) float32
+     * [0., 1., 2., 0., 1., 2.]
+     * </pre>
+     *
      * @param desiredShape the {@link Shape}that should be converted to
      * @return a {@code NDArray} that has been tiled
      */
@@ -3421,6 +3573,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Repeats element of this {@code NDArray} the number of times given repeats.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f});
+     * jshell&gt; array.repeat(2);
+     * ND: (6) cpu(0) float32
+     * [0., 0., 1., 1., 2., 2.]
+     * </pre>
+     *
      * @param repeats the number of times to repeat for each axis
      * @return an {@code NDArray} that has been repeated
      */
@@ -3428,6 +3589,15 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Repeats element of this {@code NDArray} the number of times given repeats along given axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f}, new Shape(2, 2));
+     * jshell&gt; array.repeat(1,2);
+     * ND: (6) cpu(0) float32
+     * [0., 0., 1., 1., 2., 2.]
+     * </pre>
      *
      * @param axis the axis to repeat
      * @param repeats the number of times to repeat for each axis
@@ -3439,19 +3609,41 @@ public interface NDArray extends AutoCloseable {
     /**
      * Repeats element of this {@code NDArray} the number of times given repeats along each axis.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f}, new Shape(2, 2));
+     * jshell&gt; array.repeat(new long[] {2, 2});
+     * ND: (12) cpu(0) float32
+     * [0., 0., 0., 0., 1., 1., 1., 1., 2., 2., 2., 2.]
+     * </pre>
+     *
      * @param repeats the number of times to repeat along each axis
-     * @return an NDArray that has been repeated
+     * @return a {@code NDArray} that has been repeated
      */
     NDArray repeat(long[] repeats);
 
     /**
      * Repeats element of this {@code NDArray} to match the desired shape.
      *
-     * <p>If the desired {@link Shape} has fewer dimensions that the array, it will tile against the
-     * last axis.
+     * <p>If the desired {@link Shape} has fewer dimensions that the array, it will repeat against
+     * the last axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f}, new Shape(2, 2));
+     * jshell&gt; array.repeat(new Shape(4, 4));
+     * ND: (4, 4) cpu(0) float32
+     * [[0., 0., 1., 1.],
+     *  [0., 0., 1., 1.],
+     *  [2., 2., 3., 3.],
+     *  [2., 2., 3., 3.],
+     * ]
+     * </pre>
      *
      * @param desiredShape the {@link Shape} that should be converted to
-     * @return an NDArray that has been repeated
+     * @return an {@code NDArray} that has been repeated
      */
     NDArray repeat(Shape desiredShape);
 
