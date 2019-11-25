@@ -72,6 +72,14 @@ The following pseudocode demonstrates running training:
     }
 ```
 
+## Getting Started
+
+- [Start with a PreTrained Object Detection Model](examples/docs/object_detection.md)
+- [Start with Jupyter Notebooks](jupyter/README.md)
+
+## Resources
+- [Documentation](docs/README.md#documentation)
+- [JavaDocs](https://javadoc.djl.ai/)
 
 ## Release Notes
 * 0.1.0 Initial release
