@@ -78,13 +78,7 @@ configure([project(':api'), project(':basicdataset'), project(':examples'), proj
 
         repositories {
             maven {
-                if (project.hasProperty("s3")) {
-                    name = "s3"
-                    url = "s3://djl-ai/dev"
-                    authentication {
-                        awsIm(AwsImAuthentication)
-                    }
-                } else if (project.hasProperty("snapshot")) {
+                if (project.hasProperty("snapshot")) {
                     name = "snapshot"
                     url = "https://oss.sonatype.org/content/repositories/snapshots/"
                     credentials {
