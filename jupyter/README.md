@@ -6,13 +6,13 @@ This folder contains tutorials that illustrate how to accomplish basic AI tasks 
 
 ## List of tutorials
 
-### [Create your first neural network](create_your_first_network.ipynb)
-
-### [Train your first model](train_your_first_model.ipynb)
-
-### [Run image classification with your first model](image_classification_with_your_model.ipynb)
-
-### [Run object detection with model zoo](object_detection_with_model_zoo.ipynb)
+- [Create your first neural network](create_your_first_network.ipynb)
+- [Train your first model](train_your_first_model.ipynb)
+- [Run image classification with your first model](image_classification_with_your_model.ipynb)
+- [Run object detection with model zoo](object_detection_with_model_zoo.ipynb)
+- [Load pre-trained MXNet model](load_mxnet_model.ipynb)
+- [Transfer learning example](transfer_learning_on_cifar10.ipynb)
+- [Question answering example](BERTQA.ipynb)
 
 ## Setup
 

@@ -12,10 +12,13 @@ This module contains examples and documentation for the Deep Java Library (DJL) 
 
 ## Jupyter notebook tutorials
 
-- [Create your first neural network](../jupyter/README.md#create-your-first-neural-network)
-- [Train your first model](../jupyter/README.md#train-your-first-model)
-- [Run image classification with your first model](../jupyter/README.md#run-image-classification-with-your-first-model)
-- [Run object detection with model zoo](../jupyter/README.md#run-object-detection-with-model-zoo)
+- [Create your first neural network](../jupyter/create_your_first_network.ipynb)
+- [Train your first model](../jupyter/train_your_first_model.ipynb)
+- [Run image classification with your first model](../jupyter/image_classification_with_your_model.ipynb)
+- [Run object detection with model zoo](../jupyter/object_detection_with_model_zoo.ipynb)
+- [Load pre-trained MXNet model](../jupyter/load_mxnet_model.ipynb)
+- [Transfer learning example](../jupyter/transfer_learning_on_cifar10.ipynb)
+- [Question answering example](../jupyter/BERTQA.ipynb)
 
 ## [API Examples](../examples/README.md)
 
