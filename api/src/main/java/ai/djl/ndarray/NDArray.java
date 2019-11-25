@@ -2554,6 +2554,28 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new boolean[] {true});
+     * jshell&gt; NDArray array2 = manager.create(new boolean[] {false});
+     * jshell&gt; array1.logicalAnd(array2);
+     * ND: (1) cpu(0) boolean
+     * [false]
+     * jshell&gt; array1 = manager.create(new boolean[] {true, false});
+     * jshell&gt; array2 = manager.create(new boolean[] {false, false});
+     * jshell&gt; array1.logicalAnd(array2);
+     * ND: (2) cpu(0) boolean
+     * [false, false]
+     * </pre>
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.gt(1).logicalAnd(array.lt(4));
+     * ND: (5) cpu(0) boolean
+     * [false, false,  true,  true, false]
+     * </pre>
+     *
      * @param other the other {@code NDArray} to operate on
      * @return the boolean {@code NDArray} of the logical AND operation applied to the elements of
      *     this {@code NDArray} and the other {@code NDArray}
@@ -2562,6 +2584,30 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Computes the truth value of this {@code NDArray} OR the other {@code NDArray} element-wise.
+     *
+     * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new boolean[] {true});
+     * jshell&gt; NDArray array2 = manager.create(new boolean[] {false});
+     * jshell&gt; array1.logicalOr(array2);
+     * ND: (1) cpu(0) boolean
+     * [ true]
+     * jshell&gt; array1 = manager.create(new boolean[] {true, false});
+     * jshell&gt; array2 = manager.create(new boolean[] {false, false});
+     * jshell&gt; array1.logicalOr(array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.lt(1).logicalOr(array.gt(3));
+     * ND: (5) cpu(0) boolean
+     * [ true, false, false, false,  true]
+     * </pre>
      *
      * @param other the other {@code NDArray} to operate on
      * @return the boolean {@code NDArray} of the logical OR operation applied to the elements of
@@ -2572,6 +2618,29 @@ public interface NDArray extends AutoCloseable {
     /**
      * Computes the truth value of this {@code NDArray} XOR the other {@code NDArray} element-wise.
      *
+     * <p>The shapes of this {@code NDArray} and the other {@code NDArray} must be broadcastable.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new boolean[] {true});
+     * jshell&gt; array1.logicalXor(array2);
+     * ND: (1) cpu(0) boolean
+     * [ true]
+     * jshell&gt; array1 = manager.create(new boolean[] {true, false});
+     * jshell&gt; array2 = manager.create(new boolean[] {false, false});
+     * jshell&gt; array1.logicalXor(array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.lt(1).logicalOr(array.gt(3));
+     * ND: (5) cpu(0) boolean
+     * [ true, false, false, false,  true]
+     * </pre>
+     *
      * @param other the other {@code NDArray} to operate on
      * @return the boolean {@code NDArray} of the logical XOR operation applied to the elements of
      *     this {@code NDArray} and the other {@code NDArray}
@@ -2580,6 +2649,22 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Computes the truth value of NOT this {@code NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new boolean[] {true});
+     * jshell&gt; array.logicalNot();
+     * ND: (1) cpu(0) boolean
+     * [ false]
+     * </pre>
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; array.lt(1).logicalOr(array.gt(3));
+     * ND: (5) cpu(0) boolean
+     * [false, false, false,  true,  true]
+     * </pre>
      *
      * @return the boolean {@code NDArray}
      */
