@@ -66,6 +66,7 @@ public abstract class AbstractTraining implements TrainingListener {
             CommandLine cmd = parser.parse(options, args, null, false);
             Arguments arguments = new Arguments(cmd);
             int maxGpus = arguments.getMaxGpus();
+            batchSize = arguments.getBatchSize();
             String devices;
             if (maxGpus > 0) {
                 devices = maxGpus + " GPUs";
