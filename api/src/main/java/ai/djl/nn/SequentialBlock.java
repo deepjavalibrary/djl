@@ -50,7 +50,6 @@ public class SequentialBlock extends AbstractBlock {
      */
     public SequentialBlock addAll(Block... blocks) {
         this.blocks.addAll(Arrays.asList(blocks));
-        initialized = false;
         return this;
     }
 
@@ -62,7 +61,6 @@ public class SequentialBlock extends AbstractBlock {
      */
     public SequentialBlock addAll(Collection<Block> blocks) {
         this.blocks.addAll(blocks);
-        initialized = false;
         return this;
     }
 
@@ -74,7 +72,6 @@ public class SequentialBlock extends AbstractBlock {
      */
     public SequentialBlock add(Block block) {
         blocks.add(block);
-        initialized = false;
         return this;
     }
 
@@ -86,7 +83,6 @@ public class SequentialBlock extends AbstractBlock {
      */
     public SequentialBlock add(Function<NDList, NDList> f) {
         blocks.add(new LambdaBlock(f));
-        initialized = false;
         return this;
     }
 
@@ -119,13 +115,10 @@ public class SequentialBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        if (!initialized) {
-            beforeInitialize(inputShapes);
-            Shape[] shapes = inputShapes;
-            for (Block child : getChildren().values()) {
-                shapes = child.initialize(manager, dataType, shapes);
-            }
-            initialized = true;
+        beforeInitialize(inputShapes);
+        Shape[] shapes = inputShapes;
+        for (Block child : getChildren().values()) {
+            shapes = child.initialize(manager, dataType, shapes);
         }
         return getOutputShapes(manager, inputShapes);
     }

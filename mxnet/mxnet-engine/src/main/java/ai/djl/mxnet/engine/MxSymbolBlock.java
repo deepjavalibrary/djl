@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
  * String)}.
  */
 public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
+
     private static final byte VERSION = 2;
 
     private NDManager manager;
@@ -100,14 +101,11 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        if (!initialized) {
-            beforeInitialize(inputShapes);
-            for (Parameter parameter : params) {
-                if (!inputNames.contains(parameter.getName())) {
-                    parameter.initialize(manager, dataType, inputShapes);
-                }
+        beforeInitialize(inputShapes);
+        for (Parameter parameter : params) {
+            if (!inputNames.contains(parameter.getName())) {
+                parameter.initialize(manager, dataType, inputShapes);
             }
-            initialized = true;
         }
         return getOutputShapes(manager, inputShapes);
     }

@@ -75,7 +75,6 @@ public class ParallelBlock extends AbstractBlock {
      */
     public final ParallelBlock addAll(Block... blocks) {
         this.blocks.addAll(Arrays.asList(blocks));
-        initialized = false;
         return this;
     }
 
@@ -87,7 +86,6 @@ public class ParallelBlock extends AbstractBlock {
      */
     public final ParallelBlock addAll(Collection<Block> blocks) {
         this.blocks.addAll(blocks);
-        initialized = false;
         return this;
     }
 
@@ -99,7 +97,6 @@ public class ParallelBlock extends AbstractBlock {
      */
     public final ParallelBlock add(Block block) {
         blocks.add(block);
-        initialized = false;
         return this;
     }
 
@@ -112,7 +109,6 @@ public class ParallelBlock extends AbstractBlock {
      */
     public final ParallelBlock add(Function<NDList, NDList> f) {
         blocks.add(new LambdaBlock(f));
-        initialized = false;
         return this;
     }
 
@@ -129,12 +125,9 @@ public class ParallelBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        if (!initialized) {
-            beforeInitialize(inputShapes);
-            for (Block child : getChildren().values()) {
-                child.initialize(manager, dataType, inputShapes);
-            }
-            initialized = true;
+        beforeInitialize(inputShapes);
+        for (Block child : getChildren().values()) {
+            child.initialize(manager, dataType, inputShapes);
         }
         return getOutputShapes(manager, inputShapes);
     }

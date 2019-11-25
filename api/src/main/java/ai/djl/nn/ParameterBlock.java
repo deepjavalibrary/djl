@@ -26,12 +26,9 @@ public abstract class ParameterBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        if (!initialized) {
-            beforeInitialize(inputShapes);
-            for (Parameter parameter : getDirectParameters()) {
-                parameter.initialize(manager, dataType, inputShapes);
-            }
-            initialized = true;
+        beforeInitialize(inputShapes);
+        for (Parameter parameter : getDirectParameters()) {
+            parameter.initialize(manager, dataType, inputShapes);
         }
         return getOutputShapes(manager, inputShapes);
     }
@@ -52,7 +49,7 @@ public abstract class ParameterBlock extends AbstractBlock {
             className = className.substring(0, className.length() - 5);
         }
         sb.append(className).append('(');
-        if (initialized) {
+        if (isInitialized()) {
             PairList<String, Shape> inputShapes = describeInput();
             appendShape(sb, inputShapes.values().toArray(new Shape[0]));
             sb.append(" -> ");

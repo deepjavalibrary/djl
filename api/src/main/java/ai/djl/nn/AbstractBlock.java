@@ -27,14 +27,13 @@ import java.util.List;
  */
 public abstract class AbstractBlock implements Block {
 
-    protected boolean initialized;
     protected Shape[] inputShapes;
     protected List<String> inputNames = Collections.singletonList("data");
 
     /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
-        if (!initialized) {
+        if (!isInitialized()) {
             throw new IllegalStateException("Parameter of this block are not initialised");
         }
         return new PairList<>(inputNames, Arrays.asList(inputShapes));
@@ -89,7 +88,12 @@ public abstract class AbstractBlock implements Block {
     /** {@inheritDoc} */
     @Override
     public boolean isInitialized() {
-        return initialized;
+        for (Parameter param : getParameters().values()) {
+            if (!param.isInitialized()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** {@inheritDoc} */
