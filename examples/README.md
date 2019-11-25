@@ -18,7 +18,7 @@ The following examples are included:
 ## Prerequisites
 
 * You need to have Java Development Kit version 8 or later installed on your system. For more information, see [Setup](../docs/development/setup.md).
-* You should be familiar with the API documentation in the DJL [Javadoc](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/api/index.html).
+* You should be familiar with the API documentation in the DJL [Javadoc](https://javadoc.djl.ai/0.2.0/api/index.html).
 
 
 # Getting started: 30 seconds to run an example

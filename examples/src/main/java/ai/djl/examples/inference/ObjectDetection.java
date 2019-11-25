@@ -42,7 +42,7 @@ public final class ObjectDetection {
     }
 
     public DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        Path imageFile = Paths.get("src/test/resources/3dogs.jpg");
+        Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -69,7 +69,7 @@ public final class ObjectDetection {
 
         ImageVisualization.drawBoundingBoxes(img, detection);
 
-        Path file = dir.resolve("ssd.png");
+        Path file = dir.resolve("detected-dog_bike_car.png");
         // OpenJDK can't save jpg with alpha channel
         ImageIO.write(img, "png", file.toFile());
         return file;

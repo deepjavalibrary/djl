@@ -17,9 +17,9 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 ## Run object detection example
 
 ### Input image file
-You can find the image used in this example in the project test resource folder: `src/test/resources/3dogs.jpg`
+You can find the image used in this example in the project test resource folder: `src/test/resources/dog_bike_car.jpg`
 
-![dogs](../src/test/resources/3dogs.jpg)
+![dogs](../src/test/resources/dog_bike_car.jpg)
 
 ### Build the project and run
 Use the following command to run the project:
@@ -30,14 +30,14 @@ cd examples
 
 Your output should look like the following:
 ```text
-[INFO ] - Detected objects image has been saved in: build/output/ssd.png
+[INFO ] - Detected objects image has been saved in: build/output/detected-dog_bike_car.png
 [INFO ] - [
-        class: "dog", probability: 0.99839, bounds: [x=0.615, y=0.312, width=0.281, height=0.381]
-        class: "dog", probability: 0.98797, bounds: [x=0.455, y=0.468, width=0.183, height=0.205]
-        class: "dog", probability: 0.66150, bounds: [x=0.310, y=0.207, width=0.193, height=0.448]
-]
+          	class: "car", probability: 0.99991, bounds: [x=0.611, y=0.137, width=0.293, height=0.160]
+          	class: "bicycle", probability: 0.95385, bounds: [x=0.162, y=0.207, width=0.594, height=0.588]
+          	class: "dog", probability: 0.93752, bounds: [x=0.168, y=0.350, width=0.274, height=0.593]
+          ]
 ```
 
-An output image with bounding box will be saved as build/output/ssd.jpg:
+An output image with bounding box will be saved as build/output/detected-dog_bike_car.png:
 
-![detected-dogs](img/detected-dogs.jpg)
+![detected-dogs](img/detected-dog_bike_car.png)

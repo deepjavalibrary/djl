@@ -67,7 +67,8 @@ public class ImageFolderTest {
                                 Paths.get("src/test/resources/imagefolder/cat/kitten.jpg"));
                 NDArray dog =
                         BufferedImageUtils.readFileToArray(
-                                manager, Paths.get("src/test/resources/imagefolder/dog/3dogs.jpg"));
+                                manager,
+                                Paths.get("src/test/resources/imagefolder/dog/dog_bike_car.jpg"));
 
                 NDArray pikachu =
                         BufferedImageUtils.readFileToArray(

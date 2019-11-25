@@ -18,6 +18,8 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -26,8 +28,11 @@ public class ObjectDetectionTest {
     @Test
     public void testObjectDetection() throws ModelException, TranslateException, IOException {
         DetectedObjects result = new ObjectDetection().predict();
-        Classifications.Classification best = result.best();
-        Assert.assertEquals(best.getClassName(), "dog");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.8) > 0);
+        Assert.assertEquals(result.getNumberOfObjects(), 3);
+        List<String> objects = Arrays.asList("dog", "bicycle", "car");
+        for (Classifications.Classification obj : result.items()) {
+            Assert.assertTrue(objects.contains(obj.getClassName()));
+            Assert.assertTrue(Double.compare(obj.getProbability(), 0.9) > 0);
+        }
     }
 }

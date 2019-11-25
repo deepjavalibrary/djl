@@ -82,7 +82,7 @@ The following pseudocode demonstrates running training:
 - [JavaDocs](https://javadoc.djl.ai/)
 
 ## Release Notes
-* 0.1.0 Initial release
+* 0.2.0 Initial release
 
 ## Building From Source
 
