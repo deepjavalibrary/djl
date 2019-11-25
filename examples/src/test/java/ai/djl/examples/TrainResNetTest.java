@@ -33,7 +33,7 @@ public class TrainResNetTest {
     @Test
     public void testTrainResNetSymbolicNightly() {
         // this is nightly test
-        if (Boolean.getBoolean("nightly")) {
+        if (!Boolean.getBoolean("nightly")) {
             return;
         }
         if (Engine.getInstance().getGpuCount() > 0) {
@@ -51,7 +51,7 @@ public class TrainResNetTest {
     @Test
     public void testTrainResNetImperativeNightly() {
         // this is nightly test
-        if (Boolean.getBoolean("nightly")) {
+        if (!Boolean.getBoolean("nightly")) {
             return;
         }
         if (Engine.getInstance().getGpuCount() > 0) {

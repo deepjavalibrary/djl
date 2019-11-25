@@ -26,7 +26,7 @@ public class TrainPikachuTest {
     @Test
     public void testDetection() throws IOException, MalformedModelException, TranslateException {
         // this is nightly test
-        if (Boolean.getBoolean("nightly")) {
+        if (!Boolean.getBoolean("nightly")) {
             return;
         }
         String[] args;
