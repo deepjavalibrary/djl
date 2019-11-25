@@ -84,7 +84,8 @@ public class Accuracy extends TrainingMetric {
         long numCorrect =
                 labels.asType(DataType.INT64, false)
                         .eq(predictionReduced.asType(DataType.INT64, false))
-                        .countNonzero();
+                        .countNonzero()
+                        .getLong();
         addCorrectInstances(numCorrect);
         addTotalInstances(labels.size());
     }

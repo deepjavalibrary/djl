@@ -1064,12 +1064,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean none() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArrayEx getNDArrayInternal() {
         return null;
     }

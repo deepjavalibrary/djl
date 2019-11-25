@@ -149,29 +149,29 @@ public class NDArrayOtherOpTest {
     public void testAll() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10);
-            Assert.assertFalse(array.all());
-            Assert.assertTrue(array.add(1f).all());
+            Assert.assertFalse(array.all().getBoolean());
+            Assert.assertTrue(array.add(1f).all().getBoolean());
             array = manager.create(new boolean[] {true, false});
-            Assert.assertFalse(array.all());
+            Assert.assertFalse(array.all().getBoolean());
 
             // test multi-dim
             array = manager.arange(20).reshape(2, 5, 2);
-            Assert.assertFalse(array.all());
-            Assert.assertTrue(array.add(1f).all());
+            Assert.assertFalse(array.all().getBoolean());
+            Assert.assertTrue(array.add(1f).all().getBoolean());
             array =
                     manager.create(
                             new boolean[] {true, false, true, false, true, false}, new Shape(2, 3));
-            Assert.assertFalse(array.all());
+            Assert.assertFalse(array.all().getBoolean());
 
             // test scalar
             array = manager.create(1f);
-            Assert.assertTrue(array.all());
+            Assert.assertTrue(array.all().getBoolean());
             array = manager.create(false);
-            Assert.assertFalse(array.all());
+            Assert.assertFalse(array.all().getBoolean());
 
             // test zero-dim
             array = manager.create(new Shape(0));
-            Assert.assertTrue(array.all());
+            Assert.assertTrue(array.all().getBoolean());
         }
     }
 
@@ -179,29 +179,29 @@ public class NDArrayOtherOpTest {
     public void testAny() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10);
-            Assert.assertTrue(array.any());
+            Assert.assertTrue(array.any().getBoolean());
             array = manager.zeros(new Shape(10));
-            Assert.assertFalse(array.all());
+            Assert.assertFalse(array.all().getBoolean());
             array = manager.create(new boolean[] {true, false});
-            Assert.assertTrue(array.any());
+            Assert.assertTrue(array.any().getBoolean());
 
             // test multi-dim
             array = manager.eye(2);
-            Assert.assertTrue(array.any());
+            Assert.assertTrue(array.any().getBoolean());
             array =
                     manager.create(
                             new boolean[] {true, false, true, false, true, false}, new Shape(2, 3));
-            Assert.assertTrue(array.any());
+            Assert.assertTrue(array.any().getBoolean());
 
             // test scalar
             array = manager.create(1f);
-            Assert.assertTrue(array.any());
+            Assert.assertTrue(array.any().getBoolean());
             array = manager.create(false);
-            Assert.assertFalse(array.any());
+            Assert.assertFalse(array.any().getBoolean());
 
             // test zero-dim
             array = manager.create(new Shape(0));
-            Assert.assertFalse(array.any());
+            Assert.assertFalse(array.any().getBoolean());
         }
     }
 
@@ -209,30 +209,30 @@ public class NDArrayOtherOpTest {
     public void testNone() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10);
-            Assert.assertFalse(array.none());
+            Assert.assertFalse(array.none().getBoolean());
             array = manager.zeros(new Shape(10));
-            Assert.assertTrue(array.none());
+            Assert.assertTrue(array.none().getBoolean());
             array = manager.create(new boolean[] {false, false});
-            Assert.assertTrue(array.none());
+            Assert.assertTrue(array.none().getBoolean());
 
             // test multi-dim
             array = manager.eye(2);
-            Assert.assertFalse(array.none());
+            Assert.assertFalse(array.none().getBoolean());
             array =
                     manager.create(
                             new boolean[] {false, false, false, false, false, false},
                             new Shape(2, 3));
-            Assert.assertTrue(array.none());
+            Assert.assertTrue(array.none().getBoolean());
 
             // test scalar
             array = manager.create(1f);
-            Assert.assertFalse(array.none());
+            Assert.assertFalse(array.none().getBoolean());
             array = manager.create(false);
-            Assert.assertTrue(array.none());
+            Assert.assertTrue(array.none().getBoolean());
 
             // test zero-dim
             array = manager.create(new Shape(0));
-            Assert.assertTrue(array.none());
+            Assert.assertTrue(array.none().getBoolean());
         }
     }
 
@@ -240,18 +240,18 @@ public class NDArrayOtherOpTest {
     public void testCountNonzero() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(4);
-            Assert.assertEquals(3, array.countNonzero());
+            Assert.assertEquals(3, array.countNonzero().getLong());
 
             // multi-dim
             array = manager.create(new float[] {-1f, 0f, 2f, 100f, 2340f, -200f}, new Shape(2, 3));
-            Assert.assertEquals(5, array.countNonzero());
+            Assert.assertEquals(5, array.countNonzero().getLong());
 
             // scalar
             array = manager.create(5f);
-            Assert.assertEquals(1, array.countNonzero());
+            Assert.assertEquals(1, array.countNonzero().getLong());
             // zero-dim
             array = manager.create(new Shape(2, 0));
-            Assert.assertEquals(0, array.countNonzero());
+            Assert.assertEquals(0, array.countNonzero().getLong());
         }
     }
 
@@ -262,7 +262,7 @@ public class NDArrayOtherOpTest {
             NDArray actual = manager.create(new boolean[] {true, false});
             Assert.assertEquals(actual, array.isNaN());
             array = manager.create(new float[] {1f, 2f});
-            Assert.assertFalse(array.isNaN().all());
+            Assert.assertFalse(array.isNaN().all().getBoolean());
 
             // test multi-dim
             array =

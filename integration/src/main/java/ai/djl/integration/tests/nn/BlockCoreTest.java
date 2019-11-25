@@ -186,7 +186,7 @@ public class BlockCoreTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                Assert.assertTrue(result.lte(result).all());
+                Assert.assertTrue(result.lte(result).all().getBoolean());
 
                 testEncode(manager, block);
             }

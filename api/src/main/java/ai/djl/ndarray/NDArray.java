@@ -312,7 +312,7 @@ public interface NDArray extends AutoCloseable {
      * @return a boolean array
      * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
      */
-    default boolean[] toBoolArray() {
+    default boolean[] toBooleanArray() {
         if (getDataType() != DataType.BOOLEAN) {
             throw new IllegalStateException(
                     "DataType mismatch, Required boolean" + " Actual " + getDataType());
@@ -563,6 +563,17 @@ public interface NDArray extends AutoCloseable {
      */
     default int getUint8(long... indices) {
         return getByte(indices) & 0xff;
+    }
+
+    /**
+     * Returns a boolean element from this {@code NDArray}.
+     *
+     * @param indices the indices of the int element to return
+     * @return the element in the specified index as a boolean
+     * @throws IllegalArgumentException thrown if the result is not a single element
+     */
+    default boolean getBoolean(long... indices) {
+        return getScalar(indices).toBooleanArray()[0];
     }
 
     /**
@@ -3390,9 +3401,9 @@ public interface NDArray extends AutoCloseable {
      *
      * @return {@code true} if all elements within this {@code NDArray} are non-zero or {@code true}
      */
-    default boolean all() {
+    default NDArray all() {
         // result of sum operator is int64 now
-        return asType(DataType.BOOLEAN, false).sum().getLong() == size();
+        return asType(DataType.BOOLEAN, false).sum().eq(size());
     }
 
     /**
@@ -3402,8 +3413,8 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if any of the elements within this {@code NDArray} are non-zero or
      *     {@code true}
      */
-    default boolean any() {
-        return asType(DataType.BOOLEAN, false).sum().getLong() > 0;
+    default NDArray any() {
+        return asType(DataType.BOOLEAN, false).sum().gt(0);
     }
 
     /**
@@ -3413,8 +3424,8 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if none of the elements within this {@code NDArray} are non-zero or
      *     {@code true}
      */
-    default boolean none() {
-        return asType(DataType.BOOLEAN, false).sum().getLong() == 0;
+    default NDArray none() {
+        return asType(DataType.BOOLEAN, false).sum().eq(0);
     }
 
     /**
@@ -3422,8 +3433,8 @@ public interface NDArray extends AutoCloseable {
      *
      * @return the number of non-zero values in this {@code NDArray}
      */
-    default long countNonzero() {
-        return asType(DataType.BOOLEAN, false).sum().getLong();
+    default NDArray countNonzero() {
+        return asType(DataType.BOOLEAN, false).sum();
     }
 
     /**
@@ -3432,8 +3443,8 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis to operate on
      * @return the number of non-zero values in this {@code NDArray} along a given axis
      */
-    default long countNonzero(int axis) {
-        return asType(DataType.BOOLEAN, false).sum(new int[] {axis}).getLong();
+    default NDArray countNonzero(int axis) {
+        return asType(DataType.BOOLEAN, false).sum(new int[] {axis});
     }
 
     /**

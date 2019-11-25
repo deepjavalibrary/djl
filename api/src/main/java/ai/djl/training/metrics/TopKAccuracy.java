@@ -76,7 +76,8 @@ public class TopKAccuracy extends Accuracy {
         NDArray topKPrediction = predictions.argSort(axis);
         int numDims = topKPrediction.getShape().dimension();
         if (numDims == 1) {
-            addCorrectInstances(topKPrediction.flatten().eq(labels.flatten()).countNonzero());
+            addCorrectInstances(
+                    topKPrediction.flatten().eq(labels.flatten()).countNonzero().getLong());
         } else if (numDims == 2) {
             int numClasses = (int) topKPrediction.getShape().get(1);
             topK = Math.min(topK, numClasses);
@@ -88,7 +89,11 @@ public class TopKAccuracy extends Accuracy {
                                         topKPrediction.get(":, " + (numClasses - j - 1));
                                 // TODO replace nonzero with sum
                                 addCorrectInstances(
-                                        jPrediction.flatten().eq(labels.flatten()).countNonzero());
+                                        jPrediction
+                                                .flatten()
+                                                .eq(labels.flatten())
+                                                .countNonzero()
+                                                .getLong());
                             });
         }
         addTotalInstances((int) labels.getShape().get(0));

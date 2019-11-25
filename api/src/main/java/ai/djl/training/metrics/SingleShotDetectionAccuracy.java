@@ -50,7 +50,8 @@ public class SingleShotDetectionAccuracy extends Accuracy {
                 classLabels
                         .asType(DataType.INT64, false)
                         .eq(predictionReduced.asType(DataType.INT64, false))
-                        .countNonzero();
+                        .countNonzero()
+                        .getLong();
         addCorrectInstances(numCorrect);
         addTotalInstances(classLabels.size());
     }

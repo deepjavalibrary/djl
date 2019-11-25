@@ -494,7 +494,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             return false;
         }
         try (NDArray result = eq(number)) {
-            return result.all();
+            return result.all().getBoolean();
         }
     }
 
@@ -508,7 +508,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             return false;
         }
         try (NDArray result = eq(other).asType(DataType.INT32, false)) {
-            return result.all();
+            return result.all().getBoolean();
         }
     }
 
