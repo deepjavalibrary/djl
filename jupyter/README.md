@@ -37,9 +37,8 @@ pip3 install jupyter
 ### Install IJava kernel for jupyter
 
 ```bash
-git clone https://github.com/SpencerPark/IJava.git
+git clone https://github.com/frankfliu/IJava.git
 cd IJava/
-chmod u+x gradlew
 ./gradlew installKernel
 ```
 

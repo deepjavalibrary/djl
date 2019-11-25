@@ -9,11 +9,11 @@ RUN apt-get update \
     && sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
     && dpkg-reconfigure --frontend=noninteractive locales \
     && update-locale LANG=en_US.UTF-8
+RUN apt-get install -y curl
 
-RUN git clone https://github.com/SpencerPark/IJava.git
-RUN cd IJava/ && chmod u+x gradlew && ./gradlew installKernel && ./gradlew clean && cd
-RUN rm -rf .gradle
-RUN rm -rf .m2
+RUN git clone https://github.com/frankfliu/IJava.git
+RUN cd IJava/ && ./gradlew installKernel && cd .. && rm -rf IJava/
+RUN rm -rf ~/.gradle
 
 WORKDIR /home/jupyter
 
