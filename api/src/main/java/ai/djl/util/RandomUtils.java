@@ -62,4 +62,14 @@ public final class RandomUtils {
     public static int nextInt(int bound) {
         return RANDOM.nextInt(bound);
     }
+
+    /**
+     * Returns a pseudorandom, uniformly distributed {@code float} value between {@code 0.0} and
+     * {@code 1.0}, drawn from his random number generator's sequence.
+     *
+     * @return an float value between {@code 0.0} and {@code 1.0}
+     */
+    public static float nextFloat() {
+        return RANDOM.nextFloat();
+    }
 }

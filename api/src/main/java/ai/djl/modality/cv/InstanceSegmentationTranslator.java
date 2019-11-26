@@ -65,6 +65,8 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
     public NDList processInput(TranslatorContext ctx, BufferedImage image) {
         Pipeline pipeline = getPipeline();
         pipeline.insert(0, null, this);
+        ctx.setAttachment("originalHeight", image.getHeight());
+        ctx.setAttachment("originalWidth", image.getWidth());
         return super.processInput(ctx, image);
     }
 
@@ -97,15 +99,20 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
                 double w = box[2] / rescaledWidth - x;
                 double h = box[3] / rescaledHeight - y;
 
-                Shape maskShape = masks.get(i).getShape();
-                float[][] maskVal = new float[(int) maskShape.get(0)][(int) maskShape.get(1)];
-                float[] flattened = masks.get(i).toFloatArray();
+                int maskW = (int) (w * (int) ctx.getAttachment("originalWidth"));
+                int maskH = (int) (h * (int) ctx.getAttachment("originalHeight"));
 
-                for (int j = 0; j < flattened.length; j++) {
-                    maskVal[j / maskVal.length][j % maskVal.length] = flattened[j];
+                // Reshape mask to actual image bounding box shape.
+                NDArray array = masks.get(i);
+                Shape maskShape = array.getShape();
+                array = array.reshape(maskShape.addAll(new Shape(1)));
+                NDArray maskArray = NDImageUtils.resize(array, maskW, maskH).transpose();
+                float[] flattened = maskArray.toFloatArray();
+                float[][] maskFloat = new float[maskW][maskH];
+                for (int j = 0; j < maskW; j++) {
+                    System.arraycopy(flattened, j * maskH, maskFloat[j], 0, maskH);
                 }
-
-                Mask mask = new Mask(x, y, w, h, maskVal);
+                Mask mask = new Mask(x, y, w, h, maskFloat);
 
                 retNames.add(className);
                 retProbs.add(probability);

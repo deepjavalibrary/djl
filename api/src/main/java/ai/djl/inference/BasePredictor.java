@@ -25,6 +25,8 @@ import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,9 +182,11 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     private class PredictorContext implements TranslatorContext {
 
         private NDManager ctxManager;
+        private Map<String, Object> attachments;
 
         PredictorContext() {
             ctxManager = manager.newSubManager();
+            attachments = new ConcurrentHashMap<>();
         }
 
         /** {@inheritDoc} */
@@ -207,6 +211,18 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
         @Override
         public void close() {
             ctxManager.close();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Object getAttachment(String key) {
+            return attachments.get(key);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void setAttachment(String key, Object value) {
+            attachments.put(key, value);
         }
     }
 }

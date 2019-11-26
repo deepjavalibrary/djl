@@ -46,6 +46,22 @@ public interface TranslatorContext extends AutoCloseable {
      */
     Metrics getMetrics();
 
+    /**
+     * Returns value of attached key-value pair to context.
+     *
+     * @param key key of attached value
+     * @return the object stored in relevant map
+     */
+    Object getAttachment(String key);
+
+    /**
+     * Set a key-value pair of attachments.
+     *
+     * @param key key of attached value
+     * @param value value assosicated with key
+     */
+    void setAttachment(String key, Object value);
+
     /** {@inheritDoc} */
     @Override
     void close();

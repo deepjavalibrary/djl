@@ -50,6 +50,5 @@ public class Mask extends Rectangle {
     @Override
     public void draw(Graphics2D g, int imageWidth, int imageHeight) {
         super.draw(g, imageWidth, imageHeight);
-        // TODO: implement draw mask method
     }
 }

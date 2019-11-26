@@ -21,6 +21,7 @@ import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -65,11 +66,16 @@ public class InstanceSegmentation {
             throws IOException {
         Path dir = Paths.get("build/output");
         Files.createDirectories(dir);
-
-        ImageVisualization.drawBoundingBoxes(img, detection);
+        // Make copy with alpha channel
+        BufferedImage newImage =
+                new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = newImage.createGraphics();
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+        ImageVisualization.drawBoundingBoxes(newImage, detection);
 
         Path file = dir.resolve("instances.png");
-        ImageIO.write(img, "png", file.toFile());
+        ImageIO.write(newImage, "png", file.toFile());
         return file;
     }
 }
