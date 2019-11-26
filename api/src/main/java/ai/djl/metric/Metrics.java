@@ -25,7 +25,18 @@ import java.util.stream.Collectors;
  * A collection of {@link Metric} objects organized by metric name.
  *
  * <p>{@code Metric} is a utility class that is used in the {@link ai.djl.training.Trainer} and
- * {@link ai.djl.inference.Predictor} to track the
+ * {@link ai.djl.inference.Predictor} to capture performance and other metrics during runtime.
+ *
+ * <p>It is built as a collection of individual {@link Metric} classes. As a container for
+ * individual metrics classes, {@code Metrics} stores them as time series data so that
+ * metric-vs-timeline analysis can be performed. It also provides convenient statistical methods for
+ * getting aggregated information, such as mean and percentile. The metrics is used to store key
+ * performance indicators (KPIs) during inference and training runs. These KPIs include various
+ * latencies, CPU and GPU memory consumption, losses, etc.
+ *
+ * <p>For more details about using the metrics, see the <a
+ * href="https://github.com/awslabs/djl/blob/master/docs/how_to_collect_metrics.md">metrics
+ * tutorial</a>.
  */
 public class Metrics {
 

@@ -1,6 +1,7 @@
 # Documentation
 
-This module contains examples and documentation for the Deep Java Library (DJL) project.
+This folder contains examples and documentation for the Deep Java Library (DJL) project.
+
 ## Modules
 
 - [Core API](../api/README.md) - Engine-agnostic API
@@ -33,12 +34,11 @@ This module contains examples and documentation for the Deep Java Library (DJL) 
 - [Pose estimation example](../examples/docs/pose_estimation.md)
 - [Action recognition example](../examples/docs/action_recognition.md)
 
-## Development guide
+## Documentation
 
-- [Setup development environment](development/setup.md)
-- [Development guideline](development/development_guideline.md)
 - [How to collect metrics](development/how_to_collect_metrics.md)
-- [How to use dataset](development/how_to_use_dataset.md)
-- [How to add new model to model zoo](development/add_model_to_model-zoo.md)
+- [How to use a dataset](development/how_to_use_dataset.md)
+
+## [Contributor Documentation](development/README.md)
 
 ## [FAQ](faq.md)

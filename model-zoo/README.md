@@ -61,6 +61,6 @@ The following table illustrates the possible search criteria for all models in t
 |          |                       |                   | flavor   | v1              |
 |          |                       |                   | dataset  | cifar10         |
 
-## Developer guide
+## Contributor Guides and Documentation
 
-### [How to add new models to model zoo](../docs/development/add_model_to_model-zoo.md)
+### [How to add new models the to model zoo](../docs/development/add_model_to_model-zoo.md)

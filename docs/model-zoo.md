@@ -20,4 +20,4 @@ MXNet has a large number of existing pre-trained models. We created a MXNet mode
 
 ## Publish your own model zoo
 You can create your own model zoo so customers can easily consume it.
-For more information, see [Add a new Model to MXNet model zoo ](development/add_model_to_model-zoo.md).
+For more information, see [Add a new Model to the model zoo ](development/add_model_to_model-zoo.md).

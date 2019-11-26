@@ -1,4 +1,5 @@
 # Metrics in DJL
+
 Deep Java Library (DJL) comes with utility classes to make it easy to capture performance metrics and other metrics during runtime. These metrics can be used to analyze and monitor inference and/or training performance and stability. [Metrics](../api/src/main/java/ai/djl/metric/Metrics.java) is the class that enables collecting metrics information. It is built as a collection of individual [Metric](../api/src/main/java/ai/djl/metric/Metric.java) classes.
 
 As a container for individual metrics classes, **Metrics** stores them as time series data so that metric-vs-timeline analysis could be performed. It also provides convenient statistical methods for getting aggregated information, such as _mean_ and _percentile_.
@@ -10,6 +11,7 @@ DJL also provides an easy way to keep track of your own metrics. For more inform
 Many DJL classes keep track of relevant quantitative and qualitative metrics. DJL provides easy access to these metrics.
 
 For example, if there is an application that uses Predictor to serve inference requests, the following code can be used to access mean and p90 latency of individual requests:
+
 ```java
 // load the image in which objects need to be detected
 URL url = new URL("https://s3.amazonaws.com/images.pdpics.com/preview/3033-bicycle-rider.jpg");
@@ -47,6 +49,7 @@ In order to compensate for this, the deep learning engine provides a mechanism t
 The DJL approach to out of the box metrics has another benefit: if an application or service needs to record its own metrics and KPIs, it can use the same approach with similar constructs. 
 
 The following is a simplistic example showing how an application can measure and record its own custom latency metric for a particular piece of code:
+
 ```java
 Metrics metrics = new Metrics();
 long begin = System.nanoTime();
@@ -65,6 +68,6 @@ metrics.addMetric("end_to_end_latency", (end-begin) / 1_000_000f, "ms");
 
 ## More information
 For more examples of metrics use, as well as convenient utils provided by DJL, see:
-- [MemoryUtils](../../examples/src/main/java/ai/djl/examples/util/MemoryUtils.java) for memory consumption metrics
-- [MxTrainer](../../mxnet/engine/src/main/java/ai/djl/mxnet/engine/MxTrainer.java) for training metrics
-- [BasePredictor](../../api/src/main/java/ai/djl/inference/BasePredictor.java) for inference metrics
+- [MemoryUtils](../examples/src/main/java/ai/djl/examples/util/MemoryUtils.java) for memory consumption metrics
+- [MxTrainer](../mxnet/engine/src/main/java/ai/djl/mxnet/engine/MxTrainer.java) for training metrics
+- [BasePredictor](../api/src/main/java/ai/djl/inference/BasePredictor.java) for inference metrics

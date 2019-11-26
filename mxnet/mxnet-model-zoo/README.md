@@ -94,6 +94,6 @@ The following table illustrates the possible search criteria for all models in t
 **Note:** Not all combinations in the above table are available. For more information, see the `metadata.json` file
 in the `src/test/resources/mlrepo/model` folder.
 
-## Developer guide
+## Contributor Guides and Documentation
 
-### [How to add new models to model zoo](../../docs/development/add_model_to_model-zoo.md)
+### [How to add new models to the MXNet model zoo](../docs/development/add_model_to_mxnet-model-zoo.md)
