@@ -22,18 +22,23 @@ This module contains examples and documentation for the Deep Java Library (DJL) 
 
 ## [API Examples](../examples/README.md)
 
+- [Single-shot Object Detection example](../examples/docs/object_detection.md)
+- [Train your first model](../examples/docs/train_mnist_mlp.md)
 - [Image classification example](../examples/docs/image_classification.md)
-- [Single-shot Object detection example](../examples/docs/object_detection.md)
+- [Transfer learning example](../examples/docs/train_cifar10_resnet.md)
+- [Train SSD modle example](../examples/docs/train_pikachu_ssd.md)
+- [Multi-threaded inference example](../examples/docs/multithread_inference.md)
 - [Bert question and answer example](../examples/docs/BERT_question_and_answer.md)
-- [Multi-threaded inference](../examples/docs/multithread_inference.md)
+- [Instance segmentation example](../examples/docs/instance_segmentation.md)
+- [Pose estimation example](../examples/docs/pose_estimation.md)
+- [Action recognition example](../examples/docs/action_recognition.md)
 
 ## Development guide
 
 - [Setup development environment](development/setup.md)
 - [Development guideline](development/development_guideline.md)
-- [Publish libraries to maven central](development/publish_library.md)
 - [How to collect metrics](development/how_to_collect_metrics.md)
-- [How to create custom dataset](development/create_your_dataset.md)
+- [How to use dataset](development/how_to_use_dataset.md)
 - [How to add new model to model zoo](development/add_model_to_model-zoo.md)
 
 ## [FAQ](faq.md)
