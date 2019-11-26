@@ -3227,6 +3227,46 @@ public interface NDArray extends AutoCloseable {
      *       {@code NDArray} and the second-to-last axis of the other {@code NDArray}
      * </ul>
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f, 3f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {4f, 5f, 6f});
+     * jshell&gt; array1.dot(array2); // inner product
+     * ND: () cpu(0) float32
+     * 32.
+     * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array2 = manager.create(new float[] {5f, 6f, 7f, 8f}, new Shape(2, 2));
+     * jshell&gt; array1.dot(array2); // matrix multiplication
+     * ND: (2, 2) cpu(0) float32
+     * [[19., 22.],
+     *  [43., 50.],
+     * ]
+     * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array2 = manager.create(5f);
+     * jshell&gt; array1.dot(array2);
+     * ND: (2, 2) cpu(0) float32
+     * [[ 5., 10.],
+     *  [15., 20.],
+     * ]
+     * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array2 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array1.dot(array2);
+     * ND: (2) cpu(0) float32
+     * [ 5., 11.]
+     * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f}, new Shape(2, 2, 2));
+     * jshell&gt; array2 = manager.create(new float[] {1f, 2f, 3f ,4f}, new Shape(2, 2));
+     * jshell&gt; array1.dot(array2);
+     * ND: (2, 2, 2) cpu(0) float32
+     * [[[ 7., 10.],
+     *   [15., 22.],
+     *  ],
+     *  [[23., 34.],
+     *   [31., 46.],
+     *  ],
+     * ]
+     * </pre>
+     *
      * @param other the other {@code NDArray} to perform dot product with
      * @return the result {@code NDArray}
      */
@@ -3239,8 +3279,17 @@ public interface NDArray extends AutoCloseable {
      * example, if an interval of [0, 1] is specified, values smaller than 0 become 0, and values
      * larger than 1 become 1.
      *
-     * @param min the minimum value double type
-     * @param max the maximum value double type
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(10);
+     * jshell&gt; array.clip(1, 8);
+     * ND: (10) cpu(0) float32
+     * [1., 1., 2., 3., 4., 5., 6., 7., 8., 8.]
+     * </pre>
+     *
+     * @param min the minimum value
+     * @param max the maximum value
      * @return an {@code NDArray} with the elements of this {@code NDArray}, but where values &lt;
      *     min are replaced with min, and those &gt; max with max
      */
@@ -3248,6 +3297,20 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Interchanges two axes of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f ,3f}, new Shape(1, 3));
+     * jshell&gt; array;
+     * ND: (1, 3) cpu(0) float32
+     * [[1., 2., 3.],
+     * ]
+     * jshell&gt; array.swapAxes(0, 1)
+     * ND: (1, 3) cpu(0) float32
+     * [[1., 2., 3.],
+     * ]
+     * </pre>
      *
      * @param axis1 the first axis
      * @param axis2 the second axis
@@ -3264,12 +3327,63 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns this {@code NDArray} with axes transposed.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f ,3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [3., 4.],
+     * ]
+     * jshell&gt; array.transpose();
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 3.],
+     *  [2., 4.],
+     * ]
+     * </pre>
+     *
      * @return the newly permuted array
      */
     NDArray transpose();
 
     /**
      * Returns this {@code NDArray} with given axes transposed.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f ,3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [3., 4.],
+     * ]
+     * jshell&gt; array.transpose(1, 0);
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 3.],
+     *  [2., 4.],
+     * ]
+     * jshell&gt; array = manager.arange(8).reshape(2, 2, 2);
+     * jshell&gt; array;
+     * ND: (2, 2, 2) cpu(0) float32
+     * [[[0., 1.],
+     *   [2., 3.],
+     *  ],
+     *  [[4., 5.],
+     *   [6., 7.],
+     *  ],
+     * ]
+     * jshell&gt; array.transpose(1, 0, 2);
+     * ND: (2, 2, 2) cpu(0) float32
+     * [[[0., 1.],
+     *   [4., 5.],
+     *  ],
+     *  [[2., 3.],
+     *   [6., 7.],
+     *  ],
+     * ]
+     * </pre>
      *
      * @param axes the axes to swap to
      * @return the transposed {@code NDArray}
@@ -3281,6 +3395,26 @@ public interface NDArray extends AutoCloseable {
     /**
      * Broadcasts this {@code NDArray} to be the given shape.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f ,3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [3., 4.],
+     * ]
+     * jshell&gt; array.broadcast(new Shape(2, 2, 2));
+     * ND: (2, 2, 2) cpu(0) float32
+     * [[[1., 2.],
+     *   [3., 4.],
+     *  ],
+     *  [[1., 2.],
+     *   [3., 4.],
+     *  ],
+     * ]
+     * </pre>
+     *
      * @param shape the new {@link Shape} of this {@code NDArray}
      * @return the broadcasted {@code NDArray}
      */
@@ -3288,6 +3422,26 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Broadcasts this {@code NDArray} to be the given shape.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f ,3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [3., 4.],
+     * ]
+     * jshell&gt; array.broadcast(2, 2, 2);
+     * ND: (2, 2, 2) cpu(0) float32
+     * [[[1., 2.],
+     *   [3., 4.],
+     *  ],
+     *  [[1., 2.],
+     *   [3., 4.],
+     *  ],
+     * ]
+     * </pre>
      *
      * @param shape the new {@link Shape} of this {@code NDArray}
      * @return the broadcasted {@code NDArray}
@@ -3299,12 +3453,43 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the indices of the maximum values into the flattened {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
+     * jshell&gt; array;
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * jshell&gt; array.argMax();
+     * ND: () cpu(0) float32
+     * 5.
+     * </pre>
+     *
      * @return a {@code NDArray} containing indices
      */
     NDArray argMax();
 
     /**
      * Returns the indices of the maximum values along given axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
+     * jshell&gt; array;
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * jshell&gt; array.argMax(0);
+     * ND: (3) cpu(0) float32
+     * [1., 1., 1.]
+     * jshell&gt; array.argMax(1);
+     * ND: (2) cpu(0) float32
+     * [2., 2.]
+     * </pre>
      *
      * @param axis the axis along which to find maximum values
      * @return a {@code NDArray} containing indices
@@ -3314,12 +3499,43 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns the indices of the minimum values into the flattened {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
+     * jshell&gt; array;
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * jshell&gt; array.argMin();
+     * ND: () cpu(0) float32
+     * 0.
+     * </pre>
+     *
      * @return a {@code NDArray} containing indices
      */
     NDArray argMin();
 
     /**
      * Returns the indices of the minimum values along given axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
+     * jshell&gt; array;
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * jshell&gt; array.argMin(0);
+     * ND: (3) cpu(0) float32
+     * [0., 0., 0.]
+     * jshell&gt; array.argMin(1);
+     * ND: (2) cpu(0) float32
+     * [0., 0.]
+     * </pre>
      *
      * @param axis the axis along which to find minimum values
      * @return a {@code NDArray} containing indices
