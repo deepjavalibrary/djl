@@ -62,7 +62,7 @@ You can create your own NDArray renderer as follows:
 
 Please make sure to:
 - Check the "On-demand" option, which causes IntelliJ to only render the NDArray when you click on the variable.
-- Change the "Use following expression" field to something like [toDebugString(100, 10, 10, 20)](https://djl-ai.s3.amazonaws.com/java-api/0.2.0/mxnet-engine/ai/djl/mxnet/engine/MxNDArray.html#toDebugString-int-int-int-int-)
+- Change the "Use following expression" field to something like [toDebugString(100, 10, 10, 20)](https://javadoc.djl.ai/mxnet-engine/0.2.0/ai/djl/mxnet/engine/MxNDArray.html#toDebugString-int-int-int-int-)
 if you want to adjust the range of NDArray's debug output.
 
 ## Common Problems

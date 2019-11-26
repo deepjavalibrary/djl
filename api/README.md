@@ -15,7 +15,7 @@ This module contains the core API of the Deep Java Library (DJL) project. It inc
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/0.2.0/api/index.html).
+The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/api/0.2.0/index.html).
 
 You can also build the latest javadocs locally using the following command:
 

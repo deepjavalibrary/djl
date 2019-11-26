@@ -19,8 +19,8 @@ We can simply load and use them as follows:
 
 ### Using a DJL model from Model Zoo
 
-A DJL model is natively implemented using our Java API. It's defined using the [Sequential](https://javadoc.djl.ai/0.2.0/api/index.html?ai/djl/nn/SequentialBlock.html)
-and the [Parallel](https://javadoc.djl.ai/0.2.0/api/index.html?ai/djl/nn/ParallelBlock.html) Block API.
+A DJL model is natively implemented using our Java API. It's defined using the [Sequential](https://javadoc.djl.ai/api/0.2.0/index.html?ai/djl/nn/SequentialBlock.html)
+and the [Parallel](https://javadoc.djl.ai/api/0.2.0/index.html?ai/djl/nn/ParallelBlock.html) Block API.
 Import the `ai.djl.zoo.cv.classification.ResNetV1` class and use its builder to specify various configurations such as input shape, number of layers, and number of outputs.
 You can set the number of layers to create variants of [ResNet](https://en.wikipedia.org/wiki/Residual_neural_network) such as ResNet18, ResNet50, and ResNet152.
 
@@ -63,9 +63,9 @@ It's part of the optimization algorithm that controls how fast to move towards r
 During the training process, you should usually reduce the learning rate periodically to prevent the model from plateauing. 
 You will also need different learning rate strategies based on whether you are using a pre-trained model or training from scratch.
 DJL provides several built-in `LearningRateTracker`s to suit your needs. For more information, see the
-[documentation](https://javadoc.djl.ai/0.2.0/api/index.html?ai/djl/training/optimizer/learningrate/LearningRateTracker.html).
+[documentation](https://javadoc.djl.ai/api/0.2.0/index.html?ai/djl/training/optimizer/learningrate/LearningRateTracker.html).
 
-Here, we use a [`MultiFactorTracker`](https://javadoc.djl.ai/0.2.0/api/index.html?ai/djl/training/optimizer/learningrate/MultiFactorTracker.html),
+Here, we use a [`MultiFactorTracker`](https://javadoc.djl.ai/api/0.2.0/index.html?ai/djl/training/optimizer/learningrate/MultiFactorTracker.html),
 which allows you to reduce the learning rate after a specified number of periods.
 We use a base learning rate of `0.001`, and reduce it by `sqrt(0.1)` every specified number of epochs. 
 For a pre-trained model, we reduce the learning rate at the 2nd, 5th, and 8th epoch because it take less time to train and converge. 
@@ -92,34 +92,34 @@ You should see the following output:
 hu Nov 21 00:58:29 2019
 +-----------------------------------------------------------------------------+
 | NVIDIA-SMI 418.87.00    Driver Version: 418.87.00    CUDA Version: 10.1     |
-|-------------------------------+----------------------+----------------------+
+|-------------------------------|----------------------|----------------------+
 | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
 | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
 |===============================+======================+======================|
 |   0  Tesla V100-SXM2...  On   | 00000000:00:17.0 Off |                    0 |
 | N/A   42C    P0    45W / 300W |      0MiB / 16130MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
++-------------------------------|----------------------|----------------------+
 |   1  Tesla V100-SXM2...  On   | 00000000:00:18.0 Off |                    0 |
 | N/A   44C    P0    47W / 300W |      0MiB / 16130MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
++-------------------------------|----------------------|----------------------+
 |   2  Tesla V100-SXM2...  On   | 00000000:00:19.0 Off |                    0 |
 | N/A   45C    P0    44W / 300W |      0MiB / 16130MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
++-------------------------------|----------------------|----------------------+
 |   3  Tesla V100-SXM2...  On   | 00000000:00:1A.0 Off |                    0 |
 | N/A   42C    P0    41W / 300W |      0MiB / 16130MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
++-------------------------------|----------------------|----------------------+
 |   4  Tesla V100-SXM2...  On   | 00000000:00:1B.0 Off |                    0 |
 | N/A   42C    P0    43W / 300W |      0MiB / 16130MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
++-------------------------------|----------------------|----------------------+
 |   5  Tesla V100-SXM2...  On   | 00000000:00:1C.0 Off |                    0 |
 | N/A   43C    P0    42W / 300W |      0MiB / 16130MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
++-------------------------------|----------------------|----------------------+
 |   6  Tesla V100-SXM2...  On   | 00000000:00:1D.0 Off |                    0 |
 | N/A   42C    P0    43W / 300W |      0MiB / 16130MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
++-------------------------------|----------------------|----------------------+
 |   7  Tesla V100-SXM2...  On   | 00000000:00:1E.0 Off |                    0 |
 | N/A   44C    P0    43W / 300W |      0MiB / 16130MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
++-------------------------------|----------------------|----------------------+
 
 +-----------------------------------------------------------------------------+
 | Processes:                                                       GPU Memory |
