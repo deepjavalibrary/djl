@@ -15,9 +15,7 @@ ldd libmxnet.so
 ```
 
 The example dependencies list for macOS is:
-- libiomp5.dylib
 - libmkldnn.0.dylib
-- libmklml.dylib
 - libmxnet.dylib(Be sure to rename libmxnet.so to libmxnet.dylib for macOS)
 
 The available MXNet native versions are:
@@ -44,9 +42,6 @@ cd mxnet/native
 
 # Publish to build/repo folder
 ./gradlew publish
-
-# Publish to DJL s3 bucket
-./gradlew publish -Ps3
 
 # If the artifact is large, increase the socket timeout
 ./gradlew publish -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000

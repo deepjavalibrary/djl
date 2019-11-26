@@ -68,7 +68,7 @@ The following table illustrates the possible search criteria for all models in t
 |          |                       |                   | dataset  | ucf101                                                     |
 |          | Image Classification  | MLP               | dataset  | mnist                                                      |
 |          |                       | Resnet            | layers   | 18, 34, 50, 101, 152                                       |
-|          |                       |                   | flavor   | v1, v2, v1b, v1c, v1d, v1e, v1s                            |
+|          |                       |                   | flavor   | v1, v2, v1d                                                |
 |          |                       |                   | dataset  | imagenet, cifar10                                          |
 |          |                       | Resnext           | layers   | 101, 150                                                   |
 |          |                       |                   | flavor   | 32x4d, 64x4d                                               |

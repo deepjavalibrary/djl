@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Deep Java Library (DJL) model zoo contains framework-agnostic models. All of the models have a built-in Translator and
+The Deep Java Library (DJL) model zoo contains framework-agnostic models. All the models have a built-in Translator and
 can be used for inference out of the box.
 
 ## Documentation
@@ -56,10 +56,9 @@ The following table illustrates the possible search criteria for all models in t
 
 | Category | Application           | Model Family      | Criteria | Possible values |
 |----------|-----------------------|-------------------|----------|-----------------|
-| CV       | Image Classification  | MLP               | dataset  | mnist           |
+| CV       | Image Classification  | MLP               | dataset  | mnist, cifar10  |
 |          |                       | Resnet            | layers   | 50              |
 |          |                       |                   | flavor   | v1              |
-|          |                       |                   | dataset  | cifar10         |
 
 ## Contributor Guides and Documentation
 

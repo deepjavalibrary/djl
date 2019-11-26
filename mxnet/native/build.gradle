@@ -6,7 +6,7 @@ plugins {
 group = "ai.djl.mxnet"
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = "1.6.0" + (isRelease ? "" : "-SNAPSHOT")
+version = "1.6.0-a" + (isRelease ? "" : "-SNAPSHOT")
 
 sourceSets {
     main {

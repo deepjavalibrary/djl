@@ -89,10 +89,10 @@ def getMXNetNativeLib() {
         exec {
             commandLine "nvcc", "-V"
         }
-        return "mxnet-native-cu101mkl:1.6.0-SNAPSHOT:${osPrefix}-x86_64"
+        return "mxnet-native-cu101mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
     } catch (Exception e) {
         project.logger.debug("No cuda is detected");
     }
 
-    return "mxnet-native-mkl:1.6.0-SNAPSHOT:${osPrefix}-x86_64"
+    return "mxnet-native-mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
 }
