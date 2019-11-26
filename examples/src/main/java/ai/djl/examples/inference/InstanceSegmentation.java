@@ -68,8 +68,8 @@ public class InstanceSegmentation {
 
         ImageVisualization.drawBoundingBoxes(img, detection);
 
-        Path file = dir.resolve("imgSeg.jpg");
-        ImageIO.write(img, "jpg", file.toFile());
+        Path file = dir.resolve("instances.png");
+        ImageIO.write(img, "png", file.toFile());
         return file;
     }
 }

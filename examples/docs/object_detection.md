@@ -30,7 +30,7 @@ cd examples
 
 Your output should look like the following:
 ```text
-[INFO ] - Detected objects image has been saved in: build/output/ssd.jpg
+[INFO ] - Detected objects image has been saved in: build/output/ssd.png
 [INFO ] - [
         class: "dog", probability: 0.99839, bounds: [x=0.615, y=0.312, width=0.281, height=0.381]
         class: "dog", probability: 0.98797, bounds: [x=0.455, y=0.468, width=0.183, height=0.205]
