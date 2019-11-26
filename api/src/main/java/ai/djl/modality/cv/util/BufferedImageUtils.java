@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
@@ -49,6 +50,28 @@ public final class BufferedImageUtils {
      */
     public static BufferedImage fromFile(Path path) throws IOException {
         return ImageIO.read(path.toAbsolutePath().toFile());
+    }
+
+    /**
+     * Loads the image from the specified URL.
+     *
+     * @param url the URL of the file to be loaded
+     * @return a {@link BufferedImage}
+     * @throws IOException if url is not found
+     */
+    public static BufferedImage fromUrl(URL url) throws IOException {
+        return ImageIO.read(url);
+    }
+
+    /**
+     * Loads the image from the specified URL.
+     *
+     * @param url the URL of the file to be loaded
+     * @return a {@link BufferedImage}
+     * @throws IOException if url is not found
+     */
+    public static BufferedImage fromUrl(String url) throws IOException {
+        return ImageIO.read(new URL(url));
     }
 
     /**
