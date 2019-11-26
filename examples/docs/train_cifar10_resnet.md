@@ -3,9 +3,9 @@
 
 In this example, we will show you how to train the [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset with Deep Java Library (DJL) using [Transfer Learning](https://en.wikipedia.org/wiki/Transfer_learning).
 
-You can find the example source code in: [TrainResnetWithCifar10.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/transferlearning/TrainResnetWithCifar10.java).
+You can find the example source code in: [TrainResnetWithCifar10.java](../src/main/java/ai/djl/examples/training/transferlearning/TrainResnetWithCifar10.java).
 
-You can also find the jupyter notebook tutorial [here](https://github.com/awslabs/djl/blob/master/jupyter/transfer_learning_on_cifar10.ipynb).
+You can also find the jupyter notebook tutorial [here](../../jupyter/transfer_learning_on_cifar10.ipynb).
 The jupyter notebook explains the key concepts in detail.
 
 ## Setup Guide
@@ -14,12 +14,13 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 
 ## Run CIFAR-10 training using ResNet50
 
-The models we will use are available in the [DJL Model Zoo](https://github.com/awslabs/djl/blob/master/model-zoo/README.md) and [MXNet Model Zoo](https://github.com/awslabs/djl/blob/master/mxnet/mxnet-model-zoo/README.md). 
+The models we will use are available in the [DJL Model Zoo](../../model-zoo/README.md) and [MXNet Model Zoo](../../mxnet/mxnet-model-zoo/README.md). 
 We can simply load and use them as follows:
 
 ### Using a DJL model from Model Zoo
 
-A DJL model is natively implemented using our Java API. It's defined using the [Sequential](javadoc placeholder) and the [Parallel](javadoc placeholder) Block API.
+A DJL model is natively implemented using our Java API. It's defined using the [Sequential](https://javadoc.djl.ai/0.2.0/api/index.html?ai/djl/nn/SequentialBlock.html)
+and the [Parallel](https://javadoc.djl.ai/0.2.0/api/index.html?ai/djl/nn/ParallelBlock.html) Block API.
 Import the `ai.djl.zoo.cv.classification.ResNetV1` class and use its builder to specify various configurations such as input shape, number of layers, and number of outputs.
 You can set the number of layers to create variants of [ResNet](https://en.wikipedia.org/wiki/Residual_neural_network) such as ResNet18, ResNet50, and ResNet152.
 
@@ -61,9 +62,11 @@ It's part of the optimization algorithm that controls how fast to move towards r
 
 During the training process, you should usually reduce the learning rate periodically to prevent the model from plateauing. 
 You will also need different learning rate strategies based on whether you are using a pre-trained model or training from scratch.
-DJL provides several built-in `LearningRateTracker`s to suit your needs. For more information, see the [documentation](javadoc placeholder).
+DJL provides several built-in `LearningRateTracker`s to suit your needs. For more information, see the
+[documentation](https://javadoc.djl.ai/0.2.0/api/index.html?ai/djl/training/optimizer/learningrate/LearningRateTracker.html).
 
-Here, we use a `MultiFactorTracker`, which allows you to reduce the learning rate after a specified number of periods.
+Here, we use a [`MultiFactorTracker`](https://javadoc.djl.ai/0.2.0/api/index.html?ai/djl/training/optimizer/learningrate/MultiFactorTracker.html),
+which allows you to reduce the learning rate after a specified number of periods.
 We use a base learning rate of `0.001`, and reduce it by `sqrt(0.1)` every specified number of epochs. 
 For a pre-trained model, we reduce the learning rate at the 2nd, 5th, and 8th epoch because it take less time to train and converge. 
 For training from scratch, we reduce the learning rate at 20th, 60th, 90th, 120th, and 180th epoch.

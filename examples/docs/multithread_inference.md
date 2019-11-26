@@ -6,9 +6,10 @@ It can help to increase the throughput of your inference on multi-core CPUs and 
 ## Overview
 
 DJL predictor is not thread-safe.
-You must create a new [Predictor](https://djl-ai.s3.amazonaws.com/java-api/0.2.0-SNAPSHOT/api/index.html?ai/djl/inference/Predictor.html) for each thread.
+You must create a new [Predictor](https://javadoc.djl.ai/0.2.0/api/index.html?ai/djl/inference/Predictor.html) for each thread.
 
 For a reference implementation, see [Multi-threaded Benchmark](../src/main/java/ai/djl/examples/inference/MultithreadedBenchmark.java).
+
 ## MXNet Engine configuration
 To use MXNet Engine to run multi-threading, complete the following steps.
 

@@ -5,9 +5,9 @@ for locating instances of objects in images or videos.
 
 In this example, we will show you how to implement inference code with a [ModelZoo model](../../docs/model-zoo.md) to detect dogs in an image.
 
-The source code can be found at [ObjectDetection.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ObjectDetection.java).
+The source code can be found at [ObjectDetection.java](../src/main/java/ai/djl/examples/inference/ObjectDetection.java).
 
-You can also find the jupyter notebook tutorial [here](../../jupyter/README.md#run-object-detection-with-model-zoo).
+You can also find the jupyter notebook tutorial [here](../../jupyter/object_detection_with_model_zoo.ipynb).
 The jupyter notebook explains the key concepts in detail.
 
 ## Setup Guide
