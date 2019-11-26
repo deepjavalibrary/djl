@@ -3598,12 +3598,50 @@ public interface NDArray extends AutoCloseable {
      * NDArray, one for each dimension of NDArray. DJL nonzero returns only one NDArray with last
      * dimension containing all dimension of indices
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 1f, 1f, 0f, 1f});
+     * jshell&gt; array.nonzero();
+     * ND: (4, 1) cpu(0) int64
+     * [[ 0],
+     *  [ 1],
+     *  [ 2],
+     *  [ 4],
+     * ]
+     * jshell&gt; array = manager.create(new float[] {3f, 0f, 0f, 0f, 4f, 0f, 5f, 6f, 0f}).reshape(3, 3);
+     * jshell&gt; array;
+     * ND: (3, 3) cpu(0) float32
+     * [[3., 0., 0.],
+     *  [0., 4., 0.],
+     *  [5., 6., 0.],
+     * ]
+     * jshell&gt; array.nonzero();
+     * ND: (4, 2) cpu(0) int64
+     * [[ 0,  0],
+     *  [ 1,  1],
+     *  [ 2,  0],
+     *  [ 2,  1],
+     * ]
+     * </pre>
+     *
      * @return the indices of the elements that are non-zero
      */
     NDArray nonzero();
 
     /**
      * Returns {@code true} if this {@code NDArray} is special case: no-value {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new Shape(2, 0, 1));
+     * jshell&gt; array;
+     * ND: (2, 0, 1) cpu(0) float32
+     * []
+     * jshell&gt; array.isEmpty();
+     * true
+     * </pre>
      *
      * @return {@code true} if this NDArray is empty
      */
@@ -3614,6 +3652,19 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns {@code true} if all elements within this {@code NDArray} are non-zero or {@code
      * true}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new boolean[] {true, false, true, true}, new Shape(2, 2));
+     * jshell&gt; array.all();
+     * ND: () cpu(0) boolean
+     * false
+     * jshell&gt; NDArray array = manager.create(new float[] {-1f, 4f, 5f});
+     * jshell&gt; array.all(); // all elements are non-zero
+     * ND: () cpu(0) boolean
+     * true
+     * </pre>
      *
      * @return {@code true} if all elements within this {@code NDArray} are non-zero or {@code true}
      */
@@ -3626,6 +3677,19 @@ public interface NDArray extends AutoCloseable {
      * Returns {@code true} if any of the elements within this {@code NDArray} are non-zero or
      * {@code true}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new boolean[] {true, false, true, true}, new Shape(2, 2));
+     * jshell&gt; array.any();
+     * ND: () cpu(0) boolean
+     *  true
+     * jshell&gt; NDArray array = manager.create(new float[] {-1, 0, 5});
+     * jshell&gt; array.any() // all elements are non-zero
+     * ND: () cpu(0) boolean
+     *  true
+     * </pre>
+     *
      * @return {@code true} if any of the elements within this {@code NDArray} are non-zero or
      *     {@code true}
      */
@@ -3637,6 +3701,19 @@ public interface NDArray extends AutoCloseable {
      * Returns {@code true} if none of the elements within this {@code NDArray} are non-zero or
      * {@code true}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new boolean[] {false, false});
+     * jshell&gt; array.none();
+     * ND: () cpu(0) boolean
+     *  true
+     * jshell&gt; NDArray array = manager.create(new float[] {-1f, 0f, 5f});
+     * jshell&gt; array.none() // all elements are non-zero
+     * ND: () cpu(0) boolean
+     * false
+     * </pre>
+     *
      * @return {@code true} if none of the elements within this {@code NDArray} are non-zero or
      *     {@code true}
      */
@@ -3647,6 +3724,15 @@ public interface NDArray extends AutoCloseable {
     /**
      * Counts the number of non-zero values in this {@code NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 0f, 1f, 2f, 7f, 0f}, new Shape(2, 3));
+     * jshell&gt; array.countNonzero()
+     * ND: () cpu(0) int64
+     * 3
+     * </pre>
+     *
      * @return the number of non-zero values in this {@code NDArray}
      */
     default NDArray countNonzero() {
@@ -3655,6 +3741,23 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Counts the number of non-zero values in this {@code NDArray} along a given axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 0f, 1f, 2f, 7f, 0f}, new Shape(2, 3));
+     * jshell&gt; array;
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 0., 1.],
+     *  [2., 7., 0.],
+     * ]
+     * jshell&gt; array.countNonzero(0);
+     * ND: (3) cpu(0) int64
+     * [ 1,  1,  1]
+     * jshell&gt; array.countNonzero(1);
+     * ND: (2) cpu(0) int64
+     * [ 1,  2]
+     * </pre>
      *
      * @param axis the axis to operate on
      * @return the number of non-zero values in this {@code NDArray} along a given axis
