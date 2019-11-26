@@ -60,7 +60,6 @@ public class OptimizerTest {
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);
                 NDArray result2 = runOptimizer(manager, trainer, block);
-                // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(result, manager.create(new float[] {0.68f, -0.16f}));
                 Assertions.assertAlmostEquals(
                         result2, manager.create(new float[] {0.4912f, -0.2544f}));
@@ -94,7 +93,6 @@ public class OptimizerTest {
                 for (int i = 0; i < 9; i++) {
                     result3 = runOptimizer(manager, trainer, block);
                 }
-                // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(result, manager.create(new float[] {0.68f, -0.16f}));
                 Assertions.assertAlmostEquals(
                         result2, manager.create(new float[] {0.2032f, -0.3984f}));
@@ -125,7 +123,6 @@ public class OptimizerTest {
                 NDManager manager = trainer.getManager();
                 NDArray result = runOptimizer(manager, trainer, block);
                 NDArray result2 = runOptimizer(manager, trainer, block);
-                // TODO: fix atol and rtol too large on GPU build
                 Assertions.assertAlmostEquals(
                         result, manager.create(new float[] {0.392f, -0.304f}));
                 Assertions.assertAlmostEquals(

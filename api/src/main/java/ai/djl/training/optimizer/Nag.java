@@ -46,7 +46,6 @@ public class Nag extends Optimizer {
         momentumStates = new ConcurrentHashMap<>();
     }
 
-    // TODO: make this protected after integrate with PS store
     /** {@inheritDoc} */
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {

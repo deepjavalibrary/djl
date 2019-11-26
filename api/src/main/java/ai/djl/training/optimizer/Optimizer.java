@@ -102,7 +102,6 @@ public abstract class Optimizer {
      * @param weight the weights of the parameter
      * @param grad the gradients
      */
-    // TODO: make this protected after integrate with PS store
     public abstract void update(String parameterId, NDArray weight, NDArray grad);
 
     protected NDArray withDefaultState(

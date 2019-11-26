@@ -70,7 +70,6 @@ public class SingleShotDetectionTest {
     @Test
     public void testSingleShotDetectionShape() {
         try (NDManager manager = NDManager.newBaseManager()) {
-
             int[] numFilters = {16, 32, 64};
             SequentialBlock block = new SequentialBlock();
             for (int numFilter : numFilters) {
@@ -104,12 +103,11 @@ public class SingleShotDetectionTest {
             Assert.assertEquals(output.get(0).getShape(), new Shape(1, 5444, 4));
             Assert.assertEquals(output.get(1).getShape(), new Shape(32, 5444, 2));
             Assert.assertEquals(output.get(2).getShape(), new Shape(32, 21776));
-            // TODO: fix output shape
-            //            Shape[] outputShapes = ssd.getOutputShapes(manager, new Shape[]{new
-            // Shape(32, 3, 256, 256)});
-            //            Assert.assertEquals(outputShapes[0], new Shape(1, 5444, 4));
-            //            Assert.assertEquals(outputShapes[0], new Shape(32, 5444, 2));
-            //            Assert.assertEquals(outputShapes[0], new Shape(32, 21776));
+            Shape[] outputShapes =
+                    ssd.getOutputShapes(manager, new Shape[] {new Shape(32, 3, 256, 256)});
+            Assert.assertEquals(outputShapes[0], new Shape(1, 5444, 4));
+            Assert.assertEquals(outputShapes[1], new Shape(32, 5444, 2));
+            Assert.assertEquals(outputShapes[2], new Shape(32, 21776));
         }
     }
 }

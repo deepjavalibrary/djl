@@ -79,7 +79,6 @@ public class Accuracy extends TrainingMetric {
         } else {
             predictionReduced = predictions;
         }
-        // TODO: remove asType after bug in numpy argmax is fixed. argmax should return int values.
         // result of sum operator is int64 now
         long numCorrect =
                 labels.asType(DataType.INT64, false)

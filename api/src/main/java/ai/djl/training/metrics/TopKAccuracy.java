@@ -87,7 +87,6 @@ public class TopKAccuracy extends Accuracy {
                                 // get from last index as argSort is ascending
                                 NDArray jPrediction =
                                         topKPrediction.get(":, " + (numClasses - j - 1));
-                                // TODO replace nonzero with sum
                                 addCorrectInstances(
                                         jPrediction
                                                 .flatten()

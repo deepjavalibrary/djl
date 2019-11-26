@@ -102,27 +102,6 @@ public final class SingleShotDetection extends AbstractBlock {
         return NDArrays.concat(new NDList(flattenOutput), 1);
     }
 
-    private Shape anchorPredictionShape(Shape shape) {
-        long batchSize = shape.get(0);
-        long batchVolume = 1;
-        for (int i = 0; i < shape.dimension(); i++) {
-            batchVolume = batchVolume * shape.get(i);
-        }
-        batchVolume = batchVolume / batchSize;
-        return new Shape(batchSize, batchVolume);
-    }
-
-    private Shape classPredictionShape(Shape shape) {
-        long batchSize = shape.get(0);
-        long batchVolume = 1;
-        for (int i = 0; i < shape.dimension(); i++) {
-            batchVolume = batchVolume * shape.get(i);
-        }
-        batchVolume = batchVolume / batchSize;
-
-        return new Shape(batchSize, batchVolume / (numClasses + 1), numClasses + 1);
-    }
-
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.emptyList();
@@ -137,26 +116,43 @@ public final class SingleShotDetection extends AbstractBlock {
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         // TODO: output shape is wrong
         Shape[] childInputShapes = inputShapes;
-        Shape classPredictionShape = new Shape();
-        Shape anchorPredictionShape = new Shape();
+        Shape[] anchorShapes = new Shape[features.size()];
+        Shape[] classPredictionShapes = new Shape[features.size()];
+        Shape[] anchorPredictionShapes = new Shape[features.size()];
         for (int i = 0; i < features.size(); i++) {
             childInputShapes = features.get(i).getOutputShapes(manager, childInputShapes);
-            classPredictionShape =
-                    concatShape(
-                            classPredictionShape,
-                            classPredictionShape(
-                                    classPredictionBlocks.get(i)
-                                            .getOutputShapes(manager, childInputShapes)[0]),
-                            1);
-            anchorPredictionShape =
-                    concatShape(
-                            anchorPredictionShape,
-                            anchorPredictionShape(
-                                    anchorPredictionBlocks.get(i)
-                                            .getOutputShapes(manager, childInputShapes)[0]),
-                            1);
+            anchorShapes[i] =
+                    multiBoxPriors
+                            .get(i)
+                            .generateAnchorBoxes(manager.ones(childInputShapes[0]))
+                            .getShape();
+            classPredictionShapes[i] =
+                    classPredictionBlocks.get(i).getOutputShapes(manager, childInputShapes)[0];
+            anchorPredictionShapes[i] =
+                    anchorPredictionBlocks.get(i).getOutputShapes(manager, childInputShapes)[0];
         }
-        return new Shape[] {classPredictionShape, anchorPredictionShape};
+        Shape anchorOutputShape = new Shape();
+        for (Shape shape : anchorShapes) {
+            anchorOutputShape = concatShape(anchorOutputShape, shape, 1);
+        }
+
+        NDList classPredictions = new NDList();
+        for (Shape shape : classPredictionShapes) {
+            classPredictions.add(manager.ones(shape));
+        }
+        NDArray classPredictionOutput = concatPredictions(classPredictions);
+        Shape classPredictionOutputShape =
+                classPredictionOutput
+                        .reshape(classPredictionOutput.size(0), -1, numClasses + 1)
+                        .getShape();
+        NDList anchorPredictions = new NDList();
+        for (Shape shape : anchorPredictionShapes) {
+            anchorPredictions.add(manager.ones(shape));
+        }
+        Shape anchorPredictionOutputShape = concatPredictions(anchorPredictions).getShape();
+        return new Shape[] {
+            anchorOutputShape, classPredictionOutputShape, anchorPredictionOutputShape
+        };
     }
 
     private Shape concatShape(Shape shape, Shape concat, int axis) {

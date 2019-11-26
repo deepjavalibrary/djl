@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-// TODO: Need to add Memory management for all params
 /**
  * {@code MxSymbolBlock} is the MXNet implementation of {@link SymbolBlock}.
  *
