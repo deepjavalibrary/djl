@@ -37,6 +37,37 @@ public final class NDArrays {
     /**
      * Returns {@code true} if all elements in {@link NDArray} a are equal to {@link NDArray} b.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.ones(new Shape(3));
+     * jshell&gt; NDArrays.contenEquals(array, 1); // return true instead of boolean NDArray
+     * true
+     * </pre>
+     *
+     * @param a the {@link NDArray} to compare
+     * @param n the number to compare
+     * @return the boolean result
+     */
+    public static boolean contenEquals(NDArray a, Number n) {
+        if (a == null) {
+            return false;
+        }
+        return a.contentEquals(n);
+    }
+
+    /**
+     * Returns {@code true} if all elements in {@link NDArray} a are equal to {@link NDArray} b.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(6).reshape(2, 3);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f}, new Shape(2, 3));
+     * jshell&gt; NDArrays.contenEquals(array1, array2); // return true instead of boolean NDArray
+     * true
+     * </pre>
+     *
      * @param a the {@link NDArray} to compare
      * @param b the {@link NDArray} to compare
      * @return the boolean result
@@ -55,6 +86,15 @@ public final class NDArrays {
      *   <li>size(0)...size(rank()-1) are equal for both {@link NDArray}s
      * </ul>
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.ones(new Shape(1, 2, 3));
+     * jshell&gt; NDArray array2 = manager.create(new Shape(1, 2, 3));
+     * jshell&gt; NDArrays.shapeEquals(array1, array2); // return true instead of boolean NDArray
+     * true
+     * </pre>
+     *
      * @param a the {@link NDArray} to compare
      * @param b the {@link NDArray} to compare
      * @return {@code true} if the {@link Shape}s are the same
@@ -64,35 +104,20 @@ public final class NDArrays {
     }
 
     /**
-     * Returns {@code true} if all elements in the {@link NDArray} are equal to the Number.
-     *
-     * @param a the {@link NDArray} to compare
-     * @param n the number to compare
-     * @return the result boolean
-     */
-    public static boolean equals(NDArray a, Number n) {
-        if (a == null) {
-            return false;
-        }
-        return a.contentEquals(n);
-    }
-
-    /**
-     * Returns {@code true} if all elements in both the {@link NDArray}s are equal.
-     *
-     * @param a the {@link NDArray} to compare
-     * @param b the {@link NDArray} to compare
-     * @return the result boolean
-     */
-    public static boolean equals(NDArray a, NDArray b) {
-        if (a == null) {
-            return false;
-        }
-        return a.contentEquals(b);
-    }
-
-    /**
      * Returns {@code true} if two {@link NDArray} are element-wise equal within a tolerance.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-7});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-8});
+     * jshell&gt; NDArrays.allClose(array1, array2); // return false instead of boolean NDArray
+     * false
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-8});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-9});
+     * jshell&gt; NDArrays.allClose(array1, array2); // return true instead of boolean NDArray
+     * true
+     * </pre>
      *
      * @param a the {@link NDArray} to compare with
      * @param b the {@link NDArray} to compare with
@@ -104,6 +129,23 @@ public final class NDArrays {
 
     /**
      * Returns {@code true} if two {@link NDArray} are element-wise equal within a tolerance.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-7});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-8});
+     * jshell&gt; NDArrays.allclose(array1, array2, 1e-05, 1e-08, false); // return false instead of boolean NDArray
+     * false
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-8});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-9});
+     * jshell&gt; NDArrays.allclose(array1, array2, 1e-05, 1e-08, false); // return true instead of boolean NDArray
+     * true
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, Float.NaN});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1f, Float.NaN});
+     * jshell&gt; NDArrays.allclose(array1, array2, 1e-05, 1e-08, true); // return true instead of boolean NDArray
+     * true
+     * </pre>
      *
      * @param a the {@link NDArray} to compare with
      * @param b the {@link NDArray} to compare with
@@ -121,6 +163,15 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Equals" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.ones(new Shape(1));
+     * jshell&gt; NDArrays.eq(array, 1);
+     * ND: (1) cpu(0) boolean
+     * [ true]
+     * </pre>
+     *
      * @param a the {@link NDArray} to compare
      * @param n the number to compare
      * @return the boolean {@link NDArray} for element-wise "Equals" comparison
@@ -131,6 +182,15 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.ones(new Shape(1));
+     * jshell&gt; NDArrays.eq(1, array);
+     * ND: (1) cpu(0) boolean
+     * [ true]
+     * </pre>
      *
      * @param n the number to compare
      * @param a the {@link NDArray} to compare
@@ -143,6 +203,16 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Equals" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f, 3f});
+     * jshell&gt; NDArray array2 = manager.arange(3);
+     * jshell&gt; NDArrays.eq(array1, array2);
+     * ND: (3) cpu(0) boolean
+     * [ true,  true, false]
+     * </pre>
+     *
      * @param a the {@link NDArray} to compare
      * @param b the {@link NDArray} to compare
      * @return the boolean {@link NDArray} for element-wise "Equals" comparison
@@ -153,6 +223,17 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Not equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(4).reshape(2, 2);
+     * jshell&gt; NDArrays.neq(array, 1);
+     * ND: (2, 2) cpu(0) boolean
+     * [[ true, false],
+     *  [ true,  true],
+     * ]
+     * </pre>
      *
      * @param a the {@link NDArray} to compare
      * @param n the number to compare
@@ -165,6 +246,17 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Not equals" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(4).reshape(2, 2);
+     * jshell&gt; NDArrays.neq(1, array);
+     * ND: (2, 2) cpu(0) boolean
+     * [[ true, false],
+     *  [ true,  true],
+     * ]
+     * </pre>
+     *
      * @param n the number to compare
      * @param a the {@link NDArray} to compare
      * @return the boolean {@link NDArray} for element-wise "Not equals" comparison
@@ -175,6 +267,23 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Not equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 3f});
+     * jshell&gt; NDArrays.neq(array1, array2);
+     * ND: (2) cpu(0) boolean
+     * [false,  true]
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 3f, 1f, 4f}, new Shape(2, 2));
+     * jshell&gt; NDArrays.neq(array1, array2); // broadcasting
+     * ND: (2, 2) cpu(0) boolean
+     * [[false,  true],
+     *  [false,  true],
+     * ]
+     * </pre>
      *
      * @param a the {@link NDArray} to compare
      * @param b the {@link NDArray} to compare
@@ -187,6 +296,15 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Greater Than" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
+     * jshell&gt; gt(array, 2f);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
      * @param a the {@link NDArray} to compare
      * @param n the number to be compared against
      * @return the boolean {@link NDArray} for element-wise "Greater Than" comparison
@@ -197,6 +315,15 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Greater Than" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
+     * jshell&gt; NDArrays.gt(2f, array);
+     * ND: (2) cpu(0) boolean
+     * [false, false]
+     * </pre>
      *
      * @param n the number to be compared
      * @param a the NDArray to be compared against
@@ -209,6 +336,16 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Greater Than" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
+     * jshell&gt; NDArrays.gt(array1, array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be compared
      * @param b the {@link NDArray} to be compared against
      * @return the boolean {@link NDArray} for element-wise "Greater Than" comparison
@@ -219,6 +356,13 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Greater or equals" comparison.
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
+     * jshell&gt; NDArrays.gte(array, 2);
+     * ND: (2) cpu(0) boolean
+     * [ true, true]
+     * </pre>
      *
      * @param a the {@link NDArray} to be compared
      * @param n the number to be compared against
@@ -231,6 +375,13 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Greater or equals" comparison.
      *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
+     * jshell&gt; NDArrays.gte(2, array);
+     * ND: (2) cpu(0) boolean
+     * [false,  true]
+     * </pre>
+     *
      * @param n the number to be compared
      * @param a the {@link NDArray} to be compared against
      * @return the boolean {@link NDArray} for element-wise "Greater or equals" comparison
@@ -241,6 +392,16 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Greater or equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
+     * jshell&gt; NDArrays.gte(array1, array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, true]
+     * </pre>
      *
      * @param a the {@link NDArray} to be compared
      * @param b the {@link NDArray} to be compared against
@@ -253,6 +414,15 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Less" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.lt(array, 2f);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be compared
      * @param n the number to be compared against
      * @return the boolean {@link NDArray} for element-wise "Less" comparison
@@ -263,6 +433,15 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Less" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.lt(2f, array);
+     * ND: (2) cpu(0) boolean
+     * [false, false]
+     * </pre>
      *
      * @param n the number to be compared
      * @param a the {@link NDArray} to be compared against
@@ -275,6 +454,16 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Less" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
+     * jshell&gt; NDArrays.lt(array1, array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be compared
      * @param b the {@link NDArray} to be compared against
      * @return the boolean {@link NDArray} for element-wise "Less" comparison
@@ -285,6 +474,15 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Less or equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.lte(array, 2f);
+     * ND: (2) cpu(0) boolean
+     * [ true, true]
+     * </pre>
      *
      * @param a the {@link NDArray} to be compared
      * @param n the number to be compared against
@@ -297,6 +495,15 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Less or equals" comparison.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.lte(2f, array);
+     * ND: (2) cpu(0) boolean
+     * [false,  true]
+     * </pre>
+     *
      * @param n the number to be compared
      * @param a the {@link NDArray} to be compared against
      * @return the boolean {@link NDArray} for element-wise "Less or equals" comparison
@@ -307,6 +514,16 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Less or equals" comparison.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
+     * jshell&gt; NDArrays.lte(array1, array2)
+     * ND: (2) cpu(0) boolean
+     * [ true, true]
+     * </pre>
      *
      * @param a the {@link NDArray} to be compared
      * @param b the {@link NDArray} to be compared against

@@ -27,32 +27,32 @@ public class NDArrayElementComparisonOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.create(new float[] {1f, 2f});
             NDArray array2 = manager.create(new float[] {1f, 2f});
-            Assert.assertTrue(array1.contentEquals(array2) && NDArrays.equals(array1, array2));
+            Assert.assertTrue(array1.contentEquals(array2));
             array1 = manager.ones(new Shape(2, 3));
             array2 = manager.ones(new Shape(1, 3));
-            Assert.assertFalse(array1.contentEquals(array2) && NDArrays.equals(array1, array2));
+            Assert.assertFalse(array1.contentEquals(array2));
 
             // test scalar
             array1 = manager.create(5f);
             array2 = manager.create(5f);
-            Assert.assertTrue(array1.contentEquals(array2) && NDArrays.equals(array1, array2));
+            Assert.assertTrue(array1.contentEquals(array2));
             array1 = manager.create(3);
             array2 = manager.create(4);
-            Assert.assertFalse(array1.contentEquals(array2) && NDArrays.equals(array1, array2));
+            Assert.assertFalse(array1.contentEquals(array2));
 
             // different data type
             array1 = manager.create(4f);
             array2 = manager.create(4);
-            Assert.assertFalse(array1.contentEquals(array2) || NDArrays.equals(array1, array2));
+            Assert.assertFalse(array1.contentEquals(array2));
 
             // test zero dim vs zero dim
             array1 = manager.create(new Shape(4, 0));
             array2 = manager.create(new Shape(4, 0));
 
-            Assert.assertTrue(array1.contentEquals(array2) && NDArrays.equals(array1, array2));
+            Assert.assertTrue(array1.contentEquals(array2));
             array1 = manager.create(new Shape(0, 0, 2));
             array2 = manager.create(new Shape(2, 0, 0));
-            Assert.assertFalse(array1.contentEquals(array2) && NDArrays.equals(array1, array2));
+            Assert.assertFalse(array1.contentEquals(array2));
         }
     }
 

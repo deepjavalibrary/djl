@@ -849,7 +849,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.ones(new Shape(1));
-     * jshell&gt; array1.eq(1);
+     * jshell&gt; array.eq(1);
      * ND: (1) cpu(0) boolean
      * [ true]
      * </pre>
@@ -884,7 +884,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(4).reshape(2, 2);
-     * jshell&gt; array1.neq(1);
+     * jshell&gt; array.neq(1);
      * ND: (2, 2) cpu(0) boolean
      * [[ true, false],
      *  [ true,  true],
@@ -928,7 +928,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
-     * jshell&gt; array1.gt(2f);
+     * jshell&gt; array.gt(2f);
      * ND: (2) cpu(0) boolean
      * [ true, false]
      * </pre>
@@ -979,7 +979,7 @@ public interface NDArray extends AutoCloseable {
      * <pre>
      * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
-     * jshell&gt; array1.neq(array2);
+     * jshell&gt; array1.gte(array2);
      * ND: (2) cpu(0) boolean
      * [ true, true]
      * </pre>

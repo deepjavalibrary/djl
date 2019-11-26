@@ -135,9 +135,8 @@ public class NDArrayElementArithmeticOpTest {
                 // check add scalar result
                 gradCol.backward(result);
 
-                Assert.assertFalse(
-                        NDArrays.equals(lhs, result),
-                        "None in-place operator returned in-place result");
+                Assert.assertNotEquals(
+                        lhs, result, "None in-place operator returned in-place result");
                 NDArray actual = manager.create(new float[] {3f, 4f, 5f, 6f});
                 Assert.assertEquals(actual, result, "AddScala: Incorrect value in summed array");
 
@@ -164,9 +163,8 @@ public class NDArrayElementArithmeticOpTest {
             NDArray addend = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray addendum = manager.create(new float[] {2f, 3f, 4f, 5f});
             NDArray result = NDArrays.add(addend, addendum);
-            Assert.assertFalse(
-                    NDArrays.equals(addend, result),
-                    "None in-place operator returned in-place result");
+            Assert.assertNotEquals(
+                    addend, result, "None in-place operator returned in-place result");
 
             result = NDArrays.addi(addend, addendum);
             NDArray actual = manager.create(new float[] {3f, 5f, 7f, 9f});
