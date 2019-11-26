@@ -20,7 +20,7 @@ import java.util.Objects;
  * NDArray}.
  *
  * <p>Users can use this to specify whether to load/compute the {@code NDArray} on CPU/GPU with
- * deviceType and deviceId provided
+ * deviceType and deviceId provided.
  */
 public class Device {
 
@@ -124,7 +124,10 @@ public class Device {
     }
 
     /**
-     * Returns an array of devices.
+     * Returns an array of devices given the maximum number of GPUs to use.
+     *
+     * <p>If GPUs are available, it will return an array of {@code Device} of size
+     * \(min(numAvailable, maxGpus)\). Else, it will return an array with a single CPU device.
      *
      * @param maxGpus the max number of GPUs to use
      * @return an array of devices

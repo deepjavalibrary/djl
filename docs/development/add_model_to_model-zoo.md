@@ -52,7 +52,7 @@ $ ./gradlew syncS3
 ### Step 5: Check in your ModelLoader and metadata files to git
 You need to register your new model in the model zoo. Be sure to include all necessary information to load and use your model.
 
-**Note"**: Avoid checking in binary files to git. Binary files should only be uploaded to the S3 bucket.
+**Note**: Avoid checking in binary files to git. Binary files should only be uploaded to the S3 bucket.
 
 ### Step 6: Update the README file
 Update the model-zoo/README.md file to keep the list of models up to date.

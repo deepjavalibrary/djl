@@ -27,11 +27,11 @@ import java.util.List;
  * <pre>
  * Model model = Model.load(modelDir, modelName);
  *
- * // User must implement Translator interface, read Translator for detail.
+ * // User must implement Translator interface, read {@link Translator} for detail.
  * Translator translator = new MyTranslator();
  *
- * try (Predictor&lt;String, String&gt; predictor = <b>model.newPredictor</b>(translator)) {
- *   String result = predictor.<b>predict</b>("What's up");
+ * try (Predictor&lt;String, String&gt; predictor = model.newPredictor(translator)) {
+ *   String result = predictor.predict("What's up");
  * }
  * </pre>
  *
