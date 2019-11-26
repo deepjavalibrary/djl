@@ -72,7 +72,7 @@ public final class NDArrays {
      * @param b the {@link NDArray} to compare
      * @return the boolean result
      */
-    public static boolean contenEquals(NDArray a, NDArray b) {
+    public static boolean contentEquals(NDArray a, NDArray b) {
         return a.contentEquals(b);
     }
 
