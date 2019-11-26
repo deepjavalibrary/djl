@@ -35,6 +35,20 @@ import java.util.List;
  * }
  * </pre>
  *
+ * <p>See the tutorials on:
+ *
+ * <ul>
+ *   <li><a
+ *       href="https://github.com/awslabs/djl/blob/master/jupyter/image_classification_with_your_model.ipynb">Inference
+ *       with a custom trained model</a>
+ *   <li><a
+ *       href="https://github.com/awslabs/djl/blob/master/jupyter/object_detection_with_model_zoo.ipynb">Inference
+ *       with a model zoo model</a>
+ *   <li><a
+ *       href="https://github.com/awslabs/djl/blob/master/jupyter/load_mxnet_model.ipynb">Inference
+ *       with an MXNet model</a>
+ * </ul>
+ *
  * @param <I> the input type
  * @param <O> the output type
  * @see Model

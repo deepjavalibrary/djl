@@ -12,7 +12,7 @@ assignees: ''
 
 ### Will this change the current api? How?
 
-### Who will benefit with this feature?
+### Who will benefit from this feature?
 
 ## References
 - list reference and related literature

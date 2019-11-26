@@ -1,5 +1,5 @@
 ## Description ##
-(Brief description on what this PR is about)
+(Brief description of what this PR is about)
 
 ## Checklist ##
 ### Essentials ###
@@ -16,5 +16,5 @@ Please feel free to remove inapplicable items for your PR.
 - [ ] Feature2, tests, (and when applicable, Java doc)
 
 ## Comments ##
-- If this change is a backward incompatible change, why must this change be made.
+- If this change is a backward incompatible change, why must this change be made?
 - Interesting edge cases to note here

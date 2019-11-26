@@ -93,6 +93,10 @@ import java.util.List;
  * and try to update parameters to learn. For more information about training, please refer the
  * javadoc at {@link ai.djl.training.Trainer}. At the end of training, a block represents a
  * fully-trained model.
+ *
+ * <p>See this tutorial on <a
+ * href="https://github.com/awslabs/djl/blob/master/jupyter/create_your_first_network.ipynb">creating
+ * your first network</a>.
  */
 public interface Block {
     /**

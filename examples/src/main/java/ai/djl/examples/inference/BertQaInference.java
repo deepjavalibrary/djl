@@ -26,6 +26,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An example of inference using BertQA.
+ *
+ * <p>See the <a href="https://github.com/awslabs/djl/blob/master/jupyter/BERTQA.ipynb">jupyter
+ * demo</a> with more information about BERT.
+ */
 public final class BertQaInference {
 
     private static final Logger logger = LoggerFactory.getLogger(BertQaInference.class);

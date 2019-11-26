@@ -35,30 +35,18 @@ import java.util.function.Function;
  * <p>A deep learning model usually contains the following parts:
  *
  * <ul>
- *   <li>Graph: aka Symbols in MXNet, model in Keras, Block in Pytorch
- *   <li>Parameters: weights
+ *   <li>the {@link Block} of operations to run
+ *   <li>the {@link ai.djl.nn.Parameter}s that are trained
  *   <li>Input/Output information: input and output parameter names, shape, etc.
- *   <li>Other artifacts: e.g. dictionary for classification
+ *   <li>Other artifacts such as a synset for classification that would be used during
+ *       pre-processing and post-processing
  * </ul>
  *
- * <p>In a common inference case, the model is usually loaded from a file. Once the model is loaded,
- * you can create a {@link Predictor} with the loaded model and call {@link
- * Predictor#predict(Object)} to get the inference result.
+ * <p>For loading a pre-trained model, see {@link Model#load(Path, String)}
  *
- * <pre>
- * Model model = <b>Model.load</b>(modelDir, modelName);
+ * <p>For training a model, see {@link Trainer}.
  *
- * // User must implement Translator interface, read Translator for detail.
- * Translator translator = new MyTranslator();
- *
- * try (Predictor&lt;String, String&gt; predictor = <b>model.newPredictor</b>(translator)) {
- *   String result = predictor.<b>predict</b>("What's up");
- * }
- * </pre>
- *
- * @see Model#load(Path, String)
- * @see Predictor
- * @see Translator
+ * <p>For running inference with a model, see {@link Predictor}.
  */
 public interface Model extends AutoCloseable {
 

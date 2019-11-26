@@ -27,6 +27,20 @@ import ai.djl.training.metrics.TrainingMetric;
  *
  * <p>{@code Trainer} provides an easy, and manageable interface for training. {@code Trainer} is
  * not thread-safe.
+ *
+ * <p>See the tutorials on:
+ *
+ * <ul>
+ *   <li><a
+ *       href="https://github.com/awslabs/djl/blob/master/jupyter/train_your_first_model.ipynb">Training
+ *       your first model</a>
+ *   <li><a
+ *       href="https://github.com/awslabs/djl/blob/master/jupyter/transfer_learning_on_cifar10.ipynb">Training
+ *       using transfer learning</a>
+ *   <li><a
+ *       href="https://github.com/awslabs/djl/blob/master/jupyter/load_mxnet_model.ipynb">Inference
+ *       with an MXNet model</a>
+ * </ul>
  */
 public interface Trainer extends AutoCloseable {
 
