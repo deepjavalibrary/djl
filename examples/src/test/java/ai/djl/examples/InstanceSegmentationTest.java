@@ -27,7 +27,7 @@ public class InstanceSegmentationTest {
     public void testInstanceSegmentation() throws ModelException, TranslateException, IOException {
         DetectedObjects result = new InstanceSegmentation().predict();
         Classifications.Classification best = result.best();
-        Assert.assertEquals(best.getClassName(), "person");
+        Assert.assertEquals(best.getClassName(), "bicycle");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }
 }
