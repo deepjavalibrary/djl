@@ -2657,6 +2657,21 @@ public interface NDArray extends AutoCloseable {
      * Splits this {@code NDArray} into multiple sub{@code NDArray}s given sections along first
      * axis.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(9);
+     * jshell&gt; array.split(3).forEach(System.out::println);
+     * ND: (3) cpu(0) float32
+     * [0., 1., 2.]
+     *
+     * ND: (3) cpu(0) float32
+     * [3., 4., 5.]
+     *
+     * ND: (3) cpu(0) float32
+     * [6., 7., 8.]
+     * </pre>
+     *
      * @param sections this {@code NDArray} will be divided into N (sections) equal {@code NDArray}
      * @return an {@link NDList} with size(axis) {@code NDArray}s with {@link Shape} {@code
      *     this.shape.remove(axis) }
@@ -2669,6 +2684,24 @@ public interface NDArray extends AutoCloseable {
     /**
      * Splits this {@code NDArray} into multiple sub-{@code NDArray}s given indices along first
      * axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(8);
+     * jshell&gt; array.split(new int[] {3, 5, 6}).forEach(System.out::println);
+     * ND: (3) cpu(0) float32
+     * [0., 1., 2.]
+     *
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     *
+     * ND: (1) cpu(0) float32
+     * [5.]
+     *
+     * ND: (2) cpu(0) float32
+     * [6., 7.]
+     * </pre>
      *
      * @param indices the entries indicate where along axis this {@code NDArray} is split. If an
      *     index exceeds the dimension of this {@code NDArray} along axis, an empty sub-{@link
@@ -2684,6 +2717,32 @@ public interface NDArray extends AutoCloseable {
     /**
      * Splits this {@code NDArray} into multiple sub{@code NDArray}s given sections along the given
      * axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(18).reshape(2, 9);
+     * jshell&gt; array;
+     * ND: (2, 9) cpu(0) float32
+     * [[ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.],
+     *  [ 9., 10., 11., 12., 13., 14., 15., 16., 17.],
+     * ]
+     * jshell&gt; array.split(3, 1).forEach(System.out::println);
+     * ND: (2, 3) cpu(0) float32
+     * [[ 0.,  1.,  2.],
+     *  [ 9., 10., 11.],
+     * ]
+     *
+     * ND: (2, 3) cpu(0) float32
+     * [[ 3.,  4.,  5.],
+     *  [12., 13., 14.],
+     * ]
+     *
+     * ND: (2, 3) cpu(0) float32
+     * [[ 6.,  7.,  8.],
+     *  [15., 16., 17.],
+     * ]
+     * </pre>
      *
      * @param sections this {@code NDArray} will be divided into N (sections) equal arrays along
      *     axis
@@ -2707,6 +2766,35 @@ public interface NDArray extends AutoCloseable {
      * Splits this {@code NDArray} into multiple sub-{@code NDArray}s given indices along given
      * axis.
      *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(18).reshape(2, 9);
+     * jshell&gt; array;
+     * ND: (2, 9) cpu(0) float32
+     * [[ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.],
+     *  [ 9., 10., 11., 12., 13., 14., 15., 16., 17.],
+     * ]
+     * jshell&gt; array.split(new int[] {2,4,5}, 1).forEach(System.out::println);
+     * ND: (2, 2) cpu(0) float32
+     * [[ 0.,  1.],
+     *  [ 9., 10.],
+     * ]
+     *
+     * ND: (2, 2) cpu(0) float32
+     * [[ 2.,  3.],
+     *  [11., 12.],
+     * ]
+     *
+     * ND: (2, 1) cpu(0) float32
+     * [[ 4.],
+     *  [13.],
+     * ]
+     *
+     * ND: (2, 4) cpu(0) float32
+     * [[ 5.,  6.,  7.,  8.],
+     *  [14., 15., 16., 17.],
+     * ]
+     * </pre>
+     *
      * @param indices the entries indicate where along axis this {@code NDArray} is split. If an
      *     index exceeds the dimension of this {@code NDArray} along axis, an empty sub-array is
      *     returned correspondingly
@@ -2721,12 +2809,35 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>To flatten in column-major order, first transpose this {@code NDArray}
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[]{1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.flatten();
+     * ND: (4) cpu(0) float32
+     * [1., 2., 3., 4.]
+     * </pre>
+     *
      * @return a 1-D {@code NDArray} of equal size
      */
     NDArray flatten();
 
     /**
      * Reshapes this {@code NDArray} to the given {@link Shape}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6);
+     * jshell&gt; array;
+     * ND: (6) cpu(0) float32
+     * [0., 1., 2., 3., 4., 5.]
+     * jshell&gt; array.reshape(2, 3);
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * </pre>
      *
      * @param newShape the long array to reshape into. Must have equal size to the current shape
      * @return a reshaped {@code NDArray}
@@ -2742,6 +2853,20 @@ public interface NDArray extends AutoCloseable {
      *
      * <p>You can reshape it to match another NDArray by calling {@code a.reshape(b.getShape()) }
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(6);
+     * jshell&gt; array;
+     * ND: (6) cpu(0) float32
+     * [0., 1., 2., 3., 4., 5.]
+     * jshell&gt; array.reshape(new Shape(2, 3));
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * </pre>
+     *
      * @param shape the {@link Shape} to reshape into. Must have equal size to the current shape
      * @return a reshaped {@code NDArray}
      * @throws IllegalArgumentException thrown if the given {@link Shape} does not match the size of
@@ -2755,6 +2880,24 @@ public interface NDArray extends AutoCloseable {
      * <p>Inserts a new axis that will appear at the axis position in the expanded {@code NDArray}
      * shape.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [1., 2.]
+     * jshell&gt; array.expandDims(0);
+     * ND: (1, 2) cpu(0) float32
+     * [[1., 2.],
+     * ]
+     * jshell&gt; array.expandDims(1);
+     * ND: (2, 1) cpu(0) float32
+     * [[1.],
+     *  [2.],
+     * ]
+     * </pre>
+     *
      * @param axis the position in the expanded axes where the new axis is placed
      * @return the result {@code NDArray}. The number of dimensions is one greater than that of the
      *     {@code NDArray}
@@ -2763,6 +2906,22 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Removes all singleton dimensions from this {@code NDArray} {@link Shape}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f}, new Shape(1, 3, 1));
+     * jshell&gt; array;
+     * ND: (1, 3, 1) cpu(0) float32
+     * [[[0.],
+     *   [1.],
+     *   [2.],
+     *  ],
+     * ]
+     * jshell&gt; array.squeeze();
+     * ND: (3) cpu(0) float32
+     * [0., 1., 2.]
+     * </pre>
      *
      * @return a result {@code NDArray} of same size and data without singleton dimensions
      */
@@ -2773,6 +2932,29 @@ public interface NDArray extends AutoCloseable {
 
     /**
      * Removes a singleton dimension at the given axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f}, new Shape(1, 3, 1));
+     * jshell&gt; array;
+     * ND: (1, 3, 1) cpu(0) float32
+     * [[[0.],
+     *   [1.],
+     *   [2.],
+     *  ],
+     * ]
+     * jshell&gt; array.squeeze(0);
+     * ND: (3, 1) cpu(0) float32
+     * [[0.],
+     *  [1.],
+     *  [2.],
+     * ]
+     * jshell&gt; array.squeeze(2);
+     * ND: (1, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     * ]
+     * </pre>
      *
      * @param axis the axis at which to remove the singleton dimension
      * @return a result {@code NDArray} of same size and data without the axis at part of the shape
@@ -2785,6 +2967,22 @@ public interface NDArray extends AutoCloseable {
     /**
      * Removes singleton dimensions at the given axes.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f}, new Shape(1, 3, 1));
+     * jshell&gt; array;
+     * ND: (1, 3, 1) cpu(0) float32
+     * [[[0.],
+     *   [1.],
+     *   [2.],
+     *  ],
+     * ]
+     * jshell&gt; array.squeeze(new int[] {0, 2});
+     * ND: (3) cpu(0) float32
+     * [0., 1., 2.]
+     * </pre>
+     *
      * @param axes the axes at which to remove the singleton dimensions
      * @return a result {@code NDArray} of same size and data without the axes at part of the shape
      * @throws IllegalArgumentException thrown if any of the given axes are not a singleton
@@ -2793,7 +2991,48 @@ public interface NDArray extends AutoCloseable {
     NDArray squeeze(int[] axes);
 
     /**
+     * Joins a {@code NDArray} along first axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array1.stack(array2)
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [2., 3.],
+     * ]
+     * </pre>
+     *
+     * @param array the input {@code NDArray} which must have the same {@link Shape}as this {@code
+     *     NDArray}
+     * @return the result {@code NDArray}. The stacked {@code NDArray} has one more dimension than
+     *     the input {@code NDArray}.
+     */
+    default NDArray stack(NDArray array) {
+        return stack(array, 0);
+    }
+
+    /**
      * Joins a {@code NDArray} along a new axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array1.stack(array2, 0);
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 1.],
+     *  [2., 3.],
+     * ]
+     * jshell&gt; array1.stack(array2, 1);
+     * ND: (2, 2) cpu(0) float32
+     * [[0., 2.],
+     *  [1., 3.],
+     * ]
+     * </pre>
      *
      * @param array the input {@code NDArray} which must have the same {@link Shape}as this {@code
      *     NDArray}
@@ -2809,17 +3048,34 @@ public interface NDArray extends AutoCloseable {
     /**
      * Joins a {@code NDArray} along first axis.
      *
-     * @param array the input {@code NDArray} which must have the same {@link Shape}as this {@code
-     *     NDArray}
-     * @return the result {@code NDArray}. The stacked {@code NDArray} has one more dimension than
-     *     the input {@code NDArray}.
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array1.concat(array2)
+     * ND: (4) cpu(0) float32
+     * [0., 1., 2., 3.]
+     * </pre>
+     *
+     * @param array a {@code NDArray} which have the same {@link Shape}as this {@code NDArray},
+     *     except in the dimension corresponding to axis
+     * @return the concatenated {@code NDArray}
      */
-    default NDArray stack(NDArray array) {
-        return stack(array, 0);
+    default NDArray concat(NDArray array) {
+        return concat(array, 0);
     }
 
     /**
      * Joins a {@code NDArray} along an existing axis.
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; array1.concat(array2, 0);
+     * ND: (4) cpu(0) float32
+     * [0., 1., 2., 3.]
+     * </pre>
      *
      * @param array a {@code NDArray} which have the same {@link Shape}as this {@code NDArray},
      *     except in the dimension corresponding to axis
@@ -2828,17 +3084,6 @@ public interface NDArray extends AutoCloseable {
      */
     default NDArray concat(NDArray array, int axis) {
         return getNDArrayInternal().concat(new NDList(array), axis);
-    }
-
-    /**
-     * Joins a {@code NDArray} along first axis.
-     *
-     * @param array a {@code NDArray} which have the same {@link Shape}as this {@code NDArray},
-     *     except in the dimension corresponding to axis
-     * @return the concatenated {@code NDArray}
-     */
-    default NDArray concat(NDArray array) {
-        return concat(array, 0);
     }
 
     ////////////////////////////////////////
