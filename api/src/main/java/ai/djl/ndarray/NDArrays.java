@@ -558,6 +558,15 @@ public final class NDArrays {
     /**
      * Returns the maximum of a {@link NDArray} and a number element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; NDArrays.maximum(array, 3f);
+     * ND: (3) cpu(0) float32
+     * [3., 3., 4.]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be compared
      * @param n the number to be compared
      * @return the maximum of a {@link NDArray} and a number element-wise
@@ -568,6 +577,15 @@ public final class NDArrays {
 
     /**
      * Returns the maximum of a number and a {@link NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; NDArrays.maximum(3f, array);
+     * ND: (3) cpu(0) float32
+     * [3., 3., 4.]
+     * </pre>
      *
      * @param n the number to be compared
      * @param a the {@link NDArray} to be compared
@@ -582,6 +600,23 @@ public final class NDArrays {
      *
      * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 5f, 2f});
+     * jshell&gt; NDArrays.maximum(array1, array2);
+     * ND: (3) cpu(0) float32
+     * [2., 5., 4.]
+     * jshell&gt; NDArray array1 = manager.eye(2);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {0.5f, 2f});
+     * jshell&gt; NDArrays.maximum(array1, array2); // broadcasting
+     * ND: (2, 2) cpu(0) float32
+     * [[1. , 2. ],
+     *  [0.5, 2. ],
+     * ]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be compared
      * @param b the {@link NDArray} to be compared
      * @return the maximum of {@link NDArray} a and {@link NDArray} b element-wise
@@ -593,6 +628,15 @@ public final class NDArrays {
     /**
      * Returns the minimum of a {@link NDArray} and a number element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; NDArrays.minimum(array, 3f);
+     * ND: (3) cpu(0) float32
+     * [2., 3., 3.]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be compared
      * @param n the number to be compared
      * @return the minimum of a {@link NDArray} and a number element-wise
@@ -603,6 +647,15 @@ public final class NDArrays {
 
     /**
      * Returns the minimum of a number and a {@link NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; NDArrays.minimum(3f, array);
+     * ND: (3) cpu(0) float32
+     * [2., 3., 3.]
+     * </pre>
      *
      * @param n the number to be compared
      * @param a the {@link NDArray} to be compared
@@ -616,6 +669,23 @@ public final class NDArrays {
      * Returns the minimum of {@link NDArray} a and {@link NDArray} b element-wise.
      *
      * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {2f, 3f, 4f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 5f, 2f});
+     * jshell&gt; NDArrays.minimum(array1, array2);
+     * ND: (3) cpu(0) float32
+     * [1., 3., 2.]
+     * jshell&gt; NDArray array1 = manager.eye(2);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {0.5f, 2f});
+     * jshell&gt; NDArrays.minimum(array1, array2); // broadcasting
+     * ND: (2, 2) cpu(0) float32
+     * [[0.5, 0. ],
+     *  [0. , 1. ],
+     * ]
+     * </pre>
      *
      * @param a the {@link NDArray} to be compared
      * @param b the {@link NDArray} to be compared
@@ -657,6 +727,15 @@ public final class NDArrays {
     /**
      * Adds a number to the {@link NDArray} element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.add(array, 2f);
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be added to
      * @param n the number to add
      * @return the result {@link NDArray}
@@ -667,6 +746,15 @@ public final class NDArrays {
 
     /**
      * Adds a {@link NDArray} to a number element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.add(2f, array);
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * </pre>
      *
      * @param n the number to be added to
      * @param a the {@link NDArray} to add
@@ -680,6 +768,15 @@ public final class NDArrays {
      * Adds a {@link NDArray} to a {@link NDArray} element-wise.
      *
      * <p>The shapes of all of the {@link NDArray}s must be the same.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.add(array, array, array);
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * </pre>
      *
      * @param arrays the {@link NDArray}s to add together
      * @return the result {@link NDArray}
@@ -699,6 +796,15 @@ public final class NDArrays {
     /**
      * Subtracts a number from the {@link NDArray} element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; array.sub(2f);
+     * ND: (2) cpu(0) float32
+     * [-1.,  0.]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be subtracted
      * @param n the number to subtract from
      * @return the result {@link NDArray}
@@ -709,6 +815,15 @@ public final class NDArrays {
 
     /**
      * Subtracts a {@link NDArray} from a number element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.sub(3f, array);
+     * ND: (2) cpu(0) float32
+     * [2., 1.]
+     * </pre>
      *
      * @param n the number to be subtracted
      * @param a the {@link NDArray} to subtract from
@@ -723,6 +838,19 @@ public final class NDArrays {
      *
      * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.arange(3);
+     * jshell&gt; NDArrays.sub(array1, array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[0., 0., 0.],
+     *  [3., 3., 3.],
+     *  [6., 6., 6.],
+     * ]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be subtracted
      * @param b the {@link NDArray} to subtract from
      * @return the result {@link NDArray}
@@ -734,6 +862,15 @@ public final class NDArrays {
     /**
      * Multiplies the {@link NDArray} by a number element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.mul(array, 3f);
+     * ND: (2) cpu(0) float32
+     * [3., 6.]
+     * </pre>
+     *
      * @param a the NDArray to be multiplied
      * @param n the number to multiply by
      * @return the result {@link NDArray}
@@ -744,6 +881,15 @@ public final class NDArrays {
 
     /**
      * Multiplies a number by a {@link NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.mul(3f, array);
+     * ND: (2) cpu(0) float32
+     * [3., 6.]
+     * </pre>
      *
      * @param n the number to be multiplied
      * @param a the {@link NDArray} to multiply by
@@ -757,6 +903,15 @@ public final class NDArrays {
      * Multiplies all of the {@link NDArray}s together element-wise.
      *
      * <p>The shapes of all of the {@link NDArray}s must be the same.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.mul(array, array, array);
+     * ND: (2) cpu(0) float32
+     * [1., 8.]
+     * </pre>
      *
      * @param arrays the {@link NDArray}s to multiply together
      * @return the result {@link NDArray}
@@ -776,6 +931,15 @@ public final class NDArrays {
     /**
      * Divides the {@link NDArray} by a number element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; NDArrays.div(array, 4f);
+     * ND: (5) cpu(0) float32
+     * [0.  , 0.25, 0.5 , 0.75, 1.  ]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be be divided
      * @param n the number to divide by
      * @return the result {@link NDArray}
@@ -786,6 +950,15 @@ public final class NDArrays {
 
     /**
      * Divides a number by a {@link NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5).add(1);
+     * jshell&gt; NDArrays.div(4f, array);
+     * ND: (5) cpu(0) float32
+     * [4.    , 2.    , 1.3333, 1.    , 0.8   ]
+     * </pre>
      *
      * @param n the number to be be divided
      * @param a the {@link NDArray} to divide by
@@ -800,6 +973,19 @@ public final class NDArrays {
      *
      * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.ones(new Shape(3)).mul(10);
+     * jshell&gt; NDArrays.div(array1, array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[0. , 0.1, 0.2],
+     *  [0.3, 0.4, 0.5],
+     *  [0.6, 0.7, 0.8],
+     * ]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be be divided
      * @param b the {@link NDArray} to divide by
      * @return the result {@link NDArray}
@@ -810,6 +996,15 @@ public final class NDArrays {
 
     /**
      * Returns element-wise remainder of division.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(7);
+     * jshell&gt; NDArrays.mod(array, 5f);
+     * ND: (7) cpu(0) float32
+     * [0., 1., 2., 3., 4., 0., 1.]
+     * </pre>
      *
      * @param a the dividend {@link NDArray}
      * @param n the divisor number
@@ -822,6 +1017,15 @@ public final class NDArrays {
     /**
      * Returns element-wise remainder of division.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(7).add(1);
+     * jshell&gt; NDArrays.mod(5f, array);
+     * ND: (7) cpu(0) float32
+     * [0., 1., 2., 1., 0., 5., 5.]
+     * </pre>
+     *
      * @param n the dividend number
      * @param a the divisor {@link NDArray}
      * @return the result {@link NDArray}
@@ -832,6 +1036,16 @@ public final class NDArrays {
 
     /**
      * Returns element-wise remainder of division.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 7f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; NDArrays.mod(array1, array2);
+     * ND: (2) cpu(0) float32
+     * [0., 1.]
+     * </pre>
      *
      * @param a the dividend NDArray
      * @param b the dividend NDArray
@@ -844,6 +1058,15 @@ public final class NDArrays {
     /**
      * Takes the power of the {@link NDArray} with a number element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; NDArrays.pow(array, 4f);
+     * ND: (6) cpu(0) float32
+     * [  0.,   1.,   8.,  27.,  64., 125.]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be taken the power with
      * @param n the number to take the power with
      * @return the result {@link NDArray}
@@ -854,6 +1077,15 @@ public final class NDArrays {
 
     /**
      * Takes the power of a number with a {@link NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; NDArrays.pow(4f, array);
+     * ND: (5) cpu(0) float32
+     * [  1.,   4.,  16.,  64., 256.]
+     * </pre>
      *
      * @param n the number to be taken the power with
      * @param a the {@link NDArray} to take the power with
@@ -868,6 +1100,19 @@ public final class NDArrays {
      *
      * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(6).reshape(3, 2);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; NDArrays.pow(array1, array2); // broadcasting
+     * ND: (3, 2) cpu(0) float32
+     * [[  0.,   1.],
+     *  [  4.,  27.],
+     *  [ 16., 125.],
+     * ]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be taken the power with
      * @param b the {@link NDArray} to take the power with
      * @return the result {@link NDArray}
@@ -879,6 +1124,18 @@ public final class NDArrays {
     /**
      * Adds a number to the {@link NDArray} element-wise in place.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.addi(array, 2f);
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be added to
      * @param n the number to add
      * @return the result {@link NDArray}
@@ -889,6 +1146,18 @@ public final class NDArrays {
 
     /**
      * Adds a {@link NDArray} to a number element-wise in place.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.addi(2f, array);
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * </pre>
      *
      * @param a the number to be added to
      * @param n the {@link NDArray} to add
@@ -903,6 +1172,18 @@ public final class NDArrays {
      *
      * <p>The shapes of all of the {@link NDArray}s must be the same.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.addi(array, array, array);
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [3., 4.]
+     * </pre>
+     *
      * @param arrays the {@link NDArray}s to add together
      * @return the result {@link NDArray}
      * @throws IllegalArgumentException arrays must have at least two elements
@@ -916,6 +1197,18 @@ public final class NDArrays {
     /**
      * Subtracts a number from the {@link NDArray} element-wise in place.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.subi(array, 2f);
+     * ND: (2) cpu(0) float32
+     * [-1.,  0.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [-1.,  0.]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be subtracted
      * @param n the number to subtract from
      * @return the result {@link NDArray}
@@ -926,6 +1219,18 @@ public final class NDArrays {
 
     /**
      * Subtracts a {@link NDArray} from a number element-wise in place.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.subi(3f, array);
+     * ND: (2) cpu(0) float32
+     * [2., 1.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [2., 1.]
+     * </pre>
      *
      * @param n the number to be subtracted
      * @param a the {@link NDArray} to subtract from
@@ -940,6 +1245,24 @@ public final class NDArrays {
      *
      * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.arange(3);
+     * jshell&gt; NDArrays.subi(array1, array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[0., 0., 0.],
+     *  [3., 3., 3.],
+     *  [6., 6., 6.],
+     * ]
+     * jshell&gt; array1;
+     * [[0., 0., 0.],
+     *  [3., 3., 3.],
+     *  [6., 6., 6.],
+     * ]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be subtracted
      * @param b the {@link NDArray} to subtract from
      * @return the result {@link NDArray}
@@ -951,6 +1274,18 @@ public final class NDArrays {
     /**
      * Multiplies the {@link NDArray} by a number element-wise in place.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.muli(array, 3f);
+     * ND: (2) cpu(0) float32
+     * [3., 6.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [3., 6.]
+     * </pre>
+     *
      * @param a the NDArray to be multiplied
      * @param n the number to multiply by
      * @return the result {@link NDArray}
@@ -961,6 +1296,18 @@ public final class NDArrays {
 
     /**
      * Multiplies a number by a {@link NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.muli(3f, array);
+     * ND: (2) cpu(0) float32
+     * [3., 6.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [3., 6.]
+     * </pre>
      *
      * @param n the number to multiply by
      * @param a the {@link NDArray} to multiply by
@@ -975,6 +1322,18 @@ public final class NDArrays {
      *
      * <p>The shapes of all of the {@link NDArray}s must be the same.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.muli(array, array, array);
+     * ND: (2) cpu(0) float32
+     * [ 1., 16.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [ 1., 16.]
+     * </pre>
+     *
      * @param arrays the {@link NDArray}s to multiply together
      * @return the result {@link NDArray}
      * @throws IllegalArgumentException arrays must have at least two elements
@@ -988,6 +1347,18 @@ public final class NDArrays {
     /**
      * Divides a number by a {@link NDArray} element-wise in place.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; NDArrays.divi(array, 4f);
+     * ND: (5) cpu(0) float32
+     * [0.  , 0.25, 0.5 , 0.75, 1.  ]
+     * jshell&gt; array;
+     * ND: (5) cpu(0) float32
+     * [0.  , 0.25, 0.5 , 0.75, 1.  ]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be be divided
      * @param n the number to divide by
      * @return the result {@link NDArray}
@@ -998,6 +1369,18 @@ public final class NDArrays {
 
     /**
      * Divides a number by a {@link NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5).add(1);
+     * jshell&gt; NDArrays.divi(4f, array);
+     * ND: (5) cpu(0) float32
+     * [4.    , 2.    , 1.3333, 1.    , 0.8   ]
+     * jshell&gt; array;
+     * ND: (5) cpu(0) float32
+     * [4.    , 2.    , 1.3333, 1.    , 0.8   ]
+     * </pre>
      *
      * @param n the number to be be divided
      * @param a the {@link NDArray} to divide by
@@ -1012,6 +1395,23 @@ public final class NDArrays {
      *
      * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArrays.divi(array1, array2); // broadcasting
+     * ND: (3, 3) cpu(0) float32
+     * [[0. , 0.1, 0.2],
+     *  [0.3, 0.4, 0.5],
+     *  [0.6, 0.7, 0.8],
+     * ]
+     * jshell&gt; array1;
+     * [[0. , 0.1, 0.2],
+     *  [0.3, 0.4, 0.5],
+     *  [0.6, 0.7, 0.8],
+     * ]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be be divided
      * @param b the {@link NDArray} to divide by
      * @return the result {@link NDArray}
@@ -1022,6 +1422,18 @@ public final class NDArrays {
 
     /**
      * Returns element-wise remainder of division in place.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(7);
+     * jshell&gt; NDArrays.modi(array, 5f);
+     * ND: (7) cpu(0) float32
+     * [0., 1., 2., 3., 4., 0., 1.]
+     * jshell&gt; array;
+     * ND: (7) cpu(0) float32
+     * [0., 1., 2., 3., 4., 0., 1.]
+     * </pre>
      *
      * @param a the dividend {@link NDArray}
      * @param n the divisor number
@@ -1034,6 +1446,18 @@ public final class NDArrays {
     /**
      * Returns element-wise remainder of division in place.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(7);
+     * jshell&gt; NDArrays.modi(5f, array);
+     * ND: (7) cpu(0) float32
+     * [0., 0., 1., 2., 1., 0., 5.]
+     * jshell&gt; array;
+     * ND: (7) cpu(0) float32
+     * [0., 0., 1., 2., 1., 0., 5.]
+     * </pre>
+     *
      * @param n the dividend number
      * @param a the divisor {@link NDArray}
      * @return the result {@link NDArray}
@@ -1044,6 +1468,19 @@ public final class NDArrays {
 
     /**
      * Returns element-wise remainder of division.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 7f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; NDArrays.modi(array1, array2);
+     * ND: (2) cpu(0) float32
+     * [0., 1.]
+     * jshell&gt; array1;
+     * ND: (2) cpu(0) float32
+     * [0., 1.]
+     * </pre>
      *
      * @param a the dividend NDArray
      * @param b the dividend NDArray
@@ -1056,6 +1493,18 @@ public final class NDArrays {
     /**
      * Takes the power of the {@link NDArray} with a number element-wise in place.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; NDArrays.powi(array, 4f);
+     * ND: (6) cpu(0) float32
+     * [  0.,   1.,   8.,  27.,  64., 125.]
+     * jshell&gt; array;
+     * ND: (6) cpu(0) float32
+     * [  0.,   1.,   8.,  27.,  64., 125.]
+     * </pre>
+     *
      * @param a the {@link NDArray} to be taken the power with
      * @param n the number to take the power with
      * @return the result {@link NDArray}
@@ -1066,6 +1515,18 @@ public final class NDArrays {
 
     /**
      * Takes the power of a number with a {@link NDArray} element-wise in place.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; NDArrays.powi(4f, array);
+     * ND: (5) cpu(0) float32
+     * [  1.,   4.,  16.,  64., 256.]
+     * jshell&gt; array;
+     * ND: (5) cpu(0) float32
+     * [  1.,   4.,  16.,  64., 256.]
+     * </pre>
      *
      * @param n the number to be taken the power with
      * @param a the {@link NDArray} to take the power with
@@ -1079,6 +1540,25 @@ public final class NDArrays {
      * Takes the power of a {@link NDArray} with a {@link NDArray} element-wise.
      *
      * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.arange(6).reshape(3, 2);
+     * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
+     * jshell&gt; NDArrays.powi(array1, array2); // broadcasting
+     * ND: (3, 2) cpu(0) float32
+     * [[  0.,   1.],
+     *  [  4.,  27.],
+     *  [ 16., 125.],
+     * ]
+     * jshell&gt; array1;
+     * ND: (3, 2) cpu(0) float32
+     * [[  0.,   1.],
+     *  [  4.,  27.],
+     *  [ 16., 125.],
+     * ]
+     * </pre>
      *
      * @param a the {@link NDArray} to be taken the power with
      * @param b the {@link NDArray} to take the power with
@@ -1104,6 +1584,46 @@ public final class NDArrays {
      *       {@link NDArray}(where M&gt;&#61;2), it is a sum product over the last axis of this
      *       {@link NDArray} and the second-to-last axis of the other {@link NDArray}
      * </ul>
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f, 3f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {4f, 5f, 6f});
+     * jshell&gt; NDArrays.dot(array1, array2); // inner product
+     * ND: () cpu(0) float32
+     * 32.
+     * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array2 = manager.create(new float[] {5f, 6f, 7f, 8f}, new Shape(2, 2));
+     * jshell&gt; NDArrays.dot(array1, array2); // matrix multiplication
+     * ND: (2, 2) cpu(0) float32
+     * [[19., 22.],
+     *  [43., 50.],
+     * ]
+     * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array2 = manager.create(5f);
+     * jshell&gt; NDArrays.dot(array1, array2);
+     * ND: (2, 2) cpu(0) float32
+     * [[ 5., 10.],
+     *  [15., 20.],
+     * ]
+     * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array2 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.dot(array1, array2);
+     * ND: (2) cpu(0) float32
+     * [ 5., 11.]
+     * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f}, new Shape(2, 2, 2));
+     * jshell&gt; array2 = manager.create(new float[] {1f, 2f, 3f ,4f}, new Shape(2, 2));
+     * jshell&gt; NDArrays.dot(array1, array2);
+     * ND: (2, 2, 2) cpu(0) float32
+     * [[[ 7., 10.],
+     *   [15., 22.],
+     *  ],
+     *  [[23., 34.],
+     *   [31., 46.],
+     *  ],
+     * ]
+     * </pre>
      *
      * @param a the {@link NDArray} to perform dot product with
      * @param b the {@link NDArray} to perform dot product with
@@ -1173,6 +1693,21 @@ public final class NDArrays {
      *
      * <p>The shapes of {@link NDArray} a and {@link NDArray} b must be broadcastable.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new boolean[] {true});
+     * jshell&gt; NDArray array2 = manager.create(new boolean[] {false});
+     * jshell&gt; NDArrays.logicalAnd(array1, array2);
+     * ND: (1) cpu(0) boolean
+     * [false]
+     * jshell&gt; array1 = manager.create(new boolean[] {true, false});
+     * jshell&gt; array2 = manager.create(new boolean[] {false, false});
+     * jshell&gt; NDArrays.logicalAnd(array.gt(1), array.lt(4));
+     * ND: (2) cpu(0) boolean
+     * [false, false]
+     * </pre>
+     *
      * @param a the {@link NDArray} to operate on
      * @param b the {@link NDArray} to operate on
      * @return the boolean {@link NDArray} of the logical AND operation applied to the elements of
@@ -1185,6 +1720,28 @@ public final class NDArrays {
     /**
      * Computes the truth value of {@link NDArray} a AND {@link NDArray} b element-wise.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new boolean[] {true});
+     * jshell&gt; NDArray array2 = manager.create(new boolean[] {false});
+     * jshell&gt; NDArrays.logicalOr(array1, array2);
+     * ND: (1) cpu(0) boolean
+     * [ true]
+     * jshell&gt; array1 = manager.create(new boolean[] {true, false});
+     * jshell&gt; array2 = manager.create(new boolean[] {false, false});
+     * jshell&gt; NDArrays.logicalOr(array1, array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; NDArrays.logicalOr(array.lt(1), array.gt(3));
+     * ND: (5) cpu(0) boolean
+     * [ true, false, false, false,  true]
+     * </pre>
+     *
      * @param a the {@link NDArray} to operate on
      * @param b the {@link NDArray} to operate on
      * @return the boolean {@link NDArray} of the logical AND operation applied to the elements of
@@ -1196,6 +1753,27 @@ public final class NDArrays {
 
     /**
      * Computes the truth value of {@link NDArray} a AND {@link NDArray} b element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new boolean[] {true});
+     * jshell&gt; NDArrays.logicalXor(array1, array2);
+     * ND: (1) cpu(0) boolean
+     * [ true]
+     * jshell&gt; array1 = manager.create(new boolean[] {true, false});
+     * jshell&gt; array2 = manager.create(new boolean[] {false, false});
+     * jshell&gt; NDArrays.logicalXor(array1, array2);
+     * ND: (2) cpu(0) boolean
+     * [ true, false]
+     * </pre>
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(5);
+     * jshell&gt; NDArrays.logicalOr(array.lt(1), array.gt(3));
+     * ND: (5) cpu(0) boolean
+     * [ true, false, false, false,  true]
+     * </pre>
      *
      * @param a the {@link NDArray} to operate on
      * @param b the {@link NDArray} to operate on
