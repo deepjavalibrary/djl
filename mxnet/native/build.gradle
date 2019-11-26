@@ -8,10 +8,19 @@ group = "ai.djl.mxnet"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = "1.6.0" + (isRelease ? "" : "-SNAPSHOT")
 
+sourceSets {
+    main {
+        // Don't include the resources folder with all the binaries in the placeholder jar,
+        // javadoc jar, or sources jar
+        resources {
+            srcDirs = []
+        }
+    }
+}
+
 // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
-tasks.create(name: "PlaceholderJar", type: Jar) {
+jar {
     from file("src/main/resources/placeholder")
-    archiveClassifier = ""
 }
 
 java {
@@ -63,7 +72,7 @@ flavorNames.each { flavor ->
             artifactId "mxnet-native-${flavor}"
             from components.java
             artifacts = artifactsNames
-            artifact PlaceholderJar
+            artifact jar
             artifact javadocJar
             artifact sourcesJar
             pom {
