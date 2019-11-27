@@ -546,6 +546,22 @@ public final class NDArrays {
      * <p>Note that all non-zero values are interpreted as {@code true} in condition {@link
      * NDArray}.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(10);
+     * jshell&gt; NDArrays.where(array.lt(5), array, array.mul(10));
+     * ND: (10) cpu(0) float32
+     * [ 0.,  1.,  2.,  3.,  4., 50., 60., 70., 80., 90.]
+     * jshell&gt; NDArray array = manager.create(new float[]{0f, 1f, 2f, 0f, 2f, 4f, 0f, 3f, 6f}, new Shape(3, 3));
+     * jshell&gt; NDArrays.where(array.lt(4), array, manager.create(-1f));
+     * ND: (3, 3) cpu(0) float32
+     * [[ 0.,  1.,  2.],
+     *  [ 0.,  2., -1.],
+     *  [ 0.,  3., -1.],
+     * ]
+     * </pre>
+     *
      * @param condition the condition {@code NDArray}
      * @param a the first {@link NDArray}
      * @param b the other {@link NDArray}
@@ -698,6 +714,18 @@ public final class NDArrays {
     /**
      * Returns portion of the {@link NDArray} given the index boolean {@link NDArray} along first
      * axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(3, 2));
+     * jshell&gt; NDArray mask = manager.create(new boolean[] {true, false, true});
+     * jshell&gt; NDArrays.booleanMask(array, mask);
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [5., 6.],
+     * ]
+     * </pre>
      *
      * @param data the {@link NDArray} to operate on
      * @param index the boolean {@link NDArray} mask
@@ -1178,10 +1206,10 @@ public final class NDArrays {
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.addi(array, array, array);
      * ND: (2) cpu(0) float32
-     * [3., 4.]
+     * [3., 6.]
      * jshell&gt; array;
      * ND: (2) cpu(0) float32
-     * [3., 4.]
+     * [3., 6.]
      * </pre>
      *
      * @param arrays the {@link NDArray}s to add together
@@ -1634,11 +1662,57 @@ public final class NDArrays {
     }
 
     /**
+     * Joins a sequence of {@link NDArray}s in {@link NDList} along the first axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f, 5f});
+     * jshell&gt; NDArray array3 = manager.create(new float[] {6f, 7f, 8f});
+     * jshell&gt; NDArrays.stack(new NDList(array1, array2, array3));
+     * ND: (3, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     *  [6., 7., 8.],
+     * ]
+     * </pre>
+     *
+     * @param arrays the input {@link NDList}. Each {@link NDArray} in the {@link NDList} must have
+     *     the same shape as the {@link NDArray}
+     * @return the result {@link NDArray}. The stacked {@link NDArray} has one more dimension than
+     *     the {@link NDArray}s in {@link NDList}
+     */
+    public static NDArray stack(NDList arrays) {
+        return stack(arrays, 0);
+    }
+
+    /**
      * Joins a sequence of {@link NDArray}s in {@link NDList} along a new axis.
      *
      * <p>The axis parameter specifies the index of the new axis in the dimensions of the result.
      * For example, if axis=0 it will be the first dimension and if axis=-1 it will be the last
      * dimension.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f, 5f});
+     * jshell&gt; NDArrays.stack(new NDList(array1, array2), 0);
+     * ND: (2, 3) cpu(0) float32
+     * [[0., 1., 2.],
+     *  [3., 4., 5.],
+     * ]
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f, 5f});
+     * jshell&gt; NDArrays.stack(new NDList(array1, array2), 1);
+     * ND: (3, 2) cpu(0) float32
+     * [[0., 3.],
+     *  [1., 4.],
+     *  [2., 5.],
+     * ]
+     * </pre>
      *
      * @param arrays the input {@link NDList}. Each {@link NDArray} in the {@link NDList} must have
      *     the same shape as the {@link NDArray}
@@ -1653,19 +1727,47 @@ public final class NDArrays {
     }
 
     /**
-     * Joins a sequence of {@link NDArray}s in {@link NDList} along first axis.
+     * Joins a {@link NDList} along the first axis.
      *
-     * @param arrays the input {@link NDList}. Each {@link NDArray} in the {@link NDList} must have
-     *     the same shape as the {@link NDArray}
-     * @return the result {@link NDArray}. The stacked {@link NDArray} has one more dimension than
-     *     the {@link NDArray}s in {@link NDList}
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f, 5f});
+     * jshell&gt; NDArray array3 = manager.create(new float[] {6f, 7f, 8f});
+     * jshell&gt; NDArrays.concat(new NDList(array1, array2, array3));
+     * ND: (9) cpu(0) float32
+     * [0., 1., 2., 3., 4., 5., 6., 7., 8.]
+     * </pre>
+     *
+     * @param arrays a {@link NDList} which have the same shape as the {@link NDArray}, except in
+     *     the dimension corresponding to axis
+     * @return the concatenated {@link NDArray}
      */
-    public static NDArray stack(NDList arrays) {
-        return stack(arrays, 0);
+    public static NDArray concat(NDList arrays) {
+        return concat(arrays, 0);
     }
 
     /**
      * Joins a {@link NDList} along an existing axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; NDArray array2 = manager.create(new float[] {5f, 6f}, new Shape(1, 2));
+     * jshell&gt; NDArrays.concat(new NDList(array1, array2), 0);
+     * ND: (3, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [3., 4.],
+     *  [5., 6.],
+     * ]
+     * jshell&gt; NDArrays.concat(new NDList(array1, array2.transpose()), 1);
+     * ND: (2, 3) cpu(0) float32
+     * [[1., 2., 5.],
+     *  [3., 4., 6.],
+     * ]
+     * </pre>
      *
      * @param arrays a {@link NDList} which have the same shape as the {@link NDArray}, except in
      *     the dimension corresponding to axis
@@ -1675,17 +1777,6 @@ public final class NDArrays {
     public static NDArray concat(NDList arrays, int axis) {
         NDArray array = arrays.head();
         return array.getNDArrayInternal().concat(arrays.subNDList(1), axis);
-    }
-
-    /**
-     * Joins a {@link NDList} along first axis.
-     *
-     * @param arrays a {@link NDList} which have the same shape as the {@link NDArray}, except in
-     *     the dimension corresponding to axis
-     * @return the concatenated {@link NDArray}
-     */
-    public static NDArray concat(NDList arrays) {
-        return concat(arrays, 0);
     }
 
     /**

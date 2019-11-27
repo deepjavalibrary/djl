@@ -609,6 +609,18 @@ public interface NDArray extends AutoCloseable {
      * Returns portion of this {@code NDArray} given the index boolean {@code NDArray} along first
      * axis.
      *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(3, 2));
+     * jshell&gt; NDArray mask = manager.create(new boolean[] {true, false, true});
+     * jshell&gt; array.booleanMask(mask);
+     * ND: (2, 2) cpu(0) float32
+     * [[1., 2.],
+     *  [5., 6.],
+     * ]
+     * </pre>
+     *
      * @param index boolean {@code NDArray} mask
      * @return the result {@code NDArray}
      */
@@ -1324,6 +1336,19 @@ public interface NDArray extends AutoCloseable {
      * Adds other {@code NDArray}s to this {@code NDArray} element-wise in place.
      *
      * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] 3f, 4f});
+     * jshell&gt; array1.addi(array2);
+     * ND: (2) cpu(0) float32
+     * [4., 6.]
+     * jshell&gt; array;
+     * ND: (2) cpu(0) float32
+     * [4., 6.]
+     * </pre>
      *
      * @param other the other {@code NDArray}s to add
      * @return the result {@code NDArray}
@@ -2991,7 +3016,7 @@ public interface NDArray extends AutoCloseable {
     NDArray squeeze(int[] axes);
 
     /**
-     * Joins a {@code NDArray} along first axis.
+     * Joins a {@code NDArray} along the first axis.
      *
      * <p>Examples
      *
@@ -3046,7 +3071,7 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Joins a {@code NDArray} along first axis.
+     * Joins a {@code NDArray} along the first axis.
      *
      * <p>Examples
      *
