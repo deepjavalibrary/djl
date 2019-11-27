@@ -1,3 +1,6 @@
+## Channel for questions ##
+Before or while filing an issue please feel free to join our [Slack channel](https://join.slack.com/t/deepjavalibrary/shared_invite/enQtODAwOTg0OTUzNDEwLTdlY2M4NmNlZTMzM2Q4MDUyZThkYzQwNmE2MDVhNTRiZDcxNTNlMWJhNTZkNWE1OGU2Nzg3MmY1OWQzN2Q5Mzk) to get in touch with development team, ask questions, find out what's cooking and more!
+
 ## Description ##
 (Brief description of what this PR is about)
 
@@ -7,8 +10,8 @@ Please feel free to remove inapplicable items for your PR.
 - [ ] Changes are complete (i.e. I finished coding on this PR)
 - [ ] All changes have test coverage:
 - [ ] Code is well-documented: 
-- For user-facing API changes, Java doc has been updated. 
-- For new examples, README.md is added to explain the what the example does.
+    - For user-facing API changes, Java doc has been updated. 
+    - For new examples, README.md is added to explain the what the example does.
 - [ ] To the my best knowledge, [examples](https://github.com/awslabs/djl/tree/master/examples) and [jupyter notebooks](https://github.com/awslabs/djl/tree/master/jupyter) are either not affected by this change, or have been fixed to be compatible with this change
 
 ### Changes ###
