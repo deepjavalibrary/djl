@@ -646,12 +646,12 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
-     * jshell&gt; array
+     * jshell&gt; array;
      * ND: (2, 3) cpu(0) float32
      * [[0., 1., 2.],
      *  [3., 4., 5.],
      * ]
-     * jshell&gt; array.zeros_like();
+     * jshell&gt; array.zerosLike();
      * ND: (2, 3) cpu(0) float32
      * [[0., 0., 0.],
      *  [0., 0., 0.],
@@ -670,12 +670,12 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
-     * jshell&gt; array
+     * jshell&gt; array;
      * ND: (2, 3) cpu(0) float32
      * [[0., 1., 2.],
      *  [3., 4., 5.],
      * ]
-     * jshell&gt; array.zeros_like();
+     * jshell&gt; array.onesLike();
      * ND: (2, 3) cpu(0) float32
      * [[1., 1., 1.],
      *  [1., 1., 1.],
@@ -694,7 +694,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(6).reshape(2, 3);
-     * jshell&gt; array
+     * jshell&gt; array;
      * ND: (2, 3) cpu(0) float32
      * [[0., 1., 2.],
      *  [3., 4., 5.],
@@ -788,12 +788,12 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-7});
-     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-8});
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10, 1e-7});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10, 1e-8});
      * jshell&gt; array1.allClose(array2); // return false instead of boolean NDArray
      * false
-     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-8});
-     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-9});
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10, 1e-8});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10, 1e-9});
      * jshell&gt; array1.allClose(array2); // return true instead of boolean NDArray
      * true
      * </pre>
@@ -811,17 +811,17 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-7});
-     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-8});
-     * jshell&gt; array1.allclose(array2, 1e-05, 1e-08, false); // return false instead of boolean NDArray
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10, 1e-7});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10, 1e-8});
+     * jshell&gt; array1.allClose(array2, 1e-05, 1e-08, false); // return false instead of boolean NDArray
      * false
-     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-8});
-     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-9});
-     * jshell&gt; array1.allclose(array2, 1e-05, 1e-08, false); // return true instead of boolean NDArray
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10, 1e-8});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10, 1e-9});
+     * jshell&gt; array1.allClose(array2, 1e-05, 1e-08, false); // return true instead of boolean NDArray
      * true
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, Float.NaN});
-     * jshell&gt; NDArray array2 = manager.create(new double[] {1f, Float.NaN});
-     * jshell&gt; array1.allclose(array2, 1e-05, 1e-08, true); // return true instead of boolean NDArray
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, Float.NaN});
+     * jshell&gt; array1.allClose(array2, 1e-05, 1e-08, true); // return true instead of boolean NDArray
      * true
      * </pre>
      *
@@ -973,7 +973,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
-     * jshell&gt; array1.gte(2f);
+     * jshell&gt; array.gte(2f);
      * ND: (2) cpu(0) boolean
      * [ true, true]
      * </pre>
@@ -1043,7 +1043,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
-     * jshell&gt; array.lte(2f)
+     * jshell&gt; array.lte(2f);
      * ND: (2) cpu(0) boolean
      * [ true, true]
      * </pre>
@@ -1061,7 +1061,7 @@ public interface NDArray extends AutoCloseable {
      * <pre>
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
-     * jshell&gt; array1.lte(array2)
+     * jshell&gt; array1.lte(array2);
      * ND: (2) cpu(0) boolean
      * [ true, true]
      * </pre>
@@ -1341,7 +1341,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
-     * jshell&gt; NDArray array2 = manager.create(new float[] 3f, 4f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f});
      * jshell&gt; array1.addi(array2);
      * ND: (2) cpu(0) float32
      * [4., 6.]
@@ -2150,7 +2150,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
-     * jshell&gt; array
+     * jshell&gt; array;
      * ND: (2, 2) cpu(0) float32
      * [[0., 1.],
      *  [2., 3.],
@@ -2158,7 +2158,7 @@ public interface NDArray extends AutoCloseable {
      * jshell&gt; array.max(); // Maximum of the flattened array
      * ND: () cpu(0) float32
      * 3.
-     * jshell&gt; array.max().getFloat() // Use getFloat to get native float
+     * jshell&gt; array.max().getFloat() // Use getFloat() to get native float
      * 3.0
      * </pre>
      *
@@ -2173,15 +2173,15 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
-     * jshell&gt; array
+     * jshell&gt; array;
      * ND: (2, 2) cpu(0) float32
      * [[0., 1.],
      *  [2., 3.],
      * ]
-     * jshell&gt; array.max(new int[]{0}) // Maximum along the first axis
+     * jshell&gt; array.max(new int[]{0}); // Maximum along the first axis
      * ND: (2) cpu(0) float32
      * [2., 3.]
-     * jshell&gt; array.max(new int[]{1}) // Maximum along the second axis
+     * jshell&gt; array.max(new int[]{1}); // Maximum along the second axis
      * ND: (2) cpu(0) float32
      * [1., 3.]
      * </pre>
@@ -2202,16 +2202,16 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
-     * jshell&gt; array
+     * jshell&gt; array;
      * ND: (2, 2) cpu(0) float32
      * [[0., 1.],
      *  [2., 3.],
      * ]
-     * jshell&gt; array.max(new int[]{0}, true) // Maximum along the first axis and keep dimension
+     * jshell&gt; array.max(new int[]{0}, true); // Maximum along the first axis and keep dimension
      * ND: (1, 2) cpu(0) float32
      * [[2., 3.],
      * ]
-     * jshell&gt; array.max(new int[]{1}, true) // Maximum along the second axis and keep dimension
+     * jshell&gt; array.max(new int[]{1}, true); // Maximum along the second axis and keep dimension
      * ND: (2, 1) cpu(0) float32
      * [[1.],
      *  [3.],
@@ -2232,7 +2232,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(4).reshape(2,2);
-     * jshell&gt; array
+     * jshell&gt; array;
      * ND: (2, 2) cpu(0) float32
      * [[0., 1.],
      *  [2., 3.],
@@ -2240,7 +2240,7 @@ public interface NDArray extends AutoCloseable {
      * jshell&gt; array.min(); // Minimum of the flattened array
      * ND: () cpu(0) float32
      * 0.
-     * jshell&gt; array.min().getFloat() // Use getFloat to get native float
+     * jshell&gt; array.min().getFloat(); // Use getFloat() to get native float
      * 0.0
      * </pre>
      *
@@ -2317,7 +2317,7 @@ public interface NDArray extends AutoCloseable {
      * jshell&gt; array.sum();
      * ND: () cpu(0) float32
      * 2.
-     * jshell&gt; array.sum().getFloat(); // Use getFloat to get native float
+     * jshell&gt; array.sum().getFloat(); // Use getFloat() to get native float
      * 2.0
      * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 0f, 5f}, new Shape(2, 2));
      * jshell&gt; array.sum();
@@ -2479,10 +2479,10 @@ public interface NDArray extends AutoCloseable {
      * jshell&gt; array.mean();
      * ND: () cpu(0) float32
      * 2.5
-     * jshell&gt; array.mean().getFloat(); // Use getFloat to get native float
+     * jshell&gt; array.mean().getFloat(); // Use getFloat() to get native float
      * 2.5
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
-     * jshell&gt; array.prod();
+     * jshell&gt; array.mean();
      * ND: () cpu(0) float32
      * 2.5
      * </pre>
@@ -2791,6 +2791,8 @@ public interface NDArray extends AutoCloseable {
      * Splits this {@code NDArray} into multiple sub-{@code NDArray}s given indices along given
      * axis.
      *
+     * <p>Examples
+     *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(18).reshape(2, 9);
      * jshell&gt; array;
@@ -3094,6 +3096,8 @@ public interface NDArray extends AutoCloseable {
     /**
      * Joins a {@code NDArray} along an existing axis.
      *
+     * <p>Examples
+     *
      * <pre>
      * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
@@ -3202,7 +3206,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5);
-     * jshell&gt; array.lt(1).logicalOr(array.gt(3));
+     * jshell&gt; array.lt(1).logicalXor(array.gt(3));
      * ND: (5) cpu(0) boolean
      * [ true, false, false, false,  true]
      * </pre>
@@ -3227,9 +3231,9 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5);
-     * jshell&gt; array.lt(1).logicalOr(array.gt(3));
+     * jshell&gt; array.lt(1).logicalNot();
      * ND: (5) cpu(0) boolean
-     * [false, false, false,  true,  true]
+     * [false, true, true,  true,  true]
      * </pre>
      *
      * @return the boolean {@code NDArray}
@@ -3619,7 +3623,7 @@ public interface NDArray extends AutoCloseable {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f}, new Shape(2, 2));
-     * jshell&gt; array.repeat(1,2);
+     * jshell&gt; array.repeat(1, 2);
      * ND: (6) cpu(0) float32
      * [0., 0., 1., 1., 2., 2.]
      * </pre>
@@ -3768,7 +3772,7 @@ public interface NDArray extends AutoCloseable {
      * ND: (1, 3) cpu(0) float32
      * [[1., 2., 3.],
      * ]
-     * jshell&gt; array.swapAxes(0, 1)
+     * jshell&gt; array.swapAxes(0, 1);
      * ND: (1, 3) cpu(0) float32
      * [[1., 2., 3.],
      * ]
@@ -4057,8 +4061,8 @@ public interface NDArray extends AutoCloseable {
      * Returns the indices of elements that are non-zero.
      *
      * <p>Note that the behavior is slightly different from numpy.nonzero. Numpy returns a tuple of
-     * NDArray, one for each dimension of NDArray. DJL nonzero returns only one NDArray with last
-     * dimension containing all dimension of indices
+     * NDArray, one for each dimension of NDArray. DJL nonzero returns only one {@code NDArray} with
+     * last dimension containing all dimension of indices.
      *
      * <p>Examples
      *

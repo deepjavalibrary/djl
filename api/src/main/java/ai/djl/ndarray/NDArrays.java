@@ -41,7 +41,7 @@ public final class NDArrays {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.ones(new Shape(3));
-     * jshell&gt; NDArrays.contenEquals(array, 1); // return true instead of boolean NDArray
+     * jshell&gt; NDArrays.contentEquals(array, 1); // return true instead of boolean NDArray
      * true
      * </pre>
      *
@@ -49,7 +49,7 @@ public final class NDArrays {
      * @param n the number to compare
      * @return the boolean result
      */
-    public static boolean contenEquals(NDArray a, Number n) {
+    public static boolean contentEquals(NDArray a, Number n) {
         if (a == null) {
             return false;
         }
@@ -64,7 +64,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array1 = manager.arange(6).reshape(2, 3);
      * jshell&gt; NDArray array2 = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f}, new Shape(2, 3));
-     * jshell&gt; NDArrays.contenEquals(array1, array2); // return true instead of boolean NDArray
+     * jshell&gt; NDArrays.contentEquals(array1, array2); // return true instead of boolean NDArray
      * true
      * </pre>
      *
@@ -133,17 +133,17 @@ public final class NDArrays {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-7});
-     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-8});
-     * jshell&gt; NDArrays.allclose(array1, array2, 1e-05, 1e-08, false); // return false instead of boolean NDArray
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10, 1e-7});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10, 1e-8});
+     * jshell&gt; NDArrays.allClose(array1, array2, 1e-05, 1e-08, false); // return false instead of boolean NDArray
      * false
-     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10,1e-8});
-     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10,1e-9});
-     * jshell&gt; NDArrays.allclose(array1, array2, 1e-05, 1e-08, false); // return true instead of boolean NDArray
+     * jshell&gt; NDArray array1 = manager.create(new double[] {1e10, 1e-8});
+     * jshell&gt; NDArray array2 = manager.create(new double[] {1.00001e10, 1e-9});
+     * jshell&gt; NDArrays.allClose(array1, array2, 1e-05, 1e-08, false); // return true instead of boolean NDArray
      * true
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, Float.NaN});
-     * jshell&gt; NDArray array2 = manager.create(new double[] {1f, Float.NaN});
-     * jshell&gt; NDArrays.allclose(array1, array2, 1e-05, 1e-08, true); // return true instead of boolean NDArray
+     * jshell&gt; NDArray array2 = manager.create(new float[] {1f, Float.NaN});
+     * jshell&gt; NDArrays.allClose(array1, array2, 1e-05, 1e-08, true); // return true instead of boolean NDArray
      * true
      * </pre>
      *
@@ -300,7 +300,7 @@ public final class NDArrays {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
-     * jshell&gt; gt(array, 2f);
+     * jshell&gt; NDArrays.gt(array, 2f);
      * ND: (2) cpu(0) boolean
      * [ true, false]
      * </pre>
@@ -357,6 +357,8 @@ public final class NDArrays {
     /**
      * Returns the boolean {@link NDArray} for element-wise "Greater or equals" comparison.
      *
+     * <p>Examples
+     *
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
      * jshell&gt; NDArrays.gte(array, 2);
@@ -374,6 +376,8 @@ public final class NDArrays {
 
     /**
      * Returns the boolean {@link NDArray} for element-wise "Greater or equals" comparison.
+     *
+     * <p>Examples
      *
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
@@ -803,7 +807,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.add(array, array, array);
      * ND: (2) cpu(0) float32
-     * [3., 4.]
+     * [3., 6.]
      * </pre>
      *
      * @param arrays the {@link NDArray}s to add together
@@ -1203,13 +1207,15 @@ public final class NDArrays {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
-     * jshell&gt; NDArrays.addi(array, array, array);
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f});
+     * jshell&gt; NDArray array3 = manager.create(new float[] {5f, 6f});
+     * jshell&gt; NDArrays.addi(array1, array2, array3);
      * ND: (2) cpu(0) float32
-     * [3., 6.]
+     * [9., 12.]
      * jshell&gt; array;
      * ND: (2) cpu(0) float32
-     * [3., 6.]
+     * [9., 12.]
      * </pre>
      *
      * @param arrays the {@link NDArray}s to add together
@@ -1353,13 +1359,15 @@ public final class NDArrays {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
-     * jshell&gt; NDArrays.muli(array, array, array);
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f});
+     * jshell&gt; NDArray array3 = manager.create(new float[] {5f, 6f});
+     * jshell&gt; NDArrays.muli(array1, array2, array3);
      * ND: (2) cpu(0) float32
-     * [ 1., 16.]
+     * [15., 48.]
      * jshell&gt; array;
      * ND: (2) cpu(0) float32
-     * [ 1., 16.]
+     * [15., 48.]
      * </pre>
      *
      * @param arrays the {@link NDArray}s to multiply together
@@ -1427,6 +1435,7 @@ public final class NDArrays {
      *
      * <pre>
      * jshell&gt; NDArray array1 = manager.arange(9).reshape(3, 3);
+     * jshell&gt; NDArray array2 = manager.ones(new Shape(3)).mul(10);
      * jshell&gt; NDArrays.divi(array1, array2); // broadcasting
      * ND: (3, 3) cpu(0) float32
      * [[0. , 0.1, 0.2],
@@ -1861,7 +1870,7 @@ public final class NDArrays {
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5);
-     * jshell&gt; NDArrays.logicalOr(array.lt(1), array.gt(3));
+     * jshell&gt; NDArrays.logicalXor(array.lt(1), array.gt(3));
      * ND: (5) cpu(0) boolean
      * [ true, false, false, false,  true]
      * </pre>
