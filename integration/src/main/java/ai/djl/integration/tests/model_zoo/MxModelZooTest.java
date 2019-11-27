@@ -181,7 +181,7 @@ public class MxModelZooTest {
         criteria.put("size", "512");
         criteria.put("backbone", "vgg16");
         criteria.put("flavor", "atrous");
-        criteria.put("dataset", "voc");
+        criteria.put("dataset", "coco");
         model = MxModelZoo.SSD.loadModel(criteria);
         model.close();
     }
