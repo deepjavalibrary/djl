@@ -4,6 +4,9 @@ on:
   schedule:
     - cron:  '0 10 * * *'
 
+  check_suite:
+    types: [rerequested]
+
 jobs:
   build:
     runs-on: ubuntu-18.04
