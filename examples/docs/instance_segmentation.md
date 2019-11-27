@@ -2,7 +2,7 @@
 
 Instance segmentation refers to the task of detecting objects of various classes and individual instances of objects in each class at per pixel level. Instance segmentation combines semantic segmentation and object detection.
 
-In this example, we will show you how to implement inference code with Deep Java Library (DJL) to segment classes at instance level in an image.
+In this example, you learn how to implement inference code with Deep Java Library (DJL) to segment classes at instance level in an image.
 
 The following is the instance segmentation example source code:
 

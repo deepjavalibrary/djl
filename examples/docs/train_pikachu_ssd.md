@@ -7,7 +7,7 @@ SSD model, and the way to train it using the Pikachu Dataset. The code for the e
 The code for the implementation of SSD can be found in [SingleShotDetection.java](../../model-zoo/src/main/java/ai/djl/zoo/cv/object_detection/ssd/SingleShotDetection.java).
 
 There are no small datasets, like MNIST or Fashion-MNIST, in the object detection field. In order to quickly test models,
-we are using a small dataset of Pikachu images. It contains a series of background images on which a Pikachu image
+you are using a small dataset of Pikachu images. It contains a series of background images on which a Pikachu image
 is placed at a random position. The Pikachu images are also generated in different angles and sizes.  
 
 ## Setup Guide

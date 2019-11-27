@@ -1,23 +1,23 @@
-# Train Handwritten Digit Recognition using Multilayer Perceptron(MLP) model
+# Train Handwritten Digit Recognition using Multilayer Perceptron (MLP) model
 
-Training a handwritten digit dataset([MNIST](http://yann.lecun.com/exdb/mnist/)) is like the "Hello World!" program of the deep learning world.
+Training a model on a handwritten digit dataset, such as ([MNIST](http://yann.lecun.com/exdb/mnist/)) is like the "Hello World!" program of the deep learning world.
 
-In this example, we will show you how to train the MNIST dataset with Deep Java Library (DJL) to recognize handwritten digits in an image.
+In this example, you learn how to train the MNIST dataset with Deep Java Library (DJL) to recognize handwritten digits in an image.
 
 The source code for this example can be found at [TrainMnist.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainMnist.java).
 
-You can also find the jupyter notebook tutorial [here](../../jupyter/train_your_first_model.ipynb).
-The jupyter notebook explains the key concepts in detail.
+You can also use the [Jupyter notebook tutorial](../../jupyter/train_your_first_model.ipynb).
+The Jupyter notebook explains the key concepts in detail.
 
 ## Setup Guide
 
-Follow [setup](../../docs/development/setup.md) to configure your development environment.
+To configure your development environment, follow [setup](../../docs/development/setup.md).
 
 ## Run handwritten digit recognition example
 
 ### Build the project and run
 
-The following command will train the model for 2 epochs. The trained model is saved in the `build/model` folder.
+The following command will train the model for two epochs. The trained model is saved in the `build/model` folder.
 
 ```
 cd examples
@@ -47,10 +47,10 @@ Validating:  100% |████████████████████�
 [INFO ] - epoch P50: 29.520 s, P90: 29.520 s
 ```
 
-The results show that we reached 96.93% validation accuracy at the end of the second epoch.
+The results show that you reached 96.93% validation accuracy at the end of the second epoch.
 
 
-You can also run the example with your own arguments. For example, you can train for 5 epochs using batch size 64 and save the model to a specified folder `mlp_model` using the following command:
+You can also run the example with your own arguments. For example, you can train for five epochs using batch size 64 and save the model to a specified folder `mlp_model` using the following command:
 
 ```
 cd examples

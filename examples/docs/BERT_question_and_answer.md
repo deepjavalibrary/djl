@@ -1,6 +1,6 @@
 # BERT QA Example
 
-In this example, you'll learn how to use the BERT QA model trained by MXNet. 
+In this example, you learn how to use the BERT QA model trained by MXNet. 
 You can provide the model with a question and a paragraph containing an answer. The model is then able to find the best answer from the answer paragraph.
 You can find the source code in [BertQaInference.java](../src/main/java/ai/djl/examples/inference/BertQaInference.java). 
 

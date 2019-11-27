@@ -2,7 +2,7 @@
 
 Pose estimation is a computer vision technique for determining the pose of an object in an image.
 
-In this example, we will show you how to implement inference code with a [ModelZoo model](../../docs/model-zoo.md) to detect dogs in an image.
+In this example, you learn how to implement inference code with a [ModelZoo model](../../docs/model-zoo.md) to detect dogs in an image.
 
 The source code can be found at [PoseEstimation.java](../src/main/java/ai/djl/examples/inference/PoseEstimation.java).
 

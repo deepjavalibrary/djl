@@ -6,9 +6,9 @@
 - Makes it easy for new machine learning developers to get started
 - Allows developers to write modular, reusable code
 - Reduces friction for deploying to a production environment
-- Connects model developers with their consumers using the Model Zoo
+- Connects model developers with their consumers using the model zoo
 - Allows developers to write code once and run it on any deep learning engine
-- Allows the use of engine specific features
+- Allows developers to use engine specific features
 
 ##### 2. Which DL engines can I run with DJL?
 While DJL is designed to be engine-agnostic and to run with the any engine, we currently
@@ -45,6 +45,5 @@ to use other versions of MXNet or built your own customized version.
 
 ##### 7. I have a model trained and saved by another DL engine. Can I load that model on to DJL?
 While DJL is designed to be engine-agnostic, this feature is not officially supported by DJL yet. We are currently working to bring this feature to DJL soon. 
-
 
 

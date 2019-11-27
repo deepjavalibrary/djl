@@ -47,7 +47,7 @@ Then, run the following command to upload your model to the S3 bucket:
 $ ./gradlew syncS3
 ```
 
-### Step 5: Check in your ModelLoader and metadata files to git
+### Step 5: Check in your ModelLoader and metadata files to the git repository
 
 You need to register your new model in the main model zoo interface. Be sure to include all the necessary information to load and use your model.
 

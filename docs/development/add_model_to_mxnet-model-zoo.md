@@ -12,16 +12,16 @@ An MXNet symbolic model usually contains the following files:
 $ gzip <MODEL_NAME>-0000.params
 ```
 
-You may also need to provide other artifact files for your model.
-For example, a classification model requires
+You might also need to provide other files with your model.
+For example, a classification model is dependent on
 a `synset.txt` file to provide the names of the classes to classify into.
-For an NLP model, you may need a `vocabulary.json` file to tokenize/untokenize the sentence.
+For an NLP model, you may need a `vocabulary.json` file to tokenize and untokenize the sentence.
 
 ## Step 2: Prepare the folder structure
 
 1. Navigate to the `test/resources/mlrepo/model` folder and create a folder in it to store your model based on its category.
 For example, `image_classification/ai/djl/mxnet/resnet`.
-2. Create a version folder within your newly created model's folder (e.g `0.0.1`). The version should match your ModelLoader class's version.
+2. Create a version folder within your newly created model's folder (e.g. `0.0.1`). The version should match your ModelLoader class's version.
 3. Copy model files into the version folder.
 
 ### Step 3: Create a `metadata.json` file
@@ -47,11 +47,11 @@ Then, run the following command to upload your model to the S3 bucket:
 $ ./gradlew syncS3
 ```
 
-### Step 5: Check in your ModelLoader and metadata files to git
+### Step 5: Check in your ModelLoader and metadata files to the git repository
 
 You need to register your new model in the main model zoo interface. Be sure to include all the necessary information to load and use your model.
 
-**Note**: Avoid checking in binary files to git. Binary files should only be uploaded to the S3 bucket.
+**Note**: Avoid checking in binary files to the git repository. Binary files should only be uploaded to the S3 bucket.
 
 ### Step 6: Update the README file
 

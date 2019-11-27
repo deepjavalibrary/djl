@@ -1,12 +1,12 @@
 # Train CIFAR-10 Dataset using ResNet50
 
 
-In this example, we will show you how to train the [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset with Deep Java Library (DJL) using [Transfer Learning](https://en.wikipedia.org/wiki/Transfer_learning).
+In this example, you learn how to train the [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset with Deep Java Library (DJL) using [Transfer Learning](https://en.wikipedia.org/wiki/Transfer_learning).
 
 You can find the example source code in: [TrainResnetWithCifar10.java](../src/main/java/ai/djl/examples/training/transferlearning/TrainResnetWithCifar10.java).
 
-You can also find the jupyter notebook tutorial [here](../../jupyter/transfer_learning_on_cifar10.ipynb).
-The jupyter notebook explains the key concepts in detail.
+You can also find the Jupyter notebook tutorial [here](../../jupyter/transfer_learning_on_cifar10.ipynb).
+The Jupyter notebook explains the key concepts in detail.
 
 ## Setup Guide
 
@@ -14,7 +14,7 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 
 ## Run CIFAR-10 training using ResNet50
 
-The models we will use are available in the [DJL Model Zoo](../../model-zoo/README.md) and [MXNet Model Zoo](../../mxnet/mxnet-model-zoo/README.md). 
+The models you use are available in the [DJL Model Zoo](../../model-zoo/README.md) and [MXNet Model Zoo](../../mxnet/mxnet-model-zoo/README.md). 
 We can simply load and use them as follows:
 
 ### Using a DJL model from Model Zoo
@@ -64,11 +64,11 @@ You will also need different learning rate strategies based on whether you are u
 DJL provides several built-in `LearningRateTracker`s to suit your needs. For more information, see the
 [documentation](https://javadoc.djl.ai/api/0.2.0/index.html?ai/djl/training/optimizer/learningrate/LearningRateTracker.html).
 
-Here, we use a [`MultiFactorTracker`](https://javadoc.djl.ai/api/0.2.0/index.html?ai/djl/training/optimizer/learningrate/MultiFactorTracker.html),
+Here, you use a [`MultiFactorTracker`](https://javadoc.djl.ai/api/0.2.0/index.html?ai/djl/training/optimizer/learningrate/MultiFactorTracker.html),
 which allows you to reduce the learning rate after a specified number of periods.
 We use a base learning rate of `0.001`, and reduce it by `sqrt(0.1)` every specified number of epochs. 
-For a pre-trained model, we reduce the learning rate at the 2nd, 5th, and 8th epoch because it take less time to train and converge. 
-For training from scratch, we reduce the learning rate at 20th, 60th, 90th, 120th, and 180th epoch.
+For a pre-trained model, you reduce the learning rate at the 2nd, 5th, and 8th epoch because it take less time to train and converge. 
+For training from scratch, you reduce the learning rate at 20th, 60th, 90th, 120th, and 180th epoch.
  
 
 ## Train using Multiple GPUs
@@ -131,7 +131,7 @@ hu Nov 21 00:58:29 2019
 
 ### Run this example with multi-GPU
 Use the option `-g` to specify how many GPUs to use, and use `-b` to specify the batch size. 
-Usually, we use `32*number_of_gpus`, so each GPU will get a data batch size of 32. For 4 GPUs, the total batch size is 128.
+Usually, you use `32*number_of_gpus`, so each GPU will get a data batch size of 32. For 4 GPUs, the total batch size is 128.
 
 Run the following command to train using 4 GPUs:
 ```
