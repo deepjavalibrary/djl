@@ -45,10 +45,10 @@ Validating:  100% |████████████████████�
 [INFO ] - step P50: 4.436 ms, P90: 6.829 ms
 [INFO ] - epoch P50: 138.332 s, P90: 138.332 s
 ```
-You can also run the example with your own arguments, for example, to train 5 epochs using batch size 64, and save it to a specified folder `/mlp_model`:
+You can also run the example with your own arguments, for example, to train 5 epochs using batch size 64, and save it to a specified folder `ssd_model`:
 ```
 cd examples
-./gradlew run -Dmain=ai.djl.examples.training.TrainPikachu --args="-e 5 -b 64 -o /mlp_model"
+./gradlew run -Dmain=ai.djl.examples.training.TrainPikachu --args="-e 5 -b 64 -o ssd_model"
 ```
 The following table shows the list of available arguments:
 

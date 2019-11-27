@@ -50,11 +50,11 @@ Validating:  100% |████████████████████�
 The results show that we reached 96.93% validation accuracy at the end of the second epoch.
 
 
-You can also run the example with your own arguments. For example, you can train for 5 epochs using batch size 64 and save the model to a specified folder `/mlp_model` using the following command:
+You can also run the example with your own arguments. For example, you can train for 5 epochs using batch size 64 and save the model to a specified folder `mlp_model` using the following command:
 
 ```
 cd examples
-./gradlew run -Dmain=ai.djl.examples.training.TrainMnist --args="-e 5 -b 64 -o /mlp_model"
+./gradlew run -Dmain=ai.djl.examples.training.TrainMnist --args="-e 5 -b 64 -o mlp_model"
 ```
 
 The following table shows the list of available arguments:
