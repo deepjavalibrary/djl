@@ -19,8 +19,7 @@ We can simply load and use them as follows:
 
 ### Using a DJL model from Model Zoo
 
-A DJL model is natively implemented using our Java API. It's defined using the [Sequential](https://javadoc.djl.ai/api/0.2.0/index.html?ai/djl/nn/SequentialBlock.html)
-and the [Parallel](https://javadoc.djl.ai/api/0.2.0/index.html?ai/djl/nn/ParallelBlock.html) Block API.
+A DJL model is natively implemented using our Java API. It's defined using the Block API.
 Import the `ai.djl.zoo.cv.classification.ResNetV1` class and use its builder to specify various configurations such as input shape, number of layers, and number of outputs.
 You can set the number of layers to create variants of [ResNet](https://en.wikipedia.org/wiki/Residual_neural_network) such as ResNet18, ResNet50, and ResNet152.
 

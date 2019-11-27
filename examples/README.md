@@ -8,7 +8,7 @@ The following examples are included:
 - [Train your first model](docs/train_mnist_mlp.md)
 - [Image classification example](docs/image_classification.md)
 - [Transfer learning example](docs/train_cifar10_resnet.md)
-- [Train SSD modle example](docs/train_pikachu_ssd.md)
+- [Train SSD model example](docs/train_pikachu_ssd.md)
 - [Multi-threaded inference example](docs/multithread_inference.md)
 - [Bert question and answer example](docs/BERT_question_and_answer.md)
 - [Instance segmentation example](docs/instance_segmentation.md)
