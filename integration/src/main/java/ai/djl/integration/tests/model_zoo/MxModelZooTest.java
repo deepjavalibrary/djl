@@ -171,8 +171,8 @@ public class MxModelZooTest {
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("size", "512");
-        criteria.put("backbone", "resnet50_v1");
-        criteria.put("flavor", "none");
+        criteria.put("backbone", "resnet50");
+        criteria.put("flavor", "v1");
         criteria.put("dataset", "voc");
         Model model = MxModelZoo.SSD.loadModel(criteria);
         model.close();
