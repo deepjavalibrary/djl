@@ -5,19 +5,16 @@ plugins {
 
 repositories {
     jcenter()
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
 }
 
 dependencies {
     implementation "commons-cli:commons-cli:1.4"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
     implementation "com.google.code.gson:gson:2.8.5"
-    implementation "ai.djl:api:0.2.0-SNAPSHOT"
-    implementation "ai.djl:basicdataset:0.2.0-SNAPSHOT"
-    implementation "ai.djl:model-zoo:0.2.0-SNAPSHOT"
-    implementation "ai.djl.mxnet:mxnet-model-zoo:0.2.0-SNAPSHOT"
+    implementation "ai.djl:api:0.2.0"
+    implementation "ai.djl:basicdataset:0.2.0"
+    implementation "ai.djl:model-zoo:0.2.0"
+    implementation "ai.djl.mxnet:mxnet-model-zoo:0.2.0"
 
     runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
 
@@ -57,10 +54,10 @@ def getMXNetNativeLib() {
         exec {
             commandLine "nvidia-smi", "-L"
         }
-        return "mxnet-native-cu101mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
+        return "mxnet-native-cu101mkl:1.6.0-a:${osPrefix}-x86_64"
     } catch (Exception e) {
         project.logger.debug("No cuda is detected");
     }
 
-    return "mxnet-native-mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
+    return "mxnet-native-mkl:1.6.0-a:${osPrefix}-x86_64"
 }
