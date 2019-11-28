@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.zoo.cv.classification;
+package ai.djl.basicmodelzoo.cv.classification;
 
 import ai.djl.nn.Activation;
 import ai.djl.nn.Blocks;

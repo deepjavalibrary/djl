@@ -10,6 +10,25 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.repository.zoo;
 
-/** Contains tests using the engine for {@link ai.djl.basicmodelzoo.cv.classification}. */
-package ai.djl.integration.tests.model_zoo.classification;
+/**
+ * The {@code ZooProvider} is a <i>service provider</i> that enables {@code ServiceLoader} to locate
+ * and load at the run time.
+ */
+public interface ZooProvider {
+
+    /**
+     * Gets the name of the {@link ModelZoo}.
+     *
+     * @return the name of the {@link ModelZoo}
+     */
+    String getName();
+
+    /**
+     * Returns the instance of the {@link ModelZoo}.
+     *
+     * @return the instance of {@link ModelZoo}
+     */
+    ModelZoo getModelZoo();
+}

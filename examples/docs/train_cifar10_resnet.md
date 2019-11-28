@@ -20,7 +20,7 @@ We can simply load and use them as follows:
 ### Using a DJL model from Model Zoo
 
 A DJL model is natively implemented using our Java API. It's defined using the Block API.
-Import the `ai.djl.zoo.cv.classification.ResNetV1` class and use its builder to specify various configurations such as input shape, number of layers, and number of outputs.
+Import the `ai.djl.basicmodelzoo.cv.classification.ResNetV1` class and use its builder to specify various configurations such as input shape, number of layers, and number of outputs.
 You can set the number of layers to create variants of [ResNet](https://en.wikipedia.org/wiki/Residual_neural_network) such as ResNet18, ResNet50, and ResNet152.
 
 For example, you can create ResNet50 using the following code:

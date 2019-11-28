@@ -47,7 +47,7 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
     criteria.put("flavor", "v1");
     criteria.put("dataset", "cifar10");
 
-    ZooModel<BufferedImage, Classification> model = ModelZoo.RESNET.loadModel(criteria);
+    ZooModel<BufferedImage, Classification> model = BasicModelZoo.RESNET.loadModel(criteria);
 ```
 
 ### List of search criteria of each model

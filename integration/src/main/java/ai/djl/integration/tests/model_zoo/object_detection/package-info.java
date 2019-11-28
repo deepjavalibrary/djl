@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains tests using the engine for {@link ai.djl.zoo.cv.object_detection}. */
+/** Contains tests using the engine for {@link ai.djl.basicmodelzoo.cv.object_detection}. */
 package ai.djl.integration.tests.model_zoo.object_detection;

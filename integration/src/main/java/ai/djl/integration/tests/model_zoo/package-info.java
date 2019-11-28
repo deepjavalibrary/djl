@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains tests using the engine for {@link ai.djl.zoo}. */
+/** Contains tests using the engine for {@link ai.djl.basicmodelzoo}. */
 package ai.djl.integration.tests.model_zoo;

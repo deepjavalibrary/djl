@@ -13,11 +13,11 @@
 package ai.djl;
 
 import ai.djl.basicdataset.Cifar10;
+import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Repository;
 import ai.djl.test.CoverageUtils;
-import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;

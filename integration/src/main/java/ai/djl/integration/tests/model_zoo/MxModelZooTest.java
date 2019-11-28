@@ -17,6 +17,7 @@ import ai.djl.ModelException;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.zoo.ModelLoader;
+import ai.djl.repository.zoo.ModelZoo;
 import java.io.IOException;
 import java.util.List;
 import org.testng.SkipException;
@@ -43,7 +44,7 @@ public class MxModelZooTest {
             throw new SkipException("Nightly only");
         }
 
-        List<ModelLoader<?, ?>> list = MxModelZoo.listModelLoaders();
+        List<ModelLoader<?, ?>> list = ModelZoo.getModelZoo(MxModelZoo.NAME).getModelLoaders();
         for (ModelLoader<?, ?> modelLoader : list) {
             List<Artifact> artifacts = modelLoader.listModels();
             for (Artifact artifact : artifacts) {

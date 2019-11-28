@@ -16,6 +16,8 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.Cifar10;
+import ai.djl.basicmodelzoo.BasicModelZoo;
+import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.TrainingUtils;
@@ -41,8 +43,6 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
-import ai.djl.zoo.ModelZoo;
-import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -132,7 +132,7 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 criteria.put("dataset", "cifar10");
             }
             // load pre-trained imperative ResNet50 from DJL model zoo
-            return ModelZoo.RESNET.loadModel(criteria, new ProgressBar());
+            return BasicModelZoo.RESNET.loadModel(criteria, new ProgressBar());
         } else {
             // construct new ResNet50 without pre-trained weights
             Model model = Model.newInstance();

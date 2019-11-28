@@ -11,11 +11,12 @@
  * and limitations under the License.
  */
 
-package ai.djl.zoo.cv.object_detection.ssd;
+package ai.djl.basicmodelzoo.cv.object_detection.ssd;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -28,7 +29,6 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
-import ai.djl.zoo.ModelZoo;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class SingleShotDetectionModelLoader
         extends BaseModelLoader<BufferedImage, DetectedObjects> {
     private static final Anchor BASE_ANCHOR = MRL.Model.CV.OBJECT_DETECTION;
-    private static final String GROUP_ID = ModelZoo.GROUP_ID;
+    private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "ssd";
     private static final String VERSION = "0.0.1";
 

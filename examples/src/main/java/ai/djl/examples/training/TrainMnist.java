@@ -15,6 +15,7 @@ package ai.djl.examples.training;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
+import ai.djl.basicmodelzoo.cv.classification.Mlp;
 import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.TrainingUtils;
@@ -29,7 +30,6 @@ import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.zoo.cv.classification.Mlp;
 import java.io.IOException;
 import java.nio.file.Paths;
 

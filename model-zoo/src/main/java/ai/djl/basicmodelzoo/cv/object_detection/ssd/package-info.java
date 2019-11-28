@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains classes for the computer vision section ({@link ai.djl.repository.MRL.Model.CV}) of the
- * {@link ai.djl.zoo.ModelZoo}.
+ * Contains classes for the {@link ai.djl.repository.MRL.Model.CV#OBJECT_DETECTION} models in the
+ * {@link ai.djl.basicmodelzoo.BasicModelZoo}.
  */
-package ai.djl.zoo.cv;
+package ai.djl.basicmodelzoo.cv.object_detection.ssd;

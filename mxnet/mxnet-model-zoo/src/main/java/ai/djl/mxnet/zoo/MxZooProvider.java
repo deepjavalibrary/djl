@@ -10,6 +10,25 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.mxnet.zoo;
 
-/** Contains the built-in {@link ai.djl.zoo.ModelZoo}. */
-package ai.djl.zoo;
+import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.repository.zoo.ZooProvider;
+
+/**
+ * An MXNet model zoo provider implements the {@link ai.djl.repository.zoo.ZooProvider} interface.
+ */
+public class MxZooProvider implements ZooProvider {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return MxModelZoo.NAME;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ModelZoo getModelZoo() {
+        return new MxModelZoo();
+    }
+}

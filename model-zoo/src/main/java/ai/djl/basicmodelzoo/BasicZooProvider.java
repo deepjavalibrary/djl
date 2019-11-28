@@ -10,9 +10,26 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.basicmodelzoo;
+
+import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.repository.zoo.ZooProvider;
 
 /**
- * Contains classes for the {@link ai.djl.repository.MRL.Model.CV#OBJECT_DETECTION} models in the
- * {@link ai.djl.zoo.ModelZoo}.
+ * An imperative model zoo provider implements the {@link ai.djl.repository.zoo.ZooProvider}
+ * interface.
  */
-package ai.djl.zoo.cv.object_detection.ssd;
+public class BasicZooProvider implements ZooProvider {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return BasicModelZoo.NAME;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ModelZoo getModelZoo() {
+        return new BasicModelZoo();
+    }
+}

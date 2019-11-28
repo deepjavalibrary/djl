@@ -11,5 +11,8 @@
  * and limitations under the License.
  */
 
-/** Contains tests using the engine for {@link ai.djl.basicmodelzoo.cv.classification}. */
-package ai.djl.integration.tests.model_zoo.classification;
+/**
+ * Contains classes for the {@link ai.djl.repository.MRL.Model.CV#IMAGE_CLASSIFICATION} models in
+ * the {@link ai.djl.basicmodelzoo.BasicModelZoo}.
+ */
+package ai.djl.basicmodelzoo.cv.classification;

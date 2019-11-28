@@ -16,6 +16,7 @@ package ai.djl.integration.tests.model_zoo.object_detection;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.basicdataset.PikachuDetection;
+import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.MultiBoxDetection;
@@ -42,7 +43,6 @@ import ai.djl.training.metrics.SingleShotDetectionAccuracy;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
-import ai.djl.zoo.ModelZoo;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -136,6 +136,6 @@ public class SingleShotDetectionTest {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("flavor", "tiny");
         criteria.put("dataset", "pikachu");
-        return ModelZoo.SSD.loadModel(criteria);
+        return BasicModelZoo.SSD.loadModel(criteria);
     }
 }

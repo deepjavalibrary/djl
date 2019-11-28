@@ -14,17 +14,18 @@ package ai.djl.examples.inference.util;
 
 import ai.djl.Device;
 import ai.djl.ModelException;
+import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.engine.Engine;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ModelLoader;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
-import ai.djl.zoo.ModelZoo;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.Duration;
@@ -237,9 +238,9 @@ public abstract class AbstractBenchmark<T> {
         Map<String, String> criteria = arguments.getCriteria();
         ModelLoader<BufferedImage, Classifications> loader;
         if (arguments.isImperative()) {
-            loader = ModelZoo.getModelLoader(modelName);
+            loader = ModelZoo.getModelZoo(BasicModelZoo.NAME).getModelLoader(modelName);
         } else {
-            loader = MxModelZoo.getModelLoader(modelName);
+            loader = ModelZoo.getModelZoo(MxModelZoo.NAME).getModelLoader(modelName);
         }
 
         Progress progress = new ProgressBar();

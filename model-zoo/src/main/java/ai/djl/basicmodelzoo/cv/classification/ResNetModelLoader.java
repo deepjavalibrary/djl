@@ -10,11 +10,13 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.zoo.cv.classification;
+package ai.djl.basicmodelzoo.cv.classification;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.basicmodelzoo.BasicModelZoo;
+import ai.djl.basicmodelzoo.cv.classification.ResNetV1.Builder;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.modality.cv.transform.CenterCrop;
@@ -30,8 +32,6 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
-import ai.djl.zoo.ModelZoo;
-import ai.djl.zoo.cv.classification.ResNetV1.Builder;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -42,7 +42,7 @@ import java.util.Map;
 public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
 
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
-    private static final String GROUP_ID = ModelZoo.GROUP_ID;
+    private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "resnet";
     private static final String VERSION = "0.0.1";
 

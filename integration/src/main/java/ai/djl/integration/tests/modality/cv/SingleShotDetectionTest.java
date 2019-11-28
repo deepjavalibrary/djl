@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.modality.cv;
 
+import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -20,7 +21,6 @@ import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.XavierInitializer;
-import ai.djl.zoo.cv.object_detection.ssd.SingleShotDetection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

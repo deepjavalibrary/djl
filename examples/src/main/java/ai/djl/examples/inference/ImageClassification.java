@@ -14,6 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
+import ai.djl.basicmodelzoo.cv.classification.Mlp;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
@@ -24,7 +25,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import ai.djl.zoo.cv.classification.Mlp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;

@@ -14,6 +14,8 @@ package ai.djl.integration.tests.model_zoo.classification;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.basicmodelzoo.BasicModelZoo;
+import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.inference.Predictor;
 import ai.djl.integration.util.Assertions;
 import ai.djl.modality.Classifications;
@@ -36,8 +38,6 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.PairList;
-import ai.djl.zoo.ModelZoo;
-import ai.djl.zoo.cv.classification.ResNetV1;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
@@ -130,7 +130,7 @@ public class ResnetTest {
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("layers", "50");
         criteria.put("dataset", "cifar10");
-        return ModelZoo.RESNET.loadModel(criteria);
+        return BasicModelZoo.RESNET.loadModel(criteria);
     }
 
     private static class TestTranslator implements Translator<NDList, NDList> {
