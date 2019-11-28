@@ -54,11 +54,11 @@ public interface ModelZoo {
     }
 
     /**
-     * Lists the available models in the ModelZoo.
+     * Lists the available model families in the ModelZoo.
      *
-     * @return the list of all available models in loader format
+     * @return the list of all available model families
      */
-    static List<ModelLoader<?, ?>> listModels() {
+    static List<ModelLoader<?, ?>> listModelLoaders() {
         List<ModelLoader<?, ?>> list = new ArrayList<>();
         try {
             Field[] fields = ModelZoo.class.getDeclaredFields();

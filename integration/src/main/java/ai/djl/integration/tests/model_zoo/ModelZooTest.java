@@ -14,17 +14,16 @@ package ai.djl.integration.tests.model_zoo;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
-import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.zoo.ModelLoader;
+import ai.djl.zoo.ModelZoo;
 import java.io.IOException;
 import java.util.List;
-import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class MxModelZooTest {
+public class ModelZooTest {
 
     @BeforeClass
     public void setUp() {
@@ -40,10 +39,10 @@ public class MxModelZooTest {
     @Test
     public void testDownloadModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            throw new SkipException("Nightly only");
+            return;
         }
 
-        List<ModelLoader<?, ?>> list = MxModelZoo.listModelLoaders();
+        List<ModelLoader<?, ?>> list = ModelZoo.listModelLoaders();
         for (ModelLoader<?, ?> modelLoader : list) {
             List<Artifact> artifacts = modelLoader.listModels();
             for (Artifact artifact : artifacts) {
