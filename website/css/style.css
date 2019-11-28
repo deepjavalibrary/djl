@@ -8,11 +8,12 @@
 
 .logo {
     display: inline-block;
-    height: 100%;
 }
 
 .logo>img {
-    vertical-align: middle
+    vertical-align: middle;
+    height: 60px;
+    width: auto;
 }
 
 nav li a {
