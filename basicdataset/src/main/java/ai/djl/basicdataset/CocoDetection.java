@@ -161,6 +161,17 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         return imagePaths.size();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public long getNumIterations() {
+        int batchSize = sampler.getBatchSize();
+        if (batchSize == -1) {
+            return -1;
+        }
+        long iteration = imagePaths.size() / batchSize;
+        return Math.min(maxIteration, iteration);
+    }
+
     private double[] convertRecToList(Rectangle rect) {
         double[] list = new double[5];
         list[0] = rect.getX();
@@ -192,7 +203,6 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     }
 
     /** A builder to construct a {@link CocoDetection}. */
-    @SuppressWarnings("rawtypes")
     public static final class Builder extends BaseBuilder<Builder> {
 
         private Flag flag;

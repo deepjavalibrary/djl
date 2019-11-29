@@ -38,6 +38,13 @@ public interface Sampler {
      */
     Iterator<List<Long>> sample(RandomAccessDataset dataset);
 
+    /**
+     * Returns the batch size of the {@code Sampler}.
+     *
+     * @return the batch size of the {@code Sampler}, -1 if batch size is not fixed
+     */
+    int getBatchSize();
+
     /** An interface that samples a single data item at a time. */
     interface SubSampler {
 

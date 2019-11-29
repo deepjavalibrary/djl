@@ -108,9 +108,9 @@ public final class TrainMnist extends AbstractTraining {
                         .build();
         mnist.prepare(new ProgressBar());
         if (usage == Dataset.Usage.TRAIN) {
-            trainDataSize = (int) Math.min(mnist.size() / batchSize, maxIterations);
+            trainDataSize = (int) mnist.getNumIterations();
         } else {
-            validateDataSize = (int) Math.min(mnist.size() / batchSize, maxIterations);
+            validateDataSize = (int) mnist.getNumIterations();
         }
         return mnist;
     }

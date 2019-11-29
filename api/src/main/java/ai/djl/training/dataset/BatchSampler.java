@@ -25,7 +25,7 @@ import java.util.List;
 public class BatchSampler implements Sampler {
 
     private Sampler.SubSampler subSampler;
-    private long batchSize;
+    private int batchSize;
     private boolean dropLast;
 
     /**
@@ -38,7 +38,7 @@ public class BatchSampler implements Sampler {
      * @param subSampler the {@link ai.djl.training.dataset.Sampler.SubSampler} to sample from
      * @param batchSize the required batch size
      */
-    public BatchSampler(Sampler.SubSampler subSampler, long batchSize) {
+    public BatchSampler(Sampler.SubSampler subSampler, int batchSize) {
         this(subSampler, batchSize, false);
     }
 
@@ -51,7 +51,7 @@ public class BatchSampler implements Sampler {
      * @param dropLast whether the {@code BatchSampler} should drop the last few samples in case the
      *     size of the dataset is not a multiple of batch size
      */
-    public BatchSampler(Sampler.SubSampler subSampler, long batchSize, boolean dropLast) {
+    public BatchSampler(Sampler.SubSampler subSampler, int batchSize, boolean dropLast) {
         this.subSampler = subSampler;
         this.batchSize = batchSize;
         this.dropLast = dropLast;
@@ -61,6 +61,12 @@ public class BatchSampler implements Sampler {
     @Override
     public Iterator<List<Long>> sample(RandomAccessDataset dataset) {
         return new Iterate(dataset);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getBatchSize() {
+        return batchSize;
     }
 
     class Iterate implements Iterator<List<Long>> {

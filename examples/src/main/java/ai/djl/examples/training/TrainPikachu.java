@@ -199,13 +199,13 @@ public final class TrainPikachu extends AbstractTraining {
         PikachuDetection pikachuDetection =
                 new PikachuDetection.Builder()
                         .optUsage(usage)
+                        .optMaxIteration(arguments.getMaxIterations())
                         .optPipeline(pipeline)
                         .setSampling(batchSize, true)
                         .build();
         pikachuDetection.prepare(new ProgressBar());
-        long maxIterations = arguments.getMaxIterations();
 
-        int dataSize = (int) Math.min(pikachuDetection.size() / batchSize, maxIterations);
+        int dataSize = (int) pikachuDetection.getNumIterations();
         if (usage == Dataset.Usage.TRAIN) {
             trainDataSize = dataSize;
         } else if (usage == Dataset.Usage.TEST) {

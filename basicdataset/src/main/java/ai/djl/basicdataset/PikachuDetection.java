@@ -181,6 +181,17 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         return imagePaths.size();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public long getNumIterations() {
+        int batchSize = sampler.getBatchSize();
+        if (batchSize == -1) {
+            return -1;
+        }
+        long iteration = imagePaths.size() / batchSize;
+        return Math.min(maxIteration, iteration);
+    }
+
     /** A builder for a {@link PikachuDetection}. */
     public static final class Builder extends BaseBuilder<Builder> {
 

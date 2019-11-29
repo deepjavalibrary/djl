@@ -32,7 +32,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     protected Pipeline targetPipeline;
     protected ExecutorService executor;
     protected int prefetchNumber;
-    private long maxIteration;
+    protected long maxIteration;
     protected Device device;
 
     /**
@@ -85,6 +85,13 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
      */
     public abstract long size();
 
+    /**
+     * Returns the number of iteration of the batch iterable.
+     *
+     * @return the number of iteration of the batch iterable, -1 if number of iterations is unknown
+     */
+    public abstract long getNumIterations();
+
     /** The Builder to construct a {@link RandomAccessDataset}. */
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
@@ -117,7 +124,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
          * @param random whether the sampling has to be random
          * @return this {@code BaseBuilder}
          */
-        public T setSampling(long batchSize, boolean random) {
+        public T setSampling(int batchSize, boolean random) {
             return setSampling(batchSize, random, false);
         }
 
@@ -129,7 +136,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
          * @param dropLast whether to drop the last incomplete batch
          * @return this {@code BaseBuilder}
          */
-        public T setSampling(long batchSize, boolean random, boolean dropLast) {
+        public T setSampling(int batchSize, boolean random, boolean dropLast) {
             if (random) {
                 sampler = new BatchSampler(new RandomSampler(), batchSize, dropLast);
             } else {
