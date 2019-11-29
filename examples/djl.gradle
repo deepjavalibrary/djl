@@ -28,6 +28,22 @@ dependencies {
     }
 }
 
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom.withXml {
+                // remove mxnet-native-XXX from pom file.
+                Node pomNode = asNode()
+                pomNode.dependencies.'*'.findAll() {
+                    it.artifactId.text().startsWith("mxnet-native-")
+                }.each() {
+                    it.parent().remove(it)
+                }
+            }
+        }
+    }
+}
+
 application {
     mainClassName = System.getProperty("main", "ai.djl.examples.inference.ObjectDetection")
 }
