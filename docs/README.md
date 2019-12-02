@@ -34,7 +34,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Pose estimation example](../examples/docs/pose_estimation.md)
 - [Action recognition example](../examples/docs/action_recognition.md)
 
-## Documentation
+## Cheat sheet
 
 - [How to collect metrics](how_to_collect_metrics.md)
 - [How to use a dataset](development/how_to_use_dataset.md)
