@@ -12,7 +12,7 @@ use for Java developers. DJL provides a native Java development experience and f
 
 You don't have to be machine learning/deep learning expert to get started. You can use your existing Java expertise as an on-ramp to learn and use machine learning and deep learning. You can
 use your favorite IDE to build, train, and deploy your models. DJL makes it easy to integrate these models with your
-Java applications. 
+Java applications.
 
 Because DJL is deep learning framework agnostic, you don't have to make a choice
 between frameworks when creating your projects. You can switch frameworks at any
@@ -86,7 +86,7 @@ The following pseudocode demonstrates running training:
 
 ## Building From Source
 
-To build from source, begin by checking out the code. 
+To build from source, begin by checking out the code.
 Once you have checked out the code locally, you can build it as follows using Gradle:
 
 ```sh
@@ -99,6 +99,10 @@ To increase build speed, you can use the following command to skip unit tests:
 ```
 
 **Note:** SpotBugs is not compatible with JDK 11+. SpotBugs will not be executed if you are using JDK 11+.
+
+## Slack channel
+
+Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](https://deepjavalibrary.slack.com/join/shared_invite/enQtODQyOTYxNDExMTA3LWE5YjVlMWFmNTk3ZTJjNTE4NDIwNDc4NjA2MjZkM2VmM2M3MjI4MTFiMzFkOTVlZTM1NGVlZTI0OTlkNjhhNDI) to get in touch with the development team, for questions and discussions.
 
 ## License
 
