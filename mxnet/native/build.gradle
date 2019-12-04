@@ -21,6 +21,7 @@ sourceSets {
 // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
 jar {
     from file("src/main/resources/placeholder")
+    from file("src/main/resources/license")
 }
 
 java {
@@ -29,6 +30,7 @@ java {
 }
 
 signing {
+    required(project.hasProperty("staging") || project.hasProperty("snapshot"))
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
     useInMemoryPgpKeys(signingKey, signingPassword)
@@ -64,6 +66,13 @@ flavorNames.each { flavor ->
                     sb.append(name)
                 }
                 propFile.text = sb.toString()
+                def metaInf = new File("src/main/resources/binaries/${flavor}/${osName}/META-INF")
+                metaInf.mkdirs()
+                def licenseFile = new File(metaInf, "LICENSE")
+                licenseFile.text = new URL("https://raw.githubusercontent.com/apache/incubator-mxnet/master/LICENSE").text
+
+                def binaryLicenseFile = new File(metaInf, "LICENSE.binary.dependencies")
+                binaryLicenseFile.text = new URL("https://raw.githubusercontent.com/apache/incubator-mxnet/master/tools/dependencies/LICENSE.binary.dependencies").text
             }
             from file("src/main/resources/binaries/${flavor}/${osName}")
             archiveClassifier = "${osName}-x86_64"
