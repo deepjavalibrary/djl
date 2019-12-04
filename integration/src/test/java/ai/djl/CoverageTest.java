@@ -19,12 +19,13 @@ import ai.djl.repository.Repository;
 import ai.djl.test.CoverageUtils;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import org.testng.annotations.Test;
 
 public class CoverageTest {
 
     @Test
-    public void test() throws IOException, ClassNotFoundException {
+    public void test() throws IOException, ClassNotFoundException, URISyntaxException {
         // API
         CoverageUtils.testGetterSetters(Device.class);
 

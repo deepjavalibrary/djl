@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,7 +40,7 @@ public final class CoverageUtils {
     private CoverageUtils() {}
 
     public static void testGetterSetters(Class<?> baseClass)
-            throws IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException, URISyntaxException {
         List<Class<?>> list = getClasses(baseClass);
         for (Class<?> clazz : list) {
             Object obj = null;
@@ -94,7 +95,7 @@ public final class CoverageUtils {
     }
 
     private static List<Class<?>> getClasses(Class<?> clazz)
-            throws IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException, URISyntaxException {
         URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
         String path = url.getPath();
 
@@ -104,10 +105,10 @@ public final class CoverageUtils {
 
         List<Class<?>> classList = new ArrayList<>();
 
-        Path classPath = Paths.get(path);
+        Path classPath = Paths.get(url.toURI());
         if (Files.isDirectory(classPath)) {
             Collection<Path> files =
-                    Files.walk(Paths.get(path))
+                    Files.walk(classPath)
                             .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
                             .collect(Collectors.toList());
             for (Path file : files) {
@@ -123,7 +124,7 @@ public final class CoverageUtils {
                 }
             }
         } else if (path.toLowerCase().endsWith(".jar")) {
-            try (JarFile jarFile = new JarFile(path)) {
+            try (JarFile jarFile = new JarFile(classPath.toFile())) {
                 Enumeration<JarEntry> en = jarFile.entries();
                 while (en.hasMoreElements()) {
                     JarEntry entry = en.nextElement();
