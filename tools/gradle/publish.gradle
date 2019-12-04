@@ -13,6 +13,7 @@ configure([project(':api'), project(':basicdataset'), project(':examples'), proj
 
     javadoc {
         title "Deep Java Library ${version} - ${project.name} API"
+        options.encoding = "UTF-8"
         options.overview "src/main/javadoc/overview.html"
         options.addBooleanOption("-allow-script-in-comments", true)
         options.header "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>"
