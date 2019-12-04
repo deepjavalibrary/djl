@@ -171,11 +171,11 @@ public class LibUtils {
 
         for (String path : paths) {
             File p = new File(path);
+            if (!p.exists()) {
+                continue;
+            }
             for (String name : mappedLibNames) {
-                if (!p.exists()) {
-                    continue;
-                }
-                if (p.getName().equals(name) && p.isFile()) {
+                if (p.isFile() && p.getName().endsWith(name)) {
                     return p.getAbsolutePath();
                 }
 
