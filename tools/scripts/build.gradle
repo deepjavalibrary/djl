@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation "ai.djl:examples:0.2.0-SNAPSHOT"
+    implementation "ai.djl:examples:0.2.1-SNAPSHOT"
 }
 
 application {
