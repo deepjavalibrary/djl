@@ -6,7 +6,7 @@ plugins {
 group = "ai.djl.mxnet"
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = "1.6.0-a" + (isRelease ? "" : "-SNAPSHOT")
+version = "1.6.0-b" + (isRelease ? "" : "-SNAPSHOT")
 
 sourceSets {
     main {
@@ -21,7 +21,6 @@ sourceSets {
 // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
 jar {
     from file("src/main/resources/placeholder")
-    from file("src/main/resources/license")
 }
 
 java {

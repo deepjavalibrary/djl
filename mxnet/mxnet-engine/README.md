@@ -36,7 +36,7 @@ Choose a native library based on your platform and needs:
 ### macOS
 For macOS, you can choose between the following two libraries:
 
-- org.apache.mxnet:mxnet-native-mkl:1.6.0-a:osx-x86_64
+- org.apache.mxnet:mxnet-native-mkl:1.6.0-b:osx-x86_64
 
     This package takes advantage of the Intel MKL library to boost performance.
 ```xml
@@ -44,7 +44,7 @@ For macOS, you can choose between the following two libraries:
       <groupId>org.apache.mxnet</groupId>
       <artifactId>mxnet-native-mkl</artifactId>
       <classifier>osx-x86_64</classifier>
-      <version>1.6.0-a</version>
+      <version>1.6.0-b</version>
       <scope>runtime</scope>
     </dependency>
 ```
@@ -53,15 +53,15 @@ For macOS, you can choose between the following two libraries:
 For the Linux platform, you can choose between CPU, MKL, CUDA and CUDA+MKL combinations:
 
 CUDA+MKL:
-- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-a:linux-x86_64
-- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-a:linux-x86_64
+- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-b:linux-x86_64
+- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-b:linux-x86_64
 
 ```xml
     <dependency>
       <groupId>org.apache.mxnet</groupId>
       <artifactId>mxnet-native-cu101mkl</artifactId>
       <classifier>linux-x86_64</classifier>
-      <version>1.6.0-a</version>
+      <version>1.6.0-b</version>
       <scope>runtime</scope>
     </dependency>
 ```
@@ -71,13 +71,13 @@ CUDA+MKL:
       <groupId>org.apache.mxnet</groupId>
       <artifactId>mxnet-native-cu92mkl</artifactId>
       <classifier>linux-x86_64</classifier>
-      <version>1.6.0-a</version>
+      <version>1.6.0-b</version>
       <scope>runtime</scope>
     </dependency>
 ```
 
 CPU and MKL
-- org.apache.mxnet:mxnet-native-mkl:1.6.0-a:linux-x86_64
+- org.apache.mxnet:mxnet-native-mkl:1.6.0-b:linux-x86_64
 
 ```xml
     <dependency>
@@ -85,7 +85,7 @@ CPU and MKL
       <artifactId>mxnet-native-mkl</artifactId>
       <classifier>linux-x86_64</classifier>
       <scope>runtime</scope>
-      <version>1.6.0-a</version>
+      <version>1.6.0-b</version>
     </dependency>
 ```
 
