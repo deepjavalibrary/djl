@@ -1,0 +1,33 @@
+apply plugin: 'jacoco'
+
+task jacocoMergeTestData(type: JacocoMerge) {
+    dependsOn(subprojects.test, subprojects.jacocoTestReport)
+    def jacocoProjects = subprojects.findAll {
+        def subProjDir = it.getProjectDir()
+        def testSrc = subProjDir.toPath().resolve("src/test/java").toFile()
+        return testSrc.exists()
+    }
+    jacocoProjects.each { subproject ->
+        executionData subproject.tasks.withType(Test)
+    }
+}
+
+task jacocoRootReport(type: JacocoReport) {
+    dependsOn jacocoMergeTestData
+    description = 'Generates an aggregate report from all subprojects'
+
+    subprojects.findAll { p ->
+        ![":mxnet:jnarator", ":tensorflow:engine", ":examples", ":integration"].contains(p.getPath())
+    }.each { p ->
+        additionalSourceDirs.from files((Set<File>) p.sourceSets.main.allJava.srcDirs)
+        sourceDirectories.from files((Set<File>) p.sourceSets.main.allSource.srcDirs)
+        classDirectories.from files((FileCollection) p.sourceSets.main.output)
+        additionalClassDirs((FileCollection) p.sourceSets.main.output)
+    }
+    executionData.from = files(subprojects.jacocoTestReport.executionData).filter { f -> f.exists() }
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}

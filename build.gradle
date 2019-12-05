@@ -71,6 +71,7 @@ configure(javaProjects()) {
 }
 
 apply from: file("${rootProject.projectDir}/tools/gradle/publish.gradle")
+apply from: file("${rootProject.projectDir}/tools/gradle/jacoco.gradle")
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
