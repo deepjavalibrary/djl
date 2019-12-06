@@ -1,0 +1,33 @@
+name: AWS ECS for nightly build
+
+on:
+  schedule:
+    - cron:  '35 12 * * *'
+
+  check_suite:
+    types: [rerequested]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Render Amazon ECS task definition
+        id: render-web-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task_definition.json
+          container-name: ci-example-container
+          image: 763104351884.dkr.ecr.us-east-1.amazonaws.com/mxnet-training:1.6.0-cpu-py27-ubuntu16.04
+      - name: Deploy to Amazon ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-web-container.outputs.task-definition }}
+          service: ci-example-deploy-service
+          cluster: ci-example-actions-cluster
