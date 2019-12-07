@@ -66,10 +66,7 @@ jacocoTestReport {
 
 
 tasks.distTar.enabled = false
-test.finalizedBy project.tasks.jacocoTestReport
-
-check.dependsOn jacocoTestReport
-check.dependsOn jacocoTestCoverageVerification
+test.finalizedBy project.tasks.jacocoTestReport, project.tasks.jacocoTestCoverageVerification
 
 jacocoTestCoverageVerification {
     violationRules {
