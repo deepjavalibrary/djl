@@ -34,7 +34,8 @@ application {
 
 run {
     systemProperties System.getProperties()
-    systemProperties.remove("user.dir");
+    systemProperties.remove("user.dir")
+    systemProperty("file.encoding", "UTF-8")
 }
 
 jacoco {
