@@ -88,6 +88,7 @@ def getMXNetNativeLib() {
     try {
         exec {
             commandLine "nvidia-smi", "-L"
+            standardOutput = new ByteArrayOutputStream()
         }
         return "mxnet-native-cu101mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
     } catch (Exception e) {
