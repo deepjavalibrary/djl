@@ -14,9 +14,20 @@ otool -L libmxnet.dylib
 ldd libmxnet.so
 ```
 
-The example dependencies list for macOS is:
-- libmkldnn.0.dylib
-- libmxnet.dylib(Be sure to rename libmxnet.so to libmxnet.dylib for macOS)
+The example dependencies list for macOS mkl is:
+- binaries/mkl/osx/native/lib/libmxnet.dylib (Be sure to rename libmxnet.so to libmxnet.dylib for macOS)
+
+The example dependencies list for Windows mkl is:
+- binaries/mkl/win/native/lib/mxnet.dll (Be sure to rename libmxnet.dll to mxnet.dll for Windows)
+- binaries/mkl/win/native/lib/libopenblas.dll
+- binaries/mkl/win/native/lib/libgfortran-3.dll
+- binaries/mkl/win/native/lib/libquadmath-0.dll
+- binaries/mkl/win/native/lib/libgcc_s_seh-1.dll
+
+The example dependencies list for Linux mkl is:
+- binaries/mkl/linux/native/lib/libquadmath.so.0
+- binaries/mkl/linux/native/lib/libgfortran.so.3
+- binaries/mkl/linux/native/lib/libmxnet.so
 
 The available MXNet native versions are:
 - cu101mkl
