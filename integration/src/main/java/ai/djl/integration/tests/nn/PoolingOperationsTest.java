@@ -19,7 +19,7 @@ import ai.djl.nn.pooling.Pool;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class PoolingOperatorsTest {
+public class PoolingOperationsTest {
 
     @Test
     public void testMaxPool() {

@@ -9,7 +9,7 @@ This module contains the core API of the Deep Java Library (DJL) project. It inc
 - metric - Contains classes to collect metrics information
 - modality - Contains utility classes for each of the predefined modalities
 - ndarray - Contains classes and interfaces to define an n-dimensional array
-- nn - Contains classes to define neural network operators
+- nn - Contains classes to define neural network operations
 - training - Contains classes to implement training tasks
 - translate - Contains classes and interfaces to translate between java objects and NDArrays
 

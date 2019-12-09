@@ -40,7 +40,7 @@ public class BoundingBoxError extends TrainingMetric {
      * labels and predictions.
      *
      * <p>First compute bounding box labels and bounding box masks using the MultiBoxTarget
-     * operator. Then compute bounding box error based on bounding box labels and predictions.
+     * operation. Then compute bounding box error based on bounding box labels and predictions.
      *
      * @param labels the {@code NDList} of labels
      * @param predictions the {@code NDList} of predictions

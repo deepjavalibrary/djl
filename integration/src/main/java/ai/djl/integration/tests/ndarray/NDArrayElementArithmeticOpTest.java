@@ -136,7 +136,7 @@ public class NDArrayElementArithmeticOpTest {
                 gradCol.backward(result);
 
                 Assert.assertNotEquals(
-                        lhs, result, "None in-place operator returned in-place result");
+                        lhs, result, "None in-place operation returned in-place result");
                 NDArray actual = manager.create(new float[] {3f, 4f, 5f, 6f});
                 Assert.assertEquals(actual, result, "AddScala: Incorrect value in summed array");
 
@@ -164,7 +164,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray addendum = manager.create(new float[] {2f, 3f, 4f, 5f});
             NDArray result = NDArrays.add(addend, addendum);
             Assert.assertNotEquals(
-                    addend, result, "None in-place operator returned in-place result");
+                    addend, result, "None in-place operation returned in-place result");
 
             result = NDArrays.addi(addend, addendum);
             NDArray actual = manager.create(new float[] {3f, 5f, 7f, 9f});
@@ -178,7 +178,7 @@ public class NDArrayElementArithmeticOpTest {
 
             NDArray addAll = NDArrays.add(toAddAll);
             Assert.assertNotEquals(
-                    toAddAll[0], addAll, "None in-place operator returned in-place result");
+                    toAddAll[0], addAll, "None in-place operation returned in-place result");
 
             addAll = NDArrays.addi(toAddAll);
             Assert.assertEquals(toAddAll[0], addAll, "In-place summation failed");
@@ -321,7 +321,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray mulAll = NDArrays.mul(toMulAll);
             NDArray mulAllInPlace = NDArrays.muli(toMulAll);
             Assert.assertNotSame(
-                    mulAll, toMulAll[0], "None in-place operator returned in-place result");
+                    mulAll, toMulAll[0], "None in-place operation returned in-place result");
             Assert.assertEquals(toMulAll[0], mulAllInPlace, "In-place summation failed");
             actual = manager.create(new float[] {8, 12, 12, 8}, new Shape(2, 2));
             Assert.assertEquals(actual, mulAll, "Incorrect value in summed array");

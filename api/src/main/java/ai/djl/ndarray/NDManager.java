@@ -899,7 +899,7 @@ public interface NDManager extends AutoCloseable {
     void detach(String resourceId);
 
     /**
-     * An engine specific generic invocation to native operator.
+     * An engine specific generic invocation to native operation.
      *
      * <p>You should avoid using this function if possible. Since this function is engine specific,
      * using this API may cause a portability issue. Native operation may not be compatible between
@@ -908,14 +908,14 @@ public interface NDManager extends AutoCloseable {
      * @param operation the native operation to perform
      * @param src the {@link NDList} of source {@link NDArray}
      * @param dest the {@link NDList} to save output to
-     * @param params the parameters to be passed to the native operator
+     * @param params the parameters to be passed to the native operation
      * @throws IllegalArgumentException if operation is not supported by Engine
      * @throws EngineException if operation failed in native engine
      */
     void invoke(String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params);
 
     /**
-     * An engine specific generic invocation to native operator.
+     * An engine specific generic invocation to native operation.
      *
      * <p>You should avoid using this function if possible. Since this function is engine specific,
      * using this API may cause a portability issue. Native operation may not compatible between
@@ -923,7 +923,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @param operation the native operation to perform
      * @param src the {@link NDList} of source {@link NDArray}
-     * @param params the parameters to be passed to the native operator
+     * @param params the parameters to be passed to the native operation
      * @return the output array of {@link NDArray}
      * @throws IllegalArgumentException if operation is not supported by Engine
      * @throws EngineException if operation failed in native engine

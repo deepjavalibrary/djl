@@ -31,7 +31,7 @@ public final class NDArrays {
     }
 
     ////////////////////////////////////////
-    // Operators: Element Comparison
+    // Operations: Element Comparison
     ////////////////////////////////////////
 
     /**
@@ -753,7 +753,7 @@ public final class NDArrays {
     }
 
     ////////////////////////////////////////
-    // Operators: Element Arithmetic
+    // Operations: Element Arithmetic
     ////////////////////////////////////////
 
     /**

@@ -714,12 +714,12 @@ public interface NDArray extends AutoCloseable {
 
     ////////////////////////////////////////
     ////////////////////////////////////////
-    // Operators
+    // Operations
     ////////////////////////////////////////
     ////////////////////////////////////////
 
     ////////////////////////////////////////
-    // Operators: Element Comparison
+    // Operations: Element Comparison
     ////////////////////////////////////////
 
     /**
@@ -1072,7 +1072,7 @@ public interface NDArray extends AutoCloseable {
     NDArray lte(NDArray other);
 
     ////////////////////////////////////////
-    // Operators: Element Arithmetic
+    // Operations: Element Arithmetic
     ////////////////////////////////////////
 
     /**
@@ -1681,7 +1681,7 @@ public interface NDArray extends AutoCloseable {
     NDArray minimum(NDArray other);
 
     ////////////////////////////////////////
-    // Operators: Basic Numeric
+    // Operations: Basic Numeric
     ////////////////////////////////////////
 
     /**
@@ -2140,7 +2140,7 @@ public interface NDArray extends AutoCloseable {
     NDArray toRadians();
 
     ////////////////////////////////////////
-    // Operators: Reduction
+    // Operations: Reduction
     ////////////////////////////////////////
 
     /**
@@ -2675,7 +2675,7 @@ public interface NDArray extends AutoCloseable {
     NDArray trace(int offset, int axis1, int axis2);
 
     ////////////////////////////////////////
-    // Operators: Shapes and Arrays Manipulation
+    // Operations: Shapes and Arrays Manipulation
     ////////////////////////////////////////
 
     /**
@@ -3116,7 +3116,7 @@ public interface NDArray extends AutoCloseable {
     }
 
     ////////////////////////////////////////
-    // Operators: Logical Op
+    // Operations: Logical Op
     ////////////////////////////////////////
 
     /**
@@ -3241,7 +3241,7 @@ public interface NDArray extends AutoCloseable {
     NDArray logicalNot();
 
     ////////////////////////////////////////
-    // Operators: Other
+    // Operations: Other
     ////////////////////////////////////////
 
     /**
@@ -4135,7 +4135,7 @@ public interface NDArray extends AutoCloseable {
      * @return {@code true} if all elements within this {@code NDArray} are non-zero or {@code true}
      */
     default NDArray all() {
-        // result of sum operator is int64 now
+        // result of sum operation is int64 now
         return asType(DataType.BOOLEAN, false).sum().eq(size());
     }
 

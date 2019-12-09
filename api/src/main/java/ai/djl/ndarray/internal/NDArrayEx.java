@@ -21,7 +21,7 @@ import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.util.PairList;
 import java.util.List;
 
-/** An internal interface that encapsulates engine specific operator methods. */
+/** An internal interface that encapsulates engine specific operations. */
 @SuppressWarnings("MissingJavadocMethod")
 public interface NDArrayEx {
 
@@ -240,7 +240,7 @@ public interface NDArrayEx {
     /**
      * Computes N-D convolution on (N+2)-D input.
      *
-     * @param inputs the inputs to the convolution operator. Msut include input data, weight
+     * @param inputs the inputs to the convolution operation. Msut include input data, weight
      *     parameter matrix, and bias parameter
      * @param kernel the convolution kernel size: (w,), (h, w) or (d, h, w)
      * @param stride the convolution stride: (w,), (h, w) or (d, h, w). Defaults to 1 for each
@@ -254,7 +254,7 @@ public interface NDArrayEx {
      *     NCHW for 2d and NCDHW for 3d. NHWC and NDHWC are only supported on GPU
      * @param noBias whether to disable bias parameter. Defaults to false
      * @param additional additional parameters
-     * @return the output of the convolution operator
+     * @return the output of the convolution operation
      */
     NDList convolution(
             NDList inputs,
@@ -301,10 +301,10 @@ public interface NDArrayEx {
      * Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are implemented,
      * with both multi-layer and bidirectional support.
      *
-     * @param inputs the inputs to the recurrent operator. Must include input data, parameter vector
-     *     of all trainable parameters concatenated, initial hidden state of the RNN. For LSTM, it
-     *     must include initial cell state. If useSequenceLength is true, it must also include
-     *     vector of valid sequence lengths for each element in the batch
+     * @param inputs the inputs to the recurrent operation. Must include input data, parameter
+     *     vector of all trainable parameters concatenated, initial hidden state of the RNN. For
+     *     LSTM, it must include initial cell state. If useSequenceLength is true, it must also
+     *     include vector of valid sequence lengths for each element in the batch
      * @param mode the type of RNN to compute
      * @param stateSize the sizes of the state for each layer
      * @param dropRate the drop rate of the dropout on the outputs of each RNN layer, except the
@@ -315,7 +315,7 @@ public interface NDArrayEx {
      * @param useBidirectional whether to use bidirectional recurrent layers
      * @param stateOutputs whether to have the states as symbol outputs
      * @param additional additional parameters
-     * @return the output of the operator
+     * @return the output of the operation
      */
     NDList rnn(
             NDList inputs,
@@ -331,10 +331,10 @@ public interface NDArrayEx {
     /**
      * Applies LSTM recurrent layers to input data.
      *
-     * @param inputs the inputs to the recurrent operator. Must include input data, parameter vector
-     *     of all trainable parameters concatenated, initial hidden state of the RNN and initial
-     *     cell state. If useSequenceLength is true, it must also include vector of valid sequence
-     *     lengths for each element in the batch
+     * @param inputs the inputs to the recurrent operation. Must include input data, parameter
+     *     vector of all trainable parameters concatenated, initial hidden state of the RNN and
+     *     initial cell state. If useSequenceLength is true, it must also include vector of valid
+     *     sequence lengths for each element in the batch
      * @param stateSize the sizes of the state for each layer
      * @param dropRate the drop rate of the dropout on the outputs of each RNN layer, except the
      *     last layer
@@ -346,7 +346,7 @@ public interface NDArrayEx {
      * @param lstmStateClipMin the minimum clip value of LSTM states
      * @param lstmStateClipMax the maximum clip value of LSTM states
      * @param additional additional parameters
-     * @return the output of the operator
+     * @return the output of the operation
      */
     NDList lstm(
             NDList inputs,
