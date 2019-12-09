@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.integration.tests.training;
+package ai.djl.mxnet.integration;
 
 import ai.djl.Device;
 import ai.djl.Model;
@@ -26,7 +26,7 @@ import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ParameterStoreTest {
+public class MxParameterStoreTest {
 
     @Test
     public void testParameterStore() {
@@ -122,7 +122,7 @@ public class ParameterStoreTest {
 
             private LearningRateTracker learningRateTracker;
 
-            public TestOptimizer.Builder setLearningRateTracker(
+            public MxParameterStoreTest.TestOptimizer.Builder setLearningRateTracker(
                     LearningRateTracker learningRateTracker) {
                 this.learningRateTracker = learningRateTracker;
                 return this;
@@ -134,15 +134,15 @@ public class ParameterStoreTest {
 
             /** {@inheritDoc} */
             @Override
-            protected TestOptimizer.Builder self() {
+            protected MxParameterStoreTest.TestOptimizer.Builder self() {
                 return this;
             }
 
-            public TestOptimizer build() {
+            public MxParameterStoreTest.TestOptimizer build() {
                 if (learningRateTracker == null) {
                     throw new IllegalArgumentException("No lrTracker set");
                 }
-                return new TestOptimizer(this);
+                return new MxParameterStoreTest.TestOptimizer(this);
             }
         }
     }

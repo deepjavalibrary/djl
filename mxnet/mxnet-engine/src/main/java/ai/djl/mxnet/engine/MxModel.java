@@ -196,6 +196,10 @@ public class MxModel implements Model {
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         Initializer initializer = trainingConfig.getInitializer();
+        if (block == null) {
+            throw new IllegalStateException(
+                    "You must set a block for the model before creating a new trainer");
+        }
         block.setInitializer(initializer);
 
         return new MxTrainer(this, trainingConfig);

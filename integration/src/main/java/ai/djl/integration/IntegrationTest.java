@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -50,12 +51,15 @@ public class IntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTest.class);
 
-    private static final String PACKAGE_NAME = "ai.djl.integration.tests.";
-
     private int totalFailed;
+    private Class<?> source;
+
+    public IntegrationTest(Class<?> source) {
+        this.source = source;
+    }
 
     public static void main(String[] args) {
-        new IntegrationTest().runTests(args);
+        new IntegrationTest(IntegrationTest.class).runTests(args);
     }
 
     public boolean runTests(String[] args) {
@@ -66,7 +70,7 @@ public class IntegrationTest {
             Arguments arguments = new Arguments(cmd);
 
             Duration duration = Duration.ofMinutes(arguments.getDuration());
-            List<TestClass> tests = listTests(arguments);
+            List<TestClass> tests = listTests(arguments, source);
 
             while (!duration.isNegative()) {
                 long begin = System.currentTimeMillis();
@@ -83,6 +87,7 @@ public class IntegrationTest {
             formatter.printHelp(e.getMessage(), options);
         } catch (Throwable t) {
             logger.error("Unexpected error", t);
+            return false;
         }
 
         return totalFailed == 0;
@@ -117,33 +122,38 @@ public class IntegrationTest {
         }
     }
 
-    private static List<TestClass> listTests(Arguments arguments) {
+    private static List<TestClass> listTests(Arguments arguments, Class<?> source)
+            throws IOException, ReflectiveOperationException, URISyntaxException {
         String className = arguments.getClassName();
         String methodName = arguments.getMethodName();
         List<TestClass> tests = new ArrayList<>();
         try {
             if (className != null) {
                 Class<?> clazz;
-                if (className.startsWith(PACKAGE_NAME)) {
+                if (className.startsWith(arguments.getPackageName())) {
                     clazz = Class.forName(className);
                 } else {
-                    clazz = Class.forName(PACKAGE_NAME + className);
+                    clazz = Class.forName(arguments.getPackageName() + className);
                 }
-                tests.add(getTestsInClass(clazz, methodName));
+                getTestsInClass(clazz, methodName).map(tests::add);
             } else {
-                List<Class<?>> classes = listTestClasses(IntegrationTest.class);
+                List<Class<?>> classes = listTestClasses(arguments, source);
                 for (Class<?> clazz : classes) {
-                    tests.add(getTestsInClass(clazz, methodName));
+                    getTestsInClass(clazz, methodName).map(tests::add);
                 }
             }
         } catch (ReflectiveOperationException | IOException | URISyntaxException e) {
             logger.error("Failed to resolve test class.", e);
+            throw e;
         }
         return tests;
     }
 
-    private static TestClass getTestsInClass(Class<?> clazz, String methodName)
+    private static Optional<TestClass> getTestsInClass(Class<?> clazz, String methodName)
             throws ReflectiveOperationException {
+        if (clazz.getConstructors().length == 0) {
+            return Optional.empty();
+        }
         Constructor<?> ctor = clazz.getConstructor();
         Object obj = ctor.newInstance();
         TestClass testClass = new TestClass(obj);
@@ -178,10 +188,10 @@ public class IntegrationTest {
             }
         }
 
-        return testClass;
+        return Optional.of(testClass);
     }
 
-    private static List<Class<?>> listTestClasses(Class<?> clazz)
+    private static List<Class<?>> listTestClasses(Arguments arguments, Class<?> clazz)
             throws IOException, ClassNotFoundException, URISyntaxException {
         URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
         String path = url.getPath();
@@ -203,7 +213,7 @@ public class IntegrationTest {
                 String className = p.toString();
                 className = className.substring(0, className.lastIndexOf('.'));
                 className = className.replace(File.separatorChar, '.');
-                if (className.startsWith(PACKAGE_NAME) && !className.contains("$")) {
+                if (className.startsWith(arguments.getPackageName()) && !className.contains("$")) {
                     try {
                         classList.add(Class.forName(className));
                     } catch (ExceptionInInitializerError ignore) {
@@ -220,7 +230,7 @@ public class IntegrationTest {
                     if (fileName.endsWith(".class")) {
                         fileName = fileName.substring(0, fileName.lastIndexOf('.'));
                         fileName = fileName.replace('/', '.');
-                        if (fileName.startsWith(PACKAGE_NAME)) {
+                        if (fileName.startsWith(arguments.getPackageName())) {
                             try {
                                 classList.add(Class.forName(fileName));
                             } catch (ExceptionInInitializerError ignore) {

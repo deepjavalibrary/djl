@@ -10,6 +10,23 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.mxnet.integration;
 
-/** Contains integration testing utilities. */
-package ai.djl.test;
+import ai.djl.integration.util.CoverageUtils;
+import ai.djl.mxnet.engine.MxEngine;
+import ai.djl.mxnet.zoo.MxModelZoo;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import org.testng.annotations.Test;
+
+public class MxCoverageTest {
+
+    @Test
+    public void test() throws IOException, ClassNotFoundException, URISyntaxException {
+        // mxnet-engine
+        CoverageUtils.testGetterSetters(MxEngine.class);
+
+        // mxnet-model-zoo
+        CoverageUtils.testGetterSetters(MxModelZoo.class);
+    }
+}

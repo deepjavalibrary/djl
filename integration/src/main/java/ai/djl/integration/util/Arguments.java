@@ -20,12 +20,18 @@ public class Arguments {
 
     private String methodName;
     private String className;
+    private String packageName;
     private int duration;
     private int iteration = 1;
 
     public Arguments(CommandLine cmd) {
         methodName = cmd.getOptionValue("method-name");
         className = cmd.getOptionValue("class-name");
+        if (cmd.hasOption("package-name")) {
+            packageName = cmd.getOptionValue("package-name");
+        } else {
+            packageName = "ai.djl.integration.tests.";
+        }
 
         if (cmd.hasOption("duration")) {
             duration = Integer.parseInt(cmd.getOptionValue("duration"));
@@ -52,6 +58,13 @@ public class Arguments {
                         .desc("Number of iterations in each test.")
                         .build());
         options.addOption(
+                Option.builder("p")
+                        .longOpt("package-name")
+                        .hasArg()
+                        .argName("PACKAGE-NAME")
+                        .desc("Name of the package to run")
+                        .build());
+        options.addOption(
                 Option.builder("c")
                         .longOpt("class-name")
                         .hasArg()
@@ -74,6 +87,10 @@ public class Arguments {
 
     public int getIteration() {
         return iteration;
+    }
+
+    public String getPackageName() {
+        return packageName;
     }
 
     public String getClassName() {

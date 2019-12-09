@@ -113,7 +113,7 @@ public class MxTrainer implements Trainer {
                     "The data must be on the same engine as the trainer. You may need to change one of your NDManagers.");
         }
         Batch[] splits = batch.split(devices, false);
-        try (GradientCollector collector = new MxGradientCollector()) {
+        try (GradientCollector collector = newGradientCollector()) {
             for (Batch split : splits) {
                 NDList data = split.getData();
                 NDList labels = split.getLabels();

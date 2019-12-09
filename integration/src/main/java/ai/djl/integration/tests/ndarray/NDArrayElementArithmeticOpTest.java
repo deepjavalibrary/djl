@@ -12,13 +12,18 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
-import ai.djl.mxnet.engine.MxGradientCollector;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Blocks;
+import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
+import ai.djl.training.Trainer;
+import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.testng.Assert;
@@ -126,26 +131,34 @@ public class NDArrayElementArithmeticOpTest {
 
     @Test
     public void testAddScalar() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Blocks.identityBlock());
+            NDManager manager = model.getNDManager();
             NDArray lhs = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray result;
-            try (GradientCollector gradCol = new MxGradientCollector()) {
-                lhs.attachGradient();
-                result = NDArrays.add(lhs, 2);
-                // check add scalar result
-                gradCol.backward(result);
+            try (Trainer trainer =
+                    model.newTrainer(
+                            new DefaultTrainingConfig(Loss.l2Loss())
+                                    .optInitializer(Initializer.ONES))) {
+                try (GradientCollector gradCol = trainer.newGradientCollector()) {
+                    lhs.attachGradient();
+                    result = NDArrays.add(lhs, 2);
+                    // check add scalar result
+                    gradCol.backward(result);
 
-                Assert.assertNotEquals(
-                        result, lhs, "None in-place operation returned in-place result");
-                NDArray expected = manager.create(new float[] {3f, 4f, 5f, 6f});
-                Assert.assertEquals(result, expected, "AddScala: Incorrect value in summed array");
+                    Assert.assertNotEquals(
+                            result, lhs, "None in-place operation returned in-place result");
+                    NDArray expected = manager.create(new float[] {3f, 4f, 5f, 6f});
+                    Assert.assertEquals(
+                            result, expected, "AddScala: Incorrect value in summed array");
 
-                // check add backward
-                NDArray expectedGradient = manager.create(new float[] {1f, 1f, 1f, 1f});
-                Assert.assertEquals(
-                        lhs.getGradient(),
-                        expectedGradient,
-                        "AddScala backward: Incorrect gradient after backward");
+                    // check add backward
+                    NDArray expectedGradient = manager.create(new float[] {1f, 1f, 1f, 1f});
+                    Assert.assertEquals(
+                            lhs.getGradient(),
+                            expectedGradient,
+                            "AddScala backward: Incorrect gradient after backward");
+                }
             }
             // test inplace
             lhs = manager.create(new float[] {1f, 2f, 3f, 4f});
@@ -336,28 +349,35 @@ public class NDArrayElementArithmeticOpTest {
 
     @Test
     public void testDot() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Blocks.identityBlock());
+            NDManager manager = model.getNDManager();
             NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
             NDArray result;
             NDArray expected;
             // test 2D * 2D
-            try (GradientCollector gradCol = new MxGradientCollector()) {
-                lhs.attachGradient();
-                result = NDArrays.dot(lhs, rhs);
-                gradCol.backward(result);
-                expected = manager.create(new float[] {33, 14}, new Shape(2, 1));
-                Assert.assertEquals(
-                        result,
-                        expected,
-                        "Matrix multiplication: Incorrect value in result ndarray");
+            try (Trainer trainer =
+                    model.newTrainer(
+                            new DefaultTrainingConfig(Loss.l2Loss())
+                                    .optInitializer(Initializer.ONES))) {
+                try (GradientCollector gradCol = trainer.newGradientCollector()) {
+                    lhs.attachGradient();
+                    result = NDArrays.dot(lhs, rhs);
+                    gradCol.backward(result);
+                    expected = manager.create(new float[] {33, 14}, new Shape(2, 1));
+                    Assert.assertEquals(
+                            result,
+                            expected,
+                            "Matrix multiplication: Incorrect value in result ndarray");
 
-                NDArray expectedGradient =
-                        manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
-                Assert.assertEquals(
-                        lhs.getGradient(),
-                        expectedGradient,
-                        "Matrix multiplication: Incorrect gradient after backward");
+                    NDArray expectedGradient =
+                            manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
+                    Assert.assertEquals(
+                            lhs.getGradient(),
+                            expectedGradient,
+                            "Matrix multiplication: Incorrect gradient after backward");
+                }
             }
             // test 1D * 1D
             lhs = manager.create(new float[] {1f, 2f});

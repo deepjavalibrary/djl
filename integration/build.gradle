@@ -14,12 +14,12 @@ dependencies {
     api "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
     api project(":basicdataset")
     api project(":model-zoo")
-    api project(":mxnet:mxnet-engine")
-    api project(":mxnet:mxnet-model-zoo")
     api("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
 
+    runtimeOnly project(":mxnet:mxnet-engine")
+    runtimeOnly project(":mxnet:mxnet-model-zoo")
     runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
 }
 

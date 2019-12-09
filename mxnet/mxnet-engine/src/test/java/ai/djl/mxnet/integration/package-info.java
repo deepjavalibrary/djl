@@ -10,16 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.integration;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-public class IntegrationTests {
-
-    @Test
-    public void runIntegrationTests() {
-        String[] args = {};
-        Assert.assertTrue(new IntegrationTest(IntegrationTest.class).runTests(args));
-    }
-}
+/**
+ * Contains MXNet-specific integration tests that use the engine to test the actual behavior of the
+ * API.
+ */
+package ai.djl.mxnet.integration;

@@ -14,14 +14,15 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
-import ai.djl.mxnet.engine.MxGradientCollector;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Blocks;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.ArrayDataset;
@@ -38,24 +39,32 @@ public class GradientCollectorIntegrationTest {
 
     @Test
     public void testAutograd() {
-        try (NDManager manager = NDManager.newBaseManager();
-                MxGradientCollector gradCol = new MxGradientCollector()) {
-            NDArray lhs = manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
-            NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
-            NDArray expected = manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
-            lhs.attachGradient();
-            // autograd automatically set recording and training during initialization
-            Assert.assertTrue(MxGradientCollector.isRecording());
-            Assert.assertTrue(MxGradientCollector.isTraining());
+        try (Model model = Model.newInstance();
+                NDManager manager = model.getNDManager()) {
+            model.setBlock(Blocks.identityBlock());
+            try (Trainer trainer =
+                    model.newTrainer(
+                            new DefaultTrainingConfig(Loss.l2Loss())
+                                    .optInitializer(Initializer.ONES))) {
+                try (GradientCollector gradCol = trainer.newGradientCollector()) {
+                    NDArray lhs =
+                            manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));
+                    NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
+                    NDArray expected =
+                            manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
+                    lhs.attachGradient();
+                    // autograd automatically set recording and training during initialization
 
-            NDArray result = NDArrays.dot(lhs, rhs);
-            gradCol.backward(result);
-            NDArray grad = lhs.getGradient();
-            Assertions.assertAlmostEquals(grad, expected);
-            // test close and get again
-            grad.close();
-            NDArray grad2 = lhs.getGradient();
-            Assertions.assertAlmostEquals(grad2, expected);
+                    NDArray result = NDArrays.dot(lhs, rhs);
+                    gradCol.backward(result);
+                    NDArray grad = lhs.getGradient();
+                    Assertions.assertAlmostEquals(grad, expected);
+                    // test close and get again
+                    grad.close();
+                    NDArray grad2 = lhs.getGradient();
+                    Assertions.assertAlmostEquals(grad2, expected);
+                }
+            }
         }
     }
 

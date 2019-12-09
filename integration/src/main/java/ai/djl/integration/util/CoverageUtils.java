@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.test;
+package ai.djl.integration.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,7 +114,7 @@ public final class CoverageUtils {
             for (Path file : files) {
                 Path p = classPath.relativize(file);
                 String className = p.toString();
-                className = className.substring(0, className.lastIndexOf("."));
+                className = className.substring(0, className.lastIndexOf('.'));
                 className = className.replace(File.separatorChar, '.');
 
                 try {
@@ -130,7 +130,7 @@ public final class CoverageUtils {
                     JarEntry entry = en.nextElement();
                     String fileName = entry.getName();
                     if (fileName.endsWith(".class")) {
-                        fileName = fileName.substring(0, fileName.lastIndexOf("."));
+                        fileName = fileName.substring(0, fileName.lastIndexOf('.'));
                         fileName = fileName.replace('/', '.');
                         try {
                             classList.add(Class.forName(fileName));

@@ -24,7 +24,7 @@ public class MxGradientCollector implements GradientCollector {
      * Constructs an {@code MxGradientCollector} and enables training data collection for
      * backpropogation.
      */
-    public MxGradientCollector() {
+    MxGradientCollector() {
         boolean prevRecordingState = setRecording(true);
         if (prevRecordingState) {
             throw new IllegalStateException(
