@@ -39,13 +39,18 @@ run {
 
 tasks.distTar.enabled = false
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 def getMXNetNativeLib() {
     String osName = System.getProperty("os.name")
+    if (osName.startsWith("Mac")) {
+        return "mxnet-native-mkl:1.6.0-a-SNAPSHOT:osx-x86_64"
+    }
+
     String osPrefix;
     if (osName.startsWith("Win")) {
         osPrefix = "win"
-    } else if (osName.startsWith("Mac")) {
-        osPrefix = "osx"
     } else if (osName.startsWith("Linux")) {
         osPrefix = "linux"
     } else {
@@ -55,11 +60,33 @@ def getMXNetNativeLib() {
     try {
         exec {
             commandLine "nvidia-smi", "-L"
+            standardOutput = new ByteArrayOutputStream()
         }
-        return "mxnet-native-cu101mkl:1.6.0-a:${osPrefix}-x86_64"
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream()
+        exec {
+            commandLine "nvcc", "--version"
+            standardOutput = out
+        }
+
+        String output = out.toString("UTF-8")
+        Pattern pattern = Pattern.compile("release (\\d\\d?\\.\\d), V");
+        Matcher m = pattern.matcher(output)
+        if (!m.find()) {
+            logger.log(LogLevel.ERROR, "Unexpected output: " + output)
+        } else {
+            String nvccVersion = m.group(1)
+            if (nvccVersion == "10.1") {
+                return "mxnet-native-cu101mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
+            } else if (nvccVersion == "9.2") {
+                return "mxnet-native-cu92mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
+            } else {
+                logger.log(LogLevel.WARN, "Unsupported cuda version: " + nvccVersion)
+            }
+        }
     } catch (Exception e) {
-        project.logger.debug("No cuda is detected");
+        logger.debug("No cuda is detected");
     }
 
-    return "mxnet-native-mkl:1.6.0-a:${osPrefix}-x86_64"
+    return "mxnet-native-mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
 }
