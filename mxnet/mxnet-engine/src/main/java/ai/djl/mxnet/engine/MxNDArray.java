@@ -1033,8 +1033,16 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray sum() {
         // TODO current windows doesn't support boolean NDArray
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            try (NDArray thisArr = asType(DataType.INT64, false)) {
-                return manager.invoke("_np_sum", thisArr, null);
+            DataType target = getDataType();
+            if (!target.isFloating()) {
+                try (NDArray thisArr = asType(DataType.FLOAT32, false)) {
+                    if (target == DataType.BOOLEAN) {
+                        target = DataType.INT64;
+                    }
+                    try (NDArray array = manager.invoke("_np_sum", thisArr, null)) {
+                        return array.asType(target, false);
+                    }
+                }
             }
         }
         return manager.invoke("_np_sum", this, null);
