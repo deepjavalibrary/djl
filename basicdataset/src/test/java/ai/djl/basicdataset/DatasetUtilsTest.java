@@ -83,7 +83,7 @@ public class DatasetUtilsTest {
     }
 
     @Test
-    public void testSplitSmailerBatchSize() {
+    public void testSplitSmallerBatchSize() {
         try (NDManager manager = NDManager.newBaseManager()) {
             Device[] devices = new Device[] {Device.cpu(0), Device.cpu(1), Device.cpu(2)};
 
