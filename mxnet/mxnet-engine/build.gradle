@@ -87,7 +87,6 @@ task checkHeaderFile() {
 }
 
 compileJava.dependsOn(jnarator)
-check.dependsOn checkHeaderFile
 
 publishing {
     publications {

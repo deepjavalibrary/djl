@@ -87,7 +87,6 @@ def getMXNetNativeLib() {
                 logger.log(LogLevel.WARN, "Unsupported cuda version: " + nvccVersion)
             }
         }
-        return "mxnet-native-cu101mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
     } catch (Exception e) {
         logger.debug("No cuda is detected");
     }

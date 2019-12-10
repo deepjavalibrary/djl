@@ -5,8 +5,9 @@ plugins {
 
 group = "ai.djl.mxnet"
 
+def VERSION = "1.6.0-b"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = "1.6.0-b" + (isRelease ? "" : "-SNAPSHOT")
+version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 
 sourceSets {
     main {
@@ -40,23 +41,24 @@ signing {
     sign publishing.publications
 }
 
-def flavorNames = file("src/main/resources/binaries").list() ?: []
+def BINARY_ROOT = "${project.buildDir}/download"
+def flavorNames = file(BINARY_ROOT).list() ?: []
 flavorNames.each { flavor ->
 
-    def platformNames = file("src/main/resources/binaries/${flavor}").list() ?: []
+    def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
 
     def artifactsNames = []
 
     platformNames.each { osName ->
         tasks.create(name: "${flavor}-${osName}Jar", type: Jar) {
             doFirst {
-                def propFile = file("src/main/resources/binaries/${flavor}/${osName}/native/lib/mxnet.properties")
+                def propFile = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/mxnet.properties")
                 propFile.delete()
-                def dsStore = file("src/main/resources/binaries/${flavor}/${osName}/native/lib/.DS_Store")
+                def dsStore = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/.DS_Store")
                 dsStore.delete()
 
                 def versionName = String.format("${version}-%s", new Date().format('yyyyMMdd'))
-                def dir = file("src/main/resources/binaries/${flavor}/${osName}/native/lib")
+                def dir = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib")
                 def sb = new StringBuilder()
                 sb.append("version=${versionName}\nclassifier=${flavor}-${osName}-x86_64\nlibraries=")
                 def first = true
@@ -69,7 +71,7 @@ flavorNames.each { flavor ->
                     sb.append(name)
                 }
                 propFile.text = sb.toString()
-                def metaInf = new File("src/main/resources/binaries/${flavor}/${osName}/META-INF")
+                def metaInf = new File("${BINARY_ROOT}/${flavor}/${osName}/META-INF")
                 metaInf.mkdirs()
                 def licenseFile = new File(metaInf, "LICENSE")
                 licenseFile.text = new URL("https://raw.githubusercontent.com/apache/incubator-mxnet/master/LICENSE").text
@@ -77,7 +79,7 @@ flavorNames.each { flavor ->
                 def binaryLicenseFile = new File(metaInf, "LICENSE.binary.dependencies")
                 binaryLicenseFile.text = new URL("https://raw.githubusercontent.com/apache/incubator-mxnet/master/tools/dependencies/LICENSE.binary.dependencies").text
             }
-            from file("src/main/resources/binaries/${flavor}/${osName}")
+            from file("${BINARY_ROOT}/${flavor}/${osName}")
             archiveClassifier = "${osName}-x86_64"
         }
         artifactsNames.add(tasks["${flavor}-${osName}Jar"])
@@ -146,6 +148,64 @@ publishing.repositories {
         } else {
             name = "local"
             url = "build/repo"
+        }
+    }
+}
+
+task downloadMxnetNativeLib() {
+    doLast {
+        def url = "https://djl-ai.s3.amazonaws.com/publish/mxnet-${VERSION}"
+        def files = [
+                "linux/common/libgfortran.so.3": "cu101mkl/linux/native/lib/libgfortran.so.3",
+                "linux/common/libgomp.so.1"    : "cu101mkl/linux/native/lib/libgomp.so.1",
+                "linux/common/libmkldnn.so.1"  : "cu101mkl/linux/native/lib/libmkldnn.so.1",
+                "linux/common/libquadmath.so.0": "cu101mkl/linux/native/lib/libquadmath.so.0",
+                "linux/cu101mkl/libmxnet.so"   : "cu101mkl/linux/native/lib/libmxnet.so",
+                "linux/cu92mkl/libmxnet.so"    : "cu92mkl/linux/native/lib/libmxnet.so",
+                "linux/mkl/libmxnet.so"        : "mkl/linux/native/lib/libmxnet.so",
+                "osx/mkl/libmkldnn.1.dylib"    : "mkl/osx/native/lib/libmkldnn.1.dylib",
+                "osx/mkl/libmxnet.dylib"       : "mkl/osx/native/lib/libmxnet.dylib",
+                "win/common/libgcc_s_seh-1.dll": "cu101mkl/win/native/lib/libgcc_s_seh-1.dll",
+                "win/common/libgfortran-3.dll" : "cu101mkl/win/native/lib/libgfortran-3.dll",
+                "win/common/libopenblas.dll"   : "cu101mkl/win/native/lib/libopenblas.dll",
+                "win/common/libquadmath-0.dll" : "cu101mkl/win/native/lib/libquadmath-0.dll",
+                "win/common/mkldnn.dll"        : "cu101mkl/win/native/lib/mkldnn.dll",
+                "win/cu101mkl/libmxnet.dll"    : "cu101mkl/win/native/lib/mxnet.dll",
+                "win/cu92mkl/libmxnet.dll"     : "cu92mkl/win/native/lib/mxnet.dll",
+                "win/mkl/libmxnet.dll"         : "mkl/win/native/lib/mxnet.dll"
+        ]
+
+        files.each { entry ->
+            project.logger.lifecycle("Downloaing ${url}/${entry.key}")
+            def file = new File("${BINARY_ROOT}/${entry.value}")
+            file.getParentFile().mkdirs()
+            new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+        }
+
+        copy {
+            from("${BINARY_ROOT}/cu101mkl/linux/native/lib") {
+                exclude '**/libmxnet.so'
+            }
+            into("${BINARY_ROOT}/cu92mkl/linux/native/lib")
+        }
+        copy {
+            from("${BINARY_ROOT}/cu101mkl/linux/native/lib") {
+                exclude '**/libmxnet.so'
+            }
+            into("${BINARY_ROOT}/mkl/linux/native/lib")
+        }
+
+        copy {
+            from("${BINARY_ROOT}/cu101mkl/win/native/lib") {
+                exclude '**/mxnet.dll'
+            }
+            into("${BINARY_ROOT}/cu92mkl/win/native/lib")
+        }
+        copy {
+            from("${BINARY_ROOT}/cu101mkl/win/native/lib") {
+                exclude '**/mxnet.dll'
+            }
+            into("${BINARY_ROOT}/mkl/win/native/lib")
         }
     }
 }
