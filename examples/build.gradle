@@ -5,6 +5,9 @@ plugins {
 
 repositories {
     jcenter()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 dependencies {
@@ -77,14 +80,14 @@ def getMXNetNativeLib() {
         } else {
             String nvccVersion = m.group(1)
             if (nvccVersion == "10.1") {
-                return "mxnet-native-cu101mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
+                return "mxnet-native-cu101mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
             } else if (nvccVersion == "9.2") {
-                return "mxnet-native-cu92mkl:1.6.0-a-SNAPSHOT:${osPrefix}-x86_64"
+                return "mxnet-native-cu92mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
             } else {
                 logger.log(LogLevel.WARN, "Unsupported cuda version: " + nvccVersion)
             }
         }
-        return "mxnet-native-cu101mkl:1.6.0-b:${osPrefix}-x86_64"
+        return "mxnet-native-cu101mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
     } catch (Exception e) {
         logger.debug("No cuda is detected");
     }
