@@ -6,6 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-18.04
     steps:
+
       - name: Send mail
         uses: dawidd6/action-send-mail@master
         with:
