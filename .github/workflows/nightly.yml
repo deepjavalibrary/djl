@@ -1,11 +1,10 @@
 name: nightly build
 
 on:
+  repository_dispatch:
+    types: [nightly-build]
   schedule:
     - cron:  '0 10 * * *'
-
-  check_suite:
-    types: [rerequested]
 
 jobs:
   build:
