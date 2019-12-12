@@ -16,6 +16,7 @@ package ai.djl.examples;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class TrainResNetTest {
@@ -34,7 +35,7 @@ public class TrainResNetTest {
     public void testTrainResNetSymbolicNightly() {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
-            return;
+            throw new SkipException("Nightly only");
         }
         if (Engine.getInstance().getGpuCount() > 0) {
             // Limit max 4 gpu for cifar10 training to make it converge faster.
@@ -52,7 +53,7 @@ public class TrainResNetTest {
     public void testTrainResNetImperativeNightly() {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
-            return;
+            throw new SkipException("Nightly only");
         }
         if (Engine.getInstance().getGpuCount() > 0) {
             // Limit max 4 gpu for cifar10 training to make it converge faster.

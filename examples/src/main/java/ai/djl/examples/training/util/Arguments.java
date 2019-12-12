@@ -119,7 +119,8 @@ public class Arguments {
                         .longOpt("max-iterations")
                         .hasArg()
                         .argName("max-iterations")
-                        .desc("Limit each epoch to a fixed number of iterations")
+                        .desc(
+                                "Limit each epoch to a fixed number of iterations to test the training script")
                         .build());
         options.addOption(
                 Option.builder("d")

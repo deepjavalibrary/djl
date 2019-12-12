@@ -39,6 +39,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -326,7 +327,9 @@ public class IntegrationTest {
                 method.invoke(object);
                 logger.info("Test {}.{} PASSED", getName(), method.getName());
             } catch (IllegalAccessException | InvocationTargetException e) {
-                if (notExpected(method, e)) {
+                if (e.getCause() instanceof SkipException) {
+                    logger.info("Test {}.{} SKIPPED", getName(), method.getName());
+                } else if (notExpected(method, e)) {
                     logger.error("Test {}.{} FAILED", getName(), method.getName());
                     logger.error("", e.getCause());
                     return false;

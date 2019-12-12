@@ -18,6 +18,7 @@ import ai.djl.mxnet.zoo.MxModelZoo;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -38,7 +39,7 @@ public class MxModelZooTest {
     @Test
     public void downloadActionRecognitionModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            return;
+            throw new SkipException("Nightly only");
         }
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -57,7 +58,7 @@ public class MxModelZooTest {
     @Test
     public void downloadMlpModels() throws IOException, ModelException {
         if (Boolean.getBoolean("offline")) {
-            return;
+            throw new SkipException("Requires network connection");
         }
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -69,7 +70,7 @@ public class MxModelZooTest {
     @Test
     public void downloadResnetModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            return;
+            throw new SkipException("Nightly only");
         }
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -97,7 +98,7 @@ public class MxModelZooTest {
     @Test
     public void downloadResnextModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            return;
+            throw new SkipException("Nightly only");
         }
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -111,7 +112,7 @@ public class MxModelZooTest {
     @Test
     public void downloadSeResnextModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            return;
+            throw new SkipException("Nightly only");
         }
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -132,7 +133,7 @@ public class MxModelZooTest {
     @Test
     public void downloadSenetModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            return;
+            throw new SkipException("Nightly only");
         }
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -145,7 +146,7 @@ public class MxModelZooTest {
     @Test
     public void downloadMaskRcnnModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            return;
+            throw new SkipException("Nightly only");
         }
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -166,7 +167,7 @@ public class MxModelZooTest {
     @Test
     public void downloadSsdModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            return;
+            throw new SkipException("Nightly only");
         }
 
         Map<String, String> criteria = new ConcurrentHashMap<>();
@@ -189,7 +190,7 @@ public class MxModelZooTest {
     @Test
     public void downloadSimplePoseModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            return;
+            throw new SkipException("Nightly only");
         }
 
         Map<String, String> criteria = new ConcurrentHashMap<>();

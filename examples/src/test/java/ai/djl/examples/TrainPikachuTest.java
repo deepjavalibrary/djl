@@ -19,6 +19,7 @@ import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class TrainPikachuTest {
@@ -27,7 +28,7 @@ public class TrainPikachuTest {
     public void testDetection() throws IOException, MalformedModelException, TranslateException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
-            return;
+            throw new SkipException("Nightly only");
         }
         String[] args;
         float expectedLoss;
