@@ -1,59 +1,83 @@
 # DJL - MXNet native library
 
-## Building the library
+## Publishing MXNet native library
 
-### Step 1: Copy the library
+### Step 1: Prepare MXNet native library
 
-Copy the library files and all dependencies to `<path_to_your_DJL>/mxnet/native/src/main/resources/binaries/<flavor>/<osName>/native/lib`.
-
-Use the following commands include all the libmxnet.so dependencies:
+Extract MXNet native library files from MXNet python pip wheel or build them from source.
+Make sure collect all dependencies. Use the following commands include all the libmxnet.so dependencies:
 ```bash
 # osx
 otool -L libmxnet.dylib
+
 # ubuntu
 ldd libmxnet.so
+
+# Windows
+dumpbin /dependents libmxnet.dll
 ```
 
 The example dependencies list for macOS mkl is:
-- binaries/mkl/osx/native/lib/libmxnet.dylib (Be sure to rename libmxnet.so to libmxnet.dylib for macOS)
+- libmxnet.dylib (Be sure to rename libmxnet.so to libmxnet.dylib for macOS)
 
 The example dependencies list for Windows mkl is:
-- binaries/mkl/win/native/lib/mxnet.dll (Be sure to rename libmxnet.dll to mxnet.dll for Windows)
-- binaries/mkl/win/native/lib/libopenblas.dll
-- binaries/mkl/win/native/lib/libgfortran-3.dll
-- binaries/mkl/win/native/lib/libquadmath-0.dll
-- binaries/mkl/win/native/lib/libgcc_s_seh-1.dll
+- libmxnet.dll
+- libopenblas.dll
+- libgfortran-3.dll
+- libquadmath-0.dll
+- libgcc_s_seh-1.dll
 
 The example dependencies list for Linux mkl is:
-- binaries/mkl/linux/native/lib/libquadmath.so.0
-- binaries/mkl/linux/native/lib/libgfortran.so.3
-- binaries/mkl/linux/native/lib/libmxnet.so
+- libquadmath.so.0
+- libgfortran.so.3
+- libmxnet.so
 
-The available MXNet native versions are:
-- cu101mkl
-- cu101
-- cu92mkl
-- cu92
-- cu90mkl
-- cu90
-- mkl
-- min
 
-The valid OS names are:
-- `osx`
-- `linux`
-- `win`
+### Step 2: Upload files to s3 bucket
 
-### Step 2: Publish
+The example list for s3 files is: 
+- s3://djl-ai/publish/mxnet-1.6.0-b/linux/common/libgfortran.so.3
+- s3://djl-ai/publish/mxnet-1.6.0-b/linux/common/libmkldnn.so.1
+- s3://djl-ai/publish/mxnet-1.6.0-b/linux/common/libquadmath.so.0
+- s3://djl-ai/publish/mxnet-1.6.0-b/linux/cu101mkl/libmxnet.so
+- s3://djl-ai/publish/mxnet-1.6.0-b/linux/cu92mkl/libmxnet.so
+- s3://djl-ai/publish/mxnet-1.6.0-b/linux/mkl/libmxnet.so
+- s3://djl-ai/publish/mxnet-1.6.0-b/osx/mkl/libmkldnn.1.dylib
+- s3://djl-ai/publish/mxnet-1.6.0-b/osx/mkl/libmxnet.dylib
+- s3://djl-ai/publish/mxnet-1.6.0-b/win/common/libgcc_s_seh-1.dll
+- s3://djl-ai/publish/mxnet-1.6.0-b/win/common/libgfortran-3.dll
+- s3://djl-ai/publish/mxnet-1.6.0-b/win/common/libopenblas.dll
+- s3://djl-ai/publish/mxnet-1.6.0-b/win/common/libquadmath-0.dll
+- s3://djl-ai/publish/mxnet-1.6.0-b/win/common/mkldnn.dll
+- s3://djl-ai/publish/mxnet-1.6.0-b/win/cu101mkl/libmxnet.dll
+- s3://djl-ai/publish/mxnet-1.6.0-b/win/cu92mkl/libmxnet.dll
+- s3://djl-ai/publish/mxnet-1.6.0-b/win/mkl/libmxnet.dll
+
+### Step 3: Test publishing
 
 Run the following commands to prepare your package:
 
 ```bash
 cd mxnet/native
 
+# Download native files and put into right folder
+./gradlew dMNL
+
 # Publish to build/repo folder
 ./gradlew publish
 
 # If the artifact is large, increase the socket timeout
-./gradlew publish -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000
+./gradlew publish -Psnapshot -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000
+```
+
+### Step 4: Use GitHub action to publish MXNet native library
+
+We have weekly GitHub pipeline to publish snapshot automatically. We can also use GitHub REST API to manually trigger a publish:
+
+```bash
+# manually trigger publish a snapshot release
+curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/USERNAME/RESPOSITORY_NAME/dispatches --data '{"event_type": “mxnet-snapshot-pub"}'
+
+# trigger publishing MXNet to sonatype stagging
+curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/USERNAME/RESPOSITORY_NAME/dispatches --data '{"event_type": “mxnet-staging-pub"}'
 ```
