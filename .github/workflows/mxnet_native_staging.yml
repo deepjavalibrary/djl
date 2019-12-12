@@ -7,7 +7,7 @@ on:
   # Make sure you create your personal token with repo access. Follow steps in
   # https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
   # to create your personal token.
-  repository_despatch:
+  repository_dispatch:
     types: [mxnet-staging-pub]
 
 jobs:
