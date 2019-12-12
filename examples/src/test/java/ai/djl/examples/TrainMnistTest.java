@@ -25,18 +25,25 @@ public class TrainMnistTest {
 
     @Test
     public void testTrainMnist() throws ModelException, TranslateException, IOException {
-        String[] args = new String[] {"-g", "1"};
+        if (Boolean.getBoolean("nightly")) {
+            String[] args = new String[] {"-g", "1"};
 
-        TrainMnist test = new TrainMnist();
-        Assert.assertTrue(test.runExample(args));
-        Assert.assertTrue(test.getTrainingAccuracy() > 0.9f);
-        Assert.assertTrue(test.getTrainingLoss() < 0.35f);
-        Assert.assertTrue(test.getValidationAccuracy() > 0.9f);
-        Assert.assertTrue(test.getValidationLoss() < 0.35f);
+            TrainMnist test = new TrainMnist();
+            Assert.assertTrue(test.runExample(args));
+            Assert.assertTrue(test.getTrainingAccuracy() > 0.9f);
+            Assert.assertTrue(test.getTrainingLoss() < 0.35f);
+            Assert.assertTrue(test.getValidationAccuracy() > 0.9f);
+            Assert.assertTrue(test.getValidationLoss() < 0.35f);
 
-        Classifications result = new ImageClassification().predict();
-        Classifications.Classification best = result.best();
-        Assert.assertEquals(best.getClassName(), "0");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
+            Classifications result = new ImageClassification().predict();
+            Classifications.Classification best = result.best();
+            Assert.assertEquals(best.getClassName(), "0");
+            Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
+        } else {
+            String[] args = new String[] {"-g", "1", "-m", "2"};
+
+            TrainMnist test = new TrainMnist();
+            Assert.assertTrue(test.runExample(args));
+        }
     }
 }
