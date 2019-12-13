@@ -74,15 +74,15 @@ public class ResnetTest {
 
         try (Model model = Model.newInstance()) {
             model.setBlock(resNet50);
-
             try (Trainer trainer = model.newTrainer(config)) {
-                Shape inputShape = new Shape(100, 1, 28, 28);
+                int batchSize = config.getDevices().length * 16;
+                Shape inputShape = new Shape(batchSize, 1, 28, 28);
                 trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
 
                 NDArray input = manager.ones(inputShape);
-                NDArray label = manager.ones(new Shape(100, 1));
+                NDArray label = manager.ones(new Shape(batchSize, 1));
                 Batch batch =
                         new Batch(manager, new NDList(input), new NDList(label), Batchifier.STACK);
                 PairList<String, Parameter> parameters = resNet50.getParameters();
@@ -118,7 +118,8 @@ public class ResnetTest {
         try (ZooModel<BufferedImage, Classifications> model = getModel()) {
             TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l1Loss());
             try (Trainer trainer = model.newTrainer(config)) {
-                Shape inputShape = new Shape(16, 3, 32, 32);
+                int batchSize = config.getDevices().length * 16;
+                Shape inputShape = new Shape(batchSize, 3, 32, 32);
 
                 trainer.initialize(inputShape);
 
@@ -126,7 +127,7 @@ public class ResnetTest {
                 Shape[] outputShape =
                         model.getBlock().getOutputShapes(manager, new Shape[] {inputShape});
 
-                NDArray data = manager.ones(new Shape(16, 3, 32, 32));
+                NDArray data = manager.ones(new Shape(batchSize, 3, 32, 32));
                 NDArray label = manager.ones(outputShape[0]);
                 Batch batch =
                         new Batch(manager, new NDList(data), new NDList(label), Batchifier.STACK);

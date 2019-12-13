@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.training;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
@@ -48,18 +49,22 @@ public class OptimizerTest {
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
+        Device[] devices = Device.getDevices(1);
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(sgd);
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
+                        .setOptimizer(sgd)
+                        .setDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape(BATCH_SIZE, CHANNELS));
+                int batchSize = config.getDevices().length * BATCH_SIZE;
+                trainer.initialize(new Shape(batchSize, CHANNELS));
 
                 NDManager manager = trainer.getManager();
-                NDArray result = runOptimizer(manager, trainer, block);
-                NDArray result2 = runOptimizer(manager, trainer, block);
+                NDArray result = runOptimizer(manager, trainer, block, batchSize);
+                NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
                 Assertions.assertAlmostEquals(result, manager.create(new float[] {0.68f, -0.16f}));
                 Assertions.assertAlmostEquals(
                         result2, manager.create(new float[] {0.4912f, -0.2544f}));
@@ -76,22 +81,26 @@ public class OptimizerTest {
                         .optMomentum(0.9f)
                         .build();
 
+        Device[] devices = Device.getDevices(1);
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(optim);
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
+                        .setOptimizer(optim)
+                        .setDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape(BATCH_SIZE, CHANNELS));
+                int batchSize = config.getDevices().length * BATCH_SIZE;
+                trainer.initialize(new Shape(batchSize, CHANNELS));
 
                 NDManager manager = trainer.getManager();
 
-                NDArray result = runOptimizer(manager, trainer, block);
-                NDArray result2 = runOptimizer(manager, trainer, block);
-                NDArray result3 = runOptimizer(manager, trainer, block);
+                NDArray result = runOptimizer(manager, trainer, block, batchSize);
+                NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
+                NDArray result3 = runOptimizer(manager, trainer, block, batchSize);
                 for (int i = 0; i < 9; i++) {
-                    result3 = runOptimizer(manager, trainer, block);
+                    result3 = runOptimizer(manager, trainer, block, batchSize);
                 }
                 Assertions.assertAlmostEquals(result, manager.create(new float[] {0.68f, -0.16f}));
                 Assertions.assertAlmostEquals(
@@ -111,18 +120,23 @@ public class OptimizerTest {
                         .setMomentum(0.9f)
                         .build();
 
+        // Limit to 1 GPU for consist result.
+        Device[] devices = Device.getDevices(1);
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(optim);
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
+                        .setOptimizer(optim)
+                        .setDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
 
+            int batchSize = config.getDevices().length * BATCH_SIZE;
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape(BATCH_SIZE, CHANNELS));
+                trainer.initialize(new Shape(batchSize, CHANNELS));
 
                 NDManager manager = trainer.getManager();
-                NDArray result = runOptimizer(manager, trainer, block);
-                NDArray result2 = runOptimizer(manager, trainer, block);
+                NDArray result = runOptimizer(manager, trainer, block, batchSize);
+                NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
                 Assertions.assertAlmostEquals(
                         result, manager.create(new float[] {0.392f, -0.304f}));
                 Assertions.assertAlmostEquals(
@@ -139,18 +153,22 @@ public class OptimizerTest {
                         .optLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
+        Device[] devices = Device.getDevices(1);
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(optim);
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
+                        .setOptimizer(optim)
+                        .setDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape(BATCH_SIZE, CHANNELS));
+                int batchSize = config.getDevices().length * BATCH_SIZE;
+                trainer.initialize(new Shape(batchSize, CHANNELS));
 
                 NDManager manager = trainer.getManager();
-                NDArray result = runOptimizer(manager, trainer, block);
-                NDArray result2 = runOptimizer(manager, trainer, block);
+                NDArray result = runOptimizer(manager, trainer, block, batchSize);
+                NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
                 Assertions.assertAlmostEquals(
                         result, manager.create(new float[] {0.8999999761581421f, -0.10000064f}));
                 Assertions.assertAlmostEquals(
@@ -159,8 +177,8 @@ public class OptimizerTest {
         }
     }
 
-    private NDArray runOptimizer(NDManager manager, Trainer trainer, Block block) {
-        NDArray data = manager.ones(new Shape(BATCH_SIZE, CHANNELS)).mul(2);
+    private NDArray runOptimizer(NDManager manager, Trainer trainer, Block block, int batchSize) {
+        NDArray data = manager.ones(new Shape(batchSize, CHANNELS)).mul(2);
         NDArray label = data.mul(2);
         Batch batch = new Batch(manager, new NDList(data), new NDList(label), Batchifier.STACK);
         trainer.trainBatch(batch);

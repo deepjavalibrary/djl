@@ -35,6 +35,7 @@ public class Cifar10Test {
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Blocks.identityBlock());
+            int batchSize = config.getDevices().length * 32;
 
             Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
             Cifar10 cifar10 =
@@ -42,7 +43,7 @@ public class Cifar10Test {
                             .setManager(model.getNDManager())
                             .optUsage(Usage.TEST)
                             .optRepository(repository)
-                            .setSampling(32, true)
+                            .setSampling(batchSize, true)
                             .build();
 
             cifar10.prepare();

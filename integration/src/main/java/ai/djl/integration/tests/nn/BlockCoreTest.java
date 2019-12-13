@@ -12,9 +12,11 @@
  */
 package ai.djl.integration.tests.nn;
 
+import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -328,7 +330,8 @@ public class BlockCoreTest {
 
     @Test
     public void testRNNTanh() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setDevices(getDevices());
 
         Block block =
                 new RNN.Builder()
@@ -336,7 +339,7 @@ public class BlockCoreTest {
                         .setNumStackedLayers(1)
                         .setActivation(RNN.Activation.TANH)
                         .build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -355,7 +358,8 @@ public class BlockCoreTest {
 
     @Test
     public void testRNNRelu() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setDevices(getDevices());
 
         Block block =
                 new RNN.Builder()
@@ -363,7 +367,7 @@ public class BlockCoreTest {
                         .setNumStackedLayers(1)
                         .setActivation(RNN.Activation.RELU)
                         .build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -386,7 +390,8 @@ public class BlockCoreTest {
 
     @Test
     public void testLstm() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setDevices(getDevices());
 
         Block block =
                 new LSTM.Builder()
@@ -394,7 +399,7 @@ public class BlockCoreTest {
                         .setNumStackedLayers(1)
                         .setActivation(RNN.Activation.RELU)
                         .build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -420,7 +425,8 @@ public class BlockCoreTest {
 
     @Test
     public void testGRU() throws IOException, MalformedModelException {
-        TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
+        TrainingConfig config =
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setDevices(getDevices());
 
         GRU block =
                 new GRU.Builder()
@@ -428,7 +434,7 @@ public class BlockCoreTest {
                         .setNumStackedLayers(1)
                         .setActivation(RNN.Activation.RELU)
                         .build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -535,5 +541,14 @@ public class BlockCoreTest {
         for (int idx = 0; idx < bound; idx++) {
             Assert.assertEquals(original.valueAt(idx), loaded.valueAt(idx));
         }
+    }
+
+    private static Device[] getDevices() {
+        if (TestUtils.isWindows() && TestUtils.isMxnet()) {
+            return new Device[] {
+                Device.cpu()
+            }; // TODO: RNN is not implemented on MXNet without cuDNN
+        }
+        return Device.getDevices(1);
     }
 }

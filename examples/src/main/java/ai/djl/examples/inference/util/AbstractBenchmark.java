@@ -109,6 +109,9 @@ public abstract class AbstractBenchmark<T> {
                         getClass().getSimpleName(),
                         Device.defaultDevice(),
                         duration.toMinutes());
+            } else {
+                logger.info(
+                        "Running {} on: {}.", getClass().getSimpleName(), Device.defaultDevice());
             }
             int iteration = arguments.getIteration();
 

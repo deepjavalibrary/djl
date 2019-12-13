@@ -90,15 +90,16 @@ public class GradientCollectorIntegrationTest {
                     manager.randomNormal(
                             0, 0.01, label.getShape(), DataType.FLOAT32, manager.getDevice()));
 
+            int sampling = config.getDevices().length * batchSize;
             ArrayDataset dataset =
                     new ArrayDataset.Builder()
                             .setData(data)
                             .optLabels(label)
-                            .setSampling(batchSize, false)
+                            .setSampling(sampling, false)
                             .build();
             float lossValue;
             try (Trainer trainer = model.newTrainer(config)) {
-                Shape inputShape = new Shape(batchSize, weight.size(0));
+                Shape inputShape = new Shape(sampling, weight.size(0));
                 trainer.initialize(inputShape);
 
                 for (int epoch = 0; epoch < epochs; epoch++) {

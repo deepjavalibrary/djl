@@ -13,7 +13,6 @@
 package ai.djl.training;
 
 import ai.djl.Device;
-import ai.djl.engine.Engine;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetric;
@@ -91,17 +90,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
     @Override
     public Device[] getDevices() {
         if (devices == null) {
-            int numGpus = Engine.getInstance().getGpuCount();
-            if (numGpus > 0) {
-                // TODO: Use single GPU by default for now.
-                numGpus = 1;
-                devices = new Device[numGpus];
-                for (int i = 0; i < numGpus; i++) {
-                    devices[i] = Device.gpu(i);
-                }
-            } else {
-                devices = new Device[] {Device.cpu()};
-            }
+            return Device.getDevices(Integer.MAX_VALUE);
         }
         return devices;
     }
