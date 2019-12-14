@@ -102,5 +102,16 @@
                 <classifier>linux-x86_64</classifier>
             </properties>
         </profile>
+        <profile>
+            <id>win-x86_64</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <classifier>win-x86_64</classifier>
+            </properties>
+        </profile>
     </profiles>
 </project>
