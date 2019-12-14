@@ -28,9 +28,6 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
-import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.learningrate.FactorTracker;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.zoo.cv.classification.Mlp;
 import java.io.IOException;
@@ -91,30 +88,11 @@ public final class TrainMnist extends AbstractTraining {
 
     private TrainingConfig setupTrainingConfig(Arguments arguments) {
         int batchSize = arguments.getBatchSize();
-        FactorTracker factorTracker =
-                LearningRateTracker.factorTracker()
-                        .optBaseLearningRate(0.1f)
-                        .setStep(60000 / batchSize)
-                        .optFactor(0.1f)
-                        .optWarmUpBeginLearningRate(0.01f)
-                        .optWarmUpSteps(500)
-                        .optStopFactorLearningRate(1e-3f)
-                        .build();
-        Optimizer optimizer =
-                Optimizer.sgd()
-                        .setRescaleGrad(1.0f / batchSize)
-                        .setLearningRateTracker(factorTracker)
-                        .optWeightDecays(0.001f)
-                        .optMomentum(0.9f)
-                        .optClipGrad(1f)
-                        .build();
-
         loss = Loss.softmaxCrossEntropyLoss();
         return new DefaultTrainingConfig(new XavierInitializer(), loss)
-                .setOptimizer(optimizer)
                 .addTrainingMetric(new Accuracy())
                 .setBatchSize(batchSize)
-                .setDevices(Device.getDevices(arguments.getMaxGpus()));
+                .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
     private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)

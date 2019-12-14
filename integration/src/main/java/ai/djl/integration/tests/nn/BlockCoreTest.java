@@ -331,7 +331,7 @@ public class BlockCoreTest {
     @Test
     public void testRNNTanh() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setDevices(getDevices());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).optDevices(getDevices());
 
         Block block =
                 new RNN.Builder()
@@ -359,7 +359,7 @@ public class BlockCoreTest {
     @Test
     public void testRNNRelu() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setDevices(getDevices());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).optDevices(getDevices());
 
         Block block =
                 new RNN.Builder()
@@ -391,7 +391,7 @@ public class BlockCoreTest {
     @Test
     public void testLstm() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setDevices(getDevices());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).optDevices(getDevices());
 
         Block block =
                 new LSTM.Builder()
@@ -426,7 +426,7 @@ public class BlockCoreTest {
     @Test
     public void testGRU() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setDevices(getDevices());
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).optDevices(getDevices());
 
         GRU block =
                 new GRU.Builder()

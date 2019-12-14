@@ -24,23 +24,20 @@ import ai.djl.ndarray.NDList;
 public class L1Loss extends Loss {
 
     private float weight;
-    private int batchAxis;
 
     /**
      * Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error).
      *
      * @param weight the weight to apply on loss value, default 1
-     * @param batchAxis the axis that represents mini-batch, default 0
      */
-    public L1Loss(float weight, int batchAxis) {
+    public L1Loss(float weight) {
         super("L1Loss");
         this.weight = weight;
-        this.batchAxis = batchAxis;
     }
 
     /** Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error). */
     public L1Loss() {
-        this(1, 0);
+        this(1);
     }
 
     /** {@inheritDoc} */
@@ -53,7 +50,6 @@ public class L1Loss extends Loss {
             // avoid broadcast mul
             loss = labelReshaped.mul(weight);
         }
-        // apply mean on all axes except the batchAxis
-        return loss.mean(excludeBatchAxis(loss, batchAxis));
+        return loss.mean();
     }
 }

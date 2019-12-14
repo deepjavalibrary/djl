@@ -45,15 +45,14 @@ public class OptimizerTest {
     public void testSgd() {
         Optimizer sgd =
                 new Sgd.Builder()
-                        .setRescaleGrad(1.0f / BATCH_SIZE)
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
-                        .setOptimizer(sgd)
-                        .setDevices(devices);
+                        .optOptimizer(sgd)
+                        .optDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
@@ -76,7 +75,6 @@ public class OptimizerTest {
     public void testSgdWithMomentum() {
         Optimizer optim =
                 new Sgd.Builder()
-                        .setRescaleGrad(1.0f / BATCH_SIZE)
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .optMomentum(0.9f)
                         .build();
@@ -84,8 +82,8 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
-                        .setOptimizer(optim)
-                        .setDevices(devices);
+                        .optOptimizer(optim)
+                        .optDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
@@ -115,7 +113,6 @@ public class OptimizerTest {
     public void testNag() {
         Optimizer optim =
                 new Nag.Builder()
-                        .setRescaleGrad(1.0f / BATCH_SIZE)
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .setMomentum(0.9f)
                         .build();
@@ -124,8 +121,8 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
-                        .setOptimizer(optim)
-                        .setDevices(devices);
+                        .optOptimizer(optim)
+                        .optDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
@@ -149,15 +146,14 @@ public class OptimizerTest {
     public void testAdam() {
         Optimizer optim =
                 new Adam.Builder()
-                        .setRescaleGrad(1.0f / BATCH_SIZE)
                         .optLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
-                        .setOptimizer(optim)
-                        .setDevices(devices);
+                        .optOptimizer(optim)
+                        .optDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);

@@ -43,8 +43,6 @@ import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.SingleShotDetectionLoss;
 import ai.djl.training.metrics.BoundingBoxError;
 import ai.djl.training.metrics.SingleShotDetectionAccuracy;
-import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
@@ -220,19 +218,12 @@ public final class TrainPikachu extends AbstractTraining {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
-        Optimizer optimizer =
-                Optimizer.sgd()
-                        .setRescaleGrad(1.0f / batchSize)
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.2f))
-                        .optWeightDecays(5e-4f)
-                        .build();
         loss = new SingleShotDetectionLoss("ssd_loss");
         return new DefaultTrainingConfig(initializer, loss)
-                .setOptimizer(optimizer)
                 .setBatchSize(batchSize)
                 .addTrainingMetric(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addTrainingMetric(new BoundingBoxError("boundingBoxError"))
-                .setDevices(Device.getDevices(arguments.getMaxGpus()));
+                .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
     public static Block getSsdTrainBlock() {

@@ -70,7 +70,6 @@ public class ParameterStoreTest {
 
             TestOptimizer optimizer =
                     new TestOptimizer.Builder()
-                            .setRescaleGrad(1.0f)
                             .setLearningRateTracker(LearningRateTracker.fixedLearningRate(lr))
                             .build();
 

@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.loss.Loss;
-import java.util.Arrays;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -29,12 +28,8 @@ public class LossTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
-            Assert.assertTrue(
-                    Arrays.equals(
-                            new float[] {0, 1, 2, 3, 4},
-                            Loss.l1Loss()
-                                    .getLoss(new NDList(label), new NDList(pred))
-                                    .toFloatArray()));
+            Assert.assertEquals(
+                    Loss.l1Loss().getLoss(new NDList(label), new NDList(pred)).getFloat(), 2.0f);
         }
     }
 
@@ -43,12 +38,8 @@ public class LossTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
-            Assert.assertTrue(
-                    Arrays.equals(
-                            new float[] {0f, 0.5f, 2f, 4.5f, 8f},
-                            Loss.l2Loss()
-                                    .getLoss(new NDList(label), new NDList(pred))
-                                    .toFloatArray()));
+            Assert.assertEquals(
+                    Loss.l2Loss().getLoss(new NDList(label), new NDList(pred)).getFloat(), 3.0f);
         }
     }
 
@@ -58,7 +49,7 @@ public class LossTest {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(1));
             Assertions.assertAlmostEquals(
-                    manager.create(new float[] {3.45191431f}),
+                    manager.create(3.45191431f),
                     Loss.softmaxCrossEntropyLoss().getLoss(new NDList(label), new NDList(pred)));
         }
     }
@@ -68,12 +59,8 @@ public class LossTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5)).neg();
-            Assert.assertTrue(
-                    Arrays.equals(
-                            new float[] {2, 3, 4, 5, 6},
-                            Loss.hingeLoss()
-                                    .getLoss(new NDList(label), new NDList(pred))
-                                    .toFloatArray()));
+            Assert.assertEquals(
+                    Loss.hingeLoss().getLoss(new NDList(label), new NDList(pred)).getFloat(), 4.0f);
         }
     }
 
@@ -82,13 +69,11 @@ public class LossTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
-            Assertions.assertAlmostEquals(
-                    manager.create(
-                            new float[] {
-                                0.31326175f, 0.12692809f, 0.04858732f, 0.01814985f, 0.0067153f
-                            }),
+            Assert.assertEquals(
                     Loss.sigmoidBinaryCrossEntropyLoss()
-                            .getLoss(new NDList(label), new NDList(pred)));
+                            .getLoss(new NDList(label), new NDList(pred))
+                            .getFloat(),
+                    0.10272846f);
         }
     }
 }

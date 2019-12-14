@@ -27,7 +27,6 @@ import ai.djl.ndarray.NDList;
 public class SoftmaxCrossEntropyLoss extends Loss {
 
     private float weight;
-    private int batchAxis;
     private int classAxis;
     private boolean sparseLabel;
     private boolean fromLogit;
@@ -36,16 +35,14 @@ public class SoftmaxCrossEntropyLoss extends Loss {
      * Creates a new instance of {@code SoftmaxCrossEntropyLoss} with the given parameters.
      *
      * @param weight the weight to apply on the loss value, default 1
-     * @param batchAxis the axis that represents the mini-batch, default 0
      * @param classAxis the axis that represents the class probabilities, default -1
      * @param sparseLabel whether labels are integer array or probabilities, default true
      * @param fromLogit whether labels are log probabilities or un-normalized numbers
      */
     public SoftmaxCrossEntropyLoss(
-            float weight, int batchAxis, int classAxis, boolean sparseLabel, boolean fromLogit) {
+            float weight, int classAxis, boolean sparseLabel, boolean fromLogit) {
         super("SoftmaxCrossEntropyLoss");
         this.weight = weight;
-        this.batchAxis = batchAxis;
         this.classAxis = classAxis;
         this.sparseLabel = sparseLabel;
         this.fromLogit = fromLogit;
@@ -53,7 +50,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
 
     /** Creates a new instance of {@code SoftmaxCrossEntropyLoss} with default parameters. */
     public SoftmaxCrossEntropyLoss() {
-        this(1, 0, -1, true, false);
+        this(1, -1, true, false);
     }
 
     /** {@inheritDoc} */
@@ -75,8 +72,6 @@ public class SoftmaxCrossEntropyLoss extends Loss {
         if (weight != 1) {
             loss = loss.mul(weight);
         }
-        // apply mean on all axes except the batchAxis
-        // TODO: alternative use numpy batch flatten and mean batch axis
-        return loss.mean(excludeBatchAxis(loss, batchAxis));
+        return loss.mean();
     }
 }

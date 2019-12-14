@@ -31,9 +31,6 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.optimizer.Nag;
-import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
@@ -54,16 +51,8 @@ public class ResnetTest {
 
     @Test
     public void testTrain() {
-        Optimizer optimizer =
-                new Nag.Builder()
-                        .setRescaleGrad(1.0f / 100)
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
-                        .setMomentum(0.9f)
-                        .build();
-
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss())
-                        .setOptimizer(optimizer);
+                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
 
         Block resNet50 =
                 new ResNetV1.Builder()

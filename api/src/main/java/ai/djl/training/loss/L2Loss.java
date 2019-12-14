@@ -23,23 +23,20 @@ import ai.djl.ndarray.NDList;
 public class L2Loss extends Loss {
 
     private float weight;
-    private int batchAxis;
 
     /**
      * Calculates L2Loss between the label and prediction, a.k.a. MSE(Mean Square Error).
      *
      * @param weight the weight to apply on loss value, default 1/2
-     * @param batchAxis the axis that represents mini-batch, default 0
      */
-    public L2Loss(float weight, int batchAxis) {
+    public L2Loss(float weight) {
         super("L2Loss");
         this.weight = weight;
-        this.batchAxis = batchAxis;
     }
 
     /** Calculate L2Loss between the label and prediction, a.k.a. MSE(Mean Square Error). */
     public L2Loss() {
-        this(1.f / 2, 0);
+        this(1.f / 2);
     }
 
     /** {@inheritDoc} */
@@ -48,7 +45,6 @@ public class L2Loss extends Loss {
         NDArray pred = prediction.singletonOrThrow();
         NDArray labelReshaped = label.singletonOrThrow().reshape(pred.getShape());
         NDArray loss = labelReshaped.sub(pred).square().mul(weight);
-        // apply mean on all axes except the batchAxis
-        return loss.mean(excludeBatchAxis(loss, batchAxis));
+        return loss.mean();
     }
 }

@@ -26,26 +26,23 @@ import ai.djl.nn.Activation;
 public class SigmoidBinaryCrossEntropyLoss extends Loss {
 
     private float weight;
-    private int batchAxis;
     private boolean fromSigmoid;
 
     /**
      * Performs Sigmoid cross-entropy loss for binary classification.
      *
      * @param weight the weight to apply on the loss value, default 1
-     * @param batchAxis the axis that represents the mini-batch, default 0
      * @param fromSigmoid whether the input is from the output of sigmoid, default false
      */
-    public SigmoidBinaryCrossEntropyLoss(float weight, int batchAxis, boolean fromSigmoid) {
+    public SigmoidBinaryCrossEntropyLoss(float weight, boolean fromSigmoid) {
         super("SigmoidBinaryCrossEntropyLoss");
         this.weight = weight;
-        this.batchAxis = batchAxis;
         this.fromSigmoid = fromSigmoid;
     }
 
     /** Performs Sigmoid cross-entropy loss for binary classification. */
     public SigmoidBinaryCrossEntropyLoss() {
-        this(1, 0, false);
+        this(1, false);
     }
 
     /** {@inheritDoc} */
@@ -72,6 +69,6 @@ public class SigmoidBinaryCrossEntropyLoss extends Loss {
         if (weight != 1f) {
             loss = loss.mul(weight);
         }
-        return loss.mean(excludeBatchAxis(loss, batchAxis));
+        return loss.mean();
     }
 }

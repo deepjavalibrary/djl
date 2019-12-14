@@ -17,11 +17,11 @@ import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
 
 /**
- * Base class for all training metrics.
+ * Base class for all training metrics that can be used to evaluate the performance of a model.
  *
- * <p>Training metrics can be used to evaluate the performance of a model. They can all be monitored
- * to make an assessment about the performance of the model. However, only ones that further extend
- * {@link ai.djl.training.loss.Loss} are suited to being used to directly optimize a model.
+ * <p>The {@code TrainingMetric}s can all be monitored to make an assessment about the performance
+ * of the model. However, only ones that further extend {@link ai.djl.training.loss.Loss} are suited
+ * to being used to directly optimize a model.
  */
 public abstract class TrainingMetric implements Cloneable {
 

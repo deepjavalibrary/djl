@@ -41,10 +41,6 @@ public abstract class Optimizer {
         this.weightDecays = builder.weightDecays;
         this.clipGrad = builder.clipGrad;
         this.beginNumUpdate = builder.beginNumUpdate;
-
-        if (rescaleGrad == 0) {
-            throw new IllegalArgumentException("The rescaleGrad should be set");
-        }
     }
 
     /**
@@ -133,7 +129,7 @@ public abstract class Optimizer {
     @SuppressWarnings("rawtypes")
     public abstract static class OptimizerBuilder<T extends OptimizerBuilder> {
 
-        private float rescaleGrad;
+        private float rescaleGrad = 1.0f;
         private float weightDecays;
         private float clipGrad = -1;
         private int beginNumUpdate;

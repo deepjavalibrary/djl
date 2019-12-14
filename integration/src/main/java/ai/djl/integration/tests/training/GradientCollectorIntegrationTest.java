@@ -67,12 +67,11 @@ public class GradientCollectorIntegrationTest {
 
         Optimizer optimizer =
                 new Sgd.Builder()
-                        .setRescaleGrad(1.0f / batchSize)
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
                         .build();
 
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).setOptimizer(optimizer);
+                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss()).optOptimizer(optimizer);
 
         try (Model model = Model.newInstance()) {
             Linear block = new Linear.Builder().setOutChannels(1).build();

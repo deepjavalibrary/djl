@@ -26,25 +26,22 @@ public class HingeLoss extends Loss {
 
     private int margin;
     private float weight;
-    private int batchAxis;
 
     /**
      * Calculates Hinge loss.
      *
      * @param margin the margin in hinge loss. Defaults to 1.0
      * @param weight the weight to apply on loss value, default 1
-     * @param batchAxis the axis that represents mini-batch, default 0
      */
-    public HingeLoss(int margin, float weight, int batchAxis) {
+    public HingeLoss(int margin, float weight) {
         super("HingeLoss");
         this.margin = margin;
         this.weight = weight;
-        this.batchAxis = batchAxis;
     }
 
     /** Calculates Hinge loss. */
     public HingeLoss() {
-        this(1, 1, 0);
+        this(1, 1);
     }
 
     /** {@inheritDoc} */
@@ -56,6 +53,6 @@ public class HingeLoss extends Loss {
         if (weight != 1) {
             loss = loss.mul(weight);
         }
-        return loss.mean(excludeBatchAxis(loss, batchAxis));
+        return loss.mean();
     }
 }

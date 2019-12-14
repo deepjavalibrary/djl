@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.training.transferlearning;
+package ai.djl.examples.training;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
@@ -39,19 +39,24 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
+import ai.djl.training.optimizer.Optimizer;
+import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.zoo.ModelZoo;
 import ai.djl.zoo.cv.classification.ResNetV1;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class TrainResnetWithCifar10 extends AbstractTraining {
+/** This example features sample usage of a variety of optimizers to train Cifar10. */
+public final class TrainWithOptimizers extends AbstractTraining {
 
     public static void main(String[] args) {
-        new TrainResnetWithCifar10().runExample(args);
+        new TrainWithOptimizers().runExample(args);
     }
 
     /** {@inheritDoc} */
@@ -154,8 +159,41 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         loss = Loss.softmaxCrossEntropyLoss();
         return new DefaultTrainingConfig(initializer, loss)
                 .addTrainingMetric(new Accuracy())
+                .optOptimizer(setupOptimizer(arguments))
                 .setBatchSize(batchSize)
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
+    }
+
+    private Optimizer setupOptimizer(Arguments arguments) {
+        String optimizerName = "adam";
+        switch (optimizerName) {
+            case "sgd":
+                // epoch number to change learning rate
+                int[] epochs;
+                if (arguments.isPreTrained()) {
+                    epochs = new int[] {2, 5, 8};
+                } else {
+                    epochs = new int[] {20, 60, 90, 120, 180};
+                }
+                int[] steps = Arrays.stream(epochs).map(k -> k * 60000 / batchSize).toArray();
+                MultiFactorTracker learningRateTracker =
+                        LearningRateTracker.multiFactorTracker()
+                                .setSteps(steps)
+                                .optBaseLearningRate(1e-3f)
+                                .optFactor((float) Math.sqrt(.1f))
+                                .optWarmUpBeginLearningRate(1e-4f)
+                                .optWarmUpSteps(200)
+                                .build();
+                return Optimizer.sgd()
+                        .setLearningRateTracker(learningRateTracker)
+                        .optWeightDecays(0.001f)
+                        .optClipGrad(5f)
+                        .build();
+            case "adam":
+                return Optimizer.adam().build();
+            default:
+                throw new IllegalArgumentException("Unknown optimizer");
+        }
     }
 
     private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)

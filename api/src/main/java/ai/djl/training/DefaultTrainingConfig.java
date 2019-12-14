@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetric;
+import ai.djl.training.optimizer.Adam;
 import ai.djl.training.optimizer.Optimizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
     public DefaultTrainingConfig(Initializer initializer, Loss loss) {
         this.initializer = initializer;
         trainingMetrics = new ArrayList<>();
+        optimizer = new Adam.Builder().build();
         this.loss = loss;
     }
 
@@ -48,18 +50,18 @@ public class DefaultTrainingConfig implements TrainingConfig {
      * @param devices an array of devices to be set
      * @return this {@code DefaultTrainingConfig}
      */
-    public DefaultTrainingConfig setDevices(Device[] devices) {
+    public DefaultTrainingConfig optDevices(Device[] devices) {
         this.devices = devices;
         return this;
     }
 
     /**
-     * Sets the {@link Optimizer} used during training.
+     * Sets the {@link Optimizer} used during training (default {@link Adam}).
      *
      * @param optimizer the optimizer to be set
      * @return this {@code DefaultTrainingConfig}
      */
-    public DefaultTrainingConfig setOptimizer(Optimizer optimizer) {
+    public DefaultTrainingConfig optOptimizer(Optimizer optimizer) {
         this.optimizer = optimizer;
         return this;
     }
