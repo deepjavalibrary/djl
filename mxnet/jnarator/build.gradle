@@ -22,5 +22,6 @@ jar {
         attributes 'Main-Class': 'ai.djl.mxnet.jnarator.Main'
     }
     includeEmptyDirs = false
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 }
