@@ -152,7 +152,8 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
         loss = Loss.softmaxCrossEntropyLoss();
-        return new DefaultTrainingConfig(initializer, loss)
+        return new DefaultTrainingConfig(loss)
+                .optInitializer(initializer)
                 .addTrainingMetric(new Accuracy())
                 .setBatchSize(batchSize)
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));

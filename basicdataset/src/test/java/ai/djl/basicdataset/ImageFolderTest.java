@@ -42,7 +42,8 @@ public class ImageFolderTest {
     public void testImageFolder() throws IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/imagefolder");
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Blocks.identityBlock());

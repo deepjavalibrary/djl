@@ -32,7 +32,8 @@ public class MnistTest {
     @Test
     public void testMnistLocal() throws IOException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Blocks.identityBlock());
@@ -61,7 +62,8 @@ public class MnistTest {
     @Test
     public void testMnistRemote() throws IOException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Blocks.identityBlock());

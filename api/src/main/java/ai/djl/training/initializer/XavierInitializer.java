@@ -21,7 +21,9 @@ import ai.djl.ndarray.types.Shape;
 /**
  * {@code XavierInitializer} is an {@link Initializer} that performs "Xavier" initialization for
  * parameters. This initializer is designed to keep the scale of gradients roughly the same in all
- * layers.
+ * layers. It was originally defined in the paper <a
+ * href="http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf"><i>Understanding the difficulty of
+ * training deep feedforward neural networks</i></a>.
  *
  * <p>{@code XavierInitializer} is specified by the type of random distribution({@link RandomType}),
  * the factor type({@link FactorType}), and the magnitude of the scale. By default, {@link
@@ -37,8 +39,15 @@ import ai.djl.ndarray.types.Shape;
  * <p>If {@link RandomType} is {@code GAUSSIAN} and {@link FactorType} is {@code AVG}, the
  * initializer fills the weights with numbers from normal distribution with a standard deviation of
  * \(\sqrt{\frac{3.}{0.5 * (n_{in} + n_{out})}}\).
+ *
+ * <p>Another common setting of the {@code XavierInitializer} is defined in the paper <a
+ * href="https://arxiv.org/abs/1502.01852"><i>Delving Deep into Rectifiers: Surpassing Human-Level
+ * Performance on ImageNet Classification</i></a>. These settings better handle non-linearity when
+ * preserving the variance across layers in a neural network. It can be initialized with {@code new
+ * XavierInitializer(RandomType.GAUSSIAN, FactorType.IN, 2))}.
  */
 public class XavierInitializer implements Initializer {
+
     /** Enum for different types of random distributions. */
     public enum RandomType {
         UNIFORM,

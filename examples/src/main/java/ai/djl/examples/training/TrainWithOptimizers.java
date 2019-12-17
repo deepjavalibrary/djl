@@ -157,7 +157,8 @@ public final class TrainWithOptimizers extends AbstractTraining {
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
         loss = Loss.softmaxCrossEntropyLoss();
-        return new DefaultTrainingConfig(initializer, loss)
+        return new DefaultTrainingConfig(loss)
+                .optInitializer(initializer)
                 .addTrainingMetric(new Accuracy())
                 .optOptimizer(setupOptimizer(arguments))
                 .setBatchSize(batchSize)
@@ -165,6 +166,7 @@ public final class TrainWithOptimizers extends AbstractTraining {
     }
 
     private Optimizer setupOptimizer(Arguments arguments) {
+        // TODO: Accept optimizerName as an argument
         String optimizerName = "adam";
         switch (optimizerName) {
             case "sgd":

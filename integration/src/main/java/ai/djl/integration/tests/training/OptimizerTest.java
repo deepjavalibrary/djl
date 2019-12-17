@@ -50,7 +50,8 @@ public class OptimizerTest {
 
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES)
                         .optOptimizer(sgd)
                         .optDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
@@ -81,7 +82,8 @@ public class OptimizerTest {
 
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
@@ -120,7 +122,8 @@ public class OptimizerTest {
         // Limit to 1 GPU for consist result.
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
@@ -151,7 +154,8 @@ public class OptimizerTest {
 
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss())
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = new Linear.Builder().setOutChannels(CHANNELS).build();

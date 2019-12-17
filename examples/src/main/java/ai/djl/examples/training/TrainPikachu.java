@@ -219,7 +219,8 @@ public final class TrainPikachu extends AbstractTraining {
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
         loss = new SingleShotDetectionLoss("ssd_loss");
-        return new DefaultTrainingConfig(initializer, loss)
+        return new DefaultTrainingConfig(loss)
+                .optInitializer(initializer)
                 .setBatchSize(batchSize)
                 .addTrainingMetric(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addTrainingMetric(new BoundingBoxError("boundingBoxError"))

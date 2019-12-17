@@ -44,7 +44,8 @@ import org.testng.annotations.Test;
 
 public class DatasetTest {
 
-    private TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
+    private TrainingConfig config =
+            new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
     @Test
     public void testSequenceSampler() {

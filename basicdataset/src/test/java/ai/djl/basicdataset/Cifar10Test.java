@@ -31,7 +31,8 @@ public class Cifar10Test {
     @Test
     public void testCifar10Local() throws IOException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Blocks.identityBlock());
@@ -60,7 +61,8 @@ public class Cifar10Test {
     @Test
     public void testCifar10Remote() throws IOException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(Blocks.identityBlock());

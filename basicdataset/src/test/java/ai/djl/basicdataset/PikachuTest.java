@@ -39,8 +39,8 @@ public class PikachuTest {
                                 .setSampling(1, true));
         pikachu.prepare();
         TrainingConfig config =
-                new DefaultTrainingConfig(
-                        new NormalInitializer(0.01), Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(new NormalInitializer(0.01));
         try (Model model = Model.newInstance()) {
             model.setBlock(Blocks.identityBlock());
             try (Trainer trainer = model.newTrainer(config)) {

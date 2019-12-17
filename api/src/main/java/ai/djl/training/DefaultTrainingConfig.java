@@ -14,6 +14,9 @@ package ai.djl.training;
 
 import ai.djl.Device;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.initializer.XavierInitializer;
+import ai.djl.training.initializer.XavierInitializer.FactorType;
+import ai.djl.training.initializer.XavierInitializer.RandomType;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.TrainingMetric;
 import ai.djl.training.optimizer.Adam;
@@ -34,14 +37,26 @@ public class DefaultTrainingConfig implements TrainingConfig {
     /**
      * Creates an instance of {@code DefaultTrainingConfig} with the given {@link Initializer}.
      *
-     * @param initializer the initializer to initialize the parameters with
      * @param loss the loss to use for training
      */
-    public DefaultTrainingConfig(Initializer initializer, Loss loss) {
-        this.initializer = initializer;
-        trainingMetrics = new ArrayList<>();
+    public DefaultTrainingConfig(Loss loss) {
+        // Defaults to initializer defined in https://arxiv.org/abs/1502.01852
+        this.initializer = new XavierInitializer(RandomType.GAUSSIAN, FactorType.IN, 2);
         optimizer = new Adam.Builder().build();
         this.loss = loss;
+        trainingMetrics = new ArrayList<>();
+    }
+
+    /**
+     * Sets the {@link Initializer} to use for the parameters (default from <a
+     * href="https://arxiv.org/abs/1502.01852">paper</a>).
+     *
+     * @param initializer the initialer to use for the parameters
+     * @return this {@code DefaultTrainingConfig}
+     */
+    public DefaultTrainingConfig optInitializer(Initializer initializer) {
+        this.initializer = initializer;
+        return this;
     }
 
     /**

@@ -26,7 +26,6 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
-import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.util.ProgressBar;
@@ -89,7 +88,7 @@ public final class TrainMnist extends AbstractTraining {
     private TrainingConfig setupTrainingConfig(Arguments arguments) {
         int batchSize = arguments.getBatchSize();
         loss = Loss.softmaxCrossEntropyLoss();
-        return new DefaultTrainingConfig(new XavierInitializer(), loss)
+        return new DefaultTrainingConfig(loss)
                 .addTrainingMetric(new Accuracy())
                 .setBatchSize(batchSize)
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));

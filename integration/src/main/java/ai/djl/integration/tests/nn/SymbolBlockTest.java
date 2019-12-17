@@ -65,7 +65,8 @@ public class SymbolBlockTest {
     public void trainWithNewParam()
             throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
         Map<String, String> criteria = new ConcurrentHashMap<>();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
 
@@ -94,7 +95,8 @@ public class SymbolBlockTest {
     public void trainWithExistParam()
             throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
         Map<String, String> criteria = new ConcurrentHashMap<>();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
 
@@ -122,7 +124,8 @@ public class SymbolBlockTest {
     public void trainWithCustomLayer()
             throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Initializer.ONES, Loss.softmaxCrossEntropyLoss());
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
         Map<String, String> criteria = new ConcurrentHashMap<>();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
             NDManager manager = model.getNDManager();

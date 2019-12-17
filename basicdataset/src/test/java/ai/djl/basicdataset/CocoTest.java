@@ -37,7 +37,8 @@ public class CocoTest {
                         .build();
         coco.prepare();
         try (Model model = Model.newInstance()) {
-            TrainingConfig config = new DefaultTrainingConfig(Initializer.ONES, Loss.l2Loss());
+            TrainingConfig config =
+                    new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
             model.setBlock(Blocks.identityBlock());
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(coco)) {

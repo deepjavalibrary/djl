@@ -124,7 +124,8 @@ public class SingleShotDetectionTest {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
-        return new DefaultTrainingConfig(initializer, new SingleShotDetectionLoss("ssd_loss"))
+        return new DefaultTrainingConfig(new SingleShotDetectionLoss("ssd_loss"))
+                .optInitializer(initializer)
                 .setBatchSize(32)
                 .addTrainingMetric(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addTrainingMetric(new BoundingBoxError("boundingBoxError"))
