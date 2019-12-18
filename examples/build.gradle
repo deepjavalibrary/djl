@@ -14,10 +14,10 @@ dependencies {
     implementation "commons-cli:commons-cli:1.4"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
     implementation "com.google.code.gson:gson:2.8.5"
-    implementation "ai.djl:api:0.2.1-SNAPSHOT"
-    implementation "ai.djl:basicdataset:0.2.1-SNAPSHOT"
-    implementation "ai.djl:model-zoo:0.2.1-SNAPSHOT"
-    implementation "ai.djl.mxnet:mxnet-model-zoo:0.2.1-SNAPSHOT"
+    implementation "ai.djl:api:0.2.1"
+    implementation "ai.djl:basicdataset:0.2.1"
+    implementation "ai.djl:model-zoo:0.2.1"
+    implementation "ai.djl.mxnet:mxnet-model-zoo:0.2.1"
 
     runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
 
@@ -48,7 +48,7 @@ import java.util.regex.Pattern
 def getMXNetNativeLib() {
     String osName = System.getProperty("os.name")
     if (osName.startsWith("Mac")) {
-        return "mxnet-native-mkl:1.6.0-b-SNAPSHOT:osx-x86_64"
+        return "mxnet-native-mkl:1.6.0-b:osx-x86_64"
     }
 
     String osPrefix;
@@ -80,9 +80,9 @@ def getMXNetNativeLib() {
         } else {
             String nvccVersion = m.group(1)
             if (nvccVersion == "10.1") {
-                return "mxnet-native-cu101mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
+                return "mxnet-native-cu101mkl:1.6.0-b:${osPrefix}-x86_64"
             } else if (nvccVersion == "9.2") {
-                return "mxnet-native-cu92mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
+                return "mxnet-native-cu92mkl:1.6.0-b:${osPrefix}-x86_64"
             } else {
                 logger.log(LogLevel.WARN, "Unsupported cuda version: " + nvccVersion)
             }
@@ -91,5 +91,5 @@ def getMXNetNativeLib() {
         logger.debug("No cuda is detected");
     }
 
-    return "mxnet-native-mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
+    return "mxnet-native-mkl:1.6.0-b:${osPrefix}-x86_64"
 }
