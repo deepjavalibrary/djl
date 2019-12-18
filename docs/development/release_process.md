@@ -26,20 +26,20 @@ cd djl
 ```
 Make a commit, get reviewed, and then merge it into github.
 
-### Step 1.4: Upload javadoc-index.html to S3 bucket
+### Step 1.3: Upload javadoc-index.html to S3 bucket
 
 ```shell script
 aws s3 cp website/javadoc-index.html s3://javadoc-djl-ai/index.html
 ```
 
-### Step 1.5: Publish mxnet-native library to sonatype staging server
+### Step 1.4: Publish mxnet-native library to sonatype staging server
 
 Run the following command to trigger mxnet-native publishing job:
 ```shell script
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "mxnet-staging-pub"}'
 ```
 
-### Step 1.6: Remove -SNAPSHOT in examples and jupyter notebooks
+### Step 1.5: Remove -SNAPSHOT in examples and jupyter notebooks
 
 Run the following command with correct version value:
 ```shell script
@@ -51,7 +51,7 @@ git tag -a vX.X.X -m "Releasing version vX.X.X"
 git push origin vX.X.X
 ```
 
-### Step 1.7 Create a Release Notes
+### Step 1.6 Create a Release Notes
 
 Navigate to DJL github site, select "Release" tab and click "Draft a new Release" button.
 Select tag that created by previous step. Check "This is a pre-release" checkbox.
@@ -110,7 +110,7 @@ cd djl
 
 Create a PR to get reviewed and merge into github.
 
-## Step 5: Publish new snapshot to sonatype
+## Step 6: Publish new snapshot to sonatype
 
 Manually trigger a nightly build with the following command:
 ```shell script
