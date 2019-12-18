@@ -1,0 +1,67 @@
+task release {
+    doLast {
+        def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
+        collection += files("examples/build.gradle", "examples/pom.xml")
+        collection.each { File file ->
+            file.text = file.text.replaceAll("-SNAPSHOT", "").replaceAll("%mavenRepo", "// %mavenRepo")
+        }
+    }
+}
+
+task staging() {
+    doLast {
+        if (!project.hasProperty("stagingRepo")) {
+            throw new GradleException("stagingRepo property is required.")
+        }
+        def stagingRepo = project.property("stagingRepo")
+
+        def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
+        collection += files("examples/build.gradle", "examples/pom.xml")
+        collection.each { File file ->
+            file.text = file.text.replaceAll("https://oss\\.sonatype\\.org/content/repositories/snapshots/",
+                    "https://oss.sonatype.org/service/local/repositories/${stagingRepo}/content/")
+                    .replaceAll("-SNAPSHOT", "")
+        }
+    }
+}
+
+task increaseBuildVersion {
+    doLast {
+        if (!project.hasProperty("targetVersion")) {
+            throw new GradleException("targetVersion property is required.")
+        }
+        def targetVersion = project.property("targetVersion")
+
+        def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
+        collection += files("examples/build.gradle", "examples/pom.xml")
+        collection.each { File file ->
+            file.text = file.text.replaceAll("${version}", "${targetVersion}-SNAPSHOT")
+        }
+
+        File file = new File("build.gradle")
+        def releaseVersion = version.replaceAll("-SNAPSHOT", "")
+        file.text = file.text.replaceAll("\"${releaseVersion}\"", "\"${targetVersion}\"")
+    }
+}
+
+task increaseFinalVersion {
+    doLast {
+        if (!project.hasProperty("previousVersion")) {
+            throw new GradleException("previousVersion property is required.")
+        }
+        def previousVersion = project.property("previousVersion")
+        def releaseVersion = version.replaceAll("-SNAPSHOT", "")
+
+        def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
+        collection += fileTree(".").filter {
+            it.name.endsWith(".md") || it.name.endsWith("overview.html") || it.name.endsWith("javadoc-index.html")
+        }
+
+        collection.each { File file ->
+            file.text = file.text.replaceAll("/${previousVersion}/", "/${releaseVersion}/")
+                    .replaceAll(">${previousVersion}<", ">${releaseVersion}<")
+                    .replaceAll(":${previousVersion}", ":${releaseVersion}")
+        }
+    }
+}
+

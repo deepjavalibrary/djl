@@ -30,7 +30,7 @@ You can pull the model zoo from the central Maven repository by including the fo
 
 ## Pre-trained models
 
-In the 0.2.1 release, you can find the Multilayer Perceptrons (MLP) and Resnet50 pre-trained models in the model zoo.
+You can find the Multilayer Perceptrons (MLP) and Resnet50 pre-trained models in the model zoo.
 
 ### How to find a pre-trained model in the model zoo
 
