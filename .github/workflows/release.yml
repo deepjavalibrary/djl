@@ -1,6 +1,14 @@
 name: release
 
 on:
+  # To trigger this workflow manually, you can use the following curl command:
+  # curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "release-build"}'
+
+  # Make sure you create your personal token with repo access. Follow steps in
+  # https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+  # to create your personal token.
+  repository_dispatch:
+    types: [release-build]
   release:
     types: [published]
 
