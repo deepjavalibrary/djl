@@ -15,7 +15,6 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.engine.Engine;
 import ai.djl.integration.util.Assertions;
 import ai.djl.mxnet.engine.MxParameterServer;
 import ai.djl.ndarray.NDArray;
@@ -33,7 +32,7 @@ public class ParameterStoreTest {
     public void testParameterStore() {
         try (Model model = Model.newInstance()) {
             NDManager manager = model.getNDManager();
-            int numGpus = Engine.getInstance().getGpuCount();
+            int numGpus = Device.getGpuCount();
             int numDevices;
             if (numGpus > 0) {
                 numDevices = numGpus;

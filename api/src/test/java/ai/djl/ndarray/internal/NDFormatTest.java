@@ -12,6 +12,7 @@
  */
 package ai.djl.ndarray.internal;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -25,7 +26,7 @@ public class NDFormatTest {
 
     @Test
     public void testUint8Format() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
             byte[] data = {Byte.MAX_VALUE, Byte.MIN_VALUE, 1};
             NDArray array = manager.create(new Shape(3), DataType.UINT8);
             array.set(data);
@@ -37,7 +38,7 @@ public class NDFormatTest {
 
     @Test
     public void testInt8Format() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
             byte[] data = {Byte.MAX_VALUE, Byte.MIN_VALUE, 1};
             NDArray array = manager.create(data);
 
@@ -48,7 +49,7 @@ public class NDFormatTest {
 
     @Test
     public void testIntFormat() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
             int[] data = {Integer.MAX_VALUE, Integer.MIN_VALUE, 1};
             NDArray array = manager.create(data);
 
@@ -74,7 +75,7 @@ public class NDFormatTest {
 
     @Test
     public void testLongFormat() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
             long[] data = {Long.MAX_VALUE, Long.MIN_VALUE, 1};
             NDArray array = manager.create(data);
 
@@ -90,7 +91,7 @@ public class NDFormatTest {
 
     @Test
     public void testFloat64Format() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
             double[] data = {Double.NEGATIVE_INFINITY, Double.MAX_VALUE, Double.NaN, -1};
             NDArray array = manager.create(data);
 

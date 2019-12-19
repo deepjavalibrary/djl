@@ -1,7 +1,6 @@
 group "ai.djl.mxnet"
 
 dependencies {
-    api "net.java.dev.jna:jna:${jna_version}"
     api "org.slf4j:slf4j-api:${slf4j_version}"
     api project(":api")
 

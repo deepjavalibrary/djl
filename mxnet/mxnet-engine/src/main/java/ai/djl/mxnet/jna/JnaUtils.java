@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -225,6 +226,10 @@ public final class JnaUtils {
         checkCall(LIB.MXLibInfoFeatures(ref, outSize));
 
         int size = outSize.getValue().intValue();
+        if (size == 0) {
+            return Collections.emptySet();
+        }
+
         LibFeature pointer = new LibFeature(ref.getValue());
         pointer.read();
 

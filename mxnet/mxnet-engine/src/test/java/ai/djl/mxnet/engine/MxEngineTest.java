@@ -15,13 +15,11 @@ package ai.djl.mxnet.engine;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.mxnet.jna.MxnetLibrary;
 import ai.djl.mxnet.test.MockMxnetLibrary;
 import java.io.IOException;
-import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.powermock.api.mockito.PowerMockito;
@@ -54,20 +52,6 @@ public class MxEngineTest extends PowerMockTestCase {
         Files.deleteIfExists(Paths.get("build/tmp/A-symbol.json"));
         Files.deleteIfExists(Paths.get("build/tmp/A-0122.params"));
         Files.deleteIfExists(Paths.get("build/tmp/A-0001.params"));
-    }
-
-    @Test
-    public void testGetGpuMemory() {
-        Engine engine = Engine.getEngine(MxEngine.ENGINE_NAME);
-        MemoryUsage usage = engine.getGpuMemory(Device.gpu(0));
-        Assert.assertEquals(usage.getUsed(), 100);
-        Assert.assertEquals(usage.getMax(), 1000);
-    }
-
-    @Test
-    public void testDefaultDevice() {
-        Engine engine = Engine.getEngine(MxEngine.ENGINE_NAME);
-        Assert.assertEquals(engine.defaultDevice(), Device.gpu());
     }
 
     @Test

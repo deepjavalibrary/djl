@@ -17,7 +17,6 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDManager;
-import java.lang.management.MemoryUsage;
 
 /**
  * The {@code MxEngine} is an implementation of the {@link Engine} based on the <a
@@ -49,29 +48,6 @@ public class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public int getGpuCount() {
-        return JnaUtils.getGpuCount();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public MemoryUsage getGpuMemory(Device device) {
-        long[] mem = JnaUtils.getGpuMemory(device);
-        long committed = mem[1] - mem[0];
-        return new MemoryUsage(-1, committed, committed, mem[1]);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Device defaultDevice() {
-        if (getGpuCount() > 0) {
-            return Device.gpu();
-        }
-        return Device.cpu();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public String getVersion() {
         int version = JnaUtils.getVersion();
         int major = version / 10000;
@@ -79,6 +55,12 @@ public class MxEngine extends Engine {
         int patch = version % 100;
 
         return major + "." + minor + '.' + patch;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasCapability(String capability) {
+        return JnaUtils.getFeatures().contains(capability);
     }
 
     /** {@inheritDoc} */
@@ -97,5 +79,21 @@ public class MxEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return MxNDManager.getSystemManager().newSubManager();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("Name: ")
+                .append(getEngineName())
+                .append(", version: ")
+                .append(getVersion())
+                .append(", capabilities: [\n");
+        for (String feature : JnaUtils.getFeatures()) {
+            sb.append("\t").append(feature).append(",\n"); // NOPMD
+        }
+        sb.append(']');
+        return sb.toString();
     }
 }

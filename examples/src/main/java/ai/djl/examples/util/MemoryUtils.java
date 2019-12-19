@@ -13,9 +13,9 @@
 package ai.djl.examples.util;
 
 import ai.djl.Device;
-import ai.djl.engine.Engine;
 import ai.djl.metric.Metric;
 import ai.djl.metric.Metrics;
+import ai.djl.util.cuda.CudaUtils;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -57,13 +57,13 @@ public final class MemoryUtils {
 
             metrics.addMetric("Heap", heapCommitted, "bytes");
             metrics.addMetric("NonHeap", nonHeapCommitted, "bytes");
-            Engine engine = Engine.getInstance();
-            int gpuCount = engine.getGpuCount();
-            // TODO: For some reason, MxEngine.getGpuMemory() is very slow and allocates memory on
-            // GPUs that are NOT in use.
+            int gpuCount = Device.getGpuCount();
+
+            // CudaUtils.getGpuMemory() will allocates memory on GPUs if CUDA runtime is not
+            // initialized.
             for (int i = 0; i < gpuCount; ++i) {
                 Device device = Device.gpu(i);
-                MemoryUsage mem = engine.getGpuMemory(device);
+                MemoryUsage mem = CudaUtils.getGpuMemory(device);
                 metrics.addMetric("GPU-" + i, mem.getCommitted(), "bytes");
             }
         }
@@ -92,7 +92,7 @@ public final class MemoryUtils {
                 list.addAll(metrics.getMetric("NonHeap"));
                 list.addAll(metrics.getMetric("cpu"));
                 list.addAll(metrics.getMetric("rss"));
-                int gpuCount = Engine.getInstance().getGpuCount();
+                int gpuCount = Device.getGpuCount();
                 for (int i = 0; i < gpuCount; ++i) {
                     list.addAll(metrics.getMetric("GPU-" + i));
                 }

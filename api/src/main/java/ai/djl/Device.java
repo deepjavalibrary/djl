@@ -13,6 +13,8 @@
 package ai.djl;
 
 import ai.djl.engine.Engine;
+import ai.djl.engine.StandardCapabilities;
+import ai.djl.util.cuda.CudaUtils;
 import java.util.Objects;
 
 /**
@@ -133,7 +135,7 @@ public class Device {
      * @return an array of devices
      */
     public static Device[] getDevices(int maxGpus) {
-        int count = Engine.getInstance().getGpuCount();
+        int count = getGpuCount();
         if (maxGpus <= 0 || count <= 0) {
             return new Device[] {CPU};
         }
@@ -147,6 +149,18 @@ public class Device {
     }
 
     /**
+     * Returns the number of GPUs available in the system.
+     *
+     * @return the number of GPUs available in the system
+     */
+    public static int getGpuCount() {
+        if (Engine.getInstance().hasCapability(StandardCapabilities.CUDA)) {
+            return CudaUtils.getGpuCount();
+        }
+        return 0;
+    }
+
+    /**
      * Returns the default context used in Engine.
      *
      * <p>The default type is defined by whether the Deep Learning framework is recognizing GPUs
@@ -155,7 +169,10 @@ public class Device {
      * @return a {@link Device}
      */
     public static Device defaultDevice() {
-        return Engine.getInstance().defaultDevice();
+        if (getGpuCount() > 0) {
+            return Device.gpu();
+        }
+        return Device.cpu();
     }
 
     /**
@@ -168,7 +185,7 @@ public class Device {
         if (device != null) {
             return device;
         }
-        return Engine.getInstance().defaultDevice();
+        return defaultDevice();
     }
 
     /**

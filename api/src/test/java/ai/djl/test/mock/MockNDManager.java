@@ -116,7 +116,7 @@ public class MockNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public Device getDevice() {
-        return Device.defaultDevice();
+        return Device.cpu();
     }
 
     /** {@inheritDoc} */

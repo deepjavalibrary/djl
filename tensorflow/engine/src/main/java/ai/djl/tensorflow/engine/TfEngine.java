@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
-import java.lang.management.MemoryUsage;
 import org.tensorflow.TensorFlow;
 
 /**
@@ -44,26 +43,14 @@ public class TfEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public int getGpuCount() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public MemoryUsage getGpuMemory(Device device) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Device defaultDevice() {
-        return Device.cpu();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public String getVersion() {
         return TensorFlow.version();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasCapability(String capability) {
+        return false;
     }
 
     /** {@inheritDoc} */

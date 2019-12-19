@@ -15,7 +15,6 @@ package ai.djl.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
-import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -95,38 +94,19 @@ public abstract class Engine {
     }
 
     /**
-     * Returns the number of GPUs available in the system.
-     *
-     * @return the number of GPUs available in the system
-     */
-    public abstract int getGpuCount();
-
-    /**
-     * Returns the {@link MemoryUsage} of the specified GPU device.
-     *
-     * @param device the GPU {@link Device} to retrieve
-     * @return the {@link MemoryUsage} of the specified GPU device
-     * @throws EngineException if operation is not supported
-     * @throws IllegalArgumentException if {@link Device} is not GPU device
-     */
-    public abstract MemoryUsage getGpuMemory(Device device);
-
-    /**
-     * Returns the system's default device.
-     *
-     * <p>If the system has GPU available, then the default device is {@link Device#gpu()}.
-     * Otherwise, the default device returned is {@link Device#cpu()}
-     *
-     * @return the system's default device
-     */
-    public abstract Device defaultDevice();
-
-    /**
      * Returns the version of the deep learning framework.
      *
      * @return the version number of the deep learning framework
      */
     public abstract String getVersion();
+
+    /**
+     * Returns whether the engine has the specified capability.
+     *
+     * @param capability the capability to retrieve
+     * @return {@code true} if the engine has the specified capability
+     */
+    public abstract boolean hasCapability(String capability);
 
     /**
      * Constructs a new model.

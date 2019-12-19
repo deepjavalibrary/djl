@@ -12,7 +12,7 @@
  */
 package ai.djl.examples.training.util;
 
-import ai.djl.engine.Engine;
+import ai.djl.Device;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -39,7 +39,7 @@ public class Arguments {
         } else {
             epoch = 2;
         }
-        maxGpus = Engine.getInstance().getGpuCount();
+        maxGpus = Device.getGpuCount();
         if (cmd.hasOption("max-gpus")) {
             maxGpus = Math.min(Integer.parseInt(cmd.getOptionValue("max-gpus")), maxGpus);
         }
