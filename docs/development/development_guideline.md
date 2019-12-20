@@ -51,6 +51,25 @@ To get a better understanding of your problems when developing, you can enable l
 
 The values to set the log level to can be found [here](https://logging.apache.org/log4j/2.x/manual/customloglevels.html).
 
+## Run examples in IntelliJ
+Before you run any examples in IntelliJ, configure your Application template as follows:
+1. Navigate to IntelliJ menu and select "Run". Select "Edit configurations...".
+2. Expand "Template" on the left side list, and select "Application".
+3. Change the "Working directory:" value to: "$MODULE_WORKING_DIR$".
+4. Select "OK" to save the template.
+
+Navigate to the 'examples' module. Open the class that you want to execute (e.g. ai.djl.examples.inference.ObjectDetection).
+Select the triangle at the class declaration line. A popup menu appears with 3 items:
+- Run 'ObjectDetection.main()'
+- Debug 'ObjectDetection.main()'
+- Run 'ObjectDetection.main()' with coverage
+
+Select "Run 'ObjectDetection.main()'". IntelliJ executes the ObjectDetection example.
+
+If you manually create a run configuration or the existing configuration failed to execute
+due to a missing example resource, you can edit the configuration. Change the "Working directory:"
+value to: $MODULE_WORKING_DIR$ to fix the issue.
+
 ## Debug
 
 When debugging a DJL application in IntelliJ, it is often helpful to inspect your NDArray variables. Because NDArrays may contain
