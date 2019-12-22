@@ -63,7 +63,7 @@ public class InferenceTest {
             DetectedObjects result = ssd.predict(image);
 
             DetectedObjects.DetectedObject object = result.item(0);
-            Assert.assertEquals("cat", object.getClassName());
+            Assert.assertEquals(object.getClassName(), "cat");
             Assert.assertEquals(
                     Double.compare(object.getBoundingBox().getBounds().getHeight(), 1d), 0);
         }

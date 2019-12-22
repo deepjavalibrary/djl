@@ -48,12 +48,8 @@ public final class Assertions {
         assertAlmostEquals(actual, expected, RTOL, ATOL);
     }
 
-    public static void assertAlmostEquals(float actual, float expected) {
+    public static void assertAlmostEquals(double actual, double expected) {
         assertAlmostEquals(actual, expected, RTOL, ATOL);
-    }
-
-    public static void assertAlmostEquals(float actual, float expected, double rtol, double atol) {
-        assertAlmostEquals((double) actual, (double) expected, rtol, atol);
     }
 
     public static void assertAlmostEquals(
@@ -101,7 +97,7 @@ public final class Assertions {
                 actual, expected, getDefaultErrorMessage(actual, expected, "Assert Equal failed!"));
         Assert.assertSame(
                 original,
-                expected,
+                actual,
                 getDefaultErrorMessage(original, expected, "Assert Inplace failed!"));
     }
 
@@ -115,7 +111,7 @@ public final class Assertions {
         assertAlmostEquals(actual, expected, rtol, atol);
         Assert.assertSame(
                 original,
-                expected,
+                actual,
                 getDefaultErrorMessage(original, expected, "Assert Inplace failed!"));
     }
 }

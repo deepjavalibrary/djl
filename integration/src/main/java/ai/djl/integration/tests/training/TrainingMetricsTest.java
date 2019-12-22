@@ -36,8 +36,8 @@ public class TrainingMetricsTest {
             float accuracy = acc.getValue();
             float expectedAccuracy = 2.f / 3;
             Assert.assertEquals(
-                    expectedAccuracy,
                     accuracy,
+                    expectedAccuracy,
                     "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);
         }
     }
@@ -57,8 +57,8 @@ public class TrainingMetricsTest {
             float expectedAccuracy = 1.f / 3;
             float accuracy = topKAccuracy.getValue();
             Assert.assertEquals(
-                    expectedAccuracy,
                     accuracy,
+                    expectedAccuracy,
                     "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);
         }
     }

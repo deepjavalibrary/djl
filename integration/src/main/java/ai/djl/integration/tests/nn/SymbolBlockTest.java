@@ -57,7 +57,7 @@ public class SymbolBlockTest {
             NDArray arr = manager.ones(new Shape(1, 28, 28));
             Shape shape =
                     block.forward(parameterStore, new NDList(arr)).singletonOrThrow().getShape();
-            Assert.assertEquals(new Shape(1, 10), shape);
+            Assert.assertEquals(shape, new Shape(1, 10));
         }
     }
 

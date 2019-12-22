@@ -29,27 +29,27 @@ public class NDArrayOtherOpTest {
     public void testGet() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
-            Assert.assertEquals(original, original.get(new NDIndex()));
+            Assert.assertEquals(original.get(new NDIndex()), original);
 
             NDArray getAt = original.get(0);
-            NDArray actual = manager.create(new float[] {1f, 2f});
-            Assert.assertEquals(actual, getAt);
+            NDArray expected = manager.create(new float[] {1f, 2f});
+            Assert.assertEquals(getAt, expected);
 
-            Assert.assertEquals(actual, original.get("0,:"));
-            Assert.assertEquals(actual, original.get("0,*"));
+            Assert.assertEquals(original.get("0,:"), expected);
+            Assert.assertEquals(original.get("0,*"), expected);
 
             NDArray getSlice = original.get("1:");
-            actual = manager.create(new float[] {3f, 4f}, new Shape(1, 2));
-            Assert.assertEquals(actual, getSlice);
+            expected = manager.create(new float[] {3f, 4f}, new Shape(1, 2));
+            Assert.assertEquals(getSlice, expected);
 
             NDArray getStepSlice = original.get("1::2");
-            Assert.assertEquals(actual, getStepSlice);
+            Assert.assertEquals(getStepSlice, expected);
 
             // get from boolean array
             original = manager.arange(10).reshape(2, 5);
             NDArray bool = manager.create(new boolean[] {true, false});
-            actual = manager.arange(5).reshape(1, 5);
-            Assert.assertEquals(actual, original.get(bool));
+            expected = manager.arange(5).reshape(1, 5);
+            Assert.assertEquals(original.get(bool), expected);
         }
     }
 
@@ -57,10 +57,10 @@ public class NDArrayOtherOpTest {
     public void testSetArray() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
-            NDArray actual = manager.create(new float[] {9, 10, 3, 4}, new Shape(2, 2));
+            NDArray expected = manager.create(new float[] {9, 10, 3, 4}, new Shape(2, 2));
             NDArray value = manager.create(new float[] {9, 10});
             original.set(new NDIndex(0), value);
-            Assert.assertEquals(actual, original);
+            Assert.assertEquals(original, expected);
         }
     }
 
@@ -68,10 +68,10 @@ public class NDArrayOtherOpTest {
     public void testSetArrayBroadcast() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2, 1));
-            NDArray actual = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2, 1));
+            NDArray expected = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2, 1));
             NDArray value = manager.create(new float[] {9});
             original.set(new NDIndex(0), value);
-            Assert.assertEquals(actual, original);
+            Assert.assertEquals(original, expected);
         }
     }
 
@@ -79,9 +79,9 @@ public class NDArrayOtherOpTest {
     public void testSetNumber() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
-            NDArray actual = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2));
+            NDArray expected = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2));
             original.set(new NDIndex(0), 9);
-            Assert.assertEquals(actual, original);
+            Assert.assertEquals(original, expected);
         }
     }
 
@@ -100,22 +100,22 @@ public class NDArrayOtherOpTest {
             NDArray array1 = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray array2 = manager.create(new Shape(4));
             array1.copyTo(array2);
-            Assert.assertEquals(array1, array2, "CopyTo NDArray failed");
+            Assert.assertEquals(array2, array1, "CopyTo NDArray failed");
             // test multi-dim
             array1 = manager.arange(100).reshape(2, 5, 5, 2);
             array2 = manager.create(new Shape(2, 5, 5, 2));
             array1.copyTo(array2);
-            Assert.assertEquals(array1, array2, "CopyTo NDArray failed");
+            Assert.assertEquals(array2, array1, "CopyTo NDArray failed");
             // test scalar
             array1 = manager.create(5f);
             array2 = manager.create(new Shape());
             array1.copyTo(array2);
-            Assert.assertEquals(array1, array2, "CopyTo NDArray failed");
+            Assert.assertEquals(array2, array1, "CopyTo NDArray failed");
             // test zero-dim
             array1 = manager.create(new Shape(4, 2, 1, 0));
             array2 = manager.create(new Shape(4, 2, 1, 0));
             array1.copyTo(array2);
-            Assert.assertEquals(array1, array2, "CopyTo NDArray failed");
+            Assert.assertEquals(array2, array1, "CopyTo NDArray failed");
         }
     }
 
@@ -123,24 +123,24 @@ public class NDArrayOtherOpTest {
     public void testNonZero() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.ones(new Shape(3, 3));
-            NDArray actual =
+            NDArray expected =
                     manager.create(
                             new long[] {0, 0, 0, 1, 0, 2, 1, 0, 1, 1, 1, 2, 2, 0, 2, 1, 2, 2},
                             new Shape(9, 2));
-            Assert.assertEquals(actual, array.nonzero());
+            Assert.assertEquals(array.nonzero(), expected);
             // test multi-dim
             array = manager.create(new float[] {0f, 1f, 2f, 0f, 0f, -4f}, new Shape(2, 1, 3));
-            actual = manager.create(new long[] {0, 0, 1, 0, 0, 2, 1, 0, 2}, new Shape(3, 3));
-            Assert.assertEquals(actual, array.nonzero());
+            expected = manager.create(new long[] {0, 0, 1, 0, 0, 2, 1, 0, 2}, new Shape(3, 3));
+            Assert.assertEquals(array.nonzero(), expected);
             // test scalar
             array = manager.create(1f);
-            actual = manager.create(new long[] {0}, new Shape(1, 1));
-            Assert.assertEquals(actual, array.nonzero());
+            expected = manager.create(new long[] {0}, new Shape(1, 1));
+            Assert.assertEquals(array.nonzero(), expected);
             // test zero-dim
             // TODO confirm this behavior is right
             array = manager.create(new Shape(4, 0));
-            actual = manager.create(new Shape(0, 2), DataType.INT64);
-            Assert.assertEquals(actual, array.nonzero());
+            expected = manager.create(new Shape(0, 2), DataType.INT64);
+            Assert.assertEquals(array.nonzero(), expected);
         }
     }
 
@@ -239,18 +239,18 @@ public class NDArrayOtherOpTest {
     public void testCountNonzero() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(4);
-            Assert.assertEquals(3, array.countNonzero().getLong());
+            Assert.assertEquals(array.countNonzero().getLong(), 3);
 
             // multi-dim
             array = manager.create(new float[] {-1f, 0f, 2f, 100f, 2340f, -200f}, new Shape(2, 3));
-            Assert.assertEquals(5, array.countNonzero().getLong());
+            Assert.assertEquals(array.countNonzero().getLong(), 5);
 
             // scalar
             array = manager.create(5f);
-            Assert.assertEquals(1, array.countNonzero().getLong());
+            Assert.assertEquals(array.countNonzero().getLong(), 1);
             // zero-dim
             array = manager.create(new Shape(2, 0));
-            Assert.assertEquals(0, array.countNonzero().getLong());
+            Assert.assertEquals(array.countNonzero().getLong(), 0);
         }
     }
 
@@ -258,8 +258,8 @@ public class NDArrayOtherOpTest {
     public void testIsNaN() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {Float.NaN, 0f});
-            NDArray actual = manager.create(new boolean[] {true, false});
-            Assert.assertEquals(actual, array.isNaN());
+            NDArray expected = manager.create(new boolean[] {true, false});
+            Assert.assertEquals(array.isNaN(), expected);
             array = manager.create(new float[] {1f, 2f});
             Assert.assertFalse(array.isNaN().all().getBoolean());
 
@@ -267,18 +267,18 @@ public class NDArrayOtherOpTest {
             array =
                     manager.create(
                             new float[] {Float.NaN, Float.NaN, Float.NaN, 0f}, new Shape(2, 2));
-            actual = manager.create(new boolean[] {true, true, true, false}, new Shape(2, 2));
-            Assert.assertEquals(actual, array.isNaN());
+            expected = manager.create(new boolean[] {true, true, true, false}, new Shape(2, 2));
+            Assert.assertEquals(array.isNaN(), expected);
 
             // test scalar
             array = manager.create(Float.NaN);
-            actual = manager.create(true);
-            Assert.assertEquals(actual, array.isNaN());
+            expected = manager.create(true);
+            Assert.assertEquals(array.isNaN(), expected);
 
             // test zero-dim
             array = manager.create(new Shape(0));
-            actual = manager.create(new Shape(0), DataType.BOOLEAN);
-            Assert.assertEquals(actual, array.isNaN());
+            expected = manager.create(new Shape(0), DataType.BOOLEAN);
+            Assert.assertEquals(array.isNaN(), expected);
         }
     }
 
@@ -287,16 +287,16 @@ public class NDArrayOtherOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(4);
             NDArray index = manager.create(new boolean[] {true, false, true, false});
-            NDArray actual = manager.create(new float[] {0f, 2f});
-            Assert.assertEquals(actual, array.booleanMask(index));
-            Assert.assertEquals(actual, NDArrays.booleanMask(array, index));
+            NDArray expected = manager.create(new float[] {0f, 2f});
+            Assert.assertEquals(array.booleanMask(index), expected);
+            Assert.assertEquals(NDArrays.booleanMask(array, index), expected);
 
             // test multi-dim
             array = manager.arange(10).reshape(2, 1, 5);
             index = manager.create(new boolean[] {true, false});
-            actual = manager.arange(5).reshape(1, 1, 5);
-            Assert.assertEquals(actual, array.booleanMask(index));
-            Assert.assertEquals(actual, NDArrays.booleanMask(array, index));
+            expected = manager.arange(5).reshape(1, 1, 5);
+            Assert.assertEquals(array.booleanMask(index), expected);
+            Assert.assertEquals(NDArrays.booleanMask(array, index), expected);
 
             // test scalar
             array = manager.create(5f);
@@ -306,9 +306,9 @@ public class NDArrayOtherOpTest {
             // test zero-dim
             array = manager.create(new Shape(1, 0));
             index = manager.create(new boolean[] {false});
-            actual = manager.create(new Shape(0, 0));
-            Assert.assertEquals(actual, array.booleanMask(index));
-            Assert.assertEquals(actual, NDArrays.booleanMask(array, index));
+            expected = manager.create(new Shape(0, 0));
+            Assert.assertEquals(array.booleanMask(index), expected);
+            Assert.assertEquals(NDArrays.booleanMask(array, index), expected);
         }
     }
 
@@ -317,23 +317,23 @@ public class NDArrayOtherOpTest {
         // TODO switch to numpy argsort
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {-1f, 2f, 0f, 999f, -998f});
-            NDArray actual = manager.create(new int[] {4, 0, 2, 1, 3});
-            Assert.assertEquals(actual, array.argSort());
+            NDArray expected = manager.create(new int[] {4, 0, 2, 1, 3});
+            Assert.assertEquals(array.argSort(), expected);
             // multi-dim
             array =
                     manager.create(
                             new float[] {-1.000f, -0.009f, -0.0001f, 0.0001f, 0.12f, 0.1201f},
                             new Shape(2, 1, 1, 3, 1));
-            actual = manager.zeros(new Shape(2, 1, 1, 3, 1), DataType.INT32);
-            Assert.assertEquals(actual, array.argSort());
+            expected = manager.zeros(new Shape(2, 1, 1, 3, 1), DataType.INT32);
+            Assert.assertEquals(array.argSort(), expected);
             // test axis
             array = manager.arange(10).reshape(2, 1, 5);
-            actual = manager.create(new int[] {0, 0, 0, 0, 0, 1, 1, 1, 1, 1}, new Shape(2, 1, 5));
-            Assert.assertEquals(actual, array.argSort(0));
-            actual = manager.zeros(new Shape(2, 1, 5), DataType.INT32);
-            Assert.assertEquals(actual, array.argSort(1));
-            actual = manager.create(new int[] {0, 1, 2, 3, 4, 0, 1, 2, 3, 4}, new Shape(2, 1, 5));
-            Assert.assertEquals(actual, array.argSort(2));
+            expected = manager.create(new int[] {0, 0, 0, 0, 0, 1, 1, 1, 1, 1}, new Shape(2, 1, 5));
+            Assert.assertEquals(array.argSort(0), expected);
+            expected = manager.zeros(new Shape(2, 1, 5), DataType.INT32);
+            Assert.assertEquals(array.argSort(1), expected);
+            expected = manager.create(new int[] {0, 1, 2, 3, 4, 0, 1, 2, 3, 4}, new Shape(2, 1, 5));
+            Assert.assertEquals(array.argSort(2), expected);
         }
     }
 
@@ -341,49 +341,49 @@ public class NDArrayOtherOpTest {
     public void testSort() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {2f, 1f, 4f, 3f});
-            NDArray actual = manager.create(new float[] {1f, 2f, 3f, 4f});
-            Assert.assertEquals(actual, array.sort());
+            NDArray expected = manager.create(new float[] {1f, 2f, 3f, 4f});
+            Assert.assertEquals(array.sort(), expected);
             // test multi-dim
             array =
                     manager.create(
                             new float[] {1.01f, 0.00f, 0.01f, -0.05f, 1.0f, 0.9f, 0.99f, 0.999f},
                             new Shape(2, 2, 1, 2));
-            actual =
+            expected =
                     manager.create(
                             new float[] {0f, 1.01f, -0.05f, 0.01f, 0.9f, 1f, 0.99f, 0.999f},
                             new Shape(2, 2, 1, 2));
-            Assert.assertEquals(actual, array.sort());
+            Assert.assertEquals(array.sort(), expected);
             // test axis
             array =
                     manager.create(
                             new float[] {0f, 2f, 4f, 6f, 7f, 5f, 3f, 1f}, new Shape(2, 1, 2, 2));
-            actual =
+            expected =
                     manager.create(
                             new float[] {0f, 2f, 3f, 1f, 7f, 5f, 4f, 6f}, new Shape(2, 1, 2, 2));
-            Assert.assertEquals(actual, array.sort(0));
-            actual =
+            Assert.assertEquals(array.sort(0), expected);
+            expected =
                     manager.create(
                             new float[] {0f, 2f, 4f, 6f, 7f, 5f, 3f, 1f}, new Shape(2, 1, 2, 2));
-            Assert.assertEquals(actual, array.sort(1));
-            actual =
+            Assert.assertEquals(array.sort(1), expected);
+            expected =
                     manager.create(
                             new float[] {0f, 2f, 4f, 6f, 3f, 1f, 7f, 5f}, new Shape(2, 1, 2, 2));
-            Assert.assertEquals(actual, array.sort(2));
-            actual =
+            Assert.assertEquals(array.sort(2), expected);
+            expected =
                     manager.create(
                             new float[] {0f, 2f, 4f, 6f, 5f, 7f, 1f, 3f}, new Shape(2, 1, 2, 2));
-            Assert.assertEquals(actual, array.sort(3));
+            Assert.assertEquals(array.sort(3), expected);
 
             // scalar
             array = manager.create(5f);
-            Assert.assertEquals(array, array.sort());
+            Assert.assertEquals(array.sort(), array);
 
             // zero-dim
             array = manager.create(new Shape(1, 0, 1));
-            Assert.assertEquals(array, array.sort());
-            Assert.assertEquals(array, array.sort(0));
-            Assert.assertEquals(array, array.sort(1));
-            Assert.assertEquals(array, array.sort(2));
+            Assert.assertEquals(array.sort(), array);
+            Assert.assertEquals(array.sort(0), array);
+            Assert.assertEquals(array.sort(1), array);
+            Assert.assertEquals(array.sort(2), array);
         }
     }
 
@@ -391,24 +391,24 @@ public class NDArrayOtherOpTest {
     public void testSoftmax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.ones(new Shape(10));
-            NDArray actual = manager.zeros(new Shape(10)).add(0.1f);
-            Assert.assertEquals(actual, array.softmax(0));
+            NDArray expected = manager.zeros(new Shape(10)).add(0.1f);
+            Assert.assertEquals(array.softmax(0), expected);
             // test multi-dim
             array = manager.ones(new Shape(2, 3, 1, 3));
-            actual = manager.zeros(new Shape(2, 3, 1, 3)).add(0.5f);
-            Assert.assertEquals(actual, array.softmax(0));
-            actual = manager.zeros(new Shape(2, 3, 1, 3)).add(0.33333334f);
-            Assert.assertEquals(actual, array.softmax(1));
-            actual = manager.ones(new Shape(2, 3, 1, 3));
-            Assert.assertEquals(actual, array.softmax(2));
-            actual = manager.zeros(new Shape(2, 3, 1, 3)).add(0.33333334f);
-            Assert.assertEquals(actual, array.softmax(3));
+            expected = manager.zeros(new Shape(2, 3, 1, 3)).add(0.5f);
+            Assert.assertEquals(array.softmax(0), expected);
+            expected = manager.zeros(new Shape(2, 3, 1, 3)).add(0.33333334f);
+            Assert.assertEquals(array.softmax(1), expected);
+            expected = manager.ones(new Shape(2, 3, 1, 3));
+            Assert.assertEquals(array.softmax(2), expected);
+            expected = manager.zeros(new Shape(2, 3, 1, 3)).add(0.33333334f);
+            Assert.assertEquals(array.softmax(3), expected);
             // test scalar
             array = manager.create(1f);
-            Assert.assertEquals(array, array.softmax(0));
+            Assert.assertEquals(array.softmax(0), array);
             // test zero
             array = manager.create(new Shape(2, 0, 1));
-            Assert.assertEquals(array, array.softmax(0));
+            Assert.assertEquals(array.softmax(0), array);
         }
     }
 
@@ -416,52 +416,52 @@ public class NDArrayOtherOpTest {
     public void testCumsum() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10);
-            NDArray actual =
+            NDArray expected =
                     manager.create(new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f});
-            Assert.assertEquals(actual, array.cumSum());
+            Assert.assertEquals(array.cumSum(), expected);
 
             array = manager.create(new float[] {1f, 2f, 3f, 5f, 8f, 13f});
-            actual = manager.create(new float[] {1f, 3f, 6f, 11f, 19f, 32f});
-            Assert.assertEquals(actual, array.cumSum(0));
+            expected = manager.create(new float[] {1f, 3f, 6f, 11f, 19f, 32f});
+            Assert.assertEquals(array.cumSum(0), expected);
 
             // test multi-dim
             array = manager.arange(10).reshape(2, 1, 5, 1);
-            actual =
+            expected =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 7f, 9f, 11f, 13f},
                             new Shape(2, 1, 5, 1));
-            Assert.assertEquals(actual, array.cumSum(0));
+            Assert.assertEquals(array.cumSum(0), expected);
 
             array = manager.arange(10).reshape(2, 1, 5, 1);
-            actual =
+            expected =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
                             new Shape(2, 1, 5, 1));
-            Assert.assertEquals(actual, array.cumSum(1));
+            Assert.assertEquals(array.cumSum(1), expected);
 
             array = manager.arange(10).reshape(2, 1, 5, 1);
-            actual =
+            expected =
                     manager.create(
                             new float[] {0f, 1f, 3f, 6f, 10f, 5f, 11f, 18f, 26f, 35f},
                             new Shape(2, 1, 5, 1));
-            Assert.assertEquals(actual, array.cumSum(2));
+            Assert.assertEquals(array.cumSum(2), expected);
 
             array = manager.arange(10).reshape(2, 1, 5, 1);
-            actual =
+            expected =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
                             new Shape(2, 1, 5, 1));
-            Assert.assertEquals(actual, array.cumSum(3));
+            Assert.assertEquals(array.cumSum(3), expected);
 
             // Note that shape after cumsum op with zero-dim and scalar case change
             // test scalar
             array = manager.create(1f);
-            actual = manager.create(new float[] {1f});
-            Assert.assertEquals(actual, array.cumSum());
+            expected = manager.create(new float[] {1f});
+            Assert.assertEquals(array.cumSum(), expected);
             // test zero-dim
             array = manager.create(new Shape(2, 0));
-            actual = manager.create(new Shape(0));
-            Assert.assertEquals(actual, array.cumSum());
+            expected = manager.create(new Shape(0));
+            Assert.assertEquals(array.cumSum(), expected);
         }
     }
 
@@ -471,38 +471,37 @@ public class NDArrayOtherOpTest {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
 
             NDArray tileAll = array.tile(2);
-            NDArray tileAllActual =
+            NDArray expected =
                     manager.create(
                             new float[] {1, 2, 1, 2, 3, 4, 3, 4, 1, 2, 1, 2, 3, 4, 3, 4},
                             new Shape(4, 4));
-            Assert.assertEquals(tileAllActual, tileAll, "Incorrect tile all");
+            Assert.assertEquals(tileAll, expected, "Incorrect tile all");
 
             NDArray tileAxis = array.tile(0, 3);
-            NDArray tileAxisActual =
+            expected =
                     manager.create(
                             new float[] {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, new Shape(6, 2));
-            Assert.assertEquals(tileAxisActual, tileAxis, "Incorrect tile on axis");
+            Assert.assertEquals(tileAxis, expected, "Incorrect tile on axis");
 
             NDArray tileArray = array.tile(new long[] {3, 1});
-            Assert.assertEquals(tileAxisActual, tileArray, "Incorrect tile array");
+            Assert.assertEquals(tileArray, expected, "Incorrect tile array");
 
             NDArray tileShape = array.tile(new Shape(4));
-            NDArray tileShapeActual =
-                    manager.create(new float[] {1, 2, 1, 2, 3, 4, 3, 4}, new Shape(2, 4));
-            Assert.assertEquals(tileShapeActual, tileShape, "Incorrect tile shape");
+            expected = manager.create(new float[] {1, 2, 1, 2, 3, 4, 3, 4}, new Shape(2, 4));
+            Assert.assertEquals(tileShape, expected, "Incorrect tile shape");
 
             // scalar
             array = manager.create(5f);
 
-            tileAxis = manager.create(new float[] {5f, 5f, 5f}, new Shape(1, 3));
-            Assert.assertEquals(tileAxis, array.tile(1, 3));
+            expected = manager.create(new float[] {5f, 5f, 5f}, new Shape(1, 3));
+            Assert.assertEquals(array.tile(1, 3), expected);
 
             // zero-dim
             array = manager.create(new Shape(2, 0));
-            tileAllActual = manager.create(new Shape(2, 0));
-            Assert.assertEquals(tileAllActual, array.tile(5));
-            tileAllActual = manager.create(new Shape(10, 0));
-            Assert.assertEquals(tileAllActual, array.tile(0, 5));
+            expected = manager.create(new Shape(2, 0));
+            Assert.assertEquals(array.tile(5), expected);
+            expected = manager.create(new Shape(10, 0));
+            Assert.assertEquals(array.tile(0, 5), expected);
 
             array.tile(new Shape(2, 2, 2));
         }
@@ -515,25 +514,24 @@ public class NDArrayOtherOpTest {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
 
             NDArray repeatAll = array.repeat(2);
-            NDArray repeatAllActual =
+            NDArray expected =
                     manager.create(
                             new float[] {1, 1, 2, 2, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 4, 4},
                             new Shape(4, 4));
-            Assert.assertEquals(repeatAllActual, repeatAll, "Incorrect repeat all");
+            Assert.assertEquals(repeatAll, expected, "Incorrect repeat all");
 
             NDArray repeatAxis = array.repeat(0, 3);
-            NDArray repeatAxisActual =
+            expected =
                     manager.create(
                             new float[] {1, 2, 1, 2, 1, 2, 3, 4, 3, 4, 3, 4}, new Shape(6, 2));
-            Assert.assertEquals(repeatAxisActual, repeatAxis, "Incorrect repeat on axis");
+            Assert.assertEquals(repeatAxis, expected, "Incorrect repeat on axis");
 
             NDArray repeatArray = array.repeat(new long[] {3, 1});
-            Assert.assertEquals(repeatAxisActual, repeatArray, "Incorrect repeat array");
+            Assert.assertEquals(repeatArray, expected, "Incorrect repeat array");
 
             NDArray repeatShape = array.repeat(new Shape(4));
-            NDArray repeatShapeActual =
-                    manager.create(new float[] {1, 1, 2, 2, 3, 3, 4, 4}, new Shape(2, 4));
-            Assert.assertEquals(repeatShapeActual, repeatShape, "Incorrect repeat shape");
+            expected = manager.create(new float[] {1, 1, 2, 2, 3, 3, 4, 4}, new Shape(2, 4));
+            Assert.assertEquals(repeatShape, expected, "Incorrect repeat shape");
         }
     }
 
@@ -541,29 +539,29 @@ public class NDArrayOtherOpTest {
     public void testClip() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f});
-            NDArray actual = manager.create(new float[] {2f, 2f, 3f, 3f});
-            Assert.assertEquals(actual, original.clip(2.0, 3.0));
-            Assert.assertEquals(actual, original.clip(2, 3));
+            NDArray expected = manager.create(new float[] {2f, 2f, 3f, 3f});
+            Assert.assertEquals(original.clip(2.0, 3.0), expected);
+            Assert.assertEquals(original.clip(2, 3), expected);
             // multi-dim
             original =
                     manager.create(new float[] {5f, 4f, 2f, 5f, 6f, 7f, 2f, 22f, -23f, -2f})
                             .reshape(2, 1, 5, 1);
-            actual =
+            expected =
                     manager.create(
                             new float[] {3f, 3f, 2f, 3f, 3f, 3f, 2f, 3f, 2f, 2f},
                             new Shape(2, 1, 5, 1));
-            Assert.assertEquals(actual, original.clip(2.0, 3.0));
-            Assert.assertEquals(actual, original.clip(2, 3));
+            Assert.assertEquals(original.clip(2.0, 3.0), expected);
+            Assert.assertEquals(original.clip(2, 3), expected);
 
             // scalar
             original = manager.create(5f);
-            actual = manager.create(1f);
-            Assert.assertEquals(actual, original.clip(0.0, 1.0));
-            Assert.assertEquals(actual, original.clip(0, 1));
+            expected = manager.create(1f);
+            Assert.assertEquals(original.clip(0.0, 1.0), expected);
+            Assert.assertEquals(original.clip(0, 1), expected);
             // zero-dim
             original = manager.create(new Shape(0, 0));
-            Assert.assertEquals(original, original.clip(0.0, 1.0));
-            Assert.assertEquals(original, original.clip(0, 1));
+            Assert.assertEquals(original.clip(0.0, 1.0), original);
+            Assert.assertEquals(original.clip(0, 1), original);
         }
     }
 
@@ -571,9 +569,9 @@ public class NDArrayOtherOpTest {
     public void testSwapAxes() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10).reshape(new Shape(2, 5));
-            NDArray actual =
+            NDArray expected =
                     manager.create(new float[] {0, 5, 1, 6, 2, 7, 3, 8, 4, 9}, new Shape(5, 2));
-            Assert.assertEquals(actual, array.swapAxes(0, 1));
+            Assert.assertEquals(array.swapAxes(0, 1), expected);
 
             // TODO MXNet engine crash
             // scalar
@@ -582,8 +580,8 @@ public class NDArrayOtherOpTest {
 
             // test zero-dim
             array = manager.create(new Shape(2, 0));
-            actual = manager.create(new Shape(0, 2));
-            Assert.assertEquals(actual, array.swapAxes(0, 1));
+            expected = manager.create(new Shape(0, 2));
+            Assert.assertEquals(array.swapAxes(0, 1), expected);
         }
     }
 
@@ -593,26 +591,25 @@ public class NDArrayOtherOpTest {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 2, 2));
 
             NDArray transposeAll = original.transpose();
-            NDArray transposeAllActual =
-                    manager.create(new float[] {1, 3, 2, 4}, new Shape(2, 2, 1));
-            Assert.assertEquals(transposeAllActual, transposeAll, "Incorrect transpose all");
+            NDArray expected = manager.create(new float[] {1, 3, 2, 4}, new Shape(2, 2, 1));
+            Assert.assertEquals(transposeAll, expected, "Incorrect transpose all");
 
             NDArray transpose = original.transpose(1, 0, 2);
-            NDArray transposeActual = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 1, 2));
-            Assert.assertEquals(transposeActual, transpose, "Incorrect transpose all");
-            Assert.assertEquals(transposeActual, original.swapAxes(0, 1), "Incorrect swap axes");
+            expected = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 1, 2));
+            Assert.assertEquals(transpose, expected, "Incorrect transpose all");
+            Assert.assertEquals(original.swapAxes(0, 1), expected, "Incorrect swap axes");
 
             // scalar
             original = manager.create(5f);
-            Assert.assertEquals(original, original.transpose());
+            Assert.assertEquals(original.transpose(), original);
             original.transpose(0);
 
             // zero-dim
             original = manager.create(new Shape(2, 0, 1));
-            transposeActual = manager.create(new Shape(1, 0, 2));
-            Assert.assertEquals(transposeActual, original.transpose());
-            transposeActual = manager.create(new Shape(2, 1, 0));
-            Assert.assertEquals(transposeActual, original.transpose(0, 2, 1));
+            expected = manager.create(new Shape(1, 0, 2));
+            Assert.assertEquals(original.transpose(), expected);
+            expected = manager.create(new Shape(2, 1, 0));
+            Assert.assertEquals(original.transpose(0, 2, 1), expected);
         }
     }
 
@@ -621,24 +618,24 @@ public class NDArrayOtherOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1, 2});
             NDArray broadcasted = array.broadcast(2, 2);
-            NDArray actual = manager.create(new float[] {1, 2, 1, 2}, new Shape(2, 2));
-            Assert.assertEquals(actual, broadcasted);
+            NDArray expected = manager.create(new float[] {1, 2, 1, 2}, new Shape(2, 2));
+            Assert.assertEquals(broadcasted, expected);
             // multi-dim
             array = manager.arange(4).reshape(2, 2);
             broadcasted = array.broadcast(3, 2, 2);
-            actual = manager.arange(4).reshape(2, 2);
-            actual = NDArrays.stack(new NDList(actual, actual, actual));
-            Assert.assertEquals(actual, broadcasted);
+            expected = manager.arange(4).reshape(2, 2);
+            expected = NDArrays.stack(new NDList(expected, expected, expected));
+            Assert.assertEquals(broadcasted, expected);
             // scalar
             array = manager.create(1f);
             broadcasted = array.broadcast(2, 3, 2);
-            actual = manager.ones(new Shape(2, 3, 2));
-            Assert.assertEquals(actual, broadcasted);
+            expected = manager.ones(new Shape(2, 3, 2));
+            Assert.assertEquals(broadcasted, expected);
             // zero-dim
             array = manager.create(new Shape(2, 0, 1));
             broadcasted = array.broadcast(2, 2, 0, 2);
-            actual = manager.create(new Shape(2, 2, 0, 2));
-            Assert.assertEquals(actual, broadcasted);
+            expected = manager.create(new Shape(2, 2, 0, 2));
+            Assert.assertEquals(broadcasted, expected);
         }
     }
 
@@ -653,24 +650,24 @@ public class NDArrayOtherOpTest {
                             },
                             new Shape(4, 5));
             NDArray argMax = array.argMax();
-            NDArray actual = manager.create(9f);
-            Assert.assertEquals(actual, argMax, "Argmax: Incorrect value");
+            NDArray expected = manager.create(9f);
+            Assert.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             argMax = array.argMax(0);
-            actual = manager.create(new float[] {2, 2, 2, 1, 1});
-            Assert.assertEquals(actual, argMax, "Argmax: Incorrect value");
+            expected = manager.create(new float[] {2, 2, 2, 1, 1});
+            Assert.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             argMax = array.argMax(1);
-            actual = manager.create(new float[] {3, 4, 0, 2});
-            Assert.assertEquals(actual, argMax, "Argmax: Incorrect value");
+            expected = manager.create(new float[] {3, 4, 0, 2});
+            Assert.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             // scalar
             array = manager.create(5f);
             // TODO the dtype should be int instead of float
             // Bug in MXNet to fix
-            actual = manager.create(0f);
-            Assert.assertEquals(actual, array.argMax());
-            Assert.assertEquals(actual, array.argMax(0));
+            expected = manager.create(0f);
+            Assert.assertEquals(array.argMax(), expected);
+            Assert.assertEquals(array.argMax(0), expected);
 
             // TODO MXNet engine crash
             // zero-dim
@@ -690,27 +687,27 @@ public class NDArrayOtherOpTest {
                             },
                             new Shape(4, 5));
             NDArray argMin = array.argMin();
-            NDArray actual = manager.create(8f);
-            Assert.assertEquals(actual, argMin, "ArgMin: Incorrect value");
+            NDArray expected = manager.create(8f);
+            Assert.assertEquals(argMin, expected, "ArgMin: Incorrect value");
 
             argMin = array.argMin(0);
-            actual = manager.create(new float[] {0, 2, 3, 1, 2});
-            Assert.assertEquals(actual, argMin, "ArgMin: Incorrect value");
+            expected = manager.create(new float[] {0, 2, 3, 1, 2});
+            Assert.assertEquals(argMin, expected, "ArgMin: Incorrect value");
 
             argMin = array.argMin(1);
-            actual = manager.create(new float[] {0, 3, 4, 2});
-            Assert.assertEquals(actual, argMin, "ArgMin: Incorrect value");
+            expected = manager.create(new float[] {0, 3, 4, 2});
+            Assert.assertEquals(argMin, expected, "ArgMin: Incorrect value");
 
             // scalar
             array = manager.create(1f);
-            actual = manager.create(0f);
-            Assert.assertEquals(actual, array.argMin(), "ArgMin: Incorrect value");
-            Assert.assertEquals(actual, array.argMin(0), "ArgMin: Incorrect value");
+            expected = manager.create(0f);
+            Assert.assertEquals(array.argMin(), expected, "ArgMin: Incorrect value");
+            Assert.assertEquals(array.argMin(0), expected, "ArgMin: Incorrect value");
 
             // zero-dim
             array = manager.create(new Shape(0, 1, 0));
-            actual = manager.create(new Shape(0, 0));
-            Assert.assertEquals(actual, array.argMin(1), "ArgMin: Incorrect value");
+            expected = manager.create(new Shape(0, 0));
+            Assert.assertEquals(array.argMin(1), expected, "ArgMin: Incorrect value");
         }
     }
 }

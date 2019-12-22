@@ -28,26 +28,26 @@ public class NDArrayNumericOpTest {
             double[] data = {6, 9, -12, -11, 0};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(x -> -x).toArray();
-            NDArray actual = manager.create(data);
-            Assert.assertEquals(actual, array.neg());
-            Assertions.assertInPlaceEquals(actual, array.negi(), array);
+            NDArray expected = manager.create(data);
+            Assert.assertEquals(array.neg(), expected);
+            Assertions.assertInPlaceEquals(array.negi(), expected, array);
             // test multi-dim
             data = new double[] {-2.2, 2.2, 3, -0.2, 2.76, 0.0002};
             array = manager.create(data, new Shape(2, 3));
             data = DoubleStream.of(data).map(x -> -x).toArray();
-            actual = manager.create(data, new Shape(2, 3));
-            Assert.assertEquals(actual, array.neg());
-            Assertions.assertInPlaceEquals(actual, array.negi(), array);
+            expected = manager.create(data, new Shape(2, 3));
+            Assert.assertEquals(array.neg(), expected);
+            Assertions.assertInPlaceEquals(array.negi(), expected, array);
             // test scalar
             array = manager.create(3f);
-            actual = manager.create(-3f);
-            Assert.assertEquals(actual, array.neg());
-            Assertions.assertInPlaceEquals(actual, array.negi(), array);
+            expected = manager.create(-3f);
+            Assert.assertEquals(array.neg(), expected);
+            Assertions.assertInPlaceEquals(array.negi(), expected, array);
             // test zero-dim
             array = manager.create(new Shape(2, 0, 1));
-            actual = manager.create(new Shape(2, 0, 1));
-            Assert.assertEquals(actual, array.neg());
-            Assertions.assertInPlaceEquals(actual, array.negi(), array);
+            expected = manager.create(new Shape(2, 0, 1));
+            Assert.assertEquals(array.neg(), expected);
+            Assertions.assertInPlaceEquals(array.negi(), expected, array);
         }
     }
 
@@ -57,21 +57,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::abs).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.abs());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.abs(), expected);
             // test multi-dim
             data = new double[] {1.2, 98.34, 2.34, -0.456, 2, -22};
             array = manager.create(data, new Shape(2, 1, 1, 3));
             data = DoubleStream.of(data).map(Math::abs).toArray();
-            actual = manager.create(data, new Shape(2, 1, 1, 3));
-            Assertions.assertAlmostEquals(actual, array.abs());
+            expected = manager.create(data, new Shape(2, 1, 1, 3));
+            Assertions.assertAlmostEquals(array.abs(), expected);
             // test scalar
-            array = manager.create(0.00001f);
-            actual = manager.create(-0.00001f);
-            Assertions.assertAlmostEquals(actual, array.abs());
+            array = manager.create(-0.00001f);
+            expected = manager.create(0.00001f);
+            Assertions.assertAlmostEquals(array.abs(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 0, 2, 0));
-            Assert.assertEquals(array, array.abs());
+            Assert.assertEquals(array.abs(), array);
         }
     }
 
@@ -81,21 +81,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, -2.12312, -3.5784, -4.0, 5.0, -223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(x -> Math.pow(x, 2.0)).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.square());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.square(), expected);
             // test multi-dim
             data = new double[] {1.2, 98.34, 2.34, -0.456, 2, -22};
             array = manager.create(data, new Shape(2, 1, 1, 3));
             data = DoubleStream.of(data).map(Math::abs).toArray();
-            actual = manager.create(data, new Shape(2, 1, 1, 3));
-            Assertions.assertAlmostEquals(actual, array.abs());
+            expected = manager.create(data, new Shape(2, 1, 1, 3));
+            Assertions.assertAlmostEquals(array.abs(), expected);
             // test scalar
-            array = manager.create(0.00001f);
-            actual = manager.create(-0.00001f);
-            Assertions.assertAlmostEquals(actual, array.abs());
+            array = manager.create(-0.00001f);
+            expected = manager.create(0.00001f);
+            Assertions.assertAlmostEquals(array.abs(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 0, 2, 0));
-            Assert.assertEquals(array, array.abs());
+            Assert.assertEquals(array.abs(), array);
         }
     }
 
@@ -105,21 +105,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::cbrt).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.cbrt());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.cbrt(), expected);
             // test multi-dim
             data = new double[] {1.2, 98.34, 2.34, -0.456, 2, -22};
             array = manager.create(data, new Shape(3, 1, 2, 1));
             data = DoubleStream.of(data).map(Math::cbrt).toArray();
-            actual = manager.create(data, new Shape(3, 1, 2, 1));
-            Assertions.assertAlmostEquals(actual, array.cbrt());
+            expected = manager.create(data, new Shape(3, 1, 2, 1));
+            Assertions.assertAlmostEquals(array.cbrt(), expected);
             // test scalar
             array = manager.create(125f);
-            actual = manager.create(5f);
-            Assertions.assertAlmostEquals(actual, array.cbrt());
+            expected = manager.create(5f);
+            Assertions.assertAlmostEquals(array.cbrt(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 0, 2));
-            Assert.assertEquals(array, array.cbrt());
+            Assert.assertEquals(array.cbrt(), array);
         }
     }
 
@@ -129,21 +129,21 @@ public class NDArrayNumericOpTest {
             double[] data = {-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::floor).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.floor());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.floor(), expected);
             // test multi-dim
             data = new double[] {2.4, 3.3, 4.5, -2.33, -2.0001, -3.0001};
             array = manager.create(data, new Shape(2, 3));
             data = DoubleStream.of(data).map(Math::floor).toArray();
-            actual = manager.create(data, new Shape(2, 3));
-            Assertions.assertAlmostEquals(actual, array.floor());
+            expected = manager.create(data, new Shape(2, 3));
+            Assertions.assertAlmostEquals(array.floor(), expected);
             // test scalar
             array = manager.create(0.0001f);
-            actual = manager.create(0f);
-            Assertions.assertAlmostEquals(actual, array.floor());
+            expected = manager.create(0f);
+            Assertions.assertAlmostEquals(array.floor(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 1, 2, 0));
-            Assert.assertEquals(array, array.floor());
+            Assert.assertEquals(array.floor(), array);
         }
     }
 
@@ -153,21 +153,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::ceil).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.ceil());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.ceil(), expected);
             // test multi-dim
             data = new double[] {-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0, 2.3};
             array = manager.create(data, new Shape(2, 2, 2));
             data = DoubleStream.of(data).map(Math::ceil).toArray();
-            actual = manager.create(data, new Shape(2, 2, 2));
-            Assertions.assertAlmostEquals(actual, array.ceil());
+            expected = manager.create(data, new Shape(2, 2, 2));
+            Assertions.assertAlmostEquals(array.ceil(), expected);
             // test scalar
             array = manager.create(1.0001f);
-            actual = manager.create(2f);
-            Assertions.assertAlmostEquals(actual, array.ceil());
+            expected = manager.create(2f);
+            Assertions.assertAlmostEquals(array.ceil(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 2, 3, 0));
-            Assert.assertEquals(array, array.ceil());
+            Assert.assertEquals(array.ceil(), array);
         }
     }
 
@@ -177,22 +177,22 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::round).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.round());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.round(), expected);
             // test multi-dim
             data = new double[] {-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0, 2.3};
             array = manager.create(data, new Shape(4, 2));
             // the result of round in Maths is different from Numpy
             data = new double[] {-2.0, -2.0, 0.0, 0.0, 2.0, 2.0, 2.0, 2.0};
-            actual = manager.create(data, new Shape(4, 2));
-            Assert.assertEquals(actual, array.round());
+            expected = manager.create(data, new Shape(4, 2));
+            Assert.assertEquals(array.round(), expected);
             // test scalar
             array = manager.create(1.0001f);
-            actual = manager.create(1f);
-            Assertions.assertAlmostEquals(actual, array.round());
+            expected = manager.create(1f);
+            Assertions.assertAlmostEquals(array.round(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 2, 3, 0));
-            Assert.assertEquals(array, array.round());
+            Assert.assertEquals(array.round(), array);
         }
     }
 
@@ -202,21 +202,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
             data = new double[] {1.0, 2.0, -3, -4, 5, -223};
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.trunc());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.trunc(), expected);
             // test multi-dim
             data = new double[] {-1.7, -1.5, -0.2, 0.2, 1.5, 1.7};
             array = manager.create(data, new Shape(2, 3));
             data = new double[] {-1, -1, 0, 0, 1, 1};
-            actual = manager.create(data, new Shape(2, 3));
-            Assertions.assertAlmostEquals(actual, array.trunc());
+            expected = manager.create(data, new Shape(2, 3));
+            Assertions.assertAlmostEquals(array.trunc(), expected);
             // test scalar
             array = manager.create(1.0001f);
-            actual = manager.create(1f);
-            Assertions.assertAlmostEquals(actual, array.trunc());
+            expected = manager.create(1f);
+            Assertions.assertAlmostEquals(array.trunc(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 2, 3, 0));
-            Assert.assertEquals(array, array.trunc());
+            Assert.assertEquals(array.trunc(), array);
         }
     }
 
@@ -226,21 +226,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, -3.584, -4.343234, 5.11111, -223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::exp).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.exp());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.exp(), expected);
             // test multi-dim
             data = new double[] {2.34, 204.0, 653.222, 1.0};
             array = manager.create(data, new Shape(2, 2));
             data = DoubleStream.of(data).map(Math::exp).toArray();
-            actual = manager.create(data, new Shape(2, 2));
-            Assertions.assertAlmostEquals(actual, array.exp());
+            expected = manager.create(data, new Shape(2, 2));
+            Assertions.assertAlmostEquals(array.exp(), expected);
             // test scalar
             array = manager.create(2f);
-            actual = manager.create(7.389f);
-            Assertions.assertAlmostEquals(actual, array.exp());
+            expected = manager.create(7.389f);
+            Assertions.assertAlmostEquals(array.exp(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 3, 3, 2));
-            Assert.assertEquals(array, array.exp());
+            Assert.assertEquals(array.exp(), array);
         }
     }
 
@@ -250,21 +250,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::log).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.log());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.log(), expected);
             // test multi-dim
             data = new double[] {1, Math.E, Math.E * Math.E};
             array = manager.create(data, new Shape(3, 1, 1, 1));
             data = DoubleStream.of(data).map(Math::log).toArray();
-            actual = manager.create(data, new Shape(3, 1, 1, 1));
-            Assertions.assertAlmostEquals(actual, array.log());
+            expected = manager.create(data, new Shape(3, 1, 1, 1));
+            Assertions.assertAlmostEquals(array.log(), expected);
             // test scalar
             array = manager.create(Math.E);
-            actual = manager.create(1f);
-            Assertions.assertAlmostEquals(actual, array.log());
+            expected = manager.create(1f);
+            Assertions.assertAlmostEquals(array.log(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 0));
-            Assert.assertEquals(array, array.log());
+            Assert.assertEquals(array.log(), array);
         }
     }
 
@@ -274,21 +274,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.12, 3.584, 4.334, 5.111, 223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::log10).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.log10());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.log10(), expected);
             // test multi-dim
             data = new double[] {1e-15, 1e-14, 1e-13, 1e-2};
             array = manager.create(data, new Shape(2, 2));
             data = DoubleStream.of(data).map(Math::log10).toArray();
-            actual = manager.create(data, new Shape(2, 2));
-            Assertions.assertAlmostEquals(actual, array.log10());
+            expected = manager.create(data, new Shape(2, 2));
+            Assertions.assertAlmostEquals(array.log10(), expected);
             // test scalar
             array = manager.create(1e-5);
-            actual = manager.create(-5.0);
-            Assertions.assertAlmostEquals(actual, array.log10());
+            expected = manager.create(-5.0);
+            Assertions.assertAlmostEquals(array.log10(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 0));
-            Assertions.assertAlmostEquals(array, array.log10());
+            Assertions.assertAlmostEquals(array.log10(), array);
         }
     }
 
@@ -298,21 +298,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(x -> Math.log10(x) / Math.log10(2)).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.log2());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.log2(), expected);
             // test multi-dim
             data = new double[] {1, 2, 4, 8, 16, 32};
             array = manager.create(data, new Shape(2, 3, 1));
             data = DoubleStream.of(data).map(x -> Math.log10(x) / Math.log10(2)).toArray();
-            actual = manager.create(data, new Shape(2, 3, 1));
-            Assertions.assertAlmostEquals(actual, array.log2());
+            expected = manager.create(data, new Shape(2, 3, 1));
+            Assertions.assertAlmostEquals(array.log2(), expected);
             // test scalar
             array = manager.create(1f);
-            actual = manager.create(0f);
-            Assertions.assertAlmostEquals(actual, array.log2());
+            expected = manager.create(0f);
+            Assertions.assertAlmostEquals(array.log2(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 0));
-            Assertions.assertAlmostEquals(array, array.log2());
+            Assertions.assertAlmostEquals(array.log2(), array);
         }
     }
 
@@ -322,21 +322,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::sin).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.sin());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.sin(), expected);
             // test multi-dim
             data = new double[] {0, 30, 45, 60, 90, 120};
             array = manager.create(data, new Shape(2, 3));
             data = DoubleStream.of(data).map(Math::sin).toArray();
-            actual = manager.create(data, new Shape(2, 3));
-            Assert.assertEquals(actual, array.sin());
+            expected = manager.create(data, new Shape(2, 3));
+            Assert.assertEquals(array.sin(), expected);
             // test scalar
             array = manager.create(0.5 * Math.PI);
-            actual = manager.create(1.0);
-            Assert.assertEquals(actual, array.sin());
+            expected = manager.create(1.0);
+            Assert.assertEquals(array.sin(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 0, 2));
-            Assert.assertEquals(array, array.sin());
+            Assert.assertEquals(array.sin(), array);
         }
     }
 
@@ -346,21 +346,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::cos).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.cos());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.cos(), expected);
             // test multi-dim
             data = new double[] {0, Math.PI / 4, Math.PI / 2, Math.PI};
             array = manager.create(data, new Shape(2, 2));
             data = DoubleStream.of(data).map(Math::cos).toArray();
-            actual = manager.create(data, new Shape(2, 2));
-            Assertions.assertAlmostEquals(actual, array.cos());
+            expected = manager.create(data, new Shape(2, 2));
+            Assertions.assertAlmostEquals(array.cos(), expected);
             // test scalar
             array = manager.create(0f);
-            actual = manager.create(1.0f);
-            Assert.assertEquals(actual, array.cos());
+            expected = manager.create(1.0f);
+            Assert.assertEquals(array.cos(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 1, 2));
-            Assert.assertEquals(array, array.cos());
+            Assert.assertEquals(array.cos(), array);
         }
     }
 
@@ -370,21 +370,21 @@ public class NDArrayNumericOpTest {
             double[] data = {0.0, Math.PI / 4.0, Math.PI / 2.0};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::tan).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.tan());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.tan(), expected);
             // test multi-dim
             data = new double[] {0, -Math.PI, Math.PI / 2.0, Math.PI};
             array = manager.create(data, new Shape(2, 2));
             data = DoubleStream.of(data).map(Math::tan).toArray();
-            actual = manager.create(data, new Shape(2, 2));
-            Assertions.assertAlmostEquals(actual, array.tan());
+            expected = manager.create(data, new Shape(2, 2));
+            Assertions.assertAlmostEquals(array.tan(), expected);
             // test scalar
             array = manager.create(0f);
-            actual = manager.create(0f);
-            Assert.assertEquals(actual, array.tan());
+            expected = manager.create(0f);
+            Assert.assertEquals(array.tan(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 0, 2));
-            Assert.assertEquals(array, array.tan());
+            Assert.assertEquals(array.tan(), array);
         }
     }
 
@@ -394,21 +394,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, -1.0, -0.22, 0.4, 0.1234};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::asin).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.asin());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.asin(), expected);
             // test multi-dim
             data = new double[] {0.1, 0.2, 0.3, 0.4, 0.5, 0.6};
             array = manager.create(data, new Shape(2, 3, 1));
             data = DoubleStream.of(data).map(Math::asin).toArray();
-            actual = manager.create(data, new Shape(2, 3, 1));
-            Assertions.assertAlmostEquals(actual, array.asin());
+            expected = manager.create(data, new Shape(2, 3, 1));
+            Assertions.assertAlmostEquals(array.asin(), expected);
             // test scalar
             array = manager.create(0f);
-            actual = manager.create(0f);
-            Assert.assertEquals(actual, array.asin());
+            expected = manager.create(0f);
+            Assert.assertEquals(array.asin(), expected);
             // test zero-dim
             array = manager.create(new Shape(2, 0, 2));
-            Assert.assertEquals(array, array.asin());
+            Assert.assertEquals(array.asin(), array);
         }
     }
 
@@ -418,21 +418,21 @@ public class NDArrayNumericOpTest {
             double[] data = {-1.0, -0.707, 0.0, 0.707, 1.0};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::acos).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.acos());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.acos(), expected);
             // test multi-dim
             data = new double[] {-1.0, -0.707, -0.5, 0, 0.5, 0.707, 1.0};
             array = manager.create(data, new Shape(7, 1));
             data = DoubleStream.of(data).map(Math::acos).toArray();
-            actual = manager.create(data, new Shape(7, 1));
-            Assertions.assertAlmostEquals(actual, array.acos());
+            expected = manager.create(data, new Shape(7, 1));
+            Assertions.assertAlmostEquals(array.acos(), expected);
             // test scalar
             array = manager.create(0f);
-            actual = manager.create(Math.PI / 2);
-            Assertions.assertAlmostEquals(actual, array.acos());
+            expected = manager.create(Math.PI / 2);
+            Assertions.assertAlmostEquals(array.acos(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 1));
-            Assert.assertEquals(array, array.acos());
+            Assert.assertEquals(array.acos(), array);
         }
     }
 
@@ -442,21 +442,21 @@ public class NDArrayNumericOpTest {
             double[] data = {-1.0, 0.0, 1.0};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::atan).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.atan());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.atan(), expected);
             // test multi-dim
             data = new double[] {-1.0, -0.5, 0, 0.5, 1.0};
             array = manager.create(data, new Shape(5, 1));
             data = DoubleStream.of(data).map(Math::atan).toArray();
-            actual = manager.create(data, new Shape(5, 1));
-            Assertions.assertAlmostEquals(actual, array.atan());
+            expected = manager.create(data, new Shape(5, 1));
+            Assertions.assertAlmostEquals(array.atan(), expected);
             // test scalar
             array = manager.create(0f);
-            actual = manager.create(0f);
-            Assertions.assertAlmostEquals(actual, array.atan());
+            expected = manager.create(0f);
+            Assertions.assertAlmostEquals(array.atan(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 0));
-            Assert.assertEquals(array, array.atan());
+            Assert.assertEquals(array.atan(), array);
         }
     }
 
@@ -466,8 +466,8 @@ public class NDArrayNumericOpTest {
             double[] data = {0, Math.PI / 2, Math.PI, 3 * Math.PI / 2, 2 * Math.PI};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::toDegrees).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.toDegrees());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.toDegrees(), expected);
             // test multi-dim
             data =
                     new double[] {
@@ -475,15 +475,15 @@ public class NDArrayNumericOpTest {
                     };
             array = manager.create(data, new Shape(2, 1, 3));
             data = DoubleStream.of(data).map(Math::toDegrees).toArray();
-            actual = manager.create(data, new Shape(2, 1, 3));
-            Assertions.assertAlmostEquals(actual, array.toDegrees());
+            expected = manager.create(data, new Shape(2, 1, 3));
+            Assertions.assertAlmostEquals(array.toDegrees(), expected);
             // test scalar
             array = manager.create(Math.PI);
-            actual = manager.create(180f);
-            Assertions.assertAlmostEquals(actual, array.toDegrees());
+            expected = manager.create(180f);
+            Assertions.assertAlmostEquals(array.toDegrees(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 1));
-            Assert.assertEquals(array, array.toDegrees());
+            Assert.assertEquals(array.toDegrees(), array);
         }
     }
 
@@ -493,8 +493,8 @@ public class NDArrayNumericOpTest {
             double[] data = {0.0, 90.0, 180.0, 270.0, 360.0};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::toRadians).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.toRadians());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.toRadians(), expected);
             // test multi-dim
             data =
                     new double[] {
@@ -503,15 +503,15 @@ public class NDArrayNumericOpTest {
                     };
             array = manager.create(data, new Shape(2, 2, 3));
             data = DoubleStream.of(data).map(Math::toRadians).toArray();
-            actual = manager.create(data, new Shape(2, 2, 3));
-            Assertions.assertAlmostEquals(actual, array.toRadians());
+            expected = manager.create(data, new Shape(2, 2, 3));
+            Assertions.assertAlmostEquals(array.toRadians(), expected);
             // test scalar
             array = manager.create(180f);
-            actual = manager.create(Math.PI);
-            Assertions.assertAlmostEquals(actual, array.toRadians());
+            expected = manager.create(Math.PI);
+            Assertions.assertAlmostEquals(array.toRadians(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 1, 0, 1));
-            Assert.assertEquals(array, array.toRadians());
+            Assert.assertEquals(array.toRadians(), array);
         }
     }
 
@@ -521,21 +521,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::sinh).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.sinh());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.sinh(), expected);
             // test multi-dim
             data = new double[] {0.0, 1.11, 2.22, 3.33, 4.44, 5.55, 6.66, 7.77};
             array = manager.create(data, new Shape(2, 2, 2));
             data = DoubleStream.of(data).map(Math::sinh).toArray();
-            actual = manager.create(data, new Shape(2, 2, 2));
-            Assertions.assertAlmostEquals(actual, array.sinh());
+            expected = manager.create(data, new Shape(2, 2, 2));
+            Assertions.assertAlmostEquals(array.sinh(), expected);
             // test scalar
             array = manager.create(5f);
-            actual = manager.create(74.2032f);
-            Assertions.assertAlmostEquals(actual, array.sinh());
+            expected = manager.create(74.2032f);
+            Assertions.assertAlmostEquals(array.sinh(), expected);
             // test zero-dim
             array = manager.create(new Shape(1, 0, 0, 1));
-            Assert.assertEquals(array, array.sinh());
+            Assert.assertEquals(array.sinh(), array);
         }
     }
 
@@ -545,21 +545,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::cosh).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.cosh());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.cosh(), expected);
             // test multi-dim
             data = new double[] {0.0, 1.11, 2.22, 3.33, 4.44, 5.55, 6.66, 7.77};
             array = manager.create(data, new Shape(2, 2, 2));
             data = DoubleStream.of(data).map(Math::cosh).toArray();
-            actual = manager.create(data, new Shape(2, 2, 2));
-            Assertions.assertAlmostEquals(actual, array.cosh());
+            expected = manager.create(data, new Shape(2, 2, 2));
+            Assertions.assertAlmostEquals(array.cosh(), expected);
             // test scalar
             array = manager.create(5f);
-            actual = manager.create(74.21f);
-            Assertions.assertAlmostEquals(actual, array.cosh());
+            expected = manager.create(74.21f);
+            Assertions.assertAlmostEquals(array.cosh(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 0, 0, 0));
-            Assert.assertEquals(array, array.cosh());
+            Assert.assertEquals(array.cosh(), array);
         }
     }
 
@@ -569,21 +569,21 @@ public class NDArrayNumericOpTest {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(Math::tanh).toArray();
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.tanh());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.tanh(), expected);
             // test multi-dim
             data = new double[] {0.0, 1.11, 2.22, 3.33, 4.44, 5.55, 6.66, 7.77};
             array = manager.create(data, new Shape(2, 2, 2));
             data = DoubleStream.of(data).map(Math::tanh).toArray();
-            actual = manager.create(data, new Shape(2, 2, 2));
-            Assertions.assertAlmostEquals(actual, array.tanh());
+            expected = manager.create(data, new Shape(2, 2, 2));
+            Assertions.assertAlmostEquals(array.tanh(), expected);
             // test scalar
             array = manager.create(5f);
-            actual = manager.create(0.9999f);
-            Assertions.assertAlmostEquals(actual, array.tanh());
+            expected = manager.create(0.9999f);
+            Assertions.assertAlmostEquals(array.tanh(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 4, 0, 0));
-            Assert.assertEquals(array, array.tanh());
+            Assert.assertEquals(array.tanh(), array);
         }
     }
 
@@ -593,25 +593,25 @@ public class NDArrayNumericOpTest {
             double[] data = {Math.E, 10.0};
             NDArray array = manager.create(data);
             data = new double[] {1.72538256, 2.99822295};
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.asinh());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.asinh(), expected);
             // test multi-dim
             array = manager.arange(10).reshape(5, 1, 2);
-            actual =
+            expected =
                     manager.create(
                             new float[] {
                                 0f, 0.88137f, 1.44364f, 1.81845f, 2.0947f, 2.3124f, 2.49178f,
                                 2.64412f, 2.77648f, 2.89344f
                             },
                             new Shape(5, 1, 2));
-            Assertions.assertAlmostEquals(actual, array.asinh());
+            Assertions.assertAlmostEquals(array.asinh(), expected);
             // test scalar
             array = manager.create(0f);
-            actual = manager.create(0f);
-            Assertions.assertAlmostEquals(actual, array.asinh());
+            expected = manager.create(0f);
+            Assertions.assertAlmostEquals(array.asinh(), expected);
             // test zero-dim
             array = manager.create(new Shape(0));
-            Assert.assertEquals(array, array.asinh());
+            Assert.assertEquals(array.asinh(), array);
         }
     }
 
@@ -621,25 +621,25 @@ public class NDArrayNumericOpTest {
             double[] data = {Math.E, 10.0};
             NDArray array = manager.create(data);
             data = new double[] {1.65745445, 2.99322285};
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.acosh());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.acosh(), expected);
             // test multi-dim
             array = manager.arange(10, 110, 10).reshape(2, 5);
-            actual =
+            expected =
                     manager.create(
                             new float[] {
                                 2.9932f, 3.68825f, 4.0941f, 4.38188f, 4.6051f, 4.7874f, 4.9416f,
                                 5.07513f, 5.193f, 5.2983f
                             },
                             new Shape(2, 5));
-            Assertions.assertAlmostEquals(actual, array.acosh());
+            Assertions.assertAlmostEquals(array.acosh(), expected);
             // test scalar
             array = manager.create(1f);
-            actual = manager.create(0f);
-            Assertions.assertAlmostEquals(actual, array.acosh());
+            expected = manager.create(0f);
+            Assertions.assertAlmostEquals(array.acosh(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 0));
-            Assert.assertEquals(array, array.acosh());
+            Assert.assertEquals(array.acosh(), array);
         }
     }
 
@@ -649,20 +649,20 @@ public class NDArrayNumericOpTest {
             double[] data = {0.0, -0.5};
             NDArray array = manager.create(data);
             data = new double[] {0.0, -0.54930614};
-            NDArray actual = manager.create(data);
-            Assertions.assertAlmostEquals(actual, array.atanh());
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.atanh(), expected);
             // test multi-dim
             array = manager.create(new float[] {0.0f, 0.1f, 0.2f, 0.3f}, new Shape(2, 2));
-            actual =
+            expected =
                     manager.create(new float[] {0.0f, 0.10033f, 0.2027f, 0.3095f}, new Shape(2, 2));
-            Assertions.assertAlmostEquals(actual, array.atanh());
+            Assertions.assertAlmostEquals(array.atanh(), expected);
             // test scalar
             array = manager.create(0.5f);
-            actual = manager.create(0.5493f);
-            Assertions.assertAlmostEquals(actual, array.atanh());
+            expected = manager.create(0.5493f);
+            Assertions.assertAlmostEquals(array.atanh(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 0));
-            Assert.assertEquals(array, array.atanh());
+            Assert.assertEquals(array.atanh(), array);
         }
     }
 }

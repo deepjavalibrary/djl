@@ -43,7 +43,7 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {-1, 0, 2});
                 NDArray expected = manager.create(new float[] {0, 0, 2});
-                Assert.assertEquals(expected, Activation.relu(data));
+                Assert.assertEquals(Activation.relu(data), expected);
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);
@@ -94,7 +94,7 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {0, 0, 2});
                 NDArray expected = manager.create(new float[] {.6931f, .6931f, 2.1269f});
-                Assertions.assertAlmostEquals(expected, Activation.softrelu(data));
+                Assertions.assertAlmostEquals(Activation.softrelu(data), expected);
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assertions.assertAlmostEquals(result, expected);
@@ -112,7 +112,7 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {-1, 0, 2});
                 NDArray expected = manager.create(new float[] {-1, 0, 2});
-                Assert.assertEquals(expected, Activation.leakyRelu(data, alpha));
+                Assert.assertEquals(Activation.leakyRelu(data, alpha), expected);
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);
@@ -130,7 +130,7 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {0, 2});
                 NDArray expected = manager.create(new float[] {0, 2});
-                Assertions.assertAlmostEquals(expected, Activation.elu(data, alpha));
+                Assertions.assertAlmostEquals(Activation.elu(data, alpha), expected);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assertions.assertAlmostEquals(result, expected);
             }
@@ -146,7 +146,7 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {0});
                 NDArray expected = manager.create(new float[] {0});
-                Assert.assertEquals(expected, Activation.selu(data));
+                Assert.assertEquals(Activation.selu(data), expected);
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);
@@ -163,7 +163,7 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {0});
                 NDArray expected = manager.create(new float[] {0});
-                Assert.assertEquals(expected, Activation.gelu(data));
+                Assert.assertEquals(Activation.gelu(data), expected);
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);
@@ -181,7 +181,7 @@ public class ActivationTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {0});
                 NDArray expected = manager.create(new float[] {0});
-                Assert.assertEquals(expected, Activation.swish(data, beta));
+                Assert.assertEquals(Activation.swish(data, beta), expected);
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);

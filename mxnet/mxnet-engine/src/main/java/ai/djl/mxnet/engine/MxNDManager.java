@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 /** {@code MxNDManager} is the MXNet implementation of {@link NDManager}. */
 public class MxNDManager implements NDManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(MxTrainer.class);
+    private static final Logger logger = LoggerFactory.getLogger(MxNDManager.class);
 
     /**
      * A global {@link NDManager} singleton instance.

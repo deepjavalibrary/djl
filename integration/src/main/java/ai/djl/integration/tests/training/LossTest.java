@@ -49,8 +49,8 @@ public class LossTest {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(1));
             Assertions.assertAlmostEquals(
-                    manager.create(3.45191431f),
-                    Loss.softmaxCrossEntropyLoss().getLoss(new NDList(label), new NDList(pred)));
+                    Loss.softmaxCrossEntropyLoss().getLoss(new NDList(label), new NDList(pred)),
+                    manager.create(3.45191431f));
         }
     }
 

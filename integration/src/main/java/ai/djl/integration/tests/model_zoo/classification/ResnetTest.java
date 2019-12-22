@@ -84,7 +84,7 @@ public class ResnetTest {
                 Assert.assertEquals(parameters.get(0).getValue().getArray(), expectedAtIndex0);
                 Assertions.assertAlmostEquals(
                         parameters.get(1).getValue().getArray(), expectedAtIndex1);
-                Assert.assertEquals(expectedAtIndex87, parameters.get(87).getValue().getArray());
+                Assert.assertEquals(parameters.get(87).getValue().getArray(), expectedAtIndex87);
             }
         }
     }

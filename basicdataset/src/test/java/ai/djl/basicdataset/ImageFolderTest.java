@@ -80,26 +80,27 @@ public class ImageFolderTest {
 
                 Batch catBatch = ds.next();
                 Assertions.assertAlmostEquals(
-                        NDImageUtils.toTensor(NDImageUtils.resize(cat, 100, 100)).expandDims(0),
-                        catBatch.getData().singletonOrThrow());
+                        catBatch.getData().singletonOrThrow(),
+                        NDImageUtils.toTensor(NDImageUtils.resize(cat, 100, 100)).expandDims(0));
                 Assert.assertEquals(
-                        manager.create(new int[] {0}), catBatch.getLabels().singletonOrThrow());
+                        catBatch.getLabels().singletonOrThrow(), manager.create(new int[] {0}));
                 catBatch.close();
 
                 Batch dogBatch = ds.next();
                 Assertions.assertAlmostEquals(
-                        NDImageUtils.toTensor(NDImageUtils.resize(dog, 100, 100)).expandDims(0),
-                        dogBatch.getData().singletonOrThrow());
+                        dogBatch.getData().singletonOrThrow(),
+                        NDImageUtils.toTensor(NDImageUtils.resize(dog, 100, 100)).expandDims(0));
                 Assert.assertEquals(
-                        manager.create(new int[] {1}), dogBatch.getLabels().singletonOrThrow());
+                        dogBatch.getLabels().singletonOrThrow(), manager.create(new int[] {1}));
                 dogBatch.close();
 
                 Batch pikachuBatch = ds.next();
                 Assertions.assertAlmostEquals(
-                        NDImageUtils.toTensor(NDImageUtils.resize(pikachu, 100, 100)).expandDims(0),
-                        pikachuBatch.getData().singletonOrThrow());
+                        pikachuBatch.getData().singletonOrThrow(),
+                        NDImageUtils.toTensor(NDImageUtils.resize(pikachu, 100, 100))
+                                .expandDims(0));
                 Assert.assertEquals(
-                        manager.create(new int[] {2}), pikachuBatch.getLabels().singletonOrThrow());
+                        pikachuBatch.getLabels().singletonOrThrow(), manager.create(new int[] {2}));
                 pikachuBatch.close();
             }
         }

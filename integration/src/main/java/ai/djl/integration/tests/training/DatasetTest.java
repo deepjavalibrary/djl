@@ -71,7 +71,7 @@ public class DatasetTest {
                                         original.add(
                                                 record.getData().singletonOrThrow().getLong()));
                 List<Long> expected = LongStream.range(0, 100).boxed().collect(Collectors.toList());
-                Assert.assertEquals(expected, original, "SequentialSampler test failed");
+                Assert.assertEquals(original, expected, "SequentialSampler test failed");
             }
         }
     }
