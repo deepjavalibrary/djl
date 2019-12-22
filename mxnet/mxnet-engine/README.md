@@ -52,7 +52,7 @@ For macOS, you can choose between the following two libraries:
 ### Linux
 For the Linux platform, you can choose between CPU, MKL, CUDA and CUDA+MKL combinations:
 
-CUDA+MKL:
+CUDA with MKL:
 - org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-b:linux-x86_64
 - org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-b:linux-x86_64
 
@@ -76,7 +76,7 @@ CUDA+MKL:
     </dependency>
 ```
 
-CPU and MKL
+CPU with MKL
 - org.apache.mxnet:mxnet-native-mkl:1.6.0-b:linux-x86_64
 
 ```xml
@@ -91,4 +91,43 @@ CPU and MKL
 
 ### Windows
 
-Coming soon
+For the Windows platform, you can choose between CPU and GPU.
+
+CUDA with MKL:
+- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-b:win-x86_64
+- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-b:win-x86_64
+
+    **Note:** The current MXNet native library for CUDA only supports the sm_37 and sm_70 architectures.
+
+```xml
+    <dependency>
+      <groupId>org.apache.mxnet</groupId>
+      <artifactId>mxnet-native-cu101mkl</artifactId>
+      <classifier>win-x86_64</classifier>
+      <version>1.6.0-b</version>
+      <scope>runtime</scope>
+    </dependency>
+```
+
+```xml
+    <dependency>
+      <groupId>org.apache.mxnet</groupId>
+      <artifactId>mxnet-native-cu92mkl</artifactId>
+      <classifier>win-x86_64</classifier>
+      <version>1.6.0-b</version>
+      <scope>runtime</scope>
+    </dependency>
+```
+
+CPU with MKL
+- org.apache.mxnet:mxnet-native-mkl:1.6.0-b:win-x86_64
+
+```xml
+    <dependency>
+      <groupId>org.apache.mxnet</groupId>
+      <artifactId>mxnet-native-mkl</artifactId>
+      <classifier>win-x86_64</classifier>
+      <scope>runtime</scope>
+      <version>1.6.0-b</version>
+    </dependency>
+```
