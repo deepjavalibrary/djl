@@ -82,8 +82,8 @@ The following pseudocode demonstrates running training:
 - [JavaDocs](https://javadoc.djl.ai/)
 
 ## Release Notes
-* [0.2.1](https://github.com/awslabs/djl/releases/tag/v0.2.1)
-* [0.2.0 Initial release](https://github.com/awslabs/djl/releases/tag/v0.2.0)
+* [0.2.1](https://github.com/awslabs/djl/releases/tag/v0.2.1) ([Code](https://github.com/awslabs/djl/tree/v0.2.1))
+* [0.2.0 Initial release](https://github.com/awslabs/djl/releases/tag/v0.2.0) ([Code](https://github.com/awslabs/djl/tree/v0.2.0))
 
 ## Building From Source
 
