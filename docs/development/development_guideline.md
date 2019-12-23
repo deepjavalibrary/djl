@@ -7,6 +7,30 @@ In this document, we will cover everything you need to build, test, and debug yo
 
 Many of us use the [IntelliJ IDEA IDE](https://www.jetbrains.com/idea/) to develop DJL and we will sometimes mention it. However, there is no requirement to use this IDE.
 
+## Coding Conventions
+
+When writing code for DJL, we usually try to follow standard Java coding conventions. In addition, here are some other conventions we use:
+
+- For builders, use setXXX for required values and optXXX for optional ones
+- Follow the example in `Convolution` and `Conv2D` when making extendable builders
+
+Alongside these conventions, we have a number of checks that are run including PMD, SpotBugs, and Checkstyle. These can all be verified by running the gradle `build` target. Instructions for fixing any problems will be given by the relevant tool.
+
+We also follow the [AOSP Java Code Style](https://source.android.com/setup/contribute/code-style). See [here](https://github.com/google/google-java-format) for plugins that can help setup your IDE to use this style. The formatting is checked very strictly. Failing the formatting check will look like:
+```
+> Task :api:verifyJava FAILED
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Script '/Volumes/Unix/projects/Joule/tools/gradle/formatter.gradle' line: 57
+
+* What went wrong:
+Execution failed for task ':api:verifyJava'.
+> File not formatted: /Volumes/Unix/projects/Joule/api/src/main/java/ai/djl/nn/convolutional/Conv2D.java
+```
+If you do fail the format check, the easiest way to resolve it is to run the gradle `formatJava` target to reformat your code.
+
 ## Build
 
 This project uses a gradle wrapper, so you don't have to install gradle on your machine. You can just call the gradle wrapper using the following command:
