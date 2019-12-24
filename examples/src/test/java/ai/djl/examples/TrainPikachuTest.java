@@ -42,8 +42,7 @@ public class TrainPikachuTest {
         } else {
             // test train 1 epoch and predict workflow works on CPU
             args = new String[] {"-e", "1", "-m", "1", "-b", "32"};
-            // only check loss after 5 batches
-            expectedLoss = 2.5e-2f;
+            expectedLoss = 0.7f;
         }
         // test train
         TrainPikachu trainPikachu = new TrainPikachu();

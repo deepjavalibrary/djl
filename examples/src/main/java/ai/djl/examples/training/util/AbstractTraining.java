@@ -91,12 +91,15 @@ public abstract class AbstractTraining implements TrainingListener {
             logger.info("Training: {} batches", trainDataSize);
             logger.info("Validation: {} batches", validateDataSize);
 
-            float p50 = metrics.percentile("train", 50).getValue().longValue() / 1_000_000f;
-            float p90 = metrics.percentile("train", 90).getValue().longValue() / 1_000_000f;
-            logger.info(String.format("train P50: %.3f ms, P90: %.3f ms", p50, p90));
+            if (metrics.hasMetric("train")) {
+                // possible no train metrics if only one iteration is executed
+                float p50 = metrics.percentile("train", 50).getValue().longValue() / 1_000_000f;
+                float p90 = metrics.percentile("train", 90).getValue().longValue() / 1_000_000f;
+                logger.info(String.format("train P50: %.3f ms, P90: %.3f ms", p50, p90));
+            }
 
-            p50 = metrics.percentile("forward", 50).getValue().longValue() / 1_000_000f;
-            p90 = metrics.percentile("forward", 90).getValue().longValue() / 1_000_000f;
+            float p50 = metrics.percentile("forward", 50).getValue().longValue() / 1_000_000f;
+            float p90 = metrics.percentile("forward", 90).getValue().longValue() / 1_000_000f;
             logger.info(String.format("forward P50: %.3f ms, P90: %.3f ms", p50, p90));
 
             p50 = metrics.percentile("training-metrics", 50).getValue().longValue() / 1_000_000f;
