@@ -97,7 +97,14 @@ public interface Trainer extends AutoCloseable {
     void step();
 
     /**
-     * Attaches a Metrics param to use for benchmark.
+     * Returns the Metrics param used for benchmarking.
+     *
+     * @return the the Metrics param used for benchmarking.
+     */
+    Metrics getMetrics();
+
+    /**
+     * Attaches a Metrics param to use for benchmarking.
      *
      * @param metrics the Metrics class
      */

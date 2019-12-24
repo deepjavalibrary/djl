@@ -15,35 +15,40 @@ package ai.djl.examples;
 import ai.djl.ModelException;
 import ai.djl.examples.inference.ImageClassification;
 import ai.djl.examples.training.TrainMnist;
+import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.modality.Classifications;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainMnistTest {
 
     @Test
-    public void testTrainMnist() throws ModelException, TranslateException, IOException {
+    public void testTrainMnist()
+            throws ModelException, TranslateException, IOException, ParseException {
         if (Boolean.getBoolean("nightly")) {
             String[] args = new String[] {"-g", "1"};
 
             TrainMnist test = new TrainMnist();
-            Assert.assertTrue(test.runExample(args));
-            Assert.assertTrue(test.getTrainingAccuracy() > 0.9f);
-            Assert.assertTrue(test.getTrainingLoss() < 0.35f);
-            Assert.assertTrue(test.getValidationAccuracy() > 0.9f);
-            Assert.assertTrue(test.getValidationLoss() < 0.35f);
+            ExampleTrainingResult result = test.runExample(args);
+            Assert.assertTrue(result.isSuccess());
+            Assert.assertTrue(result.getTrainingAccuracy() > 0.9f);
+            Assert.assertTrue(result.getTrainingLoss() < 0.35f);
+            Assert.assertTrue(result.getValidationAccuracy() > 0.9f);
+            Assert.assertTrue(result.getValidationLoss() < 0.35f);
 
-            Classifications result = new ImageClassification().predict();
-            Classifications.Classification best = result.best();
+            Classifications classifications = new ImageClassification().predict();
+            Classifications.Classification best = classifications.best();
             Assert.assertEquals(best.getClassName(), "0");
             Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
         } else {
             String[] args = new String[] {"-g", "1", "-m", "2"};
 
             TrainMnist test = new TrainMnist();
-            Assert.assertTrue(test.runExample(args));
+            ExampleTrainingResult result = test.runExample(args);
+            Assert.assertTrue(result.isSuccess());
         }
     }
 }

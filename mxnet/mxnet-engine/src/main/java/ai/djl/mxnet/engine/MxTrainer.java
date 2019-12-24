@@ -137,7 +137,7 @@ public class MxTrainer implements Trainer {
         batchBeginTime = System.nanoTime();
 
         if (listener != null) {
-            listener.onTrainingBatch();
+            listener.onTrainingBatch(this);
         }
     }
 
@@ -167,7 +167,7 @@ public class MxTrainer implements Trainer {
         addMetric("validate", begin);
 
         if (listener != null) {
-            listener.onValidationBatch();
+            listener.onValidationBatch(this);
         }
     }
 
@@ -181,6 +181,12 @@ public class MxTrainer implements Trainer {
         long begin = System.nanoTime();
         parameterStore.updateAllParameters();
         addMetric("step", begin);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Metrics getMetrics() {
+        return metrics;
     }
 
     /** {@inheritDoc} */
@@ -227,7 +233,7 @@ public class MxTrainer implements Trainer {
         validateMetrics.forEach(TrainingMetric::reset);
 
         if (listener != null) {
-            listener.onEpoch();
+            listener.onEpoch(this);
         }
     }
 
@@ -247,15 +253,6 @@ public class MxTrainer implements Trainer {
     @Override
     public Model getModel() {
         return model;
-    }
-
-    /**
-     * Gets the {@link ai.djl.metric.Metrics} associated with this {@code Trainer}.
-     *
-     * @return the {@link ai.djl.metric.Metrics} associated with this {@code Trainer}
-     */
-    public Metrics getMetrics() {
-        return metrics;
     }
 
     /** {@inheritDoc} */

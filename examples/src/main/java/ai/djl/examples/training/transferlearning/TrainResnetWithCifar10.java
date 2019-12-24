@@ -18,9 +18,11 @@ import ai.djl.Model;
 import ai.djl.basicdataset.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
-import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
+import ai.djl.examples.training.util.ExampleTrainingListener;
+import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
+import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
@@ -37,6 +39,7 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
@@ -47,29 +50,45 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
-public final class TrainResnetWithCifar10 extends AbstractTraining {
+public final class TrainResnetWithCifar10 {
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+            throws ParseException, ModelNotFoundException, IOException {
         new TrainResnetWithCifar10().runExample(args);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected void train(Arguments arguments) throws IOException, ModelNotFoundException {
+    public ExampleTrainingResult runExample(String[] args)
+            throws IOException, ParseException, ModelNotFoundException {
+        Options options = Arguments.getOptions();
+        DefaultParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args, null, false);
+        Arguments arguments = new Arguments(cmd);
+
         try (Model model = getModel(arguments)) {
-            batchSize = arguments.getBatchSize();
             // get training dataset
-            Dataset trainDataset = getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
-            Dataset validationDataset =
+            RandomAccessDataset trainDataset =
+                    getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
+            RandomAccessDataset validationDataset =
                     getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
 
             // setup training configuration
             TrainingConfig config = setupTrainingConfig(arguments);
 
+            ExampleTrainingListener listener;
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.setMetrics(metrics);
-                trainer.setTrainingListener(this);
+                trainer.setMetrics(new Metrics());
+                listener =
+                        new ExampleTrainingListener(
+                                arguments.getBatchSize(),
+                                (int) trainDataset.getNumIterations(),
+                                (int) validationDataset.getNumIterations());
+                listener.beforeTrain(arguments.getMaxGpus(), arguments.getEpoch());
+                trainer.setTrainingListener(listener);
 
                 /*
                  * CIFAR10 is 32x32 image and pre processed into NCHW NDArray.
@@ -86,12 +105,16 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
                         validationDataset,
                         arguments.getOutputDir(),
                         "resnetv1");
+                listener.afterTrain(trainer, arguments.getOutputDir());
             }
+
+            ExampleTrainingResult result = listener.getResult();
 
             // save model
             model.setProperty("Epoch", String.valueOf(arguments.getEpoch()));
-            model.setProperty("Accuracy", String.format("%.2f", getValidationAccuracy()));
+            model.setProperty("Accuracy", String.format("%.2f", result.getValidationAccuracy()));
             model.save(Paths.get("build/model"), "resnetv1");
+            return result;
         } catch (MalformedModelException e) {
             throw new IllegalArgumentException(e);
         }
@@ -151,16 +174,15 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
-        loss = Loss.softmaxCrossEntropyLoss();
-        return new DefaultTrainingConfig(loss)
+        return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .optInitializer(initializer)
                 .addTrainingMetric(new Accuracy())
-                .setBatchSize(batchSize)
+                .setBatchSize(arguments.getBatchSize())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
-    private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)
-            throws IOException {
+    private RandomAccessDataset getDataset(
+            NDManager manager, Dataset.Usage usage, Arguments arguments) throws IOException {
         Pipeline pipeline =
                 new Pipeline(
                         new ToTensor(),
@@ -171,17 +193,11 @@ public final class TrainResnetWithCifar10 extends AbstractTraining {
         Cifar10 cifar10 =
                 Cifar10.builder(manager)
                         .optUsage(usage)
-                        .setSampling(batchSize, true)
+                        .setSampling(arguments.getBatchSize(), true)
                         .optMaxIteration(maxIterations)
                         .optPipeline(pipeline)
                         .build();
         cifar10.prepare(new ProgressBar());
-        int dataSize = (int) Math.min(cifar10.size() / batchSize, maxIterations);
-        if (usage == Dataset.Usage.TRAIN) {
-            trainDataSize = dataSize;
-        } else if (usage == Dataset.Usage.TEST) {
-            validateDataSize = dataSize;
-        }
         return cifar10;
     }
 }

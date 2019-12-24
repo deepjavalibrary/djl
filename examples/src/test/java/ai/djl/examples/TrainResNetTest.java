@@ -15,6 +15,10 @@ package ai.djl.examples;
 
 import ai.djl.Device;
 import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
+import ai.djl.examples.training.util.ExampleTrainingResult;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import java.io.IOException;
+import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -22,17 +26,18 @@ import org.testng.annotations.Test;
 public class TrainResNetTest {
 
     @Test
-    public void testTrainResNet() {
+    public void testTrainResNet() throws ParseException, ModelNotFoundException, IOException {
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
         String[] args = {"-e", "2", "-g", "4", "-m", "10", "-s", "-p"};
 
         TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
-        Assert.assertTrue(test.runExample(args));
+        Assert.assertTrue(test.runExample(args).isSuccess());
     }
 
     @Test
-    public void testTrainResNetSymbolicNightly() {
+    public void testTrainResNetSymbolicNightly()
+            throws ParseException, ModelNotFoundException, IOException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
@@ -43,14 +48,16 @@ public class TrainResNetTest {
             String[] args = {"-e", "10", "-g", "4", "-s", "-p"};
 
             TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
-            Assert.assertTrue(test.runExample(args));
-            Assert.assertTrue(test.getTrainingAccuracy() > .7f);
-            Assert.assertTrue(test.getTrainingLoss() < .8f);
+            ExampleTrainingResult result = test.runExample(args);
+            Assert.assertTrue(result.isSuccess());
+            Assert.assertTrue(result.getTrainingAccuracy() > .7f);
+            Assert.assertTrue(result.getTrainingLoss() < .8f);
         }
     }
 
     @Test
-    public void testTrainResNetImperativeNightly() {
+    public void testTrainResNetImperativeNightly()
+            throws ParseException, ModelNotFoundException, IOException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
@@ -61,9 +68,10 @@ public class TrainResNetTest {
             String[] args = {"-e", "10", "-g", "4"};
 
             TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
-            Assert.assertTrue(test.runExample(args));
-            Assert.assertTrue(test.getTrainingAccuracy() > .7f);
-            Assert.assertTrue(test.getTrainingLoss() < .8f);
+            ExampleTrainingResult result = test.runExample(args);
+            Assert.assertTrue(result.isSuccess());
+            Assert.assertTrue(result.getTrainingAccuracy() > .7f);
+            Assert.assertTrue(result.getTrainingLoss() < .8f);
         }
     }
 }

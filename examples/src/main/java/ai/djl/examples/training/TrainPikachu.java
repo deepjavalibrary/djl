@@ -17,11 +17,11 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
-import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
+import ai.djl.examples.training.util.PikachuTrainingListener;
+import ai.djl.examples.training.util.PikachuTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.inference.Predictor;
-import ai.djl.metric.Metric;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.ImageVisualization;
@@ -39,6 +39,7 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.SingleShotDetectionLoss;
@@ -55,35 +56,42 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
-public final class TrainPikachu extends AbstractTraining {
+public final class TrainPikachu {
 
-    private float trainingClassAccuracy;
-    private float trainingBoundingBoxError;
-    private float validationClassAccuracy;
-    private float validationBoundingBoxError;
-    private static final Logger logger = LoggerFactory.getLogger(TrainPikachu.class);
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ParseException {
         new TrainPikachu().runExample(args);
     }
 
-    @Override
-    protected void train(Arguments arguments) throws IOException {
-        batchSize = arguments.getBatchSize();
+    public PikachuTrainingResult runExample(String[] args) throws IOException, ParseException {
+        Options options = Arguments.getOptions();
+        DefaultParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args, null, false);
+        Arguments arguments = new Arguments(cmd);
 
         TrainingConfig config = setupTrainingConfig(arguments);
         try (Model model = Model.newInstance()) {
             model.setBlock(getSsdTrainBlock());
-            try (Trainer trainer = model.newTrainer(config)) {
-                trainer.setMetrics(metrics);
-                trainer.setTrainingListener(this);
-                Dataset pikachuDetectionTrain = getDataset(Dataset.Usage.TRAIN, arguments);
-                Dataset pikachuDetectionTest = getDataset(Dataset.Usage.TEST, arguments);
 
-                Shape inputShape = new Shape(batchSize, 3, 256, 256);
+            RandomAccessDataset pikachuDetectionTrain = getDataset(Dataset.Usage.TRAIN, arguments);
+            RandomAccessDataset pikachuDetectionTest = getDataset(Dataset.Usage.TEST, arguments);
+
+            PikachuTrainingListener listener;
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.setMetrics(new Metrics());
+                listener =
+                        new PikachuTrainingListener(
+                                arguments.getBatchSize(),
+                                (int) pikachuDetectionTrain.getNumIterations(),
+                                (int) pikachuDetectionTest.getNumIterations());
+                listener.beforeTrain(arguments.getMaxGpus(), arguments.getEpoch());
+                trainer.setTrainingListener(listener);
+
+                Shape inputShape = new Shape(arguments.getBatchSize(), 3, 256, 256);
                 trainer.initialize(inputShape);
                 TrainingUtils.fit(
                         trainer,
@@ -92,15 +100,21 @@ public final class TrainPikachu extends AbstractTraining {
                         pikachuDetectionTest,
                         arguments.getOutputDir(),
                         "ssd");
+                listener.afterTrain(trainer, arguments.getOutputDir());
             }
+
+            PikachuTrainingResult result = listener.getResult();
 
             // save model
             model.setProperty("Epoch", String.valueOf(arguments.getEpoch()));
-            model.setProperty("Loss", String.format("%.5f", validationLoss));
-            model.setProperty("ClassAccuracy", String.format("%.5f", validationClassAccuracy));
+            model.setProperty("Loss", String.format("%.5f", result.getValidationLoss()));
             model.setProperty(
-                    "BoundingBoxError", String.format("%.5f", validationBoundingBoxError));
+                    "ClassAccuracy", String.format("%.5f", result.getValidationClassAccuracy()));
+            model.setProperty(
+                    "BoundingBoxError",
+                    String.format("%.5f", result.getValidationBoundingBoxError()));
             model.save(Paths.get(arguments.getOutputDir()), "ssd");
+            return result;
         }
     }
 
@@ -137,80 +151,18 @@ public final class TrainPikachu extends AbstractTraining {
         }
     }
 
-    @Override
-    public String getTrainingStatus(Metrics metrics) {
-        StringBuilder sb = new StringBuilder();
-        List<Metric> list = metrics.getMetric("train_" + loss.getName());
-        trainingLoss = list.get(list.size() - 1).getValue().floatValue();
-
-        list = metrics.getMetric("train_classAccuracy");
-        trainingClassAccuracy = list.get(list.size() - 1).getValue().floatValue();
-
-        list = metrics.getMetric("train_boundingBoxError");
-        trainingBoundingBoxError = list.get(list.size() - 1).getValue().floatValue();
-        sb.append(
-                String.format(
-                        "loss: %2.3ef, classAccuracy: %.4f, bboxError: %2.3e,",
-                        trainingLoss, trainingClassAccuracy, trainingBoundingBoxError));
-
-        list = metrics.getMetric("train");
-        if (!list.isEmpty()) {
-            float batchTime = list.get(list.size() - 1).getValue().longValue() / 1_000_000_000f;
-            sb.append(String.format(" speed: %.2f images/sec", (float) batchSize / batchTime));
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public void printTrainingStatus(Metrics metrics) {
-        List<Metric> list = metrics.getMetric("train_" + loss.getName());
-        trainingLoss = list.get(list.size() - 1).getValue().floatValue();
-
-        list = metrics.getMetric("train_classAccuracy");
-        trainingClassAccuracy = list.get(list.size() - 1).getValue().floatValue();
-
-        list = metrics.getMetric("train_boundingBoxError");
-        trainingBoundingBoxError = list.get(list.size() - 1).getValue().floatValue();
-
-        logger.info(
-                "train loss: {}, train class accuracy: {}, train bounding box error: {}",
-                trainingLoss,
-                trainingClassAccuracy,
-                trainingBoundingBoxError);
-        list = metrics.getMetric("validate_" + loss.getName());
-        if (!list.isEmpty()) {
-            validationLoss = list.get(list.size() - 1).getValue().floatValue();
-            list = metrics.getMetric("validate_classAccuracy");
-            validationClassAccuracy = list.get(list.size() - 1).getValue().floatValue();
-            list = metrics.getMetric("validate_boundingBoxError");
-            validationBoundingBoxError = list.get(list.size() - 1).getValue().floatValue();
-            logger.info(
-                    "validate loss: {}, validate class accuracy: {}, validate bounding box error: {}",
-                    validationLoss,
-                    validationClassAccuracy,
-                    validationBoundingBoxError);
-        } else {
-            logger.info("validation has not been run.");
-        }
-    }
-
-    private Dataset getDataset(Dataset.Usage usage, Arguments arguments) throws IOException {
+    private RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
+            throws IOException {
         Pipeline pipeline = new Pipeline(new ToTensor());
         PikachuDetection pikachuDetection =
                 new PikachuDetection.Builder()
                         .optUsage(usage)
                         .optMaxIteration(arguments.getMaxIterations())
                         .optPipeline(pipeline)
-                        .setSampling(batchSize, true)
+                        .setSampling(arguments.getBatchSize(), true)
                         .build();
         pikachuDetection.prepare(new ProgressBar());
 
-        int dataSize = (int) pikachuDetection.getNumIterations();
-        if (usage == Dataset.Usage.TRAIN) {
-            trainDataSize = dataSize;
-        } else if (usage == Dataset.Usage.TEST) {
-            validateDataSize = dataSize;
-        }
         return pikachuDetection;
     }
 
@@ -218,10 +170,9 @@ public final class TrainPikachu extends AbstractTraining {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
-        loss = new SingleShotDetectionLoss("ssd_loss");
-        return new DefaultTrainingConfig(loss)
+        return new DefaultTrainingConfig(new SingleShotDetectionLoss("ssd_loss"))
                 .optInitializer(initializer)
-                .setBatchSize(batchSize)
+                .setBatchSize(arguments.getBatchSize())
                 .addTrainingMetric(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addTrainingMetric(new BoundingBoxError("boundingBoxError"))
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));

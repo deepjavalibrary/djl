@@ -52,6 +52,12 @@ public class MockTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
+    public Metrics getMetrics() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void trainBatch(Batch batch) {}
 
     /** {@inheritDoc} */

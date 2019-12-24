@@ -18,9 +18,11 @@ import ai.djl.Model;
 import ai.djl.basicdataset.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
-import ai.djl.examples.training.util.AbstractTraining;
 import ai.djl.examples.training.util.Arguments;
+import ai.djl.examples.training.util.ExampleTrainingListener;
+import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
+import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
@@ -37,6 +39,7 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
@@ -51,30 +54,48 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** This example features sample usage of a variety of optimizers to train Cifar10. */
-public final class TrainWithOptimizers extends AbstractTraining {
+public final class TrainWithOptimizers {
 
-    public static void main(String[] args) {
+    private static final Logger logger = LoggerFactory.getLogger(TrainWithOptimizers.class);
+
+    public static void main(String[] args) throws IOException, ParseException {
         new TrainWithOptimizers().runExample(args);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected void train(Arguments arguments) throws IOException, ModelNotFoundException {
+    public ExampleTrainingResult runExample(String[] args) throws IOException, ParseException {
+        Options options = Arguments.getOptions();
+        DefaultParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args, null, false);
+        Arguments arguments = new Arguments(cmd);
+
         try (Model model = getModel(arguments)) {
-            batchSize = arguments.getBatchSize();
             // get training dataset
-            Dataset trainDataset = getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
-            Dataset validationDataset =
+            RandomAccessDataset trainDataset =
+                    getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
+            RandomAccessDataset validationDataset =
                     getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
 
             // setup training configuration
             TrainingConfig config = setupTrainingConfig(arguments);
 
+            ExampleTrainingListener listener;
             try (Trainer trainer = model.newTrainer(config)) {
-                trainer.setMetrics(metrics);
-                trainer.setTrainingListener(this);
+                trainer.setMetrics(new Metrics());
+                listener =
+                        new ExampleTrainingListener(
+                                arguments.getBatchSize(),
+                                (int) trainDataset.getNumIterations(),
+                                (int) validationDataset.getNumIterations());
+                listener.beforeTrain(arguments.getMaxGpus(), arguments.getEpoch());
+                trainer.setTrainingListener(listener);
 
                 /*
                  * CIFAR10 is 32x32 image and pre processed into NCHW NDArray.
@@ -91,15 +112,22 @@ public final class TrainWithOptimizers extends AbstractTraining {
                         validationDataset,
                         arguments.getOutputDir(),
                         "resnetv1");
+                listener.afterTrain(trainer, arguments.getOutputDir());
             }
+
+            ExampleTrainingResult result = listener.getResult();
 
             // save model
             model.setProperty("Epoch", String.valueOf(arguments.getEpoch()));
-            model.setProperty("Accuracy", String.format("%.2f", getValidationAccuracy()));
+            model.setProperty("Accuracy", String.format("%.2f", result.getValidationAccuracy()));
             model.save(Paths.get("build/model"), "resnetv1");
+            return result;
         } catch (MalformedModelException e) {
             throw new IllegalArgumentException(e);
+        } catch (ModelNotFoundException e) {
+            logger.error("Model not found", e);
         }
+        return ExampleTrainingResult.FAILURE;
     }
 
     private Model getModel(Arguments arguments)
@@ -156,18 +184,18 @@ public final class TrainWithOptimizers extends AbstractTraining {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
-        loss = Loss.softmaxCrossEntropyLoss();
-        return new DefaultTrainingConfig(loss)
+        return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .optInitializer(initializer)
                 .addTrainingMetric(new Accuracy())
                 .optOptimizer(setupOptimizer(arguments))
-                .setBatchSize(batchSize)
+                .setBatchSize(arguments.getBatchSize())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
     private Optimizer setupOptimizer(Arguments arguments) {
         // TODO: Accept optimizerName as an argument
         String optimizerName = "adam";
+        int batchSize = arguments.getBatchSize();
         switch (optimizerName) {
             case "sgd":
                 // epoch number to change learning rate
@@ -198,8 +226,8 @@ public final class TrainWithOptimizers extends AbstractTraining {
         }
     }
 
-    private Dataset getDataset(NDManager manager, Dataset.Usage usage, Arguments arguments)
-            throws IOException {
+    private RandomAccessDataset getDataset(
+            NDManager manager, Dataset.Usage usage, Arguments arguments) throws IOException {
         Pipeline pipeline =
                 new Pipeline(
                         new ToTensor(),
@@ -210,17 +238,11 @@ public final class TrainWithOptimizers extends AbstractTraining {
         Cifar10 cifar10 =
                 Cifar10.builder(manager)
                         .optUsage(usage)
-                        .setSampling(batchSize, true)
+                        .setSampling(arguments.getBatchSize(), true)
                         .optMaxIteration(maxIterations)
                         .optPipeline(pipeline)
                         .build();
         cifar10.prepare(new ProgressBar());
-        int dataSize = (int) Math.min(cifar10.size() / batchSize, maxIterations);
-        if (usage == Dataset.Usage.TRAIN) {
-            trainDataSize = dataSize;
-        } else if (usage == Dataset.Usage.TEST) {
-            validateDataSize = dataSize;
-        }
         return cifar10;
     }
 }

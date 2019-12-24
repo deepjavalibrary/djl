@@ -15,9 +15,11 @@ package ai.djl.examples;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.examples.training.TrainPikachu;
+import ai.djl.examples.training.util.PikachuTrainingResult;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -25,7 +27,8 @@ import org.testng.annotations.Test;
 public class TrainPikachuTest {
 
     @Test
-    public void testDetection() throws IOException, MalformedModelException, TranslateException {
+    public void testDetection()
+            throws IOException, MalformedModelException, TranslateException, ParseException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
@@ -46,8 +49,9 @@ public class TrainPikachuTest {
         }
         // test train
         TrainPikachu trainPikachu = new TrainPikachu();
-        Assert.assertTrue(trainPikachu.runExample(args));
-        Assert.assertTrue(trainPikachu.getValidationLoss() < expectedLoss);
+        PikachuTrainingResult result = trainPikachu.runExample(args);
+        Assert.assertTrue(result.isSuccess());
+        Assert.assertTrue(result.getValidationLoss() < expectedLoss);
 
         JnaUtils.waitAll();
         // test predict

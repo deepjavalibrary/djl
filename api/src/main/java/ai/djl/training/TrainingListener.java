@@ -16,19 +16,32 @@ package ai.djl.training;
  * {@code TrainingListener} offers an interface that allows performing some actions when certain
  * events have occurred in the {@link Trainer}.
  *
- * <p>The methods {@link #onEpoch() onEpoch}, {@link #onTrainingBatch() onTrainingBatch}, {@link
- * #onValidationBatch() onValidationBatch} are called during training. Adding an implementation of
- * the listener to the {@link Trainer} allows performing any desired actions at those junctures.
- * These could be used for collection metrics, or logging, or any other purpose.
+ * <p>The methods {@link #onEpoch(Trainer) onEpoch}, {@link #onTrainingBatch(Trainer)
+ * onTrainingBatch}, {@link #onValidationBatch(Trainer) onValidationBatch} are called during
+ * training. Adding an implementation of the listener to the {@link Trainer} allows performing any
+ * desired actions at those junctures. These could be used for collection metrics, or logging, or
+ * any other purpose.
  */
 public interface TrainingListener {
 
-    /** Listens to the end of an epoch during training. */
-    void onEpoch();
+    /**
+     * Listens to the end of an epoch during training.
+     *
+     * @param trainer the trainer the listener is attached to
+     */
+    void onEpoch(Trainer trainer);
 
-    /** Listens to the end of training one batch of data during training. */
-    void onTrainingBatch();
+    /**
+     * Listens to the end of training one batch of data during training.
+     *
+     * @param trainer the trainer the listener is attached to
+     */
+    void onTrainingBatch(Trainer trainer);
 
-    /** Listens to the end of validating one batch of data during validation. */
-    void onValidationBatch();
+    /**
+     * Listens to the end of validating one batch of data during validation.
+     *
+     * @param trainer the trainer the listener is attached to
+     */
+    void onValidationBatch(Trainer trainer);
 }
