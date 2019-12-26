@@ -107,7 +107,7 @@ public class JnaGenerator {
                     writer.write("\n");
                 }
                 for (Map.Entry<String, String> field : fieldNames.entrySet()) {
-                    writer.append("    private ").append(field.getValue()).append(' ');
+                    writer.append("    public ").append(field.getValue()).append(' ');
                     writer.append(field.getKey()).append(";\n");
                 }
 

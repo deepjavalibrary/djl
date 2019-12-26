@@ -98,12 +98,8 @@ public class DataType {
         typeName = baseTypeMapping(typeName);
 
         if (pointerCount == 2) {
-            if (isConst) {
-                if ("char".equals(typeName)) {
-                    return "String[]";
-                } else if (isStruct) {
-                    return typeName + ".ByReference[]";
-                }
+            if (isConst && "char".equals(typeName)) {
+                return "String[]";
             }
             return "PointerByReference";
         }

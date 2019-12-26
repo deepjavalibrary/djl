@@ -12,7 +12,6 @@
  */
 package ai.djl.mxnet.test;
 
-import ai.djl.mxnet.jna.LibFeature;
 import ai.djl.mxnet.jna.MXCallbackList;
 import ai.djl.mxnet.jna.MxnetLibrary;
 import ai.djl.mxnet.jna.NativeSize;
@@ -58,7 +57,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     /** {@inheritDoc} */
     @Override
-    public int MXLibInfoFeatures(LibFeature.ByReference[] libFeature, NativeSizeByReference size) {
+    public int MXLibInfoFeatures(PointerByReference libFeature, NativeSizeByReference size) {
         if (functions.containsKey("MXLibInfoFeatures")) {
             return functions.get("MXLibInfoFeatures").apply(new Object[] {libFeature, size});
         }

@@ -219,6 +219,26 @@ public final class JnaUtils {
     // Utilities
     /////////////////////////////////
 
+    public static Set<String> getFeatures() {
+        PointerByReference ref = new PointerByReference();
+        NativeSizeByReference outSize = new NativeSizeByReference();
+        checkCall(LIB.MXLibInfoFeatures(ref, outSize));
+
+        int size = outSize.getValue().intValue();
+        LibFeature pointer = new LibFeature(ref.getValue());
+        pointer.read();
+
+        LibFeature[] features = (LibFeature[]) pointer.toArray(size);
+
+        Set<String> set = new HashSet<>();
+        for (LibFeature feature : features) {
+            if (feature.getEnabled() == 1) {
+                set.add(feature.getName());
+            }
+        }
+        return set;
+    }
+
     /* Need tests
     public static int randomSeed(int seed) {
         return LIB.MXRandomSeed(seed);
