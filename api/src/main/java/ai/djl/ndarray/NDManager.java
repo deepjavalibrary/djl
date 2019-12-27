@@ -115,6 +115,17 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Creates a new top-level {@code NDManager} with specified {@link Device} and engine.
+     *
+     * @param device the default {@link Device}
+     * @param engineName the name of the engine
+     * @return a new top-level {@code NDManager}
+     */
+    static NDManager newBaseManager(Device device, String engineName) {
+        return Engine.getEngine(engineName).newBaseManager(device);
+    }
+
+    /**
      * Allocates a new engine specific direct byte buffer.
      *
      * @param capacity the new buffer's capacity, in bytes

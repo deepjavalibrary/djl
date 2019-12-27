@@ -38,9 +38,9 @@ public abstract class Engine {
 
     private static final Map<String, Engine> ALL_ENGINES = new ConcurrentHashMap<>();
 
-    private static final Engine ENGINE = initEngine();
+    private static final String DEFAULT_ENGINE = initEngine();
 
-    private static synchronized Engine initEngine() {
+    private static synchronized String initEngine() {
         ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class);
         List<EngineProvider> list = new ArrayList<>();
         for (EngineProvider provider : loaders) {
@@ -58,8 +58,18 @@ public abstract class Engine {
         }
 
         Engine engine = list.get(0).getEngine();
-        logger.debug("Loading ML engine from: {}", engine.getClass());
-        return engine;
+        String defaultEngine = System.getenv("DJL_DEFAULT_ENGINE");
+        if (defaultEngine == null || defaultEngine.isEmpty()) {
+            defaultEngine = System.getProperty("ai.djl.default_engine");
+        }
+        if (defaultEngine == null || defaultEngine.isEmpty()) {
+            defaultEngine = engine.getEngineName();
+        } else if (!ALL_ENGINES.containsKey(defaultEngine)) {
+            throw new EngineException("Unknown default engine: " + defaultEngine);
+        }
+
+        logger.debug("Found default engine: {}", defaultEngine);
+        return defaultEngine;
     }
 
     /**
@@ -76,10 +86,10 @@ public abstract class Engine {
      * @see EngineProvider
      */
     public static Engine getInstance() {
-        if (ENGINE == null) {
+        if (DEFAULT_ENGINE == null) {
             throw new EngineException("No deep learning engine found in class path.");
         }
-        return ENGINE;
+        return getEngine(DEFAULT_ENGINE);
     }
 
     /**
@@ -90,7 +100,11 @@ public abstract class Engine {
      * @see EngineProvider
      */
     public static Engine getEngine(String engineName) {
-        return ALL_ENGINES.get(engineName);
+        Engine engine = ALL_ENGINES.get(engineName);
+        if (engine == null) {
+            throw new IllegalArgumentException("Deep learning engine not found: " + engineName);
+        }
+        return engine;
     }
 
     /**

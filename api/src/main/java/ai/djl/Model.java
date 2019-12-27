@@ -70,6 +70,17 @@ public interface Model extends AutoCloseable {
     }
 
     /**
+     * Creates an empty model instance on the specified {@link Device} and engine.
+     *
+     * @param device the device to load the model onto
+     * @param engineName the name of the engine
+     * @return a new model instance
+     */
+    static Model newInstance(Device device, String engineName) {
+        return Engine.getEngine(engineName).newModel(device);
+    }
+
+    /**
      * Loads the model from the {@code modelPath}.
      *
      * @param modelPath the directory or file path of the model location
