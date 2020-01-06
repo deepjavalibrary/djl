@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -71,10 +72,10 @@ public final class TrainWithOptimizers {
     }
 
     public ExampleTrainingResult runExample(String[] args) throws IOException, ParseException {
-        Options options = Arguments.getOptions();
+        Options options = OptimizerArguments.getOptions();
         DefaultParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args, null, false);
-        Arguments arguments = new Arguments(cmd);
+        OptimizerArguments arguments = new OptimizerArguments(cmd);
 
         try (Model model = getModel(arguments)) {
             // get training dataset
@@ -180,7 +181,7 @@ public final class TrainWithOptimizers {
         }
     }
 
-    private TrainingConfig setupTrainingConfig(Arguments arguments) {
+    private TrainingConfig setupTrainingConfig(OptimizerArguments arguments) {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
@@ -192,9 +193,8 @@ public final class TrainWithOptimizers {
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
-    private Optimizer setupOptimizer(Arguments arguments) {
-        // TODO: Accept optimizerName as an argument
-        String optimizerName = "adam";
+    private Optimizer setupOptimizer(OptimizerArguments arguments) {
+        String optimizerName = arguments.getOptimizer();
         int batchSize = arguments.getBatchSize();
         switch (optimizerName) {
             case "sgd":
@@ -244,5 +244,36 @@ public final class TrainWithOptimizers {
                         .build();
         cifar10.prepare(new ProgressBar());
         return cifar10;
+    }
+
+    private static class OptimizerArguments extends Arguments {
+
+        private String optimizer;
+
+        public OptimizerArguments(CommandLine cmd) {
+            super(cmd);
+
+            if (cmd.hasOption("optimizer")) {
+                optimizer = cmd.getOptionValue("optimizer");
+            } else {
+                optimizer = "adam";
+            }
+        }
+
+        public static Options getOptions() {
+            Options options = Arguments.getOptions();
+            options.addOption(
+                    Option.builder("z")
+                            .longOpt("optimizer")
+                            .hasArg()
+                            .argName("OPTIMIZER")
+                            .desc("The optimizer to use.")
+                            .build());
+            return options;
+        }
+
+        public String getOptimizer() {
+            return optimizer;
+        }
     }
 }
