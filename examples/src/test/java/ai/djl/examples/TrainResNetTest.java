@@ -14,6 +14,7 @@
 package ai.djl.examples;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.repository.zoo.ModelNotFoundException;
@@ -26,18 +27,19 @@ import org.testng.annotations.Test;
 public class TrainResNetTest {
 
     @Test
-    public void testTrainResNet() throws ParseException, ModelNotFoundException, IOException {
+    public void testTrainResNet()
+            throws ParseException, ModelNotFoundException, IOException, MalformedModelException {
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
         String[] args = {"-e", "2", "-g", "4", "-m", "10", "-s", "-p"};
 
         TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
-        Assert.assertTrue(test.runExample(args).isSuccess());
+        test.runExample(args);
     }
 
     @Test
     public void testTrainResNetSymbolicNightly()
-            throws ParseException, ModelNotFoundException, IOException {
+            throws ParseException, ModelNotFoundException, IOException, MalformedModelException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
@@ -49,15 +51,14 @@ public class TrainResNetTest {
 
             TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
             ExampleTrainingResult result = test.runExample(args);
-            Assert.assertTrue(result.isSuccess());
-            Assert.assertTrue(result.getTrainingAccuracy() > .7f);
-            Assert.assertTrue(result.getTrainingLoss() < .8f);
+            Assert.assertTrue(result.getEvaluation("Accuracy") > 0.7f);
+            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 0.9);
         }
     }
 
     @Test
     public void testTrainResNetImperativeNightly()
-            throws ParseException, ModelNotFoundException, IOException {
+            throws ParseException, ModelNotFoundException, IOException, MalformedModelException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
@@ -69,9 +70,8 @@ public class TrainResNetTest {
 
             TrainResnetWithCifar10 test = new TrainResnetWithCifar10();
             ExampleTrainingResult result = test.runExample(args);
-            Assert.assertTrue(result.isSuccess());
-            Assert.assertTrue(result.getTrainingAccuracy() > .7f);
-            Assert.assertTrue(result.getTrainingLoss() < .8f);
+            Assert.assertTrue(result.getEvaluation("Accuracy") > 0.6f);
+            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 1.2);
         }
     }
 }

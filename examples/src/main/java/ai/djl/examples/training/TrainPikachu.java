@@ -18,8 +18,8 @@ import ai.djl.Model;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.PikachuTrainingListener;
-import ai.djl.examples.training.util.PikachuTrainingResult;
+import ai.djl.examples.training.util.ExampleTrainingListener;
+import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -67,24 +67,25 @@ public final class TrainPikachu {
         new TrainPikachu().runExample(args);
     }
 
-    public PikachuTrainingResult runExample(String[] args) throws IOException, ParseException {
+    public ExampleTrainingResult runExample(String[] args) throws IOException, ParseException {
         Options options = Arguments.getOptions();
         DefaultParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args, null, false);
         Arguments arguments = new Arguments(cmd);
 
         TrainingConfig config = setupTrainingConfig(arguments);
+
         try (Model model = Model.newInstance()) {
             model.setBlock(getSsdTrainBlock());
 
             RandomAccessDataset pikachuDetectionTrain = getDataset(Dataset.Usage.TRAIN, arguments);
             RandomAccessDataset pikachuDetectionTest = getDataset(Dataset.Usage.TEST, arguments);
 
-            PikachuTrainingListener listener;
+            ExampleTrainingListener listener;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
                 listener =
-                        new PikachuTrainingListener(
+                        new ExampleTrainingListener(
                                 arguments.getBatchSize(),
                                 (int) pikachuDetectionTrain.getNumIterations(),
                                 (int) pikachuDetectionTest.getNumIterations());
@@ -101,20 +102,11 @@ public final class TrainPikachu {
                         arguments.getOutputDir(),
                         "ssd");
                 listener.afterTrain(trainer, arguments.getOutputDir());
+                listener.recordPerformance(trainer);
+
+                model.save(Paths.get(arguments.getOutputDir()), "ssd");
+                return new ExampleTrainingResult(trainer);
             }
-
-            PikachuTrainingResult result = listener.getResult();
-
-            // save model
-            model.setProperty("Epoch", String.valueOf(arguments.getEpoch()));
-            model.setProperty("Loss", String.format("%.5f", result.getValidationLoss()));
-            model.setProperty(
-                    "ClassAccuracy", String.format("%.5f", result.getValidationClassAccuracy()));
-            model.setProperty(
-                    "BoundingBoxError",
-                    String.format("%.5f", result.getValidationBoundingBoxError()));
-            model.save(Paths.get(arguments.getOutputDir()), "ssd");
-            return result;
         }
     }
 

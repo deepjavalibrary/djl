@@ -59,19 +59,17 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** This example features sample usage of a variety of optimizers to train Cifar10. */
 public final class TrainWithOptimizers {
 
-    private static final Logger logger = LoggerFactory.getLogger(TrainWithOptimizers.class);
-
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args)
+            throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
         new TrainWithOptimizers().runExample(args);
     }
 
-    public ExampleTrainingResult runExample(String[] args) throws IOException, ParseException {
+    public ExampleTrainingResult runExample(String[] args)
+            throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
         Options options = OptimizerArguments.getOptions();
         DefaultParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args, null, false);
@@ -114,21 +112,12 @@ public final class TrainWithOptimizers {
                         arguments.getOutputDir(),
                         "resnetv1");
                 listener.afterTrain(trainer, arguments.getOutputDir());
+                listener.recordPerformance(trainer);
+
+                model.save(Paths.get("build/model"), "resnetv1");
+                return new ExampleTrainingResult(trainer);
             }
-
-            ExampleTrainingResult result = listener.getResult();
-
-            // save model
-            model.setProperty("Epoch", String.valueOf(arguments.getEpoch()));
-            model.setProperty("Accuracy", String.format("%.2f", result.getValidationAccuracy()));
-            model.save(Paths.get("build/model"), "resnetv1");
-            return result;
-        } catch (MalformedModelException e) {
-            throw new IllegalArgumentException(e);
-        } catch (ModelNotFoundException e) {
-            logger.error("Model not found", e);
         }
-        return ExampleTrainingResult.FAILURE;
     }
 
     private Model getModel(Arguments arguments)

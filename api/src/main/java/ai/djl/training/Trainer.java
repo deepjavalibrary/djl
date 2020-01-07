@@ -21,6 +21,7 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
+import java.util.List;
 
 /**
  * An interface that represents a single training iteration.
@@ -142,6 +143,13 @@ public interface Trainer extends AutoCloseable {
     Model getModel();
 
     /**
+     * Gets all training {@link Evaluator}s.
+     *
+     * @return the training metrics
+     */
+    List<Evaluator> getTrainingEvaluators();
+
+    /**
      * Gets the training {@link Evaluator} that is an instance of the given {@link Class}.
      *
      * @param clazz the {@link Class} of the {@link Evaluator} sought
@@ -149,6 +157,13 @@ public interface Trainer extends AutoCloseable {
      * @return the training evaluator requested
      */
     <T extends Evaluator> T getTrainingEvaluator(Class<T> clazz);
+
+    /**
+     * Gets all validation {@link Evaluator}s.
+     *
+     * @return the validation metrics
+     */
+    List<Evaluator> getValidationEvaluators();
 
     /**
      * Gets the validation {@link Evaluator} that is an instance of the given {@link Class}.

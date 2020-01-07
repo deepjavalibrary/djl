@@ -108,6 +108,21 @@ public class Metrics {
     }
 
     /**
+     * Returns the latest {@link Metric} with the specified metric name.
+     *
+     * @param name the name of the metric
+     * @return the {@link Metric} with the specified metric name
+     * @throws IllegalArgumentException if the given name is not found
+     */
+    public Metric latestMetric(String name) {
+        List<Metric> list = metrics.get(name);
+        if (list == null) {
+            throw new IllegalArgumentException("Could not find metric: " + name);
+        }
+        return list.get(list.size() - 1);
+    }
+
+    /**
      * Returns a percentile {@link Metric} object for the specified metric name.
      *
      * @param metricName the name of the metric

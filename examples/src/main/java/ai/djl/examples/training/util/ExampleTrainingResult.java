@@ -12,59 +12,27 @@
  */
 package ai.djl.examples.training.util;
 
+import ai.djl.metric.Metrics;
+import ai.djl.training.Trainer;
+import ai.djl.training.evaluator.Evaluator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class ExampleTrainingResult {
 
-    public static final ExampleTrainingResult FAILURE =
-            new ExampleTrainingResult().setSuccess(false);
+    Map<String, Float> evaluations;
 
-    protected boolean success;
-    protected float trainingAccuracy;
-    protected float trainingLoss;
-    protected float validationAccuracy;
-    protected float validationLoss;
-
-    public boolean isSuccess() {
-        return success;
+    public ExampleTrainingResult(Trainer trainer) {
+        Metrics metrics = trainer.getMetrics();
+        evaluations = new ConcurrentHashMap<>();
+        for (Evaluator evaluator : trainer.getValidationEvaluators()) {
+            float value =
+                    metrics.latestMetric("validate_" + evaluator.getName()).getValue().floatValue();
+            evaluations.put(evaluator.getName(), value);
+        }
     }
 
-    public ExampleTrainingResult setSuccess(boolean success) {
-        this.success = success;
-        return this;
-    }
-
-    public float getTrainingAccuracy() {
-        return trainingAccuracy;
-    }
-
-    public ExampleTrainingResult setTrainingAccuracy(float trainingAccuracy) {
-        this.trainingAccuracy = trainingAccuracy;
-        return this;
-    }
-
-    public float getTrainingLoss() {
-        return trainingLoss;
-    }
-
-    public ExampleTrainingResult setTrainingLoss(float trainingLoss) {
-        this.trainingLoss = trainingLoss;
-        return this;
-    }
-
-    public float getValidationAccuracy() {
-        return validationAccuracy;
-    }
-
-    public ExampleTrainingResult setValidationAccuracy(float validationAccuracy) {
-        this.validationAccuracy = validationAccuracy;
-        return this;
-    }
-
-    public float getValidationLoss() {
-        return validationLoss;
-    }
-
-    public ExampleTrainingResult setValidationLoss(float validationLoss) {
-        this.validationLoss = validationLoss;
-        return this;
+    public float getEvaluation(String name) {
+        return evaluations.get(name);
     }
 }

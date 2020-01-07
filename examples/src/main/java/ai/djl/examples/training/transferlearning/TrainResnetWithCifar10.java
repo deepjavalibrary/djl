@@ -58,12 +58,12 @@ import org.apache.commons.cli.ParseException;
 public final class TrainResnetWithCifar10 {
 
     public static void main(String[] args)
-            throws ParseException, ModelNotFoundException, IOException {
+            throws ParseException, ModelNotFoundException, IOException, MalformedModelException {
         new TrainResnetWithCifar10().runExample(args);
     }
 
     public ExampleTrainingResult runExample(String[] args)
-            throws IOException, ParseException, ModelNotFoundException {
+            throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
         Options options = Arguments.getOptions();
         DefaultParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args, null, false);
@@ -106,17 +106,11 @@ public final class TrainResnetWithCifar10 {
                         arguments.getOutputDir(),
                         "resnetv1");
                 listener.afterTrain(trainer, arguments.getOutputDir());
+                listener.recordPerformance(trainer);
+
+                model.save(Paths.get("build/model"), "resnetv1");
+                return new ExampleTrainingResult(trainer);
             }
-
-            ExampleTrainingResult result = listener.getResult();
-
-            // save model
-            model.setProperty("Epoch", String.valueOf(arguments.getEpoch()));
-            model.setProperty("Accuracy", String.format("%.2f", result.getValidationAccuracy()));
-            model.save(Paths.get("build/model"), "resnetv1");
-            return result;
-        } catch (MalformedModelException e) {
-            throw new IllegalArgumentException(e);
         }
     }
 

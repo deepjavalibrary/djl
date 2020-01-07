@@ -257,6 +257,12 @@ public class MxTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
+    public List<Evaluator> getTrainingEvaluators() {
+        return trainingEvaluators;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     @SuppressWarnings("unchecked")
     public final <T extends Evaluator> T getTrainingEvaluator(Class<T> clazz) {
         for (Evaluator evaluator : trainingEvaluators) {
@@ -265,6 +271,12 @@ public class MxTrainer implements Trainer {
             }
         }
         return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Evaluator> getValidationEvaluators() {
+        return validateEvaluators;
     }
 
     /** {@inheritDoc} */

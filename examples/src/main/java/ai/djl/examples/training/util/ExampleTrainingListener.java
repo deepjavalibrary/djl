@@ -13,14 +13,16 @@
 package ai.djl.examples.training.util;
 
 import ai.djl.Device;
+import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.examples.util.MemoryUtils;
-import ai.djl.metric.Metric;
 import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingListener;
+import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +30,6 @@ import org.slf4j.LoggerFactory;
 public class ExampleTrainingListener implements TrainingListener {
 
     private static final Logger logger = LoggerFactory.getLogger(ExampleTrainingListener.class);
-
-    protected float trainingAccuracy;
-    protected float trainingLoss;
-    protected float validationAccuracy;
-    protected float validationLoss;
 
     protected int batchSize;
     protected int trainDataSize;
@@ -146,31 +143,27 @@ public class ExampleTrainingListener implements TrainingListener {
         }
     }
 
-    public ExampleTrainingResult getResult() {
-        return new ExampleTrainingResult()
-                .setSuccess(true)
-                .setTrainingAccuracy(trainingAccuracy)
-                .setTrainingLoss(trainingLoss)
-                .setValidationAccuracy(validationAccuracy)
-                .setValidationLoss(validationLoss);
+    public void recordPerformance(Trainer trainer) {
+        // TODO: Add more property into model: Throughput, Memory, mAP, Dataset etc.
+        Model model = trainer.getModel();
+        Metrics metrics = trainer.getMetrics();
+        model.setProperty("Epoch", Integer.toString(numEpochs));
+        for (Evaluator evaluator : trainer.getValidationEvaluators()) {
+            float value =
+                    metrics.latestMetric("validate_" + evaluator.getName()).getValue().floatValue();
+            model.setProperty(evaluator.getName(), String.format("%.5f", value));
+        }
     }
 
     public String getTrainingStatus(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
-        Loss loss = trainer.getLoss();
         StringBuilder sb = new StringBuilder();
-        List<Metric> list = metrics.getMetric("train_" + loss.getName());
-        trainingLoss = list.get(list.size() - 1).getValue().floatValue();
 
-        list = metrics.getMetric("train_Accuracy");
-        trainingAccuracy = list.get(list.size() - 1).getValue().floatValue();
-        // use .2 precision to avoid new line in progress bar
-        sb.append(String.format("accuracy: %.2f loss: %.2f", trainingAccuracy, trainingLoss));
+        sb.append(metricsOutput(metrics, trainer.getTrainingEvaluators(), "train_"));
 
-        list = metrics.getMetric("train");
-        if (!list.isEmpty()) {
-            float batchTime = list.get(list.size() - 1).getValue().longValue() / 1_000_000_000f;
-            sb.append(String.format(" speed: %.2f images/sec", (float) batchSize / batchTime));
+        if (metrics.hasMetric("train")) {
+            float batchTime = metrics.latestMetric("train").getValue().longValue() / 1_000_000_000f;
+            sb.append(String.format(", speed: %.2f images/sec", (float) batchSize / batchTime));
         }
         return sb.toString();
     }
@@ -178,23 +171,26 @@ public class ExampleTrainingListener implements TrainingListener {
     public void printTrainingStatus(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
         Loss loss = trainer.getLoss();
-        List<Metric> list = metrics.getMetric("train_" + loss.getName());
-        trainingLoss = list.get(list.size() - 1).getValue().floatValue();
 
-        list = metrics.getMetric("train_Accuracy");
-        trainingAccuracy = list.get(list.size() - 1).getValue().floatValue();
-
-        logger.info("train accuracy: {}, train loss: {}", trainingAccuracy, trainingLoss);
-        list = metrics.getMetric("validate_" + loss.getName());
-        if (!list.isEmpty()) {
-            validationLoss = list.get(list.size() - 1).getValue().floatValue();
-            list = metrics.getMetric("validate_Accuracy");
-            validationAccuracy = list.get(list.size() - 1).getValue().floatValue();
-
+        logger.info("Train: " + metricsOutput(metrics, trainer.getTrainingEvaluators(), "train_"));
+        if (metrics.hasMetric("validate_" + loss.getName())) {
             logger.info(
-                    "validate accuracy: {}, validate loss: {}", validationAccuracy, validationLoss);
+                    "Validate: "
+                            + metricsOutput(
+                                    metrics, trainer.getValidationEvaluators(), "validate_"));
         } else {
             logger.info("validation has not been run.");
         }
+    }
+
+    private String metricsOutput(Metrics metrics, List<Evaluator> toOutput, String prefix) {
+        List<String> metricOutputs = new ArrayList<>();
+        for (Evaluator evaluator : toOutput) {
+            float value =
+                    metrics.latestMetric(prefix + evaluator.getName()).getValue().floatValue();
+            // use .2 precision to avoid new line in progress bar
+            metricOutputs.add(String.format("%s: %.2f", evaluator.getName(), value));
+        }
+        return String.join(", ", metricOutputs);
     }
 }

@@ -94,18 +94,11 @@ public final class TrainMnist {
                         arguments.getOutputDir(),
                         "mlp");
                 listener.afterTrain(trainer, arguments.getOutputDir());
+                listener.recordPerformance(trainer);
+
+                model.save(Paths.get(arguments.getOutputDir()), "mlp");
+                return new ExampleTrainingResult(trainer);
             }
-
-            ExampleTrainingResult result = listener.getResult();
-
-            // save model
-            model.setProperty("Epoch", String.valueOf(arguments.getEpoch()));
-            model.setProperty("Accuracy", String.format("%.2f", result.getValidationAccuracy()));
-            // TODO: Add more property into model: Throughput, Memory, mAP, Dataset etc.
-
-            model.save(Paths.get(arguments.getOutputDir()), "mlp");
-
-            return result;
         }
     }
 

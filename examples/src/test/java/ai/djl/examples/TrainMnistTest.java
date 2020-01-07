@@ -33,11 +33,8 @@ public class TrainMnistTest {
 
             TrainMnist test = new TrainMnist();
             ExampleTrainingResult result = test.runExample(args);
-            Assert.assertTrue(result.isSuccess());
-            Assert.assertTrue(result.getTrainingAccuracy() > 0.9f);
-            Assert.assertTrue(result.getTrainingLoss() < 0.35f);
-            Assert.assertTrue(result.getValidationAccuracy() > 0.9f);
-            Assert.assertTrue(result.getValidationLoss() < 0.35f);
+            Assert.assertTrue(result.getEvaluation("Accuracy") > 0.9f);
+            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 0.35f);
 
             Classifications classifications = new ImageClassification().predict();
             Classifications.Classification best = classifications.best();
@@ -47,8 +44,7 @@ public class TrainMnistTest {
             String[] args = new String[] {"-g", "1", "-m", "2"};
 
             TrainMnist test = new TrainMnist();
-            ExampleTrainingResult result = test.runExample(args);
-            Assert.assertTrue(result.isSuccess());
+            test.runExample(args);
         }
     }
 }

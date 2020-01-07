@@ -24,6 +24,7 @@ import ai.djl.training.TrainingListener;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
+import java.util.List;
 
 public class MockTrainer implements Trainer {
 
@@ -102,7 +103,19 @@ public class MockTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
+    public List<Evaluator> getTrainingEvaluators() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public <T extends Evaluator> T getTrainingEvaluator(Class<T> clazz) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Evaluator> getValidationEvaluators() {
         return null;
     }
 

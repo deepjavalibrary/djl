@@ -15,7 +15,7 @@ package ai.djl.examples;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.examples.training.TrainPikachu;
-import ai.djl.examples.training.util.PikachuTrainingResult;
+import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class TrainPikachuTest {
             throw new SkipException("Nightly only");
         }
         String[] args;
-        float expectedLoss;
+        float expectedLoss = 0;
         int expectedMinNumber = 0;
         int expectedMaxNumber = 0;
         if (Device.getGpuCount() > 0) {
@@ -45,13 +45,14 @@ public class TrainPikachuTest {
         } else {
             // test train 1 epoch and predict workflow works on CPU
             args = new String[] {"-e", "1", "-m", "1", "-b", "32"};
-            expectedLoss = 0.7f;
         }
         // test train
         TrainPikachu trainPikachu = new TrainPikachu();
-        PikachuTrainingResult result = trainPikachu.runExample(args);
-        Assert.assertTrue(result.isSuccess());
-        Assert.assertTrue(result.getValidationLoss() < expectedLoss);
+        ExampleTrainingResult result = trainPikachu.runExample(args);
+
+        if (expectedLoss > 0) {
+            Assert.assertTrue(result.getEvaluation("SingleShotDetectionLoss") < expectedLoss);
+        }
 
         JnaUtils.waitAll();
         // test predict
