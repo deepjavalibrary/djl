@@ -15,6 +15,8 @@ package ai.djl.training.loss;
 import ai.djl.modality.cv.MultiBoxTarget;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.util.Pair;
+import java.util.Arrays;
 
 /**
  * {@code SingleShotDetectionLoss} is an implementation of {@link Loss}. It is used to compute the
@@ -22,9 +24,8 @@ import ai.djl.ndarray.NDList;
  * computing the targets given the generated anchors, labels and predictions, and then computing the
  * sum of class predictions and bounding box predictions.
  */
-public class SingleShotDetectionLoss extends Loss {
-    private Loss softmaxLoss = Loss.softmaxCrossEntropyLoss();
-    private Loss l1Loss = Loss.l1Loss();
+public class SingleShotDetectionLoss extends AbstractCompositeLoss {
+
     private MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
 
     /**
@@ -34,12 +35,11 @@ public class SingleShotDetectionLoss extends Loss {
      */
     public SingleShotDetectionLoss(String name) {
         super(name);
+        components = Arrays.asList(Loss.softmaxCrossEntropyLoss(), Loss.l1Loss());
     }
 
     /**
      * Calculate loss between label and prediction.
-     *
-     * <p>the default implementation is simply adding all losses together
      *
      * @param labels target labels. Must contain (offsetLabels, masks, classlabels). This is
      *     returned by MultiBoxTarget function
@@ -47,23 +47,27 @@ public class SingleShotDetectionLoss extends Loss {
      * @return loss value
      */
     @Override
-    public NDArray getLoss(NDList labels, NDList predictions) {
+    protected Pair<NDList, NDList> inputForComponent(
+            int componentIndex, NDList labels, NDList predictions) {
         NDArray anchors = predictions.get(0);
         NDArray classPredictions = predictions.get(1);
-        NDArray boundingBoxPredictions = predictions.get(2);
         NDList targets =
                 multiBoxTarget.target(
                         new NDList(anchors, labels.head(), classPredictions.transpose(0, 2, 1)));
-        NDArray boundingBoxLabels = targets.get(0);
-        NDArray boundingBoxMasks = targets.get(1);
-        NDArray classLabels = targets.get(2);
 
-        NDArray classLoss =
-                softmaxLoss.getLoss(new NDList(classLabels), new NDList(classPredictions));
-        NDArray boundingBoxLoss =
-                l1Loss.getLoss(
+        switch (componentIndex) {
+            case 0: // ClassLoss
+                NDArray classLabels = targets.get(2);
+                return new Pair<>(new NDList(classLabels), new NDList(classPredictions));
+            case 1: // BoundingBoxLoss
+                NDArray boundingBoxPredictions = predictions.get(2);
+                NDArray boundingBoxLabels = targets.get(0);
+                NDArray boundingBoxMasks = targets.get(1);
+                return new Pair<>(
                         new NDList(boundingBoxLabels.mul(boundingBoxMasks)),
                         new NDList(boundingBoxPredictions.mul(boundingBoxMasks)));
-        return classLoss.add(boundingBoxLoss);
+            default:
+                throw new IllegalArgumentException("Invalid component index");
+        }
     }
 }
