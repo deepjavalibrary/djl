@@ -170,7 +170,7 @@ public final class TrainPikachu {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
-        return new DefaultTrainingConfig(new SingleShotDetectionLoss("ssd_loss"))
+        return new DefaultTrainingConfig(new SingleShotDetectionLoss())
                 .optInitializer(initializer)
                 .setBatchSize(arguments.getBatchSize())
                 .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))

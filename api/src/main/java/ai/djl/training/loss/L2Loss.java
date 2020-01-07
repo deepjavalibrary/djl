@@ -24,19 +24,29 @@ public class L2Loss extends Loss {
 
     private float weight;
 
+    /** Calculate L2Loss between the label and prediction, a.k.a. MSE(Mean Square Error). */
+    public L2Loss() {
+        this("L2Loss");
+    }
+
+    /**
+     * Calculate L2Loss between the label and prediction, a.k.a. MSE(Mean Square Error).
+     *
+     * @param name the name of the loss
+     */
+    public L2Loss(String name) {
+        this(name, 1.f / 2);
+    }
+
     /**
      * Calculates L2Loss between the label and prediction, a.k.a. MSE(Mean Square Error).
      *
+     * @param name the name of the loss
      * @param weight the weight to apply on loss value, default 1/2
      */
-    public L2Loss(float weight) {
-        super("L2Loss");
+    public L2Loss(String name, float weight) {
+        super(name);
         this.weight = weight;
-    }
-
-    /** Calculate L2Loss between the label and prediction, a.k.a. MSE(Mean Square Error). */
-    public L2Loss() {
-        this(1.f / 2);
     }
 
     /** {@inheritDoc} */

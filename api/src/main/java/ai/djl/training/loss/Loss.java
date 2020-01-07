@@ -64,13 +64,24 @@ public abstract class Loss extends Evaluator {
     }
 
     /**
+     * Returns a new instance of {@link L1Loss} with default weight and batch axis.
+     *
+     * @param name the name of the loss
+     * @return a new instance of {@link L1Loss}
+     */
+    public static L1Loss l1Loss(String name) {
+        return new L1Loss(name);
+    }
+
+    /**
      * Returns a new instance of {@link L1Loss} with given weight and batch axis.
      *
+     * @param name the name of the loss
      * @param weight the weight to apply on loss value, default 1
      * @return a new instance of {@link L1Loss}
      */
-    public static L1Loss l1Loss(float weight) {
-        return new L1Loss(weight);
+    public static L1Loss l1Loss(String name, float weight) {
+        return new L1Loss(name, weight);
     }
 
     /**
@@ -83,13 +94,24 @@ public abstract class Loss extends Evaluator {
     }
 
     /**
+     * Returns a new instance of {@link L2Loss} with default weight and batch axis.
+     *
+     * @param name the name of the loss
+     * @return a new instance of {@link L2Loss}
+     */
+    public static L2Loss l2Loss(String name) {
+        return new L2Loss(name);
+    }
+
+    /**
      * Returns a new instance of {@link L2Loss} with given weight and batch axis.
      *
+     * @param name the name of the loss
      * @param weight the weight to apply on loss value, default 1
      * @return a new instance of {@link L2Loss}
      */
-    public static L2Loss l2Loss(float weight) {
-        return new L2Loss(weight);
+    public static L2Loss l2Loss(String name, float weight) {
+        return new L2Loss(name, weight);
     }
 
     /**
@@ -102,15 +124,26 @@ public abstract class Loss extends Evaluator {
     }
 
     /**
+     * Returns a new instance of {@link SigmoidBinaryCrossEntropyLoss} with default arguments.
+     *
+     * @param name the name of the loss
+     * @return a new instance of {@link SigmoidBinaryCrossEntropyLoss}
+     */
+    public static SigmoidBinaryCrossEntropyLoss sigmoidBinaryCrossEntropyLoss(String name) {
+        return new SigmoidBinaryCrossEntropyLoss(name);
+    }
+
+    /**
      * Returns a new instance of {@link SigmoidBinaryCrossEntropyLoss} with the given arguments.
      *
+     * @param name the name of the loss
      * @param weight the weight to apply on the loss value, default 1
      * @param fromSigmoid whether the input is from the output of sigmoid, default false
      * @return a new instance of {@link SigmoidBinaryCrossEntropyLoss}
      */
     public static SigmoidBinaryCrossEntropyLoss sigmoidBinaryCrossEntropyLoss(
-            float weight, boolean fromSigmoid) {
-        return new SigmoidBinaryCrossEntropyLoss(weight, fromSigmoid);
+            String name, float weight, boolean fromSigmoid) {
+        return new SigmoidBinaryCrossEntropyLoss(name, weight, fromSigmoid);
     }
 
     /**
@@ -123,8 +156,19 @@ public abstract class Loss extends Evaluator {
     }
 
     /**
+     * Returns a new instance of {@link SoftmaxCrossEntropyLoss} with default arguments.
+     *
+     * @param name the name of the loss
+     * @return a new instance of {@link SoftmaxCrossEntropyLoss}
+     */
+    public static SoftmaxCrossEntropyLoss softmaxCrossEntropyLoss(String name) {
+        return new SoftmaxCrossEntropyLoss(name);
+    }
+
+    /**
      * Returns a new instance of {@link SoftmaxCrossEntropyLoss} with the given arguments.
      *
+     * @param name the name of the loss
      * @param weight the weight to apply on the loss value, default 1
      * @param classAxis the axis that represents the class probabilities, default -1
      * @param sparseLabel whether labels are integer array or probabilities, default true
@@ -132,8 +176,8 @@ public abstract class Loss extends Evaluator {
      * @return a new instance of {@link SoftmaxCrossEntropyLoss}
      */
     public static SoftmaxCrossEntropyLoss softmaxCrossEntropyLoss(
-            float weight, int classAxis, boolean sparseLabel, boolean fromLogit) {
-        return new SoftmaxCrossEntropyLoss(weight, classAxis, sparseLabel, fromLogit);
+            String name, float weight, int classAxis, boolean sparseLabel, boolean fromLogit) {
+        return new SoftmaxCrossEntropyLoss(name, weight, classAxis, sparseLabel, fromLogit);
     }
 
     /**
@@ -146,14 +190,25 @@ public abstract class Loss extends Evaluator {
     }
 
     /**
+     * Returns a new instance of {@link HingeLoss} with default arguments.
+     *
+     * @param name the name of the loss
+     * @return a new instance of {@link HingeLoss}
+     */
+    public static HingeLoss hingeLoss(String name) {
+        return new HingeLoss(name);
+    }
+
+    /**
      * Returns a new instance of {@link HingeLoss} with the given arguments.
      *
+     * @param name the name of the loss
      * @param margin the margin in hinge loss. Defaults to 1.0
      * @param weight the weight to apply on loss value, default 1
      * @return a new instance of {@link HingeLoss}
      */
-    public static HingeLoss hingeLoss(int margin, float weight) {
-        return new HingeLoss(margin, weight);
+    public static HingeLoss hingeLoss(String name, int margin, float weight) {
+        return new HingeLoss(name, margin, weight);
     }
 
     /** {@inheritDoc} */

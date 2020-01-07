@@ -32,6 +32,14 @@ public class SimpleCompositeLoss extends AbstractCompositeLoss {
     /**
      * Creates a new empty instance of {@code CompositeLoss} that can combine the given {@link Loss}
      * components.
+     */
+    public SimpleCompositeLoss() {
+        this("CompositeLoss");
+    }
+
+    /**
+     * Creates a new empty instance of {@code CompositeLoss} that can combine the given {@link Loss}
+     * components.
      *
      * @param name the display name of the loss
      */

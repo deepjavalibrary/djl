@@ -25,19 +25,29 @@ public class L1Loss extends Loss {
 
     private float weight;
 
+    /** Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error). */
+    public L1Loss() {
+        this("L1Loss");
+    }
+
     /**
      * Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error).
      *
-     * @param weight the weight to apply on loss value, default 1
+     * @param name the name of the loss
      */
-    public L1Loss(float weight) {
-        super("L1Loss");
-        this.weight = weight;
+    public L1Loss(String name) {
+        this(name, 1);
     }
 
-    /** Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error). */
-    public L1Loss() {
-        this(1);
+    /**
+     * Calculates L1 Loss between the label and prediction, a.k.a. MAE(Mean Absolute Error).
+     *
+     * @param name the name of the loss
+     * @param weight the weight to apply on loss value, default 1
+     */
+    public L1Loss(String name, float weight) {
+        super(name);
+        this.weight = weight;
     }
 
     /** {@inheritDoc} */

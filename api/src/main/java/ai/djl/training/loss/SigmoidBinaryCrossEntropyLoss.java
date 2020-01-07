@@ -28,21 +28,31 @@ public class SigmoidBinaryCrossEntropyLoss extends Loss {
     private float weight;
     private boolean fromSigmoid;
 
+    /** Performs Sigmoid cross-entropy loss for binary classification. */
+    public SigmoidBinaryCrossEntropyLoss() {
+        this("SigmoidBinaryCrossEntropyLoss");
+    }
+
     /**
      * Performs Sigmoid cross-entropy loss for binary classification.
      *
+     * @param name the name of the loss
+     */
+    public SigmoidBinaryCrossEntropyLoss(String name) {
+        this(name, 1, false);
+    }
+
+    /**
+     * Performs Sigmoid cross-entropy loss for binary classification.
+     *
+     * @param name the name of the loss
      * @param weight the weight to apply on the loss value, default 1
      * @param fromSigmoid whether the input is from the output of sigmoid, default false
      */
-    public SigmoidBinaryCrossEntropyLoss(float weight, boolean fromSigmoid) {
-        super("SigmoidBinaryCrossEntropyLoss");
+    public SigmoidBinaryCrossEntropyLoss(String name, float weight, boolean fromSigmoid) {
+        super(name);
         this.weight = weight;
         this.fromSigmoid = fromSigmoid;
-    }
-
-    /** Performs Sigmoid cross-entropy loss for binary classification. */
-    public SigmoidBinaryCrossEntropyLoss() {
-        this(1, false);
     }
 
     /** {@inheritDoc} */

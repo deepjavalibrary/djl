@@ -28,14 +28,12 @@ public class SingleShotDetectionLoss extends AbstractCompositeLoss {
 
     private MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
 
-    /**
-     * Base class for metric with abstract update methods.
-     *
-     * @param name The display name of the Loss
-     */
-    public SingleShotDetectionLoss(String name) {
-        super(name);
-        components = Arrays.asList(Loss.softmaxCrossEntropyLoss(), Loss.l1Loss());
+    /** Base class for metric with abstract update methods. */
+    public SingleShotDetectionLoss() {
+        super("SingleShotDetectionLoss");
+        components =
+                Arrays.asList(
+                        Loss.softmaxCrossEntropyLoss("ClassLoss"), Loss.l1Loss("BoundingBoxLoss"));
     }
 
     /**

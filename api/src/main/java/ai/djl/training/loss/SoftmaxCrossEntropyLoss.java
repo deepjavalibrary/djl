@@ -31,26 +31,36 @@ public class SoftmaxCrossEntropyLoss extends Loss {
     private boolean sparseLabel;
     private boolean fromLogit;
 
+    /** Creates a new instance of {@code SoftmaxCrossEntropyLoss} with default parameters. */
+    public SoftmaxCrossEntropyLoss() {
+        this("SoftmaxCrossEntropyLoss");
+    }
+
+    /**
+     * Creates a new instance of {@code SoftmaxCrossEntropyLoss} with default parameters.
+     *
+     * @param name the name of the loss
+     */
+    public SoftmaxCrossEntropyLoss(String name) {
+        this(name, 1, -1, true, false);
+    }
+
     /**
      * Creates a new instance of {@code SoftmaxCrossEntropyLoss} with the given parameters.
      *
+     * @param name the name of the loss
      * @param weight the weight to apply on the loss value, default 1
      * @param classAxis the axis that represents the class probabilities, default -1
      * @param sparseLabel whether labels are integer array or probabilities, default true
      * @param fromLogit whether labels are log probabilities or un-normalized numbers
      */
     public SoftmaxCrossEntropyLoss(
-            float weight, int classAxis, boolean sparseLabel, boolean fromLogit) {
-        super("SoftmaxCrossEntropyLoss");
+            String name, float weight, int classAxis, boolean sparseLabel, boolean fromLogit) {
+        super(name);
         this.weight = weight;
         this.classAxis = classAxis;
         this.sparseLabel = sparseLabel;
         this.fromLogit = fromLogit;
-    }
-
-    /** Creates a new instance of {@code SoftmaxCrossEntropyLoss} with default parameters. */
-    public SoftmaxCrossEntropyLoss() {
-        this(1, -1, true, false);
     }
 
     /** {@inheritDoc} */
