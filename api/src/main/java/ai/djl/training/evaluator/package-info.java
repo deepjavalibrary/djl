@@ -12,10 +12,10 @@
  */
 
 /**
- * Contains classes for monitoring the performance of models.
+ * Contains classes for evaluating the effectiveness of models.
  *
- * <p>It contains a main interface {@link ai.djl.training.metrics.TrainingMetric} and various
- * metrics that extend it. More metrics are located within {@link ai.djl.training.loss} which have
- * the additional property that those metrics are suited for training.
+ * <p>It contains a main interface {@link ai.djl.training.evaluator.Evaluator} and various
+ * evaluators that extend it. More evaluators are located within {@link ai.djl.training.loss} which
+ * have the additional property that those evaluators are suited for training.
  */
-package ai.djl.training.metrics;
+package ai.djl.training.evaluator;

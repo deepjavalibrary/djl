@@ -40,10 +40,10 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
+import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
@@ -187,7 +187,7 @@ public final class TrainWithOptimizers {
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .optInitializer(initializer)
-                .addTrainingMetric(new Accuracy())
+                .addEvaluator(new Accuracy())
                 .optOptimizer(setupOptimizer(arguments))
                 .setBatchSize(arguments.getBatchSize())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));

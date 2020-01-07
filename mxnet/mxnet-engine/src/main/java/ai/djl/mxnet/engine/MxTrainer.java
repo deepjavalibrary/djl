@@ -30,8 +30,8 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.TrainingListener;
 import ai.djl.training.dataset.Batch;
+import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.TrainingMetric;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -48,8 +48,8 @@ public class MxTrainer implements Trainer {
     private TrainingListener listener;
     private Device[] devices;
     private ParameterStore parameterStore;
-    private List<TrainingMetric> trainingMetrics;
-    private List<TrainingMetric> validateMetrics;
+    private List<Evaluator> trainingEvaluators;
+    private List<Evaluator> validateEvaluators;
     private Loss trainingLoss;
     private Loss validationLoss;
     long batchBeginTime;
@@ -72,15 +72,15 @@ public class MxTrainer implements Trainer {
             throw new IllegalArgumentException("You must specify a loss for the trainer");
         }
         validationLoss = trainingLoss.duplicate();
-        trainingMetrics = new ArrayList<>(trainingConfig.getTrainingMetrics());
-        validateMetrics = new ArrayList<>();
-        trainingMetrics.forEach(i -> validateMetrics.add(i.duplicate()));
+        trainingEvaluators = new ArrayList<>(trainingConfig.getEvaluators());
+        validateEvaluators = new ArrayList<>();
+        trainingEvaluators.forEach(i -> validateEvaluators.add(i.duplicate()));
 
-        // track loss as training metric by default
-        trainingMetrics.add(trainingLoss);
+        // track loss as an evaluator by default
+        trainingEvaluators.add(trainingLoss);
         // add from duplication of trainingLoss
-        // do not mess up with duplication of training metrics
-        validateMetrics.add(validationLoss);
+        // do not mess up with duplication of evaluators
+        validateEvaluators.add(validationLoss);
 
         // ParameterServer parameterServer = new MxParameterServer(trainingConfig.getOptimizer());
         ParameterServer parameterServer = new LocalParameterServer(trainingConfig.getOptimizer());
@@ -127,7 +127,7 @@ public class MxTrainer implements Trainer {
                 addMetric("backward", time);
                 time = System.nanoTime();
 
-                updateTrainingMetrics(labels, preds);
+                updateEvaluators(labels, preds);
                 addMetric("training-metrics", time);
             }
         }
@@ -201,36 +201,36 @@ public class MxTrainer implements Trainer {
         this.listener = listener;
     }
 
-    private void updateTrainingMetrics(NDList labels, NDList preds) {
+    private void updateEvaluators(NDList labels, NDList preds) {
         // stop recording as this is end of computation graph
-        // any metric calculation or update operation should not be recorded
+        // any evaluator calculation or update operation should not be recorded
         MxGradientCollector.setRecording(false);
         MxGradientCollector.setTraining(false);
         // this step is synchronized, should be done at end of batch
-        trainingMetrics.forEach(metrics -> metrics.update(labels, preds));
+        trainingEvaluators.forEach(evaluator -> evaluator.update(labels, preds));
         // TODO: this can be done during onBatch listener
-        addMetric("train", trainingLoss);
+        addEvaluator("train", trainingLoss);
         if (Float.isNaN(trainingLoss.getValue())) {
             throw new TrainingDivergedException(
                     "The Loss became NaN, try reduce learning rate,"
                             + "add clipGradient option to your optimizer, check input data and loss calculation.");
         }
-        trainingMetrics.forEach(metric -> addMetric("train", metric));
+        trainingEvaluators.forEach(evaluator -> addEvaluator("train", evaluator));
         // turn gradient recording back on
         MxGradientCollector.setRecording(true);
         MxGradientCollector.setTraining(true);
     }
 
     private void updateValidationMetrics(NDList labels, NDList preds) {
-        validateMetrics.forEach(metrics -> metrics.update(labels, preds));
-        validateMetrics.forEach(metric -> addMetric("validate", metric));
+        validateEvaluators.forEach(evaluator -> evaluator.update(labels, preds));
+        validateEvaluators.forEach(evaluator -> addEvaluator("validate", evaluator));
     }
 
     /** {@inheritDoc} */
     @Override
-    public void resetTrainingMetrics() {
-        trainingMetrics.forEach(TrainingMetric::reset);
-        validateMetrics.forEach(TrainingMetric::reset);
+    public void resetEvaluators() {
+        trainingEvaluators.forEach(Evaluator::reset);
+        validateEvaluators.forEach(Evaluator::reset);
 
         if (listener != null) {
             listener.onEpoch(this);
@@ -258,10 +258,10 @@ public class MxTrainer implements Trainer {
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
-    public final <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz) {
-        for (TrainingMetric metric : trainingMetrics) {
-            if (clazz.isInstance(metric)) {
-                return (T) metric;
+    public final <T extends Evaluator> T getTrainingEvaluator(Class<T> clazz) {
+        for (Evaluator evaluator : trainingEvaluators) {
+            if (clazz.isInstance(evaluator)) {
+                return (T) evaluator;
             }
         }
         return null;
@@ -270,10 +270,10 @@ public class MxTrainer implements Trainer {
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends TrainingMetric> T getValidationMetric(Class<T> clazz) {
-        for (TrainingMetric metric : validateMetrics) {
-            if (clazz.isInstance(metric)) {
-                return (T) metric;
+    public <T extends Evaluator> T getValidationEvaluator(Class<T> clazz) {
+        for (Evaluator evaluator : validateEvaluators) {
+            if (clazz.isInstance(evaluator)) {
+                return (T) evaluator;
             }
         }
         return null;
@@ -351,9 +351,9 @@ public class MxTrainer implements Trainer {
         }
     }
 
-    private void addMetric(String stage, TrainingMetric metric) {
+    private void addEvaluator(String stage, Evaluator evaluator) {
         if (metrics != null) {
-            metrics.addMetric(stage + '_' + metric.getName(), metric.getValue());
+            metrics.addMetric(stage + '_' + evaluator.getName(), evaluator.getValue());
         }
     }
 }

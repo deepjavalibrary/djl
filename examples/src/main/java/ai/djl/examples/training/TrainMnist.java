@@ -29,8 +29,8 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
+import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.Accuracy;
 import ai.djl.training.util.ProgressBar;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -112,7 +112,7 @@ public final class TrainMnist {
     private TrainingConfig setupTrainingConfig(Arguments arguments) {
         int batchSize = arguments.getBatchSize();
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                .addTrainingMetric(new Accuracy())
+                .addEvaluator(new Accuracy())
                 .setBatchSize(batchSize)
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }

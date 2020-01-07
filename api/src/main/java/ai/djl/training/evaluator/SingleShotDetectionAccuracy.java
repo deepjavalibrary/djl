@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.training.metrics;
+package ai.djl.training.evaluator;
 
 import ai.djl.modality.cv.MultiBoxTarget;
 import ai.djl.ndarray.NDArray;

@@ -55,8 +55,8 @@ public final class TrainingUtils {
                     batch.close();
                 }
             }
-            // reset training and validation metric at end of epoch
-            trainer.resetTrainingMetrics();
+            // reset training and validation evaluators at end of epoch
+            trainer.resetEvaluators();
             // save model at end of each epoch
             if (outputDir != null) {
                 Model model = trainer.getModel();

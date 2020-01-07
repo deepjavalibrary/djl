@@ -19,8 +19,8 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.TrainingMetric;
 
 /**
  * An interface that represents a single training iteration.
@@ -86,8 +86,8 @@ public interface Trainer extends AutoCloseable {
     /**
      * Validates the given batch of data.
      *
-     * <p>During validation, the loss and training metrics are computed, but gradients aren't
-     * computed, and parameters aren't updated.
+     * <p>During validation, the evaluators and losses are computed, but gradients aren't computed,
+     * and parameters aren't updated.
      *
      * @param batch a {@link Batch} of data
      */
@@ -117,8 +117,8 @@ public interface Trainer extends AutoCloseable {
      */
     void setTrainingListener(TrainingListener listener);
 
-    /** Resets each of the training metrics and loss to its respective initial value. */
-    void resetTrainingMetrics();
+    /** Resets each of the evaluators and losses to their respective initial values. */
+    void resetEvaluators();
 
     /**
      * Gets the training {@link Loss} function of the trainer.
@@ -142,22 +142,22 @@ public interface Trainer extends AutoCloseable {
     Model getModel();
 
     /**
-     * Gets the training {@link TrainingMetric} that is an instance of the given {@link Class}.
+     * Gets the training {@link Evaluator} that is an instance of the given {@link Class}.
      *
-     * @param clazz the {@link Class} of the {@link TrainingMetric} sought
-     * @param <T> the type of the training metric
-     * @return the training metric requested
+     * @param clazz the {@link Class} of the {@link Evaluator} sought
+     * @param <T> the type of the training evaluator
+     * @return the training evaluator requested
      */
-    <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz);
+    <T extends Evaluator> T getTrainingEvaluator(Class<T> clazz);
 
     /**
-     * Gets the validation {@link TrainingMetric} that is an instance of the given {@link Class}.
+     * Gets the validation {@link Evaluator} that is an instance of the given {@link Class}.
      *
-     * @param clazz the {@link Class} of the {@link TrainingMetric} sought
-     * @param <T> the type of the validation metric
-     * @return the validation metric requested
+     * @param clazz the {@link Class} of the {@link Evaluator} sought
+     * @param <T> the type of the validation evaluator
+     * @return the validation evaluator requested
      */
-    <T extends TrainingMetric> T getValidationMetric(Class<T> clazz);
+    <T extends Evaluator> T getValidationEvaluator(Class<T> clazz);
 
     /**
      * Gets the {@link NDManager} from the model.

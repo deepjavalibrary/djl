@@ -40,11 +40,11 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
+import ai.djl.training.evaluator.BoundingBoxError;
+import ai.djl.training.evaluator.SingleShotDetectionAccuracy;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.SingleShotDetectionLoss;
-import ai.djl.training.metrics.BoundingBoxError;
-import ai.djl.training.metrics.SingleShotDetectionAccuracy;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
@@ -173,8 +173,8 @@ public final class TrainPikachu {
         return new DefaultTrainingConfig(new SingleShotDetectionLoss("ssd_loss"))
                 .optInitializer(initializer)
                 .setBatchSize(arguments.getBatchSize())
-                .addTrainingMetric(new SingleShotDetectionAccuracy("classAccuracy"))
-                .addTrainingMetric(new BoundingBoxError("boundingBoxError"))
+                .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))
+                .addEvaluator(new BoundingBoxError("boundingBoxError"))
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 

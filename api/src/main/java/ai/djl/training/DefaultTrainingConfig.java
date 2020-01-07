@@ -13,12 +13,12 @@
 package ai.djl.training;
 
 import ai.djl.Device;
+import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.initializer.XavierInitializer.FactorType;
 import ai.djl.training.initializer.XavierInitializer.RandomType;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.TrainingMetric;
 import ai.djl.training.optimizer.Adam;
 import ai.djl.training.optimizer.Optimizer;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private Optimizer optimizer;
     private Device[] devices;
     private Loss loss;
-    private List<TrainingMetric> trainingMetrics;
+    private List<Evaluator> evaluators;
     private int batchSize;
 
     /**
@@ -44,7 +44,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
         this.initializer = new XavierInitializer(RandomType.GAUSSIAN, FactorType.IN, 2);
         optimizer = new Adam.Builder().build();
         this.loss = loss;
-        trainingMetrics = new ArrayList<>();
+        evaluators = new ArrayList<>();
     }
 
     /**
@@ -82,13 +82,13 @@ public class DefaultTrainingConfig implements TrainingConfig {
     }
 
     /**
-     * Adds a {@link TrainingMetric} that needs to be computed during training.
+     * Adds an {@link Evaluator} that needs to be computed during training.
      *
-     * @param trainingMetric the training metric to be added
+     * @param evaluator the evaluator to be added
      * @return this {@code DefaultTrainingConfig}
      */
-    public DefaultTrainingConfig addTrainingMetric(TrainingMetric trainingMetric) {
-        trainingMetrics.add(trainingMetric);
+    public DefaultTrainingConfig addEvaluator(Evaluator evaluator) {
+        evaluators.add(evaluator);
         return this;
     }
 
@@ -132,8 +132,8 @@ public class DefaultTrainingConfig implements TrainingConfig {
 
     /** {@inheritDoc} */
     @Override
-    public List<TrainingMetric> getTrainingMetrics() {
-        return trainingMetrics;
+    public List<Evaluator> getEvaluators() {
+        return evaluators;
     }
 
     /** {@inheritDoc} */

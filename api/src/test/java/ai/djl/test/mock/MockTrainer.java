@@ -22,8 +22,8 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingListener;
 import ai.djl.training.dataset.Batch;
+import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.metrics.TrainingMetric;
 
 public class MockTrainer implements Trainer {
 
@@ -80,7 +80,7 @@ public class MockTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public void resetTrainingMetrics() {}
+    public void resetEvaluators() {}
 
     /** {@inheritDoc} */
     @Override
@@ -102,13 +102,13 @@ public class MockTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends TrainingMetric> T getTrainingMetric(Class<T> clazz) {
+    public <T extends Evaluator> T getTrainingEvaluator(Class<T> clazz) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T extends TrainingMetric> T getValidationMetric(Class<T> clazz) {
+    public <T extends Evaluator> T getValidationEvaluator(Class<T> clazz) {
         return null;
     }
 

@@ -11,19 +11,19 @@
  * and limitations under the License.
  */
 
-package ai.djl.training.metrics;
+package ai.djl.training.evaluator;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 
 /**
- * {@code Accuracy} is a {@link TrainingMetric} that computes the accuracy score.
+ * {@code Accuracy} is an {@link Evaluator} that computes the accuracy score.
  *
  * <p>The accuracy score is defined as \(accuracy(y, \hat{y}) =
  * \frac{1}{n}\sum_{i=0}^{n-1}1(\hat{y_i} == y_i)\)
  */
-public class Accuracy extends TrainingMetric {
+public class Accuracy extends Evaluator {
 
     private long correctInstances;
     private long totalInstances;
@@ -31,9 +31,9 @@ public class Accuracy extends TrainingMetric {
     protected int index;
 
     /**
-     * Creates an accuracy metric.
+     * Creates an accuracy evaluator.
      *
-     * @param name the name of the metric, default is "Accuracy"
+     * @param name the name of the evaluator, default is "Accuracy"
      * @param index the index of the NDArray in labels to compute accuracy for
      * @param axis the axis that represent classes in prediction, default 1
      */
@@ -43,15 +43,15 @@ public class Accuracy extends TrainingMetric {
         this.index = index;
     }
 
-    /** Creates an accuracy metric that computes accuracy across axis 1 along the 0th index. */
+    /** Creates an accuracy evaluator that computes accuracy across axis 1 along the 0th index. */
     public Accuracy() {
         this("Accuracy", 0, 1);
     }
 
     /**
-     * Creates an accuracy metric that computes accuracy across axis 1 along given index.
+     * Creates an accuracy evaluator that computes accuracy across axis 1 along given index.
      *
-     * @param name the name of the metric, default is "Accuracy"
+     * @param name the name of the evaluator, default is "Accuracy"
      * @param index the index of the NDArray in labels to compute accuracy for
      */
     public Accuracy(String name, int index) {

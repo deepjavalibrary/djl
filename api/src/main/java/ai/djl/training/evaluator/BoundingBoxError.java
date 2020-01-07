@@ -10,26 +10,26 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.training.metrics;
+package ai.djl.training.evaluator;
 
 import ai.djl.modality.cv.MultiBoxTarget;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 
 /**
- * {@code BoundingBoxError} is a {@link TrainingMetric} that computes the error in the prediction of
+ * {@code BoundingBoxError} is an {@link Evaluator} that computes the error in the prediction of
  * bounding boxes in SingleShotDetection model.
  */
-public class BoundingBoxError extends TrainingMetric {
+public class BoundingBoxError extends Evaluator {
 
     private float ssdBoxPredictionError;
     private float numInstances;
     private MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
 
     /**
-     * Creates an BoundingBoxError metric.
+     * Creates an BoundingBoxError evaluator.
      *
-     * @param name the name of the metric.
+     * @param name the name of the evaluator
      */
     public BoundingBoxError(String name) {
         super(name);
@@ -62,7 +62,7 @@ public class BoundingBoxError extends TrainingMetric {
     }
 
     @Override
-    public TrainingMetric duplicate() {
+    public Evaluator duplicate() {
         return new BoundingBoxError(getName());
     }
 

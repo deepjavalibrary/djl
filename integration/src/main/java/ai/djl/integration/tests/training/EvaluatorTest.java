@@ -16,12 +16,12 @@ package ai.djl.integration.tests.training;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.training.metrics.Accuracy;
-import ai.djl.training.metrics.TopKAccuracy;
+import ai.djl.training.evaluator.Accuracy;
+import ai.djl.training.evaluator.TopKAccuracy;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class TrainingMetricsTest {
+public class EvaluatorTest {
 
     @Test
     public void testAccuracy() {

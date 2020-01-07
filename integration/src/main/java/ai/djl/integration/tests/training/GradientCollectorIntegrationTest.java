@@ -104,7 +104,7 @@ public class GradientCollectorIntegrationTest {
                 trainer.initialize(inputShape);
 
                 for (int epoch = 0; epoch < epochs; epoch++) {
-                    trainer.resetTrainingMetrics();
+                    trainer.resetEvaluators();
                     for (Batch batch : trainer.iterateDataset(dataset)) {
                         trainer.trainBatch(batch);
                         trainer.step();

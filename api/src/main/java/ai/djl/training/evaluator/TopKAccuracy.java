@@ -10,14 +10,13 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.training.metrics;
+package ai.djl.training.evaluator;
 
 import ai.djl.ndarray.NDArray;
 import java.util.stream.IntStream;
 
 /**
- * {@code TopKAccuracy} is a {@link TrainingMetric} that computes the accuracy of the top k
- * predictions.
+ * {@code TopKAccuracy} is an {@link Evaluator} that computes the accuracy of the top k predictions.
  *
  * <p>{@code TopKAccuracy} differs from {@link Accuracy} in that it considers the prediction to be
  * `True` as long as the ground truth label is in the top K predicated labels. If `top_k = 1`, then
@@ -44,8 +43,8 @@ public class TopKAccuracy extends Accuracy {
     }
 
     /**
-     * Creates an instance of {@code TopKAccuracy} metric that computes topK accuracy across axis 1
-     * along the given index.
+     * Creates an instance of {@code TopKAccuracy} evaluator that computes topK accuracy across axis
+     * 1 along the given index.
      *
      * @param index the index of the {@link NDArray} in labels to compute topK accuracy for
      * @param topK the value of K
@@ -55,8 +54,8 @@ public class TopKAccuracy extends Accuracy {
     }
 
     /**
-     * Creates an instance of {@code TopKAccuracy} metric that computes topK accuracy across axis 1
-     * along the 0th index.
+     * Creates an instance of {@code TopKAccuracy} evaluator that computes topK accuracy across axis
+     * 1 along the 0th index.
      *
      * @param topK the value of K
      */

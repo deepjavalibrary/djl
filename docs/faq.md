@@ -27,7 +27,7 @@ setting the devices. For example, if you have 7 GPUs available, and you want the
     int maxNumberOfGpus = 5;
     TrainingConfig config = new DefaultTrainingConfig(initializer, loss)
             .setOptimizer(optimizer)
-            .addTrainingMetric(accuracy)
+            .addEvaluator(accuracy)
             .setBatchSize(batchSize)
             // Set the devices to run on multi-GPU
             .setDevices(Device.getDevices(numberOfGpus));

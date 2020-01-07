@@ -14,15 +14,15 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.training.metrics.TrainingMetric;
+import ai.djl.training.evaluator.Evaluator;
 
 /**
  * Loss functions (or Cost functions) are used to evaluate the model predictions against true labels
  * for optimization.
  *
- * <p>Although all training metrics can be used to measure the performance of a model, not all of
- * them are suited to being used by an optimizer. Loss functions are usually non-negative where a
- * larger loss represents worse performance. They are also real-valued to accurately compare models.
+ * <p>Although all evaluators can be used to measure the performance of a model, not all of them are
+ * suited to being used by an optimizer. Loss functions are usually non-negative where a larger loss
+ * represents worse performance. They are also real-valued to accurately compare models.
  *
  * <p>When creating a loss function, you should avoid having the loss depend on the batch size. For
  * example, if you have a loss per item in a batch and sum those losses, your loss would be {@code
@@ -31,7 +31,7 @@ import ai.djl.training.metrics.TrainingMetric;
  * in the batch size would throw it off. If you have a variable batch size, it would be even more
  * difficult.
  */
-public abstract class Loss extends TrainingMetric {
+public abstract class Loss extends Evaluator {
 
     private float totalLoss;
     private int totalInstances;
@@ -168,7 +168,7 @@ public abstract class Loss extends TrainingMetric {
     }
 
     /**
-     * Updates the training metrics based on a {@link NDList} of labels and predictions.
+     * Updates the evaluators based on a {@link NDList} of labels and predictions.
      *
      * <p>This is a synchronized operation. You should only call it at the end of a batch or epoch.
      *
