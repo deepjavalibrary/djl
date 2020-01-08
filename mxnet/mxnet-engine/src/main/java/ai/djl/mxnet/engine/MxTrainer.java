@@ -339,6 +339,8 @@ public class MxTrainer implements Trainer {
     /** {@inheritDoc} */
     @Override
     public void close() {
+        listeners.forEach(listener -> listener.onTrainingEnd(this));
+
         parameterStore.sync();
         manager.close();
     }

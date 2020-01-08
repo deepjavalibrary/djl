@@ -60,16 +60,17 @@ public final class TrainMnist {
             // setup training configuration
             TrainingConfig config = setupTrainingConfig(arguments);
 
-            ExampleTrainingListener listener;
+            ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
-                listener =
-                        new ExampleTrainingListener(
+                trainer.addTrainingListeners(
+                        ExampleTrainingListener.exampleListeners(
                                 arguments.getBatchSize(),
                                 (int) trainingSet.getNumIterations(),
-                                (int) validateSet.getNumIterations());
-                listener.beforeTrain(arguments.getMaxGpus(), arguments.getEpoch());
-                trainer.addTrainingListeners(listener);
+                                (int) validateSet.getNumIterations(),
+                                arguments.getMaxGpus(),
+                                arguments.getEpoch(),
+                                arguments.getOutputDir()));
 
                 /*
                  * MNIST is 28x28 grayscale image and pre processed into 28 * 28 NDArray.
@@ -87,12 +88,11 @@ public final class TrainMnist {
                         validateSet,
                         arguments.getOutputDir(),
                         "mlp");
-                listener.afterTrain(trainer, arguments.getOutputDir());
-                listener.recordPerformance(trainer);
 
-                model.save(Paths.get(arguments.getOutputDir()), "mlp");
-                return new ExampleTrainingResult(trainer);
+                result = new ExampleTrainingResult(trainer);
             }
+            model.save(Paths.get(arguments.getOutputDir()), "mlp");
+            return result;
         }
     }
 

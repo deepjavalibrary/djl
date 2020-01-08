@@ -75,16 +75,17 @@ public final class TrainPikachu {
             RandomAccessDataset pikachuDetectionTrain = getDataset(Dataset.Usage.TRAIN, arguments);
             RandomAccessDataset pikachuDetectionTest = getDataset(Dataset.Usage.TEST, arguments);
 
-            ExampleTrainingListener listener;
+            ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
-                listener =
-                        new ExampleTrainingListener(
+                trainer.addTrainingListeners(
+                        ExampleTrainingListener.exampleListeners(
                                 arguments.getBatchSize(),
                                 (int) pikachuDetectionTrain.getNumIterations(),
-                                (int) pikachuDetectionTest.getNumIterations());
-                listener.beforeTrain(arguments.getMaxGpus(), arguments.getEpoch());
-                trainer.addTrainingListeners(listener);
+                                (int) pikachuDetectionTest.getNumIterations(),
+                                arguments.getMaxGpus(),
+                                arguments.getEpoch(),
+                                arguments.getOutputDir()));
 
                 Shape inputShape = new Shape(arguments.getBatchSize(), 3, 256, 256);
                 trainer.initialize(inputShape);
@@ -95,12 +96,11 @@ public final class TrainPikachu {
                         pikachuDetectionTest,
                         arguments.getOutputDir(),
                         "ssd");
-                listener.afterTrain(trainer, arguments.getOutputDir());
-                listener.recordPerformance(trainer);
 
-                model.save(Paths.get(arguments.getOutputDir()), "ssd");
-                return new ExampleTrainingResult(trainer);
+                result = new ExampleTrainingResult(trainer);
             }
+            model.save(Paths.get(arguments.getOutputDir()), "ssd");
+            return result;
         }
     }
 

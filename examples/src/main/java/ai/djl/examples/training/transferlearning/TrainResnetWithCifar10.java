@@ -73,16 +73,17 @@ public final class TrainResnetWithCifar10 {
             // setup training configuration
             TrainingConfig config = setupTrainingConfig(arguments);
 
-            ExampleTrainingListener listener;
+            ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
-                listener =
-                        new ExampleTrainingListener(
+                trainer.addTrainingListeners(
+                        ExampleTrainingListener.exampleListeners(
                                 arguments.getBatchSize(),
                                 (int) trainDataset.getNumIterations(),
-                                (int) validationDataset.getNumIterations());
-                listener.beforeTrain(arguments.getMaxGpus(), arguments.getEpoch());
-                trainer.addTrainingListeners(listener);
+                                (int) validationDataset.getNumIterations(),
+                                arguments.getMaxGpus(),
+                                arguments.getEpoch(),
+                                arguments.getOutputDir()));
 
                 /*
                  * CIFAR10 is 32x32 image and pre processed into NCHW NDArray.
@@ -99,12 +100,11 @@ public final class TrainResnetWithCifar10 {
                         validationDataset,
                         arguments.getOutputDir(),
                         "resnetv1");
-                listener.afterTrain(trainer, arguments.getOutputDir());
-                listener.recordPerformance(trainer);
 
-                model.save(Paths.get("build/model"), "resnetv1");
-                return new ExampleTrainingResult(trainer);
+                result = new ExampleTrainingResult(trainer);
             }
+            model.save(Paths.get("build/model"), "resnetv1");
+            return result;
         }
     }
 

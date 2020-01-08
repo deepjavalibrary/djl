@@ -44,4 +44,11 @@ public interface TrainingListener {
      * @param trainer the trainer the listener is attached to
      */
     void onValidationBatch(Trainer trainer);
+
+    /**
+     * Listens to the end of training.
+     *
+     * @param trainer the trainer the listener is attached to
+     */
+    void onTrainingEnd(Trainer trainer);
 }

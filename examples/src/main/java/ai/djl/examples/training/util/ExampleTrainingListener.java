@@ -28,26 +28,42 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExampleTrainingListener implements TrainingListener {
+public final class ExampleTrainingListener implements TrainingListener {
 
     private static final Logger logger = LoggerFactory.getLogger(ExampleTrainingListener.class);
 
-    protected int batchSize;
-    protected int trainDataSize;
-    protected int validateDataSize;
-    protected int trainingProgress;
-    protected int validateProgress;
+    private int batchSize;
+    private int trainDataSize;
+    private int validateDataSize;
+    private int trainingProgress;
+    private int validateProgress;
 
-    protected long epochTime;
-    protected int numEpochs;
+    private long epochTime;
+    private int numEpochs;
+    private String outputDir;
 
-    protected ProgressBar trainingProgressBar;
-    protected ProgressBar validateProgressBar;
+    private ProgressBar trainingProgressBar;
+    private ProgressBar validateProgressBar;
 
-    public ExampleTrainingListener(int batchSize, int trainDataSize, int validateDataSize) {
+    private ExampleTrainingListener(
+            int batchSize, int trainDataSize, int validateDataSize, String outputDir) {
         this.batchSize = batchSize;
         this.trainDataSize = trainDataSize;
         this.validateDataSize = validateDataSize;
+        this.outputDir = outputDir;
+    }
+
+    public static TrainingListener[] exampleListeners(
+            int batchSize,
+            int trainDataSize,
+            int validateDataSize,
+            int maxGpus,
+            int epoch,
+            String outputDir) {
+        ExampleTrainingListener exampleTrainingListener =
+                new ExampleTrainingListener(batchSize, trainDataSize, validateDataSize, outputDir);
+        exampleTrainingListener.beforeTrain(maxGpus, epoch);
+        return new TrainingListener[] {exampleTrainingListener};
     }
 
     /** {@inheritDoc} */
@@ -103,6 +119,13 @@ public class ExampleTrainingListener implements TrainingListener {
             validateProgressBar = new ProgressBar("Validating", validateDataSize);
         }
         validateProgressBar.update(validateProgress++);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onTrainingEnd(Trainer trainer) {
+        afterTrain(trainer, outputDir);
+        recordPerformance(trainer);
     }
 
     public void beforeTrain(int maxGpus, int epoch) {
