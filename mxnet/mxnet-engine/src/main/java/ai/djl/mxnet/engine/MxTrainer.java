@@ -66,7 +66,6 @@ public class MxTrainer implements Trainer {
     MxTrainer(MxModel model, TrainingConfig trainingConfig) {
         this.model = model;
         manager = (MxNDManager) model.getNDManager().newSubManager();
-        listeners = new ArrayList<>();
         devices = trainingConfig.getDevices();
         trainingLoss = trainingConfig.getLossFunction();
         if (trainingLoss == null) {
@@ -88,6 +87,9 @@ public class MxTrainer implements Trainer {
 
         parameterStore = new ParameterStore(manager, false);
         parameterStore.setParameterServer(parameterServer, devices);
+
+        listeners = trainingConfig.getTrainingListeners();
+        listeners.forEach(listener -> listener.onTrainingBegin(this));
     }
 
     /** {@inheritDoc} */
@@ -194,8 +196,8 @@ public class MxTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public void addTrainingListeners(TrainingListener... listeners) {
-        this.listeners.addAll(Arrays.asList(listeners));
+    public List<Device> getDevices() {
+        return Arrays.asList(devices);
     }
 
     private void updateEvaluators(NDList labels, NDList preds) {

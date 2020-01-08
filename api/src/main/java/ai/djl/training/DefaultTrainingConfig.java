@@ -22,6 +22,7 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Adam;
 import ai.djl.training.optimizer.Optimizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /** {@code DefaultTrainingConfig} is an implementation of the {@link TrainingConfig} interface. */
@@ -32,6 +33,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private Device[] devices;
     private Loss loss;
     private List<Evaluator> evaluators;
+    private List<TrainingListener> listeners;
     private int batchSize;
 
     /**
@@ -45,6 +47,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
         optimizer = new Adam.Builder().build();
         this.loss = loss;
         evaluators = new ArrayList<>();
+        listeners = new ArrayList<>();
     }
 
     /**
@@ -93,6 +96,17 @@ public class DefaultTrainingConfig implements TrainingConfig {
     }
 
     /**
+     * Adds {@link TrainingListener}s for training.
+     *
+     * @param listeners the {@link TrainingListener}s to add
+     * @return this {@code DefaultTrainingConfig}
+     */
+    public DefaultTrainingConfig addTrainingListeners(TrainingListener... listeners) {
+        this.listeners.addAll(Arrays.asList(listeners));
+        return this;
+    }
+
+    /**
      * Sets the size of a batch for training.
      *
      * @param batchSize the batch size
@@ -134,6 +148,12 @@ public class DefaultTrainingConfig implements TrainingConfig {
     @Override
     public List<Evaluator> getEvaluators() {
         return evaluators;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<TrainingListener> getTrainingListeners() {
+        return listeners;
     }
 
     /** {@inheritDoc} */

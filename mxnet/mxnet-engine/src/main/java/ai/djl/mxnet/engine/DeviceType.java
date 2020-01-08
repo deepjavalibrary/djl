@@ -30,9 +30,9 @@ public final class DeviceType {
     public static int toDeviceType(Device device) {
         String deviceType = device.getDeviceType();
 
-        if (Device.cpu().getDeviceType().equals(deviceType)) {
+        if (Device.Type.CPU.equals(deviceType)) {
             return 1;
-        } else if (Device.gpu().getDeviceType().equals(deviceType)) {
+        } else if (Device.Type.GPU.equals(deviceType)) {
             return 2;
         } else if (CPU_PINNED.equals(deviceType)) {
             return 3;
@@ -50,9 +50,9 @@ public final class DeviceType {
     public static String fromDeviceType(int deviceType) {
         switch (deviceType) {
             case 1:
-                return Device.cpu().getDeviceType();
+                return Device.Type.CPU;
             case 2:
-                return Device.gpu().getDeviceType();
+                return Device.Type.GPU;
             case 3:
                 return "cpu_pinned";
             default:

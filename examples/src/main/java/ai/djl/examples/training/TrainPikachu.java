@@ -37,7 +37,6 @@ import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
-import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.BoundingBoxError;
@@ -67,25 +66,23 @@ public final class TrainPikachu {
     public ExampleTrainingResult runExample(String[] args) throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
 
-        TrainingConfig config = setupTrainingConfig(arguments);
-
         try (Model model = Model.newInstance()) {
             model.setBlock(getSsdTrainBlock());
 
             RandomAccessDataset pikachuDetectionTrain = getDataset(Dataset.Usage.TRAIN, arguments);
             RandomAccessDataset pikachuDetectionTest = getDataset(Dataset.Usage.TEST, arguments);
 
+            DefaultTrainingConfig config = setupTrainingConfig(arguments);
+            config.addTrainingListeners(
+                    ExampleTrainingListener.exampleListeners(
+                            arguments.getBatchSize(),
+                            (int) pikachuDetectionTrain.getNumIterations(),
+                            (int) pikachuDetectionTest.getNumIterations(),
+                            arguments.getOutputDir()));
+
             ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
-                trainer.addTrainingListeners(
-                        ExampleTrainingListener.exampleListeners(
-                                arguments.getBatchSize(),
-                                (int) pikachuDetectionTrain.getNumIterations(),
-                                (int) pikachuDetectionTest.getNumIterations(),
-                                arguments.getMaxGpus(),
-                                arguments.getEpoch(),
-                                arguments.getOutputDir()));
 
                 Shape inputShape = new Shape(arguments.getBatchSize(), 3, 256, 256);
                 trainer.initialize(inputShape);
@@ -152,7 +149,7 @@ public final class TrainPikachu {
         return pikachuDetection;
     }
 
-    private TrainingConfig setupTrainingConfig(Arguments arguments) {
+    private DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);

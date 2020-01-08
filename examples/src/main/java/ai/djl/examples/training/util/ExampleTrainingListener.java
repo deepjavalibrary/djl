@@ -54,16 +54,10 @@ public final class ExampleTrainingListener implements TrainingListener {
     }
 
     public static TrainingListener[] exampleListeners(
-            int batchSize,
-            int trainDataSize,
-            int validateDataSize,
-            int maxGpus,
-            int epoch,
-            String outputDir) {
-        ExampleTrainingListener exampleTrainingListener =
-                new ExampleTrainingListener(batchSize, trainDataSize, validateDataSize, outputDir);
-        exampleTrainingListener.beforeTrain(maxGpus, epoch);
-        return new TrainingListener[] {exampleTrainingListener};
+            int batchSize, int trainDataSize, int validateDataSize, String outputDir) {
+        return new TrainingListener[] {
+            new ExampleTrainingListener(batchSize, trainDataSize, validateDataSize, outputDir)
+        };
     }
 
     /** {@inheritDoc} */
@@ -121,21 +115,16 @@ public final class ExampleTrainingListener implements TrainingListener {
         validateProgressBar.update(validateProgress++);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public void onTrainingEnd(Trainer trainer) {
-        afterTrain(trainer, outputDir);
-        recordPerformance(trainer);
-    }
-
-    public void beforeTrain(int maxGpus, int epoch) {
-        String devices;
-        if (maxGpus > 0) {
-            devices = maxGpus + " GPUs";
+    public void onTrainingBegin(Trainer trainer) {
+        String devicesMsg;
+        List<Device> devices = trainer.getDevices();
+        if (devices.size() == 1 && Device.Type.CPU.equals(devices.get(0).getDeviceType())) {
+            devicesMsg = Device.cpu().toString();
         } else {
-            devices = Device.cpu().toString();
+            devicesMsg = devices.size() + " GPUs";
         }
-        logger.info("Running {} on: {}, epoch: {}.", getClass().getSimpleName(), devices, epoch);
+        logger.info("Running {} on: {}.", getClass().getSimpleName(), devicesMsg);
 
         long init = System.nanoTime();
         String version = Engine.getInstance().getVersion();
@@ -146,7 +135,9 @@ public final class ExampleTrainingListener implements TrainingListener {
         epochTime = System.nanoTime();
     }
 
-    public void afterTrain(Trainer trainer, String outputDir) {
+    /** {@inheritDoc} */
+    @Override
+    public void onTrainingEnd(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
         logger.info("Training: {} batches", trainDataSize);
         logger.info("Validation: {} batches", validateDataSize);
@@ -182,6 +173,8 @@ public final class ExampleTrainingListener implements TrainingListener {
             MemoryUtils.dumpMemoryInfo(metrics, outputDir);
             TrainingUtils.dumpTrainingTimeInfo(metrics, outputDir);
         }
+
+        recordPerformance(trainer);
     }
 
     public void recordPerformance(Trainer trainer) {

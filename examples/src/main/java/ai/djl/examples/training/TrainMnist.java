@@ -26,7 +26,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
-import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
@@ -58,19 +57,17 @@ public final class TrainMnist {
                     getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
 
             // setup training configuration
-            TrainingConfig config = setupTrainingConfig(arguments);
+            DefaultTrainingConfig config = setupTrainingConfig(arguments);
+            config.addTrainingListeners(
+                    ExampleTrainingListener.exampleListeners(
+                            arguments.getBatchSize(),
+                            (int) trainingSet.getNumIterations(),
+                            (int) validateSet.getNumIterations(),
+                            arguments.getOutputDir()));
 
             ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
-                trainer.addTrainingListeners(
-                        ExampleTrainingListener.exampleListeners(
-                                arguments.getBatchSize(),
-                                (int) trainingSet.getNumIterations(),
-                                (int) validateSet.getNumIterations(),
-                                arguments.getMaxGpus(),
-                                arguments.getEpoch(),
-                                arguments.getOutputDir()));
 
                 /*
                  * MNIST is 28x28 grayscale image and pre processed into 28 * 28 NDArray.
@@ -96,7 +93,7 @@ public final class TrainMnist {
         }
     }
 
-    private TrainingConfig setupTrainingConfig(Arguments arguments) {
+    private DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         int batchSize = arguments.getBatchSize();
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())

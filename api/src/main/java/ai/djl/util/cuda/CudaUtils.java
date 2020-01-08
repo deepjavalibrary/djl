@@ -111,7 +111,7 @@ public final class CudaUtils {
      * @throws IllegalArgumentException if {@link Device} is not GPU device or does not exist
      */
     public static MemoryUsage getGpuMemory(Device device) {
-        if (!Device.gpu().getDeviceType().equals(device.getDeviceType())) {
+        if (!Device.Type.GPU.equals(device.getDeviceType())) {
             throw new IllegalArgumentException("Only GPU device is allowed.");
         }
 

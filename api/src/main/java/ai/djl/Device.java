@@ -26,8 +26,8 @@ import java.util.Objects;
  */
 public class Device {
 
-    private static final Device CPU = new Device("cpu", 0);
-    private static final Device GPU = new Device("gpu", 0);
+    private static final Device CPU = new Device(Type.CPU, 0);
+    private static final Device GPU = new Device(Type.GPU, 0);
 
     private String deviceType;
     private int deviceId;
@@ -103,7 +103,7 @@ public class Device {
      * @return a new instance of CPU {@code Device} with the specified {@code deviceId}
      */
     public static Device cpu(int deviceId) {
-        return new Device("cpu", deviceId);
+        return new Device(Type.CPU, deviceId);
     }
 
     /**
@@ -122,7 +122,7 @@ public class Device {
      * @return a new instance of GPU {@code Device} with specified {@code deviceId}
      */
     public static Device gpu(int deviceId) {
-        return new Device("gpu", deviceId);
+        return new Device(Type.GPU, deviceId);
     }
 
     /**
@@ -143,7 +143,7 @@ public class Device {
 
         Device[] devices = new Device[count];
         for (int i = 0; i < count; ++i) {
-            devices[i] = new Device("gpu", i);
+            devices[i] = new Device(Type.GPU, i);
         }
         return devices;
     }
@@ -213,5 +213,11 @@ public class Device {
             return device;
         }
         return defaultIfNull(def);
+    }
+
+    /** Contains device type string constants. */
+    public interface Type {
+        String CPU = "cpu";
+        String GPU = "gpu";
     }
 }

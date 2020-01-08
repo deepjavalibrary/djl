@@ -69,6 +69,13 @@ public interface TrainingConfig {
     List<Evaluator> getEvaluators();
 
     /**
+     * Returns the list of {@link TrainingListener}s that should be used during training.
+     *
+     * @return a list of {@link TrainingListener}s
+     */
+    List<TrainingListener> getTrainingListeners();
+
+    /**
      * Gets the batch size that must be used during training.
      *
      * @return the batch size

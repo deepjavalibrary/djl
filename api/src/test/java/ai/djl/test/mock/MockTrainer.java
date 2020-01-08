@@ -12,6 +12,7 @@
  */
 package ai.djl.test.mock;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
@@ -20,7 +21,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
-import ai.djl.training.TrainingListener;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
@@ -77,7 +77,9 @@ public class MockTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public void addTrainingListeners(TrainingListener... listeners) {}
+    public List<Device> getDevices() {
+        return null;
+    }
 
     /** {@inheritDoc} */
     @Override

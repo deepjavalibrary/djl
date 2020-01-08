@@ -37,7 +37,6 @@ import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
-import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
@@ -83,19 +82,17 @@ public final class TrainWithOptimizers {
                     getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
 
             // setup training configuration
-            TrainingConfig config = setupTrainingConfig(arguments);
+            DefaultTrainingConfig config = setupTrainingConfig(arguments);
+            config.addTrainingListeners(
+                    ExampleTrainingListener.exampleListeners(
+                            arguments.getBatchSize(),
+                            (int) trainDataset.getNumIterations(),
+                            (int) validationDataset.getNumIterations(),
+                            arguments.getOutputDir()));
 
             ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
-                trainer.addTrainingListeners(
-                        ExampleTrainingListener.exampleListeners(
-                                arguments.getBatchSize(),
-                                (int) trainDataset.getNumIterations(),
-                                (int) validationDataset.getNumIterations(),
-                                arguments.getMaxGpus(),
-                                arguments.getEpoch(),
-                                arguments.getOutputDir()));
 
                 /*
                  * CIFAR10 is 32x32 image and pre processed into NCHW NDArray.
@@ -170,7 +167,7 @@ public final class TrainWithOptimizers {
         }
     }
 
-    private TrainingConfig setupTrainingConfig(OptimizerArguments arguments) {
+    private DefaultTrainingConfig setupTrainingConfig(OptimizerArguments arguments) {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);

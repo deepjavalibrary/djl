@@ -12,6 +12,7 @@
  */
 package ai.djl.training;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
@@ -112,11 +113,11 @@ public interface Trainer extends AutoCloseable {
     void setMetrics(Metrics metrics);
 
     /**
-     * Adds {@link TrainingListener}s to the {@link Trainer}.
+     * Returns the devices used for training.
      *
-     * @param listeners the {@link TrainingListener}s to add
+     * @return the devices used for training
      */
-    void addTrainingListeners(TrainingListener... listeners);
+    List<Device> getDevices();
 
     /** Resets each of the evaluators and losses to their respective initial values. */
     void resetEvaluators();
