@@ -56,9 +56,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public final class TrainPikachu {
@@ -68,10 +65,7 @@ public final class TrainPikachu {
     }
 
     public ExampleTrainingResult runExample(String[] args) throws IOException, ParseException {
-        Options options = Arguments.getOptions();
-        DefaultParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(options, args, null, false);
-        Arguments arguments = new Arguments(cmd);
+        Arguments arguments = Arguments.parseArgs(args);
 
         TrainingConfig config = setupTrainingConfig(arguments);
 

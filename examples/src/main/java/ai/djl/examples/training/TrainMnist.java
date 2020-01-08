@@ -34,9 +34,6 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import java.io.IOException;
 import java.nio.file.Paths;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public final class TrainMnist {
@@ -46,10 +43,7 @@ public final class TrainMnist {
     }
 
     public ExampleTrainingResult runExample(String[] args) throws IOException, ParseException {
-        Options options = Arguments.getOptions();
-        DefaultParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(options, args, null, false);
-        Arguments arguments = new Arguments(cmd);
+        Arguments arguments = Arguments.parseArgs(args);
 
         // Construct neural network
         Block block = new Mlp(28, 28);

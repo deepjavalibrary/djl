@@ -18,8 +18,10 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 public class Arguments {
 
@@ -70,6 +72,13 @@ public class Arguments {
             Type type = new TypeToken<Map<String, String>>() {}.getType();
             criteria = new Gson().fromJson(cmd.getOptionValue("criteria"), type);
         }
+    }
+
+    public static Arguments parseArgs(String[] args) throws ParseException {
+        Options options = Arguments.getOptions();
+        DefaultParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args, null, false);
+        return new Arguments(cmd);
     }
 
     public static Options getOptions() {

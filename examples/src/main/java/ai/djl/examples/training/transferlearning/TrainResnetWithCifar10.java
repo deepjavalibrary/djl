@@ -50,9 +50,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public final class TrainResnetWithCifar10 {
@@ -64,10 +61,7 @@ public final class TrainResnetWithCifar10 {
 
     public ExampleTrainingResult runExample(String[] args)
             throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
-        Options options = Arguments.getOptions();
-        DefaultParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(options, args, null, false);
-        Arguments arguments = new Arguments(cmd);
+        Arguments arguments = Arguments.parseArgs(args);
 
         try (Model model = getModel(arguments)) {
             // get training dataset
