@@ -32,6 +32,7 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,7 @@ public class MxTrainer implements Trainer {
     private MxModel model;
     private MxNDManager manager;
     private Metrics metrics;
-    private TrainingListener listener;
+    private List<TrainingListener> listeners;
     private Device[] devices;
     private ParameterStore parameterStore;
     private List<Evaluator> trainingEvaluators;
@@ -65,6 +66,7 @@ public class MxTrainer implements Trainer {
     MxTrainer(MxModel model, TrainingConfig trainingConfig) {
         this.model = model;
         manager = (MxNDManager) model.getNDManager().newSubManager();
+        listeners = new ArrayList<>();
         devices = trainingConfig.getDevices();
         trainingLoss = trainingConfig.getLossFunction();
         if (trainingLoss == null) {
@@ -135,9 +137,7 @@ public class MxTrainer implements Trainer {
         // count batch begin time at end of batch to include batch loading time
         batchBeginTime = System.nanoTime();
 
-        if (listener != null) {
-            listener.onTrainingBatch(this);
-        }
+        listeners.forEach(listener -> listener.onTrainingBatch(this));
     }
 
     /** {@inheritDoc} */
@@ -165,9 +165,7 @@ public class MxTrainer implements Trainer {
         }
         addMetric("validate", begin);
 
-        if (listener != null) {
-            listener.onValidationBatch(this);
-        }
+        listeners.forEach(listener -> listener.onValidationBatch(this));
     }
 
     /** {@inheritDoc} */
@@ -196,8 +194,8 @@ public class MxTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public void setTrainingListener(TrainingListener listener) {
-        this.listener = listener;
+    public void addTrainingListeners(TrainingListener... listeners) {
+        this.listeners.addAll(Arrays.asList(listeners));
     }
 
     private void updateEvaluators(NDList labels, NDList preds) {
@@ -222,9 +220,7 @@ public class MxTrainer implements Trainer {
         trainingEvaluators.forEach(Evaluator::reset);
         validateEvaluators.forEach(Evaluator::reset);
 
-        if (listener != null) {
-            listener.onEpoch(this);
-        }
+        listeners.forEach(listener -> listener.onEpoch(this));
     }
 
     /** {@inheritDoc} */

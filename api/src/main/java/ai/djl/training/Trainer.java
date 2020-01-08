@@ -112,11 +112,11 @@ public interface Trainer extends AutoCloseable {
     void setMetrics(Metrics metrics);
 
     /**
-     * Sets a {@link TrainingListener} to the {@link Trainer}.
+     * Adds {@link TrainingListener}s to the {@link Trainer}.
      *
-     * @param listener the {@link TrainingListener} to be set
+     * @param listeners the {@link TrainingListener}s to add
      */
-    void setTrainingListener(TrainingListener listener);
+    void addTrainingListeners(TrainingListener... listeners);
 
     /** Resets each of the evaluators and losses to their respective initial values. */
     void resetEvaluators();

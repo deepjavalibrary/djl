@@ -82,7 +82,7 @@ public final class TrainResnetWithCifar10 {
                                 (int) trainDataset.getNumIterations(),
                                 (int) validationDataset.getNumIterations());
                 listener.beforeTrain(arguments.getMaxGpus(), arguments.getEpoch());
-                trainer.setTrainingListener(listener);
+                trainer.addTrainingListeners(listener);
 
                 /*
                  * CIFAR10 is 32x32 image and pre processed into NCHW NDArray.

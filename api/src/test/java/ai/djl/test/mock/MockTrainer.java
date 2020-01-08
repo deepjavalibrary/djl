@@ -77,7 +77,7 @@ public class MockTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public void setTrainingListener(TrainingListener listener) {}
+    public void addTrainingListeners(TrainingListener... listeners) {}
 
     /** {@inheritDoc} */
     @Override

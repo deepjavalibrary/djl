@@ -84,7 +84,7 @@ public final class TrainPikachu {
                                 (int) pikachuDetectionTrain.getNumIterations(),
                                 (int) pikachuDetectionTest.getNumIterations());
                 listener.beforeTrain(arguments.getMaxGpus(), arguments.getEpoch());
-                trainer.setTrainingListener(listener);
+                trainer.addTrainingListeners(listener);
 
                 Shape inputShape = new Shape(arguments.getBatchSize(), 3, 256, 256);
                 trainer.initialize(inputShape);

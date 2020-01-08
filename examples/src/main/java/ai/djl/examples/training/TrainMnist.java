@@ -69,7 +69,7 @@ public final class TrainMnist {
                                 (int) trainingSet.getNumIterations(),
                                 (int) validateSet.getNumIterations());
                 listener.beforeTrain(arguments.getMaxGpus(), arguments.getEpoch());
-                trainer.setTrainingListener(listener);
+                trainer.addTrainingListeners(listener);
 
                 /*
                  * MNIST is 28x28 grayscale image and pre processed into 28 * 28 NDArray.
