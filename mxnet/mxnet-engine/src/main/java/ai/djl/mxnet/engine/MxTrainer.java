@@ -14,7 +14,6 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.TrainingDivergedException;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -208,14 +207,6 @@ public class MxTrainer implements Trainer {
         MxGradientCollector.setTraining(false);
         // this step is synchronized, should be done at end of batch
         trainingEvaluators.forEach(evaluator -> evaluator.update(labels, preds));
-        // TODO: this can be done during onBatch listener
-        addEvaluator("train", trainingLoss);
-        if (Float.isNaN(trainingLoss.getValue())) {
-            throw new TrainingDivergedException(
-                    "The Loss became NaN, try reduce learning rate,"
-                            + "add clipGradient option to your optimizer, check input data and loss calculation.");
-        }
-        trainingEvaluators.forEach(evaluator -> addEvaluator("train", evaluator));
         // turn gradient recording back on
         MxGradientCollector.setRecording(true);
         MxGradientCollector.setTraining(true);
@@ -223,7 +214,6 @@ public class MxTrainer implements Trainer {
 
     private void updateValidationMetrics(NDList labels, NDList preds) {
         validateEvaluators.forEach(evaluator -> evaluator.update(labels, preds));
-        validateEvaluators.forEach(evaluator -> addEvaluator("validate", evaluator));
     }
 
     /** {@inheritDoc} */
@@ -360,12 +350,6 @@ public class MxTrainer implements Trainer {
     private void addMetric(String metricName, long begin) {
         if (metrics != null && begin > 0L) {
             metrics.addMetric(metricName, System.nanoTime() - begin);
-        }
-    }
-
-    private void addEvaluator(String stage, Evaluator evaluator) {
-        if (metrics != null) {
-            metrics.addMetric(stage + '_' + evaluator.getName(), evaluator.getValue());
         }
     }
 }

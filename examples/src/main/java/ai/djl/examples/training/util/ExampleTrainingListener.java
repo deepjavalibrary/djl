@@ -14,6 +14,7 @@ package ai.djl.examples.training.util;
 
 import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.TrainingDivergedException;
 import ai.djl.engine.Engine;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.metric.Metrics;
@@ -70,6 +71,18 @@ public class ExampleTrainingListener implements TrainingListener {
     public void onTrainingBatch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
         MemoryUtils.collectMemoryInfo(metrics);
+
+        Loss trainingLoss = trainer.getLoss();
+        if (Float.isNaN(trainingLoss.getValue())) {
+            throw new TrainingDivergedException(
+                    "The Loss became NaN, try reduce learning rate,"
+                            + "add clipGradient option to your optimizer, check input data and loss calculation.");
+        }
+
+        for (Evaluator evaluator : trainer.getTrainingEvaluators()) {
+            metrics.addMetric("train_" + evaluator.getName(), evaluator.getValue());
+        }
+
         if (trainingProgressBar == null) {
             trainingProgressBar = new ProgressBar("Training", trainDataSize);
         }
@@ -81,6 +94,11 @@ public class ExampleTrainingListener implements TrainingListener {
     public void onValidationBatch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
         MemoryUtils.collectMemoryInfo(metrics);
+
+        for (Evaluator evaluator : trainer.getValidationEvaluators()) {
+            metrics.addMetric("validate_" + evaluator.getName(), evaluator.getValue());
+        }
+
         if (validateProgressBar == null) {
             validateProgressBar = new ProgressBar("Validating", validateDataSize);
         }
