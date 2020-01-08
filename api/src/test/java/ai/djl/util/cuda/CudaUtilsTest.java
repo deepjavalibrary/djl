@@ -30,8 +30,10 @@ public class CudaUtilsTest {
         if (!CudaUtils.hasCuda()) {
             return;
         }
-
-        Assert.assertTrue(CudaUtils.getGpuCount() > 0, "GPU count should greater than 0.");
+        // Possible to have CUDA and not have a GPU.
+        if (CudaUtils.getGpuCount() == 0) {
+            return;
+        }
 
         int cudaVersion = CudaUtils.getCudaVersion();
         String smVersion = CudaUtils.getComputeCapability(0);
