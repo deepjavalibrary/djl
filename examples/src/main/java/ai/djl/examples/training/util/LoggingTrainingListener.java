@@ -13,10 +13,7 @@
 package ai.djl.examples.training.util;
 
 import ai.djl.Device;
-import ai.djl.Model;
-import ai.djl.TrainingDivergedException;
 import ai.djl.engine.Engine;
-import ai.djl.examples.util.MemoryUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingListener;
@@ -28,9 +25,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class ExampleTrainingListener implements TrainingListener {
+public class LoggingTrainingListener implements TrainingListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExampleTrainingListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoggingTrainingListener.class);
 
     private int batchSize;
     private int trainDataSize;
@@ -38,77 +35,63 @@ public final class ExampleTrainingListener implements TrainingListener {
     private int trainingProgress;
     private int validateProgress;
 
-    private long epochTime;
     private int numEpochs;
-    private String outputDir;
 
     private ProgressBar trainingProgressBar;
     private ProgressBar validateProgressBar;
 
-    private ExampleTrainingListener(
-            int batchSize, int trainDataSize, int validateDataSize, String outputDir) {
+    public LoggingTrainingListener(int batchSize, int trainDataSize, int validateDataSize) {
         this.batchSize = batchSize;
         this.trainDataSize = trainDataSize;
         this.validateDataSize = validateDataSize;
-        this.outputDir = outputDir;
     }
 
-    public static TrainingListener[] exampleListeners(
-            int batchSize, int trainDataSize, int validateDataSize, String outputDir) {
-        return new TrainingListener[] {
-            new ExampleTrainingListener(batchSize, trainDataSize, validateDataSize, outputDir)
-        };
-    }
-
-    /** {@inheritDoc} */
     @Override
     public void onEpoch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
-        if (epochTime > 0L) {
-            metrics.addMetric("epoch", System.nanoTime() - epochTime);
-        }
+        Loss loss = trainer.getLoss();
         logger.info("Epoch " + numEpochs + " finished.");
-        printTrainingStatus(trainer);
 
-        epochTime = System.nanoTime();
+        logger.info(
+                "Train: "
+                        + getEvaluatorsStatus(metrics, trainer.getTrainingEvaluators(), "train_"));
+        if (metrics.hasMetric("validate_" + loss.getName())) {
+            logger.info(
+                    "Validate: "
+                            + getEvaluatorsStatus(
+                                    metrics, trainer.getValidationEvaluators(), "validate_"));
+        } else {
+            logger.info("validation has not been run.");
+        }
+
         numEpochs++;
         trainingProgress = 0;
         validateProgress = 0;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void onTrainingBatch(Trainer trainer) {
-        Metrics metrics = trainer.getMetrics();
-        MemoryUtils.collectMemoryInfo(metrics);
-
-        Loss trainingLoss = trainer.getLoss();
-        if (Float.isNaN(trainingLoss.getValue())) {
-            throw new TrainingDivergedException(
-                    "The Loss became NaN, try reduce learning rate,"
-                            + "add clipGradient option to your optimizer, check input data and loss calculation.");
-        }
-
-        for (Evaluator evaluator : trainer.getTrainingEvaluators()) {
-            metrics.addMetric("train_" + evaluator.getName(), evaluator.getValue());
-        }
-
         if (trainingProgressBar == null) {
             trainingProgressBar = new ProgressBar("Training", trainDataSize);
         }
         trainingProgressBar.update(trainingProgress++, getTrainingStatus(trainer));
     }
 
-    /** {@inheritDoc} */
+    private String getTrainingStatus(Trainer trainer) {
+        Metrics metrics = trainer.getMetrics();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(getEvaluatorsStatus(metrics, trainer.getTrainingEvaluators(), "train_"));
+
+        if (metrics.hasMetric("train")) {
+            float batchTime = metrics.latestMetric("train").getValue().longValue() / 1_000_000_000f;
+            sb.append(String.format(", speed: %.2f images/sec", (float) batchSize / batchTime));
+        }
+        return sb.toString();
+    }
+
     @Override
     public void onValidationBatch(Trainer trainer) {
-        Metrics metrics = trainer.getMetrics();
-        MemoryUtils.collectMemoryInfo(metrics);
-
-        for (Evaluator evaluator : trainer.getValidationEvaluators()) {
-            metrics.addMetric("validate_" + evaluator.getName(), evaluator.getValue());
-        }
-
         if (validateProgressBar == null) {
             validateProgressBar = new ProgressBar("Validating", validateDataSize);
         }
@@ -127,15 +110,15 @@ public final class ExampleTrainingListener implements TrainingListener {
         logger.info("Running {} on: {}.", getClass().getSimpleName(), devicesMsg);
 
         long init = System.nanoTime();
+        String engineName = Engine.getInstance().getEngineName();
         String version = Engine.getInstance().getVersion();
         long loaded = System.nanoTime();
         logger.info(
                 String.format(
-                        "Load library %s in %.3f ms.", version, (loaded - init) / 1_000_000f));
-        epochTime = System.nanoTime();
+                        "Load %s Engine Version %s in %.3f ms.",
+                        engineName, version, (loaded - init) / 1_000_000f));
     }
 
-    /** {@inheritDoc} */
     @Override
     public void onTrainingEnd(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
@@ -168,56 +151,9 @@ public final class ExampleTrainingListener implements TrainingListener {
         p50 = metrics.percentile("epoch", 50).getValue().longValue() / 1_000_000_000f;
         p90 = metrics.percentile("epoch", 90).getValue().longValue() / 1_000_000_000f;
         logger.info(String.format("epoch P50: %.3f s, P90: %.3f s", p50, p90));
-
-        if (outputDir != null) {
-            MemoryUtils.dumpMemoryInfo(metrics, outputDir);
-            TrainingUtils.dumpTrainingTimeInfo(metrics, outputDir);
-        }
-
-        recordPerformance(trainer);
     }
 
-    public void recordPerformance(Trainer trainer) {
-        // TODO: Add more property into model: Throughput, Memory, mAP, Dataset etc.
-        Model model = trainer.getModel();
-        Metrics metrics = trainer.getMetrics();
-        model.setProperty("Epoch", Integer.toString(numEpochs));
-        for (Evaluator evaluator : trainer.getValidationEvaluators()) {
-            float value =
-                    metrics.latestMetric("validate_" + evaluator.getName()).getValue().floatValue();
-            model.setProperty(evaluator.getName(), String.format("%.5f", value));
-        }
-    }
-
-    public String getTrainingStatus(Trainer trainer) {
-        Metrics metrics = trainer.getMetrics();
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(metricsOutput(metrics, trainer.getTrainingEvaluators(), "train_"));
-
-        if (metrics.hasMetric("train")) {
-            float batchTime = metrics.latestMetric("train").getValue().longValue() / 1_000_000_000f;
-            sb.append(String.format(", speed: %.2f images/sec", (float) batchSize / batchTime));
-        }
-        return sb.toString();
-    }
-
-    public void printTrainingStatus(Trainer trainer) {
-        Metrics metrics = trainer.getMetrics();
-        Loss loss = trainer.getLoss();
-
-        logger.info("Train: " + metricsOutput(metrics, trainer.getTrainingEvaluators(), "train_"));
-        if (metrics.hasMetric("validate_" + loss.getName())) {
-            logger.info(
-                    "Validate: "
-                            + metricsOutput(
-                                    metrics, trainer.getValidationEvaluators(), "validate_"));
-        } else {
-            logger.info("validation has not been run.");
-        }
-    }
-
-    private String metricsOutput(Metrics metrics, List<Evaluator> toOutput, String prefix) {
+    private String getEvaluatorsStatus(Metrics metrics, List<Evaluator> toOutput, String prefix) {
         List<String> metricOutputs = new ArrayList<>();
         for (Evaluator evaluator : toOutput) {
             float value =

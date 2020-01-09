@@ -19,7 +19,7 @@ import ai.djl.basicdataset.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingListener;
+import ai.djl.examples.training.util.ExampleTrainingListeners;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
@@ -74,7 +74,7 @@ public final class TrainResnetWithCifar10 {
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
-                    ExampleTrainingListener.exampleListeners(
+                    ExampleTrainingListeners.exampleListeners(
                             arguments.getBatchSize(),
                             (int) trainDataset.getNumIterations(),
                             (int) validationDataset.getNumIterations(),

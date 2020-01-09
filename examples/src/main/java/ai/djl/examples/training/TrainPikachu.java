@@ -18,7 +18,7 @@ import ai.djl.Model;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingListener;
+import ai.djl.examples.training.util.ExampleTrainingListeners;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.inference.Predictor;
@@ -77,7 +77,7 @@ public final class TrainPikachu {
 
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
-                    ExampleTrainingListener.exampleListeners(
+                    ExampleTrainingListeners.exampleListeners(
                             arguments.getBatchSize(),
                             (int) pikachuDetectionTrain.getNumIterations(),
                             (int) pikachuDetectionTest.getNumIterations(),

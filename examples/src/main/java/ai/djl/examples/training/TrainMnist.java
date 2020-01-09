@@ -17,7 +17,7 @@ import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
 import ai.djl.basicmodelzoo.cv.classification.Mlp;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingListener;
+import ai.djl.examples.training.util.ExampleTrainingListeners;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
@@ -62,7 +62,7 @@ public final class TrainMnist {
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
-                    ExampleTrainingListener.exampleListeners(
+                    ExampleTrainingListeners.exampleListeners(
                             arguments.getBatchSize(),
                             (int) trainingSet.getNumIterations(),
                             (int) validateSet.getNumIterations(),
