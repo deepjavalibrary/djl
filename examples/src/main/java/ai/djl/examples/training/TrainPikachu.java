@@ -59,11 +59,14 @@ import org.apache.commons.cli.ParseException;
 
 public final class TrainPikachu {
 
+    private TrainPikachu() {}
+
     public static void main(String[] args) throws IOException, ParseException {
-        new TrainPikachu().runExample(args);
+        TrainPikachu.runExample(args);
     }
 
-    public ExampleTrainingResult runExample(String[] args) throws IOException, ParseException {
+    public static ExampleTrainingResult runExample(String[] args)
+            throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
 
         try (Model model = Model.newInstance()) {
@@ -101,7 +104,7 @@ public final class TrainPikachu {
         }
     }
 
-    public int predict(String outputDir, String imageFile)
+    public static int predict(String outputDir, String imageFile)
             throws IOException, MalformedModelException, TranslateException {
         try (Model model = Model.newInstance()) {
             float detectionThreshold = 0.6f;
@@ -134,7 +137,7 @@ public final class TrainPikachu {
         }
     }
 
-    private RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
+    private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
             throws IOException {
         Pipeline pipeline = new Pipeline(new ToTensor());
         PikachuDetection pikachuDetection =
@@ -149,7 +152,7 @@ public final class TrainPikachu {
         return pikachuDetection;
     }
 
-    private DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+    private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);

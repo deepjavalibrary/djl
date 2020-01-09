@@ -37,11 +37,14 @@ import org.apache.commons.cli.ParseException;
 
 public final class TrainMnist {
 
+    private TrainMnist() {}
+
     public static void main(String[] args) throws IOException, ParseException {
-        new TrainMnist().runExample(args);
+        TrainMnist.runExample(args);
     }
 
-    public ExampleTrainingResult runExample(String[] args) throws IOException, ParseException {
+    public static ExampleTrainingResult runExample(String[] args)
+            throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
 
         // Construct neural network
@@ -93,7 +96,7 @@ public final class TrainMnist {
         }
     }
 
-    private DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+    private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         int batchSize = arguments.getBatchSize();
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
@@ -101,7 +104,7 @@ public final class TrainMnist {
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
-    private RandomAccessDataset getDataset(
+    private static RandomAccessDataset getDataset(
             NDManager manager, Dataset.Usage usage, Arguments arguments) throws IOException {
         int batchSize = arguments.getBatchSize();
         long maxIterations = arguments.getMaxIterations();

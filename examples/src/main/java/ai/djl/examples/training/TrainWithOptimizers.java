@@ -62,12 +62,14 @@ import org.apache.commons.cli.ParseException;
 /** This example features sample usage of a variety of optimizers to train Cifar10. */
 public final class TrainWithOptimizers {
 
+    private TrainWithOptimizers() {}
+
     public static void main(String[] args)
             throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
-        new TrainWithOptimizers().runExample(args);
+        TrainWithOptimizers.runExample(args);
     }
 
-    public ExampleTrainingResult runExample(String[] args)
+    public static ExampleTrainingResult runExample(String[] args)
             throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
         Options options = OptimizerArguments.getOptions();
         DefaultParser parser = new DefaultParser();
@@ -117,7 +119,7 @@ public final class TrainWithOptimizers {
         }
     }
 
-    private Model getModel(Arguments arguments)
+    private static Model getModel(Arguments arguments)
             throws IOException, ModelNotFoundException, MalformedModelException {
         boolean isSymbolic = arguments.isSymbolic();
         boolean preTrained = arguments.isPreTrained();
@@ -167,7 +169,7 @@ public final class TrainWithOptimizers {
         }
     }
 
-    private DefaultTrainingConfig setupTrainingConfig(OptimizerArguments arguments) {
+    private static DefaultTrainingConfig setupTrainingConfig(OptimizerArguments arguments) {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
@@ -179,7 +181,7 @@ public final class TrainWithOptimizers {
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
-    private Optimizer setupOptimizer(OptimizerArguments arguments) {
+    private static Optimizer setupOptimizer(OptimizerArguments arguments) {
         String optimizerName = arguments.getOptimizer();
         int batchSize = arguments.getBatchSize();
         switch (optimizerName) {
@@ -212,7 +214,7 @@ public final class TrainWithOptimizers {
         }
     }
 
-    private RandomAccessDataset getDataset(
+    private static RandomAccessDataset getDataset(
             NDManager manager, Dataset.Usage usage, Arguments arguments) throws IOException {
         Pipeline pipeline =
                 new Pipeline(

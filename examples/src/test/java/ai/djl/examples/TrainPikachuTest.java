@@ -47,8 +47,7 @@ public class TrainPikachuTest {
             args = new String[] {"-e", "1", "-m", "1", "-b", "32"};
         }
         // test train
-        TrainPikachu trainPikachu = new TrainPikachu();
-        ExampleTrainingResult result = trainPikachu.runExample(args);
+        ExampleTrainingResult result = TrainPikachu.runExample(args);
 
         if (expectedLoss > 0) {
             Assert.assertTrue(result.getEvaluation("SingleShotDetectionLoss") < expectedLoss);
@@ -57,7 +56,7 @@ public class TrainPikachuTest {
         JnaUtils.waitAll();
         // test predict
         int numberOfPikachus =
-                new TrainPikachu().predict("build/model", "src/test/resources/pikachu.jpg");
+                TrainPikachu.predict("build/model", "src/test/resources/pikachu.jpg");
         if (expectedMinNumber > 0) {
             Assert.assertTrue(numberOfPikachus >= expectedMinNumber);
             Assert.assertTrue(numberOfPikachus <= expectedMaxNumber);

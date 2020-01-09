@@ -53,12 +53,14 @@ import org.apache.commons.cli.ParseException;
 
 public final class TrainResnetWithCifar10 {
 
+    private TrainResnetWithCifar10() {}
+
     public static void main(String[] args)
             throws ParseException, ModelNotFoundException, IOException, MalformedModelException {
-        new TrainResnetWithCifar10().runExample(args);
+        TrainResnetWithCifar10.runExample(args);
     }
 
-    public ExampleTrainingResult runExample(String[] args)
+    public static ExampleTrainingResult runExample(String[] args)
             throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
         Arguments arguments = Arguments.parseArgs(args);
 
@@ -105,7 +107,7 @@ public final class TrainResnetWithCifar10 {
         }
     }
 
-    private Model getModel(Arguments arguments)
+    private static Model getModel(Arguments arguments)
             throws IOException, ModelNotFoundException, MalformedModelException {
         boolean isSymbolic = arguments.isSymbolic();
         boolean preTrained = arguments.isPreTrained();
@@ -155,7 +157,7 @@ public final class TrainResnetWithCifar10 {
         }
     }
 
-    private DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+    private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         Initializer initializer =
                 new XavierInitializer(
                         XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
@@ -166,7 +168,7 @@ public final class TrainResnetWithCifar10 {
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
-    private RandomAccessDataset getDataset(
+    private static RandomAccessDataset getDataset(
             NDManager manager, Dataset.Usage usage, Arguments arguments) throws IOException {
         Pipeline pipeline =
                 new Pipeline(

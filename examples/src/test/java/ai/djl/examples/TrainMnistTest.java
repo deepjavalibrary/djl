@@ -31,8 +31,7 @@ public class TrainMnistTest {
         if (Boolean.getBoolean("nightly")) {
             String[] args = new String[] {"-g", "1"};
 
-            TrainMnist test = new TrainMnist();
-            ExampleTrainingResult result = test.runExample(args);
+            ExampleTrainingResult result = TrainMnist.runExample(args);
             Assert.assertTrue(result.getEvaluation("Accuracy") > 0.9f);
             Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 0.35f);
 
@@ -43,8 +42,7 @@ public class TrainMnistTest {
         } else {
             String[] args = new String[] {"-g", "1", "-m", "2"};
 
-            TrainMnist test = new TrainMnist();
-            test.runExample(args);
+            TrainMnist.runExample(args);
         }
     }
 }
