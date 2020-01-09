@@ -10,23 +10,23 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples;
+package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.ActionRecognition;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ActionRecognitionTest {
+public class InstanceSegmentationTest {
 
     @Test
-    public void testActionRecognition() throws ModelException, TranslateException, IOException {
-        Classifications result = new ActionRecognition().predict();
+    public void testInstanceSegmentation() throws ModelException, TranslateException, IOException {
+        DetectedObjects result = InstanceSegmentation.predict();
         Classifications.Classification best = result.best();
-        Assert.assertEquals(best.getClassName(), "ThrowDiscus");
+        Assert.assertEquals(best.getClassName(), "bicycle");
         Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }
 }

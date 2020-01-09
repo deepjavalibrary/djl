@@ -29,16 +29,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ActionRecognition {
+public final class ActionRecognition {
 
     private static final Logger logger = LoggerFactory.getLogger(ActionRecognition.class);
 
+    private ActionRecognition() {}
+
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        Classifications classification = new ActionRecognition().predict();
+        Classifications classification = ActionRecognition.predict();
         logger.info("{}", classification);
     }
 
-    public Classifications predict() throws IOException, ModelException, TranslateException {
+    public static Classifications predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/action_discus_throw.png");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 

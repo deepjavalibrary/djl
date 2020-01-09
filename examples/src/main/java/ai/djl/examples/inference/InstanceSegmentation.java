@@ -33,16 +33,18 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InstanceSegmentation {
+public final class InstanceSegmentation {
 
     private static final Logger logger = LoggerFactory.getLogger(InstanceSegmentation.class);
 
+    private InstanceSegmentation() {}
+
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        DetectedObjects detection = new InstanceSegmentation().predict();
+        DetectedObjects detection = InstanceSegmentation.predict();
         logger.info("{}", detection);
     }
 
-    public DetectedObjects predict() throws IOException, ModelException, TranslateException {
+    public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/segmentation.jpg");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
@@ -53,20 +55,21 @@ public class InstanceSegmentation {
 
         try (ZooModel<BufferedImage, DetectedObjects> model =
                 MxModelZoo.MASK_RCNN.loadModel(criteria, new ProgressBar())) {
+
             try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
                 DetectedObjects detection = predictor.predict(img);
-                Path output = drawBoundingBox(img, detection);
-                logger.info("Segmentation result image has been saved in: {}", output);
+                saveBoundingBoxImage(img, detection);
                 return detection;
             }
         }
     }
 
-    private static Path drawBoundingBox(BufferedImage img, DetectedObjects detection)
+    private static void saveBoundingBoxImage(BufferedImage img, DetectedObjects detection)
             throws IOException {
-        Path dir = Paths.get("build/output");
-        Files.createDirectories(dir);
-        // Make copy with alpha channel
+        Path outputDir = Paths.get("build/output");
+        Files.createDirectories(outputDir);
+
+        // Make image copy with alpha channel because original image was jpg
         BufferedImage newImage =
                 new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = newImage.createGraphics();
@@ -74,8 +77,8 @@ public class InstanceSegmentation {
         g.dispose();
         ImageVisualization.drawBoundingBoxes(newImage, detection);
 
-        Path file = dir.resolve("instances.png");
-        ImageIO.write(newImage, "png", file.toFile());
-        return file;
+        Path imagePath = outputDir.resolve("instances.png");
+        ImageIO.write(newImage, "png", imagePath.toFile());
+        logger.info("Segmentation result image has been saved in: {}", imagePath);
     }
 }

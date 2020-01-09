@@ -10,11 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples;
+package ai.djl.examples.training;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.examples.training.TrainPikachu;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.translate.TranslateException;

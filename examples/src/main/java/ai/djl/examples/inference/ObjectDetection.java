@@ -22,6 +22,7 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.cuda.CudaUtils;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,14 +38,16 @@ public final class ObjectDetection {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectDetection.class);
 
+    private ObjectDetection() {}
+
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         logger.info("GPU count: " + CudaUtils.getGpuCount());
 
-        DetectedObjects detection = new ObjectDetection().predict();
+        DetectedObjects detection = ObjectDetection.predict();
         logger.info("{}", detection);
     }
 
-    public DetectedObjects predict() throws IOException, ModelException, TranslateException {
+    public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
@@ -56,25 +59,31 @@ public final class ObjectDetection {
 
         try (ZooModel<BufferedImage, DetectedObjects> model =
                 MxModelZoo.SSD.loadModel(criteria, new ProgressBar())) {
+
             try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
                 DetectedObjects detection = predictor.predict(img);
-                Path output = drawBoundingBox(img, detection);
-                logger.info("Detected objects image has been saved in: {}", output);
+                saveBoundingBoxImage(img, detection);
                 return detection;
             }
         }
     }
 
-    private static Path drawBoundingBox(BufferedImage img, DetectedObjects detection)
+    private static void saveBoundingBoxImage(BufferedImage img, DetectedObjects detection)
             throws IOException {
-        Path dir = Paths.get("build/output");
-        Files.createDirectories(dir);
+        Path outputDir = Paths.get("build/output");
+        Files.createDirectories(outputDir);
 
-        ImageVisualization.drawBoundingBoxes(img, detection);
+        // Make image copy with alpha channel because original image was jpg
+        BufferedImage newImage =
+                new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = newImage.createGraphics();
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+        ImageVisualization.drawBoundingBoxes(newImage, detection);
 
-        Path file = dir.resolve("detected-dog_bike_car.png");
+        Path imagePath = outputDir.resolve("detected-dog_bike_car.png");
         // OpenJDK can't save jpg with alpha channel
-        ImageIO.write(img, "png", file.toFile());
-        return file;
+        ImageIO.write(newImage, "png", imagePath.toFile());
+        logger.info("Detected objects image has been saved in: {}", imagePath);
     }
 }

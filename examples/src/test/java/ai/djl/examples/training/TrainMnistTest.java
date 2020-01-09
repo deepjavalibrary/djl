@@ -10,11 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples;
+package ai.djl.examples.training;
 
 import ai.djl.ModelException;
 import ai.djl.examples.inference.ImageClassification;
-import ai.djl.examples.training.TrainMnist;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.modality.Classifications;
 import ai.djl.translate.TranslateException;
@@ -35,7 +34,7 @@ public class TrainMnistTest {
             Assert.assertTrue(result.getEvaluation("Accuracy") > 0.9f);
             Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 0.35f);
 
-            Classifications classifications = new ImageClassification().predict();
+            Classifications classifications = ImageClassification.predict();
             Classifications.Classification best = classifications.best();
             Assert.assertEquals(best.getClassName(), "0");
             Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);

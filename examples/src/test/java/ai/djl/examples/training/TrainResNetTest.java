@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.examples;
+package ai.djl.examples.training;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;

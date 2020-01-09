@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains tests for the examples. */
-package ai.djl.examples;
+/** Contains tests for the training examples. */
+package ai.djl.examples.training;

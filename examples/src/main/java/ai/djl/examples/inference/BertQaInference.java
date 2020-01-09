@@ -36,12 +36,14 @@ public final class BertQaInference {
 
     private static final Logger logger = LoggerFactory.getLogger(BertQaInference.class);
 
+    private BertQaInference() {}
+
     public static void main(String[] args) throws IOException, TranslateException, ModelException {
-        String answer = new BertQaInference().predict();
+        String answer = BertQaInference.predict();
         logger.info("Answer: {}", answer);
     }
 
-    public String predict() throws IOException, TranslateException, ModelException {
+    public static String predict() throws IOException, TranslateException, ModelException {
         String question = "When did BBC Japan start broadcasting?";
         String paragraph =
                 "BBC Japan was a general entertainment Channel.\n"
@@ -58,6 +60,7 @@ public final class BertQaInference {
 
         try (ZooModel<QAInput, String> model =
                 MxModelZoo.BERT_QA.loadModel(criteria, new ProgressBar())) {
+
             try (Predictor<QAInput, String> predictor = model.newPredictor()) {
                 return predictor.predict(input);
             }

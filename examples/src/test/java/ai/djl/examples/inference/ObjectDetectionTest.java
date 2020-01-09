@@ -10,10 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples;
+package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.ObjectDetection;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.translate.TranslateException;
@@ -27,7 +26,7 @@ public class ObjectDetectionTest {
 
     @Test
     public void testObjectDetection() throws ModelException, TranslateException, IOException {
-        DetectedObjects result = new ObjectDetection().predict();
+        DetectedObjects result = ObjectDetection.predict();
         Assert.assertEquals(result.getNumberOfObjects(), 3);
         List<String> objects = Arrays.asList("dog", "bicycle", "car");
         for (Classifications.Classification obj : result.items()) {

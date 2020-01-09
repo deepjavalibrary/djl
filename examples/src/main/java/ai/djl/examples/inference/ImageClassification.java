@@ -39,12 +39,14 @@ public final class ImageClassification {
 
     private static final Logger logger = LoggerFactory.getLogger(ImageClassification.class);
 
+    private ImageClassification() {}
+
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        Classifications classifications = new ImageClassification().predict();
+        Classifications classifications = ImageClassification.predict();
         logger.info("{}", classifications);
     }
 
-    public Classifications predict() throws IOException, ModelException, TranslateException {
+    public static Classifications predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/0.png");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
@@ -56,6 +58,7 @@ public final class ImageClassification {
             model.load(modelDir, "mlp");
 
             Translator<BufferedImage, Classifications> translator = new MyTranslator();
+
             try (Predictor<BufferedImage, Classifications> predictor =
                     model.newPredictor(translator)) {
                 return predictor.predict(img);
