@@ -154,16 +154,16 @@ public interface NDArray extends AutoCloseable {
      * @param copy set {@code true} if you want to return a copy of the Existing {@code NDArray}
      * @return the result {@code NDArray} with the new {@link Device}
      */
-    NDArray asInDevice(Device device, boolean copy);
+    NDArray toDevice(Device device, boolean copy);
 
     /**
      * Converts this {@code NDArray} to a different {@link DataType}.
      *
-     * @param dtype the {@link DataType} to be set
+     * @param dataType the {@link DataType} to be set
      * @param copy set {@code true} if you want to return a copy of the Existing {@code NDArray}
      * @return the result {@code NDArray} with the new {@link DataType}
      */
-    NDArray asType(DataType dtype, boolean copy);
+    NDArray toType(DataType dataType, boolean copy);
 
     /**
      * Converts this {@code NDArray} into a 2-D {@link Matrix}.
@@ -171,7 +171,7 @@ public interface NDArray extends AutoCloseable {
      * @return this {@code NDArray} as {@link Matrix}
      * @throws IllegalStateException thrown if this {@code NDArray} is not a 2-D {@link Matrix}
      */
-    Matrix asMatrix();
+    Matrix toMatrix();
 
     /**
      * Attaches a gradient {@code NDArray} to this {@code NDArray} and marks it so {@link
@@ -582,16 +582,6 @@ public interface NDArray extends AutoCloseable {
      * @param array this {@code NDArray} prepared to be copied to
      */
     void copyTo(NDArray array);
-
-    /**
-     * Creates a new {@code NDArray} whose content is a copy of this {@code NDArray}'s content.
-     *
-     * @return the new {@code NDArray}
-     */
-    default NDArray slice() {
-        // TODO: MXNet doesn't support view, return a copy for now
-        return duplicate();
-    }
 
     /**
      * Returns a copy of this {@code NDArray}.
@@ -4136,7 +4126,7 @@ public interface NDArray extends AutoCloseable {
      */
     default NDArray all() {
         // result of sum operation is int64 now
-        return asType(DataType.BOOLEAN, false).sum().eq(size());
+        return toType(DataType.BOOLEAN, false).sum().eq(size());
     }
 
     /**
@@ -4160,7 +4150,7 @@ public interface NDArray extends AutoCloseable {
      *     {@code true}
      */
     default NDArray any() {
-        return asType(DataType.BOOLEAN, false).sum().gt(0);
+        return toType(DataType.BOOLEAN, false).sum().gt(0);
     }
 
     /**
@@ -4184,7 +4174,7 @@ public interface NDArray extends AutoCloseable {
      *     {@code true}
      */
     default NDArray none() {
-        return asType(DataType.BOOLEAN, false).sum().eq(0);
+        return toType(DataType.BOOLEAN, false).sum().eq(0);
     }
 
     /**
@@ -4202,7 +4192,7 @@ public interface NDArray extends AutoCloseable {
      * @return the number of non-zero values in this {@code NDArray}
      */
     default NDArray countNonzero() {
-        return asType(DataType.BOOLEAN, false).sum();
+        return toType(DataType.BOOLEAN, false).sum();
     }
 
     /**
@@ -4229,7 +4219,7 @@ public interface NDArray extends AutoCloseable {
      * @return the number of non-zero values in this {@code NDArray} along a given axis
      */
     default NDArray countNonzero(int axis) {
-        return asType(DataType.BOOLEAN, false).sum(new int[] {axis});
+        return toType(DataType.BOOLEAN, false).sum(new int[] {axis});
     }
 
     /**

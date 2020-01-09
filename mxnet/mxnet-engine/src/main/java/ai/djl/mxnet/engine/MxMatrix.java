@@ -348,19 +348,19 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asInDevice(Device dev, boolean copy) {
-        return array.asInDevice(dev, copy);
+    public NDArray toDevice(Device dev, boolean copy) {
+        return array.toDevice(dev, copy);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asType(DataType dtype, boolean copy) {
-        return array.asType(dtype, copy);
+    public NDArray toType(DataType dataType, boolean copy) {
+        return array.toType(dataType, copy);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Matrix asMatrix() {
+    public Matrix toMatrix() {
         return null;
     }
 

@@ -122,7 +122,7 @@ public abstract class Optimizer {
                             return map;
                         });
         return arrayMap.computeIfAbsent(
-                device, k -> ((NDArray) arrayMap.values().toArray()[0]).asInDevice(device, true));
+                device, k -> ((NDArray) arrayMap.values().toArray()[0]).toDevice(device, true));
     }
 
     /** The Builder to construct an {@link Optimizer}. */

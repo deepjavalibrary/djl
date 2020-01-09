@@ -176,33 +176,38 @@ public class MxNDArray extends NativeResource implements NDArray {
         manager = MxNDManager.getSystemManager();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDArray asInDevice(Device dev, boolean copy) {
-        if (dev.equals(getDevice()) && !copy) {
-            return slice();
-        }
-        MxNDArray nd = manager.create(getShape(), getDataType(), dev);
-        nd.name = name;
-        copyTo(nd);
-        return nd;
+    private NDArray duplicate(
+            NDManager manager, Shape shape, DataType dataType, Device device, String name) {
+        // TODO get copy parameter
+        NDArray array = manager.create(shape, dataType, device);
+        array.setName(name);
+        copyTo(array);
+        return array;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asType(DataType dtype, boolean copy) {
-        if (dtype.equals(getDataType()) && !copy) {
-            return slice();
+    public NDArray toDevice(Device device, boolean copy) {
+        if (device.equals(getDevice()) && !copy) {
+            return this;
         }
-        MxNDArray nd = manager.create(getShape(), dtype, getDevice());
-        nd.name = name;
-        copyTo(nd);
-        return nd;
+        // TODO support copy
+        return duplicate(getManager(), getShape(), getDataType(), device, getName());
     }
 
     /** {@inheritDoc} */
     @Override
-    public Matrix asMatrix() {
+    public NDArray toType(DataType dataType, boolean copy) {
+        if (dataType.equals(getDataType()) && !copy) {
+            return this;
+        }
+        // TODO support copy
+        return duplicate(getManager(), getShape(), dataType, getDevice(), getName());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Matrix toMatrix() {
         if (!shape.isMatrix()) {
             throw new IllegalStateException("NDArray is not a matrix");
         }
@@ -333,7 +338,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
             Stack<NDArray> prepareValue = new Stack<>();
             prepareValue.add(value);
-            prepareValue.add(prepareValue.peek().asInDevice(getDevice(), false));
+            prepareValue.add(prepareValue.peek().toDevice(getDevice(), false));
             // prepareValue.add(prepareValue.peek().asType(getDataType(), false));
             // Deal with the case target: (1, 10, 1), original (10)
             // try to find (10, 1) and reshape (10) to that
@@ -397,7 +402,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray get(NDIndex index) {
         if (index.getRank() == 0 && getShape().isScalar()) {
-            // TODO: return a slice once MXNet support it
+            // TODO: return a view once MXNet support it
             return duplicate();
         }
         // use booleanMask for NDIndexBooleans case
@@ -419,7 +424,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             // TODO cast the boolean NDArray back to int32 due to lack of support of slice op on
             // boolean NDArray
             NDArray thisArr =
-                    (getDataType() == DataType.BOOLEAN) ? asType(DataType.INT32, false) : this;
+                    (getDataType() == DataType.BOOLEAN) ? toType(DataType.INT32, false) : this;
             NDArray result = manager.invoke("_npi_slice", thisArr, params);
             if (!fullSlice.getToSqueeze().isEmpty()) {
                 NDArray oldResult = result;
@@ -431,7 +436,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             // TODO cast the boolean NDArray back to int32 due to lack of support of slice op on
             // boolean NDArray
             return (getDataType() == DataType.BOOLEAN)
-                    ? result.asType(DataType.BOOLEAN, false)
+                    ? result.toType(DataType.BOOLEAN, false)
                     : result;
         }
         throw new UnsupportedOperationException(
@@ -469,7 +474,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         try (NDArray reshaped = this.reshape(reshape);
-                NDArray reshapedIndex = index.asType(DataType.INT32, false).reshape(-1);
+                NDArray reshapedIndex = index.toType(DataType.INT32, false).reshape(-1);
                 NDArray result =
                         manager.invoke(
                                 "_npi_boolean_mask",
@@ -511,7 +516,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (getDataType() != other.getDataType()) {
             return false;
         }
-        try (NDArray result = eq(other).asType(DataType.INT32, false)) {
+        try (NDArray result = eq(other).toType(DataType.INT32, false)) {
             return result.all().getBoolean();
         }
     }
@@ -649,7 +654,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             throw new IllegalArgumentException("Default type is not allowed");
         }
         if (fmt == getSparseFormat()) {
-            return slice();
+            return duplicate();
         }
         return castStorage(fmt);
     }
@@ -1035,12 +1040,12 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
             DataType target = getDataType();
             if (!target.isFloating()) {
-                try (NDArray thisArr = asType(DataType.FLOAT32, false)) {
+                try (NDArray thisArr = toType(DataType.FLOAT32, false)) {
                     if (target == DataType.BOOLEAN) {
                         target = DataType.INT64;
                     }
                     try (NDArray array = manager.invoke("_np_sum", thisArr, null)) {
-                        return array.asType(target, false);
+                        return array.toType(target, false);
                     }
                 }
             }
@@ -1158,13 +1163,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray logicalAnd(NDArray other) {
         // TODO switch to numpy op, although current op support zero-dim, scalar
         NDArray thisArr =
-                (getDataType() == DataType.BOOLEAN) ? asType(DataType.INT32, false) : this;
+                (getDataType() == DataType.BOOLEAN) ? toType(DataType.INT32, false) : this;
         other =
                 (other.getDataType() == DataType.BOOLEAN)
-                        ? other.asType(DataType.INT32, false)
+                        ? other.toType(DataType.INT32, false)
                         : other;
         return manager.invoke("broadcast_logical_and", new NDArray[] {thisArr, other}, null)
-                .asType(DataType.BOOLEAN, false);
+                .toType(DataType.BOOLEAN, false);
     }
 
     /** {@inheritDoc} */
@@ -1172,13 +1177,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray logicalOr(NDArray other) {
         // TODO switch to numpy op, although current op support zero-dim, scalar
         NDArray thisArr =
-                (getDataType() == DataType.BOOLEAN) ? asType(DataType.INT32, false) : this;
+                (getDataType() == DataType.BOOLEAN) ? toType(DataType.INT32, false) : this;
         other =
                 (other.getDataType() == DataType.BOOLEAN)
-                        ? other.asType(DataType.INT32, false)
+                        ? other.toType(DataType.INT32, false)
                         : other;
         return manager.invoke("broadcast_logical_or", new NDArray[] {thisArr, other}, null)
-                .asType(DataType.BOOLEAN, false);
+                .toType(DataType.BOOLEAN, false);
     }
 
     /** {@inheritDoc} */
@@ -1186,13 +1191,13 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray logicalXor(NDArray other) {
         // TODO switch to numpy op, although current op support zero-dim, scalar
         NDArray thisArr =
-                (getDataType() == DataType.BOOLEAN) ? asType(DataType.INT32, false) : this;
+                (getDataType() == DataType.BOOLEAN) ? toType(DataType.INT32, false) : this;
         other =
                 (other.getDataType() == DataType.BOOLEAN)
-                        ? other.asType(DataType.INT32, false)
+                        ? other.toType(DataType.INT32, false)
                         : other;
         return manager.invoke("broadcast_logical_xor", new NDArray[] {thisArr, other}, null)
-                .asType(DataType.BOOLEAN, false);
+                .toType(DataType.BOOLEAN, false);
     }
 
     /** {@inheritDoc} */
@@ -1312,7 +1317,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray toDense() {
         if (!isSparse()) {
-            return slice();
+            return duplicate();
         }
         return castStorage(SparseFormat.DENSE);
     }
@@ -1536,7 +1541,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray nonzero() {
         NDArray thisArr =
-                (getDataType() == DataType.BOOLEAN) ? asType(DataType.INT32, false) : this;
+                (getDataType() == DataType.BOOLEAN) ? toType(DataType.INT32, false) : this;
         return manager.invoke("_npx_nonzero", thisArr, null);
     }
 

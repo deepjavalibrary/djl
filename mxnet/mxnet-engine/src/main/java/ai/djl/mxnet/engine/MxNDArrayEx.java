@@ -672,7 +672,7 @@ class MxNDArrayEx implements NDArrayEx {
         NDArray array2;
         condition =
                 (condition.getDataType() == DataType.BOOLEAN)
-                        ? condition.asType(DataType.INT32, false)
+                        ? condition.toType(DataType.INT32, false)
                         : condition;
         if (!array.shapeEquals(other)) {
             Shape res = deriveBroadcastedShape(array.getShape(), other.getShape());

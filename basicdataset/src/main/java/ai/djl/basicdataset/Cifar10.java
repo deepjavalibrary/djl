@@ -144,7 +144,7 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
             try (NDArray array =
                     manager.create(new Shape(length, DATA_AND_LABEL_SIZE), DataType.UINT8)) {
                 array.set(buf);
-                return array.asType(DataType.FLOAT32, true);
+                return array.toType(DataType.FLOAT32, false);
             }
         }
     }

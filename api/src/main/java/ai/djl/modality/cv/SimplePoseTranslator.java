@@ -58,9 +58,9 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
                         .gt(0.0)
                         // current boolean NDArray operator didn't support majority of ops
                         // need to cast to int
-                        .asType(DataType.UINT8, false)
+                        .toType(DataType.UINT8, false)
                         .tile(2, 2)
-                        .asType(DataType.BOOLEAN, false);
+                        .toType(DataType.BOOLEAN, false);
         float[] flattened = result.get(predMask).toFloatArray();
         float[] flattenedConfidence = maxValues.toFloatArray();
         List<Joint> joints = new ArrayList<>(numJoints);

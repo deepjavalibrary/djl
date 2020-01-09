@@ -44,7 +44,7 @@ public class DatasetUtilsTest {
 
                 Assert.assertEquals(
                         data.get(String.format("%d:%d", i * step, (i + 1) * step))
-                                .asInDevice(devices[i], true),
+                                .toDevice(devices[i], true),
                         array);
             }
         }
@@ -70,13 +70,13 @@ public class DatasetUtilsTest {
                 if (i == split.length - 1) {
                     Assert.assertEquals(
                             data.get(String.format("%d:%d", i * step, data.size(0)))
-                                    .asInDevice(devices[i], true),
+                                    .toDevice(devices[i], true),
                             array);
                     return;
                 }
                 Assert.assertEquals(
                         data.get(String.format("%d:%d", i * step, (i + 1) * step))
-                                .asInDevice(devices[i], true),
+                                .toDevice(devices[i], true),
                         array);
             }
         }
@@ -102,13 +102,13 @@ public class DatasetUtilsTest {
                 if (i == split.length - 1) {
                     Assert.assertEquals(
                             data.get(String.format("%d:%d", i * step, data.size(0)))
-                                    .asInDevice(devices[i], true),
+                                    .toDevice(devices[i], true),
                             array);
                     return;
                 }
                 Assert.assertEquals(
                         data.get(String.format("%d:%d", i * step, (i + 1) * step))
-                                .asInDevice(devices[i], true),
+                                .toDevice(devices[i], true),
                         array);
             }
         }

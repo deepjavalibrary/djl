@@ -65,7 +65,7 @@ public class NDArrayElementComparisonOpTest {
             Assert.assertEquals(result, expected, "Incorrect comparison for equal NDArray");
             array1 = manager.ones(new Shape(4, 5, 2));
             result = NDArrays.eq(array1, 1);
-            expected = manager.ones(new Shape(4, 5, 2)).asType(DataType.BOOLEAN, false);
+            expected = manager.ones(new Shape(4, 5, 2)).toType(DataType.BOOLEAN, false);
             Assert.assertEquals(result, expected);
 
             array1 = manager.create(new float[] {1f, 2f, 3f, 4f});
@@ -102,7 +102,7 @@ public class NDArrayElementComparisonOpTest {
                             new float[] {1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f}, new Shape(2, 5));
             array2 = manager.arange(10).add(1).reshape(2, 5);
             result = NDArrays.eq(array1, array2);
-            expected = manager.ones(new Shape(2, 5)).asType(DataType.BOOLEAN, false);
+            expected = manager.ones(new Shape(2, 5)).toType(DataType.BOOLEAN, false);
             Assert.assertEquals(result, expected);
             // test scalar
             array1 = manager.ones(new Shape(4)).mul(5);

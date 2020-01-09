@@ -162,7 +162,7 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
             }
         }
         NDList newNDList = new NDList(size());
-        forEach(a -> newNDList.add(a.asInDevice(device, copy)));
+        forEach(a -> newNDList.add(a.toDevice(device, copy)));
         return newNDList;
     }
 

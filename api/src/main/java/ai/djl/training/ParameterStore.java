@@ -119,7 +119,7 @@ public class ParameterStore {
                     if (i == index && array.getDevice().equals(dev)) {
                         arrays[i] = array;
                     } else {
-                        arrays[i] = array.asInDevice(dev, true);
+                        arrays[i] = array.toDevice(dev, true);
                         arrays[i].attach(manager);
                         arrays[i].attachGradient();
                     }
@@ -127,7 +127,7 @@ public class ParameterStore {
                 }
             } else {
                 if (copy || !array.getDevice().equals(device)) {
-                    array = array.asInDevice(device, true);
+                    array = array.toDevice(device, true);
                     array.attach(manager);
                     array.attachGradient();
                 }

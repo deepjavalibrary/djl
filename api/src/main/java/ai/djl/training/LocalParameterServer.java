@@ -55,7 +55,7 @@ public class LocalParameterServer implements ParameterServer {
         Device firstDevice = grads[0].getDevice();
         // reduce gradient from all devices to first device
         for (int i = 1; i < grads.length; i++) {
-            try (NDArray gradCopy = grads[i].asInDevice(firstDevice, true)) {
+            try (NDArray gradCopy = grads[i].toDevice(firstDevice, true)) {
                 grads[0].addi(gradCopy);
             }
         }
@@ -64,7 +64,7 @@ public class LocalParameterServer implements ParameterServer {
             if (weight.getDevice().equals(firstDevice)) {
                 optimizer.update(parameterId, weight, grads[0]);
             } else {
-                try (NDArray gradSumCopy = grads[0].asInDevice(weight.getDevice(), true)) {
+                try (NDArray gradSumCopy = grads[0].toDevice(weight.getDevice(), true)) {
                     optimizer.update(parameterId, weight, gradSumCopy);
                 }
             }

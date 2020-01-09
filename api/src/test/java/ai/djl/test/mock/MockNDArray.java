@@ -115,19 +115,19 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asInDevice(Device device, boolean copy) {
+    public NDArray toDevice(Device device, boolean copy) {
         return this;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asType(DataType dtype, boolean copy) {
+    public NDArray toType(DataType dataType, boolean copy) {
         return this;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Matrix asMatrix() {
+    public Matrix toMatrix() {
         return null;
     }
 

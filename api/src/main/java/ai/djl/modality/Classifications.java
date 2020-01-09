@@ -50,7 +50,7 @@ public class Classifications {
      */
     public Classifications(List<String> classNames, NDArray probabilities) {
         this.classNames = classNames;
-        NDArray array = probabilities.asType(DataType.FLOAT64, false);
+        NDArray array = probabilities.toType(DataType.FLOAT64, false);
         this.probabilities =
                 Arrays.stream(array.toDoubleArray()).boxed().collect(Collectors.toList());
         array.close();

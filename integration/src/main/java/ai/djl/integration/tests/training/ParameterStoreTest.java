@@ -62,8 +62,8 @@ public class ParameterStoreTest {
                     } else {
                         device = Device.cpu(j);
                     }
-                    weights[i][j] = w.asInDevice(device, true);
-                    grads[i][j] = g.asInDevice(device, true);
+                    weights[i][j] = w.toDevice(device, true);
+                    grads[i][j] = g.toDevice(device, true);
                 }
             }
 

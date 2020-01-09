@@ -54,8 +54,8 @@ public class NDArrayCreationOpTest {
             // test boolean
             array = manager.create(new boolean[] {true, false, true, false}, new Shape(2, 2));
             expected = manager.create(new int[] {1, 0, 1, 0}, new Shape(2, 2));
-            Assert.assertEquals(array.asType(DataType.INT32, false), expected);
-            Assert.assertEquals(array, expected.asType(DataType.BOOLEAN, false));
+            Assert.assertEquals(array.toType(DataType.INT32, false), expected);
+            Assert.assertEquals(array, expected.toType(DataType.BOOLEAN, false));
         }
     }
 

@@ -135,7 +135,7 @@ public class NDArrayLogicalOpTest {
             Assert.assertEquals(NDArrays.logicalXor(array1, array2), expected);
             array1 = manager.arange(10);
             array2 = manager.arange(10);
-            expected = manager.zeros(new Shape(10)).asType(DataType.BOOLEAN, false);
+            expected = manager.zeros(new Shape(10)).toType(DataType.BOOLEAN, false);
             Assert.assertEquals(array1.logicalXor(array2), expected);
             Assert.assertEquals(NDArrays.logicalXor(array1, array2), expected);
 
@@ -147,7 +147,7 @@ public class NDArrayLogicalOpTest {
             Assert.assertEquals(NDArrays.logicalXor(array1, array2), expected);
             array1 = manager.arange(-5, 5).reshape(2, 1, 5);
             array2 = manager.arange(5, -5, -1).reshape(2, 1, 5);
-            expected = manager.zeros(new Shape(2, 1, 5)).asType(DataType.BOOLEAN, false);
+            expected = manager.zeros(new Shape(2, 1, 5)).toType(DataType.BOOLEAN, false);
             Assert.assertEquals(array1.logicalXor(array2), expected);
             Assert.assertEquals(NDArrays.logicalXor(array1, array2), expected);
             // scalar
@@ -180,7 +180,7 @@ public class NDArrayLogicalOpTest {
             Assert.assertEquals(array.logicalNot(), expected);
             // test zero-dim
             array = manager.create(new Shape(0, 0, 1));
-            Assert.assertEquals(array.logicalNot(), array.asType(DataType.BOOLEAN, false));
+            Assert.assertEquals(array.logicalNot(), array.toType(DataType.BOOLEAN, false));
         }
     }
 }

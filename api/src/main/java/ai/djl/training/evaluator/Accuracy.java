@@ -81,8 +81,8 @@ public class Accuracy extends Evaluator {
         }
         // result of sum is int64 now
         long numCorrect =
-                labels.asType(DataType.INT64, false)
-                        .eq(predictionReduced.asType(DataType.INT64, false))
+                labels.toType(DataType.INT64, false)
+                        .eq(predictionReduced.toType(DataType.INT64, false))
                         .countNonzero()
                         .getLong();
         addCorrectInstances(numCorrect);
