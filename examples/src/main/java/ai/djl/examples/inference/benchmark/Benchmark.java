@@ -10,11 +10,11 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.benchmark;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.util.AbstractBenchmark;
-import ai.djl.examples.inference.util.Arguments;
+import ai.djl.examples.inference.benchmark.util.AbstractBenchmark;
+import ai.djl.examples.inference.benchmark.util.Arguments;
 import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;

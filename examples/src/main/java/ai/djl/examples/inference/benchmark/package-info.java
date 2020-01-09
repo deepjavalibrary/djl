@@ -11,5 +11,9 @@
  * and limitations under the License.
  */
 
-/** Contains utilities used for the inference examples. */
-package ai.djl.examples.inference.util;
+/**
+ * Contains inference benchmarking examples and code.
+ *
+ * <p>See the inference benchmarking utilities in {@link ai.djl.examples.inference.benchmark.util}.
+ */
+package ai.djl.examples.inference.benchmark;
