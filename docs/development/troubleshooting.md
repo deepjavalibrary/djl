@@ -54,9 +54,9 @@ docker build --build-arg version=<YOUR_VERSION>
 If you require features in MXNet not provided by DJL, please submit an [issue](https://github.com/awslabs/djl/issues).
 
 By default DJL is running on the [MXNet engine](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-engine).
-We use `mxnet-mkl` on CPU machines and `mxnet-cu101mkl` on GPU machines.
+We use `mxnet-mkl` on CPU machines and `mxnet-cu102mkl` on GPU machines.
 `mkl` means [Intel-MKLDNN](https://github.com/intel/mkl-dnn) is enabled.
-`cu101` means [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) version 10.1 is enabled.
+`cu102` means [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) version 10.2 is enabled.
 
 You don't need to download and install MXNet separately. It's automatically done when you
 build the DJL project by running the `./gradlew build` command. However, you still have the option to use other versions of MXNet or built your own customized version.

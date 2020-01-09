@@ -68,7 +68,7 @@
             -->
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-native-mkl</artifactId>
-            <version>1.6.0-b-SNAPSHOT</version>
+            <version>1.6.0-c-SNAPSHOT</version>
             <classifier>${classifier}</classifier>
             <!--
                 supported classifier:

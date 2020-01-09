@@ -36,7 +36,7 @@ Choose a native library based on your platform and needs:
 ### macOS
 For macOS, you can use the following library:
 
-- org.apache.mxnet:mxnet-native-mkl:1.6.0-b:osx-x86_64
+- org.apache.mxnet:mxnet-native-mkl:1.6.0-c:osx-x86_64
 
     This package takes advantage of the Intel MKL library to boost performance.
 ```xml
@@ -44,7 +44,7 @@ For macOS, you can use the following library:
       <groupId>org.apache.mxnet</groupId>
       <artifactId>mxnet-native-mkl</artifactId>
       <classifier>osx-x86_64</classifier>
-      <version>1.6.0-b</version>
+      <version>1.6.0-c</version>
       <scope>runtime</scope>
     </dependency>
 ```
@@ -53,15 +53,26 @@ For macOS, you can use the following library:
 For the Linux platform, you can choose between CPU, MKL, CUDA and CUDA+MKL combinations:
 
 CUDA with MKL:
-- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-b:linux-x86_64
-- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-b:linux-x86_64
+- org.apache.mxnet:mxnet-native-cu102mkl:1.6.0-c:linux-x86_64
+- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-c:linux-x86_64
+- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-c:linux-x86_64
+
+```xml
+    <dependency>
+      <groupId>org.apache.mxnet</groupId>
+      <artifactId>mxnet-native-cu102mkl</artifactId>
+      <classifier>linux-x86_64</classifier>
+      <version>1.6.0-c</version>
+      <scope>runtime</scope>
+    </dependency>
+```
 
 ```xml
     <dependency>
       <groupId>org.apache.mxnet</groupId>
       <artifactId>mxnet-native-cu101mkl</artifactId>
       <classifier>linux-x86_64</classifier>
-      <version>1.6.0-b</version>
+      <version>1.6.0-c</version>
       <scope>runtime</scope>
     </dependency>
 ```
@@ -71,13 +82,13 @@ CUDA with MKL:
       <groupId>org.apache.mxnet</groupId>
       <artifactId>mxnet-native-cu92mkl</artifactId>
       <classifier>linux-x86_64</classifier>
-      <version>1.6.0-b</version>
+      <version>1.6.0-c</version>
       <scope>runtime</scope>
     </dependency>
 ```
 
 CPU with MKL
-- org.apache.mxnet:mxnet-native-mkl:1.6.0-b:linux-x86_64
+- org.apache.mxnet:mxnet-native-mkl:1.6.0-c:linux-x86_64
 
 ```xml
     <dependency>
@@ -85,7 +96,7 @@ CPU with MKL
       <artifactId>mxnet-native-mkl</artifactId>
       <classifier>linux-x86_64</classifier>
       <scope>runtime</scope>
-      <version>1.6.0-b</version>
+      <version>1.6.0-c</version>
     </dependency>
 ```
 
@@ -94,17 +105,35 @@ CPU with MKL
 For the Windows platform, you can choose between CPU and GPU.
 
 CUDA with MKL:
-- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-b:win-x86_64
-- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-b:win-x86_64
+- org.apache.mxnet:mxnet-native-cu102mkl:1.6.0-c:win-x86_64
 
-    **Note:** The current MXNet native library for CUDA only supports the sm_37 and sm_70 architectures.
+    **Note:** The MXNet cu102mkl library only supports the sm_70 and sm_75 architectures.
+- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-c:win-x86_64
+
+    **Note:** The MXNet cu101mkl library only supports the sm_37 and sm_70 architectures.
+
+- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-c:win-x86_64
+
+    **Note:** The MXNet cu92mkl library only supports the sm_37 and sm_70 architectures.
+
+
+
+```xml
+    <dependency>
+      <groupId>org.apache.mxnet</groupId>
+      <artifactId>mxnet-native-cu102mkl</artifactId>
+      <classifier>win-x86_64</classifier>
+      <version>1.6.0-c</version>
+      <scope>runtime</scope>
+    </dependency>
+```
 
 ```xml
     <dependency>
       <groupId>org.apache.mxnet</groupId>
       <artifactId>mxnet-native-cu101mkl</artifactId>
       <classifier>win-x86_64</classifier>
-      <version>1.6.0-b</version>
+      <version>1.6.0-c</version>
       <scope>runtime</scope>
     </dependency>
 ```
@@ -114,13 +143,13 @@ CUDA with MKL:
       <groupId>org.apache.mxnet</groupId>
       <artifactId>mxnet-native-cu92mkl</artifactId>
       <classifier>win-x86_64</classifier>
-      <version>1.6.0-b</version>
+      <version>1.6.0-c</version>
       <scope>runtime</scope>
     </dependency>
 ```
 
 CPU with MKL
-- org.apache.mxnet:mxnet-native-mkl:1.6.0-b:win-x86_64
+- org.apache.mxnet:mxnet-native-mkl:1.6.0-c:win-x86_64
 
 ```xml
     <dependency>
@@ -128,6 +157,6 @@ CPU with MKL
       <artifactId>mxnet-native-mkl</artifactId>
       <classifier>win-x86_64</classifier>
       <scope>runtime</scope>
-      <version>1.6.0-b</version>
+      <version>1.6.0-c</version>
     </dependency>
 ```

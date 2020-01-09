@@ -49,7 +49,7 @@ import java.util.regex.Pattern
 def getMXNetNativeLib() {
     String osName = System.getProperty("os.name")
     if (osName.startsWith("Mac")) {
-        return "mxnet-native-mkl:1.6.0-b-SNAPSHOT:osx-x86_64"
+        return "mxnet-native-mkl:1.6.0-c-SNAPSHOT:osx-x86_64"
     }
 
     String osPrefix;
@@ -81,9 +81,9 @@ def getMXNetNativeLib() {
         } else {
             String nvccVersion = m.group(1)
             if (nvccVersion == "10.1") {
-                return "mxnet-native-cu101mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
+                return "mxnet-native-cu101mkl:1.6.0-c-SNAPSHOT:${osPrefix}-x86_64"
             } else if (nvccVersion == "9.2") {
-                return "mxnet-native-cu92mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
+                return "mxnet-native-cu92mkl:1.6.0-c-SNAPSHOT:${osPrefix}-x86_64"
             } else {
                 logger.log(LogLevel.WARN, "Unsupported cuda version: " + nvccVersion)
             }
@@ -92,5 +92,5 @@ def getMXNetNativeLib() {
         logger.debug("No cuda is detected");
     }
 
-    return "mxnet-native-mkl:1.6.0-b-SNAPSHOT:${osPrefix}-x86_64"
+    return "mxnet-native-mkl:1.6.0-c-SNAPSHOT:${osPrefix}-x86_64"
 }
