@@ -42,7 +42,14 @@ Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 
 ![FAQ2](https://djl-ai.s3.amazonaws.com/web-data/images/FAQ_log_recompile.png)
 
-## 3. How to run DJL using other versions of MXNet?
+## 3. Build fails on Windows caused by "UnsatisfiedLinkError"
+DJL requires Visual C++ Redistributable Packages. If you encounter UnsatisfiedLinkError while building DJL on Windows, please download and install [Visual C++ Redistributable Packages](https://www.microsoft.com/en-in/download/details.aspx?id=48145) and try to build again. 
+If the issue continues to persist, you can use the [docker file](../../docker/windows/Dockerfile) provided by us. Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other versions of Windows, you need to pass the version as an argument as follows:
+```
+docker build --build-arg version=<YOUR_VERSION>
+``` 
+
+## 4. How to run DJL using other versions of MXNet?
 **Note:** this is not officially supported by DJL, some functions may not work. 
 If you require features in MXNet not provided by DJL, please submit an [issue](https://github.com/awslabs/djl/issues).
 
