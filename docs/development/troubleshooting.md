@@ -23,7 +23,7 @@ mxnet -> mxnet-engine -> src -> main -> resources
 
 Then, right click the resources folder and select `Rebuild<default>`.
 
-![FAQ1](https://djl-ai.s3.amazonaws.com/web-data/images/FAQ_engine_not_found.png)
+![FAQ1](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_engine_not_found.png)
 
 
 ## 2. IntelliJ throws the `No Log4j 2 configuration file found.` exception.
@@ -40,7 +40,7 @@ examples -> src -> main -> resources -> log4j2.xml
 ```
 Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 
-![FAQ2](https://djl-ai.s3.amazonaws.com/web-data/images/FAQ_log_recompile.png)
+![FAQ2](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_log_recompile.png)
 
 ## 3. Build fails on Windows caused by "UnsatisfiedLinkError"
 DJL requires Visual C++ Redistributable Packages. If you encounter UnsatisfiedLinkError while building DJL on Windows, please download and install [Visual C++ Redistributable Packages](https://www.microsoft.com/en-in/download/details.aspx?id=48145) and try to build again. 
