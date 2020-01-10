@@ -34,7 +34,7 @@ import java.util.List;
  *
  * <ul>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/train_your_first_model.ipynb">Training
+ *       href="https://github.com/awslabs/djl/blob/master/jupyter/tutorial/train_your_first_model.ipynb">Training
  *       your first model</a>
  *   <li><a
  *       href="https://github.com/awslabs/djl/blob/master/jupyter/transfer_learning_on_cifar10.ipynb">Training

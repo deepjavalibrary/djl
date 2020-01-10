@@ -72,11 +72,7 @@ The following pseudocode demonstrates running training:
     }
 ```
 
-## Getting Started
-
-- [Quick start](docs/quick_start.md)
-- [Start with a PreTrained Object Detection Model](examples/docs/object_detection.md)
-- [Start with Jupyter Notebooks](jupyter/README.md)
+## [Getting Started](docs/quick_start.md)
 
 ## Resources
 - [Documentation](docs/README.md#documentation)

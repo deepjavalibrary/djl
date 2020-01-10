@@ -13,11 +13,9 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 ## [JavaDoc API Reference](https://javadoc.djl.ai/)
 
-## Jupyter notebook tutorials
+## [Jupyter notebook tutorials](../jupyter)
 
-- [Create your first neural network](../jupyter/create_your_first_network.ipynb)
-- [Train your first model](../jupyter/train_your_first_model.ipynb)
-- [Run image classification with your first model](../jupyter/image_classification_with_your_model.ipynb)
+- **[Beginner Jupyter Tutorial](../jupyter/tutorial)**
 - [Run object detection with model zoo](../jupyter/object_detection_with_model_zoo.ipynb)
 - [Load pre-trained MXNet model](../jupyter/load_mxnet_model.ipynb)
 - [Transfer learning example](../jupyter/transfer_learning_on_cifar10.ipynb)

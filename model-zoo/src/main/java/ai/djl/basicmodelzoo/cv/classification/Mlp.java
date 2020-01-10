@@ -43,7 +43,7 @@ public class Mlp extends SequentialBlock {
     public Mlp(int width, int height) {
         add(Blocks.batchFlattenBlock(width * (long) height))
                 .add(new Linear.Builder().setOutChannels(128).build())
-                .add(Activation.reluBlock())
+                .add(Activation::relu)
                 .add(new Linear.Builder().setOutChannels(64).build())
                 .add(Activation.reluBlock())
                 .add(new Linear.Builder().setOutChannels(10).build());

@@ -6,7 +6,7 @@ In this example, you learn how to train the MNIST dataset with Deep Java Library
 
 The source code for this example can be found at [TrainMnist.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainMnist.java).
 
-You can also use the [Jupyter notebook tutorial](../../jupyter/train_your_first_model.ipynb).
+You can also use the [Jupyter notebook tutorial](../../jupyter/tutorial/train_your_first_model.ipynb).
 The Jupyter notebook explains the key concepts in detail.
 
 ## Setup Guide

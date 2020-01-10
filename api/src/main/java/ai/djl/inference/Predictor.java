@@ -39,7 +39,7 @@ import java.util.List;
  *
  * <ul>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/image_classification_with_your_model.ipynb">Inference
+ *       href="https://github.com/awslabs/djl/blob/master/jupyter/tutorial/image_classification_with_your_model.ipynb">Inference
  *       with a custom trained model</a>
  *   <li><a
  *       href="https://github.com/awslabs/djl/blob/master/jupyter/object_detection_with_model_zoo.ipynb">Inference

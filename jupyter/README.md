@@ -4,11 +4,10 @@
 
 This folder contains tutorials that illustrate how to accomplish basic AI tasks with Deep Java Library (DJL).
 
-## List of tutorials
+## [Beginner Tutorial](tutorial)
 
-- [Create your first neural network](create_your_first_network.ipynb)
-- [Train your first model](train_your_first_model.ipynb)
-- [Run image classification with your first model](image_classification_with_your_model.ipynb)
+## More Tutorial Notebooks
+
 - [Run object detection with model zoo](object_detection_with_model_zoo.ipynb)
 - [Load pre-trained MXNet model](load_mxnet_model.ipynb)
 - [Transfer learning example](transfer_learning_on_cifar10.ipynb)
