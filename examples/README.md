@@ -63,9 +63,10 @@ DJL is engine agnostic, so it's capable of supporting different backends. Only
 the MXNet engine backend implementation is currently supported.
 
 With MXNet, you can choose different versions of the native MXNet library.
-The supplied examples use `mxnet-native-mkl`. You may need to 
-change the MXNet library version for GPU support in [pom.xml](pom.xml) or [build.gradle](build.gradle).
+The supplied examples will automatically choose a proper MXNet native library for you when using gradle build. You may need to 
+manually change the MXNet library version for GPU support in [pom.xml](pom.xml) if you use maven.
 
 The following MXNet versions are available:
 * mxnet-native-mkl
-* mxnet-native-cu101mkl - Linux only
+* mxnet-native-cu92mkl
+* mxnet-native-cu101mkl

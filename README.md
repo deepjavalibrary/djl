@@ -74,12 +74,13 @@ The following pseudocode demonstrates running training:
 
 ## Getting Started
 
+- [Quick start](docs/quick_start.md)
 - [Start with a PreTrained Object Detection Model](examples/docs/object_detection.md)
 - [Start with Jupyter Notebooks](jupyter/README.md)
 
 ## Resources
 - [Documentation](docs/README.md#documentation)
-- [JavaDocs](https://javadoc.djl.ai/)
+- [JavaDoc API Reference](https://javadoc.djl.ai/)
 
 ## Release Notes
 * [0.2.1](https://github.com/awslabs/djl/releases/tag/v0.2.1) ([Code](https://github.com/awslabs/djl/tree/v0.2.1))
