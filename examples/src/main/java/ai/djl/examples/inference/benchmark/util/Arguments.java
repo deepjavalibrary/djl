@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 
 /** A class represents parsed command line arguments. */
@@ -34,7 +35,7 @@ public class Arguments {
     private String outputDir;
     private Map<String, String> criteria;
     private int duration;
-    private int iteration = 1;
+    private int iteration;
     private int threads;
 
     private boolean isImperative;
@@ -47,6 +48,7 @@ public class Arguments {
         if (cmd.hasOption("duration")) {
             duration = Integer.parseInt(cmd.getOptionValue("duration"));
         }
+        iteration = -1;
         if (cmd.hasOption("iteration")) {
             iteration = Integer.parseInt(cmd.getOptionValue("iteration"));
         }
@@ -85,20 +87,22 @@ public class Arguments {
                         .argName("IMAGE")
                         .desc("Image file.")
                         .build());
-        options.addOption(
-                Option.builder("d")
-                        .longOpt("duration")
-                        .hasArg()
-                        .argName("DURATION")
-                        .desc("Duration of the test in minutes.")
-                        .build());
-        options.addOption(
-                Option.builder("c")
-                        .longOpt("iteration")
-                        .hasArg()
-                        .argName("ITERATION")
-                        .desc("Number of total iterations.")
-                        .build());
+        options.addOptionGroup(
+                new OptionGroup()
+                        .addOption(
+                                Option.builder("d")
+                                        .longOpt("duration")
+                                        .hasArg()
+                                        .argName("DURATION")
+                                        .desc("Duration of the test in minutes.")
+                                        .build())
+                        .addOption(
+                                Option.builder("c")
+                                        .longOpt("iteration")
+                                        .hasArg()
+                                        .argName("ITERATION")
+                                        .desc("Number of total iterations.")
+                                        .build()));
         options.addOption(
                 Option.builder("t")
                         .longOpt("threads")
