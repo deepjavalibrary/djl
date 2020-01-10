@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * {@code AbstractCompositeLoss} is a {@link Loss} class that can combine other {@link Loss}es
@@ -48,6 +49,21 @@ public abstract class AbstractCompositeLoss extends Loss {
      */
     protected abstract Pair<NDList, NDList> inputForComponent(
             int componentIndex, NDList labels, NDList predictions);
+
+    /** {@inheritDoc} */
+    @Override
+    public Loss duplicate() {
+        List<Loss> dupComponents =
+                components.stream().map(Loss::duplicate).collect(Collectors.toList());
+        try {
+            AbstractCompositeLoss clone = (AbstractCompositeLoss) clone();
+            clone.components = dupComponents;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            // ignore
+            throw new AssertionError("Clone is not supported", e);
+        }
+    }
 
     /**
      * Returns the component losses that make up the composite loss.
