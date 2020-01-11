@@ -24,7 +24,6 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockList;
-import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2D;
@@ -266,15 +265,7 @@ public final class SingleShotDetection extends AbstractBlock {
                     .add(BatchNorm.builder().build())
                     .add(Activation::relu);
         }
-        sequentialBlock.add(
-                new LambdaBlock(
-                        arrays ->
-                                new NDList(
-                                        Pool.maxPool(
-                                                arrays.head(),
-                                                new Shape(2, 2),
-                                                new Shape(2, 2),
-                                                new Shape(0, 0)))));
+        sequentialBlock.add(Pool.maxPool2DBlock(new Shape(2, 2), new Shape(2, 2), new Shape(0, 0)));
         return sequentialBlock;
     }
 
@@ -429,10 +420,7 @@ public final class SingleShotDetection extends AbstractBlock {
                 }
             }
             if (globalPool) {
-                features.add(
-                        new LambdaBlock(
-                                arrays ->
-                                        new NDList(Pool.globalMaxPool(arrays.singletonOrThrow()))));
+                features.add(Pool.globalAvgPool2DBlock());
             }
             int numberOfFeatureMaps = features.size();
             if (sizes.size() != ratios.size() || sizes.size() != numberOfFeatureMaps) {

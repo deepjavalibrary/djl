@@ -12,129 +12,250 @@
  */
 package ai.djl.integration.tests.nn;
 
+import ai.djl.Model;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.pooling.Pool;
+import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PoolingOperationsTest {
+    TrainingConfig config =
+            new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
     @Test
-    public void testMaxPool() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original =
-                    manager.create(
-                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                            new Shape(1, 1, 4, 4));
-            NDArray result =
-                    Pool.maxPool(original, new Shape(2, 2), new Shape(1, 1), new Shape(0, 0));
-            NDArray expected =
-                    manager.create(
-                            new float[] {9, 9, 9, 11, 11, 9, 13, 11, 8}, new Shape(1, 1, 3, 3));
-            Assert.assertEquals(result, expected, "Max Pooling operation failed");
+    public void testMaxPool1D() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.maxPool1DBlock(new Shape(2)));
+            // Look for a max pool value 5
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2));
+                data.set(new NDIndex(1, 1, 1), 5);
+                NDArray expected = manager.ones(new Shape(2, 2, 1));
+                expected.set(new NDIndex(1, 1, 0), 5);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
+        }
+    }
+
+    @Test
+    public void testMaxPool2D() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.maxPool2DBlock(new Shape(2, 2)));
+            // Look for a max pool value 5
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2, 2));
+                data.set(new NDIndex(1, 1, 1, 1), 5);
+                NDArray expected = manager.ones(new Shape(2, 2, 1, 1));
+                expected.set(new NDIndex(1, 1, 0, 0), 5);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
+        }
+    }
+
+    @Test
+    public void testMaxPool3D() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.maxPool3DBlock(new Shape(2, 2, 2)));
+            // Look for a max pool value 5
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2, 2, 2));
+                data.set(new NDIndex(1, 1, 1, 1, 1), 5);
+                NDArray expected = manager.ones(new Shape(2, 2, 1, 1, 1));
+                expected.set(new NDIndex(1, 1, 0, 0, 0), 5);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
         }
     }
 
     @Test
     public void testGlobalMaxPool() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original =
-                    manager.create(
-                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                            new Shape(1, 1, 4, 4));
-            NDArray result = Pool.globalMaxPool(original);
-            NDArray expected = manager.create(new float[] {13}, new Shape(1, 1, 1, 1));
-            Assert.assertEquals(result, expected, "Global Max Pooling operation failed");
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.globalMaxPool1DBlock());
+            // Look for a max pool value 5
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2));
+                data.set(new NDIndex(1, 1, 1), 5);
+                NDArray expected = manager.ones(new Shape(2, 2, 1));
+                expected.set(new NDIndex(1, 1, 0), 5);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
         }
     }
 
     @Test
-    public void testSumPool() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original =
-                    manager.create(
-                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                            new Shape(1, 1, 4, 4));
-            NDArray result =
-                    Pool.sumPool(original, new Shape(2, 2), new Shape(1, 1), new Shape(0, 0));
-            NDArray expected =
-                    manager.create(
-                            new float[] {22, 24, 25, 21, 26, 23, 39, 31, 19},
-                            new Shape(1, 1, 3, 3));
-            Assert.assertEquals(result, expected, "Sum Pooling operation failed");
+    public void testAvgPool1D() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.avgPool1DBlock(new Shape(2)));
+            // Look for a average pool value 1.5
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2));
+                data.set(new NDIndex(1, 1, 1), 2);
+                NDArray expected = manager.ones(new Shape(2, 2, 1));
+                expected.set(new NDIndex(1, 1, 0), 1.5);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
         }
     }
 
     @Test
-    public void testGlobalSumPool() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original =
-                    manager.create(
-                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                            new Shape(1, 1, 4, 4));
-            NDArray result = Pool.globalSumPool(original);
-            NDArray expected = manager.create(new float[] {105}, new Shape(1, 1, 1, 1));
-            Assert.assertEquals(result, expected, "Global Sum Pooling operation failed");
+    public void testAvgPool2D() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.avgPool2DBlock(new Shape(2, 2)));
+            // Look for a average pool value 1.25
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2, 2));
+                data.set(new NDIndex(1, 1, 1, 1), 2);
+                NDArray expected = manager.ones(new Shape(2, 2, 1, 1));
+                expected.set(new NDIndex(1, 1, 0, 0), 1.25);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
         }
     }
 
     @Test
-    public void testAvgPool() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original =
-                    manager.create(
-                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                            new Shape(1, 1, 4, 4));
-            NDArray result =
-                    Pool.avgPool(original, new Shape(2, 2), new Shape(2, 2), new Shape(0, 0));
-            NDArray expected =
-                    manager.create(new float[] {5.5f, 6.25f, 9.75f, 4.75f}, new Shape(1, 1, 2, 2));
-            Assert.assertEquals(result, expected, "Avg Pooling operation failed");
+    public void testAvgPool3D() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.avgPool3DBlock(new Shape(2, 2, 2)));
+            // Look for a average pool value 1.125
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2, 2, 2));
+                data.set(new NDIndex(1, 1, 1, 1, 1), 2);
+                NDArray expected = manager.ones(new Shape(2, 2, 1, 1, 1));
+                expected.set(new NDIndex(1, 1, 0, 0, 0), 1.125);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
         }
     }
 
     @Test
     public void testGlobalAvgPool() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original =
-                    manager.create(
-                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                            new Shape(1, 1, 4, 4));
-            NDArray result = Pool.globalAvgPool(original);
-            NDArray expected = manager.create(new float[] {6.5625f}, new Shape(1, 1, 1, 1));
-            Assert.assertEquals(result, expected, "Global Avg Pooling operation failed");
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.globalAvgPool1DBlock());
+            // Look for a average pool value 1.5
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2));
+                data.set(new NDIndex(1, 1, 1), 2);
+                NDArray expected = manager.ones(new Shape(2, 2, 1));
+                expected.set(new NDIndex(1, 1, 0), 1.5);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
         }
     }
 
     @Test
-    public void testLpPool() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original =
-                    manager.create(
-                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                            new Shape(1, 1, 4, 4));
-            NDArray result =
-                    Pool.lpPool(original, new Shape(2, 2), new Shape(1, 1), new Shape(0, 0), 1);
-            NDArray expected =
-                    manager.create(
-                            new float[] {22, 24, 25, 21, 26, 23, 39, 31, 19},
-                            new Shape(1, 1, 3, 3));
-            Assert.assertEquals(result, expected, "Sum Pooling operation failed");
+    public void testLpPool1D() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.lpPool1DBlock(new Shape(2), 1));
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2));
+                data.set(new NDIndex(1, 1, 1), 2);
+                NDArray expected = manager.ones(new Shape(2, 2, 1));
+                expected.muli(2);
+                expected.set(new NDIndex(1, 1, 0), 3);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
+        }
+    }
+
+    @Test
+    public void testLpPool2D() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.lpPool2DBlock(new Shape(2, 2), 1));
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2, 2));
+                data.set(new NDIndex(1, 1, 1, 1), 2);
+                NDArray expected = manager.ones(new Shape(2, 2, 1, 1));
+                expected.muli(4);
+                expected.set(new NDIndex(1, 1, 0, 0), 5);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
+        }
+    }
+
+    @Test
+    public void testLpPool3D() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.lpPool3DBlock(new Shape(2, 2, 2), 1));
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2, 2, 2));
+                data.set(new NDIndex(1, 1, 1, 1, 1), 2);
+                NDArray expected = manager.ones(new Shape(2, 2, 1, 1, 1));
+                expected.muli(8);
+                expected.set(new NDIndex(1, 1, 0, 0, 0), 9);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
         }
     }
 
     @Test
     public void testGlobalLpPool() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original =
-                    manager.create(
-                            new float[] {9, 8, 3, 6, 1, 4, 9, 7, 5, 11, 2, 5, 13, 10, 8, 4},
-                            new Shape(1, 1, 4, 4));
-            NDArray result = Pool.globalLpPool(original, 1);
-            NDArray expected = manager.create(new float[] {105}, new Shape(1, 1, 1, 1));
-            Assert.assertEquals(result, expected, "Global Lp Pooling operation failed");
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Pool.globalLpPool1DBlock(1));
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(2, 2, 2));
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(new Shape(2, 2, 2));
+                data.set(new NDIndex(1, 1, 1), 2);
+                NDArray expected = manager.ones(new Shape(2, 2, 1));
+                expected.muli(2);
+                expected.set(new NDIndex(1, 1, 0), 3);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result, expected);
+            }
         }
     }
 }

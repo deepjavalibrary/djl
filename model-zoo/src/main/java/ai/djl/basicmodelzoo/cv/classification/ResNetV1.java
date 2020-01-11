@@ -17,7 +17,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
-import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2D;
@@ -195,15 +194,7 @@ public final class ResNetV1 {
                                     .optMomentum(builder.batchNormMomentum)
                                     .build())
                     .add(Activation.reluBlock())
-                    .add(
-                            new LambdaBlock(
-                                    arrays ->
-                                            new NDList(
-                                                    Pool.maxPool(
-                                                            arrays.singletonOrThrow(),
-                                                            new Shape(3, 3),
-                                                            new Shape(2, 2),
-                                                            new Shape(1, 1)))));
+                    .add(Pool.maxPool2DBlock(new Shape(3, 3), new Shape(2, 2), new Shape(1, 1)));
         }
         Shape resStride = new Shape(1, 1);
         for (int i = 0; i < numStages; i++) {
@@ -227,7 +218,7 @@ public final class ResNetV1 {
                 resStride = new Shape(2, 2);
             }
         }
-        return resNet.add(new LambdaBlock(arrays -> new NDList(Pool.globalAvgPool(arrays.head()))))
+        return resNet.add(Pool.globalAvgPool2DBlock())
                 .add(Blocks.batchFlattenBlock())
                 .add(Linear.builder().setOutChannels(builder.outSize).build())
                 .add(Blocks.batchFlattenBlock());
