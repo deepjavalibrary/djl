@@ -83,6 +83,12 @@ public class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public void setRandomSeed(int seed) {
+        JnaUtils.randomSeed(seed);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
         sb.append("Name: ")

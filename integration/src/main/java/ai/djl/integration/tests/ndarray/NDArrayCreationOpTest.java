@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.engine.Engine;
 import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -267,6 +268,40 @@ public class NDArrayCreationOpTest {
             array = manager.linspace(0, 10, 0);
             expected = manager.create(new Shape(0));
             Assert.assertEquals(array, expected);
+        }
+    }
+
+    @Test
+    public void testRandomGeneration() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray uniform = manager.randomUniform(0, 10, new Shape(1000, 1000));
+            Assert.assertTrue(uniform.min().getFloat() >= 0f);
+            Assert.assertTrue(uniform.max().getFloat() < 100f);
+            Assertions.assertAlmostEquals(uniform.mean().getFloat(), 5f, 1e-2f, 1e-2f);
+
+            NDArray normal = manager.randomNormal(new Shape(1000, 1000));
+            NDArray mean = normal.mean();
+            NDArray std = normal.sub(mean).pow(2).mean();
+            Assertions.assertAlmostEquals(normal.mean().getFloat(), 0f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(std.getFloat(), 1f, 2e-2f, 2e-2f);
+        }
+    }
+
+    @Test
+    public void testFixedSeed() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            int fixedSeed = 1234;
+            Engine.getInstance().setRandomSeed(fixedSeed);
+            NDArray expectedUniform = manager.randomUniform(-10, 10, new Shape(10, 10));
+            Engine.getInstance().setRandomSeed(fixedSeed);
+            NDArray actualUniform = manager.randomUniform(-10, 10, new Shape(10, 10));
+            Assertions.assertAlmostEquals(expectedUniform, actualUniform, 1e-2f, 1e-2f);
+
+            Engine.getInstance().setRandomSeed(fixedSeed);
+            NDArray expectedNormal = manager.randomNormal(new Shape(100, 100));
+            Engine.getInstance().setRandomSeed(fixedSeed);
+            NDArray actualNormal = manager.randomNormal(new Shape(100, 100));
+            Assertions.assertAlmostEquals(expectedNormal, actualNormal, 1e-2f, 1e-2f);
         }
     }
 }

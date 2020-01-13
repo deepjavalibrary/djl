@@ -244,10 +244,11 @@ public final class JnaUtils {
         return set;
     }
 
-    /* Need tests
     public static int randomSeed(int seed) {
         return LIB.MXRandomSeed(seed);
     }
+
+    /* Need tests
 
     public static int randomSeed(int seed, Device device) {
         int deviceType = DeviceType.toDeviceType(device);

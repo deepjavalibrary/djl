@@ -57,6 +57,10 @@ public class MockEngine extends Engine {
         return new MockNDManager();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void setRandomSeed(int seed) {}
+
     public void setVersion(String version) {
         this.version = version;
     }

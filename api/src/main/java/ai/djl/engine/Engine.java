@@ -146,4 +146,14 @@ public abstract class Engine {
      * @return a new top-level {@code NDManager}
      */
     public abstract NDManager newBaseManager(Device device);
+
+    /**
+     * Seeds the random number generator in DJL Engine.
+     *
+     * <p>This will affect all {@link Device}s and all operators using Engine's random number
+     * generator.
+     *
+     * @param seed the seed to be fixed in Engine
+     */
+    public abstract void setRandomSeed(int seed);
 }

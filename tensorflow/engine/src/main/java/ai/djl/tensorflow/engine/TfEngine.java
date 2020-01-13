@@ -64,4 +64,8 @@ public class TfEngine extends Engine {
     public NDManager newBaseManager(Device device) {
         return TfNDManager.newBaseManager(device);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setRandomSeed(int seed) {}
 }
