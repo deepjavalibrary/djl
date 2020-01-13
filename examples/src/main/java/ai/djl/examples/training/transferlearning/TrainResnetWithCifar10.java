@@ -40,8 +40,6 @@ import ai.djl.training.Trainer;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
-import ai.djl.training.initializer.Initializer;
-import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
@@ -158,11 +156,7 @@ public final class TrainResnetWithCifar10 {
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
-        Initializer initializer =
-                new XavierInitializer(
-                        XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                .optInitializer(initializer)
                 .addEvaluator(new Accuracy())
                 .setBatchSize(arguments.getBatchSize())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));

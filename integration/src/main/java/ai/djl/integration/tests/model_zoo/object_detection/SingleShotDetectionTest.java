@@ -37,8 +37,6 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.BoundingBoxError;
 import ai.djl.training.evaluator.SingleShotDetectionAccuracy;
-import ai.djl.training.initializer.Initializer;
-import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.SingleShotDetectionLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
@@ -121,11 +119,7 @@ public class SingleShotDetectionTest {
     }
 
     private TrainingConfig setupTrainingConfig() {
-        Initializer initializer =
-                new XavierInitializer(
-                        XavierInitializer.RandomType.UNIFORM, XavierInitializer.FactorType.AVG, 2);
         return new DefaultTrainingConfig(new SingleShotDetectionLoss())
-                .optInitializer(initializer)
                 .setBatchSize(32)
                 .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addEvaluator(new BoundingBoxError("boundingBoxError"))
