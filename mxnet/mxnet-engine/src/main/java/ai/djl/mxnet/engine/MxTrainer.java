@@ -116,6 +116,10 @@ public class MxTrainer implements Trainer {
     /** {@inheritDoc} */
     @Override
     public void trainBatch(Batch batch) {
+        if (manager.getEngine() != batch.getManager().getEngine()) {
+            throw new IllegalArgumentException(
+                    "The data must be on the same engine as the trainer. You may need to change one of your NDManagers.");
+        }
         Batch[] splits = batch.split(devices, false);
         try (GradientCollector collector = new MxGradientCollector()) {
             for (Batch split : splits) {
@@ -156,6 +160,10 @@ public class MxTrainer implements Trainer {
     /** {@inheritDoc} */
     @Override
     public void validateBatch(Batch batch) {
+        if (manager.getEngine() != batch.getManager().getEngine()) {
+            throw new IllegalArgumentException(
+                    "The data must be on the same engine as the trainer. You may need to change one of your NDManagers.");
+        }
         long begin = System.nanoTime();
         Batch[] splits = batch.split(devices, false);
         for (Batch split : splits) {

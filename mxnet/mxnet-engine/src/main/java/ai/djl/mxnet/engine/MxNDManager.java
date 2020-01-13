@@ -13,6 +13,7 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
+import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
@@ -394,6 +395,12 @@ public class MxNDManager implements NDManager {
      */
     public NDArray invoke(String operation, PairList<String, ?> params) {
         return invoke(operation, EMPTY, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Engine getEngine() {
+        return Engine.getEngine(MxEngine.ENGINE_NAME);
     }
 
     /** {@inheritDoc} */

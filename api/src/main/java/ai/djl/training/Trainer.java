@@ -74,6 +74,7 @@ public interface Trainer extends AutoCloseable {
      * Trains the model with one iteration of the given {@link Batch} of data.
      *
      * @param batch a {@link Batch} that contains data, and its respective labels
+     * @throws IllegalArgumentException if the batch engine does not match the trainer engine
      */
     void trainBatch(Batch batch);
 
@@ -92,6 +93,7 @@ public interface Trainer extends AutoCloseable {
      * and parameters aren't updated.
      *
      * @param batch a {@link Batch} of data
+     * @throws IllegalArgumentException if the batch engine does not match the trainer engine
      */
     void validateBatch(Batch batch);
 

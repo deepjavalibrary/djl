@@ -13,6 +13,7 @@
 package ai.djl.test.mock;
 
 import ai.djl.Device;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -147,6 +148,12 @@ public class MockNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Engine getEngine() {
         return null;
     }
 

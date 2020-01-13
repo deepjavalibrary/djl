@@ -13,6 +13,7 @@
 package ai.djl.tensorflow.engine;
 
 import ai.djl.Device;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -128,6 +129,11 @@ public class TfNDManager implements NDManager, AutoCloseable {
     @Override
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
         return null;
+    }
+
+    @Override
+    public Engine getEngine() {
+        return Engine.getEngine(TfEngine.ENGINE_NAME);
     }
 
     /** {@inheritDoc} */

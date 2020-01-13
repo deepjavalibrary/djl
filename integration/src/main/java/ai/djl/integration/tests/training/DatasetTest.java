@@ -274,7 +274,7 @@ public class DatasetTest {
 
             Cifar10 cifar10 =
                     new Cifar10.Builder()
-                            .setManager(manager)
+                            .optManager(manager)
                             .setSampling(100, true)
                             .optUsage(Dataset.Usage.TEST)
                             // you could start trying prefetchNumber with 2 * number of threads.

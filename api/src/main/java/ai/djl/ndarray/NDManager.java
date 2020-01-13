@@ -941,6 +941,13 @@ public interface NDManager extends AutoCloseable {
      */
     NDList invoke(String operation, NDList src, PairList<String, ?> params);
 
+    /**
+     * Returns the {@link Engine} associated with this manager.
+     *
+     * @return the {@link Engine} associated with this manager
+     */
+    Engine getEngine();
+
     /** {@inheritDoc} */
     @Override
     void close();

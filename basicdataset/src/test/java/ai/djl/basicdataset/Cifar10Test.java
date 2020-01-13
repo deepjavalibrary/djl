@@ -41,7 +41,7 @@ public class Cifar10Test {
             Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
             Cifar10 cifar10 =
                     new Cifar10.Builder()
-                            .setManager(model.getNDManager())
+                            .optManager(model.getNDManager())
                             .optUsage(Usage.TEST)
                             .optRepository(repository)
                             .setSampling(batchSize, true)
@@ -69,7 +69,7 @@ public class Cifar10Test {
 
             Cifar10 cifar10 =
                     new Cifar10.Builder()
-                            .setManager(model.getNDManager())
+                            .optManager(model.getNDManager())
                             .optUsage(Usage.TEST)
                             .setSampling(32, true)
                             .build();

@@ -27,6 +27,8 @@ import org.tensorflow.TensorFlow;
  */
 public class TfEngine extends Engine {
 
+    public static final String ENGINE_NAME = "Tensorflow";
+
     TfEngine() {}
 
     /** {@inheritDoc} */
@@ -38,7 +40,7 @@ public class TfEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getEngineName() {
-        return "Tensorflow";
+        return ENGINE_NAME;
     }
 
     /** {@inheritDoc} */

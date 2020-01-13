@@ -27,7 +27,6 @@ import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
@@ -76,10 +75,8 @@ public final class TrainWithOptimizers {
 
         try (Model model = getModel(arguments)) {
             // get training dataset
-            RandomAccessDataset trainDataset =
-                    getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
-            RandomAccessDataset validationDataset =
-                    getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
+            RandomAccessDataset trainDataset = getDataset(Dataset.Usage.TRAIN, arguments);
+            RandomAccessDataset validationDataset = getDataset(Dataset.Usage.TEST, arguments);
 
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
@@ -208,8 +205,8 @@ public final class TrainWithOptimizers {
         }
     }
 
-    private static RandomAccessDataset getDataset(
-            NDManager manager, Dataset.Usage usage, Arguments arguments) throws IOException {
+    private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
+            throws IOException {
         Pipeline pipeline =
                 new Pipeline(
                         new ToTensor(),
@@ -218,7 +215,7 @@ public final class TrainWithOptimizers {
                                 new float[] {0.2023f, 0.1994f, 0.2010f}));
         long maxIterations = arguments.getMaxIterations();
         Cifar10 cifar10 =
-                Cifar10.builder(manager)
+                Cifar10.builder()
                         .optUsage(usage)
                         .setSampling(arguments.getBatchSize(), true)
                         .optMaxIteration(maxIterations)

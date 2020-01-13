@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.engine.Engine;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -56,11 +57,10 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
     /**
      * Creates a builder to build a {@link Cifar10}.
      *
-     * @param manager the manager to use in the builder
      * @return a new builder
      */
-    public static Builder builder(NDManager manager) {
-        return new Builder().setManager(manager);
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** {@inheritDoc} */
@@ -162,6 +162,7 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());
+            manager = Engine.getInstance().newBaseManager();
         }
 
         /** {@inheritDoc} */
@@ -171,12 +172,12 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         }
 
         /**
-         * Sets the manager for the dataset.
+         * Sets the optional manager for the dataset (default follows engine default).
          *
          * @param manager the new manager
          * @return this builder
          */
-        public Builder setManager(NDManager manager) {
+        public Builder optManager(NDManager manager) {
             this.manager = manager;
             return this;
         }

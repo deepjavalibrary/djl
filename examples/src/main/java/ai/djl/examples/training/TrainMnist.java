@@ -21,7 +21,6 @@ import ai.djl.examples.training.util.ExampleTrainingListeners;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.DefaultTrainingConfig;
@@ -54,10 +53,8 @@ public final class TrainMnist {
             model.setBlock(block);
 
             // get training and validation dataset
-            RandomAccessDataset trainingSet =
-                    getDataset(model.getNDManager(), Dataset.Usage.TRAIN, arguments);
-            RandomAccessDataset validateSet =
-                    getDataset(model.getNDManager(), Dataset.Usage.TEST, arguments);
+            RandomAccessDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
+            RandomAccessDataset validateSet = getDataset(Dataset.Usage.TEST, arguments);
 
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
@@ -104,13 +101,13 @@ public final class TrainMnist {
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
-    private static RandomAccessDataset getDataset(
-            NDManager manager, Dataset.Usage usage, Arguments arguments) throws IOException {
+    private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
+            throws IOException {
         int batchSize = arguments.getBatchSize();
         long maxIterations = arguments.getMaxIterations();
 
         Mnist mnist =
-                Mnist.builder(manager)
+                Mnist.builder()
                         .optUsage(usage)
                         .setSampling(batchSize, true)
                         .optMaxIteration(maxIterations)
