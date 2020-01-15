@@ -10,18 +10,20 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.training.util;
+package ai.djl.training.listener;
 
 import ai.djl.TrainingDivergedException;
 import ai.djl.training.Trainer;
-import ai.djl.training.TrainingListener;
 import ai.djl.training.loss.Loss;
 
+/** {@link TrainingListener} that gives early warning if your training has failed by divergence. */
 public class DivergenceCheckTrainingListener implements TrainingListener {
 
+    /** {@inheritDoc} */
     @Override
     public void onEpoch(Trainer trainer) {}
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingBatch(Trainer trainer) {
         Loss trainingLoss = trainer.getLoss();
@@ -32,12 +34,15 @@ public class DivergenceCheckTrainingListener implements TrainingListener {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onValidationBatch(Trainer trainer) {}
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingBegin(Trainer trainer) {}
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingEnd(Trainer trainer) {}
 }

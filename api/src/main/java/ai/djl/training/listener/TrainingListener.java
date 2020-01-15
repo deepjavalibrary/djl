@@ -10,7 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.training;
+package ai.djl.training.listener;
+
+import ai.djl.training.Trainer;
 
 /**
  * {@code TrainingListener} offers an interface that allows performing some actions when certain
@@ -58,4 +60,29 @@ public interface TrainingListener {
      * @param trainer the trainer the listener is attached to
      */
     void onTrainingEnd(Trainer trainer);
+
+    /** Contains default {@link TrainingListener} sets. */
+    interface Defaults {
+
+        /**
+         * A default {@link TrainingListener} set including batch output logging.
+         *
+         * @param batchSize the size of training batches
+         * @param trainDataSize the total number of elements in the training dataset
+         * @param validateDataSize the total number of elements in the validation dataset
+         * @param outputDir the output directory to store created log files
+         * @return the new set of listeners
+         */
+        static TrainingListener[] logging(
+                int batchSize, int trainDataSize, int validateDataSize, String outputDir) {
+            return new TrainingListener[] {
+                new EpochTrainingListener(),
+                new MemoryTrainingListener(outputDir),
+                new DivergenceCheckTrainingListener(),
+                new EvaluatorMetricsTrainingListener(),
+                new LoggingTrainingListener(batchSize, trainDataSize, validateDataSize),
+                new TimeMeasureTrainingListener(outputDir)
+            };
+        }
+    }
 }

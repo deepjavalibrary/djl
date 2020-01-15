@@ -10,19 +10,27 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.training.util;
+package ai.djl.training.listener;
 
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
-import ai.djl.training.TrainingListener;
 import ai.djl.training.evaluator.Evaluator;
 
+/**
+ * {@link TrainingListener} that records evaluator results in metrics.
+ *
+ * <p>The training and validation evaluators are saved as metrics with name ("train_" +
+ * evaluator.getName()) and ("validate_" + evaluator.getName()). The validation evaluators are also
+ * saved as model properties with the evaluator name.
+ */
 public class EvaluatorMetricsTrainingListener implements TrainingListener {
 
+    /** {@inheritDoc} */
     @Override
     public void onEpoch(Trainer trainer) {}
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingBatch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
@@ -31,6 +39,7 @@ public class EvaluatorMetricsTrainingListener implements TrainingListener {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onValidationBatch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
@@ -39,9 +48,11 @@ public class EvaluatorMetricsTrainingListener implements TrainingListener {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingBegin(Trainer trainer) {}
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingEnd(Trainer trainer) {
         Model model = trainer.getModel();

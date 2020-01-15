@@ -15,12 +15,12 @@ package ai.djl.examples.inference.benchmark;
 import ai.djl.ModelException;
 import ai.djl.examples.inference.benchmark.util.AbstractBenchmark;
 import ai.djl.examples.inference.benchmark.util.Arguments;
-import ai.djl.examples.util.MemoryUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -121,7 +121,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
             for (int i = 0; i < iteration; i++) {
                 result = predictor.predict(img);
                 if (collectMemory) {
-                    MemoryUtils.collectMemoryInfo(metrics);
+                    MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
                 logger.trace("Worker-{}: {} iteration finished.", workerId, i + 1);
             }

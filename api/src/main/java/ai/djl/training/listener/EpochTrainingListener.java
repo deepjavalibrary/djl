@@ -10,38 +10,45 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.training.util;
+package ai.djl.training.listener;
 
-import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
-import ai.djl.training.TrainingListener;
 
-public class TimeMeasureTrainingListener implements TrainingListener {
+/**
+ * {@link EpochTrainingListener} that tracks epochs.
+ *
+ * <p>Adds "epoch" metric with epoch times and saves "epoch" model property with numEpochs
+ */
+public class EpochTrainingListener implements TrainingListener {
 
-    private String outputDir;
+    private long epochTime;
+    private int numEpochs;
 
-    public TimeMeasureTrainingListener(String outputDir) {
-        this.outputDir = outputDir;
+    /** {@inheritDoc} */
+    @Override
+    public void onEpoch(Trainer trainer) {
+        trainer.getMetrics().addMetric("epoch", System.nanoTime() - epochTime);
+        epochTime = System.nanoTime();
+        numEpochs++;
     }
 
-    @Override
-    public void onEpoch(Trainer trainer) {}
-
+    /** {@inheritDoc} */
     @Override
     public void onTrainingBatch(Trainer trainer) {}
 
+    /** {@inheritDoc} */
     @Override
     public void onValidationBatch(Trainer trainer) {}
 
+    /** {@inheritDoc} */
     @Override
-    public void onTrainingBegin(Trainer trainer) {}
+    public void onTrainingBegin(Trainer trainer) {
+        epochTime = System.nanoTime();
+    }
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingEnd(Trainer trainer) {
-        Metrics metrics = trainer.getMetrics();
-
-        if (outputDir != null) {
-            TrainingUtils.dumpTrainingTimeInfo(metrics, outputDir);
-        }
+        trainer.getModel().setProperty("Epoch", Integer.toString(numEpochs));
     }
 }

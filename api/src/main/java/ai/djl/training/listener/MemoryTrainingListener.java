@@ -10,11 +10,12 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.util;
+package ai.djl.training.listener;
 
 import ai.djl.Device;
 import ai.djl.metric.Metric;
 import ai.djl.metric.Metrics;
+import ai.djl.training.Trainer;
 import ai.djl.util.cuda.CudaUtils;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -34,11 +35,60 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class MemoryUtils {
+/**
+ * {@link TrainingListener} that collects the memory usage information.
+ *
+ * <p>If an outputDir is provided, the file "$outputDir/memory.log" will be created after training
+ * with the memory usage results.
+ */
+public class MemoryTrainingListener implements TrainingListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(MemoryUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(MemoryTrainingListener.class);
 
-    private MemoryUtils() {}
+    private String outputDir;
+
+    /** Constructs a {@link MemoryTrainingListener} that does not output data to a file. */
+    public MemoryTrainingListener() {}
+
+    /**
+     * Constructs a {@link MemoryTrainingListener} that outputs data in the given directory.
+     *
+     * @param outputDir the directory to output the tracked memory data in
+     */
+    public MemoryTrainingListener(String outputDir) {
+        this.outputDir = outputDir;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onEpoch(Trainer trainer) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void onTrainingBatch(Trainer trainer) {
+        Metrics metrics = trainer.getMetrics();
+        collectMemoryInfo(metrics);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onValidationBatch(Trainer trainer) {
+        Metrics metrics = trainer.getMetrics();
+        collectMemoryInfo(metrics);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onTrainingBegin(Trainer trainer) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void onTrainingEnd(Trainer trainer) {
+        Metrics metrics = trainer.getMetrics();
+        if (outputDir != null) {
+            dumpMemoryInfo(metrics, outputDir);
+        }
+    }
 
     /**
      * Collect memory information.

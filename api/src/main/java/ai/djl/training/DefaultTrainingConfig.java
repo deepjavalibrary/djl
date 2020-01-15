@@ -18,6 +18,7 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.initializer.XavierInitializer.FactorType;
 import ai.djl.training.initializer.XavierInitializer.RandomType;
+import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Adam;
 import ai.djl.training.optimizer.Optimizer;

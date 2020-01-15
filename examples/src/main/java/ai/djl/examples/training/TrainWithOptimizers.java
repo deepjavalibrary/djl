@@ -19,7 +19,6 @@ import ai.djl.basicdataset.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingListeners;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
@@ -39,6 +38,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
+import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
@@ -81,7 +81,7 @@ public final class TrainWithOptimizers {
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
-                    ExampleTrainingListeners.exampleListeners(
+                    TrainingListener.Defaults.logging(
                             arguments.getBatchSize(),
                             (int) trainDataset.getNumIterations(),
                             (int) validationDataset.getNumIterations(),

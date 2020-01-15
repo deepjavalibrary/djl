@@ -16,13 +16,13 @@ import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.engine.Engine;
-import ai.djl.examples.util.MemoryUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
@@ -196,7 +196,7 @@ public abstract class AbstractBenchmark<T> {
                         logger.info(String.format("rss P90: %.3f", rss));
                     }
                 }
-                MemoryUtils.dumpMemoryInfo(metrics, arguments.getOutputDir());
+                MemoryTrainingListener.dumpMemoryInfo(metrics, arguments.getOutputDir());
                 long delta = System.currentTimeMillis() - begin;
                 duration = duration.minus(Duration.ofMillis(delta));
                 if (!duration.isNegative()) {

@@ -11,5 +11,11 @@
  * and limitations under the License.
  */
 
-/** Contains utilities used throughout the examples. */
-package ai.djl.examples.util;
+/**
+ * Contains classes providing functionality during training through {@link
+ * ai.djl.training.listener.TrainingListener}.
+ *
+ * <p>It contains a main interface {@link ai.djl.training.listener.TrainingListener} and various
+ * listeners that extend it.
+ */
+package ai.djl.training.listener;

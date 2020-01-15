@@ -18,7 +18,6 @@ import ai.djl.Model;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingListeners;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.inference.Predictor;
@@ -41,6 +40,7 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.BoundingBoxError;
 import ai.djl.training.evaluator.SingleShotDetectionAccuracy;
+import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.SingleShotDetectionLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
@@ -75,7 +75,7 @@ public final class TrainPikachu {
 
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
-                    ExampleTrainingListeners.exampleListeners(
+                    TrainingListener.Defaults.logging(
                             arguments.getBatchSize(),
                             (int) pikachuDetectionTrain.getNumIterations(),
                             (int) pikachuDetectionTest.getNumIterations(),

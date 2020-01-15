@@ -10,13 +10,12 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.training.util;
+package ai.djl.training.listener;
 
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
-import ai.djl.training.TrainingListener;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
@@ -25,6 +24,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * {@link TrainingListener} that outputs the progress of training each batch and epoch into logs.
+ */
 public class LoggingTrainingListener implements TrainingListener {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingTrainingListener.class);
@@ -40,12 +42,20 @@ public class LoggingTrainingListener implements TrainingListener {
     private ProgressBar trainingProgressBar;
     private ProgressBar validateProgressBar;
 
+    /**
+     * Constructs a {@link LoggingTrainingListener}.
+     *
+     * @param batchSize the size of training batches
+     * @param trainDataSize the total number of elements in the training dataset
+     * @param validateDataSize the total number of elements in the validation dataset
+     */
     public LoggingTrainingListener(int batchSize, int trainDataSize, int validateDataSize) {
         this.batchSize = batchSize;
         this.trainDataSize = trainDataSize;
         this.validateDataSize = validateDataSize;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onEpoch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
@@ -69,6 +79,7 @@ public class LoggingTrainingListener implements TrainingListener {
         validateProgress = 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingBatch(Trainer trainer) {
         if (trainingProgressBar == null) {
@@ -90,6 +101,7 @@ public class LoggingTrainingListener implements TrainingListener {
         return sb.toString();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onValidationBatch(Trainer trainer) {
         if (validateProgressBar == null) {
@@ -98,6 +110,7 @@ public class LoggingTrainingListener implements TrainingListener {
         validateProgressBar.update(validateProgress++);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingBegin(Trainer trainer) {
         String devicesMsg;
@@ -119,6 +132,7 @@ public class LoggingTrainingListener implements TrainingListener {
                         engineName, version, (loaded - init) / 1_000_000f));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onTrainingEnd(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();

@@ -17,7 +17,6 @@ import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
 import ai.djl.basicmodelzoo.cv.classification.Mlp;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingListeners;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
@@ -28,6 +27,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
+import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public final class TrainMnist {
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
-                    ExampleTrainingListeners.exampleListeners(
+                    TrainingListener.Defaults.logging(
                             arguments.getBatchSize(),
                             (int) trainingSet.getNumIterations(),
                             (int) validateSet.getNumIterations(),
