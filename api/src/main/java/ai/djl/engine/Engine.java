@@ -156,4 +156,10 @@ public abstract class Engine {
      * @param seed the seed to be fixed in Engine
      */
     public abstract void setRandomSeed(int seed);
+
+    /** Logs debug information about the environment for use when debugging environment issues. */
+    public void debugEnvironment() {
+        logger.info("Engine name: " + getEngineName());
+        logger.info("Engine version: " + getVersion());
+    }
 }

@@ -62,6 +62,13 @@ public class LibUtils {
     private LibUtils() {}
 
     public static MxnetLibrary loadLibrary() {
+        String libName = getLibName();
+        logger.debug("Loading mxnet library from: {}", libName);
+
+        return Native.load(libName, MxnetLibrary.class);
+    }
+
+    public static String getLibName() {
         String libName = LibUtils.findOverrideLibrary();
         if (libName == null) {
             libName = LibUtils.findLibraryInClasspath();
@@ -75,9 +82,7 @@ public class LibUtils {
                 }
             }
         }
-        logger.debug("Loading mxnet library from: {}", libName);
-
-        return Native.load(libName, MxnetLibrary.class);
+        return libName;
     }
 
     private static String findOverrideLibrary() {

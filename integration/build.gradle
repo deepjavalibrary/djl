@@ -61,6 +61,11 @@ jacocoTestReport {
     }
 }
 
+task debugEnv(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "ai.djl.integration.util.DebugEnvironment"
+}
+
 tasks.distTar.enabled = false
 test.finalizedBy project.tasks.jacocoTestReport, project.tasks.jacocoTestCoverageVerification
 

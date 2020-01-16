@@ -30,10 +30,9 @@ assignees: ''
 2.
 
 ## Environment Info
-Please provide the following information:
 
-* Operating System:
-* Hardware(Machine) Info:
-* CUDA version(if available):
-* Deep Java Library version:
-* MXNet version:
+Please run the command `./gradlew debugEnv` from the root directory of DJL (if necessary, clone DJL first). It will output information about your system, environment, and installation that can help us debug your issue. Paste the output of the command below:
+
+```
+PASTE OUTPUT HERE
+```

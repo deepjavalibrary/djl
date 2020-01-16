@@ -16,7 +16,10 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.ndarray.NDManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@code MxEngine} is an implementation of the {@link Engine} based on the <a
@@ -26,6 +29,8 @@ import ai.djl.ndarray.NDManager;
  * Engine#getEngine(String)} with the Engine name "MXNet".
  */
 public class MxEngine extends Engine {
+
+    private static final Logger logger = LoggerFactory.getLogger(MxEngine.class);
 
     public static final String ENGINE_NAME = "MXNet";
 
@@ -85,6 +90,14 @@ public class MxEngine extends Engine {
     @Override
     public void setRandomSeed(int seed) {
         JnaUtils.randomSeed(seed);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void debugEnvironment() {
+        super.debugEnvironment();
+        logger.info("MXNet Library: " + LibUtils.getLibName());
+        logger.info("MXNet Features: " + String.join(", ", JnaUtils.getFeatures()));
     }
 
     /** {@inheritDoc} */
