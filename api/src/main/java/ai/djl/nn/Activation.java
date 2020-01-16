@@ -255,6 +255,32 @@ public final class Activation {
     }
 
     /**
+     * Applies Mish activation on the input {@link NDArray}.
+     *
+     * <p>Mish is defined as \(y = x * tanh(ln(1 + e^x)\) defined by Diganta Misra in his paper
+     * Mish: A Self Regularized Non-Monotonic Neural Activation Function
+     *
+     * @param array the input {@link NDArray}
+     * @return the {@link NDArray} after applying Mish activation
+     */
+    public static NDArray mish(NDArray array) {
+        return array.getNDArrayInternal().mish();
+    }
+
+    /**
+     * Applies Mish activation on the input singleton {@link NDList}.
+     *
+     * <p>Mish is defined as \(y = x * tanh(ln(1 + e^x)\) defined by Diganta Misra in his paper
+     * Mish: A Self Regularized Non-Monotonic Neural Activation Function
+     *
+     * @param arrays the input singleton {@link NDList}
+     * @return the singleton {@link NDList} after applying Mish activation
+     */
+    public static NDList mish(NDList arrays) {
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().mish());
+    }
+
+    /**
      * Creates a {@link LambdaBlock} that applies the {@link #relu(NDList) ReLU} activation function
      * in its forward function.
      *
@@ -354,6 +380,17 @@ public final class Activation {
      */
     public static Block swishBlock(float beta) {
         return new LambdaBlock(arrays -> Activation.swish(arrays, beta));
+    }
+
+    /**
+     * Creates a {@link LambdaBlock} that applies the {@link #mish(NDList) Mish} activation function
+     * in its forward function.
+     *
+     * @return the {@link LambdaBlock} that applies the {@link #mish(NDList) Mish} activation
+     *     function
+     */
+    public static Block mishBlock() {
+        return new LambdaBlock(Activation::mish);
     }
 
     /**

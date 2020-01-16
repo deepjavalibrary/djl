@@ -172,6 +172,10 @@ public interface NDArrayEx {
         return Activation.sigmoid(getArray().mul(beta)).mul(getArray());
     }
 
+    default NDArray mish() {
+        return getArray().exp().add(1).log2().tanh().mul(getArray());
+    }
+
     ////////////////////////////////////////
     // Pooling Operations
     ////////////////////////////////////////

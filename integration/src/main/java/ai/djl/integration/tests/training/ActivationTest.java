@@ -179,12 +179,29 @@ public class ActivationTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.create(new float[] {0});
-                NDArray expected = manager.create(new float[] {0});
-                Assert.assertEquals(Activation.swish(data, beta), expected);
+                NDArray data = manager.create(new float[] {1, 5, 0.3f, 0.08f});
+                NDArray expected = manager.create(new float[] {0.7311f, 4.9665f, 0.1723f, 0.0416f});
+                Assertions.assertAlmostEquals(Activation.swish(data, beta), expected);
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                Assert.assertEquals(result, expected);
+                Assertions.assertAlmostEquals(result, expected);
+            }
+        }
+    }
+
+    @Test
+    public void testMish() {
+        try (Model model = Model.newInstance()) {
+            model.setBlock(Activation.mishBlock());
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.create(new float[] {1, 5, 0.3f, 0.08f});
+                NDArray expected = manager.create(new float[] {0.9558f, 5, 0.253f, 0.0628f});
+                Assertions.assertAlmostEquals(Activation.mish(data), expected);
+
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assertions.assertAlmostEquals(result, expected);
             }
         }
     }
