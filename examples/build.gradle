@@ -19,6 +19,7 @@ dependencies {
     implementation "ai.djl:model-zoo:0.3.0-SNAPSHOT"
     implementation "ai.djl.mxnet:mxnet-model-zoo:0.3.0-SNAPSHOT"
 
+    // See: https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for MXNet library selection
     runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
 
     testImplementation 'org.testng:testng:6.14.3'

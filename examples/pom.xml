@@ -63,10 +63,19 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <!--
+                See: https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more detail.
+            -->
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-native-mkl</artifactId>
             <version>1.6.0-b-SNAPSHOT</version>
             <classifier>${classifier}</classifier>
+            <!--
+                supported classifier:
+                <classifier>osx-x86_64</classifier>
+                <classifier>linux-x86_64</classifier>
+                <classifier>win-x86_64</classifier>
+            -->
             <scope>runtime</scope>
         </dependency>
 

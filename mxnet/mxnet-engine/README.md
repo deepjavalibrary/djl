@@ -34,7 +34,7 @@ Besides the `mxnet-engine` library, you may also need to include the MXNet nativ
 Choose a native library based on your platform and needs:
 
 ### macOS
-For macOS, you can choose between the following two libraries:
+For macOS, you can use the following library:
 
 - org.apache.mxnet:mxnet-native-mkl:1.6.0-b:osx-x86_64
 
