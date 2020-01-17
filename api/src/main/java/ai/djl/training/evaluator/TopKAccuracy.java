@@ -13,6 +13,9 @@
 package ai.djl.training.evaluator;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
+import ai.djl.ndarray.NDList;
+import ai.djl.util.Pair;
 import java.util.stream.IntStream;
 
 /**
@@ -63,37 +66,40 @@ public class TopKAccuracy extends Accuracy {
         this("Top_" + topK + "_Accuracy", 0, topK);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public void update(NDArray labels, NDArray predictions) {
+    protected Pair<Long, NDArray> accuracyHelper(NDList labels, NDList predictions) {
+        NDArray label = labels.get(index);
+        NDArray prediction = predictions.get(index);
         // number of labels and predictions should be the same
-        checkLabelShapes(labels, predictions);
-        if (predictions.getShape().dimension() > 2) {
-            throw new IllegalStateException("Prediction should be less than 2 dimensions");
-        }
+        checkLabelShapes(label, prediction);
         // ascending by default
-        NDArray topKPrediction = predictions.argSort(axis);
+        NDArray topKPrediction = prediction.argSort(axis);
         int numDims = topKPrediction.getShape().dimension();
+        NDArray numCorrect;
         if (numDims == 1) {
-            addCorrectInstances(
-                    topKPrediction.flatten().eq(labels.flatten()).countNonzero().getLong());
+            numCorrect = topKPrediction.flatten().eq(label.flatten()).countNonzero();
         } else if (numDims == 2) {
             int numClasses = (int) topKPrediction.getShape().get(1);
             topK = Math.min(topK, numClasses);
-            IntStream.range(0, topK)
-                    .forEach(
-                            j -> {
-                                // get from last index as argSort is ascending
-                                NDArray jPrediction =
-                                        topKPrediction.get(":, " + (numClasses - j - 1));
-                                addCorrectInstances(
-                                        jPrediction
-                                                .flatten()
-                                                .eq(labels.flatten())
-                                                .countNonzero()
-                                                .getLong());
-                            });
+            numCorrect =
+                    NDArrays.add(
+                            IntStream.range(0, topK)
+                                    .mapToObj(
+                                            j -> {
+                                                // get from last index as argSort is ascending
+                                                NDArray jPrediction =
+                                                        topKPrediction.get(
+                                                                ":, " + (numClasses - j - 1));
+                                                return jPrediction
+                                                        .flatten()
+                                                        .eq(label.flatten())
+                                                        .countNonzero();
+                                            })
+                                    .toArray(NDArray[]::new));
+        } else {
+            throw new IllegalArgumentException("Prediction should be less than 2 dimensions");
         }
-        addTotalInstances((int) labels.getShape().get(0));
+        long total = label.getShape().get(0);
+        return new Pair<>(total, numCorrect);
     }
 }

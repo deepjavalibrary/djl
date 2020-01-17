@@ -169,7 +169,7 @@ public class SymbolBlockTest {
         try (GradientCollector gradCol = new MxGradientCollector()) {
             pred = trainer.forward(new NDList(data)).singletonOrThrow();
             NDArray loss =
-                    Loss.softmaxCrossEntropyLoss().getLoss(new NDList(label), new NDList(pred));
+                    Loss.softmaxCrossEntropyLoss().evaluate(new NDList(label), new NDList(pred));
             gradCol.backward(loss);
         }
         List<NDArray> grads =

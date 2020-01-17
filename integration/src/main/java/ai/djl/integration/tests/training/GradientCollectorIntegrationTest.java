@@ -111,7 +111,7 @@ public class GradientCollectorIntegrationTest {
                         batch.close();
                     }
                 }
-                lossValue = trainer.getLoss().getValue();
+                lossValue = trainer.getLoss().getAccumulator(Trainer.TRAIN);
             }
             float expectedLoss = 0.001f;
             Assert.assertTrue(

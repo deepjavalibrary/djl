@@ -85,18 +85,4 @@ public class SimpleCompositeLoss extends AbstractCompositeLoss {
             return new Pair<>(labels, predictions);
         }
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public Loss duplicate() {
-        SimpleCompositeLoss dup = new SimpleCompositeLoss(getName());
-        for (int i = 0; i < components.size(); i++) {
-            if (indices.get(i) != null) {
-                dup.addLoss(components.get(i).duplicate(), indices.get(i));
-            } else {
-                dup.addLoss(components.get(i).duplicate());
-            }
-        }
-        return dup;
-    }
 }

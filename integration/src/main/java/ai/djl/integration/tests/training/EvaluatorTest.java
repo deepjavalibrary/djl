@@ -14,6 +14,7 @@
 package ai.djl.integration.tests.training;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.evaluator.Accuracy;
@@ -32,8 +33,9 @@ public class EvaluatorTest {
             NDArray labels = manager.create(new int[] {0, 1, 1}, new Shape(3));
 
             Accuracy acc = new Accuracy();
-            acc.update(labels, predictions);
-            float accuracy = acc.getValue();
+            acc.addAccumulator("");
+            acc.updateAccumulator("", new NDList(labels), new NDList(predictions));
+            float accuracy = acc.getAccumulator("");
             float expectedAccuracy = 2.f / 3;
             Assert.assertEquals(
                     accuracy,
@@ -53,9 +55,10 @@ public class EvaluatorTest {
                             new Shape(3, 4));
             NDArray labels = manager.create(new int[] {0, 1, 2}, new Shape(3));
             TopKAccuracy topKAccuracy = new TopKAccuracy(2);
-            topKAccuracy.update(labels, predictions);
+            topKAccuracy.addAccumulator("");
+            topKAccuracy.updateAccumulator("", new NDList(labels), new NDList(predictions));
             float expectedAccuracy = 1.f / 3;
-            float accuracy = topKAccuracy.getValue();
+            float accuracy = topKAccuracy.getAccumulator("");
             Assert.assertEquals(
                     accuracy,
                     expectedAccuracy,

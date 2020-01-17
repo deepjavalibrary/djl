@@ -93,37 +93,19 @@ public class MockTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public Loss getValidationLoss() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Model getModel() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<Evaluator> getTrainingEvaluators() {
+    public List<Evaluator> getEvaluators() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Evaluator> T getTrainingEvaluator(Class<T> clazz) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Evaluator> getValidationEvaluators() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <T extends Evaluator> T getValidationEvaluator(Class<T> clazz) {
+    public <T extends Evaluator> T getEvaluator(Class<T> clazz) {
         return null;
     }
 

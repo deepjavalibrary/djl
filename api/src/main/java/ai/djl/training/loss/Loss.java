@@ -12,9 +12,10 @@
  */
 package ai.djl.training.loss;
 
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.evaluator.Evaluator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Loss functions (or Cost functions) are used to evaluate the model predictions against true labels
@@ -30,11 +31,12 @@ import ai.djl.training.evaluator.Evaluator;
  * batchSize factor. Otherwise, it can make it difficult to tune the learning rate since any change
  * in the batch size would throw it off. If you have a variable batch size, it would be even more
  * difficult.
+ *
+ * <p>For more details about the class internals, see {@link Evaluator}.
  */
 public abstract class Loss extends Evaluator {
 
-    private float totalLoss;
-    private int totalInstances;
+    private Map<String, Float> totalLoss;
 
     /**
      * Base class for metric with abstract update methods.
@@ -43,16 +45,8 @@ public abstract class Loss extends Evaluator {
      */
     public Loss(String name) {
         super(name);
+        totalLoss = new ConcurrentHashMap<>();
     }
-
-    /**
-     * Calculates loss between the label and prediction.
-     *
-     * @param label the true label
-     * @param prediction the predicted label
-     * @return the loss value
-     */
-    public abstract NDArray getLoss(NDList label, NDList prediction);
 
     /**
      * Returns a new instance of {@link L1Loss} with default weight and batch axis.
@@ -213,44 +207,39 @@ public abstract class Loss extends Evaluator {
 
     /** {@inheritDoc} */
     @Override
-    public Loss duplicate() {
-        try {
-            return (Loss) clone();
-        } catch (CloneNotSupportedException e) {
-            // ignore
-            throw new AssertionError("Clone is not supported", e);
-        }
+    public void addAccumulator(String key) {
+        totalInstances.put(key, 0L);
+        totalLoss.put(key, 0f);
     }
 
-    /**
-     * Updates the evaluators based on a {@link NDList} of labels and predictions.
-     *
-     * <p>This is a synchronized operation. You should only call it at the end of a batch or epoch.
-     *
-     * @param labels a {@code NDList} of labels
-     * @param predictions a {@code NDList} of predictions
-     */
+    /** {@inheritDoc} */
     @Override
-    public void update(NDList labels, NDList predictions) {
+    public void updateAccumulator(String key, NDList labels, NDList predictions) {
         // this is a synchronized operation, only call it at end of batch or epoch
-        NDArray update = getLoss(labels, predictions);
-        totalLoss += update.sum().getFloat();
-        totalInstances += update.size();
+        float update = evaluate(labels, predictions).sum().getFloat();
+        totalInstances.compute(key, (k, v) -> v + 1);
+        totalLoss.compute(key, (k, v) -> v + update);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void reset() {
-        totalLoss = 0.f;
-        totalInstances = 0;
+    public void resetAccumulator(String key) {
+        totalInstances.compute(key, (k, v) -> 0L);
+        totalLoss.compute(key, (k, v) -> 0f);
     }
 
     /** {@inheritDoc} */
     @Override
-    public float getValue() {
-        if (totalInstances == 0) {
+    public float getAccumulator(String key) {
+        Long total = totalInstances.get(key);
+        if (total == null) {
+            throw new IllegalArgumentException("No loss found at that path");
+        }
+
+        if (total == 0) {
             return Float.NaN;
         }
-        return totalLoss / totalInstances;
+
+        return totalLoss.get(key) / totalInstances.get(key);
     }
 }

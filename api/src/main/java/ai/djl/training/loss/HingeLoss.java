@@ -56,7 +56,7 @@ public class HingeLoss extends Loss {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getLoss(NDList label, NDList prediction) {
+    public NDArray evaluate(NDList label, NDList prediction) {
         NDArray pred = prediction.singletonOrThrow();
         NDArray labelReshaped = label.singletonOrThrow().reshape(pred.getShape());
         NDArray loss = Activation.relu(NDArrays.sub(margin, labelReshaped.mul(pred)));

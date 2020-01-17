@@ -62,14 +62,11 @@ public class LoggingTrainingListener implements TrainingListener {
         Loss loss = trainer.getLoss();
         logger.info("Epoch " + numEpochs + " finished.");
 
-        logger.info(
-                "Train: "
-                        + getEvaluatorsStatus(metrics, trainer.getTrainingEvaluators(), "train_"));
+        logger.info("Train: " + getEvaluatorsStatus(metrics, trainer.getEvaluators(), "train_"));
         if (metrics.hasMetric("validate_" + loss.getName())) {
             logger.info(
                     "Validate: "
-                            + getEvaluatorsStatus(
-                                    metrics, trainer.getValidationEvaluators(), "validate_"));
+                            + getEvaluatorsStatus(metrics, trainer.getEvaluators(), "validate_"));
         } else {
             logger.info("validation has not been run.");
         }
@@ -92,7 +89,7 @@ public class LoggingTrainingListener implements TrainingListener {
         Metrics metrics = trainer.getMetrics();
         StringBuilder sb = new StringBuilder();
 
-        sb.append(getEvaluatorsStatus(metrics, trainer.getTrainingEvaluators(), "train_"));
+        sb.append(getEvaluatorsStatus(metrics, trainer.getEvaluators(), "train_"));
 
         if (metrics.hasMetric("train")) {
             float batchTime = metrics.latestMetric("train").getValue().longValue() / 1_000_000_000f;

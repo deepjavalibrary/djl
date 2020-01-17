@@ -34,8 +34,9 @@ public class EvaluatorMetricsTrainingListener implements TrainingListener {
     @Override
     public void onTrainingBatch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
-        for (Evaluator evaluator : trainer.getTrainingEvaluators()) {
-            metrics.addMetric("train_" + evaluator.getName(), evaluator.getValue());
+        for (Evaluator evaluator : trainer.getEvaluators()) {
+            metrics.addMetric(
+                    "train_" + evaluator.getName(), evaluator.getAccumulator(Trainer.TRAIN));
         }
     }
 
@@ -43,8 +44,9 @@ public class EvaluatorMetricsTrainingListener implements TrainingListener {
     @Override
     public void onValidationBatch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
-        for (Evaluator evaluator : trainer.getValidationEvaluators()) {
-            metrics.addMetric("validate_" + evaluator.getName(), evaluator.getValue());
+        for (Evaluator evaluator : trainer.getEvaluators()) {
+            metrics.addMetric(
+                    "validate_" + evaluator.getName(), evaluator.getAccumulator(Trainer.VALIDATE));
         }
     }
 
@@ -57,7 +59,7 @@ public class EvaluatorMetricsTrainingListener implements TrainingListener {
     public void onTrainingEnd(Trainer trainer) {
         Model model = trainer.getModel();
         Metrics metrics = trainer.getMetrics();
-        for (Evaluator evaluator : trainer.getValidationEvaluators()) {
+        for (Evaluator evaluator : trainer.getEvaluators()) {
             float value =
                     metrics.latestMetric("validate_" + evaluator.getName()).getValue().floatValue();
             model.setProperty(evaluator.getName(), String.format("%.5f", value));

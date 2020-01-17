@@ -29,7 +29,7 @@ public class LossTest {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
             Assert.assertEquals(
-                    Loss.l1Loss().getLoss(new NDList(label), new NDList(pred)).getFloat(), 2.0f);
+                    Loss.l1Loss().evaluate(new NDList(label), new NDList(pred)).getFloat(), 2.0f);
         }
     }
 
@@ -39,7 +39,7 @@ public class LossTest {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
             Assert.assertEquals(
-                    Loss.l2Loss().getLoss(new NDList(label), new NDList(pred)).getFloat(), 3.0f);
+                    Loss.l2Loss().evaluate(new NDList(label), new NDList(pred)).getFloat(), 3.0f);
         }
     }
 
@@ -49,7 +49,7 @@ public class LossTest {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(1));
             Assertions.assertAlmostEquals(
-                    Loss.softmaxCrossEntropyLoss().getLoss(new NDList(label), new NDList(pred)),
+                    Loss.softmaxCrossEntropyLoss().evaluate(new NDList(label), new NDList(pred)),
                     manager.create(3.45191431f));
         }
     }
@@ -60,7 +60,8 @@ public class LossTest {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5)).neg();
             Assert.assertEquals(
-                    Loss.hingeLoss().getLoss(new NDList(label), new NDList(pred)).getFloat(), 4.0f);
+                    Loss.hingeLoss().evaluate(new NDList(label), new NDList(pred)).getFloat(),
+                    4.0f);
         }
     }
 
@@ -71,7 +72,7 @@ public class LossTest {
             NDArray label = manager.ones(new Shape(5));
             Assert.assertEquals(
                     Loss.sigmoidBinaryCrossEntropyLoss()
-                            .getLoss(new NDList(label), new NDList(pred))
+                            .evaluate(new NDList(label), new NDList(pred))
                             .getFloat(),
                     0.10272846f);
         }

@@ -17,6 +17,7 @@ import ai.djl.modality.cv.MultiBoxTarget;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.util.Pair;
 
 /**
  * {@code SingleShotDetectionAccuracy} is an implementation of {@link Accuracy}. It is used while
@@ -37,7 +38,7 @@ public class SingleShotDetectionAccuracy extends Accuracy {
     }
 
     @Override
-    public void update(NDList labels, NDList predictions) {
+    protected Pair<Long, NDArray> accuracyHelper(NDList labels, NDList predictions) {
         NDArray anchors = predictions.get(0);
         NDArray classPredictions = predictions.get(1);
         NDList targets =
@@ -46,13 +47,12 @@ public class SingleShotDetectionAccuracy extends Accuracy {
         NDArray classLabels = targets.get(2);
         checkLabelShapes(classLabels, classPredictions);
         NDArray predictionReduced = classPredictions.argMax(-1);
-        long numCorrect =
+        long total = classLabels.size();
+        NDArray numCorrect =
                 classLabels
                         .toType(DataType.INT64, false)
                         .eq(predictionReduced.toType(DataType.INT64, false))
-                        .countNonzero()
-                        .getLong();
-        addCorrectInstances(numCorrect);
-        addTotalInstances(classLabels.size());
+                        .countNonzero();
+        return new Pair<>(total, numCorrect);
     }
 }

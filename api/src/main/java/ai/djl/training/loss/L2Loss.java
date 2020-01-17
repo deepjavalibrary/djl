@@ -51,7 +51,7 @@ public class L2Loss extends Loss {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getLoss(NDList label, NDList prediction) {
+    public NDArray evaluate(NDList label, NDList prediction) {
         NDArray pred = prediction.singletonOrThrow();
         NDArray labelReshaped = label.singletonOrThrow().reshape(pred.getShape());
         NDArray loss = labelReshaped.sub(pred).square().mul(weight);

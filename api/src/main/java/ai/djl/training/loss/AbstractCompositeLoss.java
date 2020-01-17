@@ -17,7 +17,6 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * {@code AbstractCompositeLoss} is a {@link Loss} class that can combine other {@link Loss}es
@@ -50,21 +49,6 @@ public abstract class AbstractCompositeLoss extends Loss {
     protected abstract Pair<NDList, NDList> inputForComponent(
             int componentIndex, NDList labels, NDList predictions);
 
-    /** {@inheritDoc} */
-    @Override
-    public Loss duplicate() {
-        List<Loss> dupComponents =
-                components.stream().map(Loss::duplicate).collect(Collectors.toList());
-        try {
-            AbstractCompositeLoss clone = (AbstractCompositeLoss) clone();
-            clone.components = dupComponents;
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            // ignore
-            throw new AssertionError("Clone is not supported", e);
-        }
-    }
-
     /**
      * Returns the component losses that make up the composite loss.
      *
@@ -76,35 +60,43 @@ public abstract class AbstractCompositeLoss extends Loss {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getLoss(NDList labels, NDList predictions) {
+    public NDArray evaluate(NDList labels, NDList predictions) {
         NDArray[] lossComponents = new NDArray[components.size()];
         for (int i = 0; i < components.size(); i++) {
             Pair<NDList, NDList> inputs = inputForComponent(i, labels, predictions);
-            lossComponents[i] = components.get(i).getLoss(inputs.getKey(), inputs.getValue());
+            lossComponents[i] = components.get(i).evaluate(inputs.getKey(), inputs.getValue());
         }
         return NDArrays.add(lossComponents);
     }
 
+    @Override
+    public void addAccumulator(String key) {
+        for (Loss component : components) {
+            component.addAccumulator(key);
+        }
+    }
+
     /** {@inheritDoc} */
     @Override
-    public void update(NDList labels, NDList predictions) {
+    public void updateAccumulator(String key, NDList labels, NDList predictions) {
         for (int i = 0; i < components.size(); i++) {
             Pair<NDList, NDList> inputs = inputForComponent(i, labels, predictions);
-            components.get(i).update(inputs.getKey(), inputs.getValue());
+            components.get(i).updateAccumulator(key, inputs.getKey(), inputs.getValue());
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public void reset() {
+    public void resetAccumulator(String key) {
         for (Loss component : components) {
-            component.reset();
+            component.resetAccumulator(key);
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public float getValue() {
-        return (float) components.stream().mapToDouble(Loss::getValue).sum();
+    public float getAccumulator(String key) {
+        return (float)
+                components.stream().mapToDouble(component -> component.getAccumulator(key)).sum();
     }
 }

@@ -27,7 +27,7 @@ public class DivergenceCheckTrainingListener implements TrainingListener {
     @Override
     public void onTrainingBatch(Trainer trainer) {
         Loss trainingLoss = trainer.getLoss();
-        if (Float.isNaN(trainingLoss.getValue())) {
+        if (Float.isNaN(trainingLoss.getAccumulator(Trainer.TRAIN))) {
             throw new TrainingDivergedException(
                     "The Loss became NaN, try reduce learning rate,"
                             + "add clipGradient option to your optimizer, check input data and loss calculation.");

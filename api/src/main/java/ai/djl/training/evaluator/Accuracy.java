@@ -16,6 +16,9 @@ package ai.djl.training.evaluator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.util.Pair;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@code Accuracy} is an {@link Evaluator} that computes the accuracy score.
@@ -25,8 +28,7 @@ import ai.djl.ndarray.types.DataType;
  */
 public class Accuracy extends Evaluator {
 
-    private long correctInstances;
-    private long totalInstances;
+    protected Map<String, Long> correctInstances;
     protected int axis;
     protected int index;
 
@@ -39,6 +41,7 @@ public class Accuracy extends Evaluator {
      */
     public Accuracy(String name, int index, int axis) {
         super(name);
+        correctInstances = new ConcurrentHashMap<>();
         this.axis = axis;
         this.index = index;
     }
@@ -58,70 +61,63 @@ public class Accuracy extends Evaluator {
         this(name, index, 1);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public void reset() {
-        correctInstances = 0;
-        totalInstances = 0;
+    public NDArray evaluate(NDList labels, NDList predictions) {
+        return accuracyHelper(labels, predictions).getValue();
     }
 
-    /**
-     * Computes and updates the accuracy based on the labels and predictions.
-     *
-     * @param labels a {@link NDList} of labels
-     * @param predictions a {@link NDList} of predictions
-     */
-    public void update(NDArray labels, NDArray predictions) {
-        checkLabelShapes(labels, predictions);
-        NDArray predictionReduced;
-        if (!labels.getShape().equals(predictions.getShape())) {
-            predictionReduced = predictions.argMax(axis);
-        } else {
-            predictionReduced = predictions;
-        }
-        // result of sum is int64 now
-        long numCorrect =
-                labels.toType(DataType.INT64, false)
-                        .eq(predictionReduced.toType(DataType.INT64, false))
-                        .countNonzero()
-                        .getLong();
-        addCorrectInstances(numCorrect);
-        addTotalInstances(labels.size());
+    @Override
+    public void addAccumulator(String key) {
+        totalInstances.put(key, 0L);
+        correctInstances.put(key, 0L);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public void update(NDList labels, NDList predictions) {
+    public void updateAccumulator(String key, NDList labels, NDList predictions) {
+        Pair<Long, NDArray> update = accuracyHelper(labels, predictions);
+        totalInstances.compute(key, (k, v) -> update.getKey());
+        correctInstances.compute(key, (k, v) -> update.getValue().sum().getLong());
+    }
+
+    protected Pair<Long, NDArray> accuracyHelper(NDList labels, NDList predictions) {
         if (labels.size() != predictions.size()) {
             throw new IllegalArgumentException("labels and prediction length does not match.");
         }
-        update(labels.get(index), predictions.get(index));
+        NDArray label = labels.get(index);
+        NDArray prediction = predictions.get(index);
+        checkLabelShapes(label, prediction);
+        NDArray predictionReduced;
+        if (!label.getShape().equals(prediction.getShape())) {
+            predictionReduced = prediction.argMax(axis);
+        } else {
+            predictionReduced = prediction;
+        }
+        // result of sum is int64 now
+        long total = label.size();
+        NDArray correct =
+                label.toType(DataType.INT64, false)
+                        .eq(predictionReduced.toType(DataType.INT64, false))
+                        .countNonzero();
+        return new Pair<>(total, correct);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public float getValue() {
-        if (totalInstances == 0) {
+    public void resetAccumulator(String key) {
+        totalInstances.compute(key, (k, v) -> 0L);
+        correctInstances.compute(key, (k, v) -> 0L);
+    }
+
+    @Override
+    public float getAccumulator(String key) {
+        Long total = totalInstances.get(key);
+        if (total == null) {
+            throw new IllegalArgumentException("No evaluator found at that path");
+        }
+
+        if (total == 0) {
             return Float.NaN;
         }
-        return (float) correctInstances / totalInstances;
-    }
 
-    /**
-     * Add a number to the correct instances.
-     *
-     * @param numInstances the number to increment by
-     */
-    public void addCorrectInstances(long numInstances) {
-        this.correctInstances += numInstances;
-    }
-
-    /**
-     * Add a number to the total instances.
-     *
-     * @param totalInstances the number to increment by
-     */
-    public void addTotalInstances(long totalInstances) {
-        this.totalInstances += totalInstances;
+        return (float) correctInstances.get(key) / totalInstances.get(key);
     }
 }

@@ -48,10 +48,8 @@ public class MxTrainer implements Trainer {
     private List<TrainingListener> listeners;
     private Device[] devices;
     private ParameterStore parameterStore;
-    private List<Evaluator> trainingEvaluators;
-    private List<Evaluator> validateEvaluators;
-    private Loss trainingLoss;
-    private Loss validationLoss;
+    private List<Evaluator> evaluators;
+    private Loss loss;
     long batchBeginTime;
 
     private boolean gradientsChecked;
@@ -67,20 +65,14 @@ public class MxTrainer implements Trainer {
         this.model = model;
         manager = (MxNDManager) model.getNDManager().newSubManager();
         devices = trainingConfig.getDevices();
-        trainingLoss = trainingConfig.getLossFunction();
-        if (trainingLoss == null) {
+        loss = trainingConfig.getLossFunction();
+        if (loss == null) {
             throw new IllegalArgumentException("You must specify a loss for the trainer");
         }
-        validationLoss = trainingLoss.duplicate();
-        trainingEvaluators = new ArrayList<>(trainingConfig.getEvaluators());
-        validateEvaluators = new ArrayList<>();
-        trainingEvaluators.forEach(i -> validateEvaluators.add(i.duplicate()));
-
-        // track loss as an evaluator by default
-        trainingEvaluators.add(trainingLoss);
-        // add from duplication of trainingLoss
-        // do not mess up with duplication of evaluators
-        validateEvaluators.add(validationLoss);
+        evaluators = new ArrayList<>(trainingConfig.getEvaluators());
+        evaluators.add(loss); // track loss as an evaluator by default
+        evaluators.forEach(evaluator -> evaluator.addAccumulator(Trainer.TRAIN));
+        evaluators.forEach(evaluator -> evaluator.addAccumulator(Trainer.VALIDATE));
 
         // ParameterServer parameterServer = new MxParameterServer(trainingConfig.getOptimizer());
         ParameterServer parameterServer = new LocalParameterServer(trainingConfig.getOptimizer());
@@ -128,13 +120,13 @@ public class MxTrainer implements Trainer {
                 NDList preds = forward(data);
 
                 long time = System.nanoTime();
-                NDArray loss = trainingLoss.getLoss(labels, preds);
+                NDArray lossValue = this.loss.evaluate(labels, preds);
 
-                collector.backward(loss);
+                collector.backward(lossValue);
                 addMetric("backward", time);
                 time = System.nanoTime();
 
-                updateEvaluators(labels, preds);
+                updateTrainEvaluators(labels, preds);
                 addMetric("training-metrics", time);
             }
         }
@@ -171,7 +163,7 @@ public class MxTrainer implements Trainer {
             NDList labels = split.getLabels();
 
             NDList preds = forward(data);
-            updateValidationMetrics(labels, preds);
+            updateValidateEvaluators(labels, preds);
         }
         addMetric("validate", begin);
 
@@ -208,27 +200,28 @@ public class MxTrainer implements Trainer {
         return Arrays.asList(devices);
     }
 
-    private void updateEvaluators(NDList labels, NDList preds) {
+    private void updateTrainEvaluators(NDList labels, NDList preds) {
         // stop recording as this is end of computation graph
         // any evaluator calculation or update operation should not be recorded
         MxGradientCollector.setRecording(false);
         MxGradientCollector.setTraining(false);
         // this step is synchronized, should be done at end of batch
-        trainingEvaluators.forEach(evaluator -> evaluator.update(labels, preds));
+        evaluators.forEach(evaluator -> evaluator.updateAccumulator(Trainer.TRAIN, labels, preds));
         // turn gradient recording back on
         MxGradientCollector.setRecording(true);
         MxGradientCollector.setTraining(true);
     }
 
-    private void updateValidationMetrics(NDList labels, NDList preds) {
-        validateEvaluators.forEach(evaluator -> evaluator.update(labels, preds));
+    private void updateValidateEvaluators(NDList labels, NDList preds) {
+        evaluators.forEach(
+                evaluator -> evaluator.updateAccumulator(Trainer.VALIDATE, labels, preds));
     }
 
     /** {@inheritDoc} */
     @Override
     public void resetEvaluators() {
-        trainingEvaluators.forEach(Evaluator::reset);
-        validateEvaluators.forEach(Evaluator::reset);
+        evaluators.forEach(evaluator -> evaluator.resetAccumulator(Trainer.TRAIN));
+        evaluators.forEach(evaluator -> evaluator.resetAccumulator(Trainer.VALIDATE));
 
         listeners.forEach(listener -> listener.onEpoch(this));
     }
@@ -236,13 +229,7 @@ public class MxTrainer implements Trainer {
     /** {@inheritDoc} */
     @Override
     public Loss getLoss() {
-        return trainingLoss;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Loss getValidationLoss() {
-        return validationLoss;
+        return loss;
     }
 
     /** {@inheritDoc} */
@@ -253,33 +240,15 @@ public class MxTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public List<Evaluator> getTrainingEvaluators() {
-        return trainingEvaluators;
+    public List<Evaluator> getEvaluators() {
+        return evaluators;
     }
 
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
-    public final <T extends Evaluator> T getTrainingEvaluator(Class<T> clazz) {
-        for (Evaluator evaluator : trainingEvaluators) {
-            if (clazz.isInstance(evaluator)) {
-                return (T) evaluator;
-            }
-        }
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Evaluator> getValidationEvaluators() {
-        return validateEvaluators;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Evaluator> T getValidationEvaluator(Class<T> clazz) {
-        for (Evaluator evaluator : validateEvaluators) {
+    public final <T extends Evaluator> T getEvaluator(Class<T> clazz) {
+        for (Evaluator evaluator : evaluators) {
             if (clazz.isInstance(evaluator)) {
                 return (T) evaluator;
             }

@@ -65,7 +65,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getLoss(NDList label, NDList prediction) {
+    public NDArray evaluate(NDList label, NDList prediction) {
         NDArray pred = prediction.singletonOrThrow();
         if (!fromLogit) {
             // TODO: use numpy log softmax

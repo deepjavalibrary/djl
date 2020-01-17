@@ -46,6 +46,9 @@ import java.util.List;
  */
 public interface Trainer extends AutoCloseable {
 
+    String TRAIN = "train";
+    String VALIDATE = "train";
+
     /**
      * Initializes the {@link Model} that the {@code Trainer} is going to train.
      *
@@ -132,13 +135,6 @@ public interface Trainer extends AutoCloseable {
     Loss getLoss();
 
     /**
-     * Gets the validation {@link Loss} function of the trainer.
-     *
-     * @return the validation {@link Loss} function
-     */
-    Loss getValidationLoss();
-
-    /**
      * Returns the model used to create this trainer.
      *
      * @return the model associated with this trainer
@@ -146,36 +142,20 @@ public interface Trainer extends AutoCloseable {
     Model getModel();
 
     /**
-     * Gets all training {@link Evaluator}s.
+     * Gets all {@link Evaluator}s.
      *
-     * @return the training metrics
+     * @return the evaluators used during training
      */
-    List<Evaluator> getTrainingEvaluators();
+    List<Evaluator> getEvaluators();
 
     /**
-     * Gets the training {@link Evaluator} that is an instance of the given {@link Class}.
+     * Gets the {@link Evaluator} that is an instance of the given {@link Class}.
      *
      * @param clazz the {@link Class} of the {@link Evaluator} sought
      * @param <T> the type of the training evaluator
-     * @return the training evaluator requested
+     * @return the requested evaluator
      */
-    <T extends Evaluator> T getTrainingEvaluator(Class<T> clazz);
-
-    /**
-     * Gets all validation {@link Evaluator}s.
-     *
-     * @return the validation metrics
-     */
-    List<Evaluator> getValidationEvaluators();
-
-    /**
-     * Gets the validation {@link Evaluator} that is an instance of the given {@link Class}.
-     *
-     * @param clazz the {@link Class} of the {@link Evaluator} sought
-     * @param <T> the type of the validation evaluator
-     * @return the validation evaluator requested
-     */
-    <T extends Evaluator> T getValidationEvaluator(Class<T> clazz);
+    <T extends Evaluator> T getEvaluator(Class<T> clazz);
 
     /**
      * Gets the {@link NDManager} from the model.

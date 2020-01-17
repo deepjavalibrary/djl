@@ -25,7 +25,7 @@ public class ExampleTrainingResult {
     public ExampleTrainingResult(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
         evaluations = new ConcurrentHashMap<>();
-        for (Evaluator evaluator : trainer.getValidationEvaluators()) {
+        for (Evaluator evaluator : trainer.getEvaluators()) {
             float value =
                     metrics.latestMetric("validate_" + evaluator.getName()).getValue().floatValue();
             evaluations.put(evaluator.getName(), value);
