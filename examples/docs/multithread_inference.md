@@ -19,6 +19,11 @@ If using the MXNet engine for a multi-threaded inference case, you need to speci
 export MXNET_ENGINE_TYPE=NaiveEngine
 ```
 
+To get the best throughput, you may also need to set 'OMP_NUM_THREADS' environment variable:
+```
+export OMP_NUM_THREADS=1
+```
+
 ### Save your inference memory with thread-safe mode (Experimental)
 
 This is an experimental feature used in MXNet to share the parameters' memory across all predictors.
