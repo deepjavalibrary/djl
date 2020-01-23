@@ -116,7 +116,7 @@ public class Metrics {
      */
     public Metric latestMetric(String name) {
         List<Metric> list = metrics.get(name);
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             throw new IllegalArgumentException("Could not find metric: " + name);
         }
         return list.get(list.size() - 1);
