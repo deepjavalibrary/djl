@@ -14,7 +14,7 @@ For a reference implementation, see [Multi-threaded Benchmark](../src/main/java/
 To use MXNet Engine to run multi-threading, complete the following steps.
 
 ### Enable NaiveEngine with MXNet
-If using the MXNet engine for a multi-threaded inference case, you need to specify the 'MXNET_ENGINE_TYPE' environment variable using the following command:```
+If using the MXNet engine for a multi-threaded inference case, you need to specify the 'MXNET_ENGINE_TYPE' environment variable using the following command:
 ```
 export MXNET_ENGINE_TYPE=NaiveEngine
 ```
