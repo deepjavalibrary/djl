@@ -4,6 +4,8 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+
+import java.nio.CharBuffer;
 import java.nio.IntBuffer;
 
 public interface PyTorchLibrary extends Library {
@@ -16,7 +18,17 @@ public interface PyTorchLibrary extends Library {
 
     int ones(PointerByReference output);
 
-    int TensorToFloat(Pointer input, PointerByReference output, IntBuffer size);
+    int TensorToFloat(Pointer tensorHandle, PointerByReference output, IntBuffer size);
 
-    int TensorGetShape(Pointer input, IntBuffer dim, PointerByReference output);
+    int TensorGetShape(Pointer tensorHandle, IntBuffer dim, PointerByReference output);
+
+    int ModuleLoad(CharBuffer path, PointerByReference moduleHandle);
+
+    int ModuleEval(Pointer moduleHandle);
+
+    int ModuleForward(Pointer moduleHandle, Pointer iValueArrayHandle, int length, PointerByReference resultHandle);
+
+    int IValueCreateFromTensor(Pointer tensorHandle, PointerByReference iValueHandle);
+
+    int IValueToTensor(Pointer iValueHandle, PointerByReference tensorHandle);
 }
