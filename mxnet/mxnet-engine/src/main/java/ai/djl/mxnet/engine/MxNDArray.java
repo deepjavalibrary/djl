@@ -1245,13 +1245,17 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes) {
-        return softmax(axes, 1.0);
+    public NDArray softmax(int[] axes, double temperature) {
+        return softmaxHelper(axes, temperature, "_npx_softmax");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, double temperature) {
+    public NDArray logSoftmax(int[] axes, double temperature) {
+        return softmaxHelper(axes, temperature, "_npx_log_softmax");
+    }
+
+    private NDArray softmaxHelper(int[] axes, double temperature, String opName) {
         // TODO remove this after MXNet softmax fix zero-dim issue
         if (isEmpty()) {
             return getManager().create(getShape());
@@ -1264,14 +1268,16 @@ public class MxNDArray extends NativeResource implements NDArray {
             Shape sliced = transposed.getShape().slice(axes.length);
             NDArray array = transposed.reshape(new Shape(size).addAll(sliced));
             params.addParam("axis", 0);
-            params.addParam("temperature", temperature);
-            return manager.invoke("_npx_softmax", array, params)
-                    .reshape(transposedShape)
-                    .transpose(axes);
+            if (temperature != 1.0) {
+                params.addParam("temperature", temperature);
+            }
+            return manager.invoke(opName, array, params).reshape(transposedShape).transpose(axes);
         } else {
             params.addParam("axis", axes[0]);
-            params.addParam("temperature", temperature);
-            return manager.invoke("_npx_softmax", this, params);
+            if (temperature != 1.0) {
+                params.addParam("temperature", temperature);
+            }
+            return manager.invoke(opName, this, params);
         }
     }
 

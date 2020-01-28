@@ -858,6 +858,11 @@ public class TfNDArray implements NDArray {
         return out;
     }
 
+    @Override
+    public NDArray logSoftmax(int[] axes, double temperature) {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray cumSum(int axis) {

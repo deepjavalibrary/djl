@@ -13,6 +13,7 @@
 package ai.djl.integration.tests.ndarray;
 
 import ai.djl.engine.EngineException;
+import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -392,23 +393,23 @@ public class NDArrayOtherOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.ones(new Shape(10));
             NDArray expected = manager.zeros(new Shape(10)).add(0.1f);
-            Assert.assertEquals(array.softmax(0), expected);
+            Assertions.assertAlmostEquals(array.softmax(0), expected);
             // test multi-dim
             array = manager.ones(new Shape(2, 3, 1, 3));
             expected = manager.zeros(new Shape(2, 3, 1, 3)).add(0.5f);
-            Assert.assertEquals(array.softmax(0), expected);
+            Assertions.assertAlmostEquals(array.softmax(0), expected);
             expected = manager.zeros(new Shape(2, 3, 1, 3)).add(0.33333334f);
-            Assert.assertEquals(array.softmax(1), expected);
+            Assertions.assertAlmostEquals(array.softmax(1), expected);
             expected = manager.ones(new Shape(2, 3, 1, 3));
-            Assert.assertEquals(array.softmax(2), expected);
+            Assertions.assertAlmostEquals(array.softmax(2), expected);
             expected = manager.zeros(new Shape(2, 3, 1, 3)).add(0.33333334f);
-            Assert.assertEquals(array.softmax(3), expected);
+            Assertions.assertAlmostEquals(array.softmax(3), expected);
             // test scalar
             array = manager.create(1f);
-            Assert.assertEquals(array.softmax(0), array);
+            Assertions.assertAlmostEquals(array.softmax(0), array);
             // test zero
             array = manager.create(new Shape(2, 0, 1));
-            Assert.assertEquals(array.softmax(0), array);
+            Assertions.assertAlmostEquals(array.softmax(0), array);
         }
     }
 

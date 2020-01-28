@@ -299,6 +299,8 @@ public interface NDArrayEx {
             float epsilon,
             float momentum,
             int axis,
+            boolean center,
+            boolean scale,
             PairList<String, Object> additional);
 
     /**

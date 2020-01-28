@@ -840,6 +840,12 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray logSoftmax(int[] axes, double temperature) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray cumSum(int axis) {
         return null;
     }

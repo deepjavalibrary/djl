@@ -66,8 +66,12 @@ public class Adam extends Optimizer {
         float lr = learningRateTracker.getNewLearningRate(t);
         float newLearningRate = (float) (lr * Math.sqrt(coef2) / coef1);
         float weightDecay = getWeightDecay();
-        if (Float.isNaN(newLearningRate) || Float.isNaN(weightDecay)) {
-            throw new IllegalStateException("learning rate or weight decay is nan");
+
+        if (Float.isNaN(newLearningRate)
+                || Float.isNaN(weightDecay)
+                || Float.isInfinite(newLearningRate)
+                || Float.isInfinite(weightDecay)) {
+            throw new IllegalStateException("learning rate or weight decay is nan or infinite");
         }
         NDList inputs =
                 new NDList(

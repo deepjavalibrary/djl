@@ -1020,6 +1020,12 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray logSoftmax(int[] axes, double temperature) {
+        return array.logSoftmax(axes, temperature);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray cumSum(int axis) {
         return array.cumSum(axis);
     }

@@ -69,7 +69,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
         NDArray pred = prediction.singletonOrThrow();
         if (!fromLogit) {
             // TODO: use numpy log softmax
-            pred = pred.softmax(classAxis).log();
+            pred = pred.logSoftmax(classAxis);
         }
         NDArray loss;
         NDArray lab = label.singletonOrThrow();

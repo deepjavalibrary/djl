@@ -220,42 +220,31 @@ public final class Utils {
      */
     public static void checkParameterValues(
             PairList<String, Parameter> parameters, boolean checkGradient, Logger logger) {
-        List<Float> values = new ArrayList<>();
-        String valueName = checkGradient ? "gradient" : "value";
+        for (Parameter parameter : parameters.values()) {
+            logger.info(
+                    "Checking parameter: "
+                            + parameter.getName()
+                            + " Shape: "
+                            + parameter.getArray().getShape());
+            checkNDArrayValues(parameter.getArray(), logger, "weight");
 
-        values.addAll(
-                parameters
-                        .values()
-                        .stream()
-                        .filter(Parameter::requireGradient)
-                        .map(
-                                param -> {
-                                    NDArray value =
-                                            checkGradient
-                                                    ? param.getArray().getGradient()
-                                                    : param.getArray();
-                                    float[] sums = value.sum().toFloatArray();
-                                    float sum = 0f;
-                                    for (float num : sums) {
-                                        sum += num;
-                                    }
-                                    if (Float.isNaN(sum)) {
-                                        logger.info(
-                                                "param name: "
-                                                        + param.getName()
-                                                        + ", "
-                                                        + valueName
-                                                        + " is nan :"
-                                                        + sum);
-                                    }
-                                    return sum;
-                                })
-                        .collect(Collectors.toList()));
+            if (parameter.requireGradient() && checkGradient) {
+                logger.info("Checking gradient of: " + parameter.getName());
+                checkNDArrayValues(parameter.getArray().getGradient(), logger, "grad");
+            }
+        }
+    }
 
-        logger.debug(
-                "Sum of param's"
-                        + valueName
-                        + "is : "
-                        + values.stream().mapToDouble(f -> f.doubleValue()).sum());
+    private static void checkNDArrayValues(NDArray array, Logger logger, String prefix) {
+        if (array.isNaN().any().getBoolean()) {
+            logger.warn("There are NANs in value");
+            for (int i = 0; i < array.size(0); i++) {
+                logger.info(array.get(i).toString());
+            }
+        }
+        logger.info(prefix + " sum: " + array.sum().getFloat());
+        logger.info(prefix + " mean: " + array.mean().getFloat());
+        logger.info(prefix + " max: " + array.max().getFloat());
+        logger.info(prefix + " min: " + array.min().getFloat());
     }
 }

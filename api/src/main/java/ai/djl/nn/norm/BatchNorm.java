@@ -72,7 +72,7 @@ public class BatchNorm extends ParameterBlock {
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
-        return ex.batchNorm(inputs, epsilon, momentum, axis, params);
+        return ex.batchNorm(inputs, epsilon, momentum, axis, center, scale, params);
     }
 
     /** {@inheritDoc} */

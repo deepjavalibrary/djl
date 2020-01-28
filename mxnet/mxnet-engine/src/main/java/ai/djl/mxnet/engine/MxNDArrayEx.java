@@ -546,11 +546,14 @@ class MxNDArrayEx implements NDArrayEx {
             float epsilon,
             float momentum,
             int axis,
+            boolean center,
+            boolean scale,
             PairList<String, Object> additional) {
         MxOpParams params = new MxOpParams();
         params.addParam("eps", epsilon);
         params.addParam("momentum", momentum);
         params.addParam("axis", axis);
+        params.addParam("fix_gamma", scale ? 0 : 1);
         params.addAll(additional);
 
         return getManager().invoke("BatchNorm", inputs, params);
