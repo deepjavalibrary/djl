@@ -25,7 +25,7 @@ import ai.djl.training.loss.Loss;
 import java.util.List;
 
 /**
- * An interface that represents a single training iteration.
+ * The {@code Trainer} interface provides a session for model training.
  *
  * <p>{@code Trainer} provides an easy, and manageable interface for training. {@code Trainer} is
  * not thread-safe.

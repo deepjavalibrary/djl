@@ -18,7 +18,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 
 /**
- * A {@code Batch} is used to hold multiple items (data and labels) from a {@link Dataset}.
+ * A {@code Batch} is used to hold multiple items (data and label pairs) from a {@link Dataset}.
  *
  * <p>When training and performing inference, it is often more efficient to run multiple items
  * through a network simultaneously rather than one at a time. For this reason, much of the API is
@@ -27,12 +27,12 @@ import ai.djl.translate.Batchifier;
  * <p>In a {@code Batch}, data and label are each an {@link NDList}. The data {@link NDList}
  * represents the data for each input in the batch. The number of {@link ai.djl.ndarray.NDArray}s in
  * the NDList is based on the number of different kinds of inputs, not the batch size. Similarly,
- * the label {@link NDList} represents the labels for each output.
+ * the label {@link NDList} represents the labels for each kind of output.
  *
- * <p>For example, an Image Question and Answer dataset has two inputs: an image and the question.
- * In this case, the data in the {@code Batch} will be an {@link NDList} containing a NCHW image
- * {@link ai.djl.ndarray.NDArray} and a NTC question {@link ai.djl.ndarray.NDArray}. The label will
- * be an {@link NDList} containing only a NTC answer {@link ai.djl.ndarray.NDArray}.
+ * <p>For example, an Image Question and Answer dataset has two inputs: an image and a question. In
+ * this case, the data in the {@code Batch} will be an {@link NDList} containing an NCHW image
+ * {@link ai.djl.ndarray.NDArray} and an NTC question {@link ai.djl.ndarray.NDArray}. The label will
+ * be an {@link NDList} containing only an NTC answer {@link ai.djl.ndarray.NDArray}.
  *
  * <p>In order to differentiate a batch vs a single record (despite them both consisting of two
  * {@link NDList}s), we have the {@link Batch} and the {@link Record} respectively.

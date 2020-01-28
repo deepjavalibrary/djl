@@ -27,13 +27,14 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * A {@code Block} is a composable unit that forms a neural network.
+ * A {@code Block} is a composable function that forms a neural network.
  *
- * <p>Primarily, a {@code Block} is a unit that can take multiple inputs in the form of an {@link
- * NDList}, perform an operation on the inputs, and returns the output of the operation as an {@link
- * NDList}. In that sense, a {@code Block} is a neuron in the neural network. It can also be a
- * sub-network in a network, or the whole network itself. To understand the {@code Block}, we need
- * to understand the important components of a block:
+ * <p>Blocks serve a purpose similar to functions that convert an input NDList to an output NDList.
+ * They can represent single operations, parts of a neural network, and even the whole neural
+ * network. What makes blocks special is that they contain a number of parameters that are used in
+ * their function and are trained during deep learning. As these parameters are trained, the
+ * functions represented by the blocks get more and more accurate. Each block consists of the
+ * following components:
  *
  * <ul>
  *   <li>Forward function
@@ -51,10 +52,14 @@ import java.util.List;
  * block, the parameters are {@code weight} and {@code bias}. During training, these parameters are
  * updated to reflect the training data, and that forms the crux of learning.
  *
- * <p>A block and its children together form a neural network. The way the network is structured
- * depends on the implementation of the block, and its interaction with its children. The children
- * can be aligned in sequence (eg. {@link SequentialBlock}), in parallel (eg. {@link
- * ParallelBlock}), or in many other ways.
+ * <p>When building these block functions, the easiest way is to use composition. Similar to how
+ * functions are built by calling other functions, blocks can be built by combining other blocks. We
+ * refer to the containing block as the parent and the sub-blocks as the children.
+ *
+ * <p>We provide helpers for creating two common structures of blocks. For blocks that call children
+ * in a chain, use {@link SequentialBlock}. If a blocks calls all of the children in parallel and
+ * then combines their results, use {@link ParallelBlock}. For blocks that do not fit these
+ * strcutures, you should directly extend the {@link AbstractBlock} class.
  *
  * <p>A block does not necessarily have to have children and parameters. For example, {@link
  * SequentialBlock}, and {@link ParallelBlock} don't have any parameters, but do have child blocks.
@@ -99,6 +104,7 @@ import java.util.List;
  * your first network</a>.
  */
 public interface Block {
+
     /**
      * Applies the operating function of the block once. This method should be called only on blocks
      * that are initialized.
