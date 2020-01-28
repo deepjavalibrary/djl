@@ -36,6 +36,9 @@ import java.util.Map;
  */
 public final class Cifar10 extends ArrayDataset implements ZooDataset {
 
+    public static final float[] NORMALIZE_MEAN = {0.4914f, 0.4822f, 0.4465f};
+    public static final float[] NORMALIZE_STD = {0.2023f, 0.1994f, 0.2010f};
+
     private static final String ARTIFACT_ID = "cifar10";
     // 3072 = 32 * 32 * 3, i.e. one image size, +1 here is label
     private static final int DATA_AND_LABEL_SIZE = 32 * 32 * 3 + 1;

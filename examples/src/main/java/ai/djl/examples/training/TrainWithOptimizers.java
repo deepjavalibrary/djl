@@ -210,15 +210,12 @@ public final class TrainWithOptimizers {
         Pipeline pipeline =
                 new Pipeline(
                         new ToTensor(),
-                        new Normalize(
-                                new float[] {0.4914f, 0.4822f, 0.4465f},
-                                new float[] {0.2023f, 0.1994f, 0.2010f}));
-        long maxIterations = arguments.getMaxIterations();
+                        new Normalize(Cifar10.NORMALIZE_MEAN, Cifar10.NORMALIZE_STD));
         Cifar10 cifar10 =
                 Cifar10.builder()
                         .optUsage(usage)
                         .setSampling(arguments.getBatchSize(), true)
-                        .optMaxIteration(maxIterations)
+                        .optMaxIteration(arguments.getMaxIterations())
                         .optPipeline(pipeline)
                         .build();
         cifar10.prepare(new ProgressBar());

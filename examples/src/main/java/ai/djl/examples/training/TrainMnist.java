@@ -94,23 +94,19 @@ public final class TrainMnist {
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
-        int batchSize = arguments.getBatchSize();
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .setBatchSize(batchSize)
+                .setBatchSize(arguments.getBatchSize())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()));
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
             throws IOException {
-        int batchSize = arguments.getBatchSize();
-        long maxIterations = arguments.getMaxIterations();
-
         Mnist mnist =
                 Mnist.builder()
                         .optUsage(usage)
-                        .setSampling(batchSize, true)
-                        .optMaxIteration(maxIterations)
+                        .setSampling(arguments.getBatchSize(), true)
+                        .optMaxIteration(arguments.getMaxIterations())
                         .build();
         mnist.prepare(new ProgressBar());
         return mnist;
