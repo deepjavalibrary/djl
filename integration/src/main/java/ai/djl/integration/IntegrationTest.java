@@ -29,7 +29,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -51,7 +53,6 @@ public class IntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTest.class);
 
-    private int totalFailed;
     private Class<?> source;
 
     public IntegrationTest(Class<?> source) {
@@ -72,54 +73,65 @@ public class IntegrationTest {
             Duration duration = Duration.ofMinutes(arguments.getDuration());
             List<TestClass> tests = listTests(arguments, source);
 
+            boolean testsPassed = true;
             while (!duration.isNegative()) {
                 long begin = System.currentTimeMillis();
 
-                runTests(tests);
+                testsPassed = testsPassed && runTests(tests);
 
                 long delta = System.currentTimeMillis() - begin;
                 duration = duration.minus(Duration.ofMillis(delta));
             }
+            return testsPassed;
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.setLeftPadding(1);
             formatter.setWidth(120);
             formatter.printHelp(e.getMessage(), options);
+            return false;
         } catch (Throwable t) {
             logger.error("Unexpected error", t);
             return false;
         }
-
-        return totalFailed == 0;
     }
 
-    private void runTests(List<TestClass> tests) {
-        long totalMethodCount = 0;
+    private boolean runTests(List<TestClass> tests) {
+        Map<TestResult, Integer> totals = new ConcurrentHashMap<>();
         for (TestClass testClass : tests) {
             logger.info("Running test {} ...", testClass.getName());
             int testCount = testClass.getTestCount();
-            totalMethodCount += testCount;
 
             try {
                 if (!testClass.beforeClass()) {
-                    totalFailed += totalMethodCount;
+                    totals.merge(TestResult.FAILED, testCount, Integer::sum);
                     continue;
                 }
 
                 for (int i = 0; i < testCount; ++i) {
-                    if (!testClass.runTest(i)) {
-                        ++totalFailed;
-                    }
+                    TestResult result = testClass.runTest(i);
+                    totals.merge(result, 1, Integer::sum);
                 }
             } finally {
                 testClass.afterClass();
             }
         }
-        if (totalFailed > 0) {
-            logger.error("Failed {} out of {} tests", totalFailed, totalMethodCount);
-        } else {
-            logger.info("Passed all {} tests", totalMethodCount);
+
+        int totalFailed = totals.getOrDefault(TestResult.FAILED, 0);
+        int totalPassed = totals.getOrDefault(TestResult.SUCCESS, 0);
+        int totalSkipped = totals.getOrDefault(TestResult.SKIPPED, 0);
+        int totalUnsupported = totals.getOrDefault(TestResult.UNSUPPORTED, 0);
+        if (totalSkipped > 0) {
+            logger.info("Skipped: {} tests", totalSkipped);
         }
+        if (totalUnsupported > 0) {
+            logger.info("Unsupported: {} tests", totalUnsupported);
+        }
+        if (totalFailed > 0) {
+            logger.error("Failed {} out of {} tests", totalFailed, totalFailed + totalPassed);
+        } else {
+            logger.info("Passed all {} tests", totalPassed);
+        }
+        return totalFailed == 0;
     }
 
     private static List<TestClass> listTests(Arguments arguments, Class<?> source)
@@ -327,27 +339,37 @@ public class IntegrationTest {
             }
         }
 
-        public boolean runTest(int index) {
+        public TestResult runTest(int index) {
             if (!beforeTest()) {
-                return false;
+                return TestResult.FAILED;
             }
 
+            TestResult result;
             Method method = testMethods.get(index);
             try {
                 method.invoke(object);
                 logger.info("Test {}.{} PASSED", getName(), method.getName());
+                result = TestResult.SUCCESS;
             } catch (IllegalAccessException | InvocationTargetException e) {
-                if (e.getCause() instanceof SkipException) {
+                if (expectedException(method, e)) {
+                    logger.info("Test {}.{} PASSED", getName(), method.getName());
+                    result = TestResult.SUCCESS;
+                } else if (e.getCause() instanceof SkipException) {
                     logger.info("Test {}.{} SKIPPED", getName(), method.getName());
-                } else if (notExpected(method, e)) {
+                    result = TestResult.SKIPPED;
+                } else if (e.getCause() instanceof UnsupportedOperationException) {
+                    logger.info("Test {}.{} UNSUPPORTED", getName(), method.getName());
+                    logger.debug("", e.getCause());
+                    result = TestResult.UNSUPPORTED;
+                } else {
                     logger.error("Test {}.{} FAILED", getName(), method.getName());
                     logger.error("", e.getCause());
-                    return false;
+                    result = TestResult.FAILED;
                 }
             } finally {
                 afterTest();
             }
-            return true;
+            return result;
         }
 
         public int getTestCount() {
@@ -358,18 +380,25 @@ public class IntegrationTest {
             return object.getClass().getName();
         }
 
-        private static boolean notExpected(Method method, Exception e) {
+        private static boolean expectedException(Method method, Exception e) {
             Test test = method.getAnnotation(Test.class);
             Class<?>[] exceptions = test.expectedExceptions();
             if (exceptions.length > 0) {
                 Throwable exception = e.getCause();
                 for (Class<?> c : exceptions) {
                     if (c.isInstance(exception)) {
-                        return false;
+                        return true;
                     }
                 }
             }
-            return true;
+            return false;
         }
+    }
+
+    public enum TestResult {
+        SUCCESS,
+        FAILED,
+        SKIPPED,
+        UNSUPPORTED;
     }
 }
