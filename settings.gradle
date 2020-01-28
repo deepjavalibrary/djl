@@ -10,5 +10,6 @@ include ':mxnet:mxnet-engine'
 include ':mxnet:mxnet-model-zoo'
 include ':mxnet:native'
 include ':tensorflow:engine'
+include ':pytorch:pytorch-engine'
 
 project(":examples").buildFileName = "djl.gradle"

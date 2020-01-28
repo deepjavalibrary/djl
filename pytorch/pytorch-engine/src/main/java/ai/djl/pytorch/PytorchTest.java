@@ -1,7 +1,6 @@
 package ai.djl.pytorch;
 
 import com.sun.jna.ptr.PointerByReference;
-
 import java.nio.IntBuffer;
 
 public class PytorchTest {
