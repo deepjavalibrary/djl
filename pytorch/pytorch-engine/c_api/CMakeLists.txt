@@ -4,8 +4,8 @@ project(torch-wrapper)
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
-add_library(torch-wrapper SHARED torch-wrapper.cpp)
 #add_executable(torch-wrapper test.cpp)
+add_library(torch-wrapper SHARED c_api.h c_api.cc)
 target_link_libraries(torch-wrapper "${TORCH_LIBRARIES}")
 set_property(TARGET torch-wrapper PROPERTY CXX_STANDARD 14)
 

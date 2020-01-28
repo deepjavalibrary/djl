@@ -14,5 +14,9 @@ public interface PyTorchLibrary extends Library {
                             + "/pytorch/pytorch-engine/c_api/build/libtorch-wrapper.dylib",
                     PyTorchLibrary.class);
 
-    int getShape(Pointer input, IntBuffer dim, PointerByReference output);
+    int ones(PointerByReference output);
+
+    int TensorToFloat(Pointer input, PointerByReference output, IntBuffer size);
+
+    int TensorGetShape(Pointer input, IntBuffer dim, PointerByReference output);
 }
