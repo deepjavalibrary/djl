@@ -31,6 +31,8 @@ You can pull the MXNet engine from the central Maven repository by including the
 ```
 
 Besides the `mxnet-engine` library, you may also need to include the MXNet native library in your project.
+All current provided MXNet native libraries are built with [MKLDNN](https://github.com/intel/mkl-dnn).
+
 Choose a native library based on your platform and needs:
 
 ### macOS
@@ -50,12 +52,13 @@ For macOS, you can use the following library:
 ```
 
 ### Linux
-For the Linux platform, you can choose between CPU, MKL, CUDA and CUDA+MKL combinations:
+For the Linux platform, you can choose between CPU, GPU. If you have Nvidia [CUDA](https://en.wikipedia.org/wiki/CUDA)
+installed on your GPU machine, you can use one of the following library:
 
-CUDA with MKL:
-- org.apache.mxnet:mxnet-native-cu102mkl:1.6.0-c:linux-x86_64
-- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-c:linux-x86_64
-- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-c:linux-x86_64
+GPU:
+- org.apache.mxnet:mxnet-native-cu102mkl:1.6.0-c:linux-x86_64 - CUDA 10.2
+- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-c:linux-x86_64 - CUDA 10.1
+- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-c:linux-x86_64 - CUDA 9.2
 
 ```xml
     <dependency>
@@ -87,7 +90,7 @@ CUDA with MKL:
     </dependency>
 ```
 
-CPU with MKL
+CPU
 - org.apache.mxnet:mxnet-native-mkl:1.6.0-c:linux-x86_64
 
 ```xml
@@ -104,7 +107,7 @@ CPU with MKL
 
 For the Windows platform, you can choose between CPU and GPU.
 
-CUDA with MKL:
+GPU:
 - org.apache.mxnet:mxnet-native-cu102mkl:1.6.0-c:win-x86_64
 
     **Note:** The MXNet cu102mkl library only supports the sm_70 and sm_75 architectures.
@@ -148,7 +151,7 @@ CUDA with MKL:
     </dependency>
 ```
 
-CPU with MKL
+CPU
 - org.apache.mxnet:mxnet-native-mkl:1.6.0-c:win-x86_64
 
 ```xml
