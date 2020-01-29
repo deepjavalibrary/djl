@@ -90,7 +90,14 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
      *
      * @return the number of iteration of the batch iterable, -1 if number of iterations is unknown
      */
-    public abstract long getNumIterations();
+    public long getNumIterations() {
+        int batchSize = sampler.getBatchSize();
+        if (batchSize == -1) {
+            return -1;
+        }
+        long iteration = size() / batchSize;
+        return Math.min(maxIteration, iteration);
+    }
 
     /** The Builder to construct a {@link RandomAccessDataset}. */
     @SuppressWarnings("rawtypes")

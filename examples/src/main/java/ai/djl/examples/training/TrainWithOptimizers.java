@@ -95,7 +95,7 @@ public final class TrainWithOptimizers {
                  * CIFAR10 is 32x32 image and pre processed into NCHW NDArray.
                  * 1st axis is batch axis, we can use 1 for initialization.
                  */
-                Shape inputShape = new Shape(1, 3, 32, 32);
+                Shape inputShape = new Shape(1, 3, Cifar10.IMAGE_HEIGHT, Cifar10.IMAGE_WIDTH);
 
                 // initialize trainer with proper input shape
                 trainer.initialize(inputShape);
@@ -155,7 +155,7 @@ public final class TrainWithOptimizers {
             Model model = Model.newInstance();
             Block resNet50 =
                     new ResNetV1.Builder()
-                            .setImageShape(new Shape(3, 32, 32))
+                            .setImageShape(new Shape(3, Cifar10.IMAGE_HEIGHT, Cifar10.IMAGE_WIDTH))
                             .setNumLayers(50)
                             .setOutSize(10)
                             .build();

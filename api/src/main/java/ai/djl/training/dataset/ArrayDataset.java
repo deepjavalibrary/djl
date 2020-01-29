@@ -70,17 +70,6 @@ public class ArrayDataset extends RandomAccessDataset {
 
     /** {@inheritDoc} */
     @Override
-    public long getNumIterations() {
-        int batchSize = sampler.getBatchSize();
-        if (batchSize == -1) {
-            return -1;
-        }
-        long iteration = data[0].size(0) / batchSize;
-        return Math.min(maxIteration, iteration);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Record get(NDManager manager, long index) {
         NDList datum = new NDList();
         NDList label = new NDList();

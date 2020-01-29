@@ -36,6 +36,9 @@ import java.util.Map;
  */
 public final class Mnist extends ArrayDataset implements ZooDataset {
 
+    public static final int IMAGE_WIDTH = 28;
+    public static final int IMAGE_HEIGHT = 28;
+
     private static final String ARTIFACT_ID = "mnist";
 
     private NDManager manager;

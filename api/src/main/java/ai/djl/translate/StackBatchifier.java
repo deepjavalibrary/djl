@@ -12,9 +12,12 @@
  */
 package ai.djl.translate;
 
+import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -36,18 +39,52 @@ public class StackBatchifier implements Batchifier {
             return new NDList();
         }
 
-        // stack all the data and labels together
-        NDList result = new NDList(numInputKinds);
-        for (int i = 0; i < numInputKinds; i++) {
-            NDList inputsOfKind = new NDList(batchSize);
-            for (NDList input : inputs) {
-                inputsOfKind.add(input.get(i));
+        try {
+            // stack all the data and labels together
+            NDList result = new NDList(numInputKinds);
+            for (int i = 0; i < numInputKinds; i++) {
+                NDList inputsOfKind = new NDList(batchSize);
+                for (NDList input : inputs) {
+                    inputsOfKind.add(input.get(i));
+                }
+                NDArray stacked = NDArrays.stack(new NDList(inputsOfKind));
+                result.add(stacked);
             }
-            NDArray stacked = NDArrays.stack(new NDList(inputsOfKind));
-            result.add(stacked);
-        }
 
-        return result;
+            return result;
+        } catch (IndexOutOfBoundsException | EngineException e) {
+            // If there is an error when batchifying, check for various potential problems with the
+            // inputs. The error is not handled in this block. It only attempts to clarify the
+            // error's cause before rethrowing.
+
+            // Check if numInputKinds is not consistant for all inputs
+            for (NDList input : inputs) {
+                if (input.size() != numInputKinds) {
+                    throw new IllegalArgumentException(
+                            "You cannot batch data with different numbers of inputs", e);
+                }
+            }
+
+            // Check if data does not have a consistent shape or type
+            for (int i = 0; i < numInputKinds; i++) {
+                Shape kindDataShape = inputs[0].get(i).getShape();
+                DataType kindDataType = inputs[0].get(i).getDataType();
+                for (NDList input : inputs) {
+                    NDArray currInput = input.get(i);
+                    if (!currInput.getShape().equals(kindDataShape)) {
+                        throw new IllegalArgumentException(
+                                "You cannot batch data with different input shapes", e);
+                    }
+                    if (!currInput.getDataType().equals(kindDataType)) {
+                        throw new IllegalArgumentException(
+                                "You cannot batch data with different input data types", e);
+                    }
+                }
+            }
+
+            // Could not clarify cause - rethrow original error.
+            throw e;
+        }
     }
 
     /** {@inheritDoc} */

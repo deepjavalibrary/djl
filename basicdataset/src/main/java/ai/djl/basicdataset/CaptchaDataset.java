@@ -12,61 +12,96 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.engine.Engine;
 import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.modality.cv.util.NDImageUtils.Flag;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.ZooDataset;
-import ai.djl.training.dataset.ArrayDataset;
+import ai.djl.training.dataset.RandomAccessDataset;
+import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
-import ai.djl.util.Utils;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * CIFAR10 image classification dataset from https://www.cs.toronto.edu/~kriz/cifar.html.
+ * A {@link ai.djl.training.dataset.Dataset} featuring captcha images.
  *
- * <p>Each sample is an image (in 3-D {@link NDArray}) with shape (32, 32, 3).
+ * <p>Each image is a 160x60 grayscale image featuring 5 or 6 digits where each digit ranges from
+ * 0-10. The dataset therefore features 6 labels. Each label ranges from 0-11 where 0-10 represent a
+ * recognized digit and 11 indicates that the value is not a digit (size 5 and not 6).
  */
-public final class Cifar10 extends ArrayDataset implements ZooDataset {
+public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
 
-    public static final int IMAGE_WIDTH = 32;
-    public static final int IMAGE_HEIGHT = 32;
+    public static final int IMAGE_WIDTH = 160;
+    public static final int IMAGE_HEIGHT = 60;
+    public static final int CAPTCHA_LENGTH = 6;
+    public static final int CAPTCHA_OPTIONS = 11;
 
-    public static final float[] NORMALIZE_MEAN = {0.4914f, 0.4822f, 0.4465f};
-    public static final float[] NORMALIZE_STD = {0.2023f, 0.1994f, 0.2010f};
+    private static final String ARTIFACT_ID = "captcha";
 
-    private static final String ARTIFACT_ID = "cifar10";
-    // 3072 = 32 * 32 * 3, i.e. one image size, +1 here is label
-    private static final int DATA_AND_LABEL_SIZE = IMAGE_HEIGHT * IMAGE_WIDTH * 3 + 1;
-
-    private NDManager manager;
     private Repository repository;
     private Artifact artifact;
     private Usage usage;
     private boolean prepared;
 
-    Cifar10(Builder builder) {
+    private List<String> items;
+
+    /**
+     * Creates a new instance of {@link CaptchaDataset}.
+     *
+     * @param builder a builder with the necessary configurations
+     */
+    public CaptchaDataset(Builder builder) {
         super(builder);
-        this.manager = builder.manager;
         this.repository = builder.repository;
         this.artifact = builder.artifact;
         this.usage = builder.usage;
     }
 
     /**
-     * Creates a builder to build a {@link Cifar10}.
+     * Creates a builder to build a {@link CaptchaDataset}.
      *
      * @return a new builder
      */
-    public static Builder builder() {
-        return new Builder();
+    public static CaptchaDataset.Builder builder() {
+        return new CaptchaDataset.Builder();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Record get(NDManager manager, long index) throws IOException {
+        String item = items.get(Math.toIntExact(index));
+
+        Path imagePath =
+                repository.getFile(getArtifactItem(), getUsagePath() + "/" + item + ".jpeg");
+        NDArray imageArray = BufferedImageUtils.readFileToArray(manager, imagePath, Flag.GRAYSCALE);
+        NDList data = new NDList(imageArray);
+
+        NDList labels = new NDList(CAPTCHA_LENGTH);
+        char[] labelChars = item.toCharArray();
+        for (int i = 0; i < CAPTCHA_LENGTH; i++) {
+            if (i < item.length()) {
+                int labelDigit = Integer.parseInt(Character.toString(labelChars[i]));
+                labels.add(manager.create(labelDigit));
+            } else {
+                labels.add(manager.create(11));
+            }
+        }
+
+        return new Record(data, labels);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long size() {
+        return items.size();
     }
 
     /** {@inheritDoc} */
@@ -114,54 +149,37 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
     /** {@inheritDoc} */
     @Override
     public void prepareData(Usage usage) throws IOException {
-        Map<String, Artifact.Item> map = artifact.getFiles();
-        Artifact.Item item;
+
+        items = new ArrayList<>();
+        for (String filenameWithExtension :
+                repository.listDirectory(getArtifactItem(), getUsagePath())) {
+            String captchaFilename =
+                    filenameWithExtension.substring(0, filenameWithExtension.lastIndexOf('.'));
+            items.add(captchaFilename);
+        }
+    }
+
+    private Artifact.Item getArtifactItem() {
+        return artifact.getFiles().get("data");
+    }
+
+    private String getUsagePath() {
+        String prefix = "captchaImage/";
         switch (usage) {
             case TRAIN:
-                item = map.get("data_batch.bin");
-                break;
+                return prefix + "train";
             case TEST:
-                item = map.get("test_batch.bin");
-                break;
+                return prefix + "test";
             case VALIDATION:
+                return prefix + "validate";
             default:
-                throw new UnsupportedOperationException("Validation data not available.");
-        }
-        NDArray dataAndLabels = readData(item);
-        data =
-                new NDArray[] {
-                    dataAndLabels
-                            .get(":, 1:")
-                            .reshape(-1, 3, IMAGE_HEIGHT, IMAGE_WIDTH)
-                            .transpose(0, 2, 3, 1)
-                };
-        labels = new NDArray[] {dataAndLabels.get(":,0")};
-        // check if data and labels have the same size
-        if (data[0].size(0) != labels[0].size(0)) {
-            throw new IOException(
-                    "the size of data "
-                            + data[0].size(0)
-                            + " didn't match with the size of labels "
-                            + labels[0].size(0));
+                throw new IllegalArgumentException("Invalid usage");
         }
     }
 
-    private NDArray readData(Artifact.Item item) throws IOException {
-        try (InputStream is = repository.openStream(item, null)) {
-            byte[] buf = Utils.toByteArray(is);
-            int length = buf.length / DATA_AND_LABEL_SIZE;
-            try (NDArray array =
-                    manager.create(new Shape(length, DATA_AND_LABEL_SIZE), DataType.UINT8)) {
-                array.set(buf);
-                return array.toType(DataType.FLOAT32, false);
-            }
-        }
-    }
-
-    /** A builder to construct a {@link Cifar10}. */
+    /** A builder for a {@link ai.djl.basicdataset.CaptchaDataset}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private NDManager manager;
         private Repository repository;
         private Artifact artifact;
         private Usage usage;
@@ -171,7 +189,6 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());
-            manager = Engine.getInstance().newBaseManager();
         }
 
         /** {@inheritDoc} */
@@ -181,20 +198,9 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         }
 
         /**
-         * Sets the optional manager for the dataset (default follows engine default).
+         * Sets the optional repository.
          *
-         * @param manager the new manager
-         * @return this builder
-         */
-        public Builder optManager(NDManager manager) {
-            this.manager = manager;
-            return this;
-        }
-
-        /**
-         * Sets the optional repository for the dataset.
-         *
-         * @param repository the new repository
+         * @param repository the repository
          * @return this builder
          */
         public Builder optRepository(Repository repository) {
@@ -203,7 +209,7 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         }
 
         /**
-         * Sets the optional artifact containing the data.
+         * Sets the optional artifact.
          *
          * @param artifact the artifact
          * @return this builder
@@ -214,7 +220,7 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         }
 
         /**
-         * Sets the optional usage for the dataset.
+         * Sets the optional usage.
          *
          * @param usage the usage
          * @return this builder
@@ -225,12 +231,12 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         }
 
         /**
-         * Builds a new {@link Cifar10}.
+         * Builds the {@link CaptchaDataset}.
          *
-         * @return the new {@link Cifar10}
+         * @return the {@link CaptchaDataset}
          */
-        public Cifar10 build() {
-            return new Cifar10(this);
+        public CaptchaDataset build() {
+            return new CaptchaDataset(this);
         }
     }
 }

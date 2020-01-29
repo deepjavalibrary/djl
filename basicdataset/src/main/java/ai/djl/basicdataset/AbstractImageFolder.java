@@ -72,17 +72,6 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         return items.size();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public long getNumIterations() {
-        int batchSize = sampler.getBatchSize();
-        if (batchSize == -1) {
-            return -1;
-        }
-        long iteration = items.size() / batchSize;
-        return Math.min(maxIteration, iteration);
-    }
-
     /**
      * Returns the synsets of the ImageFolder dataset.
      *
