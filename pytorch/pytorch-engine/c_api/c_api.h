@@ -16,7 +16,7 @@ extern "C" {
     int ones(TensorHandle *output);
     int TensorToFloat(TensorHandle input, const void **data, size_t* size);
     int TensorGetShape(TensorHandle input, int *dim, const int64_t **out_data);
-    int ModuleLoad(char* path, ModuleHandle* moduleHandle);
+    int ModuleLoad(const char* path, ModuleHandle* moduleHandle);
     int ModuleEval(ModuleHandle moduleHandle);
     int ModuleForward(ModuleHandle moduleHandle, IValueArrayHandle iValueArrayHandle, int length, IValueHandle* resultHandle);
     int IValueCreateFromTensor(TensorHandle tensorHandle, IValueHandle* iValueHandle);

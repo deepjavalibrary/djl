@@ -22,7 +22,7 @@ public interface PyTorchLibrary extends Library {
 
     int TensorGetShape(Pointer tensorHandle, IntBuffer dim, PointerByReference output);
 
-    int ModuleLoad(CharBuffer path, PointerByReference moduleHandle);
+    int ModuleLoad(String path, PointerByReference moduleHandle);
 
     int ModuleEval(Pointer moduleHandle);
 

@@ -3,7 +3,7 @@
 using namespace at;
 
 int ones(TensorHandle* output) {
-  *output = new Tensor(torch::ones({2, 3}));
+  *output = new Tensor(torch::ones({1, 3, 224, 224}));
   return 0;
 }
 
@@ -25,7 +25,7 @@ int TensorGetShape(TensorHandle input, int *out_dim, const int64_t **out_data) {
     return 0;
 }
 
-int ModuleLoad(char* path, ModuleHandle* moduleHandle) {
+int ModuleLoad(const char* path, ModuleHandle* moduleHandle) {
     //TODO: add device support
     std::string pathString(path);
     torch::jit::script::Module module = torch::jit::load(pathString);
@@ -44,17 +44,18 @@ int ModuleEval(ModuleHandle moduleHandle) {
 }
 
 int ModuleForward(ModuleHandle moduleHandle, IValueArrayHandle iValueArrayHandle, int length, IValueHandle* resultHandle) {
+    //TODO: This haven't been test the case with multiple inputs
     auto module = static_cast<torch::jit::script::Module*>(moduleHandle);
-    auto iValueArray = std::vector<c10::IValue>(length);
+    auto iValueArray = std::vector<c10::IValue>();
     for (int i = 0; i < length; i++) {
-        iValueArray.emplace_back(static_cast<c10::IValue>(*(iValueArrayHandle + i)));
+        iValueArray.emplace_back(*static_cast<c10::IValue*>(*(iValueArrayHandle + i)));
     }
     *resultHandle = new c10::IValue(module->forward(iValueArray));
     return 0;
 }
 
 int IValueCreateFromTensor(TensorHandle tensorHandle, IValueHandle* iValueHandle) {
-    *iValueHandle = new at::IValue(static_cast<torch::Tensor*>(tensorHandle));
+    *iValueHandle = new at::IValue(*static_cast<torch::Tensor*>(tensorHandle));
     return 0;
 }
 
