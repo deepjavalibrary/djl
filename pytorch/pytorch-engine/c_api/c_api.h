@@ -13,9 +13,11 @@ typedef void* TensorHandle;
 typedef void** IValueArrayHandle;
 
 extern "C" {
-    int ones(TensorHandle *output);
-    int TensorToFloat(TensorHandle input, const void **data, size_t* size);
-    int TensorGetShape(TensorHandle input, int *dim, const int64_t **out_data);
+    int ones(const int64_t *shape, const int dim, TensorHandle *output);
+    int TensorToFloat(TensorHandle handle, const void **data, size_t* size);
+    int TensorGetShape(TensorHandle handle, int *dim, const int64_t **out_data);
+    int TensorGetDType(TensorHandle handle, int* dtype);
+    int TensorCreate(const int64_t *shape, const int dim, int dtype, int device, TensorHandle *out_handle);
     int ModuleLoad(const char* path, ModuleHandle* moduleHandle);
     int ModuleEval(ModuleHandle moduleHandle);
     int ModuleForward(ModuleHandle moduleHandle, IValueArrayHandle iValueArrayHandle, int length, IValueHandle* resultHandle);
