@@ -46,9 +46,6 @@ import java.util.List;
  */
 public interface Trainer extends AutoCloseable {
 
-    String TRAIN = "train";
-    String VALIDATE = "train";
-
     /**
      * Initializes the {@link Model} that the {@code Trainer} is going to train.
      *
@@ -124,8 +121,8 @@ public interface Trainer extends AutoCloseable {
      */
     List<Device> getDevices();
 
-    /** Resets each of the evaluators and losses to their respective initial values. */
-    void resetEvaluators();
+    /** Runs the end epoch actions. */
+    void endEpoch();
 
     /**
      * Gets the training {@link Loss} function of the trainer.

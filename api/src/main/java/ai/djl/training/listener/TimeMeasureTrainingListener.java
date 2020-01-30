@@ -51,11 +51,11 @@ public class TimeMeasureTrainingListener implements TrainingListener {
 
     /** {@inheritDoc} */
     @Override
-    public void onTrainingBatch(Trainer trainer) {}
+    public void onTrainingBatch(Trainer trainer, BatchData batchData) {}
 
     /** {@inheritDoc} */
     @Override
-    public void onValidationBatch(Trainer trainer) {}
+    public void onValidationBatch(Trainer trainer, BatchData batchData) {}
 
     /** {@inheritDoc} */
     @Override

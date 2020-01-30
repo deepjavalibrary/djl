@@ -15,6 +15,7 @@ package ai.djl.examples.training.util;
 import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
 import ai.djl.training.evaluator.Evaluator;
+import ai.djl.training.listener.EvaluatorTrainingListener;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,7 +28,11 @@ public class ExampleTrainingResult {
         evaluations = new ConcurrentHashMap<>();
         for (Evaluator evaluator : trainer.getEvaluators()) {
             float value =
-                    metrics.latestMetric("validate_" + evaluator.getName()).getValue().floatValue();
+                    metrics.latestMetric(
+                                    EvaluatorTrainingListener.metricName(
+                                            evaluator, EvaluatorTrainingListener.VALIDATE_EPOCH))
+                            .getValue()
+                            .floatValue();
             evaluations.put(evaluator.getName(), value);
         }
     }

@@ -65,14 +65,14 @@ public class MemoryTrainingListener implements TrainingListener {
 
     /** {@inheritDoc} */
     @Override
-    public void onTrainingBatch(Trainer trainer) {
+    public void onTrainingBatch(Trainer trainer, BatchData batchData) {
         Metrics metrics = trainer.getMetrics();
         collectMemoryInfo(metrics);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void onValidationBatch(Trainer trainer) {
+    public void onValidationBatch(Trainer trainer, BatchData batchData) {
         Metrics metrics = trainer.getMetrics();
         collectMemoryInfo(metrics);
     }

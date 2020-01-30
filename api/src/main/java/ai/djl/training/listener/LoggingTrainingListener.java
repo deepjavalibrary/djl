@@ -62,11 +62,21 @@ public class LoggingTrainingListener implements TrainingListener {
         Loss loss = trainer.getLoss();
         logger.info("Epoch " + numEpochs + " finished.");
 
-        logger.info("Train: " + getEvaluatorsStatus(metrics, trainer.getEvaluators(), "train_"));
-        if (metrics.hasMetric("validate_" + loss.getName())) {
+        logger.info(
+                "Train: "
+                        + getEvaluatorsStatus(
+                                metrics,
+                                trainer.getEvaluators(),
+                                EvaluatorTrainingListener.TRAIN_EPOCH));
+        if (metrics.hasMetric(
+                EvaluatorTrainingListener.metricName(
+                        loss, EvaluatorTrainingListener.VALIDATE_EPOCH))) {
             logger.info(
                     "Validate: "
-                            + getEvaluatorsStatus(metrics, trainer.getEvaluators(), "validate_"));
+                            + getEvaluatorsStatus(
+                                    metrics,
+                                    trainer.getEvaluators(),
+                                    EvaluatorTrainingListener.VALIDATE_EPOCH));
         } else {
             logger.info("validation has not been run.");
         }
@@ -78,7 +88,7 @@ public class LoggingTrainingListener implements TrainingListener {
 
     /** {@inheritDoc} */
     @Override
-    public void onTrainingBatch(Trainer trainer) {
+    public void onTrainingBatch(Trainer trainer, BatchData batchData) {
         if (trainingProgressBar == null) {
             trainingProgressBar = new ProgressBar("Training", trainDataSize);
         }
@@ -89,7 +99,11 @@ public class LoggingTrainingListener implements TrainingListener {
         Metrics metrics = trainer.getMetrics();
         StringBuilder sb = new StringBuilder();
 
-        sb.append(getEvaluatorsStatus(metrics, trainer.getEvaluators(), "train_"));
+        sb.append(
+                getEvaluatorsStatus(
+                        metrics,
+                        trainer.getEvaluators(),
+                        EvaluatorTrainingListener.TRAIN_PROGRESS));
 
         if (metrics.hasMetric("train")) {
             float batchTime = metrics.latestMetric("train").getValue().longValue() / 1_000_000_000f;
@@ -100,7 +114,7 @@ public class LoggingTrainingListener implements TrainingListener {
 
     /** {@inheritDoc} */
     @Override
-    public void onValidationBatch(Trainer trainer) {
+    public void onValidationBatch(Trainer trainer, BatchData batchData) {
         if (validateProgressBar == null) {
             validateProgressBar = new ProgressBar("Validating", validateDataSize);
         }
@@ -164,13 +178,17 @@ public class LoggingTrainingListener implements TrainingListener {
         logger.info(String.format("epoch P50: %.3f s, P90: %.3f s", p50, p90));
     }
 
-    private String getEvaluatorsStatus(Metrics metrics, List<Evaluator> toOutput, String prefix) {
+    private String getEvaluatorsStatus(Metrics metrics, List<Evaluator> toOutput, String stage) {
         List<String> metricOutputs = new ArrayList<>();
         for (Evaluator evaluator : toOutput) {
-            float value =
-                    metrics.latestMetric(prefix + evaluator.getName()).getValue().floatValue();
-            // use .2 precision to avoid new line in progress bar
-            metricOutputs.add(String.format("%s: %.2f", evaluator.getName(), value));
+            String metricName = EvaluatorTrainingListener.metricName(evaluator, stage);
+            if (metrics.hasMetric(metricName)) {
+                float value = metrics.latestMetric(metricName).getValue().floatValue();
+                // use .2 precision to avoid new line in progress bar
+                metricOutputs.add(String.format("%s: %.2f", evaluator.getName(), value));
+            } else {
+                metricOutputs.add(String.format("%s: _", evaluator.getName()));
+            }
         }
         return String.join(", ", metricOutputs);
     }

@@ -30,10 +30,12 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.listener.TrainingListener;
+import ai.djl.training.listener.TrainingListener.BatchData;
 import ai.djl.training.loss.Loss;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +73,6 @@ public class MxTrainer implements Trainer {
         }
         evaluators = new ArrayList<>(trainingConfig.getEvaluators());
         evaluators.add(loss); // track loss as an evaluator by default
-        evaluators.forEach(evaluator -> evaluator.addAccumulator(Trainer.TRAIN));
-        evaluators.forEach(evaluator -> evaluator.addAccumulator(Trainer.VALIDATE));
 
         // ParameterServer parameterServer = new MxParameterServer(trainingConfig.getOptimizer());
         ParameterServer parameterServer = new LocalParameterServer(trainingConfig.getOptimizer());
@@ -113,6 +113,7 @@ public class MxTrainer implements Trainer {
                     "The data must be on the same engine as the trainer. You may need to change one of your NDManagers.");
         }
         Batch[] splits = batch.split(devices, false);
+        BatchData batchData = new BatchData(new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         try (GradientCollector collector = newGradientCollector()) {
             for (Batch split : splits) {
                 NDList data = split.getData();
@@ -120,13 +121,14 @@ public class MxTrainer implements Trainer {
                 NDList preds = forward(data);
 
                 long time = System.nanoTime();
-                NDArray lossValue = this.loss.evaluate(labels, preds);
+                NDArray lossValue = loss.evaluate(labels, preds);
 
                 collector.backward(lossValue);
                 addMetric("backward", time);
                 time = System.nanoTime();
 
-                updateTrainEvaluators(labels, preds);
+                batchData.getLabels().put(labels.get(0).getDevice(), labels);
+                batchData.getPredictions().put(preds.get(0).getDevice(), preds);
                 addMetric("training-metrics", time);
             }
         }
@@ -135,7 +137,7 @@ public class MxTrainer implements Trainer {
         // count batch begin time at end of batch to include batch loading time
         batchBeginTime = System.nanoTime();
 
-        listeners.forEach(listener -> listener.onTrainingBatch(this));
+        listeners.forEach(listener -> listener.onTrainingBatch(this, batchData));
     }
 
     /** {@inheritDoc} */
@@ -158,16 +160,18 @@ public class MxTrainer implements Trainer {
         }
         long begin = System.nanoTime();
         Batch[] splits = batch.split(devices, false);
+        BatchData batchData = new BatchData(new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         for (Batch split : splits) {
             NDList data = split.getData();
             NDList labels = split.getLabels();
 
             NDList preds = forward(data);
-            updateValidateEvaluators(labels, preds);
+            batchData.getLabels().put(labels.get(0).getDevice(), labels);
+            batchData.getPredictions().put(preds.get(0).getDevice(), preds);
         }
         addMetric("validate", begin);
 
-        listeners.forEach(listener -> listener.onValidationBatch(this));
+        listeners.forEach(listener -> listener.onValidationBatch(this, batchData));
     }
 
     /** {@inheritDoc} */
@@ -200,29 +204,9 @@ public class MxTrainer implements Trainer {
         return Arrays.asList(devices);
     }
 
-    private void updateTrainEvaluators(NDList labels, NDList preds) {
-        // stop recording as this is end of computation graph
-        // any evaluator calculation or update operation should not be recorded
-        MxGradientCollector.setRecording(false);
-        MxGradientCollector.setTraining(false);
-        // this step is synchronized, should be done at end of batch
-        evaluators.forEach(evaluator -> evaluator.updateAccumulator(Trainer.TRAIN, labels, preds));
-        // turn gradient recording back on
-        MxGradientCollector.setRecording(true);
-        MxGradientCollector.setTraining(true);
-    }
-
-    private void updateValidateEvaluators(NDList labels, NDList preds) {
-        evaluators.forEach(
-                evaluator -> evaluator.updateAccumulator(Trainer.VALIDATE, labels, preds));
-    }
-
     /** {@inheritDoc} */
     @Override
-    public void resetEvaluators() {
-        evaluators.forEach(evaluator -> evaluator.resetAccumulator(Trainer.TRAIN));
-        evaluators.forEach(evaluator -> evaluator.resetAccumulator(Trainer.VALIDATE));
-
+    public void endEpoch() {
         listeners.forEach(listener -> listener.onEpoch(this));
     }
 

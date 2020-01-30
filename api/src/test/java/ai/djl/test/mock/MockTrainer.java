@@ -83,7 +83,7 @@ public class MockTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public void resetEvaluators() {}
+    public void endEpoch() {}
 
     /** {@inheritDoc} */
     @Override

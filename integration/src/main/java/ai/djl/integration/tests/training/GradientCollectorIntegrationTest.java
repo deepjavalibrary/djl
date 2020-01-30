@@ -28,6 +28,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.listener.EvaluatorTrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.Sgd;
@@ -81,6 +82,7 @@ public class GradientCollectorIntegrationTest {
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
+                        .addTrainingListeners(new EvaluatorTrainingListener())
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(optimizer);
 
@@ -113,14 +115,14 @@ public class GradientCollectorIntegrationTest {
                 trainer.initialize(inputShape);
 
                 for (int epoch = 0; epoch < epochs; epoch++) {
-                    trainer.resetEvaluators();
+                    trainer.endEpoch();
                     for (Batch batch : trainer.iterateDataset(dataset)) {
                         trainer.trainBatch(batch);
                         trainer.step();
                         batch.close();
                     }
                 }
-                lossValue = trainer.getLoss().getAccumulator(Trainer.TRAIN);
+                lossValue = trainer.getLoss().getAccumulator(EvaluatorTrainingListener.TRAIN_EPOCH);
             }
             float expectedLoss = 0.001f;
             Assert.assertTrue(
