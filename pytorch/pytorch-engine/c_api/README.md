@@ -8,7 +8,7 @@ mkdir build && cd build
 ```
 - Run
 ```
-cmake -DCMAKE_PREFIX_PATH=liborch ..
+cmake -DCMAKE_PREFIX_PATH=libtorch ..
 cmake --build .
 ```
 Then you should be able to run the gradle build in the pytorch-engine level.
