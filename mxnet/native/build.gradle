@@ -21,7 +21,14 @@ sourceSets {
 
 // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
 jar {
-    from file("src/main/resources/placeholder")
+    def versionName = String.format("${version}-%s", new Date().format('yyyyMMdd'))
+    def placeholder = "${project.buildDir}/placeholder"
+    def dir = file("${placeholder}/native/lib")
+    dir.mkdirs();
+    def propFile = file("${placeholder}/native/lib/mxnet.properties")
+    propFile.text = "placeholder=true\nversion=${versionName}\n"
+
+    from placeholder
 }
 
 java {

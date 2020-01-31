@@ -13,6 +13,7 @@
 package ai.djl.mxnet.jna;
 
 import ai.djl.util.Utils;
+import ai.djl.util.cuda.CudaUtils;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import java.io.BufferedReader;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,24 +113,29 @@ public class LibUtils {
         try (InputStream conf = url.openStream()) {
             Properties prop = new Properties();
             prop.load(conf);
-            if (prop.getProperty("placeholder") != null) {
-                throw new IllegalStateException(
-                        "You are using a placeholder jar. Make sure that the Maven Dependency Classifier includes your system type");
+            // 1.6.0-c later should always has version property
+            String version = prop.getProperty("version", "1.6.0-c");
+            String osName = System.getProperty("os.name");
+            String osPrefix;
+            if (osName.startsWith("Win")) {
+                osPrefix = "win";
+            } else if (osName.startsWith("Mac")) {
+                osPrefix = "osx";
+            } else if (osName.startsWith("Linux")) {
+                osPrefix = "linux";
+            } else {
+                throw new AssertionError("Unsupported platform: " + osName);
             }
-            String version = prop.getProperty("version");
+
+            if (prop.getProperty("placeholder") != null) {
+                try {
+                    return downloadMxnet(version, osPrefix);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to download MXNet native library", e);
+                }
+            }
             String classifier = prop.getProperty("classifier", "");
             if (!classifier.isEmpty()) {
-                String osName = System.getProperty("os.name");
-                String osPrefix;
-                if (osName.startsWith("Win")) {
-                    osPrefix = "win";
-                } else if (osName.startsWith("Mac")) {
-                    osPrefix = "osx";
-                } else if (osName.startsWith("Linux")) {
-                    osPrefix = "linux";
-                } else {
-                    throw new AssertionError("Unsupported platform: " + osName);
-                }
                 if (!osPrefix.equals(classifier.split("-")[1])) {
                     throw new IllegalStateException(
                             "Your MXNet native library jar does not match your operating system. Make sure that the Maven Dependency Classifier matches your system type.");
@@ -156,8 +163,7 @@ public class LibUtils {
             tmp = null;
             return path.toAbsolutePath().toString();
         } catch (IOException e) {
-            logger.error("Failed to load mxnet native library.", e);
-            return null;
+            throw new IllegalStateException("Failed to extract MXNet native library", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
@@ -229,5 +235,91 @@ public class LibUtils {
             }
         }
         return null;
+    }
+
+    private static String downloadMxnet(String version, String os) throws IOException {
+        String flavor;
+        String cudaArch;
+        if (CudaUtils.getGpuCount() > 0) {
+            flavor = "cu" + CudaUtils.getCudaVersion() + "mkl";
+            cudaArch = CudaUtils.getComputeCapability(0);
+        } else {
+            flavor = "mkl";
+            cudaArch = null;
+        }
+
+        String classifier = os + "-x86_64";
+        String userHome = System.getProperty("user.home");
+        String libName = System.mapLibraryName(LIB_NAME);
+        Path dir = Paths.get(userHome, ".mxnet/cache/" + version + flavor + '-' + classifier);
+        Path path = dir.resolve(libName);
+        if (Files.exists(path)) {
+            return path.toAbsolutePath().toString();
+        }
+
+        Path tmp = Paths.get(userHome, ".mxnet/cache/tmp");
+        Files.createDirectories(tmp);
+
+        int pos = version.indexOf("-SNAPSHOT");
+        if (pos > 0) {
+            version = version.substring(0, pos);
+        }
+        String link = "https://djl-ai.s3.amazonaws.com/publish/mxnet-" + version;
+        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            List<String> lines = Utils.readLines(is);
+            if (cudaArch != null) {
+                // has CUDA
+                if ("win".equals(os)) {
+                    if (!lines.contains(os + '/' + flavor + "/mxnet_" + cudaArch + ".dll.gz")) {
+                        logger.warn(
+                                "No matching cuda flavor for {} found: {}/sm_{}.",
+                                os,
+                                flavor,
+                                cudaArch);
+                        // fallback to CPU
+                        flavor = "mkl";
+                    }
+                } else if ("linux".equals(os)) {
+                    if (!lines.contains(os + '/' + flavor + "/libmxnet.so.gz")) {
+                        logger.warn(
+                                "No matching cuda flavor for {} found: {}/sm_{}.",
+                                os,
+                                flavor,
+                                cudaArch);
+                        // fallback to CPU
+                        flavor = "mkl";
+                    }
+                } else {
+                    throw new AssertionError("Unsupported GPU operating system: " + os);
+                }
+            }
+
+            for (String line : lines) {
+                if (line.startsWith(os + "/common/") || line.startsWith(os + '/' + flavor + '/')) {
+                    URL url = new URL(link + '/' + line);
+                    String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
+                    if ("win".equals(os)) {
+                        if ("libmxnet.dll".equals(fileName)) {
+                            continue;
+                        } else if ("libcumxnet.dll".equals(fileName)) {
+                            fileName = "mxnet.dll";
+                        } else if (fileName.startsWith("mxnet_")
+                                && !("mxnet_" + cudaArch + ".dll").equals(fileName)) {
+                            continue;
+                        }
+                    }
+                    try (InputStream fis = new GZIPInputStream(url.openStream())) {
+                        Files.copy(fis, tmp.resolve(fileName));
+                    }
+                }
+            }
+            Files.move(tmp, dir);
+            tmp = null;
+            return path.toAbsolutePath().toString();
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
     }
 }

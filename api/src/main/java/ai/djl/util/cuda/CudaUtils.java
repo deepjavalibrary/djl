@@ -100,7 +100,7 @@ public final class CudaUtils {
         checkCall(LIB.cudaDeviceGetAttribute(major, attrComputeCapabilityMajor, device));
         checkCall(LIB.cudaDeviceGetAttribute(minor, attrComputeCapabilityMinor, device));
 
-        return major[0] + "." + minor[0];
+        return String.valueOf(major[0]) + minor[0];
     }
 
     /**
