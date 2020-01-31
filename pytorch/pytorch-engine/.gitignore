@@ -1,3 +1,0 @@
-c_api/libtorch/*
-c_api/cmake-build-debug/*
-*.pt

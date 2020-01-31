@@ -1,29 +1,15 @@
 group "ai.djl.pytorch"
 
 dependencies {
-    api "org.slf4j:slf4j-api:${slf4j_version}"
     api project(":api")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
+
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
-    testImplementation "org.powermock:powermock-module-testng:${powermock_version}"
-    testImplementation "org.powermock:powermock-api-mockito2:${powermock_version}"
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/java', 'build/generated-src']
-        }
-    }
-}
-
-checkstyleMain.source = 'src/main/java'
-checkstyleMain.enabled(false)
-pmdMain.enabled(false)
-//pmdMain.source = 'src/main/java'
 
 test {
     environment "PATH", "src/test/bin:${environment.PATH}"

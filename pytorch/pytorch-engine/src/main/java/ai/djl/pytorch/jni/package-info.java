@@ -10,25 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
+/** Contains classes to interface with the underlying PyTorch Engine. */
 package ai.djl.pytorch.jni;
-
-import java.nio.ByteBuffer;
-
-/** A class containing utilities to interact with the PyTorch Engine's JNI layer. */
-@SuppressWarnings("MissingJavadocMethod")
-public final class PyTorchLibrary {
-
-    static {
-        System.loadLibrary("djl_torch"); // NOPMD
-    }
-
-    public static final PyTorchLibrary LIB = new PyTorchLibrary();
-
-    private PyTorchLibrary() {}
-
-    public native Pointer atOnes(long[] shape);
-
-    public native long[] atSizes(Pointer handle);
-
-    public native ByteBuffer atDataPtr(Pointer handle);
-}
