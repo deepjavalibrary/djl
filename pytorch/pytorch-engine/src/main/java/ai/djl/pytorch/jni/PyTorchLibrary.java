@@ -31,4 +31,14 @@ public final class PyTorchLibrary {
     public native long[] atSizes(Pointer handle);
 
     public native ByteBuffer atDataPtr(Pointer handle);
+
+    public native Pointer moduleLoad(String path);
+
+    public native void moduleEval(Pointer handle);
+
+    public native Pointer moduleForward(Pointer moduleHandle, Pointer[] IValuePointers);
+
+    public native Pointer iValueCreateFromTensor(Pointer tensorHandle);
+
+    public native Pointer iValueToTensor(Pointer iValueHandle);
 }
