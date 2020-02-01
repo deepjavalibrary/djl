@@ -159,7 +159,7 @@ public abstract class Engine {
 
     /** Logs debug information about the environment for use when debugging environment issues. */
     public void debugEnvironment() {
-        logger.info("Engine name: " + getEngineName());
-        logger.info("Engine version: " + getVersion());
+        logger.info("Engine name: {}", getEngineName());
+        logger.info("Engine version: {}", getVersion());
     }
 }

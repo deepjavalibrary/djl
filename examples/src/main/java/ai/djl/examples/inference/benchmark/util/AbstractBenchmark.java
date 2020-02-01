@@ -118,11 +118,6 @@ public abstract class AbstractBenchmark<T> {
 
             while (!duration.isNegative()) {
                 Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
-                logger.info(
-                        "Running {} on: {}, iteration: {}.",
-                        getClass().getSimpleName(),
-                        Device.defaultDevice(),
-                        iteration);
                 progressBar = new ProgressBar("Iteration", iteration);
                 long begin = System.currentTimeMillis();
                 lastResult = predict(arguments, metrics, iteration);

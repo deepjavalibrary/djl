@@ -169,7 +169,7 @@ public class MemoryTrainingListener implements TrainingListener {
                     String line = new String(readAll(is), StandardCharsets.UTF_8).trim();
                     String[] tokens = line.split("\\s+");
                     if (tokens.length != 2) {
-                        logger.error("Invalid ps output: " + line);
+                        logger.error("Invalid ps output: {}", line);
                         return;
                     }
                     float cpu = Float.parseFloat(tokens[0]);

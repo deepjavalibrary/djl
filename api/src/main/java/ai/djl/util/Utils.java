@@ -221,15 +221,14 @@ public final class Utils {
     public static void checkParameterValues(
             PairList<String, Parameter> parameters, boolean checkGradient, Logger logger) {
         for (Parameter parameter : parameters.values()) {
-            logger.info(
-                    "Checking parameter: "
-                            + parameter.getName()
-                            + " Shape: "
-                            + parameter.getArray().getShape());
+            logger.debug(
+                    "Checking parameter: {} Shape: {}",
+                    parameter.getName(),
+                    parameter.getArray().getShape());
             checkNDArrayValues(parameter.getArray(), logger, "weight");
 
             if (parameter.requireGradient() && checkGradient) {
-                logger.info("Checking gradient of: " + parameter.getName());
+                logger.debug("Checking gradient of: {}", parameter.getName());
                 checkNDArrayValues(parameter.getArray().getGradient(), logger, "grad");
             }
         }
@@ -237,14 +236,14 @@ public final class Utils {
 
     private static void checkNDArrayValues(NDArray array, Logger logger, String prefix) {
         if (array.isNaN().any().getBoolean()) {
-            logger.warn("There are NANs in value");
+            logger.warn("There are NANs in value:");
             for (int i = 0; i < array.size(0); i++) {
-                logger.info(array.get(i).toString());
+                logger.warn("{}", array.get(i));
             }
         }
-        logger.info(prefix + " sum: " + array.sum().getFloat());
-        logger.info(prefix + " mean: " + array.mean().getFloat());
-        logger.info(prefix + " max: " + array.max().getFloat());
-        logger.info(prefix + " min: " + array.min().getFloat());
+        logger.debug("{} sum: {}", prefix, array.sum().getFloat());
+        logger.debug("{} mean: {}", prefix, array.mean().getFloat());
+        logger.debug("{} max: {}", prefix, array.max().getFloat());
+        logger.debug("{} min: {}", prefix, array.min().getFloat());
     }
 }

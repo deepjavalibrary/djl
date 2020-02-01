@@ -37,9 +37,8 @@ public final class DebugEnvironment {
      *
      * @param args program arguments
      * @throws IOException if failed to get environment data
-     * @throws InterruptedException if failed to get environment data
      */
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         logger.info("----------System Properties----------");
         System.getProperties().forEach((k, v) -> logger.info(k + ": " + v));
 
@@ -58,54 +57,54 @@ public final class DebugEnvironment {
     }
 
     // Based on https://stackoverflow.com/a/25596
-    private static void hardware() throws IOException, InterruptedException {
+    private static void hardware() throws IOException {
         Runtime rt = Runtime.getRuntime();
 
         /* Total number of processors or cores available to the JVM */
-        logger.info("Available processors (cores): " + rt.availableProcessors());
+        logger.info("Available processors (cores): {}", rt.availableProcessors());
 
         logger.info("Byte Order: " + ByteOrder.nativeOrder().toString());
 
         /* Total amount of free memory available to the JVM */
-        logger.info("Free memory (bytes): " + rt.freeMemory());
+        logger.info("Free memory (bytes): {}", rt.freeMemory());
 
         /* This will return Long.MAX_VALUE if there is no preset limit */
         long maxMemory = rt.maxMemory();
         /* Maximum amount of memory the JVM will attempt to use */
         logger.info(
-                "Maximum memory (bytes): "
-                        + (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
+                "Maximum memory (bytes): {}",
+                (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
 
         /* Total memory currently available to the JVM */
-        logger.info("Total memory available to JVM (bytes): " + rt.totalMemory());
+        logger.info("Total memory available to JVM (bytes): {}", rt.totalMemory());
 
         MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
         MemoryUsage heap = memBean.getHeapMemoryUsage();
         MemoryUsage nonHeap = memBean.getNonHeapMemoryUsage();
 
-        logger.info("Heap committed: " + heap.getCommitted());
-        logger.info("Heap nonCommitted: " + nonHeap.getCommitted());
+        logger.info("Heap committed: {}", heap.getCommitted());
+        logger.info("Heap nonCommitted: {}", nonHeap.getCommitted());
 
         int gpuCount = Device.getGpuCount();
-        logger.info("GPU Count: " + gpuCount);
-        logger.info("Default Device: " + Device.defaultDevice());
+        logger.info("GPU Count: {}", gpuCount);
+        logger.info("Default Device: {}", Device.defaultDevice());
 
         // CudaUtils.getGpuMemory() will allocates memory on GPUs if CUDA runtime is not
         // initialized.
         for (int i = 0; i < gpuCount; ++i) {
             Device device = Device.gpu(i);
             MemoryUsage mem = CudaUtils.getGpuMemory(device);
-            logger.info("GPU " + i + " memory used: " + mem.getCommitted() + " bytes");
+            logger.info("GPU {} memory used: {} bytes", i, mem.getCommitted());
         }
 
         logger.info("GCC: ");
-        Scanner gccOut =
-                new Scanner(
-                                rt.exec("gcc --version").getInputStream(),
-                                StandardCharsets.UTF_8.name())
-                        .useDelimiter(System.lineSeparator());
-        while (gccOut.hasNext()) {
-            logger.info(gccOut.next());
+        Process process = rt.exec("gcc --version");
+        try (Scanner gccOut =
+                new Scanner(process.getInputStream(), StandardCharsets.UTF_8.name())) {
+            gccOut.useDelimiter(System.lineSeparator());
+            while (gccOut.hasNext()) {
+                logger.info(gccOut.next());
+            }
         }
     }
 }

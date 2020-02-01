@@ -21,7 +21,6 @@ import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import ai.djl.util.cuda.CudaUtils;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -41,8 +40,6 @@ public final class ObjectDetection {
     private ObjectDetection() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        logger.info("GPU count: " + CudaUtils.getGpuCount());
-
         DetectedObjects detection = ObjectDetection.predict();
         logger.info("{}", detection);
     }

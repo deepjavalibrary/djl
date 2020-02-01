@@ -60,23 +60,22 @@ public class LoggingTrainingListener implements TrainingListener {
     public void onEpoch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
         Loss loss = trainer.getLoss();
-        logger.info("Epoch " + numEpochs + " finished.");
+        String status =
+                getEvaluatorsStatus(
+                        metrics, trainer.getEvaluators(), EvaluatorTrainingListener.TRAIN_EPOCH);
+        logger.info("Epoch {} finished.", numEpochs);
+        logger.info("Train: {}", status);
 
-        logger.info(
-                "Train: "
-                        + getEvaluatorsStatus(
-                                metrics,
-                                trainer.getEvaluators(),
-                                EvaluatorTrainingListener.TRAIN_EPOCH));
-        if (metrics.hasMetric(
+        String metricName =
                 EvaluatorTrainingListener.metricName(
-                        loss, EvaluatorTrainingListener.VALIDATE_EPOCH))) {
-            logger.info(
-                    "Validate: "
-                            + getEvaluatorsStatus(
-                                    metrics,
-                                    trainer.getEvaluators(),
-                                    EvaluatorTrainingListener.VALIDATE_EPOCH));
+                        loss, EvaluatorTrainingListener.VALIDATE_EPOCH);
+        if (metrics.hasMetric(metricName)) {
+            status =
+                    getEvaluatorsStatus(
+                            metrics,
+                            trainer.getEvaluators(),
+                            EvaluatorTrainingListener.VALIDATE_EPOCH);
+            logger.info("Validate: {}", status);
         } else {
             logger.info("validation has not been run.");
         }

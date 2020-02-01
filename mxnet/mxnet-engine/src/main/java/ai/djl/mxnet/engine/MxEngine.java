@@ -96,8 +96,8 @@ public class MxEngine extends Engine {
     @Override
     public void debugEnvironment() {
         super.debugEnvironment();
-        logger.info("MXNet Library: " + LibUtils.getLibName());
-        logger.info("MXNet Features: " + String.join(", ", JnaUtils.getFeatures()));
+        logger.info("MXNet Library: {}", LibUtils.getLibName());
+        logger.info("MXNet Features: {}", String.join(", ", JnaUtils.getFeatures()));
     }
 
     /** {@inheritDoc} */

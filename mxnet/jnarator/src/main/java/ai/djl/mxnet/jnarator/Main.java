@@ -54,7 +54,7 @@ public final class Main {
             if (mappingFile != null) {
                 Path file = Paths.get(mappingFile);
                 if (Files.notExists(file)) {
-                    logger.error("mapping file does not exists: " + mappingFile);
+                    logger.error("mapping file does not exists: {}", mappingFile);
                     System.exit(-1); // NOPMD
                 }
                 try (InputStream in = Files.newInputStream(file)) {
