@@ -4,7 +4,7 @@ This module contains examples to demonstrate use of the Deep Java Library (DJL).
 
 The following examples are included:
 
-- [Single-shot Object Detection example](docs/object_detection.md)
+- [Single-shot object detection example](docs/object_detection.md)
 - [Train your first model](docs/train_mnist_mlp.md)
 - [Image classification example](docs/image_classification.md)
 - [Transfer learning example](docs/train_cifar10_resnet.md)
@@ -14,6 +14,7 @@ The following examples are included:
 - [Instance segmentation example](docs/instance_segmentation.md)
 - [Pose estimation example](docs/pose_estimation.md)
 - [Action recognition example](docs/action_recognition.md)
+- [Multi-label dataset training example](docs/train_captcha.md)
 
 ## Prerequisites
 

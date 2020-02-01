@@ -10,14 +10,14 @@ There are no small datasets, like MNIST or Fashion-MNIST, in the object detectio
 you are using a small dataset of Pikachu images. It contains a series of background images on which a Pikachu image
 is placed at a random position. The Pikachu images are also generated in different angles and sizes.  
 
-## Setup Guide
+## Setup guide
 
 Follow [setup](../../docs/development/setup.md) to configure your development environment.
 
 ## Run SSD training example
 
 ### Build the project and run it
-The following command will train the model for 2 epochs. The trained model is saved in the following folder: `build/model`.
+The following command trains the model for 2 epochs. The trained model is saved in the following folder: `build/model`.
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainPikachu
@@ -56,7 +56,7 @@ The following table shows the list of available arguments:
  | ---------- | ---------------------------------------- |
  | `-e`       | Number of epochs to train. |
  | `-b`       | Batch size to use for training. |
- | `-g`       | Maximum number of GPUs to use. Default will use all detected GPUs. |
+ | `-g`       | Maximum number of GPUs to use. Default uses all detected GPUs. |
  | `-o`       | Directory to save the trained model. |
  
  

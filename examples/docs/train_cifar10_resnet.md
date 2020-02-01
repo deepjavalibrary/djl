@@ -8,7 +8,7 @@ You can find the example source code in: [TrainResnetWithCifar10.java](../src/ma
 You can also find the Jupyter notebook tutorial [here](../../jupyter/transfer_learning_on_cifar10.ipynb).
 The Jupyter notebook explains the key concepts in detail.
 
-## Setup Guide
+## Setup guide
 
 Follow [setup](../../docs/development/setup.md) to configure your development environment.
 

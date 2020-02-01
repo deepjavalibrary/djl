@@ -6,7 +6,7 @@ In this example, you learn how to implement inference code with a [ModelZoo mode
 
 The source code can be found at [PoseEstimation.java](../src/main/java/ai/djl/examples/inference/PoseEstimation.java).
 
-## Setup Guide
+## Setup guide
 
 Follow [setup](../../docs/development/setup.md) to configure your development environment.
 

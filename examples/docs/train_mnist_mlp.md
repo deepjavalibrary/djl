@@ -9,7 +9,7 @@ The source code for this example can be found at [TrainMnist.java](https://githu
 You can also use the [Jupyter notebook tutorial](../../jupyter/tutorial/train_your_first_model.ipynb).
 The Jupyter notebook explains the key concepts in detail.
 
-## Setup Guide
+## Setup guide
 
 To configure your development environment, follow [setup](../../docs/development/setup.md).
 
@@ -17,7 +17,7 @@ To configure your development environment, follow [setup](../../docs/development
 
 ### Build the project and run
 
-The following command will train the model for two epochs. The trained model is saved in the `build/model` folder.
+The following command trains the model for two epochs. The trained model is saved in the `build/model` folder.
 
 ```
 cd examples
@@ -47,7 +47,7 @@ Validating:  100% |████████████████████�
 [INFO ] - epoch P50: 29.520 s, P90: 29.520 s
 ```
 
-The results show that you reached 96.93% validation accuracy at the end of the second epoch.
+The results show that you reached 96.93 percent validation accuracy at the end of the second epoch.
 
 
 You can also run the example with your own arguments. For example, you can train for five epochs using batch size 64 and save the model to a specified folder `mlp_model` using the following command:
@@ -64,5 +64,5 @@ The following table shows the list of available arguments:
  | ---------- | ---------------------------------------- |
  | `-e`       | Number of epochs to train. |
  | `-b`       | Batch size to use for training. |
- | `-g`       | Maximum number of GPUs to use. Default will use all detected GPUs. |
+ | `-g`       | Maximum number of GPUs to use. Default uses all detected GPUs. |
  | `-o`       | Directory to save the trained model. |

@@ -9,7 +9,7 @@ The following is the instance segmentation example source code:
 [InstanceSegmentation.java](../src/main/java/ai/djl/examples/inference/InstanceSegmentation.java).
 
 
-## Setup Guide
+## Setup guide
 
 Follow [setup](../../docs/development/setup.md) to configure your development environment.
 

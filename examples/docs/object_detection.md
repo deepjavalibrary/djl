@@ -10,7 +10,7 @@ The source code can be found at [ObjectDetection.java](../src/main/java/ai/djl/e
 You can also use the [Jupyter notebook tutorial](../../jupyter/object_detection_with_model_zoo.ipynb).
 The Jupyter notebook explains the key concepts in detail.
 
-## Setup Guide
+## Setup guide
 
 To configure your development environment, follow [setup](../../docs/development/setup.md).
 

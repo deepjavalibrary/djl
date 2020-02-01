@@ -35,4 +35,4 @@ Your output should look like the following:
 ]
 ```
 
-The results show that there is a 99.868% probability that the action is "ThrowDiscus".
+The results show that there is a 99.868 percent probability that the action is "ThrowDiscus".

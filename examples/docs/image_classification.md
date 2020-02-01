@@ -44,4 +44,4 @@ Your output should look like the following:
 ]
 ```
 
-The results show that there's a 99.996% probability that the image contains a "0" digit.
+The results show that there's a 99.996 percent probability that the image contains a "0" digit.

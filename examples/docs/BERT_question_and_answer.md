@@ -19,7 +19,7 @@ And it picked the right answer:
 A: December 2004
 ```
 
-## Setup Guide
+## Setup guide
 
 Follow [setup](../../docs/development/setup.md) to configure your development environment.
 
