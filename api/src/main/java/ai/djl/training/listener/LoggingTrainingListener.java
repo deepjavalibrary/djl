@@ -66,7 +66,10 @@ public class LoggingTrainingListener implements TrainingListener {
         Loss loss = trainer.getLoss();
         String status =
                 getEvaluatorsStatus(
-                        metrics, trainer.getEvaluators(), EvaluatorTrainingListener.TRAIN_EPOCH);
+                        metrics,
+                        trainer.getEvaluators(),
+                        EvaluatorTrainingListener.TRAIN_EPOCH,
+                        Short.MAX_VALUE);
         logger.info("Epoch {} finished.", numEpochs);
         logger.info("Train: {}", status);
 
@@ -78,7 +81,8 @@ public class LoggingTrainingListener implements TrainingListener {
                     getEvaluatorsStatus(
                             metrics,
                             trainer.getEvaluators(),
-                            EvaluatorTrainingListener.VALIDATE_EPOCH);
+                            EvaluatorTrainingListener.VALIDATE_EPOCH,
+                            Short.MAX_VALUE);
             logger.info("Validate: {}", status);
         } else {
             logger.info("validation has not been run.");
@@ -106,7 +110,8 @@ public class LoggingTrainingListener implements TrainingListener {
                 getEvaluatorsStatus(
                         metrics,
                         trainer.getEvaluators(),
-                        EvaluatorTrainingListener.TRAIN_PROGRESS));
+                        EvaluatorTrainingListener.TRAIN_PROGRESS,
+                        2));
 
         if (metrics.hasMetric("train")) {
             float batchTime = metrics.latestMetric("train").getValue().longValue() / 1_000_000_000f;
@@ -181,9 +186,15 @@ public class LoggingTrainingListener implements TrainingListener {
         logger.info(String.format("epoch P50: %.3f s, P90: %.3f s", p50, p90));
     }
 
-    private String getEvaluatorsStatus(Metrics metrics, List<Evaluator> toOutput, String stage) {
-        List<String> metricOutputs = new ArrayList<>();
+    private String getEvaluatorsStatus(
+            Metrics metrics, List<Evaluator> toOutput, String stage, int limit) {
+        List<String> metricOutputs = new ArrayList<>(limit + 1);
+        int count = 0;
         for (Evaluator evaluator : toOutput) {
+            if (++count > limit) {
+                metricOutputs.add("...");
+                break;
+            }
             String metricName = EvaluatorTrainingListener.metricName(evaluator, stage);
             if (metrics.hasMetric(metricName)) {
                 float value = metrics.latestMetric(metricName).getValue().floatValue();
