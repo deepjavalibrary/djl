@@ -31,6 +31,7 @@ public class LoggingTrainingListener implements TrainingListener {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingTrainingListener.class);
 
+    private String name;
     private int batchSize;
     private int trainDataSize;
     private int validateDataSize;
@@ -45,11 +46,14 @@ public class LoggingTrainingListener implements TrainingListener {
     /**
      * Constructs a {@link LoggingTrainingListener}.
      *
+     * @param name the name of the listener
      * @param batchSize the size of training batches
      * @param trainDataSize the total number of elements in the training dataset
      * @param validateDataSize the total number of elements in the validation dataset
      */
-    public LoggingTrainingListener(int batchSize, int trainDataSize, int validateDataSize) {
+    public LoggingTrainingListener(
+            String name, int batchSize, int trainDataSize, int validateDataSize) {
+        this.name = name;
         this.batchSize = batchSize;
         this.trainDataSize = trainDataSize;
         this.validateDataSize = validateDataSize;
@@ -130,7 +134,7 @@ public class LoggingTrainingListener implements TrainingListener {
         } else {
             devicesMsg = devices.size() + " GPUs";
         }
-        logger.info("Running {} on: {}.", getClass().getSimpleName(), devicesMsg);
+        logger.info("Running {} on: {}.", name, devicesMsg);
 
         long init = System.nanoTime();
         String engineName = Engine.getInstance().getEngineName();

@@ -76,6 +76,7 @@ public final class TrainPikachu {
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
                     TrainingListener.Defaults.logging(
+                            TrainPikachu.class.getSimpleName(),
                             arguments.getBatchSize(),
                             (int) pikachuDetectionTrain.getNumIterations(),
                             (int) pikachuDetectionTest.getNumIterations(),

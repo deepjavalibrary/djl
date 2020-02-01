@@ -70,6 +70,7 @@ public final class TrainResnetWithCifar10 {
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
                     TrainingListener.Defaults.logging(
+                            TrainResnetWithCifar10.class.getSimpleName(),
                             arguments.getBatchSize(),
                             (int) trainDataset.getNumIterations(),
                             (int) validationDataset.getNumIterations(),

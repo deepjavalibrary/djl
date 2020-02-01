@@ -72,6 +72,7 @@ public interface TrainingListener {
         /**
          * A default {@link TrainingListener} set including batch output logging.
          *
+         * @param name the name of the {@link LoggingTrainingListener}
          * @param batchSize the size of training batches
          * @param trainDataSize the total number of elements in the training dataset
          * @param validateDataSize the total number of elements in the validation dataset
@@ -79,13 +80,17 @@ public interface TrainingListener {
          * @return the new set of listeners
          */
         static TrainingListener[] logging(
-                int batchSize, int trainDataSize, int validateDataSize, String outputDir) {
+                String name,
+                int batchSize,
+                int trainDataSize,
+                int validateDataSize,
+                String outputDir) {
             return new TrainingListener[] {
                 new EpochTrainingListener(),
                 new MemoryTrainingListener(outputDir),
                 new EvaluatorTrainingListener(),
                 new DivergenceCheckTrainingListener(),
-                new LoggingTrainingListener(batchSize, trainDataSize, validateDataSize),
+                new LoggingTrainingListener(name, batchSize, trainDataSize, validateDataSize),
                 new TimeMeasureTrainingListener(outputDir)
             };
         }

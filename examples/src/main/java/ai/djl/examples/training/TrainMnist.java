@@ -60,6 +60,7 @@ public final class TrainMnist {
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
                     TrainingListener.Defaults.logging(
+                            TrainMnist.class.getSimpleName(),
                             arguments.getBatchSize(),
                             (int) trainingSet.getNumIterations(),
                             (int) validateSet.getNumIterations(),

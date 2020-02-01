@@ -82,6 +82,7 @@ public final class TrainWithOptimizers {
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
                     TrainingListener.Defaults.logging(
+                            TrainWithOptimizers.class.getSimpleName(),
                             arguments.getBatchSize(),
                             (int) trainDataset.getNumIterations(),
                             (int) validationDataset.getNumIterations(),

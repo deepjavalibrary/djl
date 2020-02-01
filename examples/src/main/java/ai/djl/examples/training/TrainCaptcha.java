@@ -62,6 +62,7 @@ public final class TrainCaptcha {
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             config.addTrainingListeners(
                     TrainingListener.Defaults.logging(
+                            TrainCaptcha.class.getSimpleName(),
                             arguments.getBatchSize(),
                             (int) trainingSet.getNumIterations(),
                             (int) validateSet.getNumIterations(),
