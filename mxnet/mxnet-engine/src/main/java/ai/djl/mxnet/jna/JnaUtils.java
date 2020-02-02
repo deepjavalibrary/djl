@@ -15,7 +15,7 @@ package ai.djl.mxnet.jna;
 import ai.djl.Device;
 import ai.djl.engine.EngineException;
 import ai.djl.mxnet.engine.CachedOp;
-import ai.djl.mxnet.engine.DeviceType;
+import ai.djl.mxnet.engine.MxDeviceType;
 import ai.djl.mxnet.engine.MxNDArray;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.mxnet.engine.MxSymbolBlock;
@@ -326,7 +326,7 @@ public final class JnaUtils {
 
     public static Pointer createNdArray(
             Device device, Shape shape, DataType dtype, int size, boolean delayedAlloc) {
-        int deviceType = DeviceType.toDeviceType(device);
+        int deviceType = MxDeviceType.toDeviceType(device);
         int deviceId = device.getDeviceId();
         int delay = delayedAlloc ? 1 : 0;
 
@@ -348,7 +348,7 @@ public final class JnaUtils {
             Shape[] auxShapes,
             boolean delayedAlloc) {
         int[] shapeArray = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
-        int deviceType = DeviceType.toDeviceType(device);
+        int deviceType = MxDeviceType.toDeviceType(device);
         int deviceId = device.getDeviceId();
         int delay = delayedAlloc ? 1 : 0;
         PointerByReference ref = new PointerByReference();
@@ -518,7 +518,7 @@ public final class JnaUtils {
         IntBuffer deviceType = IntBuffer.allocate(1);
         IntBuffer deviceId = IntBuffer.allocate(1);
         checkCall(LIB.MXNDArrayGetContext(ndArray, deviceType, deviceId));
-        return new Device(DeviceType.fromDeviceType(deviceType.get(0)), deviceId.get(0));
+        return new Device(MxDeviceType.fromDeviceType(deviceType.get(0)), deviceId.get(0));
     }
 
     public static Shape getShape(Pointer ndArray) {

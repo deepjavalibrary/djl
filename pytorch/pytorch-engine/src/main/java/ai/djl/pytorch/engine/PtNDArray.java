@@ -22,18 +22,35 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.Pointer;
-
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.function.Predicate;
 
 public class PtNDArray implements NDArray {
 
     private Pointer handle;
+    private Device device;
+    private DataType dataType;
+    private Shape shape;
+    private PtNDManager manager;
 
-    public PtNDArray(Pointer handle) {
+    public PtNDArray(
+            PtNDManager manager, Pointer handle, Device device, Shape shape, DataType dataType) {
+        this.device = device;
+        // shape check
+        if (Arrays.stream(shape.getShape()).anyMatch(s -> s < 0)) {
+            throw new IllegalArgumentException("The shape must be >= 0");
+        }
+        this.shape = shape;
+        this.dataType = dataType;
+    }
+
+    public PtNDArray(PtNDManager manager, Pointer handle) {
         this.handle = handle;
+        this.manager = manager;
     }
 
     public Pointer getHandle() {
@@ -42,7 +59,7 @@ public class PtNDArray implements NDArray {
 
     @Override
     public NDManager getManager() {
-        return null;
+        return manager;
     }
 
     @Override
@@ -51,9 +68,7 @@ public class PtNDArray implements NDArray {
     }
 
     @Override
-    public void setName(String name) {
-
-    }
+    public void setName(String name) {}
 
     @Override
     public String getUid() {
@@ -62,17 +77,26 @@ public class PtNDArray implements NDArray {
 
     @Override
     public DataType getDataType() {
-        return null;
+        if (dataType == null) {
+            dataType = JniUtils.getDataType(getHandle());
+        }
+        return dataType;
     }
 
     @Override
     public Device getDevice() {
-        return null;
+        if (device == null) {
+            device = JniUtils.getDevice(getHandle());
+        }
+        return device;
     }
 
     @Override
     public Shape getShape() {
-        return null;
+        if (shape == null) {
+            shape = JniUtils.getShape(getHandle());
+        }
+        return shape;
     }
 
     @Override
@@ -96,9 +120,7 @@ public class PtNDArray implements NDArray {
     }
 
     @Override
-    public void attachGradient() {
-
-    }
+    public void attachGradient() {}
 
     @Override
     public NDArray getGradient() {
@@ -107,28 +129,20 @@ public class PtNDArray implements NDArray {
 
     @Override
     public ByteBuffer toByteBuffer() {
-        return null;
+        return JniUtils.getByteBuffer(getHandle());
     }
 
     @Override
-    public void set(Buffer data) {
-
-    }
+    public void set(Buffer data) {}
 
     @Override
-    public void set(NDIndex index, NDArray value) {
-
-    }
+    public void set(NDIndex index, NDArray value) {}
 
     @Override
-    public void set(NDIndex index, Number value) {
-
-    }
+    public void set(NDIndex index, Number value) {}
 
     @Override
-    public void setScalar(NDIndex index, Number value) {
-
-    }
+    public void setScalar(NDIndex index, Number value) {}
 
     @Override
     public NDArray get(NDIndex index) {
@@ -136,9 +150,7 @@ public class PtNDArray implements NDArray {
     }
 
     @Override
-    public void copyTo(NDArray array) {
-
-    }
+    public void copyTo(NDArray array) {}
 
     @Override
     public NDArray booleanMask(NDArray index, int axis) {
@@ -776,7 +788,5 @@ public class PtNDArray implements NDArray {
     }
 
     @Override
-    public void close() {
-
-    }
+    public void close() {}
 }

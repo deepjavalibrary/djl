@@ -24,7 +24,6 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
 import ai.djl.util.PairList;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,21 +54,19 @@ public class PtModel implements Model {
     }
 
     @Override
-    public void load(Path modelPath, String modelName, Map<String, String> options) throws IOException, MalformedModelException {
+    public void load(Path modelPath, String modelName, Map<String, String> options)
+            throws IOException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
         this.modelName = modelName;
         Path modelFile = modelDir.resolve(modelName + ".pt");
         if (Files.notExists(modelFile)) {
-            throw new FileNotFoundException(
-                    ".pt file not found in: " + modelPath);
+            throw new FileNotFoundException(".pt file not found in: " + modelPath);
         }
         this.module = Module.load(modelFile);
     }
 
     @Override
-    public void save(Path modelPath, String modelName) throws IOException {
-
-    }
+    public void save(Path modelPath, String modelName) throws IOException {}
 
     @Override
     public Block getBlock() {
@@ -77,9 +74,7 @@ public class PtModel implements Model {
     }
 
     @Override
-    public void setBlock(Block block) {
-
-    }
+    public void setBlock(Block block) {}
 
     @Override
     public String getName() {
@@ -92,9 +87,7 @@ public class PtModel implements Model {
     }
 
     @Override
-    public void setProperty(String key, String value) {
-
-    }
+    public void setProperty(String key, String value) {}
 
     @Override
     public NDManager getNDManager() {
@@ -142,9 +135,7 @@ public class PtModel implements Model {
     }
 
     @Override
-    public void setDataType(DataType dataType) {
-
-    }
+    public void setDataType(DataType dataType) {}
 
     @Override
     public DataType getDataType() {
@@ -152,12 +143,8 @@ public class PtModel implements Model {
     }
 
     @Override
-    public void cast(DataType dataType) {
-
-    }
+    public void cast(DataType dataType) {}
 
     @Override
-    public void close() {
-
-    }
+    public void close() {}
 }
