@@ -26,11 +26,30 @@ public final class PyTorchLibrary {
 
     private PyTorchLibrary() {}
 
-    public native Pointer atOnes(long[] shape);
+    public native long[] torchSizes(Pointer handle);
 
-    public native long[] atSizes(Pointer handle);
+    public native ByteBuffer torchDataPtr(Pointer handle);
 
-    public native ByteBuffer atDataPtr(Pointer handle);
+    public native int torchDType(Pointer handle);
+
+    public native int[] torchDevice(Pointer handle);
+
+    public native Pointer torchEmpty(
+            long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
+
+    public native Pointer torchZeros(
+            long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
+
+    public native Pointer torchOnes(
+            long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
+
+    public native Pointer torchFromBlob(
+            ByteBuffer data,
+            long[] shape,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
 
     public native Pointer moduleLoad(String path);
 
