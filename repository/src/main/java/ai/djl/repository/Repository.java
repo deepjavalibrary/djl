@@ -122,6 +122,13 @@ public interface Repository {
     }
 
     /**
+     * Returns whether the repository is remote repository.
+     *
+     * @return whether the repository is remote repository
+     */
+    boolean isRemote();
+
+    /**
      * Returns the repository name.
      *
      * @return the repository name

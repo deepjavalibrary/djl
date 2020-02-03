@@ -52,6 +52,12 @@ public class RemoteRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
+    public boolean isRemote() {
+        return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getName() {
         return name;
     }

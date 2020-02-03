@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class TfPredictor<I, O> extends BasePredictor<I, O> {
 
     /** {@inheritDoc} */
     @Override
-    protected NDList forward(NDList ndList) {
+    protected NDList forward(TranslatorContext ctx, NDList ndList) {
         Session session = ((TfNDManager) model).getSession();
         TfNDManager tfNDManager = (TfNDManager) manager;
         Session.Runner runner = session.runner();

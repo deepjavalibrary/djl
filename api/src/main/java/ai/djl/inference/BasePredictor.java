@@ -85,7 +85,7 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
                     NDList ndList = translator.processInput(context, input);
                     preprocessEnd(ndList);
 
-                    NDList result = forward(ndList);
+                    NDList result = forward(context, ndList);
                     forwardEnd(result);
 
                     ret.add(translator.processOutput(context, result));
@@ -98,7 +98,7 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
             NDList inputBatch = processInputs(context, inputs);
             preprocessEnd(inputBatch);
 
-            NDList result = forward(inputBatch);
+            NDList result = forward(context, inputBatch);
             forwardEnd(result);
 
             return processOutputs(context, result);
@@ -119,7 +119,7 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
 
     protected void waitToRead(NDList list) {}
 
-    protected NDList forward(NDList ndList) {
+    protected NDList forward(TranslatorContext ctx, NDList ndList) {
         logger.trace("Predictor input data: {}", ndList);
         return block.forward(parameterStore, ndList);
     }

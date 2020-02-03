@@ -60,7 +60,7 @@ public abstract class AbstractRepository implements Repository {
 
         String itemUri = item.getUri();
         // Resolve cached item
-        if (itemUri != null && URI.create(itemUri).isAbsolute()) {
+        if (itemUri != null && URI.create(itemUri).isAbsolute() || isRemote()) {
             Path cacheDir = getCacheDirectory();
             Path resourceDir = cacheDir.resolve(artifactUri.getPath());
             String type = item.getType();

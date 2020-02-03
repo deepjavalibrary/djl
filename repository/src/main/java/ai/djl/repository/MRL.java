@@ -148,6 +148,7 @@ public class MRL {
         interface NLP {
 
             Anchor QUESTION_ANSWER = new Anchor("model/nlp/qa");
+            Anchor TEXT_CLASSIFICATION = new Anchor("model/nlp/textclassification");
         }
     }
 }
