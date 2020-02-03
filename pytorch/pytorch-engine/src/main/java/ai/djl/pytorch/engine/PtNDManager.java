@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;

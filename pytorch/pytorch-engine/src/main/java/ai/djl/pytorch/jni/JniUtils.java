@@ -17,7 +17,8 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.pytorch.engine.Module;
+import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.pytorch.engine.PtSymbolBlock;
 import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
@@ -28,6 +29,19 @@ import java.nio.file.Path;
 
 public class JniUtils {
     private JniUtils() {}
+
+    public static Pointer createEmptyNdArray(Shape shape, DataType dType, Device device, SparseFormat fmt) {
+        int layoutVal = -1;
+        if (fmt.getType().equals("default")) {
+            layoutVal = 0;
+        } else if (fmt.getType().equals("undefined")) {
+            throw new UnsupportedOperationException("Type not supported");
+        } else {
+            layoutVal = 1;
+        }
+        // TODO: set default type of require gradient
+        return PyTorchLibrary.LIB.torchEmpty(shape.getShape(), dType.ordinal(), layoutVal, new int[]{device.getDeviceId()}, false);
+    }
 
     public static DataType getDataType(Pointer ndArray) {
         int dataType = PyTorchLibrary.LIB.torchDType(ndArray);
@@ -49,16 +63,16 @@ public class JniUtils {
         return bb;
     }
 
-    public static Module loadModule(PtNDManager manager, Path path) {
+    public static PtSymbolBlock loadModule(PtNDManager manager, Path path) {
         Pointer handle = PyTorchLibrary.LIB.moduleLoad(path.toString());
-        return new Module(manager, handle);
+        return new PtSymbolBlock(manager, handle);
     }
 
-    public static void moduleEval(Module module) {
-        PyTorchLibrary.LIB.moduleEval(module.getHandle());
+    public static void moduleEval(Pointer handle) {
+        PyTorchLibrary.LIB.moduleEval(handle);
     }
 
-    public static NDList moduleForward(Module module, NDList inputs) {
+    public static NDList moduleForward(Pointer handle, NDList inputs) {
         Pointer[] iValueHandles =
                 inputs.stream()
                         .map(
@@ -69,7 +83,7 @@ public class JniUtils {
         NDArray result =
                 new PtNDArray((PtNDManager) inputs.head().getManager(),
                         PyTorchLibrary.LIB.iValueToTensor(
-                                PyTorchLibrary.LIB.moduleForward(module.getHandle(), iValueHandles)));
+                                PyTorchLibrary.LIB.moduleForward(handle, iValueHandles)));
         return new NDList(result);
     }
 }

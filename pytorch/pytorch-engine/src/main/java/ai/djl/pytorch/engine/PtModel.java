@@ -38,7 +38,7 @@ import java.util.function.Function;
 public class PtModel implements Model {
 
     private Path modelDir;
-    private Module module;
+    private PtSymbolBlock ptSymbolBlock;
     private String modelName;
     private DataType dataType;
     private Map<String, String> properties;
@@ -65,7 +65,7 @@ public class PtModel implements Model {
         if (Files.notExists(modelFile)) {
             throw new FileNotFoundException(".pt file not found in: " + modelPath);
         }
-        this.module = JniUtils.loadModule(manager, modelFile);
+        this.ptSymbolBlock = JniUtils.loadModule(manager, modelFile);
     }
 
     @Override
