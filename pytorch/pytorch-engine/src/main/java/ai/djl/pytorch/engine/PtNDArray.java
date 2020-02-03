@@ -23,15 +23,15 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
+import ai.djl.pytorch.jni.NativeResource;
 import ai.djl.pytorch.jni.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-public class PtNDArray implements NDArray {
+public class PtNDArray extends NativeResource implements NDArray {
 
-    private Pointer handle;
     private Device device;
     private DataType dataType;
     private Shape shape;
@@ -39,6 +39,7 @@ public class PtNDArray implements NDArray {
 
     public PtNDArray(
             PtNDManager manager, Pointer handle, Device device, Shape shape, DataType dataType) {
+        this(manager, handle);
         this.device = device;
         // shape check
         if (Arrays.stream(shape.getShape()).anyMatch(s -> s < 0)) {
@@ -49,12 +50,8 @@ public class PtNDArray implements NDArray {
     }
 
     public PtNDArray(PtNDManager manager, Pointer handle) {
-        this.handle = handle;
+        super(handle);
         this.manager = manager;
-    }
-
-    public Pointer getHandle() {
-        return handle;
     }
 
     @Override
@@ -69,11 +66,6 @@ public class PtNDArray implements NDArray {
 
     @Override
     public void setName(String name) {}
-
-    @Override
-    public String getUid() {
-        return null;
-    }
 
     @Override
     public DataType getDataType() {
@@ -788,5 +780,7 @@ public class PtNDArray implements NDArray {
     }
 
     @Override
-    public void close() {}
+    public void close() {
+        //TODO: Implement close method
+    }
 }

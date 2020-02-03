@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
@@ -41,6 +42,7 @@ public class PtModel implements Model {
     private String modelName;
     private DataType dataType;
     private Map<String, String> properties;
+    private PtNDManager manager;
 
     /**
      * Constructs a new Model on a given device.
@@ -51,6 +53,7 @@ public class PtModel implements Model {
         device = Device.defaultIfNull(device);
         dataType = DataType.FLOAT32;
         properties = new ConcurrentHashMap<>();
+        //TODO: Assign NDManager to Model
     }
 
     @Override
@@ -62,7 +65,7 @@ public class PtModel implements Model {
         if (Files.notExists(modelFile)) {
             throw new FileNotFoundException(".pt file not found in: " + modelPath);
         }
-        this.module = Module.load(modelFile);
+        this.module = JniUtils.loadModule(manager, modelFile);
     }
 
     @Override

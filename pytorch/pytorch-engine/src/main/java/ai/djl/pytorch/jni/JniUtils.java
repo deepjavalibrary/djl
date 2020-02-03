@@ -13,11 +13,18 @@
 package ai.djl.pytorch.jni;
 
 import ai.djl.Device;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.pytorch.engine.Module;
 import ai.djl.pytorch.engine.PtDeviceType;
+import ai.djl.pytorch.engine.PtNDArray;
+import ai.djl.pytorch.engine.PtNDManager;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Path;
 
 public class JniUtils {
     private JniUtils() {}
@@ -40,5 +47,29 @@ public class JniUtils {
         ByteBuffer bb = PyTorchLibrary.LIB.torchDataPtr(handle);
         bb.order(ByteOrder.nativeOrder());
         return bb;
+    }
+
+    public static Module loadModule(PtNDManager manager, Path path) {
+        Pointer handle = PyTorchLibrary.LIB.moduleLoad(path.toString());
+        return new Module(manager, handle);
+    }
+
+    public static void moduleEval(Module module) {
+        PyTorchLibrary.LIB.moduleEval(module.getHandle());
+    }
+
+    public static NDList moduleForward(Module module, NDList inputs) {
+        Pointer[] iValueHandles =
+                inputs.stream()
+                        .map(
+                                ele ->
+                                        PyTorchLibrary.LIB.iValueCreateFromTensor(
+                                                ((PtNDArray) ele).getHandle()))
+                        .toArray(Pointer[]::new);
+        NDArray result =
+                new PtNDArray((PtNDManager) inputs.head().getManager(),
+                        PyTorchLibrary.LIB.iValueToTensor(
+                                PyTorchLibrary.LIB.moduleForward(module.getHandle(), iValueHandles)));
+        return new NDList(result);
     }
 }

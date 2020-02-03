@@ -14,40 +14,28 @@ package ai.djl.pytorch.engine;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.pytorch.jni.JniUtils;
+import ai.djl.pytorch.jni.NativeResource;
 import ai.djl.pytorch.jni.Pointer;
 import ai.djl.pytorch.jni.PyTorchLibrary;
 import java.nio.file.Path;
 
 // TODO: Memory handling
-public class Module {
+public class Module extends NativeResource {
 
-    private Pointer handle;
+    private PtNDManager manager;
 
-    public Module(Pointer moduleHandle) {
-        this.handle = moduleHandle;
-    }
 
-    public static Module load(Path path) {
-        Pointer handle = PyTorchLibrary.LIB.moduleLoad(path.toString());
-        return new Module(handle);
+    public Module(PtNDManager manager, Pointer moduleHandle) {
+        super(moduleHandle);
+        this.manager = manager;
     }
 
     public void eval() {
-        PyTorchLibrary.LIB.moduleEval(handle);
+        JniUtils.moduleEval(this);
     }
 
     public NDList forward(NDList input) {
-        Pointer[] iValueHandles =
-                input.stream()
-                        .map(
-                                ele ->
-                                        PyTorchLibrary.LIB.iValueCreateFromTensor(
-                                                ((PtNDArray) ele).getHandle()))
-                        .toArray(Pointer[]::new);
-        NDArray result =
-                new PtNDArray(
-                        PyTorchLibrary.LIB.iValueToTensor(
-                                PyTorchLibrary.LIB.moduleForward(handle, iValueHandles)));
-        return new NDList(result);
+        return JniUtils.moduleForward(this, input);
     }
 }
