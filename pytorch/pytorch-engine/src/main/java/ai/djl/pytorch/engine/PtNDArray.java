@@ -70,7 +70,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public DataType getDataType() {
         if (dataType == null) {
-            dataType = JniUtils.getDataType(getHandle());
+            dataType = JniUtils.getDataType(this);
         }
         return dataType;
     }
@@ -78,7 +78,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public Device getDevice() {
         if (device == null) {
-            device = JniUtils.getDevice(getHandle());
+            device = JniUtils.getDevice(this);
         }
         return device;
     }
@@ -86,7 +86,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public Shape getShape() {
         if (shape == null) {
-            shape = JniUtils.getShape(getHandle());
+            shape = JniUtils.getShape(this);
         }
         return shape;
     }
@@ -121,7 +121,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public ByteBuffer toByteBuffer() {
-        return JniUtils.getByteBuffer(getHandle());
+        return JniUtils.getByteBuffer(this);
     }
 
     @Override
@@ -781,6 +781,6 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public void close() {
-        //TODO: Implement close method
+        // TODO: Implement close method
     }
 }

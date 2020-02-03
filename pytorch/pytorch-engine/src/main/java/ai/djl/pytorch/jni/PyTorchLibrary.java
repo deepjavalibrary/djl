@@ -51,6 +51,10 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
+    public native Pointer[] torchSplit(Pointer handle, long size, long axis);
+
+    public native Pointer[] torchSplit(Pointer handle, long[] indices, long axis);
+
     public native Pointer moduleLoad(String path);
 
     public native void moduleEval(Pointer handle);

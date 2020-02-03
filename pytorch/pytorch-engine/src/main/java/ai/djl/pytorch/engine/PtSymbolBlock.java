@@ -13,7 +13,6 @@
 package ai.djl.pytorch.engine;
 
 import ai.djl.MalformedModelException;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -25,22 +24,18 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.NativeResource;
 import ai.djl.pytorch.jni.Pointer;
-import ai.djl.pytorch.jni.PyTorchLibrary;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 // TODO: Memory handling
 public class PtSymbolBlock extends NativeResource implements SymbolBlock {
 
     private PtNDManager manager;
-
 
     public PtSymbolBlock(PtNDManager manager, Pointer handle) {
         super(handle);
@@ -51,7 +46,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
 
     @Override
     public void close() {
-        //TODO: Implement close methods
+        // TODO: Implement close methods
     }
 
     @Override
@@ -60,7 +55,8 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     }
 
     @Override
-    public NDList forward(ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         return JniUtils.moduleForward(getHandle(), inputs);
     }
 
@@ -130,7 +126,8 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     }
 
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is) throws IOException, MalformedModelException {
+    public void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException {
         throw new UnsupportedOperationException("Not supported for PyTorch");
     }
 }

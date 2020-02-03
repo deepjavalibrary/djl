@@ -18,11 +18,10 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
-import ai.djl.pytorch.engine.PtSymbolBlock;
 import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
-
+import ai.djl.pytorch.engine.PtSymbolBlock;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
@@ -30,7 +29,8 @@ import java.nio.file.Path;
 public class JniUtils {
     private JniUtils() {}
 
-    public static Pointer createEmptyNdArray(Shape shape, DataType dType, Device device, SparseFormat fmt) {
+    public static PtNDArray createEmptyNdArray(
+            PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
         int layoutVal = -1;
         if (fmt.getType().equals("default")) {
             layoutVal = 0;
@@ -40,25 +40,32 @@ public class JniUtils {
             layoutVal = 1;
         }
         // TODO: set default type of require gradient
-        return PyTorchLibrary.LIB.torchEmpty(shape.getShape(), dType.ordinal(), layoutVal, new int[]{device.getDeviceId()}, false);
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchEmpty(
+                        shape.getShape(),
+                        dType.ordinal(),
+                        layoutVal,
+                        new int[] {device.getDeviceId()},
+                        false));
     }
 
-    public static DataType getDataType(Pointer ndArray) {
-        int dataType = PyTorchLibrary.LIB.torchDType(ndArray);
+    public static DataType getDataType(PtNDArray ndArray) {
+        int dataType = PyTorchLibrary.LIB.torchDType(ndArray.getHandle());
         return DataType.values()[dataType];
     }
 
-    public static Device getDevice(Pointer ndArray) {
-        int[] device = PyTorchLibrary.LIB.torchDevice(ndArray);
+    public static Device getDevice(PtNDArray ndArray) {
+        int[] device = PyTorchLibrary.LIB.torchDevice(ndArray.getHandle());
         return new Device(PtDeviceType.fromDeviceType(device[0]), device[1]);
     }
 
-    public static Shape getShape(Pointer handle) {
-        return new Shape(PyTorchLibrary.LIB.torchSizes(handle));
+    public static Shape getShape(PtNDArray ndArray) {
+        return new Shape(PyTorchLibrary.LIB.torchSizes(ndArray.getHandle()));
     }
 
-    public static ByteBuffer getByteBuffer(Pointer handle) {
-        ByteBuffer bb = PyTorchLibrary.LIB.torchDataPtr(handle);
+    public static ByteBuffer getByteBuffer(PtNDArray ndArray) {
+        ByteBuffer bb = PyTorchLibrary.LIB.torchDataPtr(ndArray.getHandle());
         bb.order(ByteOrder.nativeOrder());
         return bb;
     }
@@ -81,7 +88,8 @@ public class JniUtils {
                                                 ((PtNDArray) ele).getHandle()))
                         .toArray(Pointer[]::new);
         NDArray result =
-                new PtNDArray((PtNDManager) inputs.head().getManager(),
+                new PtNDArray(
+                        (PtNDManager) inputs.head().getManager(),
                         PyTorchLibrary.LIB.iValueToTensor(
                                 PyTorchLibrary.LIB.moduleForward(handle, iValueHandles)));
         return new NDList(result);

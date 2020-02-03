@@ -85,6 +85,33 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
 
+JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2JJ
+  (JNIEnv *env, jobject jthis, jobject jhandle, jlong size, jlong dim) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  auto tensors = tensor_ptr->split(size, dim);
+  jobjectArray jarray = env->NewObjectArray(tensors.size(), env->FindClass(utils::POINTER_CLASS), nullptr);
+  for (unsigned long i = 0; i < tensors.size(); ++i) {
+    const auto* element_ptr = new torch::Tensor(tensors.at(i));
+    auto ptr = utils::CreatePointer<torch::Tensor>(env, element_ptr);
+    env->SetObjectArrayElement(jarray, i, ptr);
+  }
+  return jarray;
+}
+
+JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2_3IJ
+  (JNIEnv *env, jobject jthis, jobject jhandle, jlongArray jlongArrayPtr, jlong dim) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  auto jlongArray = env->GetLongArrayElements(jlongArrayPtr, JNI_FALSE);
+  auto tensors = tensor_ptr->split_with_sizes(c10::IntArrayRef(*jlongArray), dim);
+  jobjectArray jarray = env->NewObjectArray(tensors.size(), env->FindClass(utils::POINTER_CLASS), nullptr);
+  for (unsigned long i = 0; i < tensors.size(); ++i) {
+    const auto* element_ptr = new torch::Tensor(tensors.at(i));
+    auto ptr = utils::CreatePointer<torch::Tensor>(env, element_ptr);
+    env->SetObjectArrayElement(jarray, i, ptr);
+  }
+  return jarray;
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(
   JNIEnv* env,
   jobject jthis,

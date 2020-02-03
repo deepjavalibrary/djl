@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
@@ -33,8 +34,7 @@ public class PtNDManager implements NDManager {
 
     @Override
     public PtNDArray create(Shape shape, DataType dataType, Device device) {
-        PtNDArray array = new PtNDArray(this, handle);
-        return null;
+        return JniUtils.createEmptyNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
     @Override
