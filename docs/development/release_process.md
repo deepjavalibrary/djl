@@ -39,7 +39,14 @@ Run the following command to trigger mxnet-native publishing job:
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "mxnet-staging-pub"}'
 ```
 
-### Step 1.5: Remove -SNAPSHOT in examples and jupyter notebooks
+### Step 1.5: Publish DJL library to sonatype staging server
+
+Run the following command to trigger DJL publishing job:
+```shell script
+curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "release-build"}'
+```
+
+### Step 1.6: Remove -SNAPSHOT in examples and jupyter notebooks
 
 Run the following command with correct version value:
 ```shell script
@@ -50,20 +57,6 @@ git commit -a -m 'Remove -SNAPSHOT for release vX.X.X'
 git tag -a vX.X.X -m "Releasing version vX.X.X"
 git push origin vX.X.X
 ```
-
-### Step 1.6 Create a Release Notes
-
-Navigate to DJL github site, select "Release" tab and click "Draft a new Release" button.
-Select tag that created by previous step. Check "This is a pre-release" checkbox.
-
-Release notes content should include the following:
-- list of new features
-- list of bug fixes
-- limitations and known issues
-- API changes and migration document
-
-Once "Publish release" button is clicked, a github Action will be triggered, and release packages
-will be published sonatype staging server.
 
 ## Step 2: Validate release on staging server
 
@@ -76,7 +69,7 @@ git checkout vX.X.X
 ./gradlew -PstagingRepo=aidjl-XXXX staging
 ```
 
-### Validate examples project are working fine
+### Step 2.1: Validate examples project are working fine
 
 ```shell script
 cd examples
@@ -84,7 +77,7 @@ cd examples
 mvn exec:java -Dexec.mainClass="ai.djl.examples.inference.ObjectDetection" 
 ```
 
-### Validate jupyter notebooks
+### Step 2.2: Validate jupyter notebooks
 
 Make sure jupyter notebook and running properly and all javadoc links are accessible.
 ```shell script
@@ -101,7 +94,28 @@ check javadoc links are accessible.
 
 Login to https://oss.sonatype.org/, close staging packages and publish to maven central.
 
-## Step 5: Upgrade version for next release
+Make sure all packages are available on maven central. It may take up to 2 hours. File a ticket
+to sonatype if we run into CDN cache issue like: [this](https://issues.sonatype.org/browse/MVNCENTRAL-5470).
+
+## Step 5 Create a Release Note
+
+Once we confirmed release packages are all working, we can create a release note:
+
+Navigate to DJL github site, select "Release" tab and click "Draft a new Release" button.
+Select tag that created by previous step. Check "This is a pre-release" checkbox.
+
+Release notes content should include the following:
+- list of new features
+- list of bug fixes
+- limitations and known issues
+- API changes and migration document
+
+Once "Publish release" button is clicked, a github Action will be triggered, and release packages
+will be published sonatype staging server.
+
+## Step 6: Post release tasks
+
+### Step 6.1: Upgrade version for next release
 
 ```shell script
 cd djl
@@ -110,7 +124,7 @@ cd djl
 
 Create a PR to get reviewed and merge into github.
 
-## Step 6: Publish new snapshot to sonatype
+### Step 6.2: Publish new snapshot to sonatype
 
 Manually trigger a nightly build with the following command:
 ```shell script

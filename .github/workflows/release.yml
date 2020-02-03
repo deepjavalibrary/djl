@@ -9,8 +9,6 @@ on:
   # to create your personal token.
   repository_dispatch:
     types: [release-build]
-  release:
-    types: [published]
 
 jobs:
   build:
