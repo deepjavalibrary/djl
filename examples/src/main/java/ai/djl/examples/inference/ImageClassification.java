@@ -14,7 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
-import ai.djl.basicmodelzoo.cv.classification.Mlp;
+import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
@@ -58,7 +58,7 @@ public final class ImageClassification {
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
         try (Model model = Model.newInstance()) {
-            model.setBlock(new Mlp(28, 28));
+            model.setBlock(new Mlp(28 * 28, 10, new int[] {128, 64}));
 
             // Assume you have run TrainMnist.java example, and saved model in build/model folder.
             Path modelDir = Paths.get("build/model");

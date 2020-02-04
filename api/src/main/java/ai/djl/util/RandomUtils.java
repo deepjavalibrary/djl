@@ -54,13 +54,26 @@ public final class RandomUtils {
 
     /**
      * Returns a pseudorandom, uniformly distributed {@code int} value between 0 (inclusive) and the
-     * specified value (exclusive), drawn from his random number generator's sequence.
+     * specified upper bound (exclusive), drawn from his random number generator's sequence.
      *
      * @param bound the bounding value
-     * @return an integer value between 0 (inclusive) and the specified value (exclusive)
+     * @return an integer value between 0 (inclusive) and the specified upper bound (exclusive)
      */
     public static int nextInt(int bound) {
         return RANDOM.nextInt(bound);
+    }
+
+    /**
+     * Returns a pseudorandom, uniformly distributed {@code float} value between lower and upper,
+     * drawn from his random number generator's sequence.
+     *
+     * @param lower the lower bound (inclusive)
+     * @param upper the upper bound (exclusive)
+     * @return an float value between lower and upper
+     */
+    public static float nextFloat(float lower, float upper) {
+        float range = upper - lower;
+        return RANDOM.nextFloat() * range + lower;
     }
 
     /**

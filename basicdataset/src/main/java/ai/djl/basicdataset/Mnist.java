@@ -38,6 +38,7 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
 
     public static final int IMAGE_WIDTH = 28;
     public static final int IMAGE_HEIGHT = 28;
+    public static final int NUM_CLASSES = 10;
 
     private static final String ARTIFACT_ID = "mnist";
 

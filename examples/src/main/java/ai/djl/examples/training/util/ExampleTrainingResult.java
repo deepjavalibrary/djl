@@ -21,9 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ExampleTrainingResult {
 
+    private String lossName;
     Map<String, Float> evaluations;
 
     public ExampleTrainingResult(Trainer trainer) {
+        lossName = trainer.getLoss().getName();
         Metrics metrics = trainer.getMetrics();
         evaluations = new ConcurrentHashMap<>();
         for (Evaluator evaluator : trainer.getEvaluators()) {
@@ -39,5 +41,9 @@ public class ExampleTrainingResult {
 
     public float getEvaluation(String name) {
         return evaluations.get(name);
+    }
+
+    public float getLoss() {
+        return evaluations.get(lossName);
     }
 }

@@ -15,7 +15,7 @@ package ai.djl.examples.training;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
-import ai.djl.basicmodelzoo.cv.classification.Mlp;
+import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
@@ -54,7 +54,8 @@ public final class TrainMnist {
         Arguments arguments = Arguments.parseArgs(args);
 
         // Construct neural network
-        Block block = new Mlp(28, 28);
+        Block block =
+                new Mlp(Mnist.IMAGE_HEIGHT * Mnist.IMAGE_WIDTH, Mnist.NUM_CLASSES, new int[] {5});
 
         try (Model model = Model.newInstance()) {
             model.setBlock(block);

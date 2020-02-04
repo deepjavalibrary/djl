@@ -38,6 +38,34 @@
           "size": 438097
         }
       }
+    },
+    {
+      "version": "0.0.2",
+      "snapshot": false,
+      "name": "mlp",
+      "properties": {
+        "dataset": "mnist"
+      },
+      "arguments": {
+        "flag": "GRAYSCALE",
+        "width": 28,
+        "height": 28,
+        "output": 10,
+        "hidden": [128, 64]
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_mnist.txt",
+          "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1",
+          "size": 19,
+          "name": "synset.txt"
+        },
+        "parameters": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/mlp/0.0.1/mlp-0000.params",
+          "sha1Hash": "a848dc6c63097d2e2d01f236fcfba1652f50ce6b",
+          "size": 438097
+        }
+      }
     }
   ]
 }

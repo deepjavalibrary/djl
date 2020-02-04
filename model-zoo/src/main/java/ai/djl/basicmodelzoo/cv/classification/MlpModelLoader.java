@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
+import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.modality.cv.transform.CenterCrop;
@@ -33,6 +34,7 @@ import ai.djl.translate.Translator;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 /** Model loader for MLP models. */
@@ -41,7 +43,7 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
     private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "mlp";
-    private static final String VERSION = "0.0.1";
+    private static final String VERSION = "0.0.2";
 
     /**
      * Creates the Model loader from the given repository.
@@ -76,9 +78,17 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
         Map<String, Object> arguments = artifact.getArguments();
         int width = ((Double) arguments.getOrDefault("width", 28d)).intValue();
         int height = ((Double) arguments.getOrDefault("height", 28d)).intValue();
+        int input = width * height;
+        int output = ((Double) arguments.get("output")).intValue();
+        @SuppressWarnings("unchecked")
+        int[] hidden =
+                ((List<Double>) arguments.get("hidden"))
+                        .stream()
+                        .mapToInt(Double::intValue)
+                        .toArray();
 
         Model model = Model.newInstance(device);
-        model.setBlock(new Mlp(width, height));
+        model.setBlock(new Mlp(input, output, hidden));
         model.load(modelPath, artifact.getName());
         return model;
     }

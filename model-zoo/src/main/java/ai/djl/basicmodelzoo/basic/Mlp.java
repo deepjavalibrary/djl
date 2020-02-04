@@ -10,12 +10,14 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicmodelzoo.cv.classification;
+package ai.djl.basicmodelzoo.basic;
 
+import ai.djl.ndarray.NDList;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
+import java.util.function.Function;
 
 /**
  * Multilayer Perceptron (MLP) NeuralNetworks.
@@ -32,20 +34,33 @@ import ai.djl.nn.core.Linear;
 public class Mlp extends SequentialBlock {
 
     /**
-     * Create a MLP NeuralNetwork.
+     * Create an MLP NeuralNetwork using RELU.
      *
-     * <p>The existing MLP only contains three {@link Linear} blocks with output channels as 128, 64
-     * and 10. Users can specify the width and height on the first layer to match the input
-     *
-     * @param width the width of the input
-     * @param height the height of the input
+     * @param input the size of the input vector
+     * @param output the size of the input vector
+     * @param hidden the sizes of all of the hidden layers
      */
-    public Mlp(int width, int height) {
-        add(Blocks.batchFlattenBlock(width * (long) height))
-                .add(new Linear.Builder().setOutChannels(128).build())
-                .add(Activation::relu)
-                .add(new Linear.Builder().setOutChannels(64).build())
-                .add(Activation.reluBlock())
-                .add(new Linear.Builder().setOutChannels(10).build());
+    public Mlp(int input, int output, int[] hidden) {
+        this(input, output, hidden, Activation::relu);
+    }
+
+    /**
+     * Create an MLP NeuralNetwork.
+     *
+     * @param input the size of the input vector
+     * @param output the size of the input vector
+     * @param hidden the sizes of all of the hidden layers
+     * @param activation the activation function to use
+     */
+    public Mlp(int input, int output, int[] hidden, Function<NDList, NDList> activation) {
+
+        add(Blocks.batchFlattenBlock(input));
+
+        for (int hiddenSize : hidden) {
+            add(new Linear.Builder().setOutChannels(hiddenSize).build());
+            add(activation);
+        }
+
+        add(new Linear.Builder().setOutChannels(output).build());
     }
 }

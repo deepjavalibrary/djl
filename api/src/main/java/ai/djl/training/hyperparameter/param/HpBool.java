@@ -1,5 +1,5 @@
 /*
- * Copyright XXXX Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,3 +10,19 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.training.hyperparameter.param;
+
+import java.util.Arrays;
+
+/** A {@link Hyperparameter} for a boolean option. */
+public class HpBool extends HpCategorical<Boolean> {
+
+    /**
+     * Constructs a {@link HpBool}.
+     *
+     * @param name the name of the hyperparameter.
+     */
+    public HpBool(String name) {
+        super(name, Arrays.asList(false, true));
+    }
+}
