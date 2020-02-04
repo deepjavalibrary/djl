@@ -46,7 +46,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
 
     @Override
     public void close() {
-        // TODO: Implement close methods
+        JniUtils.deleteModule(this);
     }
 
     @Override

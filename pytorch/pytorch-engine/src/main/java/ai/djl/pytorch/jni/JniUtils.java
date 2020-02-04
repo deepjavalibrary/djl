@@ -139,6 +139,16 @@ public class JniUtils {
         return bb;
     }
 
+    public static void deleteNdArray(PtNDArray ndArray) {
+        Pointer pointer = ndArray.getHandle();
+        PyTorchLibrary.LIB.torchDeleteTensor(pointer);
+    }
+
+    public static void deleteModule(PtSymbolBlock block) {
+        Pointer pointer = block.getHandle();
+        PyTorchLibrary.LIB.torchDeleteModule(pointer);
+    }
+
     public static PtSymbolBlock loadModule(PtNDManager manager, Path path) {
         Pointer handle = PyTorchLibrary.LIB.moduleLoad(path.toString());
         return new PtSymbolBlock(manager, handle);

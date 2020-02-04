@@ -50,7 +50,7 @@ public abstract class NativeResource implements AutoCloseable {
      *
      * @return the {@link Pointer} to this resource
      */
-    public Pointer getHandle() {
+    protected Pointer getHandle() {
         Pointer pointer = handle.get();
         if (pointer == null) {
             throw new IllegalStateException("Native resource has been release already.");

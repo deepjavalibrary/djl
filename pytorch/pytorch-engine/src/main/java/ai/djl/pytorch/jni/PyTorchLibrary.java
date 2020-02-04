@@ -51,6 +51,10 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
+    public native void torchDeleteTensor(Pointer pointer);
+
+    public native void torchDeleteModule(Pointer pointer);
+
     public native Pointer[] torchSplit(Pointer handle, long size, long axis);
 
     public native Pointer[] torchSplit(Pointer handle, long[] indices, long axis);

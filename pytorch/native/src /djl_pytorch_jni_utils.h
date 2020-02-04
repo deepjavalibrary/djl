@@ -109,11 +109,11 @@ inline std::vector<int> GetDeviceVecFromJDevice(JNIEnv* env, jintArray jdevice) 
   return device_vec;
 }
 
-inline torch::TensorOptions GetTensorOptions(JNIEnv* env,
-                                             jint jdtype,
-                                             jint jlayout,
-                                             jintArray jdevice,
-                                             jboolean jrequired_grad) {
+inline torch::TensorOptions CreateTensorOptions(JNIEnv* env,
+                                                jint jdtype,
+                                                jint jlayout,
+                                                jintArray jdevice,
+                                                jboolean jrequired_grad) {
   const auto device_vec =  utils::GetDeviceVecFromJDevice(env, jdevice);
   auto options = torch::TensorOptions()
     .dtype(GetScalarTypeFromDType(jdtype))

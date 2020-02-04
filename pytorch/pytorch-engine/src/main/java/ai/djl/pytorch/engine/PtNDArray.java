@@ -781,6 +781,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public void close() {
-        // TODO: Implement close method
+        JniUtils.deleteNdArray(this);
+
     }
 }

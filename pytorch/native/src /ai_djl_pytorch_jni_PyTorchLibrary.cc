@@ -52,7 +52,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEmpty(
   jintArray jdevice,
   jboolean jrequired_grad) {
   const auto shape_vec = utils::GetShapeVecFromJShape(env, jshape);
-  const auto options = utils::GetTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
+  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const torch::Tensor* tensor_ptr = new torch::Tensor(torch::empty(shape_vec, options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
@@ -66,7 +66,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchZeros(
   jintArray jdevice,
   jboolean jrequired_grad) {
   const auto shape_vec = utils::GetShapeVecFromJShape(env, jshape);
-  const auto options = utils::GetTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
+  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const torch::Tensor* tensor_ptr = new torch::Tensor(torch::zeros(shape_vec, options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
@@ -80,17 +80,17 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(
   jintArray jdevice,
   jboolean jrequired_grad) {
   const auto shape_vec = utils::GetShapeVecFromJShape(env, jshape);
-  const auto options = utils::GetTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
+  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const auto* tensor_ptr = new torch::Tensor(torch::ones(shape_vec, options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
 
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2JJ
-  (JNIEnv *env, jobject jthis, jobject jhandle, jlong size, jlong dim) {
+  (JNIEnv *env, jobject jthis, jobject jhandle, jlong jsize, jlong jdim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  auto tensors = tensor_ptr->split(size, dim);
+  auto tensors = tensor_ptr->split(jsize, jdim);
   jobjectArray jarray = env->NewObjectArray(tensors.size(), env->FindClass(utils::POINTER_CLASS), nullptr);
-  for (unsigned long i = 0; i < tensors.size(); ++i) {
+  for (size_t i = 0; i < tensors.size(); ++i) {
     const auto* element_ptr = new torch::Tensor(tensors.at(i));
     auto ptr = utils::CreatePointer<torch::Tensor>(env, element_ptr);
     env->SetObjectArrayElement(jarray, i, ptr);
@@ -99,12 +99,12 @@ JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit
 }
 
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2_3IJ
-  (JNIEnv *env, jobject jthis, jobject jhandle, jlongArray jlongArrayPtr, jlong dim) {
+  (JNIEnv *env, jobject jthis, jobject jhandle, jlongArray jindices, jlong jdim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  auto jlongArray = env->GetLongArrayElements(jlongArrayPtr, JNI_FALSE);
-  auto tensors = tensor_ptr->split_with_sizes(c10::IntArrayRef(*jlongArray), dim);
+  auto indices = env->GetLongArrayElements(jindices, JNI_FALSE);
+  auto tensors = tensor_ptr->split_with_sizes(c10::IntArrayRef(*indices), jdim);
   jobjectArray jarray = env->NewObjectArray(tensors.size(), env->FindClass(utils::POINTER_CLASS), nullptr);
-  for (unsigned long i = 0; i < tensors.size(); ++i) {
+  for (size_t i = 0; i < tensors.size(); ++i) {
     const auto* element_ptr = new torch::Tensor(tensors.at(i));
     auto ptr = utils::CreatePointer<torch::Tensor>(env, element_ptr);
     env->SetObjectArrayElement(jarray, i, ptr);
@@ -122,7 +122,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(
   jintArray jdevice,
   jboolean jrequired_grad) {
   const auto shape_vec = utils::GetShapeVecFromJShape(env, jshape);
-  const auto options = utils::GetTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
+  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const torch::Tensor* tensor_ptr =
     new torch::Tensor(torch::from_blob(
       env->GetDirectBufferAddress(jbuffer),
@@ -138,10 +138,22 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDataPtr
   return buf;
 }
 
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteTensor
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  delete tensor_ptr;
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteModule
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
+  const auto* module_ptr = utils::GetPointerFromJHandle<const torch::jit::script::Module>(env, jhandle);
+  delete module_ptr;
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad
   (JNIEnv* env, jobject jthis, jstring jpath) {
-  std::string path_string((env)->GetStringUTFChars(jpath, JNI_FALSE));
-  torch::jit::script::Module module = torch::jit::load(path_string);
+  const std::string path_string((env)->GetStringUTFChars(jpath, JNI_FALSE));
+  const torch::jit::script::Module module = torch::jit::load(path_string);
   const auto* module_ptr = new torch::jit::script::Module(module);
   return utils::CreatePointer<torch::jit::script::Module>(env, module_ptr);
 }
@@ -153,27 +165,27 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleEval
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward
-  (JNIEnv* env, jobject jthis, jobject module_handle, jobjectArray ivalue_handle_array) {
-  auto ivalue_array = std::vector<c10::IValue>();
-  for (int i = 0; i < env->GetArrayLength(ivalue_handle_array); ++i) {
-    auto ivalue = utils::GetPointerFromJHandle<c10::IValue>(env, env->GetObjectArrayElement(ivalue_handle_array, i));
-    ivalue_array.emplace_back(*ivalue);
+  (JNIEnv* env, jobject jthis, jobject module_handle, jobjectArray jivalue_ptr_array) {
+  auto ivalue_vec = std::vector<c10::IValue>();
+  for (auto i = 0; i < env->GetArrayLength(jivalue_ptr_array); ++i) {
+    auto ivalue = utils::GetPointerFromJHandle<c10::IValue>(env, env->GetObjectArrayElement(jivalue_ptr_array, i));
+    ivalue_vec.emplace_back(*ivalue);
   }
   auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);
-  const auto* result_handle = new c10::IValue(module_ptr->forward(ivalue_array));
-  return utils::CreatePointer<c10::IValue>(env, result_handle);
+  const auto* result_ptr = new c10::IValue(module_ptr->forward(ivalue_vec));
+  return utils::CreatePointer<c10::IValue>(env, result_ptr);
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueCreateFromTensor
-  (JNIEnv* env, jobject jthis, jobject tensor_handle) {
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
   const auto* ivalue_ptr = new c10::IValue(
-    *utils::GetPointerFromJHandle<torch::Tensor>(env, tensor_handle));
+    *utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle));
   return utils::CreatePointer<c10::IValue>(env, ivalue_ptr);
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToTensor
-  (JNIEnv* env, jobject jthis, jobject ivalue_handle) {
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
   auto* tensor_ptr = new torch::Tensor(
-    utils::GetPointerFromJHandle<c10::IValue>(env, ivalue_handle)->toTensor());
+    utils::GetPointerFromJHandle<c10::IValue>(env, jhandle)->toTensor());
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
