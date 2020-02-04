@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -29,17 +30,9 @@ import java.lang.ref.WeakReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** {@code MxNDManager} is the MXNet implementation of {@link NDManager}. */
-public class MxNDManager implements NDManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(MxNDManager.class);
+public class MxNDManager extends BaseNDManager {
 
     /**
      * A global {@link NDManager} singleton instance.
@@ -52,17 +45,8 @@ public class MxNDManager implements NDManager {
 
     private static final NDArray[] EMPTY = new NDArray[0];
 
-    private NDManager parent;
-    private String uid;
-    private Device device;
-    private Map<String, Reference<AutoCloseable>> resources;
-    private AtomicBoolean closed = new AtomicBoolean(false);
-
     private MxNDManager(NDManager parent, Device device) {
-        this.parent = parent;
-        this.device = Device.defaultIfNull(device);
-        resources = new ConcurrentHashMap<>();
-        uid = UUID.randomUUID().toString();
+        super(parent, device);
     }
 
     static MxNDManager getSystemManager() {
@@ -269,12 +253,6 @@ public class MxNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager getParentManager() {
-        return parent;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public MxNDManager newSubManager() {
         return newSubManager(device);
     }
@@ -285,12 +263,6 @@ public class MxNDManager implements NDManager {
         MxNDManager manager = new MxNDManager(this, dev);
         attach(manager.uid, manager);
         return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Device getDevice() {
-        return device;
     }
 
     /** {@inheritDoc} */
@@ -403,39 +375,6 @@ public class MxNDManager implements NDManager {
         return Engine.getEngine(MxEngine.ENGINE_NAME);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        String parentUID = parent == null ? "No Parent" : ((MxNDManager) parent).uid;
-        return "UID: "
-                + uid
-                + " Parent UID: "
-                + parentUID
-                + " isOpen: "
-                + isOpen()
-                + " Resource size: "
-                + resources.size();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public synchronized void close() {
-        if (!closed.getAndSet(true)) {
-            for (Reference<AutoCloseable> resource : resources.values()) {
-                AutoCloseable closeable = resource.get();
-                if (closeable != null) {
-                    try {
-                        closeable.close();
-                    } catch (Exception e) {
-                        logger.error("Resource close failed.", e);
-                    }
-                }
-            }
-            parent.detach(uid);
-            resources.clear();
-        }
-    }
-
     /**
      * Prints information about this {@link NDManager} and all sub-managers to the console.
      *
@@ -458,10 +397,6 @@ public class MxNDManager implements NDManager {
                 ((MxNDManager) c).debugDump(level + 1);
             }
         }
-    }
-
-    boolean isOpen() {
-        return !closed.get();
     }
 
     private NDArray fill(String opName, Device dev, Shape shape, DataType dataType) {

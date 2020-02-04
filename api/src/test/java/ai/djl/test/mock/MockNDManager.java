@@ -110,6 +110,12 @@ public class MockNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public boolean isOpen() {
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDManager getParentManager() {
         return this;
     }

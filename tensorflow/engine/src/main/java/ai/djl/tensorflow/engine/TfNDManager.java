@@ -30,7 +30,7 @@ import org.tensorflow.Session;
 import org.tensorflow.Tensor;
 import org.tensorflow.Tensors;
 
-public class TfNDManager implements NDManager, AutoCloseable {
+public class TfNDManager implements NDManager {
 
     static final TfNDManager SYSTEM_MANAGER = new SystemManager();
     private static int nameAssignment = 1;
@@ -217,6 +217,11 @@ public class TfNDManager implements NDManager, AutoCloseable {
         TfNDManager manager = new TfNDManager(this, device, graph);
         resources.put(manager.uid, manager);
         return manager;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return false;
     }
 
     /** {@inheritDoc} */

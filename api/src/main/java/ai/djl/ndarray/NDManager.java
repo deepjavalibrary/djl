@@ -858,6 +858,13 @@ public interface NDManager extends AutoCloseable {
     NDArray randomMultinomial(int n, NDArray pValues, Shape shape);
 
     /**
+     * Check if the manager is still valid.
+     *
+     * @return the current status
+     */
+    boolean isOpen();
+
+    /**
      * Returns the parent {@code NDManager}.
      *
      * @return the parent {@code NDManager}
