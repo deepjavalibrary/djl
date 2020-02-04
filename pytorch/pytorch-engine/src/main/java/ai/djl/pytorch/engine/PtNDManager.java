@@ -39,7 +39,7 @@ public class PtNDManager implements NDManager {
     }
 
     @Override
-    public NDArray createCSRD(
+    public NDArray createCSR(
             Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
         throw new UnsupportedOperationException("Not implemented");
     }

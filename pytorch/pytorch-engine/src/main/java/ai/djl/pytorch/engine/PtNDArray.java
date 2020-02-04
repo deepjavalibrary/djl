@@ -625,6 +625,11 @@ public class PtNDArray extends NativeResource implements NDArray {
     }
 
     @Override
+    public NDArray logSoftmax(int[] axes, double temperature) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
     public NDArray cumSum() {
         throw new UnsupportedOperationException("Not implemented");
     }
@@ -782,6 +787,5 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public void close() {
         JniUtils.deleteNdArray(this);
-
     }
 }

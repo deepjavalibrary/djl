@@ -18,9 +18,10 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
 
-    runtimeOnly project(":mxnet:mxnet-engine")
-    runtimeOnly project(":mxnet:mxnet-model-zoo")
-    runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
+//    runtimeOnly project(":mxnet:mxnet-engine")
+//    runtimeOnly project(":mxnet:mxnet-model-zoo")
+//    runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
+    runtimeOnly project(":pytorch:pytorch-engine")
 }
 
 task copyDependencies(type: Copy) {
