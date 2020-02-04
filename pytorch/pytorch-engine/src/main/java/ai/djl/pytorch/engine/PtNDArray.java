@@ -61,7 +61,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public String getName() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -93,22 +93,22 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public SparseFormat getSparseFormat() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray toDevice(Device device, boolean copy) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public Matrix toMatrix() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -116,7 +116,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray getGradient() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -138,7 +138,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray get(NDIndex index) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -146,17 +146,17 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray booleanMask(NDArray index, int axis) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray zerosLike() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray onesLike() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -171,612 +171,612 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray eq(Number other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray eq(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray neq(Number other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray neq(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray gt(Number other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray gt(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray gte(Number other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray gte(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray lt(Number other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray lt(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray lte(Number other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray lte(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray add(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray add(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray sub(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray sub(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray mul(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray mul(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray div(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray div(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray mod(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray mod(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray pow(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray pow(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray addi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray addi(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray subi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray subi(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray muli(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray muli(NDArray others) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray divi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray divi(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray modi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray modi(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray powi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray powi(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray maximum(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray maximum(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray minimum(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray minimum(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray neg() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray negi() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray abs() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray square() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray cbrt() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray floor() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray ceil() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray round() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray trunc() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray exp() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray log() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray log10() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray log2() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray sin() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray cos() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray tan() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray asin() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray acos() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray atan() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray sinh() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray cosh() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray tanh() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray asinh() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray acosh() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray atanh() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray toDegrees() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray toRadians() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray max() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray max(int[] axes, boolean keepDims) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray min() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray min(int[] axes, boolean keepDims) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray sum() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray sum(int[] axes, boolean keepDims) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray prod() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray prod(int[] axes, boolean keepDims) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray mean() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray mean(int[] axes, boolean keepDims) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray trace(int offset, int axis1, int axis2) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDList split(int[] indices, int axis) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray flatten() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray reshape(Shape shape) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray expandDims(int axis) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray squeeze(int[] axes) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray logicalAnd(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray logicalOr(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray logicalXor(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray logicalNot() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray argSort(int axis, boolean ascending) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray sort() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray sort(int axis) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray softmax(int[] axes, double temperature) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray cumSum() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray cumSum(int axis) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray isInfinite() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray isNaN() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray createMask(NDIndex index) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray createMask(Predicate<Number> predicate) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray tile(long repeats) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray tile(int axis, long repeats) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray tile(long[] repeats) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray tile(Shape desiredShape) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray repeat(long repeats) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray repeat(int axis, long repeats) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray repeat(long[] repeats) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray repeat(Shape desiredShape) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray dot(NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray clip(Number min, Number max) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray transpose() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray transpose(int... axes) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray broadcast(Shape shape) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray argMax() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray argMax(int axis) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray argMin() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray argMin(int axis) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray percentile(Number percentile) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray percentile(Number percentile, int[] axes) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray median() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray median(int[] axes) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray toDense() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray toSparse(SparseFormat fmt) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray nonzero() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArrayEx getNDArrayInternal() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override

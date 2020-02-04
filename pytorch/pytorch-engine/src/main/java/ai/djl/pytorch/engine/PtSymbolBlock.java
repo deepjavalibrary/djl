@@ -92,27 +92,27 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
 
     @Override
     public PairList<String, Shape> describeInput() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public BlockList getChildren() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public List<Parameter> getDirectParameters() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public ParameterList getParameters() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override

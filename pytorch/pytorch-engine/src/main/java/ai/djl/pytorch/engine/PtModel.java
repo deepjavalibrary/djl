@@ -73,7 +73,7 @@ public class PtModel implements Model {
 
     @Override
     public Block getBlock() {
-        return null;
+        return ptSymbolBlock;
     }
 
     @Override
@@ -81,12 +81,12 @@ public class PtModel implements Model {
 
     @Override
     public String getName() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public String getProperty(String key) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -94,27 +94,27 @@ public class PtModel implements Model {
 
     @Override
     public NDManager getNDManager() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public PairList<String, Shape> describeInput() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public PairList<String, Shape> describeOutput() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -124,17 +124,17 @@ public class PtModel implements Model {
 
     @Override
     public <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public URL getArtifact(String name) throws IOException {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public InputStream getArtifactAsStream(String name) throws IOException {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -142,7 +142,7 @@ public class PtModel implements Model {
 
     @Override
     public DataType getDataType() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override

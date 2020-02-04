@@ -29,16 +29,39 @@ import java.nio.file.Path;
 public class JniUtils {
     private JniUtils() {}
 
-    public static PtNDArray createEmptyNdArray(
-            PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
-        int layoutVal = -1;
-        if (fmt.getType().equals("default")) {
-            layoutVal = 0;
-        } else if (fmt.getType().equals("undefined")) {
+    private static int layoutMapper(SparseFormat fmt) {
+        if (fmt == SparseFormat.DENSE) {
+            return 0;
+        } else if (fmt == SparseFormat.UNDEFINED) {
             throw new UnsupportedOperationException("Type not supported");
         } else {
-            layoutVal = 1;
+            return 1;
         }
+    }
+
+    // TODO: Unchecked Datatype and device mapping
+    public static PtNDArray CreateNdFromByteBuffer(
+            PtNDManager manager,
+            ByteBuffer data,
+            Shape shape,
+            DataType dType,
+            SparseFormat fmt,
+            Device device) {
+        int layoutVal = layoutMapper(fmt);
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchFromBlob(
+                        data,
+                        shape.getShape(),
+                        dType.ordinal(),
+                        layoutVal,
+                        new int[] {device.getDeviceId()},
+                        false));
+    }
+
+    public static PtNDArray createEmptyNdArray(
+            PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
+        int layoutVal = layoutMapper(fmt);
         // TODO: set default type of require gradient
         return new PtNDArray(
                 manager,
@@ -48,6 +71,52 @@ public class JniUtils {
                         layoutVal,
                         new int[] {device.getDeviceId()},
                         false));
+    }
+
+    public static PtNDArray createZerosNdArray(
+            PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
+        int layoutVal = layoutMapper(fmt);
+        // TODO: set default type of require gradient
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchZeros(
+                        shape.getShape(),
+                        dType.ordinal(),
+                        layoutVal,
+                        new int[] {device.getDeviceId()},
+                        false));
+    }
+
+    public static PtNDArray createOnesNdArray(
+            PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
+        int layoutVal = layoutMapper(fmt);
+        // TODO: set default type of require gradient
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchOnes(
+                        shape.getShape(),
+                        dType.ordinal(),
+                        layoutVal,
+                        new int[] {device.getDeviceId()},
+                        false));
+    }
+
+    public static NDList split(PtNDArray ndArray, long size, long axis) {
+        Pointer[] ndPtrs = PyTorchLibrary.LIB.torchSplit(ndArray.getHandle(), size, axis);
+        NDList list = new NDList();
+        for (Pointer ptr : ndPtrs) {
+            list.add(new PtNDArray((PtNDManager) ndArray.getManager(), ptr));
+        }
+        return list;
+    }
+
+    public static NDList split(PtNDArray ndArray, long[] indices, long axis) {
+        Pointer[] ndPtrs = PyTorchLibrary.LIB.torchSplit(ndArray.getHandle(), indices, axis);
+        NDList list = new NDList();
+        for (Pointer ptr : ndPtrs) {
+            list.add(new PtNDArray((PtNDManager) ndArray.getManager(), ptr));
+        }
+        return list;
     }
 
     public static DataType getDataType(PtNDArray ndArray) {
@@ -80,6 +149,8 @@ public class JniUtils {
     }
 
     public static NDList moduleForward(Pointer handle, NDList inputs) {
+        // TODO: reconsider the usage of IValue
+        // Currently, only map Tensor to IValue
         Pointer[] iValueHandles =
                 inputs.stream()
                         .map(

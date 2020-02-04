@@ -29,92 +29,93 @@ public class PtNDManager implements NDManager {
 
     @Override
     public ByteBuffer allocateDirect(int capacity) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public PtNDArray create(Shape shape, DataType dataType, Device device) {
+
         return JniUtils.createEmptyNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
     @Override
     public NDArray createCSR(
             Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray createRowSparse(
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray ones(Shape shape, DataType dataType, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray arange(
             Number start, Number stop, Number step, DataType dataType, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray linspace(Number start, Number stop, int num, boolean endpoint, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray randomUniform(
             Number low, Number high, Shape shape, DataType dataType, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray randomNormal(
             Number loc, Number scale, Shape shape, DataType dataType, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray randomMultinomial(int n, NDArray pValues) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDManager getParentManager() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDManager newSubManager() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDManager newSubManager(Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public Device getDevice() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -129,12 +130,12 @@ public class PtNDManager implements NDManager {
 
     @Override
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public Engine getEngine() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
