@@ -303,18 +303,20 @@ public class Artifact {
     public String toString() {
         StringBuilder sb = new StringBuilder(100);
         sb.append(name).append(':').append(version).append(" {");
-        boolean first = true;
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(" ,");
+        if (properties != null) {
+            boolean first = true;
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(" ,");
+                }
+                sb.append('"')
+                        .append(entry.getKey())
+                        .append("\": \"")
+                        .append(entry.getValue())
+                        .append('"');
             }
-            sb.append('"')
-                    .append(entry.getKey())
-                    .append("\": \"")
-                    .append(entry.getValue())
-                    .append('"');
         }
         sb.append('}');
         return sb.toString();

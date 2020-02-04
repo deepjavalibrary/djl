@@ -17,9 +17,9 @@ import ai.djl.repository.Repository;
 /** An interface which contains datasets that are hosted on https://mlrepo.djl.ai/. */
 public interface BasicDatasets {
 
-    String MXNET_REPO_URL = "https://mlrepo.djl.ai/";
+    String DJL_REPO_URL = "https://mlrepo.djl.ai/";
 
-    Repository REPOSITORY = Repository.newInstance("BasicDataset", MXNET_REPO_URL);
+    Repository REPOSITORY = Repository.newInstance("BasicDataset", DJL_REPO_URL);
 
     String GROUP_ID = "ai.djl.basicdataset";
 }
