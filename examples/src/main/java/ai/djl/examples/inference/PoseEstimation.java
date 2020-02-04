@@ -37,6 +37,13 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An example of inference using a pose estimation model.
+ *
+ * <p>See this <a
+ * href="https://github.com/awslabs/djl/blob/master/examples/docs/pose_estimation.md">doc</a> for
+ * information about this example.
+ */
 public final class PoseEstimation {
 
     private static final Logger logger = LoggerFactory.getLogger(PoseEstimation.class);

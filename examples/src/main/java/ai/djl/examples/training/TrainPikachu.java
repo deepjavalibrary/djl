@@ -55,6 +55,13 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import org.apache.commons.cli.ParseException;
 
+/**
+ * An example of training a simple Single Shot Detection (SSD) model.
+ *
+ * <p>See this <a
+ * href="https://github.com/awslabs/djl/blob/master/examples/docs/train_pikachu_ssd.md">doc</a> for
+ * information about this example.
+ */
 public final class TrainPikachu {
 
     private TrainPikachu() {}

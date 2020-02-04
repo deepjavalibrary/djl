@@ -33,6 +33,13 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An example of inference using an instance segmentation model.
+ *
+ * <p>See this <a
+ * href="https://github.com/awslabs/djl/blob/master/examples/docs/instance_segmentation.md">doc</a>
+ * for information about this example.
+ */
 public final class InstanceSegmentation {
 
     private static final Logger logger = LoggerFactory.getLogger(InstanceSegmentation.class);

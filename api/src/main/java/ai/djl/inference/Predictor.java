@@ -49,6 +49,9 @@ import java.util.List;
  *       with an MXNet model</a>
  * </ul>
  *
+ * <p>For information about running multi-threaded inference, see <a
+ * href="https://github.com/awslabs/djl/blob/master/examples/docs/multithread_inference.md">here</a>.
+ *
  * @param <I> the input type
  * @param <O> the output type
  * @see Model

@@ -23,7 +23,11 @@ import ai.djl.util.Utils;
 import java.io.IOException;
 import java.util.List;
 
-/** The translator for {@link BertQAModelLoader}. */
+/**
+ * The translator for {@link BertQAModelLoader}.
+ *
+ * @see BertQAModelLoader
+ */
 public class BertQATranslator implements Translator<QAInput, String> {
 
     private List<String> tokens;

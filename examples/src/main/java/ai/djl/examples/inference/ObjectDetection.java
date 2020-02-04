@@ -33,6 +33,13 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An example of inference using an object detection model.
+ *
+ * <p>See this <a
+ * href="https://github.com/awslabs/djl/blob/master/examples/docs/object_detection.md">doc</a> for
+ * information about this example.
+ */
 public final class ObjectDetection {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectDetection.class);
