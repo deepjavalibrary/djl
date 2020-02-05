@@ -28,7 +28,6 @@ import ai.djl.training.loss.Loss;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bytedeco.javacpp.CharPointer;
@@ -68,14 +67,7 @@ public class FtTrainer implements Trainer {
         String modelName = config.getModelName();
         Path modelFile = outputDir.resolve(modelName).toAbsolutePath();
 
-        List<String> cmd = new ArrayList<>(6);
-        cmd.add("fasttext");
-        cmd.add(config.getTrainingMode().name().toLowerCase());
-        cmd.add("-input");
-        cmd.add(trainingSet.getInputFile().toString());
-        cmd.add("-output");
-        cmd.add(modelFile.toString());
-        String[] args = cmd.toArray(new String[0]);
+        String[] args = config.toCommand(trainingSet.getInputFile().toString());
 
         model.fta.runCmd(args.length, new PointerPointer<CharPointer>(args));
         model.setModelFile(modelFile);

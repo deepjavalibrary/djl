@@ -45,7 +45,7 @@ public class TrainCookingStackExchange {
                     FtTrainingConfig.builder()
                             .setOutputDir(Paths.get("build"))
                             .setModelName("cooking")
-                            .optQuantized(true)
+                            .optLoss(FtTrainingConfig.FtLoss.HS)
                             .build();
 
             try (FtTrainer trainer = (FtTrainer) model.newTrainer(config)) {
