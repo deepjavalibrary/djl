@@ -17,8 +17,6 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.pytorch.jni.JniUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@code PtEngine} is an implementation of the {@link Engine} based on the <a
@@ -28,8 +26,6 @@ import org.slf4j.LoggerFactory;
  * Engine#getEngine(String)} with the Engine name "PyTorch".
  */
 public class PtEngine extends Engine {
-
-    private static final Logger logger = LoggerFactory.getLogger(PtEngine.class);
 
     public static final String ENGINE_NAME = "PyTorch";
 

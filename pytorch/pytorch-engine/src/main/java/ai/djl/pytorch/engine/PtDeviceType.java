@@ -15,8 +15,17 @@ package ai.djl.pytorch.engine;
 import ai.djl.Device;
 import ai.djl.DeviceType;
 
+/** DeviceType is the PyTorch equivalent of the types in {@link Device}. */
 public final class PtDeviceType implements DeviceType {
 
+    private PtDeviceType() {}
+
+    /**
+     * Converts a {@link Device} to the corresponding MXNet device number.
+     *
+     * @param device the java {@link Device}
+     * @return the PyTorch device number
+     */
     public static int toDeviceType(Device device) {
         String deviceType = device.getDeviceType();
 
@@ -29,6 +38,12 @@ public final class PtDeviceType implements DeviceType {
         }
     }
 
+    /**
+     * Converts from an PyTorch device number to {@link Device}.
+     *
+     * @param deviceType the PyTorch device number
+     * @return the corresponding {@link Device}
+     */
     public static String fromDeviceType(int deviceType) {
         switch (deviceType) {
             case 0:

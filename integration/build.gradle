@@ -18,10 +18,16 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
 
-//    runtimeOnly project(":mxnet:mxnet-engine")
-//    runtimeOnly project(":mxnet:mxnet-model-zoo")
-//    runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
+    runtimeOnly project(":mxnet:mxnet-engine")
+    runtimeOnly project(":mxnet:mxnet-model-zoo")
+    runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
     runtimeOnly project(":pytorch:pytorch-engine")
+}
+
+test {
+    doFirst {
+        systemProperty "ai.djl.default.engine", "MXNet"
+    }
 }
 
 task copyDependencies(type: Copy) {
@@ -37,7 +43,6 @@ run {
     systemProperties System.getProperties()
     systemProperties.remove("user.dir")
     systemProperty("file.encoding", "UTF-8")
-    applicationDefaultJvmArgs = ["-Djava.library.path=" + System.getProperty("user.dir") + "/pytorch/native/build"]
 }
 
 jacocoTestReport {

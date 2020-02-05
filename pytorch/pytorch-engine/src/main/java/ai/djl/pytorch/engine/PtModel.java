@@ -32,16 +32,17 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+/**
+ * {@code PtModel} is the PyTorch implementation of {@link Model}.
+ *
+ * <p>PtModel contains all the methods in Model to load and process a model. In addition, it
+ * provides PyTorch Specific functionality
+ */
 public class PtModel implements Model {
 
-    private Path modelDir;
     private PtSymbolBlock ptSymbolBlock;
-    private String modelName;
-    private DataType dataType;
-    private Map<String, String> properties;
     private PtNDManager manager;
 
     /**
@@ -51,16 +52,13 @@ public class PtModel implements Model {
      */
     PtModel(Device device) {
         device = Device.defaultIfNull(device);
-        dataType = DataType.FLOAT32;
-        properties = new ConcurrentHashMap<>();
         manager = PtNDManager.getSystemManager().newSubManager(device);
     }
 
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException, MalformedModelException {
-        modelDir = modelPath.toAbsolutePath();
-        this.modelName = modelName;
+        Path modelDir = modelPath.toAbsolutePath();
         Path modelFile = modelDir.resolve(modelName + ".pt");
         if (Files.notExists(modelFile)) {
             throw new FileNotFoundException(".pt file not found in: " + modelPath);

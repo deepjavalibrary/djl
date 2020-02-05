@@ -55,6 +55,7 @@ configure(javaProjects()) {
             systemProperty "ai.djl.logging.level", "debug"
             systemProperty "disableProgressBar", "true"
             systemProperty "nightly", System.getProperty("nightly", "false")
+            systemProperty "java.library.path=", "pytorch/native/build"
             if (gradle.startParameter.offline) {
                 systemProperty "offline", "true"
             }

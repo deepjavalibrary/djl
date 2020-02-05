@@ -26,7 +26,13 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
 
-public class JniUtils {
+/**
+ * A class containing utilities to interact with the PyTorch Engine's Java Native Interface (JNI)
+ * layer.
+ */
+@SuppressWarnings("MissingJavadocMethod")
+public final class JniUtils {
+
     private JniUtils() {}
 
     private static int layoutMapper(SparseFormat fmt) {

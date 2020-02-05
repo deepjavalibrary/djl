@@ -31,6 +31,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 
+/** {@code PtNDManager} is the PyTorch implementation of {@link NDManager}. */
 public class PtNDManager extends BaseNDManager {
 
     private static final PtNDManager SYSTEM_MANAGER = new SystemManager();

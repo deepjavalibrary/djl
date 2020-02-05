@@ -22,7 +22,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** {@code BaseNDManager} is the default implementation of {@link NDManager}. */
+/**
+ * {@code BaseNDManager} is the default implementation of {@link NDManager} for {@code PtNDManager}.
+ */
 public abstract class BaseNDManager implements NDManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseNDManager.class);

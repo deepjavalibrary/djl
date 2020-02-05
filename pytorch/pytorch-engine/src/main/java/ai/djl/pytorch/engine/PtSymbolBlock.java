@@ -32,11 +32,26 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * {@code PtSymbolBlock} is the PyTorch implementation of {@link SymbolBlock}.
+ *
+ * <p>You can create a {@code PtSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
+ * String)}.
+ */
 // TODO: Memory handling
 public class PtSymbolBlock extends NativeResource implements SymbolBlock {
 
     private PtNDManager manager;
 
+    /**
+     * Constructs a {@code PtSymbolBlock}.
+     *
+     * <p>You can create a {@code PtSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
+     * String)}.
+     *
+     * @param manager the manager to use for the block
+     * @param handle the module handle
+     */
     public PtSymbolBlock(PtNDManager manager, Pointer handle) {
         super(handle);
         this.manager = manager;
