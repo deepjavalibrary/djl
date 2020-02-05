@@ -43,6 +43,17 @@ public final class PyTorchLibrary {
     public native Pointer torchOnes(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
+    public native Pointer torchReshape(Pointer handle, long[] shape);
+
+    public native Pointer torchSoftmax(Pointer handle, int dim, int dType);
+
+    public native Pointer torchArgMax(Pointer handle);
+
+    public native Pointer torchArgMax(Pointer handle, int dim, boolean keepDim);
+
+    public native Pointer torchUpsampleBilinear2d(
+            Pointer handle, long[] size, boolean alignCorners);
+
     public native Pointer torchFromBlob(
             ByteBuffer data,
             long[] shape,

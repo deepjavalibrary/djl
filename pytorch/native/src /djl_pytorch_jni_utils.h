@@ -95,11 +95,18 @@ inline jobject CreatePointer(JNIEnv* env, const T *ptr) {
   return new_obj;
 }
 
-inline std::vector<int64_t> GetShapeVecFromJShape(JNIEnv* env, jlongArray jshape) {
-  jlong* shape = env->GetLongArrayElements(jshape, JNI_FALSE);
-  jsize length = env->GetArrayLength(jshape);
-  const std::vector<int64_t> shape_vec(shape, shape + length);
-  return shape_vec;
+inline std::vector<int64_t> GetVecFromJLongArray(JNIEnv* env, jlongArray jarray) {
+  jlong* jarr = env->GetLongArrayElements(jarray, JNI_FALSE);
+  jsize length = env->GetArrayLength(jarray);
+  const std::vector<int64_t> vec(jarr, jarr + length);
+  return vec;
+}
+
+inline std::vector<int32_t> GetVecFromJIntArray(JNIEnv* env, jintArray jarray) {
+  jint* jarr = env->GetIntArrayElements(jarray, JNI_FALSE);
+  jsize length = env->GetArrayLength(jarray);
+  const std::vector<int32_t> vec(jarr, jarr + length);
+  return vec;
 }
 
 inline std::vector<int> GetDeviceVecFromJDevice(JNIEnv* env, jintArray jdevice) {

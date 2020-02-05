@@ -101,6 +101,30 @@ public class JniUtils {
                         false));
     }
 
+    public static PtNDArray reshape(PtNDArray ndArray, long[] shape) {
+        return new PtNDArray(
+                (PtNDManager) ndArray.getManager(),
+                PyTorchLibrary.LIB.torchReshape(ndArray.getHandle(), shape));
+    }
+
+    public static PtNDArray softmax(PtNDArray ndArray, int dim, DataType dTpe) {
+        return new PtNDArray(
+                (PtNDManager) ndArray.getManager(),
+                PyTorchLibrary.LIB.torchSoftmax(ndArray.getHandle(), dim, dTpe.ordinal()));
+    }
+
+    public static PtNDArray argMax(PtNDArray ndArray) {
+        return new PtNDArray(
+                (PtNDManager) ndArray.getManager(),
+                PyTorchLibrary.LIB.torchArgMax(ndArray.getHandle()));
+    }
+
+    public static PtNDArray argMax(PtNDArray ndArray, int dim, boolean keepDim) {
+        return new PtNDArray(
+                (PtNDManager) ndArray.getManager(),
+                PyTorchLibrary.LIB.torchArgMax(ndArray.getHandle(), dim, keepDim));
+    }
+
     public static NDList split(PtNDArray ndArray, long size, long axis) {
         Pointer[] ndPtrs = PyTorchLibrary.LIB.torchSplit(ndArray.getHandle(), size, axis);
         NDList list = new NDList();

@@ -571,7 +571,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray reshape(Shape shape) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.reshape(this, shape.getShape());
     }
 
     @Override
@@ -621,7 +621,10 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray softmax(int[] axes, double temperature) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (temperature != 1.0) {
+            throw new UnsupportedOperationException("PyTorch softmax didn't suuport temperature");
+        }
+        return JniUtils.softmax(this, axes[0], getDataType());
     }
 
     @Override
@@ -726,12 +729,12 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray argMax() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.argMax(this);
     }
 
     @Override
     public NDArray argMax(int axis) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.argMax(this, axis, false);
     }
 
     @Override

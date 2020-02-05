@@ -1229,6 +1229,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             }
             return duplicate();
         }
+
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         return manager.invoke("sort", this, params);
