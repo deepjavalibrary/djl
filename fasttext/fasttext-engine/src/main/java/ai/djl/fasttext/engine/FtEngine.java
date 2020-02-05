@@ -22,7 +22,7 @@ import ai.djl.ndarray.NDManager;
  * href="https://fasttext.cc//">Facebook fastText Framework</a>.
  *
  * <p>To get an instance of the {@code FtEngine} when it is not the default Engine, call {@link
- * Engine#getEngine(String)} with the Engine name "Fasttext".
+ * Engine#getEngine(String)} with the Engine name "fastText".
  */
 public class FtEngine extends Engine {
 

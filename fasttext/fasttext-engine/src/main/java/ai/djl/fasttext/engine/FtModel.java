@@ -37,9 +37,7 @@ import java.util.function.Function;
 /**
  * {@code FtModel} is the fastText implementation of {@link Model}.
  *
- * <p>FtModel contains all the methods in Model to load and process a model. In addition, it
- * provides fastText Specific functionality, such as getSymbol to obtain the Symbolic graph and
- * getParameters to obtain the parameter NDArrays
+ * <p>FtModel contains all the methods in Model to load and process a model.
  */
 public class FtModel implements Model {
 
@@ -57,16 +55,6 @@ public class FtModel implements Model {
 
     /**
      * Loads the fastText model from a specified location.
-     *
-     * <p>Fasttext engine looks for {MODEL_NAME}-symbol.json and {MODEL_NAME}-{EPOCH}.params files
-     * in the specified directory. By default, fastText engine will pick up the latest epoch of the
-     * parameter file. However, users can explicitly specify an epoch to be loaded:
-     *
-     * <pre>
-     * Map&lt;String, String&gt; options = new HashMap&lt;&gt;()
-     * <b>options.put("epoch", "3");</b>
-     * model.load(modelPath, "squeezenet", options);
-     * </pre>
      *
      * @param modelPath the directory of the model
      * @param modelName the name of the model
