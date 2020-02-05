@@ -131,7 +131,7 @@ public class PtNDManager extends BaseNDManager {
 
     @Override
     public Engine getEngine() {
-        throw new UnsupportedOperationException("Not implemented");
+        return Engine.getEngine(PtEngine.ENGINE_NAME);
     }
 
     /** The SystemManager is the root {@link PtNDManager} of which all others are children. */

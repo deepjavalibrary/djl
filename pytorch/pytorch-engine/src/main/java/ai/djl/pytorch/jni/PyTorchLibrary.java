@@ -26,6 +26,8 @@ public final class PyTorchLibrary {
 
     private PyTorchLibrary() {}
 
+    public native long torchVersion();
+
     public native long[] torchSizes(Pointer handle);
 
     public native ByteBuffer torchDataPtr(Pointer handle);

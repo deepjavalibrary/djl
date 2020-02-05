@@ -39,6 +39,10 @@ public class JniUtils {
         }
     }
 
+    public static String libraryVersion() {
+        return String.valueOf(PyTorchLibrary.LIB.torchVersion());
+    }
+
     // TODO: Unchecked Datatype and device mapping
     public static PtNDArray CreateNdFromByteBuffer(
             PtNDManager manager,

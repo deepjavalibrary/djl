@@ -16,6 +16,12 @@
 #include <torch/script.h>
 
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchVersion
+  (JNIEnv *env, jobject jthis) {
+  auto tensor = torch::empty(1);
+  return tensor._version();
+}
+
 JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSizes
   (JNIEnv* env, jobject jthis, jobject jhandle) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
