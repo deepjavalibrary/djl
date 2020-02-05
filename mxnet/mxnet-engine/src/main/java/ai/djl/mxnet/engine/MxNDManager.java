@@ -25,8 +25,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -267,26 +265,6 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized void attach(String resourceId, AutoCloseable resource) {
-        if (closed.get()) {
-            throw new IllegalStateException("NDManager has been closed already.");
-        }
-        WeakReference<AutoCloseable> ref = new WeakReference<>(resource);
-        resources.put(resourceId, ref);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public synchronized void detach(String resourceId) {
-        if (closed.get()) {
-            // This may happen in the middle of MxNDManager.close()
-            return;
-        }
-        resources.remove(resourceId);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void invoke(
             String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
         JnaUtils.op(operation).invoke(this, src, dest, params);
@@ -373,30 +351,6 @@ public class MxNDManager extends BaseNDManager {
     @Override
     public Engine getEngine() {
         return Engine.getEngine(MxEngine.ENGINE_NAME);
-    }
-
-    /**
-     * Prints information about this {@link NDManager} and all sub-managers to the console.
-     *
-     * @param level the level of this {@link NDManager} in the hierarchy
-     */
-    public void debugDump(int level) {
-        StringBuilder sb = new StringBuilder(100);
-        for (int i = 0; i < level; ++i) {
-            sb.append("    ");
-        }
-        sb.append("\\--- NDManager(")
-                .append(uid.substring(24))
-                .append(") resource count: ")
-                .append(resources.size());
-
-        System.out.println(sb.toString()); // NOPMD
-        for (Reference<AutoCloseable> ref : resources.values()) {
-            AutoCloseable c = ref.get();
-            if (c instanceof MxNDManager) {
-                ((MxNDManager) c).debugDump(level + 1);
-            }
-        }
     }
 
     private NDArray fill(String opName, Device dev, Shape shape, DataType dataType) {

@@ -46,7 +46,12 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
 
     @Override
     public void close() {
-        JniUtils.deleteModule(this);
+        Pointer pointer = handle.getAndSet(null);
+        if (pointer != null) {
+            manager.detach(getUid());
+            JniUtils.deleteModule(this);
+            manager = null;
+        }
     }
 
     @Override

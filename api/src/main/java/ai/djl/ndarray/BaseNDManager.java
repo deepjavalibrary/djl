@@ -14,6 +14,7 @@ package ai.djl.ndarray;
 
 import ai.djl.Device;
 import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,6 +74,26 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public synchronized void attach(String resourceId, AutoCloseable resource) {
+        if (closed.get()) {
+            throw new IllegalStateException("NDManager has been closed already.");
+        }
+        WeakReference<AutoCloseable> ref = new WeakReference<>(resource);
+        resources.put(resourceId, ref);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public synchronized void detach(String resourceId) {
+        if (closed.get()) {
+            // This may happen in the middle of BaseNDManager.close()
+            return;
+        }
+        resources.remove(resourceId);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public synchronized void close() {
         if (!closed.getAndSet(true)) {
             for (Reference<AutoCloseable> resource : resources.values()) {
@@ -87,6 +108,30 @@ public abstract class BaseNDManager implements NDManager {
             }
             parent.detach(uid);
             resources.clear();
+        }
+    }
+
+    /**
+     * Prints information about this {@link NDManager} and all sub-managers to the console.
+     *
+     * @param level the level of this {@link NDManager} in the hierarchy
+     */
+    public void debugDump(int level) {
+        StringBuilder sb = new StringBuilder(100);
+        for (int i = 0; i < level; ++i) {
+            sb.append("    ");
+        }
+        sb.append("\\--- NDManager(")
+                .append(uid.substring(24))
+                .append(") resource count: ")
+                .append(resources.size());
+
+        System.out.println(sb.toString()); // NOPMD
+        for (Reference<AutoCloseable> ref : resources.values()) {
+            AutoCloseable c = ref.get();
+            if (c instanceof BaseNDManager) {
+                ((BaseNDManager) c).debugDump(level + 1);
+            }
         }
     }
 }

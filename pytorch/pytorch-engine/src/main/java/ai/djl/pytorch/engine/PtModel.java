@@ -53,7 +53,7 @@ public class PtModel implements Model {
         device = Device.defaultIfNull(device);
         dataType = DataType.FLOAT32;
         properties = new ConcurrentHashMap<>();
-        // TODO: Assign NDManager to Model
+        manager = PtNDManager.getSystemManager().newSubManager(device);
     }
 
     @Override

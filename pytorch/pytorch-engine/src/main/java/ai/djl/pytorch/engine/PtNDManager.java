@@ -14,6 +14,7 @@ package ai.djl.pytorch.engine;
 
 import ai.djl.Device;
 import ai.djl.engine.Engine;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -25,7 +26,17 @@ import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-public class PtNDManager implements NDManager {
+public class PtNDManager extends BaseNDManager {
+
+    private static final PtNDManager SYSTEM_MANAGER = new SystemManager();
+
+    protected PtNDManager(NDManager parent, Device device) {
+        super(parent, device);
+    }
+
+    static PtNDManager getSystemManager() {
+        return SYSTEM_MANAGER;
+    }
 
     @Override
     public ByteBuffer allocateDirect(int capacity) {
@@ -34,7 +45,6 @@ public class PtNDManager implements NDManager {
 
     @Override
     public PtNDArray create(Shape shape, DataType dataType, Device device) {
-
         return JniUtils.createEmptyNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
@@ -99,30 +109,16 @@ public class PtNDManager implements NDManager {
     }
 
     @Override
-    public NDManager getParentManager() {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDManager newSubManager() {
+        return newSubManager(device);
     }
 
     @Override
-    public NDManager newSubManager() {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDManager newSubManager(Device dev) {
+        PtNDManager manager = new PtNDManager(this, dev);
+        attach(manager.uid, manager);
+        return manager;
     }
-
-    @Override
-    public NDManager newSubManager(Device device) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public Device getDevice() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public void attach(String resourceId, AutoCloseable resource) {}
-
-    @Override
-    public void detach(String resourceId) {}
 
     @Override
     public void invoke(
@@ -138,6 +134,23 @@ public class PtNDManager implements NDManager {
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    @Override
-    public void close() {}
+    /** The SystemManager is the root {@link PtNDManager} of which all others are children. */
+    private static final class SystemManager extends PtNDManager {
+
+        SystemManager() {
+            super(null, Device.defaultDevice());
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void attach(String resourceId, AutoCloseable resource) {}
+
+        /** {@inheritDoc} */
+        @Override
+        public void detach(String resourceId) {}
+
+        /** {@inheritDoc} */
+        @Override
+        public void close() {}
+    }
 }
