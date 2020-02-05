@@ -56,8 +56,7 @@ public class PtNDArray extends NativeResource implements NDArray {
      * @param shape the shape of the new array
      * @param dataType the dataType of the new array
      */
-    public PtNDArray(
-            PtNDManager manager, Pointer handle, Device device, Shape shape, DataType dataType) {
+    PtNDArray(PtNDManager manager, Pointer handle, Device device, Shape shape, DataType dataType) {
         this(manager, handle);
         this.device = device;
         // shape check

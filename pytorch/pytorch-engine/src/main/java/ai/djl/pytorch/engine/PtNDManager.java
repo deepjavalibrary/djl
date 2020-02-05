@@ -36,7 +36,7 @@ public class PtNDManager extends BaseNDManager {
 
     private static final PtNDManager SYSTEM_MANAGER = new SystemManager();
 
-    protected PtNDManager(NDManager parent, Device device) {
+    private PtNDManager(NDManager parent, Device device) {
         super(parent, device);
     }
 

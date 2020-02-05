@@ -21,7 +21,7 @@ public final class PtDeviceType implements DeviceType {
     private PtDeviceType() {}
 
     /**
-     * Converts a {@link Device} to the corresponding MXNet device number.
+     * Converts a {@link Device} to the corresponding PyTorch device number.
      *
      * @param device the java {@link Device}
      * @return the PyTorch device number
