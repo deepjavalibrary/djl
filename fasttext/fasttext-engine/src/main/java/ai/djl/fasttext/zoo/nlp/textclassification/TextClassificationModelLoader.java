@@ -12,7 +12,7 @@
  */
 package ai.djl.fasttext.zoo.nlp.textclassification;
 
-import ai.djl.fasttext.engine.FtTranslator;
+import ai.djl.fasttext.engine.TextClassificationTranslator;
 import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.modality.Classifications;
 import ai.djl.repository.Anchor;
@@ -43,6 +43,6 @@ public class TextClassificationModelLoader extends BaseModelLoader<String, Class
     /** {@inheritDoc} */
     @Override
     public Translator<String, Classifications> getTranslator(Artifact artifact) {
-        return new FtTranslator();
+        return new TextClassificationTranslator();
     }
 }

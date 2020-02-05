@@ -22,21 +22,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** A text classification @{link Translator} for fastText. */
-public class FtTranslator implements Translator<String, Classifications> {
+public class TextClassificationTranslator implements Translator<String, Classifications> {
 
     private int topK;
 
-    /** Constructs an instance of {@link FtTranslator}. */
-    public FtTranslator() {
+    /** Constructs an instance of {@link TextClassificationTranslator}. */
+    public TextClassificationTranslator() {
         this(1);
     }
 
     /**
-     * Constructs an instance of {@link FtTranslator} that return @{code topK} classifications.
+     * Constructs an instance of {@link TextClassificationTranslator} that return @{code topK}
+     * classifications.
      *
      * @param topK the value of K
      */
-    public FtTranslator(int topK) {
+    public TextClassificationTranslator(int topK) {
         this.topK = topK;
     }
 

@@ -17,7 +17,7 @@ import ai.djl.Model;
 import ai.djl.fasttext.dataset.CookingStackExchange;
 import ai.djl.fasttext.engine.FtTrainer;
 import ai.djl.fasttext.engine.FtTrainingConfig;
-import ai.djl.fasttext.engine.FtTranslator;
+import ai.djl.fasttext.engine.Word2VecTranslator;
 import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -61,11 +61,26 @@ public class TrainCookingStackExchange {
                     ModelNotFoundException {
         try (ZooModel<String, Classifications> model =
                 FtModelZoo.COOKING_STACKEXCHANGE.loadModel()) {
-            FtTranslator translator = new FtTranslator(5);
-            try (Predictor<String, Classifications> predictor = model.newPredictor(translator)) {
+            try (Predictor<String, Classifications> predictor = model.newPredictor()) {
                 Classifications result =
                         predictor.predict("Which baking dish is best to bake a banana bread ?");
-                System.out.println(result);
+
+                Assert.assertEquals(result.item(0).getClassName(), "bread");
+            }
+        }
+    }
+
+    @Test
+    public void testWord2Vec()
+            throws IOException, TranslateException, MalformedModelException,
+                    ModelNotFoundException {
+        try (ZooModel<String, Classifications> model =
+                FtModelZoo.COOKING_STACKEXCHANGE.loadModel()) {
+            Word2VecTranslator translator = new Word2VecTranslator();
+            try (Predictor<String, float[]> predictor = model.newPredictor(translator)) {
+                float[] result = predictor.predict("bread");
+                Assert.assertEquals(result.length, 100);
+                Assert.assertEquals(result[0], 0.038162477, 0.001);
             }
         }
     }
