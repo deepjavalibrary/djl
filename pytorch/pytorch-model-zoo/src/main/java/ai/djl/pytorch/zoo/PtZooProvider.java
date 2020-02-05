@@ -10,19 +10,25 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.pytorch.engine;
+package ai.djl.pytorch.zoo;
 
-import ai.djl.engine.Engine;
-import ai.djl.engine.EngineProvider;
+import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.repository.zoo.ZooProvider;
 
-/** {@code PtEngineProvider} is the PyTorch implementation of {@link EngineProvider}. */
-public class PtEngineProvider implements EngineProvider {
-
-    private static final Engine ENGINE = new PtEngine();
+/**
+ * An PyTorch model zoo provider implements the {@link ai.djl.repository.zoo.ZooProvider} interface.
+ */
+public class PtZooProvider implements ZooProvider {
 
     /** {@inheritDoc} */
     @Override
-    public Engine getEngine() {
-        return ENGINE;
+    public String getName() {
+        return PtModelZoo.NAME;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ModelZoo getModelZoo() {
+        return new PtModelZoo();
     }
 }

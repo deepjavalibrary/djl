@@ -10,19 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.pytorch.engine;
 
-import ai.djl.engine.Engine;
-import ai.djl.engine.EngineProvider;
-
-/** {@code PtEngineProvider} is the PyTorch implementation of {@link EngineProvider}. */
-public class PtEngineProvider implements EngineProvider {
-
-    private static final Engine ENGINE = new PtEngine();
-
-    /** {@inheritDoc} */
-    @Override
-    public Engine getEngine() {
-        return ENGINE;
-    }
-}
+/** Contains the built-in {@link ai.djl.pytorch.zoo.PtModelZoo}. */
+package ai.djl.pytorch.zoo;
