@@ -28,7 +28,6 @@ import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
-import ai.djl.training.GradReq;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
