@@ -20,42 +20,56 @@ import ai.djl.pytorch.jni.JniUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The {@code PtEngine} is an implementation of the {@link Engine} based on the <a
+ * href="https://pytorch.org/">PyTorch Deep Learning Framework</a>.
+ *
+ * <p>To get an instance of the {@code PtEngine} when it is not the default Engine, call {@link
+ * Engine#getEngine(String)} with the Engine name "PyTorch".
+ */
 public class PtEngine extends Engine {
 
     private static final Logger logger = LoggerFactory.getLogger(PtEngine.class);
 
     public static final String ENGINE_NAME = "PyTorch";
 
+    /** {@inheritDoc} */
     @Override
     public String getEngineName() {
         return ENGINE_NAME;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getVersion() {
         return JniUtils.libraryVersion();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Model newModel(Device device) {
         return new PtModel(device);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager() {
         return PtNDManager.getSystemManager().newSubManager();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
-        return PtNDManager.getSystemManager().newSubManager(device);
+        return PtNDManager.getSystemManager().newSubManager();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setRandomSeed(int seed) {}
 }

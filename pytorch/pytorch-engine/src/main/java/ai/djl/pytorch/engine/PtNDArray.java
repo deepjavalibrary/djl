@@ -18,7 +18,9 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.index.NDIndexFullSlice;
 import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -32,6 +34,12 @@ import java.util.function.Predicate;
 
 public class PtNDArray extends NativeResource implements NDArray {
 
+    private static final int MAX_SIZE = 100;
+    private static final int MAX_DEPTH = 10;
+    private static final int MAX_ROWS = 10;
+    private static final int MAX_COLUMNS = 20;
+
+    private String name;
     private Device device;
     private DataType dataType;
     private Shape shape;
@@ -61,11 +69,13 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not implemented");
+        return name;
     }
 
     @Override
-    public void setName(String name) {}
+    public void setName(String name) {
+        this.name = name;
+    }
 
     @Override
     public DataType getDataType() {
@@ -138,7 +148,9 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public NDArray get(NDIndex index) {
-        throw new UnsupportedOperationException("Not implemented");
+        // TODO add full support of index and refactor NDIndex
+        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
+        return JniUtils.get(this, 0, fullSlice.getMin()[0]);
     }
 
     @Override
@@ -787,11 +799,33 @@ public class PtNDArray extends NativeResource implements NDArray {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
+    }
+
+    /**
+     * Runs the debug string representation of this {@code NDArray}.
+     *
+     * @param maxSize the maximum elements to print out
+     * @param maxDepth the maximum depth to print out
+     * @param maxRows the maximum rows to print out
+     * @param maxColumns the maximum columns to print out
+     * @return the debug string representation of this {@code NDArray}
+     */
+    public String toDebugString(int maxSize, int maxDepth, int maxRows, int maxColumns) {
+        if (isReleased()) {
+            return "This array is already closed";
+        }
+        return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns);
+    }
+
     @Override
     public void close() {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
-            JniUtils.deleteNdArray(this);
+            JniUtils.deleteNdArray(pointer);
             manager.detach(getUid());
             manager = null;
         }

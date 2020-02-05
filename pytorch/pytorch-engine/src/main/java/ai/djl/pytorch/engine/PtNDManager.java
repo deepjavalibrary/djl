@@ -62,12 +62,12 @@ public class PtNDManager extends BaseNDManager {
 
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.createZerosNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
     @Override
     public NDArray ones(Shape shape, DataType dataType, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.createOnesNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
     @Override

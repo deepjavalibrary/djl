@@ -15,7 +15,7 @@ package ai.djl.pytorch.engine;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineProvider;
 
-/** {@code PtEngineProvider} is the MXNet implementation of {@link EngineProvider}. */
+/** {@code PtEngineProvider} is the PyTorch implementation of {@link EngineProvider}. */
 public class PtEngineProvider implements EngineProvider {
 
     private static final Engine ENGINE = new PtEngine();

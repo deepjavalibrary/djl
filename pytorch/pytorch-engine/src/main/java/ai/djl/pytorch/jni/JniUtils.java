@@ -44,7 +44,7 @@ public class JniUtils {
     }
 
     // TODO: Unchecked Datatype and device mapping
-    public static PtNDArray CreateNdFromByteBuffer(
+    public static PtNDArray createNdFromByteBuffer(
             PtNDManager manager,
             ByteBuffer data,
             Shape shape,
@@ -103,6 +103,12 @@ public class JniUtils {
                         layoutVal,
                         new int[] {device.getDeviceId()},
                         false));
+    }
+
+    public static PtNDArray get(PtNDArray ndArray, long dim, long start) {
+        return new PtNDArray(
+                (PtNDManager) ndArray.getManager(),
+                PyTorchLibrary.LIB.torchGet(ndArray.getHandle(), dim, start));
     }
 
     public static PtNDArray reshape(PtNDArray ndArray, long[] shape) {
@@ -167,9 +173,8 @@ public class JniUtils {
         return bb;
     }
 
-    public static void deleteNdArray(PtNDArray ndArray) {
-        Pointer pointer = ndArray.getHandle();
-        PyTorchLibrary.LIB.torchDeleteTensor(pointer);
+    public static void deleteNdArray(Pointer handle) {
+        PyTorchLibrary.LIB.torchDeleteTensor(handle);
     }
 
     public static void deleteModule(PtSymbolBlock block) {

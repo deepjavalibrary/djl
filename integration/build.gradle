@@ -37,6 +37,7 @@ run {
     systemProperties System.getProperties()
     systemProperties.remove("user.dir")
     systemProperty("file.encoding", "UTF-8")
+    applicationDefaultJvmArgs = ["-Djava.library.path=" + System.getProperty("user.dir") + "/pytorch/native/build"]
 }
 
 jacocoTestReport {
