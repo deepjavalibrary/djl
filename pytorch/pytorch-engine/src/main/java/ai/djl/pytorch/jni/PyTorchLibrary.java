@@ -53,6 +53,8 @@ public final class PyTorchLibrary {
 
     public native Pointer torchArgMax(Pointer handle, long dim, boolean keepDim);
 
+    public native boolean contentEqual(Pointer handle1, Pointer handle2);
+
     public native Pointer torchUpsampleBilinear2d(
             Pointer handle, long[] size, boolean alignCorners);
 

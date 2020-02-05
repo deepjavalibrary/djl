@@ -178,7 +178,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     @Override
     public boolean contentEquals(NDArray other) {
-        return false;
+        return JniUtils.contentEqual(this, (PtNDArray) other);
     }
 
     @Override
@@ -819,6 +819,21 @@ public class PtNDArray extends NativeResource implements NDArray {
             return "This array is already closed";
         }
         return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PtNDArray) {
+            return contentEquals((PtNDArray) obj);
+        }
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return 0;
     }
 
     @Override

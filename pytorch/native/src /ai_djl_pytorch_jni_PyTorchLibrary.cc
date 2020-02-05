@@ -99,6 +99,13 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchReshape
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_contentEqual
+  (JNIEnv *env, jobject jthis, jobject jhandle1, jobject jhandle2) {
+  auto tensor_ptr1 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle1);
+  auto tensor_ptr2 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle2);
+  return tensor_ptr1->equal(*tensor_ptr2);
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSoftmax
   (JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jint jdtype) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);

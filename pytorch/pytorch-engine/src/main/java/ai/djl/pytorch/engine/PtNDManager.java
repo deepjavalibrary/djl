@@ -25,6 +25,11 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 
 public class PtNDManager extends BaseNDManager {
 
@@ -38,81 +43,132 @@ public class PtNDManager extends BaseNDManager {
         return SYSTEM_MANAGER;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ByteBuffer allocateDirect(int capacity) {
-        throw new UnsupportedOperationException("Not implemented");
+        return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
+    /** {@inheritDoc} */
     @Override
     public PtNDArray create(Shape shape, DataType dataType, Device device) {
         return JniUtils.createEmptyNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArray create(Buffer data, Shape shape, DataType dataType) {
+        int size = data.remaining();
+        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
+        DataType inputType = DataType.fromBuffer(data);
+
+        int numOfBytes = inputType.getNumOfBytes();
+        ByteBuffer buf = allocateDirect(size * numOfBytes);
+
+        switch (inputType) {
+            case FLOAT32:
+                buf.asFloatBuffer().put((FloatBuffer) data);
+                break;
+            case FLOAT64:
+                buf.asDoubleBuffer().put((DoubleBuffer) data);
+                break;
+            case UINT8:
+            case INT8:
+            case BOOLEAN:
+                buf.put((ByteBuffer) data);
+                break;
+            case INT32:
+                buf.asIntBuffer().put((IntBuffer) data);
+                break;
+            case INT64:
+                buf.asLongBuffer().put((LongBuffer) data);
+                break;
+            case FLOAT16:
+            default:
+                throw new AssertionError("Show never happen");
+        }
+        return JniUtils.createNdFromByteBuffer(
+                this, buf, shape, dataType, SparseFormat.DENSE, device);
+    }
+
+    /** {@inheritDoc} */
     @Override
     public NDArray createCSR(
             Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray createRowSparse(
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
         return JniUtils.createZerosNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray ones(Shape shape, DataType dataType, Device device) {
         return JniUtils.createOnesNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray arange(
             Number start, Number stop, Number step, DataType dataType, Device device) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray linspace(Number start, Number stop, int num, boolean endpoint, Device device) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
             Number low, Number high, Shape shape, DataType dataType, Device device) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
             Number loc, Number scale, Shape shape, DataType dataType, Device device) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomMultinomial(int n, NDArray pValues) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public PtNDManager newSubManager() {
         return newSubManager(device);
     }
 
+    /** {@inheritDoc} */
     @Override
     public PtNDManager newSubManager(Device dev) {
         PtNDManager manager = new PtNDManager(this, dev);
@@ -120,15 +176,18 @@ public class PtNDManager extends BaseNDManager {
         return manager;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void invoke(
             String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {}
 
+    /** {@inheritDoc} */
     @Override
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
         return Engine.getEngine(PtEngine.ENGINE_NAME);
