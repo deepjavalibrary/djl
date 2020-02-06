@@ -22,7 +22,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArgMax__La
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArgMax__Lai_djl_pytorch_jni_Pointer_2IZ
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArgMax__Lai_djl_pytorch_jni_Pointer_2JZ
   (JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jboolean jkeep_dim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->argmax(jdim, jkeep_dim == JNI_TRUE));

@@ -239,7 +239,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.eq(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -251,7 +251,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.neq(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -263,7 +263,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.gt(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -275,7 +275,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.gte(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -287,7 +287,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.lt(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -299,7 +299,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lte(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.lte(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */

@@ -137,6 +137,18 @@ public final class PyTorchLibrary {
 
     public native Pointer torchTanh(Pointer handle);
 
+    public native Pointer torchEq(Pointer self, Pointer other);
+
+    public native Pointer torchNeq(Pointer self, Pointer other);
+
+    public native Pointer torchGt(Pointer self, Pointer other);
+
+    public native Pointer torchGte(Pointer self, Pointer other);
+
+    public native Pointer torchLt(Pointer self, Pointer other);
+
+    public native Pointer torchLte(Pointer self, Pointer other);
+
     public native Pointer normalize(Pointer handle, float[] mean, float[] std);
 
     public native Pointer resize(Pointer handle, long[] size, boolean alignCorners);

@@ -44,7 +44,7 @@ JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit
   return jarray;
 }
 
-JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2_3IJ
+JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2_3JJ
   (JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jindices, jlong jdim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   auto indices = env->GetLongArrayElements(jindices, JNI_FALSE);
