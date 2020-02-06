@@ -18,6 +18,8 @@
 #include <c10/util/typeid.h>
 #include <torch/script.h>
 
+// The file is utilities that ared used for JNI
+
 namespace utils {
 
 static constexpr const char *const POINTER_CLASS = "ai/djl/pytorch/jni/Pointer";
