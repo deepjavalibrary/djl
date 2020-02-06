@@ -12,14 +12,13 @@
  */
 package ai.djl.pytorch.engine;
 
+import ai.djl.BaseModel;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Block;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -27,12 +26,12 @@ import ai.djl.translate.Translator;
 import ai.djl.util.PairList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * {@code PtModel} is the PyTorch implementation of {@link Model}.
@@ -40,11 +39,9 @@ import java.util.function.Function;
  * <p>PtModel contains all the methods in Model to load and process a model. In addition, it
  * provides PyTorch Specific functionality
  */
-public class PtModel implements Model {
+public class PtModel extends BaseModel {
 
-    private PtSymbolBlock ptSymbolBlock;
-    private PtNDManager manager;
-
+    PtNDManager manager;
     /**
      * Constructs a new Model on a given device.
      *
@@ -58,41 +55,20 @@ public class PtModel implements Model {
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException, MalformedModelException {
-        Path modelDir = modelPath.toAbsolutePath();
+        modelDir = modelPath.toAbsolutePath();
         Path modelFile = modelDir.resolve(modelName + ".pt");
         if (Files.notExists(modelFile)) {
             throw new FileNotFoundException(".pt file not found in: " + modelPath);
         }
-        this.ptSymbolBlock = JniUtils.loadModule(manager, modelFile);
+        block = JniUtils.loadModule(manager, modelFile);
     }
 
     @Override
     public void save(Path modelPath, String modelName) throws IOException {}
 
     @Override
-    public Block getBlock() {
-        return ptSymbolBlock;
-    }
-
-    @Override
-    public void setBlock(Block block) {}
-
-    @Override
-    public String getName() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public String getProperty(String key) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public void setProperty(String key, String value) {}
-
-    @Override
-    public NDManager getNDManager() {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDManager getNDManager() {
+        return manager;
     }
 
     @Override
@@ -117,22 +93,23 @@ public class PtModel implements Model {
 
     @Override
     public String[] getArtifactNames() {
-        return new String[0];
-    }
-
-    @Override
-    public <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public URL getArtifact(String name) throws IOException {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public InputStream getArtifactAsStream(String name) throws IOException {
-        throw new UnsupportedOperationException("Not implemented");
+        try {
+            List<Path> files =
+                    Files.walk(modelDir).filter(Files::isRegularFile).collect(Collectors.toList());
+            List<String> ret = new ArrayList<>(files.size());
+            for (Path path : files) {
+                String fileName = path.toFile().getName();
+                if (fileName.endsWith(".pt")) {
+                    // ignore model files.
+                    continue;
+                }
+                Path relative = modelDir.relativize(path);
+                ret.add(relative.toString());
+            }
+            return ret.toArray(new String[0]);
+        } catch (IOException e) {
+            throw new AssertionError("Failed list files", e);
+        }
     }
 
     @Override

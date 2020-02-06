@@ -1,0 +1,42 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "resnet",
+  "type": "cv",
+  "name": "Resnet",
+  "description": "Resnet image classification",
+  "website": "http://www.djl.ai/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet50",
+      "properties": {
+        "layers": "50",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "model": {
+          "uri": "0.0.1/traced_resnet50.pt.gz",
+          "sha1Hash": "7a6af726e3596bd54633f25357acfa869b424d00",
+          "size": 95229629
+        }
+      }
+    }
+  ]
+}

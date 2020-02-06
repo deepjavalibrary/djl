@@ -12,6 +12,7 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.BaseModel;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
@@ -19,10 +20,8 @@ import ai.djl.inference.Predictor;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -35,8 +34,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,20 +55,15 @@ import org.slf4j.LoggerFactory;
  * provides MXNet Specific functionality, such as getSymbol to obtain the Symbolic graph and
  * getParameters to obtain the parameter NDArrays
  */
-public class MxModel implements Model {
+public class MxModel extends BaseModel {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
 
     private static final int MODEL_VERSION = 1;
 
-    private Path modelDir;
-    private String modelName;
     private MxNDManager manager;
-    private Block block;
     private DataType dataType;
-    private Map<String, String> properties;
     private PairList<String, Shape> inputData;
-    private Map<String, Object> artifacts = new ConcurrentHashMap<>();
     // the variable is used to avoid ParameterStore copy for the first time
     private AtomicBoolean first;
 
@@ -176,20 +167,8 @@ public class MxModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public Block getBlock() {
-        return block;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setBlock(Block block) {
-        this.block = block;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return modelName;
+    public MxNDManager getNDManager() {
+        return manager;
     }
 
     /** {@inheritDoc} */
@@ -270,69 +249,6 @@ public class MxModel implements Model {
         } catch (IOException e) {
             throw new AssertionError("Failed list files", e);
         }
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException {
-        try {
-            Object artifact =
-                    artifacts.computeIfAbsent(
-                            name,
-                            v -> {
-                                try (InputStream is = getArtifactAsStream(name)) {
-                                    return function.apply(is);
-                                } catch (IOException e) {
-                                    throw new IllegalStateException(e);
-                                }
-                            });
-            return (T) artifact;
-        } catch (RuntimeException e) {
-            Throwable t = e.getCause();
-            if (t instanceof IOException) {
-                throw (IOException) e.getCause();
-            }
-            throw e;
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public URL getArtifact(String artifactName) throws IOException {
-        if (artifactName == null) {
-            throw new IllegalArgumentException("artifactName cannot be null");
-        }
-        Path file = modelDir.resolve(artifactName);
-        if (Files.exists(file) && Files.isReadable(file)) {
-            return file.toUri().toURL();
-        }
-        throw new FileNotFoundException("File not found: " + file);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public InputStream getArtifactAsStream(String name) throws IOException {
-        URL url = getArtifact(name);
-        return url.openStream();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager getNDManager() {
-        return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setProperty(String key, String value) {
-        properties.put(key, value);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getProperty(String key) {
-        return properties.get(key);
     }
 
     /** {@inheritDoc} */
