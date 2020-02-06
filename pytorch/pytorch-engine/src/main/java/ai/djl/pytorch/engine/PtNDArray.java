@@ -44,6 +44,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     private Device device;
     private DataType dataType;
     private Shape shape;
+    private SparseFormat sparseFormat;
     private PtNDManager manager;
 
     /**
@@ -126,7 +127,10 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public SparseFormat getSparseFormat() {
-        throw new UnsupportedOperationException("Not implemented");
+        if (sparseFormat == null) {
+            sparseFormat = JniUtils.getSparseFormat(this);
+        }
+        return sparseFormat;
     }
 
     /** {@inheritDoc} */
@@ -691,8 +695,15 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDList split(int sections, int axis) {
+        return JniUtils.split(this, sections, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList split(int[] indices, int axis) {
-        throw new UnsupportedOperationException("Not implemented");
+        long[] longIndices = Arrays.stream(indices).asLongStream().toArray();
+        return JniUtils.split(this, longIndices, axis);
     }
 
     /** {@inheritDoc} */
@@ -1004,7 +1015,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     public void close() {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
-            JniUtils.deleteNdArray(pointer);
+            JniUtils.deleteNdArray(this);
             manager.detach(getUid());
             manager = null;
         }

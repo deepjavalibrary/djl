@@ -45,10 +45,6 @@ public final class JniUtils {
         }
     }
 
-    public static String libraryVersion() {
-        return String.valueOf(PyTorchLibrary.LIB.torchVersion());
-    }
-
     // TODO: Unchecked Datatype and device mapping
     public static PtNDArray createNdFromByteBuffer(
             PtNDManager manager,
@@ -173,6 +169,17 @@ public final class JniUtils {
         return new Device(PtDeviceType.fromDeviceType(device[0]), device[1]);
     }
 
+    public static SparseFormat getSparseFormat(PtNDArray ndArray) {
+        int layout = PyTorchLibrary.LIB.torchLayout(ndArray.getHandle());
+        if (layout == 0) {
+            return SparseFormat.DENSE;
+        } else if (layout == 1) {
+            return SparseFormat.COO;
+        } else {
+            throw new UnsupportedOperationException("Unsupported data format");
+        }
+    }
+
     public static Shape getShape(PtNDArray ndArray) {
         return new Shape(PyTorchLibrary.LIB.torchSizes(ndArray.getHandle()));
     }
@@ -183,13 +190,12 @@ public final class JniUtils {
         return bb;
     }
 
-    public static void deleteNdArray(Pointer handle) {
-        PyTorchLibrary.LIB.torchDeleteTensor(handle);
+    public static void deleteNdArray(PtNDArray ndArray) {
+        PyTorchLibrary.LIB.torchDeleteTensor(ndArray.getHandle());
     }
 
     public static void deleteModule(PtSymbolBlock block) {
-        Pointer pointer = block.getHandle();
-        PyTorchLibrary.LIB.torchDeleteModule(pointer);
+        PyTorchLibrary.LIB.torchDeleteModule(block.getHandle());
     }
 
     public static PtSymbolBlock loadModule(PtNDManager manager, Path path) {
@@ -197,11 +203,11 @@ public final class JniUtils {
         return new PtSymbolBlock(manager, handle);
     }
 
-    public static void moduleEval(Pointer handle) {
-        PyTorchLibrary.LIB.moduleEval(handle);
+    public static void enableInferenceMode(PtSymbolBlock block) {
+        PyTorchLibrary.LIB.moduleEval(block.getHandle());
     }
 
-    public static NDList moduleForward(Pointer handle, NDList inputs) {
+    public static NDList moduleForward(PtSymbolBlock block, NDList inputs) {
         // TODO: reconsider the usage of IValue
         // Currently, only map Tensor to IValue
         Pointer[] iValueHandles =
@@ -215,7 +221,8 @@ public final class JniUtils {
                 new PtNDArray(
                         (PtNDManager) inputs.head().getManager(),
                         PyTorchLibrary.LIB.iValueToTensor(
-                                PyTorchLibrary.LIB.moduleForward(handle, iValueHandles)));
+                                PyTorchLibrary.LIB.moduleForward(
+                                        block.getHandle(), iValueHandles)));
         return new NDList(result);
     }
 }

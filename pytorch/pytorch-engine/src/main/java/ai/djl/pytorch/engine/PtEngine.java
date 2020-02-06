@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
-import ai.djl.pytorch.jni.JniUtils;
 
 /**
  * The {@code PtEngine} is an implementation of the {@link Engine} based on the <a
@@ -38,7 +37,7 @@ public class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return JniUtils.libraryVersion();
+        return "1.4.0";
     }
 
     /** {@inheritDoc} */

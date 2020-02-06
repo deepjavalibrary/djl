@@ -26,8 +26,6 @@ public final class PyTorchLibrary {
 
     private PyTorchLibrary() {}
 
-    public native long torchVersion();
-
     public native long[] torchSizes(Pointer handle);
 
     public native ByteBuffer torchDataPtr(Pointer handle);
@@ -35,6 +33,8 @@ public final class PyTorchLibrary {
     public native int torchDType(Pointer handle);
 
     public native int[] torchDevice(Pointer handle);
+
+    public native int torchLayout(Pointer handle);
 
     public native Pointer torchEmpty(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);

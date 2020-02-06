@@ -27,7 +27,8 @@ public enum SparseFormat {
     UNDEFINED("undefined", -1),
     DENSE("default", 0),
     ROW_SPARSE("row_sparse", 1),
-    CSR("csr", 2);
+    CSR("csr", 2),
+    COO("coo", 3);
 
     private String type;
     private int value;

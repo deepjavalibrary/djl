@@ -15,13 +15,6 @@
 #include <torch/torch.h>
 #include <torch/script.h>
 
-
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchVersion
-  (JNIEnv *env, jobject jthis) {
-  auto tensor = torch::empty(1);
-  return tensor._version();
-}
-
 JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSizes
   (JNIEnv* env, jobject jthis, jobject jhandle) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
@@ -47,6 +40,22 @@ JNIEXPORT jintArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDevice
   int temp_device[] = {static_cast<int>(tensor_ptr->device().type()), tensor_ptr->device().index()};
   env->SetIntArrayRegion(result, 0, 2, temp_device);
   return result;
+}
+
+JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLayout
+  (JNIEnv *env, jobject jthis, jobject jhandle) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  auto layout = tensor_ptr->layout();
+  switch (layout) {
+    case torch::kStrided:
+      return 0;
+    case torch::kSparse:
+      return 1;
+    case torch::kMkldnn:
+      return 2;
+    default:
+      throw;
+  }
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEmpty(

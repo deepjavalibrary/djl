@@ -56,7 +56,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
         super(handle);
         this.manager = manager;
         // Set for inference mode by default
-        JniUtils.moduleEval(handle);
+        JniUtils.enableInferenceMode(this);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return JniUtils.moduleForward(getHandle(), inputs);
+        return JniUtils.moduleForward(this, inputs);
     }
 
     @Override
