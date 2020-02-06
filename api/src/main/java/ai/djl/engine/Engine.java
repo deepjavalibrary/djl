@@ -53,16 +53,15 @@ public abstract class Engine {
             return null;
         }
 
-        if (list.size() > 1) {
-            logger.warn("More than one deep learning engines found.");
-        }
-
         Engine engine = list.get(0).getEngine();
         String defaultEngine = System.getenv("DJL_DEFAULT_ENGINE");
         if (defaultEngine == null || defaultEngine.isEmpty()) {
             defaultEngine = System.getProperty("ai.djl.default_engine");
         }
         if (defaultEngine == null || defaultEngine.isEmpty()) {
+            if (list.size() > 1) {
+                logger.warn("More than one deep learning engines found.");
+            }
             defaultEngine = engine.getEngineName();
         } else if (!ALL_ENGINES.containsKey(defaultEngine)) {
             throw new EngineException("Unknown default engine: " + defaultEngine);
