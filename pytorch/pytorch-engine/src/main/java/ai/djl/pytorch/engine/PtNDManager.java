@@ -122,7 +122,29 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public NDArray arange(
             Number start, Number stop, Number step, DataType dataType, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (start instanceof Float
+                || start instanceof Double
+                || stop instanceof Float
+                || stop instanceof Double
+                || step instanceof Float
+                || step instanceof Double) {
+            return JniUtils.arange(
+                    this,
+                    start.doubleValue(),
+                    stop.doubleValue(),
+                    step.doubleValue(),
+                    dataType,
+                    device,
+                    SparseFormat.DENSE);
+        }
+        return JniUtils.arange(
+                this,
+                start.intValue(),
+                stop.intValue(),
+                step.intValue(),
+                dataType,
+                device,
+                SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */

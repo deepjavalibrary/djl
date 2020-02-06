@@ -408,7 +408,10 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray stack(NDList arrays, int axis) {
-        return null;
+        NDArray[] srcArray = new NDArray[arrays.size() + 1];
+        srcArray[0] = array;
+        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
+        return JniUtils.stack(srcArray, axis);
     }
 
     /** {@inheritDoc} */

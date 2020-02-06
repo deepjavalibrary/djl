@@ -43,7 +43,7 @@ JNIEXPORT jintArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDevice
 }
 
 JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLayout
-  (JNIEnv *env, jobject jthis, jobject jhandle) {
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   auto layout = tensor_ptr->layout();
   switch (layout) {
@@ -56,6 +56,15 @@ JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLayout
     default:
       throw;
   }
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTo
+  (JNIEnv* env, jobject jthis, jobject jhandle, jint jdtype, jintArray jdevice, jboolean jcopy) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto device = utils::GetDeviceFromJDevice(env, jdevice);
+  const auto* result_ptr = new torch::Tensor(
+    tensor_ptr->to(device, utils::GetScalarTypeFromDType(jdtype), false, jcopy == JNI_TRUE));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGet

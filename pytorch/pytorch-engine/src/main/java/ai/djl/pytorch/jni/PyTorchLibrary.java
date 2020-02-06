@@ -36,6 +36,8 @@ public final class PyTorchLibrary {
 
     public native int torchLayout(Pointer handle);
 
+    public native Pointer torchTo(Pointer handle, int dType, int[] device, boolean copy);
+
     public native Pointer torchEmpty(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
@@ -44,6 +46,24 @@ public final class PyTorchLibrary {
 
     public native Pointer torchOnes(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
+
+    public native Pointer torchArange(
+            int start,
+            int end,
+            int step,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
+
+    public native Pointer torchArange(
+            double start,
+            double end,
+            double step,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
 
     public native Pointer torchSub(Pointer handle, double scalar);
 
@@ -72,13 +92,15 @@ public final class PyTorchLibrary {
 
     public native Pointer torchGet(Pointer handle, long dim, long start);
 
-    public native void torchDeleteTensor(Pointer pointer);
+    public native void torchDeleteTensor(Pointer handle);
 
-    public native void torchDeleteModule(Pointer pointer);
+    public native void torchDeleteModule(Pointer handle);
 
-    public native Pointer[] torchSplit(Pointer handle, long size, long axis);
+    public native Pointer[] torchSplit(Pointer handle, long size, long dim);
 
-    public native Pointer[] torchSplit(Pointer handle, long[] indices, long axis);
+    public native Pointer[] torchSplit(Pointer handle, long[] indices, long dim);
+
+    public native Pointer torchStack(Pointer[] handles, long dim);
 
     public native Pointer moduleLoad(String path);
 

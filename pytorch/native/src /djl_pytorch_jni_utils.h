@@ -22,7 +22,7 @@
 
 namespace utils {
 
-static constexpr const char *const POINTER_CLASS = "ai/djl/pytorch/jni/Pointer";
+static constexpr const char* const POINTER_CLASS = "ai/djl/pytorch/jni/Pointer";
 
 inline jint GetDTypeFromScalarType(const c10::ScalarType& type) {
   if (torch::kFloat32 == type) {
@@ -72,17 +72,35 @@ inline c10::ScalarType GetScalarTypeFromDType(jint dtype) {
 
 template<typename T>
 inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
-  jclass cls = env->GetObjectClass(jhandle);
+  jclass cls = env->FindClass(POINTER_CLASS);
   jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
   if (nullptr == get_value) {
     std::cout << "getValue method not found!" << std::endl;
   }
   jlong ptr = env->CallLongMethod(jhandle, get_value);
-  return reinterpret_cast<T *>(ptr);
+  return reinterpret_cast<T*>(ptr);
 }
 
 template<typename T>
-inline jobject CreatePointer(JNIEnv* env, const T *ptr) {
+inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandles) {
+  jclass cls = env->FindClass(POINTER_CLASS);
+  jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
+  jsize length = env->GetArrayLength(jhandles);
+  std::vector<T> vec;
+  vec.reserve(length);
+  for (auto i = 0; i < length; ++i) {
+    jobject jhandle = env->GetObjectArrayElement(jhandles, i);
+    if (nullptr == jhandle) {
+      std::cout << "Pointer not found!" << std::endl;
+    }
+    jlong ptr = env->CallLongMethod(jhandle, get_value);
+    vec.emplace_back(*(reinterpret_cast<T*>(ptr)));
+  }
+  return std::move(vec);
+}
+
+template<typename T>
+inline jobject CreatePointer(JNIEnv* env, const T* ptr) {
   jclass cls = env->FindClass(POINTER_CLASS);
   if (nullptr == cls) {
     std::cout << "Pointer class not found!" << std::endl;
@@ -111,11 +129,15 @@ inline std::vector<int32_t> GetVecFromJIntArray(JNIEnv* env, jintArray jarray) {
   return vec;
 }
 
-inline std::vector<int> GetDeviceVecFromJDevice(JNIEnv* env, jintArray jdevice) {
+inline c10::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
   jint* device = env->GetIntArrayElements(jdevice, JNI_FALSE);
-  jsize length = env->GetArrayLength(jdevice);
-  const std::vector<int> device_vec(device, device + length);
-  return device_vec;
+  c10::DeviceType device_type = static_cast<c10::DeviceType>(*device);
+  int device_idx = *(device + 1);
+  if (device_type == c10::DeviceType::CPU) {
+    device_idx = -1;
+  }
+  c10::Device c10_device(device_type, device_idx);
+  return c10_device;
 }
 
 inline torch::TensorOptions CreateTensorOptions(JNIEnv* env,
@@ -123,14 +145,12 @@ inline torch::TensorOptions CreateTensorOptions(JNIEnv* env,
                                                 jint jlayout,
                                                 jintArray jdevice,
                                                 jboolean jrequired_grad) {
-  const auto device_vec =  utils::GetDeviceVecFromJDevice(env, jdevice);
+  const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   auto options = torch::TensorOptions()
     .dtype(GetScalarTypeFromDType(jdtype))
     .layout((jlayout == 0) ? torch::kStrided : torch::kSparse)
+    .device(device)
     .requires_grad(JNI_TRUE == jrequired_grad);
-  if (device_vec[0] != 0) {
-    options = options.device(torch::kCUDA, device_vec[1]);
-  }
   return options;
 }
 

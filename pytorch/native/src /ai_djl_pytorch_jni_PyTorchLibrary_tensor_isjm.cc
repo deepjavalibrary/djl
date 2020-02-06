@@ -23,8 +23,16 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchReshape
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStack
+  (JNIEnv* env, jobject jthis, jobjectArray jhandles, jlong jdim) {
+  const std::vector<torch::Tensor> tensor_vec =
+    utils::GetObjectVecFromJHandles<torch::Tensor>(env, jhandles);
+  const torch::Tensor* result_ptr = new torch::Tensor(torch::stack(tensor_vec, jdim));
+  return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
+}
+
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2JJ
-  (JNIEnv *env, jobject jthis, jobject jhandle, jlong jsize, jlong jdim) {
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jsize, jlong jdim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   auto tensors = tensor_ptr->split(jsize, jdim);
   jobjectArray jarray = env->NewObjectArray(tensors.size(), env->FindClass(utils::POINTER_CLASS), nullptr);
@@ -37,7 +45,7 @@ JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit
 }
 
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2_3IJ
-  (JNIEnv *env, jobject jthis, jobject jhandle, jlongArray jindices, jlong jdim) {
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jindices, jlong jdim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   auto indices = env->GetLongArrayElements(jindices, JNI_FALSE);
   auto tensors = tensor_ptr->split_with_sizes(c10::IntArrayRef(*indices), jdim);

@@ -46,6 +46,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     private Shape shape;
     private SparseFormat sparseFormat;
     private PtNDManager manager;
+    private PtNDArrayEx ptNDArrayEx;
 
     /**
      * Constructs an PtTorch from a native handle and metadata (internal. Use {@link NDManager}
@@ -77,6 +78,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     public PtNDArray(PtNDManager manager, Pointer handle) {
         super(handle);
         this.manager = manager;
+        this.ptNDArrayEx = new PtNDArrayEx(this);
     }
 
     /** {@inheritDoc} */
@@ -136,13 +138,13 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toDevice(Device device, boolean copy) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.to(this, getDataType(), device, copy);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.to(this, dataType, getDevice(), copy);
     }
 
     /** {@inheritDoc} */
@@ -188,6 +190,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     public NDArray get(NDIndex index) {
         // TODO add full support of index and refactor NDIndex
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
+        if (isScalar()) {
+            return this;
+        }
         return JniUtils.get(this, 0, fullSlice.getMin()[0]);
     }
 
@@ -970,7 +975,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArrayEx getNDArrayInternal() {
-        throw new UnsupportedOperationException("Not implemented");
+        return ptNDArrayEx;
     }
 
     /** {@inheritDoc} */

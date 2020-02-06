@@ -26,6 +26,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUpsampleBi
   (JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jsize, jboolean jalign_corners) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto size_vec = utils::GetVecFromJLongArray(env, jsize);
-  const auto* result_ptr = new torch::Tensor(torch::upsample_bilinear2d(*tensor_ptr, size_vec, jalign_corners == JNI_TRUE));
+  const auto* result_ptr = new torch::Tensor(
+    torch::upsample_bilinear2d(*tensor_ptr, size_vec, jalign_corners == JNI_TRUE));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }

@@ -16,7 +16,7 @@
 // The file is the implementation for PyTorch tensor comparision ops
 
 JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_contentEqual
-  (JNIEnv *env, jobject jthis, jobject jhandle1, jobject jhandle2) {
+  (JNIEnv* env, jobject jthis, jobject jhandle1, jobject jhandle2) {
   auto tensor_ptr1 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle1);
   auto tensor_ptr2 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle2);
   return tensor_ptr1->equal(*tensor_ptr2);

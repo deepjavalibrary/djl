@@ -25,6 +25,7 @@ import ai.djl.pytorch.engine.PtSymbolBlock;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 /**
  * A class containing utilities to interact with the PyTorch Engine's Java Native Interface (JNI)
@@ -61,7 +62,7 @@ public final class JniUtils {
                         shape.getShape(),
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {device.getDeviceId()},
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
                         false));
     }
 
@@ -75,7 +76,7 @@ public final class JniUtils {
                         shape.getShape(),
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {device.getDeviceId()},
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
                         false));
     }
 
@@ -89,7 +90,7 @@ public final class JniUtils {
                         shape.getShape(),
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {device.getDeviceId()},
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
                         false));
     }
 
@@ -103,8 +104,60 @@ public final class JniUtils {
                         shape.getShape(),
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {device.getDeviceId()},
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
                         false));
+    }
+
+    public static PtNDArray arange(
+            PtNDManager manager,
+            int start,
+            int end,
+            int step,
+            DataType dType,
+            Device device,
+            SparseFormat fmt) {
+        int layoutVal = layoutMapper(fmt);
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchArange(
+                        start,
+                        end,
+                        step,
+                        dType.ordinal(),
+                        layoutVal,
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        false));
+    }
+
+    public static PtNDArray arange(
+            PtNDManager manager,
+            double start,
+            double end,
+            double step,
+            DataType dType,
+            Device device,
+            SparseFormat fmt) {
+        int layoutVal = layoutMapper(fmt);
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchArange(
+                        start,
+                        end,
+                        step,
+                        dType.ordinal(),
+                        layoutVal,
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        false));
+    }
+
+    public static PtNDArray to(PtNDArray ndArray, DataType dataType, Device device, boolean copy) {
+        return new PtNDArray(
+                (PtNDManager) ndArray.getManager(),
+                PyTorchLibrary.LIB.torchTo(
+                        ndArray.getHandle(),
+                        dataType.ordinal(),
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        copy));
     }
 
     public static PtNDArray get(PtNDArray ndArray, long dim, long start) {
@@ -117,6 +170,15 @@ public final class JniUtils {
         return new PtNDArray(
                 (PtNDManager) ndArray.getManager(),
                 PyTorchLibrary.LIB.torchReshape(ndArray.getHandle(), shape));
+    }
+
+    public static PtNDArray stack(NDArray[] arrays, int dim) {
+        Pointer[] pointers =
+                Arrays.stream(arrays)
+                        .map(array -> ((PtNDArray) array).getHandle())
+                        .toArray(Pointer[]::new);
+        return new PtNDArray(
+                (PtNDManager) arrays[0].getManager(), PyTorchLibrary.LIB.torchStack(pointers, dim));
     }
 
     public static PtNDArray softmax(PtNDArray ndArray, int dim, DataType dTpe) {
