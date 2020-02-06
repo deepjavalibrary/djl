@@ -129,6 +129,13 @@ inline std::vector<int32_t> GetVecFromJIntArray(JNIEnv* env, jintArray jarray) {
   return vec;
 }
 
+inline std::vector<float> GetVecFromJFloatArray(JNIEnv* env, jfloatArray jarray) {
+  jfloat* jarr = env->GetFloatArrayElements(jarray, JNI_FALSE);
+  jsize length = env->GetArrayLength(jarray);
+  const std::vector<float> vec(jarr, jarr + length);
+  return vec;
+}
+
 inline c10::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
   jint* device = env->GetIntArrayElements(jdevice, JNI_FALSE);
   c10::DeviceType device_type = static_cast<c10::DeviceType>(*device);

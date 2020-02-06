@@ -816,6 +816,6 @@ class MxNDArrayEx implements NDArrayEx {
     }
 
     private MxNDManager getManager() {
-        return (MxNDManager) array.getManager();
+        return array.getManager();
     }
 }

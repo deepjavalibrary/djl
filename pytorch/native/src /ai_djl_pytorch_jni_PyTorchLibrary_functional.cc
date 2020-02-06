@@ -30,3 +30,18 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUpsampleBi
     torch::upsample_bilinear2d(*tensor_ptr, size_vec, jalign_corners == JNI_TRUE));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_normalize
+  (JNIEnv* env, jobject jthis, jobject jhandle, jfloatArray jmean, jfloatArray jstd) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  std::vector<float> mean = utils::GetVecFromJFloatArray(env, jmean);
+  std::vector<float> std = utils::GetVecFromJFloatArray(env, jstd);
+  torch::Tensor mean_tensor = torch::from_blob(mean.data(), {3, 1, 1});
+  torch::Tensor std_tensor = torch::from_blob(std.data(), {3, 1, 1});
+  if (tensor_ptr->dim() == 4) {
+    mean_tensor = mean_tensor.reshape({1, 3, 1, 1});
+    std_tensor = std_tensor.reshape({1, 3, 1, 1});
+  }
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->sub(mean_tensor).div(std_tensor));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}

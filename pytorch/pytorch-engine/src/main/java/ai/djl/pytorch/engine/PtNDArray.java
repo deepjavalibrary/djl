@@ -83,7 +83,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager getManager() {
+    public PtNDManager getManager() {
         return manager;
     }
 
@@ -485,13 +485,13 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray abs() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.abs(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray square() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sqrt(this);
     }
 
     /** {@inheritDoc} */
@@ -503,103 +503,103 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray floor() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.floor(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray ceil() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.ceil(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray round() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.round(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray trunc() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.trunc(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray exp() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.exp(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray log() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.log(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray log10() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.log10(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray log2() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.log2(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sin() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sin(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray cos() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.cos(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray tan() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.tan(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray asin() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.asin(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray acos() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.acos(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray atan() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.atan(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sinh() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sinh(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray cosh() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.cosh(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.tanh(this);
     }
 
     /** {@inheritDoc} */

@@ -102,6 +102,46 @@ public final class PyTorchLibrary {
 
     public native Pointer torchStack(Pointer[] handles, long dim);
 
+    public native Pointer torchAbs(Pointer handle);
+
+    public native Pointer torchFloor(Pointer handle);
+
+    public native Pointer torchCeil(Pointer handle);
+
+    public native Pointer torchRound(Pointer handle);
+
+    public native Pointer torchTrunc(Pointer handle);
+
+    public native Pointer torchExp(Pointer handle);
+
+    public native Pointer torchLog(Pointer handle);
+
+    public native Pointer torchLog10(Pointer handle);
+
+    public native Pointer torchLog2(Pointer handle);
+
+    public native Pointer torchSin(Pointer handle);
+
+    public native Pointer torchCos(Pointer handle);
+
+    public native Pointer torchTan(Pointer handle);
+
+    public native Pointer torchASin(Pointer handle);
+
+    public native Pointer torchAcos(Pointer handle);
+
+    public native Pointer torchAtan(Pointer handle);
+
+    public native Pointer torchSqrt(Pointer handle);
+
+    public native Pointer torchSinh(Pointer handle);
+
+    public native Pointer torchCosh(Pointer handle);
+
+    public native Pointer torchTanh(Pointer handle);
+
+    public native Pointer normalize(Pointer handle, float[] mean, float[] std);
+
     public native Pointer moduleLoad(String path);
 
     public native void moduleEval(Pointer handle);

@@ -108,7 +108,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager getManager() {
+    public MxNDManager getManager() {
         return manager;
     }
 

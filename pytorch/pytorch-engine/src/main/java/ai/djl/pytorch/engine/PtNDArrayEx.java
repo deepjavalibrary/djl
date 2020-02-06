@@ -371,8 +371,7 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray normalize(float[] mean, float[] std) {
-        // TODO support normalize by channel
-        return array.sub(mean[0]).div(std[0]);
+        return JniUtils.normalize(array, mean, std);
     }
 
     /** {@inheritDoc} */
@@ -463,6 +462,6 @@ public class PtNDArrayEx implements NDArrayEx {
     }
 
     private PtNDManager getManager() {
-        return (PtNDManager) array.getManager();
+        return array.getManager();
     }
 }
