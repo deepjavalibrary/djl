@@ -553,5 +553,10 @@ public interface NDArrayEx {
             boolean forceSuppress,
             int nmsTopK);
 
+    /**
+     * Get internal {@link NDArray}.
+     *
+     * @return a NDArray
+     */
     NDArray getArray();
 }

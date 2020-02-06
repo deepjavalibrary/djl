@@ -312,7 +312,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sub(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sub(this, n.doubleValue());
     }
 
     /** {@inheritDoc} */
@@ -336,7 +336,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray div(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.div(this, n.doubleValue());
     }
 
     /** {@inheritDoc} */

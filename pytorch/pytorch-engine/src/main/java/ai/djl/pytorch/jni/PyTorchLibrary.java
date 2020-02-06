@@ -45,6 +45,10 @@ public final class PyTorchLibrary {
     public native Pointer torchOnes(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
+    public native Pointer torchSub(Pointer handle, double scalar);
+
+    public native Pointer torchDiv(Pointer handle, double scalar);
+
     public native Pointer torchReshape(Pointer handle, long[] shape);
 
     public native Pointer torchSoftmax(Pointer handle, long dim, int dType);

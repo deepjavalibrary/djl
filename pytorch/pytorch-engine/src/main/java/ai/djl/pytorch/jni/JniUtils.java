@@ -141,6 +141,18 @@ public final class JniUtils {
         return PyTorchLibrary.LIB.contentEqual(ndArray1.getHandle(), ndArray2.getHandle());
     }
 
+    public static PtNDArray sub(PtNDArray ndArray, double scalar) {
+        return new PtNDArray(
+                (PtNDManager) ndArray.getManager(),
+                PyTorchLibrary.LIB.torchSub(ndArray.getHandle(), scalar));
+    }
+
+    public static PtNDArray div(PtNDArray ndArray, double scalar) {
+        return new PtNDArray(
+                (PtNDManager) ndArray.getManager(),
+                PyTorchLibrary.LIB.torchDiv(ndArray.getHandle(), scalar));
+    }
+
     public static NDList split(PtNDArray ndArray, long size, long axis) {
         Pointer[] ndPtrs = PyTorchLibrary.LIB.torchSplit(ndArray.getHandle(), size, axis);
         NDList list = new NDList();

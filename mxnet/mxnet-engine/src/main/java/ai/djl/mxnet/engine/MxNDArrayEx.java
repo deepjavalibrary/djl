@@ -29,7 +29,7 @@ class MxNDArrayEx implements NDArrayEx {
     private MxNDArray array;
 
     /**
-     * Constructs an {@code MxNDArrayEx} given an NDArray.
+     * Constructs an {@code MxNDArrayEx} given a {@link NDArray}.
      *
      * @param parent the {@link NDArray} to extend
      */
@@ -815,7 +815,7 @@ class MxNDArrayEx implements NDArrayEx {
         return new Shape(shape);
     }
 
-    public MxNDManager getManager() {
+    private MxNDManager getManager() {
         return (MxNDManager) array.getManager();
     }
 }

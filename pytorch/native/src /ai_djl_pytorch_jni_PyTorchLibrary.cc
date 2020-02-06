@@ -100,6 +100,20 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSub
+  (JNIEnv* env, jobject jthis, jobject jhandle, jdouble jscalar) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->sub(jscalar));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDiv
+  (JNIEnv* env, jobject jthis, jobject jhandle, jdouble jscalar) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->div(jscalar));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchReshape
   (JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jshape) {
   const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
