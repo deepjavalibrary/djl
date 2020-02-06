@@ -328,6 +328,12 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.normalize(ndArray.getHandle(), mean, std));
     }
 
+    public static PtNDArray resize(PtNDArray ndArray, long[] size, boolean alignCorners) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.resize(ndArray.getHandle(), size, alignCorners));
+    }
+
     public static DataType getDataType(PtNDArray ndArray) {
         int dataType = PyTorchLibrary.LIB.torchDType(ndArray.getHandle());
         return DataType.values()[dataType];
@@ -359,8 +365,8 @@ public final class JniUtils {
         return bb;
     }
 
-    public static void deleteNdArray(PtNDArray ndArray) {
-        PyTorchLibrary.LIB.torchDeleteTensor(ndArray.getHandle());
+    public static void deleteNdArray(Pointer handle) {
+        PyTorchLibrary.LIB.torchDeleteTensor(handle);
     }
 
     public static void deleteModule(PtSymbolBlock block) {

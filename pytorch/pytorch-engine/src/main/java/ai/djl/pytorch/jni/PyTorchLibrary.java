@@ -79,9 +79,6 @@ public final class PyTorchLibrary {
 
     public native boolean contentEqual(Pointer handle1, Pointer handle2);
 
-    public native Pointer torchUpsampleBilinear2d(
-            Pointer handle, long[] size, boolean alignCorners);
-
     public native Pointer torchFromBlob(
             ByteBuffer data,
             long[] shape,
@@ -141,6 +138,8 @@ public final class PyTorchLibrary {
     public native Pointer torchTanh(Pointer handle);
 
     public native Pointer normalize(Pointer handle, float[] mean, float[] std);
+
+    public native Pointer resize(Pointer handle, long[] size, boolean alignCorners);
 
     public native Pointer moduleLoad(String path);
 

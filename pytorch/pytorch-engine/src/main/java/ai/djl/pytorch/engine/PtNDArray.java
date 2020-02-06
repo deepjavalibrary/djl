@@ -1020,7 +1020,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     public void close() {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
-            JniUtils.deleteNdArray(this);
+            JniUtils.deleteNdArray(pointer);
             manager.detach(getUid());
             manager = null;
         }

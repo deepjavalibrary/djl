@@ -383,7 +383,10 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray resize(int width, int height) {
-        return null;
+        if (array.isEmpty()) {
+            throw new IllegalArgumentException("attempt to resize of an empty NDArray");
+        }
+        return JniUtils.resize(array, new long[] {height, width}, true);
     }
 
     /** {@inheritDoc} */
