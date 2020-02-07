@@ -778,6 +778,11 @@ public class MockNDArray implements NDArray {
         return null;
     }
 
+    @Override
+    public NDArray reshapeLike(NDArray array) {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray expandDims(long axis) {

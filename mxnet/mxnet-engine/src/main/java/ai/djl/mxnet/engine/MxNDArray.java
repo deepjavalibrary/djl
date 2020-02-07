@@ -1134,6 +1134,14 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray reshapeLike(NDArray array) {
+        MxOpParams params = new MxOpParams();
+        return manager.invoke("_npx_reshape_like", new NDList(this, array), params)
+                .singletonOrThrow();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray expandDims(long axis) {
         if (isScalar()) {
             return reshape(1);

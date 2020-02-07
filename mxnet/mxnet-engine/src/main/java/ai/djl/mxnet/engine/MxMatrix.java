@@ -268,6 +268,11 @@ public class MxMatrix implements Matrix {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
+    @Override
+    public NDArray reshapeLike(NDArray array) {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public double[][] toDoubleMatrix() {

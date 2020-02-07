@@ -2893,6 +2893,14 @@ public interface NDArray extends AutoCloseable {
     NDArray reshape(Shape shape);
 
     /**
+     * Reshapes this {@code NDArray} to the match the {@link Shape} of the given {@code NDArray}.
+     *
+     * @param array the {@code NDArray} whose shape to match
+     * @return a reshaped {@code NDArray}
+     */
+    NDArray reshapeLike(NDArray array);
+
+    /**
      * Expands the {@link Shape} of a {@code NDArray}.
      *
      * <p>Inserts a new axis that will appear at the axis position in the expanded {@code NDArray}

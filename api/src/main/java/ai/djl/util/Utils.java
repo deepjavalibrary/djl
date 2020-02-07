@@ -234,7 +234,14 @@ public final class Utils {
         }
     }
 
-    private static void checkNDArrayValues(NDArray array, Logger logger, String prefix) {
+    /**
+     * Utility function to help summarize the values in an {@link NDArray}.
+     *
+     * @param array the {@link NDArray} to be summarized
+     * @param logger the logger to log the result
+     * @param prefix the prefix or name to be displayed
+     */
+    public static void checkNDArrayValues(NDArray array, Logger logger, String prefix) {
         if (array.isNaN().any().getBoolean()) {
             logger.warn("There are NANs in value:");
             for (int i = 0; i < array.size(0); i++) {
@@ -245,5 +252,6 @@ public final class Utils {
         logger.debug("{} mean: {}", prefix, array.mean().getFloat());
         logger.debug("{} max: {}", prefix, array.max().getFloat());
         logger.debug("{} min: {}", prefix, array.min().getFloat());
+        logger.debug("{} shape: {}", prefix, array.getShape().toString());
     }
 }

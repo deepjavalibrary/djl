@@ -750,6 +750,11 @@ public class PtNDArray extends NativeResource implements NDArray {
         return JniUtils.reshape(this, shape.getShape());
     }
 
+    @Override
+    public NDArray reshapeLike(NDArray array) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
     /** {@inheritDoc} */
     @Override
     public PtNDArray expandDims(long axis) {

@@ -391,7 +391,7 @@ public class BlockCoreTest {
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 NDArray expected =
                         manager.create(
-                                new float[] {7, 12, 12, 12, 12, 23, 28, 28, 28, 28},
+                                new float[] {6, 6, 6, 6, 6, 52, 52, 52, 52, 52},
                                 new Shape(1, 2, 5));
                 Assert.assertEquals(result, expected);
 
@@ -407,12 +407,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES)
                         .optDevices(getDevices());
 
-        Block block =
-                new LSTM.Builder()
-                        .setStateSize(4)
-                        .setNumStackedLayers(1)
-                        .setActivation(RNN.Activation.RELU)
-                        .build();
+        Block block = new LSTM.Builder().setStateSize(4).setNumStackedLayers(1).build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
@@ -426,8 +421,8 @@ public class BlockCoreTest {
                 NDArray expected =
                         manager.create(
                                 new float[] {
-                                    0.9638f, 0.9631f, 0.9576f, 0.964f, 0.9639f, 0.964f, 0.9576f,
-                                    0.964f
+                                    0.7587f, 0.7587f, 0.7587f, 0.7587f, 0.9639f, 0.9639f, 0.9639f,
+                                    0.9639f
                                 },
                                 new Shape(1, 2, 4));
                 Assertions.assertAlmostEquals(result, expected);
@@ -444,12 +439,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES)
                         .optDevices(getDevices());
 
-        GRU block =
-                new GRU.Builder()
-                        .setStateSize(4)
-                        .setNumStackedLayers(1)
-                        .setActivation(RNN.Activation.RELU)
-                        .build();
+        GRU block = new GRU.Builder().setStateSize(4).setNumStackedLayers(1).build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
@@ -460,7 +450,14 @@ public class BlockCoreTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                Assertions.assertAlmostEquals(result, manager.ones(new Shape(1, 2, 4)));
+                NDArray expected =
+                        manager.create(
+                                new float[] {
+                                    0.0025f, 0.0025f, 0.0025f, 0.0025f, 0.0025f, 0.0025f, 0.0025f,
+                                    0.0025f
+                                },
+                                new Shape(1, 2, 4));
+                Assertions.assertAlmostEquals(result, expected);
 
                 testEncode(manager, block);
             }

@@ -319,7 +319,7 @@ public interface NDArrayEx {
      * @param useSequenceLength if set to true, this layer takes in an extra input parameter
      *     sequence_length to specify variable length sequence.
      * @param useBidirectional whether to use bidirectional recurrent layers
-     * @param stateOutputs whether to have the states as symbol outputs
+     * @param stateOutputs whether to include the state in the output
      * @param additional additional parameters
      * @return the output of the operation
      */
@@ -348,7 +348,7 @@ public interface NDArrayEx {
      * @param useSequenceLength if set to true, this layer takes in an extra input parameter
      *     sequence_length to specify variable length sequence.
      * @param useBidirectional whether to use bidirectional recurrent layers
-     * @param stateOutputs whether to have the states as symbol outputs
+     * @param stateOutputs whether to include the state in the output
      * @param lstmStateClipMin the minimum clip value of LSTM states
      * @param lstmStateClipMax the maximum clip value of LSTM states
      * @param additional additional parameters
@@ -493,6 +493,25 @@ public interface NDArrayEx {
     }
 
     // TODO Add default implementation
+
+    /**
+     * Concats the parameters of a recurrent neural network as expected by the engine.
+     *
+     * @param arrays an {@link NDList} containing the the parameter arrays to be concatenated
+     * @param numArgs number of inputs to be concatenated
+     * @return the concatenated {@code NDArray} of parameters
+     */
+    NDArray rnnParameterConcat(NDList arrays, int numArgs);
+
+    /**
+     * Concats the parameters of a recurrent neural network as expected by the engine.
+     *
+     * @param arrays an {@link NDList} containing the the parameter arrays to be concatenated
+     * @param numArgs number of inputs to be concatenated
+     * @param dim the dimension to be concatenated
+     * @return the concatenated {@code NDArray} of parameters
+     */
+    NDArray rnnParameterConcat(NDList arrays, int numArgs, int dim);
 
     /**
      * Computes Multibox training targets.

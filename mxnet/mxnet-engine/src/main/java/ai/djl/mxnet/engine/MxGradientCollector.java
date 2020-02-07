@@ -15,6 +15,7 @@ package ai.djl.mxnet.engine;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
 
 /** {@code MxGradientCollector} is the MXNet implementation of {@link GradientCollector}. */
@@ -78,6 +79,18 @@ public class MxGradientCollector implements GradientCollector {
      */
     public static boolean setTraining(boolean isTraining) {
         return JnaUtils.autogradSetTraining(isTraining);
+    }
+
+    /**
+     * Returns the {@link Symbol} of a network formed by the recorded operations on the given {@link
+     * NDArray}.
+     *
+     * @param manager the {@link NDManager} to create the {@link Symbol}
+     * @param array the {@link NDArray}
+     * @return the {@link Symbol}
+     */
+    public static Symbol getSymbol(NDManager manager, NDArray array) {
+        return new Symbol((MxNDManager) manager, JnaUtils.autogradGetSymbol(array));
     }
 
     /** {@inheritDoc} */

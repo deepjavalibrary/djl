@@ -778,6 +778,11 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    @Override
+    public NDArray reshapeLike(NDArray array) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray expandDims(long axis) {

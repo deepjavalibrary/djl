@@ -577,8 +577,8 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("num_layers", numStackedLayers);
         params.addParam("use_sequence_length", useSequenceLength);
         params.addParam("bidirectional", useBidirectional);
-        params.addParam("state_outputs", stateOutputs);
         params.addParam("mode", mode);
+        params.addParam("state_outputs", stateOutputs);
         params.addAll(additional);
 
         return getManager().invoke("RNN", inputs, params);
@@ -736,6 +736,21 @@ class MxNDArrayEx implements NDArrayEx {
         srcArray[0] = array;
         System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
         return getManager().invoke("_npi_concatenate", srcArray, params);
+    }
+
+    @Override
+    public NDArray rnnParameterConcat(NDList arrays, int numArgs) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("num_args", numArgs);
+        return getManager().invoke("_npi_rnn_param_concat", arrays, params).singletonOrThrow();
+    }
+
+    @Override
+    public NDArray rnnParameterConcat(NDList arrays, int numArgs, int dim) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("dim", dim);
+        params.addParam("num_args", numArgs);
+        return getManager().invoke("_npi_rnn_param_concat", arrays, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */

@@ -19,19 +19,13 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.types.LayoutType;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Applies Long Short-Term Memory recurrent layer to input.
@@ -46,38 +40,11 @@ import java.util.List;
  * \tanh(c_t) \end{array}\end{split} $$
  */
 public class LSTM extends RecurrentCell {
-
-    private static final LayoutType[] EXPECTED_LAYOUT = {
-        LayoutType.TIME, LayoutType.BATCH, LayoutType.CHANNEL
-    };
-
     private static final byte VERSION = 1;
 
     private boolean clipLstmState;
     private double lstmStateClipMin;
     private double lstmStateClipMax;
-
-    private List<Parameter> parameters =
-            Arrays.asList(
-                    new Parameter("i2iWeight", this, ParameterType.WEIGHT),
-                    new Parameter("i2iBias", this, ParameterType.BIAS),
-                    new Parameter("h2iWeight", this, ParameterType.WEIGHT),
-                    new Parameter("h2iBias", this, ParameterType.BIAS),
-                    new Parameter("i2fWeight", this, ParameterType.WEIGHT),
-                    new Parameter("i2fBias", this, ParameterType.BIAS),
-                    new Parameter("h2fWeight", this, ParameterType.WEIGHT),
-                    new Parameter("h2fBias", this, ParameterType.BIAS),
-                    new Parameter("i2gWeight", this, ParameterType.WEIGHT),
-                    new Parameter("i2gBias", this, ParameterType.BIAS),
-                    new Parameter("h2gWeight", this, ParameterType.WEIGHT),
-                    new Parameter("h2gBias", this, ParameterType.BIAS),
-                    new Parameter("i2oWeight", this, ParameterType.WEIGHT),
-                    new Parameter("i2oBias", this, ParameterType.BIAS),
-                    new Parameter("h2oWeight", this, ParameterType.WEIGHT),
-                    new Parameter("h2oBias", this, ParameterType.BIAS));
-
-    private Parameter state = new Parameter("state", this, ParameterType.OTHER);
-    private Parameter stateCell = new Parameter("state_cell", this, ParameterType.OTHER);
 
     /**
      * Creates an LSTM block.
@@ -86,7 +53,9 @@ public class LSTM extends RecurrentCell {
      */
     LSTM(Builder builder) {
         super(builder);
+        currentVersion = 1;
         mode = "lstm";
+        gates = 4;
         clipLstmState = builder.clipLstmState;
         lstmStateClipMin = builder.lstmStateClipMin;
         lstmStateClipMax = builder.lstmStateClipMax;
@@ -99,92 +68,45 @@ public class LSTM extends RecurrentCell {
         inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
 
+        NDList output;
         if (clipLstmState) {
-            return ex.lstm(
-                    inputs,
-                    stateSize,
-                    dropRate,
-                    numStackedLayers,
-                    useSequenceLength,
-                    useBidirectional,
-                    stateOutputs,
-                    lstmStateClipMin,
-                    lstmStateClipMax,
-                    params);
+            output =
+                    ex.lstm(
+                            inputs,
+                            stateSize,
+                            dropRate,
+                            numStackedLayers,
+                            useSequenceLength,
+                            useBidirectional,
+                            stateOutputs,
+                            lstmStateClipMin,
+                            lstmStateClipMax,
+                            params);
+        } else {
+            output =
+                    ex.rnn(
+                            inputs,
+                            mode,
+                            stateSize,
+                            dropRate,
+                            numStackedLayers,
+                            useSequenceLength,
+                            useBidirectional,
+                            stateOutputs,
+                            params);
         }
 
-        return ex.rnn(
-                inputs,
-                mode,
-                stateSize,
-                dropRate,
-                numStackedLayers,
-                useSequenceLength,
-                useBidirectional,
-                stateOutputs,
-                params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        Shape inputShape = inputShapes[0];
-        return new Shape[] {new Shape(inputShape.get(0), inputShape.get(1), stateSize)};
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Parameter> getDirectParameters() {
-        List<Parameter> directParameters = new ArrayList<>(this.parameters);
-        directParameters.add(state);
-        directParameters.add(stateCell);
-        return directParameters;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void beforeInitialize(Shape[] inputs) {
-        this.inputShapes = inputs;
-        Shape inputShape = inputs[0];
-        Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        Shape shape = inputShapes[0];
-        long channelSize = shape.get(2);
-        long batchSize = shape.get(1);
-        switch (name) {
-            case "i2iWeight":
-            case "i2fWeight":
-            case "i2gWeight":
-            case "i2oWeight":
-                return new Shape(stateSize, channelSize);
-            case "h2iWeight":
-            case "h2fWeight":
-            case "h2gWeight":
-            case "h2oWeight":
-                return new Shape(stateSize, stateSize);
-            case "h2iBias":
-            case "i2iBias":
-            case "h2fBias":
-            case "i2fBias":
-            case "h2gBias":
-            case "i2gBias":
-            case "h2oBias":
-            case "i2oBias":
-                return new Shape(stateSize);
-            case "state":
-            case "state_cell":
-                return new Shape(numStackedLayers, batchSize, stateSize);
-            default:
-                throw new IllegalArgumentException("Invalid parameter name");
+        NDList result = new NDList(output.head().transpose(1, 0, 2));
+        if (stateOutputs) {
+            result.add(output.get(1));
         }
+        return result;
     }
 
-    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
+    @Override
+    protected NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         validateInputSize(inputs);
+        inputs = updateInputLayoutToTNC(inputs);
         NDArray head = inputs.head();
         Device device = head.getDevice();
 
@@ -197,8 +119,9 @@ public class LSTM extends RecurrentCell {
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);
         }
-        result.add(parameterStore.getValue(state, device));
-        result.add(parameterStore.getValue(stateCell, device));
+        // Adding state and stateCell
+        result.add(inputs.head().getManager().zeros(stateShape));
+        result.add(inputs.head().getManager().zeros(stateShape));
         if (useSequenceLength) {
             result.add(inputs.get(1));
         }
@@ -212,8 +135,6 @@ public class LSTM extends RecurrentCell {
         for (Parameter parameter : parameters) {
             parameter.save(os);
         }
-        state.save(os);
-        stateCell.save(os);
     }
 
     /** {@inheritDoc} */
@@ -227,8 +148,6 @@ public class LSTM extends RecurrentCell {
         for (Parameter parameter : parameters) {
             parameter.load(manager, is);
         }
-        state.load(manager, is);
-        stateCell.load(manager, is);
     }
 
     /** The Builder to construct a {@link LSTM} type of {@link Block}. */
@@ -238,6 +157,20 @@ public class LSTM extends RecurrentCell {
         @Override
         protected Builder self() {
             return this;
+        }
+
+        /**
+         * Sets the minimum and maximum clip value of LSTM states.
+         *
+         * @param lstmStateClipMin the minimum clip value of LSTM states
+         * @param lstmStateClipMax the maximum clip value of LSTM states
+         * @return this Builder
+         */
+        public Builder optLstmStateClipMin(float lstmStateClipMin, float lstmStateClipMax) {
+            this.lstmStateClipMin = lstmStateClipMin;
+            this.lstmStateClipMax = lstmStateClipMax;
+            this.clipLstmState = true;
+            return self();
         }
 
         /**

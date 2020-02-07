@@ -12,14 +12,35 @@
  */
 package ai.djl.nn.recurrent;
 
+import ai.djl.Device;
+import ai.djl.MalformedModelException;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.types.LayoutType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Block;
+import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
+import ai.djl.nn.ParameterType;
+import ai.djl.training.ParameterStore;
+import ai.djl.util.PairList;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are implemented,
  * with both multi-layer and bidirectional support.
  */
 public abstract class RecurrentCell extends ParameterBlock {
+    private static final LayoutType[] EXPECTED_LAYOUT = {
+        LayoutType.BATCH, LayoutType.TIME, LayoutType.CHANNEL
+    };
 
     protected long stateSize;
     protected float dropRate;
@@ -27,7 +48,12 @@ public abstract class RecurrentCell extends ParameterBlock {
     protected String mode;
     protected boolean useSequenceLength;
     protected boolean useBidirectional;
+    protected int gates;
+    protected byte currentVersion = 1;
     protected boolean stateOutputs;
+
+    protected Shape stateShape;
+    protected List<Parameter> parameters = new ArrayList<>();
 
     /**
      * Creates a {@code RecurrentCell} object.
@@ -41,6 +67,31 @@ public abstract class RecurrentCell extends ParameterBlock {
         useSequenceLength = builder.useSequenceLength;
         useBidirectional = builder.useBidirectional;
         stateOutputs = builder.stateOutputs;
+
+        for (int i = 0; i < numStackedLayers; i++) {
+            // Preserve this order of parameters. It is important to maintain this order as we
+            // concat the parameters.
+            parameters.add(
+                    new Parameter(String.format("l%d_i2h_weight", i), this, ParameterType.WEIGHT));
+            parameters.add(
+                    new Parameter(String.format("l%d_h2h_weight", i), this, ParameterType.WEIGHT));
+            parameters.add(
+                    new Parameter(String.format("l%d_i2h_bias", i), this, ParameterType.BIAS));
+            parameters.add(
+                    new Parameter(String.format("l%d_h2h_bias", i), this, ParameterType.BIAS));
+            if (useBidirectional) {
+                parameters.add(
+                        new Parameter(
+                                String.format("r%d_i2h_weight", i), this, ParameterType.WEIGHT));
+                parameters.add(
+                        new Parameter(
+                                String.format("r%d_h2h_weight", i), this, ParameterType.WEIGHT));
+                parameters.add(
+                        new Parameter(String.format("r%d_i2h_bias", i), this, ParameterType.BIAS));
+                parameters.add(
+                        new Parameter(String.format("r%d_h2h_bias", i), this, ParameterType.BIAS));
+            }
+        }
     }
 
     protected void validateInputSize(NDList inputs) {
@@ -55,6 +106,121 @@ public abstract class RecurrentCell extends ParameterBlock {
                             + " when useSequenceLength is "
                             + useSequenceLength);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList forward(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        inputs = opInputs(parameterStore, inputs);
+        NDArrayEx ex = inputs.head().getNDArrayInternal();
+        NDList output =
+                ex.rnn(
+                        inputs,
+                        mode,
+                        stateSize,
+                        dropRate,
+                        numStackedLayers,
+                        useSequenceLength,
+                        useBidirectional,
+                        stateOutputs,
+                        params);
+
+        NDList result = new NDList(output.head().transpose(1, 0, 2));
+        if (stateOutputs) {
+            result.add(output.get(1));
+        }
+        return result;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+        // Input shape at this point is TNC. Output Shape should be NTS
+        Shape inputShape = inputs[0];
+        return new Shape[] {new Shape(inputShape.get(1), inputShape.get(0), stateSize)};
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Parameter> getDirectParameters() {
+        return parameters;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void beforeInitialize(Shape[] inputs) {
+        this.inputShapes = inputs;
+        Shape inputShape = inputs[0];
+        Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
+        long batchSize = inputShape.get(0);
+        inputs[0] = new Shape(inputShape.get(1), inputShape.get(0), inputShape.get(2));
+        stateShape = new Shape(numStackedLayers, batchSize, stateSize);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
+        Shape shape = inputShapes[0];
+        long inputSize = shape.get(2);
+        if (name.contains("bias")) {
+            return new Shape(gates * stateSize);
+        }
+        if (name.contains("i2h")) {
+            return new Shape(gates * stateSize, inputSize);
+        }
+        if (name.contains("h2h")) {
+            return new Shape(gates * stateSize, stateSize);
+        }
+        throw new IllegalArgumentException("Invalid parameter name");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(currentVersion);
+        for (Parameter parameter : parameters) {
+            parameter.save(os);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException {
+        byte version = is.readByte();
+        if (version != this.currentVersion) {
+            throw new MalformedModelException("Unsupported encoding version: " + version);
+        }
+        for (Parameter parameter : parameters) {
+            parameter.load(manager, is);
+        }
+    }
+
+    protected NDList opInputs(ParameterStore parameterStore, NDList inputs) {
+        validateInputSize(inputs);
+        inputs = updateInputLayoutToTNC(inputs);
+        NDArray head = inputs.head();
+        Device device = head.getDevice();
+
+        NDList result = new NDList(head);
+        try (NDList parameterList = new NDList()) {
+            for (Parameter parameter : parameters) {
+                NDArray array = parameterStore.getValue(parameter, device);
+                parameterList.add(array.flatten());
+            }
+            NDArray array = NDArrays.concat(parameterList);
+            result.add(array);
+        }
+        result.add(inputs.head().getManager().zeros(stateShape));
+        if (useSequenceLength) {
+            result.add(inputs.get(1));
+        }
+        return result;
+    }
+
+    protected NDList updateInputLayoutToTNC(NDList inputs) {
+        return new NDList(inputs.singletonOrThrow().transpose(1, 0, 2));
     }
 
     /** The Builder to construct a {@link RecurrentCell} type of {@link ai.djl.nn.Block}. */
@@ -85,20 +251,6 @@ public abstract class RecurrentCell extends ParameterBlock {
         }
 
         /**
-         * Sets the minimum and maximum clip value of LSTM states.
-         *
-         * @param lstmStateClipMin the minimum clip value of LSTM states
-         * @param lstmStateClipMax the maximum clip value of LSTM states
-         * @return this Builder
-         */
-        public T optLstmStateClipMin(float lstmStateClipMin, float lstmStateClipMax) {
-            this.lstmStateClipMin = lstmStateClipMin;
-            this.lstmStateClipMax = lstmStateClipMax;
-            this.clipLstmState = true;
-            return self();
-        }
-
-        /**
          * Sets the <b>Required</b> size of the state for each layer.
          *
          * @param stateSize the size of the state for each layer
@@ -117,17 +269,6 @@ public abstract class RecurrentCell extends ParameterBlock {
          */
         public T setNumStackedLayers(int numStackedLayers) {
             this.numStackedLayers = numStackedLayers;
-            return self();
-        }
-
-        /**
-         * Sets the activation for the RNN - ReLu or Tanh.
-         *
-         * @param activation the activation
-         * @return this Builder
-         */
-        public T setActivation(RNN.Activation activation) {
-            this.activation = activation;
             return self();
         }
 

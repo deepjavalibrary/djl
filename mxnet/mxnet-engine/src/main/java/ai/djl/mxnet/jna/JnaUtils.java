@@ -644,6 +644,13 @@ public final class JnaUtils {
                         gradSparseFormatRef));
     }
 
+    public static Pointer autogradGetSymbol(NDArray array) {
+        Pointer handle = ((MxNDArray) array).getHandle();
+        PointerByReference out = new PointerByReference();
+        checkCall(LIB.MXAutogradGetSymbol(handle, out));
+        return out.getValue();
+    }
+
     public static int isNumpyMode() {
         IntBuffer ret = IntBuffer.allocate(1);
         checkCall(LIB.MXIsNumpyShape(ret));
