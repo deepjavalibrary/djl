@@ -33,7 +33,7 @@
         },
         "model": {
           "uri": "0.0.1/traced_resnet50.pt.gz",
-          "sha1Hash": "7a6af726e3596bd54633f25357acfa869b424d00",
+          "sha1Hash": "dabcf25f827f4fa163a91899ea11f45e82c9fb60",
           "size": 95229629
         }
       }

@@ -141,11 +141,8 @@ public final class BufferedImageUtils {
                 }
             }
         }
-
-        NDArray array = manager.create(new Shape(height, width, channel), DataType.UINT8);
         bb.rewind();
-        array.set(bb);
-        return array;
+        return manager.create(bb, new Shape(height, width, channel), DataType.UINT8);
     }
 
     /**
