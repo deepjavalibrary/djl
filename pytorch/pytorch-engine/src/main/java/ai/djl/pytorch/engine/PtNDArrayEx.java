@@ -377,7 +377,7 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public PtNDArray toTensor() {
-        return JniUtils.div(array, 255);
+        return JniUtils.toTensor(array);
     }
 
     /** {@inheritDoc} */

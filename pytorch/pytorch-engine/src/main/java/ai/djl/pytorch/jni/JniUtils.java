@@ -367,6 +367,11 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.resize(ndArray.getHandle(), size, alignCorners));
     }
 
+    public static PtNDArray toTensor(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.toTensor(ndArray.getHandle()));
+    }
+
     public static DataType getDataType(PtNDArray ndArray) {
         int dataType = PyTorchLibrary.LIB.torchDType(ndArray.getHandle());
         return DataType.values()[dataType];
