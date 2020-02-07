@@ -1213,7 +1213,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         // be careful that MXNet numpy argsort op didn't officially support this param
         params.addParam("is_ascend", ascending);
         params.setDataType(DataType.INT32);
-        return manager.invoke("argsort", this, params);
+        return manager.invoke("argsort", this, params).toType(DataType.INT64, false);
     }
 
     /** {@inheritDoc} */
@@ -1479,7 +1479,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray argMax() {
-        return manager.invoke("_npi_argmax", this, null);
+        // TODO MXNet engine bug
+        return manager.invoke("_npi_argmax", this, null).toType(DataType.INT64, false);
     }
 
     /** {@inheritDoc} */
@@ -1487,7 +1488,8 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray argMax(int axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
-        return manager.invoke("_npi_argmax", this, params);
+        // TODO MXNet engine bug
+        return manager.invoke("_npi_argmax", this, params).toType(DataType.INT64, false);
     }
 
     /** {@inheritDoc} */
@@ -1498,7 +1500,7 @@ public class MxNDArray extends NativeResource implements NDArray {
             throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");
         }
         NDArray array = (isScalar()) ? reshape(1) : this;
-        try (NDArray temp = manager.invoke("argmin", array, null)) {
+        try (NDArray temp = manager.invoke("argmin", array, null).toType(DataType.INT64, false)) {
             return temp.reshape(new Shape());
         }
     }
@@ -1510,7 +1512,7 @@ public class MxNDArray extends NativeResource implements NDArray {
         NDArray array = (isScalar()) ? reshape(1) : this;
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
-        NDArray temp = manager.invoke("argmin", array, params);
+        NDArray temp = manager.invoke("argmin", array, params).toType(DataType.INT64, false);
         if (isScalar()) {
             NDArray res = temp.reshape(new Shape());
             temp.close();

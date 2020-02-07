@@ -15,6 +15,7 @@ package ai.djl.training.evaluator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.util.Pair;
 import java.util.stream.IntStream;
 
@@ -73,7 +74,7 @@ public class TopKAccuracy extends Accuracy {
         // number of labels and predictions should be the same
         checkLabelShapes(label, prediction);
         // ascending by default
-        NDArray topKPrediction = prediction.argSort(axis);
+        NDArray topKPrediction = prediction.argSort(axis).toType(DataType.INT32, false);
         int numDims = topKPrediction.getShape().dimension();
         NDArray numCorrect;
         if (numDims == 1) {

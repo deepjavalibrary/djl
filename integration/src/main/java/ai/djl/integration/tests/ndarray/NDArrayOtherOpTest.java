@@ -318,22 +318,24 @@ public class NDArrayOtherOpTest {
         // TODO switch to numpy argsort
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {-1f, 2f, 0f, 999f, -998f});
-            NDArray expected = manager.create(new int[] {4, 0, 2, 1, 3});
+            NDArray expected = manager.create(new long[] {4, 0, 2, 1, 3});
             Assert.assertEquals(array.argSort(), expected);
             // multi-dim
             array =
                     manager.create(
                             new float[] {-1.000f, -0.009f, -0.0001f, 0.0001f, 0.12f, 0.1201f},
                             new Shape(2, 1, 1, 3, 1));
-            expected = manager.zeros(new Shape(2, 1, 1, 3, 1), DataType.INT32);
+            expected = manager.zeros(new Shape(2, 1, 1, 3, 1), DataType.INT64);
             Assert.assertEquals(array.argSort(), expected);
             // test axis
             array = manager.arange(10).reshape(2, 1, 5);
-            expected = manager.create(new int[] {0, 0, 0, 0, 0, 1, 1, 1, 1, 1}, new Shape(2, 1, 5));
+            expected =
+                    manager.create(new long[] {0, 0, 0, 0, 0, 1, 1, 1, 1, 1}, new Shape(2, 1, 5));
             Assert.assertEquals(array.argSort(0), expected);
-            expected = manager.zeros(new Shape(2, 1, 5), DataType.INT32);
+            expected = manager.zeros(new Shape(2, 1, 5), DataType.INT64);
             Assert.assertEquals(array.argSort(1), expected);
-            expected = manager.create(new int[] {0, 1, 2, 3, 4, 0, 1, 2, 3, 4}, new Shape(2, 1, 5));
+            expected =
+                    manager.create(new long[] {0, 1, 2, 3, 4, 0, 1, 2, 3, 4}, new Shape(2, 1, 5));
             Assert.assertEquals(array.argSort(2), expected);
         }
     }
@@ -651,22 +653,22 @@ public class NDArrayOtherOpTest {
                             },
                             new Shape(4, 5));
             NDArray argMax = array.argMax();
-            NDArray expected = manager.create(9f);
+            NDArray expected = manager.create(9L);
             Assert.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             argMax = array.argMax(0);
-            expected = manager.create(new float[] {2, 2, 2, 1, 1});
+            expected = manager.create(new long[] {2, 2, 2, 1, 1});
             Assert.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             argMax = array.argMax(1);
-            expected = manager.create(new float[] {3, 4, 0, 2});
+            expected = manager.create(new long[] {3, 4, 0, 2});
             Assert.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             // scalar
             array = manager.create(5f);
             // TODO the dtype should be int instead of float
             // Bug in MXNet to fix
-            expected = manager.create(0f);
+            expected = manager.create(0L);
             Assert.assertEquals(array.argMax(), expected);
             Assert.assertEquals(array.argMax(0), expected);
 
@@ -688,26 +690,26 @@ public class NDArrayOtherOpTest {
                             },
                             new Shape(4, 5));
             NDArray argMin = array.argMin();
-            NDArray expected = manager.create(8f);
+            NDArray expected = manager.create(8L);
             Assert.assertEquals(argMin, expected, "ArgMin: Incorrect value");
 
             argMin = array.argMin(0);
-            expected = manager.create(new float[] {0, 2, 3, 1, 2});
+            expected = manager.create(new long[] {0, 2, 3, 1, 2});
             Assert.assertEquals(argMin, expected, "ArgMin: Incorrect value");
 
             argMin = array.argMin(1);
-            expected = manager.create(new float[] {0, 3, 4, 2});
+            expected = manager.create(new long[] {0, 3, 4, 2});
             Assert.assertEquals(argMin, expected, "ArgMin: Incorrect value");
 
             // scalar
             array = manager.create(1f);
-            expected = manager.create(0f);
+            expected = manager.create(0L);
             Assert.assertEquals(array.argMin(), expected, "ArgMin: Incorrect value");
             Assert.assertEquals(array.argMin(0), expected, "ArgMin: Incorrect value");
 
             // zero-dim
             array = manager.create(new Shape(0, 1, 0));
-            expected = manager.create(new Shape(0, 0));
+            expected = manager.create(new Shape(0, 0), DataType.INT64);
             Assert.assertEquals(array.argMin(1), expected, "ArgMin: Incorrect value");
         }
     }

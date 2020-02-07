@@ -3245,12 +3245,12 @@ public interface NDArray extends AutoCloseable {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {3f, 1f, 2f});
      * jshell&gt; array.argSort();
-     * ND: (3) cpu(0) int32
+     * ND: (3) cpu(0) int64
      * [ 1,  2,  0]
      *
      * jshell&gt; array = manager.create(new float[] {0f, 3f, 2f, 2f}, new Shape(2, 2));
      * jshell&gt; array.argSort();
-     * ND: (2, 2) cpu(0) int32
+     * ND: (2, 2) cpu(0) int64
      * [[ 0,  1],
      *  [ 0,  1],
      * ]
@@ -3275,12 +3275,12 @@ public interface NDArray extends AutoCloseable {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {0f, 3f, 2f, 2f}, new Shape(2, 2));
      * jshell&gt; array.argSort(0);
-     * ND: (2, 2) cpu(0) int32
+     * ND: (2, 2) cpu(0) int64
      * [[ 0,  1],
      *  [ 1,  0],
      * ]
      * jshell&gt; array.argSort(1);
-     * ND: (2, 2) cpu(0) int32
+     * ND: (2, 2) cpu(0) int64
      * [[ 0,  1],
      *  [ 0,  1],
      * ]
@@ -3304,11 +3304,11 @@ public interface NDArray extends AutoCloseable {
      * <p>Examples
      *
      * <pre>
-     * jshell&gt; NDArray array = manager.create(new float[] {1f, 4f, 3f, 1f}, new Shape(2, 2));
-     * jshell&gt; array.sort();
-     * ND: (2, 2) cpu(0) float32
-     * [[1., 4.],
-     *  [1., 3.],
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 3f, 2f, 2f}, new Shape(2, 2));
+     * jshell&gt; array.argSort(0, false);
+     * ND: (2, 2) cpu(0) int64
+     * [[ 1,  0],
+     *  [ 0,  1],
      * ]
      * </pre>
      *
@@ -3973,7 +3973,7 @@ public interface NDArray extends AutoCloseable {
      *  [3., 4., 5.],
      * ]
      * jshell&gt; array.argMax();
-     * ND: () cpu(0) float32
+     * ND: () cpu(0) int64
      * 5.
      * </pre>
      *
@@ -3994,11 +3994,11 @@ public interface NDArray extends AutoCloseable {
      *  [3., 4., 5.],
      * ]
      * jshell&gt; array.argMax(0);
-     * ND: (3) cpu(0) float32
-     * [1., 1., 1.]
+     * ND: (3) cpu(0) int64
+     * [1, 1, 1]
      * jshell&gt; array.argMax(1);
-     * ND: (2) cpu(0) float32
-     * [2., 2.]
+     * ND: (2) cpu(0) int64
+     * [2, 2]
      * </pre>
      *
      * @param axis the axis along which to find maximum values
@@ -4019,7 +4019,7 @@ public interface NDArray extends AutoCloseable {
      *  [3., 4., 5.],
      * ]
      * jshell&gt; array.argMin();
-     * ND: () cpu(0) float32
+     * ND: () cpu(0) int64
      * 0.
      * </pre>
      *
@@ -4040,11 +4040,11 @@ public interface NDArray extends AutoCloseable {
      *  [3., 4., 5.],
      * ]
      * jshell&gt; array.argMin(0);
-     * ND: (3) cpu(0) float32
-     * [0., 0., 0.]
+     * ND: (3) cpu(0) int64
+     * [0, 0, 0]
      * jshell&gt; array.argMin(1);
-     * ND: (2) cpu(0) float32
-     * [0., 0.]
+     * ND: (2) cpu(0) int64
+     * [0, 0]
      * </pre>
      *
      * @param axis the axis along which to find minimum values

@@ -49,10 +49,7 @@ public class SingleShotDetectionAccuracy extends Accuracy {
         NDArray predictionReduced = classPredictions.argMax(-1);
         long total = classLabels.size();
         NDArray numCorrect =
-                classLabels
-                        .toType(DataType.INT64, false)
-                        .eq(predictionReduced.toType(DataType.INT64, false))
-                        .countNonzero();
+                classLabels.toType(DataType.INT64, false).eq(predictionReduced).countNonzero();
         return new Pair<>(total, numCorrect);
     }
 }
