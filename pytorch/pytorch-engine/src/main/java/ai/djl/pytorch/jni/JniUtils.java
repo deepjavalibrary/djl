@@ -228,6 +228,16 @@ public final class JniUtils {
         return list;
     }
 
+    public static PtNDArray squeeze(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchSqueeze(ndArray.getHandle()));
+    }
+
+    public static PtNDArray squeeze(PtNDArray ndArray, int axis) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchSqueeze(ndArray.getHandle(), axis));
+    }
+
     public static PtNDArray abs(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchAbs(ndArray.getHandle()));

@@ -97,6 +97,10 @@ public final class PyTorchLibrary {
 
     public native Pointer[] torchSplit(Pointer handle, long[] indices, long dim);
 
+    public native Pointer torchSqueeze(Pointer handle);
+
+    public native Pointer torchSqueeze(Pointer handle, int axis);
+
     public native Pointer torchStack(Pointer[] handles, long dim);
 
     public native Pointer torchAbs(Pointer handle);

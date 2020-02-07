@@ -730,7 +730,20 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public PtNDArray squeeze() {
+        return JniUtils.squeeze(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArray squeeze(int axis) {
+        return JniUtils.squeeze(this, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray squeeze(int[] axes) {
+        // TODO: add workaround for PyTorch
         throw new UnsupportedOperationException("Not implemented");
     }
 
