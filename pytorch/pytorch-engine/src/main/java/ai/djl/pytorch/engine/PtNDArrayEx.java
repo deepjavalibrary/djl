@@ -39,165 +39,165 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public PtNDArray rdiv(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rdiv(NDArray b) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rdivi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rdivi(NDArray b) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rsub(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rsub(NDArray b) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rsubi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rsubi(NDArray b) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rmod(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rmod(NDArray b) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rmodi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rmodi(NDArray b) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rpow(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rpowi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray relu() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray sigmoid() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray tanh() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray softrelu() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray softsign() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray leakyRelu(float alpha) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray elu(float alpha) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray selu() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray gelu() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray maxPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray globalMaxPool() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray sumPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray globalSumPool() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -208,13 +208,13 @@ public class PtNDArrayEx implements NDArrayEx {
             Shape pad,
             PoolingConvention poolingConvention,
             boolean countIncludePad) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray globalAvgPool() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -225,13 +225,13 @@ public class PtNDArrayEx implements NDArrayEx {
             Shape pad,
             PoolingConvention poolingConvention,
             int pValue) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray globalLpPool(int pValue) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -246,7 +246,9 @@ public class PtNDArrayEx implements NDArrayEx {
             float beta1,
             float beta2,
             float epsilon,
-            boolean lazyUpdate) {}
+            boolean lazyUpdate) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -257,7 +259,9 @@ public class PtNDArrayEx implements NDArrayEx {
             float weightDecay,
             float rescaleGrad,
             float clipGrad,
-            float momentum) {}
+            float momentum) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -269,7 +273,9 @@ public class PtNDArrayEx implements NDArrayEx {
             float rescaleGrad,
             float clipGrad,
             float momentum,
-            boolean lazyUpdate) {}
+            boolean lazyUpdate) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -284,7 +290,7 @@ public class PtNDArrayEx implements NDArrayEx {
             String layout,
             boolean noBias,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -295,7 +301,7 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean flatten,
             boolean noBias,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -306,13 +312,13 @@ public class PtNDArrayEx implements NDArrayEx {
             int embeddingSize,
             DataType dataType,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList prelu(NDList inputs, PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -321,7 +327,7 @@ public class PtNDArrayEx implements NDArrayEx {
             float probability,
             int[] sharedAxes,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -334,7 +340,7 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean center,
             boolean scale,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -349,7 +355,7 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean useBidirectional,
             boolean stateOutputs,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -365,7 +371,7 @@ public class PtNDArrayEx implements NDArrayEx {
             double lstmStateClipMin,
             double lstmStateClipMax,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */

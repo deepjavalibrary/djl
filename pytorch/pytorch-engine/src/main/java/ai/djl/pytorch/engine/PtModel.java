@@ -122,7 +122,9 @@ public class PtModel extends BaseModel {
     }
 
     @Override
-    public void cast(DataType dataType) {}
+    public void cast(DataType dataType) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     @Override
     public void close() {}

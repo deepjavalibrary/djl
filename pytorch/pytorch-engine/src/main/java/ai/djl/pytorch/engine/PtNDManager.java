@@ -202,7 +202,9 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public void invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {}
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override

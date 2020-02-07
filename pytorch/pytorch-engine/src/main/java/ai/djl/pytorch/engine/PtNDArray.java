@@ -170,19 +170,27 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void set(Buffer data) {}
+    public void set(Buffer data) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override
-    public void set(NDIndex index, NDArray value) {}
+    public void set(NDIndex index, NDArray value) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override
-    public void set(NDIndex index, Number value) {}
+    public void set(NDIndex index, Number value) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override
-    public void setScalar(NDIndex index, Number value) {}
+    public void setScalar(NDIndex index, Number value) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -197,7 +205,9 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void copyTo(NDArray array) {}
+    public void copyTo(NDArray array) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -220,7 +230,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
-        return false;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */

@@ -97,7 +97,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
 
     @Override
     public boolean isInitialized() {
-        return false;
+        return true;
     }
 
     @Override
