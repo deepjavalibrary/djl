@@ -19,7 +19,7 @@ sudo yum install java-1.8.0-openjdk
 
 For Mac:
 ```bash
-brew tap caskroom/versions
+brew tap homebrew/cask-versions
 brew update
 brew cask install adoptopenjdk8
 ```
