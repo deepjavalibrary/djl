@@ -19,7 +19,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.NDIndexFullSlice;
-import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -137,13 +136,13 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray toDevice(Device device, boolean copy) {
+    public PtNDArray toDevice(Device device, boolean copy) {
         return JniUtils.to(this, getDataType(), device, copy);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray toType(DataType dataType, boolean copy) {
+    public PtNDArray toType(DataType dataType, boolean copy) {
         return JniUtils.to(this, dataType, getDevice(), copy);
     }
 
@@ -159,7 +158,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getGradient() {
+    public PtNDArray getGradient() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -187,7 +186,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray get(NDIndex index) {
+    public PtNDArray get(NDIndex index) {
         // TODO add full support of index and refactor NDIndex
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
         if (isScalar()) {
@@ -202,19 +201,19 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray booleanMask(NDArray index, int axis) {
+    public PtNDArray booleanMask(NDArray index, int axis) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zerosLike() {
+    public PtNDArray zerosLike() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray onesLike() {
+    public PtNDArray onesLike() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -232,469 +231,469 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eq(Number other) {
+    public PtNDArray eq(Number other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eq(NDArray other) {
+    public PtNDArray eq(NDArray other) {
         return JniUtils.eq(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray neq(Number other) {
+    public PtNDArray neq(Number other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray neq(NDArray other) {
+    public PtNDArray neq(NDArray other) {
         return JniUtils.neq(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gt(Number other) {
+    public PtNDArray gt(Number other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gt(NDArray other) {
+    public PtNDArray gt(NDArray other) {
         return JniUtils.gt(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gte(Number other) {
+    public PtNDArray gte(Number other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gte(NDArray other) {
+    public PtNDArray gte(NDArray other) {
         return JniUtils.gte(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lt(Number other) {
+    public PtNDArray lt(Number other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lt(NDArray other) {
+    public PtNDArray lt(NDArray other) {
         return JniUtils.lt(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lte(Number other) {
+    public PtNDArray lte(Number other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lte(NDArray other) {
+    public PtNDArray lte(NDArray other) {
         return JniUtils.lte(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray add(Number n) {
+    public PtNDArray add(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray add(NDArray other) {
+    public PtNDArray add(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sub(Number n) {
+    public PtNDArray sub(Number n) {
         return JniUtils.sub(this, n.doubleValue());
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sub(NDArray other) {
+    public PtNDArray sub(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mul(Number n) {
+    public PtNDArray mul(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mul(NDArray other) {
+    public PtNDArray mul(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray div(Number n) {
+    public PtNDArray div(Number n) {
         return JniUtils.div(this, n.doubleValue());
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray div(NDArray other) {
+    public PtNDArray div(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mod(Number n) {
+    public PtNDArray mod(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mod(NDArray other) {
+    public PtNDArray mod(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray pow(Number n) {
+    public PtNDArray pow(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray pow(NDArray other) {
+    public PtNDArray pow(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray addi(Number n) {
+    public PtNDArray addi(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray addi(NDArray other) {
+    public PtNDArray addi(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray subi(Number n) {
+    public PtNDArray subi(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray subi(NDArray other) {
+    public PtNDArray subi(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(Number n) {
+    public PtNDArray muli(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray muli(NDArray others) {
+    public PtNDArray muli(NDArray others) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray divi(Number n) {
+    public PtNDArray divi(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray divi(NDArray other) {
+    public PtNDArray divi(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray modi(Number n) {
+    public PtNDArray modi(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray modi(NDArray other) {
+    public PtNDArray modi(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray powi(Number n) {
+    public PtNDArray powi(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray powi(NDArray other) {
+    public PtNDArray powi(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray maximum(Number n) {
+    public PtNDArray maximum(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray maximum(NDArray other) {
+    public PtNDArray maximum(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray minimum(Number n) {
+    public PtNDArray minimum(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray minimum(NDArray other) {
+    public PtNDArray minimum(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray neg() {
+    public PtNDArray neg() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray negi() {
+    public PtNDArray negi() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray abs() {
+    public PtNDArray abs() {
         return JniUtils.abs(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray square() {
+    public PtNDArray square() {
         return JniUtils.sqrt(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cbrt() {
+    public PtNDArray cbrt() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray floor() {
+    public PtNDArray floor() {
         return JniUtils.floor(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ceil() {
+    public PtNDArray ceil() {
         return JniUtils.ceil(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray round() {
+    public PtNDArray round() {
         return JniUtils.round(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray trunc() {
+    public PtNDArray trunc() {
         return JniUtils.trunc(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray exp() {
+    public PtNDArray exp() {
         return JniUtils.exp(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray log() {
+    public PtNDArray log() {
         return JniUtils.log(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray log10() {
+    public PtNDArray log10() {
         return JniUtils.log10(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray log2() {
+    public PtNDArray log2() {
         return JniUtils.log2(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sin() {
+    public PtNDArray sin() {
         return JniUtils.sin(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cos() {
+    public PtNDArray cos() {
         return JniUtils.cos(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tan() {
+    public PtNDArray tan() {
         return JniUtils.tan(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asin() {
+    public PtNDArray asin() {
         return JniUtils.asin(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray acos() {
+    public PtNDArray acos() {
         return JniUtils.acos(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray atan() {
+    public PtNDArray atan() {
         return JniUtils.atan(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sinh() {
+    public PtNDArray sinh() {
         return JniUtils.sinh(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cosh() {
+    public PtNDArray cosh() {
         return JniUtils.cosh(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tanh() {
+    public PtNDArray tanh() {
         return JniUtils.tanh(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray asinh() {
+    public PtNDArray asinh() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray acosh() {
+    public PtNDArray acosh() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray atanh() {
+    public PtNDArray atanh() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray toDegrees() {
+    public PtNDArray toDegrees() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray toRadians() {
+    public PtNDArray toRadians() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray max() {
+    public PtNDArray max() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray max(int[] axes, boolean keepDims) {
+    public PtNDArray max(int[] axes, boolean keepDims) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray min() {
+    public PtNDArray min() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray min(int[] axes, boolean keepDims) {
+    public PtNDArray min(int[] axes, boolean keepDims) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sum() {
+    public PtNDArray sum() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sum(int[] axes, boolean keepDims) {
+    public PtNDArray sum(int[] axes, boolean keepDims) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray prod() {
+    public PtNDArray prod() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray prod(int[] axes, boolean keepDims) {
+    public PtNDArray prod(int[] axes, boolean keepDims) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mean() {
+    public PtNDArray mean() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray mean(int[] axes, boolean keepDims) {
+    public PtNDArray mean(int[] axes, boolean keepDims) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray trace(int offset, int axis1, int axis2) {
+    public PtNDArray trace(int offset, int axis1, int axis2) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -713,73 +712,73 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray flatten() {
+    public PtNDArray flatten() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshape(Shape shape) {
+    public PtNDArray reshape(Shape shape) {
         return JniUtils.reshape(this, shape.getShape());
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray expandDims(int axis) {
+    public PtNDArray expandDims(int axis) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray squeeze(int[] axes) {
+    public PtNDArray squeeze(int[] axes) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logicalAnd(NDArray other) {
+    public PtNDArray logicalAnd(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logicalOr(NDArray other) {
+    public PtNDArray logicalOr(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logicalXor(NDArray other) {
+    public PtNDArray logicalXor(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logicalNot() {
+    public PtNDArray logicalNot() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argSort(int axis, boolean ascending) {
+    public PtNDArray argSort(int axis, boolean ascending) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sort() {
+    public PtNDArray sort() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sort(int axis) {
+    public PtNDArray sort(int axis) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, double temperature) {
+    public PtNDArray softmax(int[] axes, double temperature) {
         if (temperature != 1.0) {
             throw new UnsupportedOperationException("PyTorch softmax didn't suuport temperature");
         }
@@ -788,193 +787,193 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logSoftmax(int[] axes, double temperature) {
+    public PtNDArray logSoftmax(int[] axes, double temperature) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumSum() {
+    public PtNDArray cumSum() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumSum(int axis) {
+    public PtNDArray cumSum(int axis) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray isInfinite() {
+    public PtNDArray isInfinite() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray isNaN() {
+    public PtNDArray isNaN() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createMask(NDIndex index) {
+    public PtNDArray createMask(NDIndex index) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createMask(Predicate<Number> predicate) {
+    public PtNDArray createMask(Predicate<Number> predicate) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(long repeats) {
+    public PtNDArray tile(long repeats) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(int axis, long repeats) {
+    public PtNDArray tile(int axis, long repeats) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(long[] repeats) {
+    public PtNDArray tile(long[] repeats) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tile(Shape desiredShape) {
+    public PtNDArray tile(Shape desiredShape) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(long repeats) {
+    public PtNDArray repeat(long repeats) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(int axis, long repeats) {
+    public PtNDArray repeat(int axis, long repeats) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(long[] repeats) {
+    public PtNDArray repeat(long[] repeats) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray repeat(Shape desiredShape) {
+    public PtNDArray repeat(Shape desiredShape) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray dot(NDArray other) {
+    public PtNDArray dot(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray clip(Number min, Number max) {
+    public PtNDArray clip(Number min, Number max) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose() {
+    public PtNDArray transpose() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose(int... axes) {
+    public PtNDArray transpose(int... axes) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray broadcast(Shape shape) {
+    public PtNDArray broadcast(Shape shape) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax() {
+    public PtNDArray argMax() {
         return JniUtils.argMax(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax(int axis) {
+    public PtNDArray argMax(int axis) {
         return JniUtils.argMax(this, axis, false);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin() {
+    public PtNDArray argMin() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin(int axis) {
+    public PtNDArray argMin(int axis) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray percentile(Number percentile) {
+    public PtNDArray percentile(Number percentile) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray percentile(Number percentile, int[] axes) {
+    public PtNDArray percentile(Number percentile, int[] axes) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray median() {
+    public PtNDArray median() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray median(int[] axes) {
+    public PtNDArray median(int[] axes) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray toDense() {
+    public PtNDArray toDense() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray toSparse(SparseFormat fmt) {
+    public PtNDArray toSparse(SparseFormat fmt) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray nonzero() {
+    public PtNDArray nonzero() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArrayEx getNDArrayInternal() {
+    public PtNDArrayEx getNDArrayInternal() {
         return ptNDArrayEx;
     }
 

@@ -16,7 +16,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "resnet50",
+      "name": "traced_resnet50",
       "properties": {
         "layers": "50",
         "dataset": "imagenet"

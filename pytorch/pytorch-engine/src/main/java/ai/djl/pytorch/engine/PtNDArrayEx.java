@@ -38,171 +38,171 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rdiv(Number n) {
+    public PtNDArray rdiv(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rdiv(NDArray b) {
+    public PtNDArray rdiv(NDArray b) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rdivi(Number n) {
+    public PtNDArray rdivi(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rdivi(NDArray b) {
+    public PtNDArray rdivi(NDArray b) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rsub(Number n) {
+    public PtNDArray rsub(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rsub(NDArray b) {
+    public PtNDArray rsub(NDArray b) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rsubi(Number n) {
+    public PtNDArray rsubi(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rsubi(NDArray b) {
+    public PtNDArray rsubi(NDArray b) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rmod(Number n) {
+    public PtNDArray rmod(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rmod(NDArray b) {
+    public PtNDArray rmod(NDArray b) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rmodi(Number n) {
+    public PtNDArray rmodi(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rmodi(NDArray b) {
+    public PtNDArray rmodi(NDArray b) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rpow(Number n) {
+    public PtNDArray rpow(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rpowi(Number n) {
+    public PtNDArray rpowi(Number n) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray relu() {
+    public PtNDArray relu() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sigmoid() {
+    public PtNDArray sigmoid() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray tanh() {
+    public PtNDArray tanh() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softrelu() {
+    public PtNDArray softrelu() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softsign() {
+    public PtNDArray softsign() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray leakyRelu(float alpha) {
+    public PtNDArray leakyRelu(float alpha) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray elu(float alpha) {
+    public PtNDArray elu(float alpha) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray selu() {
+    public PtNDArray selu() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gelu() {
+    public PtNDArray gelu() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray maxPool(
+    public PtNDArray maxPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray globalMaxPool() {
+    public PtNDArray globalMaxPool() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sumPool(
+    public PtNDArray sumPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray globalSumPool() {
+    public PtNDArray globalSumPool() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray avgPool(
+    public PtNDArray avgPool(
             Shape kernel,
             Shape stride,
             Shape pad,
@@ -213,13 +213,13 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray globalAvgPool() {
+    public PtNDArray globalAvgPool() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lpPool(
+    public PtNDArray lpPool(
             Shape kernel,
             Shape stride,
             Shape pad,
@@ -230,7 +230,7 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray globalLpPool(int pValue) {
+    public PtNDArray globalLpPool(int pValue) {
         return null;
     }
 
@@ -370,46 +370,49 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray normalize(float[] mean, float[] std) {
+    public PtNDArray normalize(float[] mean, float[] std) {
         return JniUtils.normalize(array, mean, std);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray toTensor() {
+    public PtNDArray toTensor() {
         return JniUtils.div(array, 255);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray resize(int width, int height) {
+    public PtNDArray resize(int width, int height) {
         if (array.isEmpty()) {
             throw new IllegalArgumentException("attempt to resize of an empty NDArray");
+        }
+        if (array.getDataType() != DataType.FLOAT32) {
+            array = array.toType(DataType.FLOAT32, true);
         }
         return JniUtils.resize(array, new long[] {height, width}, true);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray crop(int x, int y, int width, int height) {
-        return null;
+    public PtNDArray crop(int x, int y, int width, int height) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
-        return null;
+    public PtNDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray where(NDArray condition, NDArray other) {
-        return null;
+    public PtNDArray where(NDArray condition, NDArray other) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray stack(NDList arrays, int axis) {
+    public PtNDArray stack(NDList arrays, int axis) {
         NDArray[] srcArray = new NDArray[arrays.size() + 1];
         srcArray[0] = array;
         System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
@@ -418,8 +421,8 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray concat(NDList arrays, int axis) {
-        return null;
+    public PtNDArray concat(NDList arrays, int axis) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -431,7 +434,7 @@ public class PtNDArrayEx implements NDArrayEx {
             float negativeMiningRatio,
             float negativeMiningThreshold,
             int minNegativeSamples) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -442,7 +445,7 @@ public class PtNDArrayEx implements NDArrayEx {
             List<Float> steps,
             List<Float> offsets,
             boolean clip) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -455,12 +458,12 @@ public class PtNDArrayEx implements NDArrayEx {
             float nmsThreshold,
             boolean forceSuppress,
             int nmsTopK) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getArray() {
+    public PtNDArray getArray() {
         return array;
     }
 

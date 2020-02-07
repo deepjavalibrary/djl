@@ -14,7 +14,6 @@ package ai.djl.pytorch.zoo.cv.classification;
 
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.ImageClassificationTranslator;
-import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -58,8 +57,7 @@ public abstract class ImageClassificationModelLoader
         String flag = (String) arguments.getOrDefault("flag", NDImageUtils.Flag.COLOR.name());
 
         Pipeline pipeline = new Pipeline();
-        pipeline.add(new CenterCrop())
-                .add(new Resize(width, height))
+        pipeline.add(new Resize(width, height))
                 .add(new ToTensor())
                 .add(
                         new Normalize(
