@@ -25,13 +25,12 @@ public final class Blocks {
     }
 
     /**
-     * Flattens the only {@link ai.djl.ndarray.NDArray} in the input to a 2-D {@link
-     * ai.djl.ndarray.NDArray} of shape (batch, size).
+     * Inflates the 1-D flattened {@link ai.djl.ndarray.NDArray} provided as input to a 2-D {@link ai.djl.ndarray.NDArray} of shape (batch, size).
      *
-     * @param array a singleton {@link NDList}
+     * @param array a 1-D flattened array of size batch * size {@link NDList}
      * @param batch the batch size
-     * @param size the size of the flattened array
-     * @return a singleton {@link NDList} that contains the flattened {@link ai.djl.ndarray.NDArray}
+     * @param size the dimension of the input
+     * @return a 2-D {@link NDList} that contains the inflated {@link ai.djl.ndarray.NDArray}
      * @throws IndexOutOfBoundsException if the input {@link NDList} has more than one {@link
      *     ai.djl.ndarray.NDArray}
      */
