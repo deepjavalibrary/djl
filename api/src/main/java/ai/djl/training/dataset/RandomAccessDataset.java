@@ -16,9 +16,12 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.RandomUtils;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.RandomAccess;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.IntStream;
 
 /**
  * RandomAccessDataset represent the dataset that support random access reads. i.e. it could access
@@ -34,6 +37,8 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     protected int prefetchNumber;
     protected long maxIteration;
     protected Device device;
+
+    RandomAccessDataset() {}
 
     /**
      * Creates a new instance of {@link RandomAccessDataset} with the given necessary
@@ -97,6 +102,40 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         }
         long iteration = size() / batchSize;
         return Math.min(maxIteration, iteration);
+    }
+
+    /**
+     * Splits the dataset set into multiple portions.
+     *
+     * @param ratio the ratio of each sub dataset
+     * @return an array of the sub dataset
+     */
+    public RandomAccessDataset[] randomSplit(int... ratio) {
+        if (ratio.length < 2) {
+            throw new IllegalArgumentException("Requires at least two split portion.");
+        }
+        int size = Math.toIntExact(size());
+        int[] indices = IntStream.range(0, size).toArray();
+        for (int i = 0; i < size; ++i) {
+            swap(indices, i, RandomUtils.nextInt(size));
+        }
+        RandomAccessDataset[] ret = new RandomAccessDataset[ratio.length];
+
+        double sum = Arrays.stream(ratio).sum();
+        int from = 0;
+        for (int i = 0; i < ratio.length - 1; ++i) {
+            int to = from + (int) (indices[i] / sum * size);
+            ret[i] = new SubDataset(this, indices, from, to);
+            from += to;
+        }
+        ret[ratio.length - 1] = new SubDataset(this, indices, from, size);
+        return ret;
+    }
+
+    private static void swap(int[] arr, int i, int j) {
+        int tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
     }
 
     /** The Builder to construct a {@link RandomAccessDataset}. */
@@ -241,5 +280,43 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
          * @return this {@code BaseBuilder}
          */
         protected abstract T self();
+    }
+
+    private static final class SubDataset extends RandomAccessDataset {
+
+        private RandomAccessDataset dataset;
+        private int[] indices;
+        private int from;
+        private int to;
+
+        public SubDataset(RandomAccessDataset dataset, int[] indices, int from, int to) {
+            this.dataset = dataset;
+            this.indices = indices;
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        public Record get(NDManager manager, long index) throws IOException {
+            if (index >= size()) {
+                throw new IndexOutOfBoundsException("index(" + index + ") > size(" + size() + ").");
+            }
+            return dataset.get(manager, indices[Math.toIntExact(index) + from]);
+        }
+
+        @Override
+        public long size() {
+            return to - from;
+        }
+
+        @Override
+        public Iterable<Batch> getData(NDManager manager) {
+            return dataset.getData(manager);
+        }
+
+        @Override
+        public long getNumIterations() {
+            return dataset.getNumIterations();
+        }
     }
 }
