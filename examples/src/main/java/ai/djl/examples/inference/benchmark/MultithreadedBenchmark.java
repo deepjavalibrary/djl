@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,12 +57,12 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
         ZooModel<BufferedImage, Classifications> model = loadModel(arguments, metrics);
 
         int numOfThreads = arguments.getThreads();
+        AtomicInteger counter = new AtomicInteger(iteration);
         logger.info("Multithreaded inference with {} threads.", numOfThreads);
 
-        metrics.addMetric("thread", numOfThreads);
         List<PredictorCallable> callables = new ArrayList<>(numOfThreads);
         for (int i = 0; i < numOfThreads; ++i) {
-            callables.add(new PredictorCallable(model, img, metrics, iteration, i, i == 0));
+            callables.add(new PredictorCallable(model, img, metrics, counter, i, i == 0));
         }
 
         Classifications classification = null;
@@ -94,21 +95,21 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
         private Predictor<BufferedImage, Classifications> predictor;
         private BufferedImage img;
         private Metrics metrics;
-        private int iteration;
         private String workerId;
         private boolean collectMemory;
+        private AtomicInteger counter;
 
         public PredictorCallable(
                 ZooModel<BufferedImage, Classifications> model,
                 BufferedImage img,
                 Metrics metrics,
-                int iteration,
+                AtomicInteger counter,
                 int workerId,
                 boolean collectMemory) {
             this.predictor = model.newPredictor();
             this.img = img;
             this.metrics = metrics;
-            this.iteration = iteration;
+            this.counter = counter;
             this.workerId = String.format("%02d", workerId);
             this.collectMemory = collectMemory;
             predictor.setMetrics(metrics);
@@ -118,12 +119,13 @@ public class MultithreadedBenchmark extends AbstractBenchmark<Classifications> {
         @Override
         public Classifications call() throws TranslateException {
             Classifications result = null;
-            for (int i = 0; i < iteration; i++) {
+            int count = 0;
+            while (counter.decrementAndGet() > 0) {
                 result = predictor.predict(img);
                 if (collectMemory) {
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
-                logger.trace("Worker-{}: {} iteration finished.", workerId, i + 1);
+                logger.trace("Worker-{}: {} iteration finished.", workerId, ++count);
             }
             logger.debug("Worker-{}: finished.", workerId);
             return result;

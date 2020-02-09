@@ -97,7 +97,7 @@ public class Arguments {
                         .longOpt("iteration")
                         .hasArg()
                         .argName("ITERATION")
-                        .desc("Number of iterations in each test.")
+                        .desc("Number of total iterations.")
                         .build());
         options.addOption(
                 Option.builder("t")

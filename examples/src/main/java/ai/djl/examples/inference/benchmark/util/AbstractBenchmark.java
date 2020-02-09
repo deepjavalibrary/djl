@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.engine.Engine;
+import ai.djl.examples.inference.benchmark.MultithreadedBenchmark;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
 import ai.djl.mxnet.zoo.MxModelZoo;
@@ -114,8 +115,11 @@ public abstract class AbstractBenchmark<T> {
                 logger.info(
                         "Running {} on: {}.", getClass().getSimpleName(), Device.defaultDevice());
             }
+            int numOfThreads = arguments.getThreads();
             int iteration = arguments.getIteration();
-
+            if (this instanceof MultithreadedBenchmark) {
+                iteration = Math.max(iteration, numOfThreads * 2);
+            }
             while (!duration.isNegative()) {
                 Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
                 progressBar = new ProgressBar("Iteration", iteration);
@@ -124,14 +128,9 @@ public abstract class AbstractBenchmark<T> {
                 long totalTime = System.currentTimeMillis() - begin;
 
                 logger.info("Inference result: {}", lastResult);
-                int totalRuns = iteration;
-                if (metrics.hasMetric("thread")) {
-                    totalRuns *= metrics.getMetric("thread").get(0).getValue().intValue();
-                }
+                String throughput = String.format("%.2f", iteration * 1000d / totalTime);
                 logger.info(
-                        String.format(
-                                "total time: %d ms, total runs: %d iterations",
-                                totalTime, totalRuns));
+                        "Throughput: {}, {} iteration / {} ms.", throughput, iteration, totalTime);
 
                 if (metrics.hasMetric("LoadModel")) {
                     long loadModelTime =
