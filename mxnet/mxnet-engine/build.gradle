@@ -14,7 +14,9 @@ dependencies {
     testImplementation project(":basicdataset")
     testImplementation project(":model-zoo")
     testImplementation project(":mxnet:mxnet-model-zoo")
-    testImplementation project(":integration")
+    testImplementation(project(":integration")) {
+        exclude group: "org.apache.logging.log4j", module: "log4j-slf4j-impl"
+    }
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

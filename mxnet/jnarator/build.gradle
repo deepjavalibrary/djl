@@ -19,7 +19,10 @@ pmdMain.source = 'src/main/java'
 
 jar {
     manifest {
-        attributes 'Main-Class': 'ai.djl.mxnet.jnarator.Main'
+        attributes (
+            "Main-Class" : "ai.djl.mxnet.jnarator.Main",
+            "Multi-Release" : true
+        )
     }
     includeEmptyDirs = false
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
