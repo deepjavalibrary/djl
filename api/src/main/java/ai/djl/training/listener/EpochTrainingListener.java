@@ -12,6 +12,7 @@
  */
 package ai.djl.training.listener;
 
+import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
 
 /**
@@ -27,7 +28,10 @@ public class EpochTrainingListener implements TrainingListener {
     /** {@inheritDoc} */
     @Override
     public void onEpoch(Trainer trainer) {
-        trainer.getMetrics().addMetric("epoch", System.nanoTime() - epochTime);
+        Metrics metrics = trainer.getMetrics();
+        if (metrics != null) {
+            metrics.addMetric("epoch", System.nanoTime() - epochTime);
+        }
         epochTime = System.nanoTime();
         numEpochs++;
     }

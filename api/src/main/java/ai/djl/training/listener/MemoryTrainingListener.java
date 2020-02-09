@@ -85,9 +85,7 @@ public class MemoryTrainingListener implements TrainingListener {
     @Override
     public void onTrainingEnd(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
-        if (outputDir != null) {
-            dumpMemoryInfo(metrics, outputDir);
-        }
+        dumpMemoryInfo(metrics, outputDir);
     }
 
     /**
@@ -126,7 +124,7 @@ public class MemoryTrainingListener implements TrainingListener {
      * @param logDir output log directory
      */
     public static void dumpMemoryInfo(Metrics metrics, String logDir) {
-        if (logDir == null) {
+        if (metrics == null || logDir == null) {
             return;
         }
 

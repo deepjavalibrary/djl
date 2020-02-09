@@ -31,8 +31,10 @@ public class TrainMnistTest {
             String[] args = new String[] {"-g", "1"};
 
             ExampleTrainingResult result = TrainMnist.runExample(args);
-            Assert.assertTrue(result.getEvaluation("Accuracy") > 0.9f);
-            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 0.35f);
+            float accuracy = result.getEvaluation("Accuracy");
+            float loss = result.getEvaluation("SoftmaxCrossEntropyLoss");
+            Assert.assertTrue(accuracy > 0.9f, "Accuracy: " + accuracy);
+            Assert.assertTrue(loss < 0.35f, "Loss: " + loss);
 
             Classifications classifications = ImageClassification.predict();
             Classifications.Classification best = classifications.best();
