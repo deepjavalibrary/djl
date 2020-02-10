@@ -15,17 +15,67 @@
 
 // The file is the implementation for PyTorch tensor pointwise ops
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAdd
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->add(*other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSub
-  (JNIEnv* env, jobject jthis, jobject jhandle, jdouble jscalar) {
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->sub(jscalar));
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->sub(*other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMul
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->mul(*other_ptr));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDiv
-  (JNIEnv* env, jobject jthis, jobject jhandle, jdouble jscalar) {
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->div(jscalar));
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->div(*other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchPow
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jexponent) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* exponent_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jexponent);
+  const auto* result_ptr = new torch::Tensor(self_ptr->pow(*exponent_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMatmul
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->matmul(*other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMax__Lai_djl_pytorch_jni_Pointer_2Lai_djl_pytorch_jni_Pointer_2
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->max(*other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMin__Lai_djl_pytorch_jni_Pointer_2Lai_djl_pytorch_jni_Pointer_2
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->min(*other_ptr));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 

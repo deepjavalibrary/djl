@@ -19,7 +19,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import java.util.Arrays;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 /**
  * {@code StackBatchifier} is used to merge a list of samples to form a mini-batch of NDArray(s).
@@ -175,7 +175,7 @@ public class StackBatchifier implements Batchifier {
         }
 
         int step = (int) Math.ceil((double) batchSize / numOfSlices);
-        int[] indices = IntStream.range(1, numOfSlices).map(i -> i * step).toArray();
+        long[] indices = LongStream.range(1, numOfSlices).map(i -> i * step).toArray();
         return array.split(indices);
     }
 }

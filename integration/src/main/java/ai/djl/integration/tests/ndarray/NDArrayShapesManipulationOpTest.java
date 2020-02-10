@@ -30,7 +30,7 @@ public class NDArrayShapesManipulationOpTest {
             NDList result = array.split(2);
             Assert.assertEquals(result.get(0), manager.create(new float[] {1f, 2f}));
             Assert.assertEquals(result.get(1), manager.create(new float[] {3f, 4f}));
-            result = array.split(new int[] {2});
+            result = array.split(new long[] {2});
             Assert.assertEquals(result.get(0), manager.create(new float[] {1f, 2f}));
             Assert.assertEquals(result.get(1), manager.create(new float[] {3f, 4f}));
         }
@@ -122,13 +122,13 @@ public class NDArrayShapesManipulationOpTest {
             expected = manager.ones(new Shape(1, 2, 3, 1));
             Assert.assertEquals(array.squeeze(2), expected);
             expected = manager.ones(new Shape(2, 1, 3));
-            Assert.assertEquals(array.squeeze(new long[] {0, 4}), expected);
+            Assert.assertEquals(array.squeeze(new int[] {0, 4}), expected);
 
             // scalar
             array = manager.create(2f);
             Assert.assertEquals(array.squeeze(), array);
             Assert.assertEquals(array.squeeze(0), array);
-            Assert.assertEquals(array.squeeze(new long[] {0}), array);
+            Assert.assertEquals(array.squeeze(new int[] {0}), array);
 
             // zero-dim
             array = manager.create(new Shape(1, 0, 1, 3, 1));
@@ -137,7 +137,7 @@ public class NDArrayShapesManipulationOpTest {
             expected = manager.create(new Shape(1, 0, 3, 1));
             Assert.assertEquals(array.squeeze(2), expected);
             expected = manager.create(new Shape(0, 1, 3));
-            Assert.assertEquals(array.squeeze(new long[] {0, 4}), expected);
+            Assert.assertEquals(array.squeeze(new int[] {0, 4}), expected);
         }
     }
 
@@ -199,7 +199,7 @@ public class NDArrayShapesManipulationOpTest {
             NDArray array1 = manager.create(new float[] {1f});
             NDArray array2 = manager.create(new float[] {2f});
             NDArray expected = manager.create(new float[] {1f, 2f});
-            // Assert.assertEquals(NDArrays.concat(new NDList(array1, array2),0), expected);
+            Assert.assertEquals(NDArrays.concat(new NDList(array1, array2), 0), expected);
             Assert.assertEquals(array1.concat(array2), expected);
 
             array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));

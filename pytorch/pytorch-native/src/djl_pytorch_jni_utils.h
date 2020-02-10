@@ -160,7 +160,6 @@ inline torch::TensorOptions CreateTensorOptions(JNIEnv* env,
     .requires_grad(JNI_TRUE == jrequired_grad);
   return options;
 }
-
 } // namespace utils
 
 #endif //DJL_TORCH_DJL_PYTORCH_JNI_UTILS_H

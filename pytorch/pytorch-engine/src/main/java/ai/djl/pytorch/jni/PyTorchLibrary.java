@@ -18,11 +18,11 @@ import java.nio.ByteBuffer;
 @SuppressWarnings("MissingJavadocMethod")
 public final class PyTorchLibrary {
 
+    public static final PyTorchLibrary LIB = new PyTorchLibrary();
+
     static {
         System.loadLibrary("djl_torch"); // NOPMD
     }
-
-    public static final PyTorchLibrary LIB = new PyTorchLibrary();
 
     private PyTorchLibrary() {}
 
@@ -65,9 +65,17 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer torchSub(Pointer handle, double scalar);
+    public native Pointer torchAdd(Pointer self, Pointer other);
 
-    public native Pointer torchDiv(Pointer handle, double scalar);
+    public native Pointer torchSub(Pointer self, Pointer other);
+
+    public native Pointer torchMul(Pointer self, Pointer other);
+
+    public native Pointer torchDiv(Pointer self, Pointer other);
+
+    public native Pointer torchPow(Pointer self, Pointer exponent);
+
+    public native Pointer torchMatmul(Pointer self, Pointer other);
 
     public native Pointer torchReshape(Pointer handle, long[] shape);
 
@@ -107,6 +115,28 @@ public final class PyTorchLibrary {
 
     public native void torchDeleteModule(Pointer handle);
 
+    public native Pointer torchMax(Pointer handle);
+
+    public native Pointer torchMax(Pointer self, Pointer other);
+
+    public native Pointer torchMax(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchMin(Pointer handle);
+
+    public native Pointer torchMin(Pointer self, Pointer other);
+
+    public native Pointer torchMin(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchMean(Pointer handle);
+
+    public native Pointer torchMean(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchSum(Pointer handle);
+
+    public native Pointer torchSum(Pointer handle, long[] dim, boolean keepDim);
+
+    public native Pointer torchFlatten(Pointer handle, long startDim, long endDim);
+
     public native Pointer[] torchSplit(Pointer handle, long size, long dim);
 
     public native Pointer[] torchSplit(Pointer handle, long[] indices, long dim);
@@ -118,6 +148,8 @@ public final class PyTorchLibrary {
     public native Pointer torchSqueeze(Pointer handle, long axis);
 
     public native Pointer torchStack(Pointer[] handles, long dim);
+
+    public native Pointer torchCat(Pointer[] handles, long dim);
 
     public native Pointer torchAbs(Pointer handle);
 

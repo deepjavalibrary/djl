@@ -2691,9 +2691,9 @@ public interface NDArray extends AutoCloseable {
      * @param sections this {@code NDArray} will be divided into N (sections) equal {@code NDArray}
      * @return an {@link NDList} with size(axis) {@code NDArray}s with {@link Shape} {@code
      *     this.shape.remove(axis) }
-     * @see NDArray#split(int, int)
+     * @see NDArray#split(long, int)
      */
-    default NDList split(int sections) {
+    default NDList split(long sections) {
         return split(sections, 0);
     }
 
@@ -2724,9 +2724,9 @@ public interface NDArray extends AutoCloseable {
      *     NDArray} is returned correspondingly.
      * @return an NDList with size(axis) {@code NDArray}s with {@link Shape} {@code
      *     this.shape.remove(axis) }
-     * @see NDArray#split(int[], int)
+     * @see NDArray#split(long[], int)
      */
-    default NDList split(int[] indices) {
+    default NDList split(long[] indices) {
         return split(indices, 0);
     }
 
@@ -2768,13 +2768,13 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
      *     axis
      */
-    default NDList split(int sections, int axis) {
+    default NDList split(long sections, int axis) {
         long axisSize = getShape().getShape()[axis];
         if (axisSize % sections != 0) {
             throw new IllegalArgumentException("array split does not result in an equal division");
         }
         long sectionSize = axisSize / sections;
-        int[] indices = IntStream.range(0, sections).map(i -> (int) (i * sectionSize)).toArray();
+        long[] indices = LongStream.range(0, sections).map(i -> i * sectionSize).toArray();
         return split(indices, axis);
     }
 
@@ -2820,7 +2820,7 @@ public interface NDArray extends AutoCloseable {
      * @return an {@link NDList} with numOutputs {@code NDArray}s with {@link Shape} {@code
      *     (this.shape.axis /= axis) }
      */
-    NDList split(int[] indices, int axis);
+    NDList split(long[] indices, int axis);
 
     /**
      * Flattens this {@code NDArray} into a 1-D {@code NDArray} in row-major order.
@@ -2928,7 +2928,7 @@ public interface NDArray extends AutoCloseable {
      * @return the result {@code NDArray}. The number of dimensions is one greater than that of the
      *     {@code NDArray}
      */
-    NDArray expandDims(long axis);
+    NDArray expandDims(int axis);
 
     /**
      * Removes all singleton dimensions from this {@code NDArray} {@link Shape}.
@@ -2953,10 +2953,7 @@ public interface NDArray extends AutoCloseable {
      */
     default NDArray squeeze() {
         long[] shape = getShape().getShape();
-        return squeeze(
-                LongStream.range(0, shape.length)
-                        .filter(i -> shape[Math.toIntExact(i)] == 1)
-                        .toArray());
+        return squeeze(IntStream.range(0, shape.length).filter(i -> shape[i] == 1).toArray());
     }
 
     /**
@@ -2989,8 +2986,8 @@ public interface NDArray extends AutoCloseable {
      * @return a result {@code NDArray} of same size and data without the axis at part of the shape
      * @throws IllegalArgumentException thrown if the given axis is not a singleton dimension
      */
-    default NDArray squeeze(long axis) {
-        return squeeze(new long[] {axis});
+    default NDArray squeeze(int axis) {
+        return squeeze(new int[] {axis});
     }
 
     /**
@@ -3017,7 +3014,7 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException thrown if any of the given axes are not a singleton
      *     dimension
      */
-    NDArray squeeze(long[] axes);
+    NDArray squeeze(int[] axes);
 
     /**
      * Joins a {@code NDArray} along the first axis.
@@ -3270,7 +3267,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
      *     axis, the output DataType is always {@link DataType#INT32}
-     * @see NDArray#argSort(long, boolean)
+     * @see NDArray#argSort(int, boolean)
      */
     default NDArray argSort() {
         return argSort(-1, true);
@@ -3301,7 +3298,7 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis to sort along
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
      *     axis, the output DataType is always {@link DataType#INT32}
-     * @see NDArray#argSort(long, boolean)
+     * @see NDArray#argSort(int, boolean)
      */
     default NDArray argSort(int axis) {
         return argSort(axis, true);
@@ -3329,7 +3326,7 @@ public interface NDArray extends AutoCloseable {
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
      *     axis, the output DataType is always {@link DataType#INT32}
      */
-    NDArray argSort(long axis, boolean ascending);
+    NDArray argSort(int axis, boolean ascending);
 
     /**
      * Sorts the flattened {@code NDArray}.
@@ -3384,10 +3381,10 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which to apply
      * @return the result {@code NDArray}
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(long[], double)
+     * @see NDArray#softmax(int[], double)
      */
-    default NDArray softmax(long axis) {
-        return softmax(new long[] {axis}, 1);
+    default NDArray softmax(int axis) {
+        return softmax(new int[] {axis}, 1);
     }
 
     /**
@@ -3397,10 +3394,10 @@ public interface NDArray extends AutoCloseable {
      * @param temperature the exponent multiplier Beta in the softmax
      * @return the result {@code NDArray}
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(long[], double)
+     * @see NDArray#softmax(int[], double)
      */
-    default NDArray softmax(long axis, double temperature) {
-        return softmax(new long[] {axis}, temperature);
+    default NDArray softmax(int axis, double temperature) {
+        return softmax(new int[] {axis}, temperature);
     }
 
     /**
@@ -3411,7 +3408,7 @@ public interface NDArray extends AutoCloseable {
      * @return the result {@code NDArray}
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
      */
-    default NDArray softmax(long[] axes) {
+    default NDArray softmax(int[] axes) {
         return softmax(axes, 1);
     }
 
@@ -3423,9 +3420,9 @@ public interface NDArray extends AutoCloseable {
      * @param temperature the exponent multiplier Beta in the softmax
      * @return the result {@code NDArray}
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(long[], double)
+     * @see NDArray#softmax(int[], double)
      */
-    NDArray softmax(long[] axes, double temperature);
+    NDArray softmax(int[] axes, double temperature);
 
     /**
      * Applies the softmax function followed by a logarithm.
@@ -3436,8 +3433,8 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which to apply
      * @return the result {@code NDArray}
      */
-    default NDArray logSoftmax(long axis) {
-        return logSoftmax(new long[] {axis}, 1);
+    default NDArray logSoftmax(int axis) {
+        return logSoftmax(new int[] {axis}, 1);
     }
 
     /**
@@ -3450,8 +3447,8 @@ public interface NDArray extends AutoCloseable {
      * @param temperature the exponent multiplier Beta in the softmax
      * @return the result {@code NDArray}
      */
-    default NDArray logSoftmax(long axis, double temperature) {
-        return logSoftmax(new long[] {axis}, temperature);
+    default NDArray logSoftmax(int axis, double temperature) {
+        return logSoftmax(new int[] {axis}, temperature);
     }
 
     /**
@@ -3464,7 +3461,7 @@ public interface NDArray extends AutoCloseable {
      *     the whole array.
      * @return the result {@code NDArray}
      */
-    default NDArray logSoftmax(long[] axes) {
+    default NDArray logSoftmax(int[] axes) {
         return logSoftmax(axes, 1);
     }
 
@@ -3479,7 +3476,7 @@ public interface NDArray extends AutoCloseable {
      * @param temperature the exponent multiplier Beta in the softmax
      * @return the result {@code NDArray}
      */
-    NDArray logSoftmax(long[] axes, double temperature);
+    NDArray logSoftmax(int[] axes, double temperature);
 
     /**
      * Returns the cumulative sum of the elements in the flattened {@code NDArray}.
@@ -3838,11 +3835,11 @@ public interface NDArray extends AutoCloseable {
      * @param axis2 the second axis
      * @return the swapped axes {@code NDArray}
      */
-    default NDArray swapAxes(long axis1, long axis2) {
-        long[] dims = LongStream.range(0, getShape().dimension()).toArray();
-        long tmp = dims[Math.toIntExact(axis1)];
-        dims[Math.toIntExact(axis1)] = dims[Math.toIntExact(axis2)];
-        dims[Math.toIntExact(axis2)] = tmp;
+    default NDArray swapAxes(int axis1, int axis2) {
+        int[] dims = IntStream.range(0, getShape().dimension()).toArray();
+        int tmp = dims[axis1];
+        dims[axis1] = dims[axis2];
+        dims[axis2] = tmp;
         return transpose(dims);
     }
 
@@ -3912,7 +3909,7 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException thrown when passing a axis that is greater than the actual
      *     number of dimensions
      */
-    NDArray transpose(long... axes);
+    NDArray transpose(int... axes);
 
     /**
      * Broadcasts this {@code NDArray} to be the given shape.

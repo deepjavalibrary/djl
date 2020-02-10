@@ -428,7 +428,10 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public PtNDArray concat(NDList arrays, int axis) {
-        throw new UnsupportedOperationException("Not implemented");
+        NDArray[] srcArray = new NDArray[arrays.size() + 1];
+        srcArray[0] = array;
+        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
+        return JniUtils.cat(srcArray, axis);
     }
 
     @Override

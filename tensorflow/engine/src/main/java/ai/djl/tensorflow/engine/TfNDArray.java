@@ -722,7 +722,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int[] indices, int axis) {
+    public NDList split(long[] indices, int axis) {
         TfNDArray axisOp = (TfNDArray) manager.create(axis);
         Operation op =
                 manager.getGraph()
@@ -742,7 +742,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int sections, int axis) {
+    public NDList split(long sections, int axis) {
         if (axis < 0 || axis > getShape().dimension()) {
             throw new IllegalArgumentException("Invalid axis value");
         }
@@ -785,13 +785,13 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray expandDims(long axis) {
+    public NDArray expandDims(int axis) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray squeeze(long[] axes) {
+    public NDArray squeeze(int[] axes) {
         return null;
     }
 
@@ -821,7 +821,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argSort(long axis, boolean ascending) {
+    public NDArray argSort(int axis, boolean ascending) {
         return null;
     }
 
@@ -839,7 +839,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(long[] axes, double temperature) {
+    public NDArray softmax(int[] axes, double temperature) {
         Operation op =
                 manager.getGraph()
                         .opBuilder("Softmax", "Softmax_" + TfNDManager.nextNameAssignment())
@@ -864,7 +864,7 @@ public class TfNDArray implements NDArray {
     }
 
     @Override
-    public NDArray logSoftmax(long[] axes, double temperature) {
+    public NDArray logSoftmax(int[] axes, double temperature) {
         return null;
     }
 
@@ -966,7 +966,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(long axis1, long axis2) {
+    public NDArray swapAxes(int axis1, int axis2) {
         return null;
     }
 
@@ -978,7 +978,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose(long... dimensions) {
+    public NDArray transpose(int... dimensions) {
         return null;
     }
 

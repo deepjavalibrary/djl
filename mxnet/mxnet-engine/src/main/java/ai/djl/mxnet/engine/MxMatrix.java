@@ -953,7 +953,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int[] indices, int axis) {
+    public NDList split(long[] indices, int axis) {
         return array.split(indices, axis);
     }
 
@@ -965,13 +965,13 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray expandDims(long axis) {
+    public NDArray expandDims(int axis) {
         return array.expandDims(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray squeeze(long[] axes) {
+    public NDArray squeeze(int[] axes) {
         return array.squeeze(axes);
     }
 
@@ -1001,7 +1001,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argSort(long axis, boolean ascending) {
+    public NDArray argSort(int axis, boolean ascending) {
         return array.argSort(axis, ascending);
     }
 
@@ -1019,13 +1019,13 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(long[] axes, double temperature) {
+    public NDArray softmax(int[] axes, double temperature) {
         return array.softmax(axes, temperature);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logSoftmax(long[] axes, double temperature) {
+    public NDArray logSoftmax(int[] axes, double temperature) {
         return array.logSoftmax(axes, temperature);
     }
 
@@ -1127,7 +1127,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(long axis1, long axis2) {
+    public NDArray swapAxes(int axis1, int axis2) {
         return array.swapAxes(axis1, axis2);
     }
 
@@ -1139,7 +1139,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose(long... dimensions) {
+    public NDArray transpose(int... dimensions) {
         return array.transpose(dimensions);
     }
 

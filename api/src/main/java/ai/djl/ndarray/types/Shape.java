@@ -140,7 +140,7 @@ public class Shape {
      * @return the size of specific dimension(s) or -1 for indeterminate size
      * @throws IllegalArgumentException thrown if passed an invalid dimension
      */
-    public long size(long... dimensions) {
+    public long size(int... dimensions) {
         int total = 1;
         for (long d : dimensions) {
             if (d < 0 || d >= shape.length) {

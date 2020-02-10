@@ -52,6 +52,14 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStack
   return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCat
+  (JNIEnv* env, jobject jthis, jobjectArray jhandles, jlong jdim) {
+  const std::vector<torch::Tensor> tensor_vec =
+    utils::GetObjectVecFromJHandles<torch::Tensor>(env, jhandles);
+  const torch::Tensor* result_ptr = new torch::Tensor(torch::cat(tensor_vec, jdim));
+  return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
+}
+
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2JJ
   (JNIEnv* env, jobject jthis, jobject jhandle, jlong jsize, jlong jdim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);

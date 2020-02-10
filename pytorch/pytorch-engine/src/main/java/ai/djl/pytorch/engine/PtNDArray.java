@@ -230,7 +230,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.contentEqual(this, numberToNDArray(number));
     }
 
     /** {@inheritDoc} */
@@ -314,49 +314,49 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray add(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return add(numberToNDArray(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray add(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.add(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray sub(Number n) {
-        return JniUtils.sub(this, n.doubleValue());
+        return sub(numberToNDArray(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray sub(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sub(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray mul(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return mul(numberToNDArray(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray mul(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.mul(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray div(Number n) {
-        return JniUtils.div(this, n.doubleValue());
+        return div(numberToNDArray(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray div(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.div(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -374,13 +374,13 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray pow(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return pow(numberToNDArray(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray pow(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.pow(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -458,25 +458,25 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray maximum(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.max(this, numberToNDArray(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray maximum(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.max(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray minimum(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.min(this, numberToNDArray(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray minimum(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.min(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -524,7 +524,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray cbrt() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.pow(this, numberToNDArray(1 / 3));
     }
 
     /** {@inheritDoc} */
@@ -650,49 +650,57 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray toDegrees() {
-        throw new UnsupportedOperationException("Not implemented");
+        return mul(180.0).div(Math.PI);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray toRadians() {
-        throw new UnsupportedOperationException("Not implemented");
+        return mul(Math.PI).div(numberToNDArray(180.0));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray max() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.max(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray max(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (axes.length > 1) {
+            // TODO fix this
+            throw new UnsupportedOperationException("Only 1 axis is support!");
+        }
+        return JniUtils.max(this, axes[0], keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray min() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.min(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray min(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (axes.length > 1) {
+            // TODO fix this
+            throw new UnsupportedOperationException("Only 1 axis is support!");
+        }
+        return JniUtils.min(this, axes[0], keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray sum() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sum(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray sum(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sum(this, Arrays.stream(axes).mapToLong(i -> i).toArray(), keepDims);
     }
 
     /** {@inheritDoc} */
@@ -710,13 +718,17 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray mean() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sum(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray mean(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (axes.length > 1) {
+            // TODO fix this
+            throw new UnsupportedOperationException("Only 1 axis is support!");
+        }
+        return JniUtils.mean(this, axes[0], keepDims);
     }
 
     /** {@inheritDoc} */
@@ -727,21 +739,20 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int sections, int axis) {
+    public NDList split(long sections, int axis) {
         return JniUtils.split(this, sections, axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int[] indices, int axis) {
-        long[] longIndices = Arrays.stream(indices).asLongStream().toArray();
-        return JniUtils.split(this, longIndices, axis);
+    public NDList split(long[] indices, int axis) {
+        return JniUtils.split(this, indices, axis);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray flatten() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.flatten(this, 0, -1);
     }
 
     /** {@inheritDoc} */
@@ -757,7 +768,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray expandDims(long axis) {
+    public PtNDArray expandDims(int axis) {
         return JniUtils.unsqueeze(this, axis);
     }
 
@@ -769,13 +780,13 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray squeeze(long axis) {
+    public PtNDArray squeeze(int axis) {
         return JniUtils.squeeze(this, axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray squeeze(long[] axes) {
+    public PtNDArray squeeze(int[] axes) {
         // TODO: add workaround for PyTorch
         throw new UnsupportedOperationException("Not implemented");
     }
@@ -806,7 +817,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray argSort(long axis, boolean ascending) {
+    public PtNDArray argSort(int axis, boolean ascending) {
         if (!ascending) {
             throw new UnsupportedOperationException("Only support ascending!");
         }
@@ -827,7 +838,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray softmax(long[] axes, double temperature) {
+    public PtNDArray softmax(int[] axes, double temperature) {
         if (temperature != 1.0) {
             throw new UnsupportedOperationException("PyTorch softmax didn't suuport temperature");
         }
@@ -836,7 +847,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray logSoftmax(long[] axes, double temperature) {
+    public PtNDArray logSoftmax(int[] axes, double temperature) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -927,7 +938,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray dot(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.matmul(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -938,7 +949,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray swapAxes(long axis1, long axis2) {
+    public PtNDArray swapAxes(int axis1, int axis2) {
         return JniUtils.transpose(this, axis1, axis2);
     }
 
@@ -946,19 +957,18 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public PtNDArray transpose() {
         long[] shapeArray = getShape().getShape();
+        int[] reversedShape = new int[shapeArray.length];
         // reverse the long array in-place
-        for (int i = 0; i < shapeArray.length / 2; i++) {
-            long tmp = shapeArray[i];
-            shapeArray[i] = shapeArray[shapeArray.length - i - 1];
-            shapeArray[shapeArray.length - i - 1] = tmp;
+        for (int i = 0; i < shapeArray.length; i++) {
+            reversedShape[shapeArray.length - i - 1] = Math.toIntExact(shapeArray[i]);
         }
-        return transpose(shapeArray);
+        return transpose(reversedShape);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray transpose(long... axes) {
-        return JniUtils.permute(this, axes);
+    public PtNDArray transpose(int... axes) {
+        return JniUtils.permute(this, Arrays.stream(axes).mapToLong(i -> i).toArray());
     }
 
     /** {@inheritDoc} */

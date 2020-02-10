@@ -212,7 +212,7 @@ public final class TrainPikachu {
                                                     classPredictions,
                                                     boundingBoxPredictions,
                                                     anchors));
-                            return detections.singletonOrThrow().split(new int[] {1, 2}, 2);
+                            return detections.singletonOrThrow().split(new long[] {1, 2}, 2);
                         }));
         return ssdPredict;
     }
