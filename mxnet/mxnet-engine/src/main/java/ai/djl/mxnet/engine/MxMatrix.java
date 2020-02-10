@@ -960,13 +960,13 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray expandDims(int axis) {
+    public NDArray expandDims(long axis) {
         return array.expandDims(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray squeeze(int[] axes) {
+    public NDArray squeeze(long[] axes) {
         return array.squeeze(axes);
     }
 
@@ -996,7 +996,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argSort(int axis, boolean ascending) {
+    public NDArray argSort(long axis, boolean ascending) {
         return array.argSort(axis, ascending);
     }
 
@@ -1014,13 +1014,13 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, double temperature) {
+    public NDArray softmax(long[] axes, double temperature) {
         return array.softmax(axes, temperature);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logSoftmax(int[] axes, double temperature) {
+    public NDArray logSoftmax(long[] axes, double temperature) {
         return array.logSoftmax(axes, temperature);
     }
 
@@ -1122,7 +1122,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(int axis1, int axis2) {
+    public NDArray swapAxes(long axis1, long axis2) {
         return array.swapAxes(axis1, axis2);
     }
 
@@ -1134,7 +1134,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose(int... dimensions) {
+    public NDArray transpose(long... dimensions) {
         return array.transpose(dimensions);
     }
 
@@ -1158,7 +1158,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax(int axis) {
+    public NDArray argMax(long axis) {
         return array.argMax(axis);
     }
 
@@ -1170,7 +1170,7 @@ public class MxMatrix implements Matrix {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin(int axis) {
+    public NDArray argMin(long axis) {
         return array.argMin(axis);
     }
 

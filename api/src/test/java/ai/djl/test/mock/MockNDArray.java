@@ -780,13 +780,13 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray expandDims(int axis) {
+    public NDArray expandDims(long axis) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray squeeze(int[] axes) {
+    public NDArray squeeze(long[] axes) {
         return new MockNDArray();
     }
 
@@ -816,7 +816,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argSort(int axis, boolean ascending) {
+    public NDArray argSort(long axis, boolean ascending) {
         return null;
     }
 
@@ -834,13 +834,13 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, double temperature) {
+    public NDArray softmax(long[] axes, double temperature) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logSoftmax(int[] axes, double temperature) {
+    public NDArray logSoftmax(long[] axes, double temperature) {
         return null;
     }
 
@@ -954,7 +954,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(int axis1, int axis2) {
+    public NDArray swapAxes(long axis1, long axis2) {
         return null;
     }
 
@@ -966,7 +966,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose(int... dimensions) {
+    public NDArray transpose(long... dimensions) {
         return null;
     }
 
@@ -990,7 +990,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax(int axis) {
+    public NDArray argMax(long axis) {
         return null;
     }
 
@@ -1002,7 +1002,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin(int axis) {
+    public NDArray argMin(long axis) {
         return null;
     }
 

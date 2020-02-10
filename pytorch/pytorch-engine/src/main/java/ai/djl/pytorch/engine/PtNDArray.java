@@ -734,8 +734,8 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray expandDims(int axis) {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray expandDims(long axis) {
+        return JniUtils.unsqueeze(this, axis);
     }
 
     /** {@inheritDoc} */
@@ -746,13 +746,13 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray squeeze(int axis) {
+    public PtNDArray squeeze(long axis) {
         return JniUtils.squeeze(this, axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray squeeze(int[] axes) {
+    public PtNDArray squeeze(long[] axes) {
         // TODO: add workaround for PyTorch
         throw new UnsupportedOperationException("Not implemented");
     }
@@ -783,25 +783,28 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray argSort(int axis, boolean ascending) {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray argSort(long axis, boolean ascending) {
+        if (!ascending) {
+            throw new UnsupportedOperationException("Only support ascending!");
+        }
+        return JniUtils.argSort(this, axis, false);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray sort() {
-        throw new UnsupportedOperationException("Not implemented");
+        return sort(-1);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray sort(int axis) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sort(this, axis, false);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray softmax(int[] axes, double temperature) {
+    public PtNDArray softmax(long[] axes, double temperature) {
         if (temperature != 1.0) {
             throw new UnsupportedOperationException("PyTorch softmax didn't suuport temperature");
         }
@@ -810,7 +813,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray logSoftmax(int[] axes, double temperature) {
+    public PtNDArray logSoftmax(long[] axes, double temperature) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -912,14 +915,27 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray transpose() {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray swapAxes(long axis1, long axis2) {
+        return JniUtils.transpose(this, axis1, axis2);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray transpose(int... axes) {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray transpose() {
+        long[] shapeArray = getShape().getShape();
+        // reverse the long array in-place
+        for (int i = 0; i < shapeArray.length / 2; i++) {
+            long tmp = shapeArray[i];
+            shapeArray[i] = shapeArray[shapeArray.length - i - 1];
+            shapeArray[shapeArray.length - i - 1] = tmp;
+        }
+        return transpose(shapeArray);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArray transpose(long... axes) {
+        return JniUtils.permute(this, axes);
     }
 
     /** {@inheritDoc} */
@@ -936,20 +952,20 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray argMax(int axis) {
+    public PtNDArray argMax(long axis) {
         return JniUtils.argMax(this, axis, false);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray argMin() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.argMin(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray argMin(int axis) {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray argMin(long axis) {
+        return JniUtils.argMin(this, axis, false);
     }
 
     /** {@inheritDoc} */

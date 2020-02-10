@@ -40,7 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 /** {@code MxNDArray} is the MXNet implementation of {@link NDArray}. */
 public class MxNDArray extends NativeResource implements NDArray {
@@ -429,7 +429,7 @@ public class MxNDArray extends NativeResource implements NDArray {
                 NDArray oldResult = result;
                 result =
                         result.squeeze(
-                                fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
+                                fullSlice.getToSqueeze().stream().mapToLong(i -> i).toArray());
                 oldResult.close();
             }
             // TODO cast the boolean NDArray back to int32 due to lack of support of slice op on
@@ -1134,7 +1134,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray expandDims(int axis) {
+    public NDArray expandDims(long axis) {
         if (isScalar()) {
             return reshape(1);
         }
@@ -1151,7 +1151,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray squeeze(int[] axes) {
+    public NDArray squeeze(long[] axes) {
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
         return manager.invoke("_np_squeeze", this, params);
@@ -1207,7 +1207,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argSort(int axis, boolean ascending) {
+    public NDArray argSort(long axis, boolean ascending) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         // be careful that MXNet numpy argsort op didn't officially support this param
@@ -1245,17 +1245,17 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, double temperature) {
+    public NDArray softmax(long[] axes, double temperature) {
         return softmaxHelper(axes, temperature, "_npx_softmax");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logSoftmax(int[] axes, double temperature) {
+    public NDArray logSoftmax(long[] axes, double temperature) {
         return softmaxHelper(axes, temperature, "_npx_log_softmax");
     }
 
-    private NDArray softmaxHelper(int[] axes, double temperature, String opName) {
+    private NDArray softmaxHelper(long[] axes, double temperature, String opName) {
         // TODO remove this after MXNet softmax fix zero-dim issue
         if (isEmpty()) {
             return getManager().create(getShape());
@@ -1436,7 +1436,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray swapAxes(int axis1, int axis2) {
+    public NDArray swapAxes(long axis1, long axis2) {
         MxOpParams params = new MxOpParams();
         params.addParam("dim1", axis1);
         params.addParam("dim2", axis2);
@@ -1451,14 +1451,14 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transpose(int... dimensions) {
-        if (Arrays.stream(dimensions).anyMatch((int d) -> d < 0)) {
+    public NDArray transpose(long... dimensions) {
+        if (Arrays.stream(dimensions).anyMatch((long d) -> d < 0)) {
             throw new UnsupportedOperationException(
                     "Passing -1 for broadcasting the dimension is not currently supported");
         }
         if (!Arrays.equals(
                 Arrays.stream(dimensions).sorted().toArray(),
-                IntStream.range(0, getShape().dimension()).toArray())) {
+                LongStream.range(0, getShape().dimension()).toArray())) {
             throw new IllegalArgumentException(
                     "You must include each of the dimensions from 0 until "
                             + getShape().dimension());
@@ -1485,7 +1485,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax(int axis) {
+    public NDArray argMax(long axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         // TODO MXNet engine bug
@@ -1507,7 +1507,7 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin(int axis) {
+    public NDArray argMin(long axis) {
         // TODO switch to MXNet numpy argmin
         NDArray array = (isScalar()) ? reshape(1) : this;
         MxOpParams params = new MxOpParams();

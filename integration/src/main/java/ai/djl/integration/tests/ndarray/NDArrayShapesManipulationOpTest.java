@@ -122,13 +122,13 @@ public class NDArrayShapesManipulationOpTest {
             expected = manager.ones(new Shape(1, 2, 3, 1));
             Assert.assertEquals(array.squeeze(2), expected);
             expected = manager.ones(new Shape(2, 1, 3));
-            Assert.assertEquals(array.squeeze(new int[] {0, 4}), expected);
+            Assert.assertEquals(array.squeeze(new long[] {0, 4}), expected);
 
             // scalar
             array = manager.create(2f);
             Assert.assertEquals(array.squeeze(), array);
             Assert.assertEquals(array.squeeze(0), array);
-            Assert.assertEquals(array.squeeze(new int[] {0}), array);
+            Assert.assertEquals(array.squeeze(new long[] {0}), array);
 
             // zero-dim
             array = manager.create(new Shape(1, 0, 1, 3, 1));
@@ -137,7 +137,7 @@ public class NDArrayShapesManipulationOpTest {
             expected = manager.create(new Shape(1, 0, 3, 1));
             Assert.assertEquals(array.squeeze(2), expected);
             expected = manager.create(new Shape(0, 1, 3));
-            Assert.assertEquals(array.squeeze(new int[] {0, 4}), expected);
+            Assert.assertEquals(array.squeeze(new long[] {0, 4}), expected);
         }
     }
 

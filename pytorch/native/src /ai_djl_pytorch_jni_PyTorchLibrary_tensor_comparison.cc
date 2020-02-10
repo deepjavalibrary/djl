@@ -69,3 +69,10 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLte
   const auto* result_ptr = new torch::Tensor(tensor_ptr1->le(*tensor_ptr2));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSort
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jboolean jdescending) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(std::get<0>(tensor_ptr->sort(jdim, jdescending == JNI_TRUE)));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}

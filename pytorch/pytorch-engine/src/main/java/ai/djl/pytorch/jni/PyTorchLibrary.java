@@ -77,6 +77,20 @@ public final class PyTorchLibrary {
 
     public native Pointer torchArgMax(Pointer handle, long dim, boolean keepDim);
 
+    public native Pointer torchArgMin(Pointer handle);
+
+    public native Pointer torchArgMin(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchArgSort(Pointer handle);
+
+    public native Pointer torchArgSort(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchSort(Pointer handle, long dim, boolean descending);
+
+    public native Pointer torchPermute(Pointer handle, long[] dims);
+
+    public native Pointer torchTranspose(Pointer handle, long axis1, long axis2);
+
     public native boolean contentEqual(Pointer handle1, Pointer handle2);
 
     public native Pointer torchFromBlob(
@@ -97,9 +111,11 @@ public final class PyTorchLibrary {
 
     public native Pointer[] torchSplit(Pointer handle, long[] indices, long dim);
 
+    public native Pointer torchUnsqueeze(Pointer handle, long dim);
+
     public native Pointer torchSqueeze(Pointer handle);
 
-    public native Pointer torchSqueeze(Pointer handle, int axis);
+    public native Pointer torchSqueeze(Pointer handle, long axis);
 
     public native Pointer torchStack(Pointer[] handles, long dim);
 
