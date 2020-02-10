@@ -25,7 +25,8 @@ public final class Blocks {
     }
 
     /**
-     * Inflates the 1-D flattened {@link ai.djl.ndarray.NDArray} provided as input to a 2-D {@link ai.djl.ndarray.NDArray} of shape (batch, size).
+     * Inflates the 1-D flattened {@link ai.djl.ndarray.NDArray} provided as input to a 2-D {@link
+     * ai.djl.ndarray.NDArray} of shape (batch, size).
      *
      * @param array a 1-D flattened array of size batch * size {@link NDList}
      * @param batch the batch size
