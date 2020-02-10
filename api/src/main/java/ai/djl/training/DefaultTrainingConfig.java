@@ -38,7 +38,10 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private int batchSize;
 
     /**
-     * Creates an instance of {@code DefaultTrainingConfig} with the given {@link Initializer}.
+     * Creates an instance of {@code DefaultTrainingConfig} with the given {@link Loss}. {@code
+     * DefaultTrainingConfig} creates a default {@link TrainingConfig} with the {@link
+     * XavierInitializer} as initialiser, {@link Adam} as optimiser, and the given {@link Loss}. The
+     * evaluators and listeners are left to the user's discretion.
      *
      * @param loss the loss to use for training
      */
