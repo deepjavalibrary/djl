@@ -242,7 +242,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray eq(Number other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return eq(numberToNDArray(other));
     }
 
     /** {@inheritDoc} */
@@ -254,7 +254,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray neq(Number other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return neq(numberToNDArray(other));
     }
 
     /** {@inheritDoc} */
@@ -266,7 +266,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray gt(Number other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return gt(numberToNDArray(other));
     }
 
     /** {@inheritDoc} */
@@ -278,7 +278,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray gte(Number other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return gte(numberToNDArray(other));
     }
 
     /** {@inheritDoc} */
@@ -290,7 +290,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray lt(Number other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return lt(numberToNDArray(other));
     }
 
     /** {@inheritDoc} */
@@ -302,7 +302,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray lte(Number other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return lte(numberToNDArray(other));
     }
 
     /** {@inheritDoc} */
@@ -1036,6 +1036,30 @@ public class PtNDArray extends NativeResource implements NDArray {
             return "This array is already closed";
         }
         return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns);
+    }
+
+    /**
+     * Convert number into Scalar NDArray.
+     *
+     * <p>In PyTorch, this value will be considered as c10::Scalar type for all purposes.
+     *
+     * @param number the number used for conversion
+     * @return the Scalar {@code NDArray}
+     */
+    private PtNDArray numberToNDArray(Number number) {
+        if (number instanceof Integer) {
+            return (PtNDArray) manager.create(number.intValue());
+        } else if (number instanceof Float) {
+            return (PtNDArray) manager.create(number.floatValue());
+        } else if (number instanceof Double) {
+            return (PtNDArray) manager.create(number.doubleValue());
+        } else if (number instanceof Long) {
+            return (PtNDArray) manager.create(number.longValue());
+        } else if (number instanceof Byte) {
+            return (PtNDArray) manager.create(number.byteValue());
+        } else {
+            throw new IllegalArgumentException("Short conversion not supported!");
+        }
     }
 
     /** {@inheritDoc} */
