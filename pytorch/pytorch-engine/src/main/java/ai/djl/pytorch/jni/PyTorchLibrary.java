@@ -202,6 +202,27 @@ public final class PyTorchLibrary {
 
     public native Pointer normalize(Pointer handle, float[] mean, float[] std);
 
+    public native Pointer atNormal(
+            double mean,
+            double std,
+            long[] sizes,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
+
+    public native Pointer tensorUniform(
+            double from,
+            double to,
+            long[] sizes,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
+
+    public native Pointer torchEye(
+            int n, int m, int dType, int layout, int[] device, boolean requiredGrad);
+
     public native Pointer resize(Pointer handle, long[] size, boolean alignCorners);
 
     // TODO to be removed once we have div and swapAxes operator

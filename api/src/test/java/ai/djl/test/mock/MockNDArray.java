@@ -995,7 +995,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax(long axis) {
+    public NDArray argMax(int axis) {
         return null;
     }
 
@@ -1007,7 +1007,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin(long axis) {
+    public NDArray argMin(int axis) {
         return null;
     }
 

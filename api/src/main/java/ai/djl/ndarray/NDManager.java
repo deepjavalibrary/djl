@@ -784,7 +784,7 @@ public interface NDManager extends AutoCloseable {
      * @return the drawn samples {@link NDArray}
      */
     default NDArray randomUniform(Number low, Number high, Shape shape) {
-        return randomUniform(low, high, shape, null, getDevice());
+        return randomUniform(low, high, shape, DataType.UNKNOWN, getDevice());
     }
 
     /**
@@ -816,7 +816,7 @@ public interface NDManager extends AutoCloseable {
      * @return the drawn samples {@link NDArray}
      */
     default NDArray randomNormal(Shape shape) {
-        return randomNormal(0f, 1f, shape, null, getDevice());
+        return randomNormal(0f, 1f, shape, DataType.UNKNOWN, getDevice());
     }
 
     /**

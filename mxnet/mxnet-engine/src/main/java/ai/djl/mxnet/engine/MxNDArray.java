@@ -19,6 +19,7 @@ import ai.djl.ndarray.Matrix;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.NDIndexBooleans;
 import ai.djl.ndarray.index.NDIndexElement;
@@ -1488,12 +1489,19 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray argMax() {
         // TODO MXNet engine bug
+        if (isEmpty()) {
+            throw new IllegalArgumentException("attempt to get argMax of an empty NDArray");
+        }
         return manager.invoke("_npi_argmax", this, null).toType(DataType.INT64, false);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMax(long axis) {
+    public NDArray argMax(int axis) {
+        if (isEmpty()) {
+            Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
+            return manager.create(newShape, DataType.INT64);
+        }
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         // TODO MXNet engine bug
@@ -1515,8 +1523,12 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray argMin(long axis) {
+    public NDArray argMin(int axis) {
         // TODO switch to MXNet numpy argmin
+        if (isEmpty()) {
+            Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
+            return manager.create(newShape, DataType.INT64);
+        }
         NDArray array = (isScalar()) ? reshape(1) : this;
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);

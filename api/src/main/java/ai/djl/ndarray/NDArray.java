@@ -4013,7 +4013,7 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which to find maximum values
      * @return a {@code NDArray} containing indices
      */
-    NDArray argMax(long axis);
+    NDArray argMax(int axis);
 
     /**
      * Returns the indices of the minimum values into the flattened {@code NDArray}.
@@ -4059,7 +4059,7 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which to find minimum values
      * @return a {@code NDArray} containing indices
      */
-    NDArray argMin(long axis);
+    NDArray argMin(int axis);
 
     /**
      * Returns percentile for this {@code NDArray}.

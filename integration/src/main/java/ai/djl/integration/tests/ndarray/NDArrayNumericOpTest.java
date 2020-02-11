@@ -29,7 +29,7 @@ public class NDArrayNumericOpTest {
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(x -> -x).toArray();
             NDArray expected = manager.create(data);
-            Assert.assertEquals(array.neg(), expected);
+            Assertions.assertAlmostEquals(array.neg(), expected);
             Assertions.assertInPlaceEquals(array.negi(), expected, array);
             // test multi-dim
             data = new double[] {-2.2, 2.2, 3, -0.2, 2.76, 0.0002};

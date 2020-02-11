@@ -211,7 +211,7 @@ public class MxNDManager extends BaseNDManager {
         params.addParam("high", high);
         params.addParam("size", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
-        if (dataType != null) {
+        if (dataType != DataType.UNKNOWN) {
             params.setDataType(dataType);
         }
         return invoke("_npi_uniform", params);
@@ -226,7 +226,7 @@ public class MxNDManager extends BaseNDManager {
         params.addParam("scale", scale);
         params.addParam("size", shape);
         params.setDevice(Device.defaultIfNull(dev, device));
-        if (dataType != null) {
+        if (dataType != DataType.UNKNOWN) {
             params.setDataType(dataType);
         }
         return invoke("_npi_normal", params);

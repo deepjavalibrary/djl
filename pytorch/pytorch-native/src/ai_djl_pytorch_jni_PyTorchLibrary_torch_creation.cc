@@ -94,3 +94,17 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArange(
   const auto* tensor_ptr = new torch::Tensor(torch::arange(start_ptr->item(), end_ptr->item(), step_ptr->item(), options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEye(
+  JNIEnv* env,
+  jobject jthis,
+  jint jn,
+  jint jm,
+  jint jdtype,
+  jint jlayout,
+  jintArray jdevice,
+  jboolean jrequired_grad) {
+  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
+  const auto* tensor_ptr = new torch::Tensor(torch::eye(jn, jm, options));
+  return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
+}

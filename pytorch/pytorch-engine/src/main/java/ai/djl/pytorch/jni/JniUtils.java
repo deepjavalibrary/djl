@@ -506,6 +506,57 @@ public final class JniUtils {
                 self.getManager(), PyTorchLibrary.LIB.torchNeg(self.getHandle(), inplace));
     }
 
+    public static PtNDArray normal(
+            PtNDManager manager,
+            double mean,
+            double std,
+            Shape size,
+            DataType dataType,
+            Device device) {
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.atNormal(
+                        mean,
+                        std,
+                        size.getShape(),
+                        dataType.ordinal(),
+                        layoutMapper(SparseFormat.DENSE),
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        false));
+    }
+
+    public static PtNDArray uniform(
+            PtNDManager manager,
+            double low,
+            double high,
+            Shape size,
+            DataType dataType,
+            Device device) {
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.tensorUniform(
+                        low,
+                        high,
+                        size.getShape(),
+                        dataType.ordinal(),
+                        layoutMapper(SparseFormat.DENSE),
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        false));
+    }
+
+    public static PtNDArray eye(
+            PtNDManager manager, int n, int m, DataType dataType, Device device) {
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchEye(
+                        n,
+                        m,
+                        dataType.ordinal(),
+                        layoutMapper(SparseFormat.DENSE),
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        false));
+    }
+
     public static PtNDArray normalize(PtNDArray ndArray, float[] mean, float[] std) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.normalize(ndArray.getHandle(), mean, std));

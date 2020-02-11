@@ -135,7 +135,10 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (k != 0) {
+            throw new IllegalArgumentException("index of the diagonal is not supported in PyTorch");
+        }
+        return JniUtils.eye(this, rows, cols, dataType, device);
     }
 
     /** {@inheritDoc} */
@@ -148,14 +151,16 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public NDArray randomUniform(
             Number low, Number high, Shape shape, DataType dataType, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.uniform(
+                this, low.doubleValue(), high.doubleValue(), shape, dataType, device);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
             Number loc, Number scale, Shape shape, DataType dataType, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.normal(
+                this, loc.doubleValue(), scale.doubleValue(), shape, dataType, device);
     }
 
     /** {@inheritDoc} */

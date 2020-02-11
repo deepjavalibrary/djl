@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests.ndarray;
 
-import ai.djl.engine.EngineException;
 import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -568,10 +567,12 @@ public class NDArrayOtherOpTest {
         }
     }
 
-    @Test(expectedExceptions = EngineException.class)
+    @Test
     public void testSwapAxes() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.arange(10).reshape(new Shape(2, 5));
+            NDArray array =
+                    manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f})
+                            .reshape(new Shape(2, 5));
             NDArray expected =
                     manager.create(new float[] {0, 5, 1, 6, 2, 7, 3, 8, 4, 9}, new Shape(5, 2));
             Assert.assertEquals(array.swapAxes(0, 1), expected);
@@ -642,14 +643,14 @@ public class NDArrayOtherOpTest {
         }
     }
 
-    @Test(expectedExceptions = EngineException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testArgMax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array =
                     manager.create(
                             new float[] {
-                                1, 2, 3, 4, 4, 5, 6, 23, 54, 234, 54, 23, 54, 4, 34, 34, 23, 54, 4,
-                                3
+                                1, 2, 3, 4, 7, 9, 6, 23, 54, 234, 51, 33, 52, 0, 37, 34, 21, 59, 46,
+                                32
                             },
                             new Shape(4, 5));
             NDArray argMax = array.argMax();
@@ -657,11 +658,11 @@ public class NDArrayOtherOpTest {
             Assert.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             argMax = array.argMax(0);
-            expected = manager.create(new long[] {2, 2, 2, 1, 1});
+            expected = manager.create(new long[] {2, 2, 3, 1, 1});
             Assert.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             argMax = array.argMax(1);
-            expected = manager.create(new long[] {3, 4, 0, 2});
+            expected = manager.create(new long[] {4, 4, 2, 2});
             Assert.assertEquals(argMax, expected, "Argmax: Incorrect value");
 
             // scalar
@@ -674,23 +675,26 @@ public class NDArrayOtherOpTest {
 
             // TODO MXNet engine crash
             // zero-dim
-            // array = manager.create(new Shape(2, 0, 1));
-            // array.argMax();
+            array = manager.create(new Shape(2, 0, 1));
+            expected = manager.create(new Shape(0, 1), DataType.INT64);
+            Assert.assertEquals(array.argMax(0), expected);
+            // throw IllegalArgumentException
+            array.argMax();
         }
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testArgMin() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array =
                     manager.create(
                             new float[] {
-                                1, 23, 3, 74, 4, 5, 6, -23, -54, 234, 54, 2, 54, 4, -34, 34, 23,
-                                -54, 4, 3
+                                1, 23, 3, 74, 4, 5, 6, -23, -54, 234, 154, 2, 50, 42, -34, 34, 23,
+                                -59, 10, 2
                             },
                             new Shape(4, 5));
             NDArray argMin = array.argMin();
-            NDArray expected = manager.create(8L);
+            NDArray expected = manager.create(17L);
             Assert.assertEquals(argMin, expected, "ArgMin: Incorrect value");
 
             argMin = array.argMin(0);
@@ -711,6 +715,7 @@ public class NDArrayOtherOpTest {
             array = manager.create(new Shape(0, 1, 0));
             expected = manager.create(new Shape(0, 0), DataType.INT64);
             Assert.assertEquals(array.argMin(1), expected, "ArgMin: Incorrect value");
+            array.argMin();
         }
     }
 }

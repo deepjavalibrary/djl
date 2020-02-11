@@ -17,6 +17,7 @@ import ai.djl.ndarray.Matrix;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.NDIndexFullSlice;
 import ai.djl.ndarray.internal.NDFormat;
@@ -236,6 +237,12 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(NDArray other) {
+        if (other == null || (!shapeEquals(other))) {
+            return false;
+        }
+        if (getDataType() != other.getDataType()) {
+            return false;
+        }
         return JniUtils.contentEqual(this, (PtNDArray) other);
     }
 
@@ -518,7 +525,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray square() {
-        return JniUtils.sqrt(this);
+        return pow(2);
     }
 
     /** {@inheritDoc} */
@@ -718,7 +725,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray mean() {
-        return JniUtils.sum(this);
+        return JniUtils.mean(this);
     }
 
     /** {@inheritDoc} */
@@ -980,24 +987,38 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray argMax() {
+        if (isEmpty()) {
+            throw new IllegalArgumentException("attempt to get argMax of an empty NDArray");
+        }
         return JniUtils.argMax(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray argMax(long axis) {
+    public PtNDArray argMax(int axis) {
+        if (isEmpty()) {
+            Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
+            return (PtNDArray) manager.create(newShape, DataType.INT64);
+        }
         return JniUtils.argMax(this, axis, false);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray argMin() {
+        if (isEmpty()) {
+            throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");
+        }
         return JniUtils.argMin(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray argMin(long axis) {
+    public PtNDArray argMin(int axis) {
+        if (isEmpty()) {
+            Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
+            return (PtNDArray) manager.create(newShape, DataType.INT64);
+        }
         return JniUtils.argMin(this, axis, false);
     }
 

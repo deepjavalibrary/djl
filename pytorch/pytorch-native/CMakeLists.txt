@@ -16,6 +16,7 @@ set(SOURCE_FILES
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_isjm.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_pointwise.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_reduction.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_random_sampling.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_other.cc")
 add_library(djl_torch SHARED ${SOURCE_FILES})
 target_link_libraries(djl_torch "${TORCH_LIBRARIES}")

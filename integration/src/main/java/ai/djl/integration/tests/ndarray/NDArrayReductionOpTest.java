@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests.ndarray;
 
-import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -21,7 +20,7 @@ import org.testng.annotations.Test;
 
 public class NDArrayReductionOpTest {
 
-    @Test(expectedExceptions = EngineException.class)
+    @Test
     public void testMax() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1f, 2f, 5f, 1f});
@@ -50,7 +49,7 @@ public class NDArrayReductionOpTest {
         }
     }
 
-    @Test(expectedExceptions = EngineException.class)
+    @Test
     public void testMin() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {2f, 1f, 5f, 0f});
