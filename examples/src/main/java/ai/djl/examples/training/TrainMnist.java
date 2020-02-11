@@ -55,7 +55,10 @@ public final class TrainMnist {
 
         // Construct neural network
         Block block =
-                new Mlp(Mnist.IMAGE_HEIGHT * Mnist.IMAGE_WIDTH, Mnist.NUM_CLASSES, new int[] {5});
+                new Mlp(
+                        Mnist.IMAGE_HEIGHT * Mnist.IMAGE_WIDTH,
+                        Mnist.NUM_CLASSES,
+                        new int[] {128, 64});
 
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
