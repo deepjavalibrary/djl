@@ -154,10 +154,13 @@ inline torch::TensorOptions CreateTensorOptions(JNIEnv* env,
                                                 jboolean jrequired_grad) {
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   auto options = torch::TensorOptions()
-    .dtype(GetScalarTypeFromDType(jdtype))
     .layout((jlayout == 0) ? torch::kStrided : torch::kSparse)
     .device(device)
     .requires_grad(JNI_TRUE == jrequired_grad);
+  // DJL's UNKNOWN type
+  if (jdtype != 8) {
+   options = options.dtype(GetScalarTypeFromDType(jdtype));
+  }
   return options;
 }
 } // namespace utils

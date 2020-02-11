@@ -48,18 +48,9 @@ public final class PyTorchLibrary {
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
     public native Pointer torchArange(
-            int start,
-            int end,
-            int step,
-            int dType,
-            int layout,
-            int[] device,
-            boolean requiredGrad);
-
-    public native Pointer torchArange(
-            double start,
-            double end,
-            double step,
+            Pointer start,
+            Pointer end,
+            Pointer step,
             int dType,
             int layout,
             int[] device,

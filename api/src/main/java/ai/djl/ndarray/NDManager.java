@@ -147,6 +147,28 @@ public interface NDManager extends AutoCloseable {
     /**
      * Creates and initializes a scalar {@link NDArray}.
      *
+     * @param data the {@link Number} that needs to be set
+     * @return a new instance of {@link NDArray}
+     */
+    default NDArray create(Number data) {
+        if (data instanceof Integer) {
+            return create(data.intValue());
+        } else if (data instanceof Float) {
+            return create(data.floatValue());
+        } else if (data instanceof Double) {
+            return create(data.doubleValue());
+        } else if (data instanceof Long) {
+            return create(data.longValue());
+        } else if (data instanceof Byte) {
+            return create(data.byteValue());
+        } else {
+            throw new IllegalArgumentException("Short conversion not supported!");
+        }
+    }
+
+    /**
+     * Creates and initializes a scalar {@link NDArray}.
+     *
      * @param data the float that needs to be set
      * @return a new instance of {@link NDArray}
      */
@@ -613,7 +635,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray arange(Number stop) {
-        return arange(0, stop, 1, null, getDevice());
+        return arange(0, stop, 1, DataType.UNKNOWN, getDevice());
     }
 
     /**
@@ -629,7 +651,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray arange(Number start, Number stop) {
-        return arange(start, stop, 1, null, getDevice());
+        return arange(start, stop, 1, DataType.UNKNOWN, getDevice());
     }
 
     /**
@@ -646,7 +668,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray arange(Number start, Number stop, Number step) {
-        return arange(start, stop, step, null, getDevice());
+        return arange(start, stop, step, DataType.UNKNOWN, getDevice());
     }
 
     /**

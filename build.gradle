@@ -52,10 +52,12 @@ configure(javaProjects()) {
         }
 
         doFirst {
+            systemProperties System.getProperties()
+            systemProperties.remove("user.dir")
+            systemProperty "java.library.path", "${rootProject.projectDir}/pytorch/pytorch-native/build"
             systemProperty "ai.djl.logging.level", "debug"
             systemProperty "disableProgressBar", "true"
             systemProperty "nightly", System.getProperty("nightly", "false")
-            systemProperty "java.library.path=", "pytorch/native/build"
             if (gradle.startParameter.offline) {
                 systemProperty "offline", "true"
             }

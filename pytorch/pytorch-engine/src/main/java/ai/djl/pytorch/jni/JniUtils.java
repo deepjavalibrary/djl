@@ -110,9 +110,9 @@ public final class JniUtils {
 
     public static PtNDArray arange(
             PtNDManager manager,
-            int start,
-            int end,
-            int step,
+            PtNDArray start,
+            PtNDArray stop,
+            PtNDArray step,
             DataType dType,
             Device device,
             SparseFormat fmt) {
@@ -120,30 +120,9 @@ public final class JniUtils {
         return new PtNDArray(
                 manager,
                 PyTorchLibrary.LIB.torchArange(
-                        start,
-                        end,
-                        step,
-                        dType.ordinal(),
-                        layoutVal,
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
-                        false));
-    }
-
-    public static PtNDArray arange(
-            PtNDManager manager,
-            double start,
-            double end,
-            double step,
-            DataType dType,
-            Device device,
-            SparseFormat fmt) {
-        int layoutVal = layoutMapper(fmt);
-        return new PtNDArray(
-                manager,
-                PyTorchLibrary.LIB.torchArange(
-                        start,
-                        end,
-                        step,
+                        start.getHandle(),
+                        stop.getHandle(),
+                        step.getHandle(),
                         dType.ordinal(),
                         layoutVal,
                         new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},

@@ -230,7 +230,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
-        return JniUtils.contentEqual(this, numberToNDArray(number));
+        return JniUtils.contentEqual(this, (PtNDArray) manager.create(number));
     }
 
     /** {@inheritDoc} */
@@ -242,7 +242,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray eq(Number other) {
-        return eq(numberToNDArray(other));
+        return eq(manager.create(other));
     }
 
     /** {@inheritDoc} */
@@ -254,7 +254,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray neq(Number other) {
-        return neq(numberToNDArray(other));
+        return neq(manager.create(other));
     }
 
     /** {@inheritDoc} */
@@ -266,7 +266,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray gt(Number other) {
-        return gt(numberToNDArray(other));
+        return gt(manager.create(other));
     }
 
     /** {@inheritDoc} */
@@ -278,7 +278,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray gte(Number other) {
-        return gte(numberToNDArray(other));
+        return gte(manager.create(other));
     }
 
     /** {@inheritDoc} */
@@ -290,7 +290,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray lt(Number other) {
-        return lt(numberToNDArray(other));
+        return lt(manager.create(other));
     }
 
     /** {@inheritDoc} */
@@ -302,7 +302,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray lte(Number other) {
-        return lte(numberToNDArray(other));
+        return lte(manager.create(other));
     }
 
     /** {@inheritDoc} */
@@ -314,7 +314,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray add(Number n) {
-        return add(numberToNDArray(n));
+        return add(manager.create(n));
     }
 
     /** {@inheritDoc} */
@@ -326,7 +326,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray sub(Number n) {
-        return sub(numberToNDArray(n));
+        return sub(manager.create(n));
     }
 
     /** {@inheritDoc} */
@@ -338,7 +338,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray mul(Number n) {
-        return mul(numberToNDArray(n));
+        return mul(manager.create(n));
     }
 
     /** {@inheritDoc} */
@@ -350,7 +350,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray div(Number n) {
-        return div(numberToNDArray(n));
+        return div(manager.create(n));
     }
 
     /** {@inheritDoc} */
@@ -374,7 +374,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray pow(Number n) {
-        return pow(numberToNDArray(n));
+        return pow(manager.create(n));
     }
 
     /** {@inheritDoc} */
@@ -458,7 +458,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray maximum(Number n) {
-        return JniUtils.max(this, numberToNDArray(n));
+        return JniUtils.max(this, (PtNDArray) manager.create(n));
     }
 
     /** {@inheritDoc} */
@@ -470,7 +470,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray minimum(Number n) {
-        return JniUtils.min(this, numberToNDArray(n));
+        return JniUtils.min(this, (PtNDArray) manager.create(n));
     }
 
     /** {@inheritDoc} */
@@ -524,7 +524,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray cbrt() {
-        return JniUtils.pow(this, numberToNDArray(1 / 3));
+        return JniUtils.pow(this, (PtNDArray) manager.create(1.0 / 3));
     }
 
     /** {@inheritDoc} */
@@ -656,7 +656,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray toRadians() {
-        return mul(Math.PI).div(numberToNDArray(180.0));
+        return mul(Math.PI).div(manager.create(180.0));
     }
 
     /** {@inheritDoc} */
@@ -1069,30 +1069,6 @@ public class PtNDArray extends NativeResource implements NDArray {
             return "This array is already closed";
         }
         return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns);
-    }
-
-    /**
-     * Convert number into Scalar NDArray.
-     *
-     * <p>In PyTorch, this value will be considered as c10::Scalar type for all purposes.
-     *
-     * @param number the number used for conversion
-     * @return the Scalar {@code NDArray}
-     */
-    private PtNDArray numberToNDArray(Number number) {
-        if (number instanceof Integer) {
-            return (PtNDArray) manager.create(number.intValue());
-        } else if (number instanceof Float) {
-            return (PtNDArray) manager.create(number.floatValue());
-        } else if (number instanceof Double) {
-            return (PtNDArray) manager.create(number.doubleValue());
-        } else if (number instanceof Long) {
-            return (PtNDArray) manager.create(number.longValue());
-        } else if (number instanceof Byte) {
-            return (PtNDArray) manager.create(number.byteValue());
-        } else {
-            throw new IllegalArgumentException("Short conversion not supported!");
-        }
     }
 
     /** {@inheritDoc} */

@@ -168,7 +168,7 @@ public class MxNDManager extends BaseNDManager {
         params.addParam("start", start);
         params.addParam("stop", stop);
         params.addParam("step", step);
-        if (dataType != null) {
+        if (dataType != DataType.UNKNOWN) {
             params.setDataType(dataType);
         }
         params.setDevice(Device.defaultIfNull(dev, device));

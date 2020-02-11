@@ -77,32 +77,20 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArange__IIIII_3IZ(
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArange(
   JNIEnv* env,
   jobject jthis,
-  jint jstart,
-  jint jend,
-  jint jstep,
+  jobject jstart,
+  jobject jend,
+  jobject jstep,
   jint jdtype,
   jint jlayout,
   jintArray jdevice,
   jboolean jrequired_grad) {
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
-  const auto* tensor_ptr = new torch::Tensor(torch::arange(jstart, jend, jstep, options));
-  return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
-}
-
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArange__DDDII_3IZ(
-  JNIEnv* env,
-  jobject jthis,
-  jdouble jstart,
-  jdouble jend,
-  jdouble jstep,
-  jint jdtype,
-  jint jlayout,
-  jintArray jdevice,
-  jboolean jrequired_grad) {
-  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
-  const auto* tensor_ptr = new torch::Tensor(torch::arange(jstart, jend, jstep, options));
+  const auto* start_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jstart);
+  const auto* end_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jend);
+  const auto* step_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jstep);
+  const auto* tensor_ptr = new torch::Tensor(torch::arange(start_ptr->item(), end_ptr->item(), step_ptr->item(), options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
