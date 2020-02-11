@@ -481,14 +481,32 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public PtNDArray all() {
+        return JniUtils.all(toType(DataType.BOOLEAN, true));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArray any() {
+        return JniUtils.any(toType(DataType.BOOLEAN, true));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArray none() {
+        return JniUtils.none(toType(DataType.BOOLEAN, true));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray neg() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.neg(this, false);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray negi() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.neg(this, true);
     }
 
     /** {@inheritDoc} */

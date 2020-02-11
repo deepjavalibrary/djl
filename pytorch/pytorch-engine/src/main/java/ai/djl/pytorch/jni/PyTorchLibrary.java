@@ -157,6 +157,12 @@ public final class PyTorchLibrary {
 
     public native Pointer torchTanh(Pointer handle);
 
+    public native Pointer torchAll(Pointer self);
+
+    public native Pointer torchAny(Pointer self);
+
+    public native Pointer torchNone(Pointer self);
+
     public native Pointer torchEq(Pointer self, Pointer other);
 
     public native Pointer torchNeq(Pointer self, Pointer other);
@@ -168,6 +174,8 @@ public final class PyTorchLibrary {
     public native Pointer torchLt(Pointer self, Pointer other);
 
     public native Pointer torchLte(Pointer self, Pointer other);
+
+    public native Pointer torchNeg(Pointer self, boolean inplace);
 
     public native Pointer normalize(Pointer handle, float[] mean, float[] std);
 

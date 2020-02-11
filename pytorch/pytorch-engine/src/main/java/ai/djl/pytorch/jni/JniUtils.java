@@ -377,6 +377,21 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.torchTanh(ndArray.getHandle()));
     }
 
+    public static PtNDArray all(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchAll(ndArray.getHandle()));
+    }
+
+    public static PtNDArray any(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchAny(ndArray.getHandle()));
+    }
+
+    public static PtNDArray none(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchNone(ndArray.getHandle()));
+    }
+
     public static PtNDArray eq(PtNDArray self, PtNDArray other) {
         return new PtNDArray(
                 self.getManager(), PyTorchLibrary.LIB.torchEq(self.getHandle(), other.getHandle()));
@@ -408,6 +423,11 @@ public final class JniUtils {
         return new PtNDArray(
                 self.getManager(),
                 PyTorchLibrary.LIB.torchLte(self.getHandle(), other.getHandle()));
+    }
+
+    public static PtNDArray neg(PtNDArray self, boolean inplace) {
+        return new PtNDArray(
+                self.getManager(), PyTorchLibrary.LIB.torchNeg(self.getHandle(), inplace));
     }
 
     public static PtNDArray normalize(PtNDArray ndArray, float[] mean, float[] std) {
