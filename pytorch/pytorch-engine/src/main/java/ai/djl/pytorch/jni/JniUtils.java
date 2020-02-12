@@ -265,7 +265,8 @@ public final class JniUtils {
 
     public static PtNDArray max(PtNDArray ndArray1, PtNDArray ndArray2) {
         return new PtNDArray(
-                ndArray1.getManager(), PyTorchLibrary.LIB.torchMax(ndArray2.getHandle()));
+                ndArray1.getManager(),
+                PyTorchLibrary.LIB.torchMax(ndArray1.getHandle(), ndArray2.getHandle()));
     }
 
     public static PtNDArray max(PtNDArray ndArray) {
@@ -281,7 +282,8 @@ public final class JniUtils {
 
     public static PtNDArray min(PtNDArray ndArray1, PtNDArray ndArray2) {
         return new PtNDArray(
-                ndArray1.getManager(), PyTorchLibrary.LIB.torchMax(ndArray2.getHandle()));
+                ndArray1.getManager(),
+                PyTorchLibrary.LIB.torchMin(ndArray1.getHandle(), ndArray2.getHandle()));
     }
 
     public static PtNDArray min(PtNDArray ndArray) {
