@@ -77,7 +77,18 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return JniUtils.moduleForward(this, inputs);
+        IValue[] iValues =
+                inputs.stream()
+                        .map(input -> IValue.fromNDArray((PtNDArray) input))
+                        .toArray(IValue[]::new);
+        IValue result = JniUtils.moduleForward(this, iValues);
+        if (result.isNDArray()) {
+            return new NDList(new NDList(result.toNDArray()));
+        } else if (result.isNDList()) {
+            return result.toNDList();
+        } else {
+            throw new UnsupportedOperationException("Unsupported IValue type");
+        }
     }
 
     @Override

@@ -237,4 +237,22 @@ public final class PyTorchLibrary {
     public native Pointer iValueCreateFromTensor(Pointer tensorHandle);
 
     public native Pointer iValueToTensor(Pointer iValueHandle);
+
+    public native Pointer[] iValueToTensorList(Pointer iValueHandle);
+
+    public native Pointer[] iValueToList(Pointer iValueHandle);
+
+    public native Pointer[] iValueToMap(Pointer iValueHandle);
+
+    public native String iValueToString(Pointer iValueHandle);
+
+    public native boolean iValueIsString(Pointer iValueHandle);
+
+    public native boolean iValueIsTensor(Pointer iValueHandle);
+
+    public native boolean iValueIsTensorList(Pointer iValueHandle);
+
+    public native boolean iValueIsList(Pointer iValueHandle);
+
+    public native boolean iValueIsMap(Pointer iValueHandle);
 }
