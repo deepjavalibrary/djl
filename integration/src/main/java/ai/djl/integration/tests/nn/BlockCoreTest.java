@@ -15,6 +15,7 @@ package ai.djl.integration.tests.nn;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -26,6 +27,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.Parameter;
+import ai.djl.nn.ParameterList;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv1D;
 import ai.djl.nn.convolutional.Conv2D;
@@ -39,10 +41,13 @@ import ai.djl.nn.recurrent.LSTM;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -336,14 +341,14 @@ public class BlockCoreTest {
 
     @Test
     public void testRNNTanh() throws IOException, MalformedModelException {
+        Loss loss = new SoftmaxCrossEntropyLoss("SmCeLoss", 1, -1, false, true);
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                new DefaultTrainingConfig(loss)
+                        .optInitializer(new XavierInitializer())
                         .optDevices(getDevices());
-
         Block block =
                 RNN.builder()
-                        .setStateSize(5)
+                        .setStateSize(4)
                         .setNumStackedLayers(1)
                         .setActivation(RNN.Activation.TANH)
                         .build();
@@ -351,14 +356,83 @@ public class BlockCoreTest {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                Shape inputShape = new Shape(3, 4, 4);
+                Shape inputShape = new Shape(1, 2, 4);
+                Engine.getInstance().setRandomSeed(1234);
                 trainer.initialize(inputShape);
-
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.arange(0.0f, 48.0f).reshape(inputShape);
-                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                Assertions.assertAlmostEquals(result, manager.ones(new Shape(3, 4, 5)));
+                NDArray data = manager.randomUniform(0, 10, inputShape);
+                NDArray labels = manager.randomUniform(0, 1, inputShape);
+                try (GradientCollector collector = trainer.newGradientCollector()) {
+                    NDList result = trainer.forward(new NDList(data));
+                    NDArray expected =
+                            manager.create(
+                                    new float[] {
+                                        0.9411f, 1f, 1f, 0.918f, -0.9883f, 1f, 1f, -0.4683f
+                                    },
+                                    new Shape(1, 2, 4));
+                    Assertions.assertAlmostEquals(result.singletonOrThrow(), expected);
+                    NDArray lossValue = loss.evaluate(new NDList(labels), result);
+                    Assertions.assertAlmostEquals(lossValue.getFloat(), -1.14439737);
 
+                    collector.backward(lossValue);
+                    ParameterList parameterList = model.getBlock().getParameters();
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(0).getValue().getArray(),
+                            new Shape(4, 4),
+                            3.059284f,
+                            0.19120525f,
+                            0.8596075f,
+                            -0.8024095f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(0).getValue().getArray().getGradient(),
+                            new Shape(4, 4),
+                            -1.7775341f,
+                            -0.11109588f,
+                            -7.650868E-9f,
+                            -0.5153482f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(1).getValue().getArray(),
+                            new Shape(4, 4),
+                            -1.9064846f,
+                            -0.11915529f,
+                            0.84814364f,
+                            -0.7939344f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(1).getValue().getArray().getGradient(),
+                            new Shape(4, 4),
+                            -0.01559069f,
+                            -9.7441813E-4f,
+                            0.0f,
+                            -0.003516526f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(2).getValue().getArray(),
+                            new Shape(4),
+                            0f,
+                            0f,
+                            0f,
+                            0f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(2).getValue().getArray().getGradient(),
+                            new Shape(4),
+                            -0.07112471f,
+                            -0.017781178f,
+                            -9.5081925E-9f,
+                            -0.055576526f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(3).getValue().getArray(),
+                            new Shape(4),
+                            0f,
+                            0f,
+                            0f,
+                            0f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(3).getValue().getArray().getGradient(),
+                            new Shape(4),
+                            -0.07112471f,
+                            -0.017781178f,
+                            -9.5081925E-9f,
+                            -0.055576526f);
+                }
                 testEncode(manager, block);
             }
         }
@@ -366,14 +440,14 @@ public class BlockCoreTest {
 
     @Test
     public void testRNNRelu() throws IOException, MalformedModelException {
+        Loss loss = new SoftmaxCrossEntropyLoss("SmCeLoss", 1, -1, false, true);
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                new DefaultTrainingConfig(loss)
+                        .optInitializer(new XavierInitializer())
                         .optDevices(getDevices());
-
         Block block =
                 RNN.builder()
-                        .setStateSize(5)
+                        .setStateSize(4)
                         .setNumStackedLayers(1)
                         .setActivation(RNN.Activation.RELU)
                         .build();
@@ -382,17 +456,83 @@ public class BlockCoreTest {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 2, 4);
+                Engine.getInstance().setRandomSeed(1234);
                 trainer.initialize(inputShape);
-
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.arange(0.0f, 8.0f).reshape(inputShape);
-                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                NDArray expected =
-                        manager.create(
-                                new float[] {6, 6, 6, 6, 6, 52, 52, 52, 52, 52},
-                                new Shape(1, 2, 5));
-                Assert.assertEquals(result, expected);
+                NDArray data = manager.randomUniform(0, 10, inputShape);
+                NDArray labels = manager.randomUniform(0, 1, inputShape);
+                try (GradientCollector collector = trainer.newGradientCollector()) {
+                    NDList result = trainer.forward(new NDList(data));
+                    NDArray expected =
+                            manager.create(
+                                    new float[] {
+                                        1.7478f, 8.0788f, 8.8983f, 1.5759f, 0f, 10.8066f, 4.7126f,
+                                        0f
+                                    },
+                                    new Shape(1, 2, 4));
+                    Assertions.assertAlmostEquals(result.singletonOrThrow(), expected);
+                    NDArray lossValue = loss.evaluate(new NDList(labels), result);
+                    Assertions.assertAlmostEquals(lossValue.getFloat(), -6.27057);
 
+                    collector.backward(lossValue);
+                    ParameterList parameterList = model.getBlock().getParameters();
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(0).getValue().getArray(),
+                            new Shape(4, 4),
+                            3.059284f,
+                            0.19120525f,
+                            0.8596075f,
+                            -0.8024095f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(0).getValue().getArray().getGradient(),
+                            new Shape(4, 4),
+                            -22.968185f,
+                            -1.4355116f,
+                            -0.02831553f,
+                            -3.8558674f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(1).getValue().getArray(),
+                            new Shape(4, 4),
+                            -1.9064846f,
+                            -0.11915529f,
+                            0.84814364f,
+                            -0.7939344f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(1).getValue().getArray().getGradient(),
+                            new Shape(4, 4),
+                            -7.3317056f,
+                            -0.4582316f,
+                            0f,
+                            -2.2465506f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(2).getValue().getArray(),
+                            new Shape(4),
+                            0f,
+                            0f,
+                            0f,
+                            0f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(2).getValue().getArray().getGradient(),
+                            new Shape(4),
+                            -0.9217882f,
+                            -0.23044705f,
+                            -0.035189405f,
+                            -0.43959588f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(3).getValue().getArray(),
+                            new Shape(4),
+                            0f,
+                            0f,
+                            0f,
+                            0f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(3).getValue().getArray().getGradient(),
+                            new Shape(4),
+                            -0.9217882f,
+                            -0.23044705f,
+                            -0.035189405f,
+                            -0.43959588f);
+                }
                 testEncode(manager, block);
             }
         }
@@ -400,31 +540,94 @@ public class BlockCoreTest {
 
     @Test
     public void testLstm() throws IOException, MalformedModelException {
+        Loss loss = new SoftmaxCrossEntropyLoss("SmCeLoss", 1, -1, false, true);
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                new DefaultTrainingConfig(loss)
+                        .optInitializer(new XavierInitializer())
                         .optDevices(getDevices());
-
         Block block = LSTM.builder().setStateSize(4).setNumStackedLayers(1).build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 2, 4);
+                Engine.getInstance().setRandomSeed(1234);
                 trainer.initialize(inputShape);
-
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.arange(0.0f, 8.0f).reshape(inputShape);
-                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                NDArray expected =
-                        manager.create(
-                                new float[] {
-                                    0.7587f, 0.7587f, 0.7587f, 0.7587f, 0.9639f, 0.9639f, 0.9639f,
-                                    0.9639f
-                                },
-                                new Shape(1, 2, 4));
-                Assertions.assertAlmostEquals(result, expected);
+                NDArray data = manager.randomUniform(0, 10, inputShape);
+                NDArray labels = manager.randomUniform(0, 1, inputShape);
+                try (GradientCollector collector = trainer.newGradientCollector()) {
+                    NDList result = trainer.forward(new NDList(data));
+                    NDArray expected =
+                            manager.create(
+                                    new float[] {
+                                        0.0028f, 0.0253f, -0.0273f, -0.0095f, 0.3141f, 0.5168f,
+                                        -0.0266f, -0.6412f
+                                    },
+                                    new Shape(1, 2, 4));
+                    Assertions.assertAlmostEquals(result.singletonOrThrow(), expected);
+                    NDArray lossValue = loss.evaluate(new NDList(labels), result);
+                    Assertions.assertAlmostEquals(lossValue.getFloat(), -0.03504385f);
 
+                    collector.backward(lossValue);
+                    ParameterList parameterList = model.getBlock().getParameters();
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(0).getValue().getArray(),
+                            new Shape(16, 4),
+                            -0.23054221f,
+                            -0.003602222f,
+                            0.5436635f,
+                            -0.537854f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(0).getValue().getArray().getGradient(),
+                            new Shape(16, 4),
+                            -0.48049742f,
+                            -0.007507772f,
+                            0.0771877f,
+                            -0.22537863f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(1).getValue().getArray(),
+                            new Shape(16, 4),
+                            1.2113954f,
+                            0.018928053f,
+                            0.5252731f,
+                            -0.54756975f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(1).getValue().getArray().getGradient(),
+                            new Shape(16, 4),
+                            1.9402013E-4f,
+                            3.0315646E-6f,
+                            6.4684724E-4f,
+                            -6.010107E-4f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(2).getValue().getArray(),
+                            new Shape(16),
+                            0f,
+                            0f,
+                            0f,
+                            0f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(2).getValue().getArray().getGradient(),
+                            new Shape(16),
+                            -0.017782848f,
+                            -0.001111428f,
+                            0.008951807f,
+                            -0.027755652f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(3).getValue().getArray(),
+                            new Shape(16),
+                            0f,
+                            0f,
+                            0f,
+                            0f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(3).getValue().getArray().getGradient(),
+                            new Shape(16),
+                            -0.017782848f,
+                            -0.001111428f,
+                            0.008951807f,
+                            -0.027755652f);
+                }
                 testEncode(manager, block);
             }
         }
@@ -432,31 +635,95 @@ public class BlockCoreTest {
 
     @Test
     public void testGRU() throws IOException, MalformedModelException {
-        TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
-                        .optDevices(getDevices());
 
+        Loss loss = new SoftmaxCrossEntropyLoss("SmCeLoss", 1, -1, false, true);
+        TrainingConfig config =
+                new DefaultTrainingConfig(loss)
+                        .optInitializer(new XavierInitializer())
+                        .optDevices(getDevices());
         GRU block = GRU.builder().setStateSize(4).setNumStackedLayers(1).build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(1, 2, 4);
+                Engine.getInstance().setRandomSeed(1234);
                 trainer.initialize(inputShape);
-
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.arange(0.0f, 8.0f).reshape(inputShape);
-                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                NDArray expected =
-                        manager.create(
-                                new float[] {
-                                    0.0025f, 0.0025f, 0.0025f, 0.0025f, 0.0025f, 0.0025f, 0.0025f,
-                                    0.0025f
-                                },
-                                new Shape(1, 2, 4));
-                Assertions.assertAlmostEquals(result, expected);
+                NDArray data = manager.randomUniform(0, 10, inputShape);
+                NDArray labels = manager.randomUniform(0, 1, inputShape);
+                try (GradientCollector collector = trainer.newGradientCollector()) {
+                    NDList result = trainer.forward(new NDList(data));
+                    NDArray expected =
+                            manager.create(
+                                    new float[] {
+                                        0.9973f, 0.6594f, -0.886f, -0.9176f, -0.0989f, 0.437f,
+                                        0.2401f, -0.933f
+                                    },
+                                    new Shape(1, 2, 4));
+                    Assertions.assertAlmostEquals(result.singletonOrThrow(), expected);
+                    NDArray lossValue = loss.evaluate(new NDList(labels), result);
+                    Assertions.assertAlmostEquals(lossValue.getFloat(), -0.104264974f);
 
+                    collector.backward(lossValue);
+                    ParameterList parameterList = model.getBlock().getParameters();
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(0).getValue().getArray(),
+                            new Shape(12, 4),
+                            0.12911546f,
+                            0.0026899055f,
+                            0.6078343f,
+                            -0.6013391f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(0).getValue().getArray().getGradient(),
+                            new Shape(12, 4),
+                            -10.557455f,
+                            -0.21994698f,
+                            0.18836471f,
+                            -2.2442424f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(1).getValue().getArray(),
+                            new Shape(12, 4),
+                            -0.085866004f,
+                            -0.0017888751f,
+                            0.5796961f,
+                            -0.6122016f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(1).getValue().getArray().getGradient(),
+                            new Shape(12, 4),
+                            0.06644759f,
+                            0.0013843249f,
+                            0.2643293f,
+                            -0.2872954f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(2).getValue().getArray(),
+                            new Shape(12),
+                            0f,
+                            0f,
+                            0f,
+                            0f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(2).getValue().getArray().getGradient(),
+                            new Shape(12),
+                            -0.64488584f,
+                            -0.053740487f,
+                            0.023915248f,
+                            -0.31230754f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(3).getValue().getArray(),
+                            new Shape(12),
+                            0f,
+                            0f,
+                            0f,
+                            0f);
+                    TestUtils.verifyNDArrayValues(
+                            parameterList.get(3).getValue().getArray().getGradient(),
+                            new Shape(12),
+                            -0.5020572f,
+                            -0.0418381f,
+                            0.023915248f,
+                            -0.3114909f);
+                }
                 testEncode(manager, block);
             }
         }

@@ -12,7 +12,12 @@
  */
 package ai.djl.integration.util;
 
+import ai.djl.TrainingDivergedException;
 import ai.djl.engine.Engine;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.Assertions;
+import org.testng.Assert;
 
 public final class TestUtils {
 
@@ -25,5 +30,17 @@ public final class TestUtils {
     public static boolean isMxnet() {
         Engine engine = Engine.getInstance();
         return "MXNet".equals(engine.getEngineName());
+    }
+
+    public static void verifyNDArrayValues(
+            NDArray array, Shape expectedShape, float sum, float mean, float max, float min) {
+        if (array.isNaN().any().getBoolean()) {
+            throw new TrainingDivergedException("There are NANs in this array");
+        }
+        Assert.assertEquals(array.getShape(), expectedShape);
+        Assertions.assertAlmostEquals(array.sum().getFloat(), sum);
+        Assertions.assertAlmostEquals(array.mean().getFloat(), mean);
+        Assertions.assertAlmostEquals(array.max().getFloat(), max);
+        Assertions.assertAlmostEquals(array.min().getFloat(), min);
     }
 }
