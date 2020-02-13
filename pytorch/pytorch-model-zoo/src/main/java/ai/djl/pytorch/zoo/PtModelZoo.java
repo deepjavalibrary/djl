@@ -13,6 +13,7 @@
 package ai.djl.pytorch.zoo;
 
 import ai.djl.pytorch.zoo.cv.classification.Resnet;
+import ai.djl.pytorch.zoo.cv.objectdetection.FasterRcnnDetectionModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelNotFoundException;
@@ -34,6 +35,8 @@ public class PtModelZoo implements ModelZoo {
     public static final String GROUP_ID = "ai.djl.pytorch";
 
     public static final Resnet RESNET = new Resnet(REPOSITORY);
+    public static final FasterRcnnDetectionModelLoader FASTER_RCNN =
+            new FasterRcnnDetectionModelLoader(REPOSITORY);
 
     /** {@inheritDoc} */
     @Override
