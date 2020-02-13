@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training.transferlearning;
 
+import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
@@ -22,8 +23,10 @@ import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
@@ -32,7 +35,9 @@ import ai.djl.nn.Blocks;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.dataset.Dataset;
@@ -42,10 +47,10 @@ import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.cli.ParseException;
 
 /**
@@ -114,15 +119,23 @@ public final class TrainResnetWithCifar10 {
             throws IOException, ModelNotFoundException, MalformedModelException {
         boolean isSymbolic = arguments.isSymbolic();
         boolean preTrained = arguments.isPreTrained();
-        Map<String, String> criteria = arguments.getCriteria();
+        Map<String, String> options = arguments.getCriteria();
+        Criteria.Builder<BufferedImage, Classifications> builder =
+                Criteria.builder()
+                        .optApplication(Application.CV.IMAGE_CLASSIFICATION)
+                        .setTypes(BufferedImage.class, Classifications.class)
+                        .optProgress(new ProgressBar())
+                        .optModelLoaderName("resnet");
         if (isSymbolic) {
             // load the model
-            if (criteria == null) {
-                criteria = new ConcurrentHashMap<>();
-                criteria.put("layers", "50");
-                criteria.put("flavor", "v1");
+            builder.optEngine(MxEngine.ENGINE_NAME).optModelZooName(MxModelZoo.NAME);
+            if (options == null) {
+                builder.optOption("layers", "50");
+                builder.optOption("flavor", "v1");
+            } else {
+                builder.optOptions(options);
             }
-            Model model = MxModelZoo.RESNET.loadModel(criteria, new ProgressBar());
+            Model model = ModelZoo.loadModel(builder.build());
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
             block.removeLastBlock();
@@ -138,14 +151,16 @@ public final class TrainResnetWithCifar10 {
         }
         // imperative resnet50
         if (preTrained) {
-            if (criteria == null) {
-                criteria = new ConcurrentHashMap<>();
-                criteria.put("layers", "50");
-                criteria.put("flavor", "v1");
-                criteria.put("dataset", "cifar10");
+            builder.optModelZooName(BasicModelZoo.NAME);
+            if (options == null) {
+                builder.optOption("layers", "50");
+                builder.optOption("flavor", "v1");
+                builder.optOption("dataset", "cifar10");
+            } else {
+                builder.optOptions(options);
             }
             // load pre-trained imperative ResNet50 from DJL model zoo
-            return BasicModelZoo.RESNET.loadModel(criteria, new ProgressBar());
+            return ModelZoo.loadModel(builder.build());
         } else {
             // construct new ResNet50 without pre-trained weights
             Model model = Model.newInstance();

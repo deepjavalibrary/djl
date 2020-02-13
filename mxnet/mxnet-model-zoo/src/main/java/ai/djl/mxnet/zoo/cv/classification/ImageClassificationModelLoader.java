@@ -12,6 +12,7 @@
  */
 package ai.djl.mxnet.zoo.cv.classification;
 
+import ai.djl.Application;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.modality.cv.transform.CenterCrop;
@@ -19,22 +20,21 @@ import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.Anchor;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorFactory;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** Model loader for Image Classification models. */
-public abstract class ImageClassificationModelLoader
-        extends BaseModelLoader<BufferedImage, Classifications> {
+public abstract class ImageClassificationModelLoader extends BaseModelLoader {
 
-    private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
+    private static final Application APPLICATION = Application.CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
 
     /**
@@ -46,24 +46,36 @@ public abstract class ImageClassificationModelLoader
      */
     public ImageClassificationModelLoader(
             Repository repository, String artifactId, String version) {
-        super(repository, new MRL(BASE_ANCHOR, GROUP_ID, artifactId), version);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, artifactId), version);
+        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
+        map.put(Classifications.class, new FactoryImpl());
+        factories.put(BufferedImage.class, map);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Translator<BufferedImage, Classifications> getTranslator(Artifact artifact) {
-        Map<String, Object> arguments = artifact.getArguments();
-        int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
-        int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
-        String flag = (String) arguments.getOrDefault("flag", NDImageUtils.Flag.COLOR.name());
+    public Application getApplication() {
+        return APPLICATION;
+    }
 
-        Pipeline pipeline = new Pipeline();
-        pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
+    private static final class FactoryImpl
+            implements TranslatorFactory<BufferedImage, Classifications> {
 
-        return ImageClassificationTranslator.builder()
-                .optFlag(NDImageUtils.Flag.valueOf(flag))
-                .setPipeline(pipeline)
-                .setSynsetArtifactName("synset.txt")
-                .build();
+        @Override
+        public Translator<BufferedImage, Classifications> newInstance(
+                Map<String, Object> arguments) {
+            int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
+            int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
+            String flag = (String) arguments.getOrDefault("flag", NDImageUtils.Flag.COLOR.name());
+
+            Pipeline pipeline = new Pipeline();
+            pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
+
+            return ImageClassificationTranslator.builder()
+                    .optFlag(NDImageUtils.Flag.valueOf(flag))
+                    .setPipeline(pipeline)
+                    .setSynsetArtifactName("synset.txt")
+                    .build();
+        }
     }
 }

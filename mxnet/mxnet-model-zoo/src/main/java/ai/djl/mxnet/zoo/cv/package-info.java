@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains classes for the computer vision section ({@link ai.djl.repository.MRL.Model.CV}) of the
- * {@link ai.djl.mxnet.zoo.MxModelZoo}.
+ * Contains classes for the computer vision section ({@link ai.djl.Application.CV}) of the {@link
+ * ai.djl.mxnet.zoo.MxModelZoo}.
  */
 package ai.djl.mxnet.zoo.cv;

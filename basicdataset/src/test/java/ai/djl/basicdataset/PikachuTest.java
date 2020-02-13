@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.Application.CV;
 import ai.djl.Model;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
@@ -63,7 +64,7 @@ public class PikachuTest {
         /** {@inheritDoc} */
         @Override
         public MRL getMrl() {
-            return new MRL(MRL.Dataset.CV, BasicDatasets.GROUP_ID, "pikachu-unittest");
+            return MRL.dataset(CV.OBJECT_DETECTION, BasicDatasets.GROUP_ID, "pikachu-unittest");
         }
     }
 }

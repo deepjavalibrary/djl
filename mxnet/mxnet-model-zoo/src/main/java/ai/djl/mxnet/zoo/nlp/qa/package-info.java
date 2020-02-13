@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains classes for the {@link ai.djl.repository.MRL.Model.NLP#QUESTION_ANSWER} models in the
- * {@link ai.djl.mxnet.zoo.MxModelZoo}.
+ * Contains classes for the {@link ai.djl.Application.NLP#QUESTION_ANSWER} models in the {@link
+ * ai.djl.mxnet.zoo.MxModelZoo}.
  */
 package ai.djl.mxnet.zoo.nlp.qa;

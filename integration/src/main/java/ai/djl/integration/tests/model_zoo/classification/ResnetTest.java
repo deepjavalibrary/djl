@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.model_zoo.classification;
 
+import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
@@ -26,7 +27,9 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -43,8 +46,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -135,10 +136,18 @@ public class ResnetTest {
         if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
             throw new SkipException("Model not supported");
         }
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("layers", "50");
-        criteria.put("dataset", "cifar10");
-        return BasicModelZoo.RESNET.loadModel(criteria);
+
+        Criteria<BufferedImage, Classifications> criteria =
+                Criteria.builder()
+                        .optApplication(Application.CV.IMAGE_CLASSIFICATION)
+                        .setTypes(BufferedImage.class, Classifications.class)
+                        .optModelZooName(BasicModelZoo.NAME)
+                        .optModelLoaderName("resnet")
+                        .optOption("layers", "50")
+                        .optOption("dataset", "cifar10")
+                        .build();
+
+        return ModelZoo.loadModel(criteria);
     }
 
     private static class TestTranslator implements Translator<NDList, NDList> {

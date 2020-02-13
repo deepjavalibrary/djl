@@ -13,21 +13,36 @@
 package ai.djl;
 
 /** A class contains common deep learning applications. */
-public interface Application {
+public class Application {
+
+    private String path;
+
+    Application(String path) {
+        this.path = path;
+    }
+
+    /**
+     * Returns the repository path of the application.
+     *
+     * @return the repository path of the application
+     */
+    public String getPath() {
+        return path;
+    }
 
     /** The common set of applications for computer vision. */
-    enum CV {
-        IMAGE_CLASSIFICATION,
-        OBJECT_DETECTION,
-        SEMANTIC_SEGMENTATION,
-        INSTANCE_SEGMENTATION,
-        POSE_ESTIMATION,
-        ACTION_RECOGNITION
+    public interface CV {
+        Application IMAGE_CLASSIFICATION = new Application("cv/image_classification");
+        Application OBJECT_DETECTION = new Application("cv/object_detection");
+        Application SEMANTIC_SEGMENTATION = new Application("cv/semantic_segmentation");
+        Application INSTANCE_SEGMENTATION = new Application("cv/instance_segmentation");
+        Application POSE_ESTIMATION = new Application("cv/pose_estimation");
+        Application ACTION_RECOGNITION = new Application("cv/action_recognition");
     }
 
     /** The common set of applications for natural language processing. */
-    enum NLP {
-        QUESTION_ANSWER,
-        TEXT_CLASSIFICATION
+    public interface NLP {
+        Application QUESTION_ANSWER = new Application("nlp/question_answer");
+        Application TEXT_CLASSIFICATION = new Application("nlp/text_classification");
     }
 }

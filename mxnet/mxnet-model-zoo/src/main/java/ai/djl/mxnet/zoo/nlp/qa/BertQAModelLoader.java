@@ -12,14 +12,16 @@
  */
 package ai.djl.mxnet.zoo.nlp.qa;
 
+import ai.djl.Application;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.Anchor;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.MRL.Model.NLP;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorFactory;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Model loader for BERT QA models.
@@ -32,9 +34,9 @@ import ai.djl.translate.Translator;
  *
  * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
-public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
+public class BertQAModelLoader extends BaseModelLoader {
 
-    private static final Anchor BASE_ANCHOR = NLP.QUESTION_ANSWER;
+    private static final Application APPLICATION = Application.NLP.QUESTION_ANSWER;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "bertqa";
     private static final String VERSION = "0.0.1";
@@ -45,12 +47,23 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
      * @param repository the repository to load the model from
      */
     public BertQAModelLoader(Repository repository) {
-        super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
+        map.put(String.class, new FactoryImpl());
+        factories.put(QAInput.class, map);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Translator<QAInput, String> getTranslator(Artifact artifact) {
-        return new BertQATranslator();
+    public Application getApplication() {
+        return APPLICATION;
+    }
+
+    private static final class FactoryImpl implements TranslatorFactory<QAInput, String> {
+
+        @Override
+        public Translator<QAInput, String> newInstance(Map<String, Object> arguments) {
+            return new BertQATranslator();
+        }
     }
 }

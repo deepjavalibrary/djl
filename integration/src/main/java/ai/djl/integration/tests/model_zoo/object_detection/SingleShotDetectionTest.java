@@ -13,6 +13,7 @@
 
 package ai.djl.integration.tests.model_zoo.object_detection;
 
+import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.basicdataset.PikachuDetection;
@@ -29,7 +30,9 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -46,8 +49,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -134,9 +135,17 @@ public class SingleShotDetectionTest {
         if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
             throw new SkipException("Model not supported");
         }
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("flavor", "tiny");
-        criteria.put("dataset", "pikachu");
-        return BasicModelZoo.SSD.loadModel(criteria);
+
+        Criteria<BufferedImage, DetectedObjects> criteria =
+                Criteria.builder()
+                        .optApplication(Application.CV.OBJECT_DETECTION)
+                        .setTypes(BufferedImage.class, DetectedObjects.class)
+                        .optModelZooName(BasicModelZoo.NAME)
+                        .optModelLoaderName("ssd")
+                        .optOption("flavor", "tiny")
+                        .optOption("dataset", "pikachu")
+                        .build();
+
+        return ModelZoo.loadModel(criteria);
     }
 }

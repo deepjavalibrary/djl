@@ -12,25 +12,22 @@
  */
 package ai.djl.examples.inference.benchmark.util;
 
+import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.ModelException;
-import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.engine.Engine;
 import ai.djl.examples.inference.benchmark.MultithreadedBenchmark;
 import ai.djl.metric.Metrics;
-import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.zoo.ModelLoader;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import ai.djl.util.Progress;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -45,12 +42,19 @@ public abstract class AbstractBenchmark<I, O> {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractBenchmark.class);
 
+    private Class<I> input;
+    private Class<O> output;
     private O lastResult;
 
     protected ProgressBar progressBar;
 
     protected int maxIterations;
     protected int iterationCount;
+
+    public AbstractBenchmark(Class<I> input, Class<O> output) {
+        this.input = input;
+        this.output = output;
+    }
 
     /**
      * Returns last predict result.
@@ -107,7 +111,7 @@ public abstract class AbstractBenchmark<I, O> {
 
             List<CompletableFuture<O>> predictResults = new ArrayList<>();
             long totalTime;
-            try (ZooModel<I, O> model = loadModel(arguments, metrics)) {
+            try (ZooModel<I, O> model = loadModel(arguments, metrics, input, output)) {
                 initialize(model, arguments, metrics);
                 while (keepPredicting(duration, begin)) {
                     iterationCount++;
@@ -149,13 +153,10 @@ public abstract class AbstractBenchmark<I, O> {
      * @param arguments command line arguments
      * @param metrics {@link Metrics} to collect statistic information
      * @return prediction result
-     * @throws IOException if io error occurs when loading model.
-     * @throws ModelException if specified model not found or there is a parameter error
      * @throws TranslateException if error occurs when processing input or output
      */
     protected abstract CompletableFuture<O> predict(
-            ZooModel<I, O> model, Arguments arguments, Metrics metrics)
-            throws IOException, ModelException, TranslateException;
+            ZooModel<I, O> model, Arguments arguments, Metrics metrics) throws TranslateException;
 
     protected abstract void clean();
 
@@ -182,25 +183,25 @@ public abstract class AbstractBenchmark<I, O> {
         return new Arguments(cmd);
     }
 
-    protected ZooModel<I, O> loadModel(Arguments arguments, Metrics metrics)
+    protected ZooModel<I, O> loadModel(
+            Arguments arguments, Metrics metrics, Class<I> input, Class<O> output)
             throws ModelException, IOException {
         long begin = System.nanoTime();
 
+        Criteria.Builder<I, O> builder =
+                Criteria.builder()
+                        .optApplication(Application.CV.IMAGE_CLASSIFICATION)
+                        .setTypes(input, output)
+                        .optOptions(arguments.getCriteria())
+                        .optProgress(new ProgressBar());
+
         String modelName = arguments.getModelName();
         if (modelName == null) {
-            modelName = "RESNET";
+            modelName = "resnet";
         }
+        builder.optModelLoaderName(modelName);
 
-        Map<String, String> criteria = arguments.getCriteria();
-        ModelLoader<I, O> loader;
-        if (arguments.isImperative()) {
-            loader = ModelZoo.getModelZoo(BasicModelZoo.NAME).getModelLoader(modelName);
-        } else {
-            loader = ModelZoo.getModelZoo(MxModelZoo.NAME).getModelLoader(modelName);
-        }
-
-        Progress progress = new ProgressBar();
-        ZooModel<I, O> model = loader.loadModel(criteria, progress);
+        ZooModel<I, O> model = ModelZoo.loadModel(builder.build());
         long delta = System.nanoTime() - begin;
         logger.info(
                 "Model {} loaded in: {} ms.",

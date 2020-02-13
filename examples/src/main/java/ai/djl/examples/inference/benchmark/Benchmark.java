@@ -31,6 +31,10 @@ public final class Benchmark extends AbstractBenchmark<BufferedImage, Classifica
     BufferedImage img;
     Predictor<BufferedImage, Classifications> predictor;
 
+    public Benchmark() {
+        super(BufferedImage.class, Classifications.class);
+    }
+
     public static void main(String[] args) {
         if (new Benchmark().runBenchmark(args)) {
             System.exit(0); // NOPMD

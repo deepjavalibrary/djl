@@ -12,12 +12,14 @@
  */
 package ai.djl.examples.inference;
 
+import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.mxnet.zoo.MxModelZoo;
+import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -27,8 +29,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,14 +55,17 @@ public final class InstanceSegmentation {
         Path imageFile = Paths.get("src/test/resources/segmentation.jpg");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("flavor", "v1b");
-        criteria.put("backbone", "resnet18");
-        criteria.put("dataset", "coco");
+        Criteria<BufferedImage, DetectedObjects> criteria =
+                Criteria.builder()
+                        .optApplication(Application.CV.INSTANCE_SEGMENTATION)
+                        .setTypes(BufferedImage.class, DetectedObjects.class)
+                        .optOption("backbone", "resnet18")
+                        .optOption("flavor", "v1b")
+                        .optOption("dataset", "coco")
+                        .optProgress(new ProgressBar())
+                        .build();
 
-        try (ZooModel<BufferedImage, DetectedObjects> model =
-                MxModelZoo.MASK_RCNN.loadModel(criteria, new ProgressBar())) {
-
+        try (ZooModel<BufferedImage, DetectedObjects> model = ModelZoo.loadModel(criteria)) {
             try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
                 DetectedObjects detection = predictor.predict(img);
                 saveBoundingBoxImage(img, detection);

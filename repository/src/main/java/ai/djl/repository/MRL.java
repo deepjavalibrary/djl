@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import ai.djl.Application;
 import java.net.URI;
 
 /**
@@ -46,10 +47,36 @@ public class MRL {
      * @param groupId the desired groupId
      * @param artifactId the desired artifactId
      */
-    public MRL(Anchor baseAnchor, String groupId, String artifactId) {
+    MRL(Anchor baseAnchor, String groupId, String artifactId) {
         this.baseAnchor = baseAnchor;
         this.groupId = groupId;
         this.artifactId = artifactId;
+    }
+
+    /**
+     * Creates a model {@code MRL} with specified application.
+     *
+     * @param application the desired application
+     * @param groupId the desired groupId
+     * @param artifactId the desired artifactId
+     * @return a model {@code MRL}
+     */
+    public static MRL model(Application application, String groupId, String artifactId) {
+        Anchor baseAnchor = Anchor.MODEL.resolve(application.getPath());
+        return new MRL(baseAnchor, groupId, artifactId);
+    }
+
+    /**
+     * Creates a dataset {@code MRL} with specified application.
+     *
+     * @param application the desired application
+     * @param groupId the desired groupId
+     * @param artifactId the desired artifactId
+     * @return a dataset {@code MRL}
+     */
+    public static MRL dataset(Application application, String groupId, String artifactId) {
+        Anchor baseAnchor = Anchor.DATASET.resolve(application.getPath()).getParent();
+        return new MRL(baseAnchor, groupId, artifactId);
     }
 
     /**
@@ -121,34 +148,5 @@ public class MRL {
     @Override
     public String toString() {
         return toURI().toString();
-    }
-
-    /** The default set of {@link Anchor}s for {@link Dataset}s. */
-    public interface Dataset {
-
-        Anchor CV = new Anchor("dataset/cv");
-        Anchor NLP = new Anchor("dataset/nlp");
-    }
-
-    /** The default set of {@link Anchor}s for {@link Model}s. */
-    public interface Model {
-
-        /** The default set of {@link Anchor}s for computer vision {@link Model}s. */
-        interface CV {
-
-            Anchor IMAGE_CLASSIFICATION = new Anchor("model/cv/image_classification");
-            Anchor OBJECT_DETECTION = new Anchor("model/cv/object_detection");
-            Anchor SEMANTIC_SEGMENTATION = new Anchor("model/cv/semantic_segmentation");
-            Anchor INSTANCE_SEGMENTATION = new Anchor("model/cv/instance_segmentation");
-            Anchor POSE_ESTIMATION = new Anchor("model/cv/pose_estimation");
-            Anchor ACTION_RECOGNITION = new Anchor("model/cv/action_recognition");
-        }
-
-        /** The default set of {@link Anchor}s for natural language processing {@link Model}s. */
-        interface NLP {
-
-            Anchor QUESTION_ANSWER = new Anchor("model/nlp/question_answer");
-            Anchor TEXT_CLASSIFICATION = new Anchor("model/nlp/text_classification");
-        }
     }
 }

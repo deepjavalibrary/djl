@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains classes for the computer vision section ({@link ai.djl.repository.MRL.Model.CV}) of the
- * {@link ai.djl.basicmodelzoo.BasicModelZoo}.
+ * Contains classes for the computer vision section ({@link ai.djl.Application.CV}) of the {@link
+ * ai.djl.basicmodelzoo.BasicModelZoo}.
  */
 package ai.djl.basicmodelzoo.cv;

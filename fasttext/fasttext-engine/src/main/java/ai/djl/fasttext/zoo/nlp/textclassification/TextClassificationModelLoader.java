@@ -12,21 +12,23 @@
  */
 package ai.djl.fasttext.zoo.nlp.textclassification;
 
+import ai.djl.Application;
 import ai.djl.fasttext.engine.TextClassificationTranslator;
 import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.modality.Classifications;
-import ai.djl.repository.Anchor;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.MRL.Model.NLP;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorFactory;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** Model loader for fastText cooking stackexchange models. */
-public class TextClassificationModelLoader extends BaseModelLoader<String, Classifications> {
+public class TextClassificationModelLoader extends BaseModelLoader {
 
-    private static final Anchor BASE_ANCHOR = NLP.TEXT_CLASSIFICATION;
+    private static final Application APPLICATION = Application.NLP.TEXT_CLASSIFICATION;
     private static final String GROUP_ID = FtModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "cooking_stackexchange";
     private static final String VERSION = "0.0.1";
@@ -37,12 +39,23 @@ public class TextClassificationModelLoader extends BaseModelLoader<String, Class
      * @param repository the repository to load the model from
      */
     public TextClassificationModelLoader(Repository repository) {
-        super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
+        map.put(Classifications.class, new FactoryImpl());
+        factories.put(String.class, map);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Translator<String, Classifications> getTranslator(Artifact artifact) {
-        return new TextClassificationTranslator();
+    public Application getApplication() {
+        return APPLICATION;
+    }
+
+    private static final class FactoryImpl implements TranslatorFactory<String, Classifications> {
+
+        @Override
+        public Translator<String, Classifications> newInstance(Map<String, Object> arguments) {
+            return new TextClassificationTranslator();
+        }
     }
 }

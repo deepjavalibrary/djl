@@ -12,7 +12,6 @@
  */
 package ai.djl.examples.inference.benchmark;
 
-import ai.djl.ModelException;
 import ai.djl.examples.inference.benchmark.util.AbstractBenchmark;
 import ai.djl.examples.inference.benchmark.util.Arguments;
 import ai.djl.inference.Predictor;
@@ -21,7 +20,6 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
-import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -44,6 +42,10 @@ public class MultithreadedBenchmark extends AbstractBenchmark<BufferedImage, Cla
     AtomicInteger callableNumber;
     AtomicInteger successThreads;
     ExecutorService executorService;
+
+    public MultithreadedBenchmark() {
+        super(BufferedImage.class, Classifications.class);
+    }
 
     public static void main(String[] args) {
         if (new MultithreadedBenchmark().runBenchmark(args)) {
@@ -71,8 +73,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark<BufferedImage, Cla
     /** {@inheritDoc} */
     @Override
     protected CompletableFuture<Classifications> predict(
-            ZooModel<BufferedImage, Classifications> model, Arguments arguments, Metrics metrics)
-            throws IOException, ModelException, TranslateException {
+            ZooModel<BufferedImage, Classifications> model, Arguments arguments, Metrics metrics) {
         PredictorSupplier supplier = new PredictorSupplier(model, metrics);
         return CompletableFuture.supplyAsync(supplier, executorService);
     }

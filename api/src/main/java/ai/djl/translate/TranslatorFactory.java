@@ -10,9 +10,23 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.translate;
+
+import java.util.Map;
 
 /**
- * Contains classes for the {@link ai.djl.Application.NLP#TEXT_CLASSIFICATION} models in the {@link
- * ai.djl.fasttext.zoo.FtModelZoo}.
+ * A utility class creates {@link Translator} instances.
+ *
+ * @param <I> the type of the input
+ * @param <O> the type of the output
  */
-package ai.djl.fasttext.zoo.nlp.textclassification;
+public interface TranslatorFactory<I, O> {
+
+    /**
+     * Returns a new instance of the {@link Translator} class.
+     *
+     * @param arguments the configurations for a new {@code Translator} instance
+     * @return a new instance of the {@code Translator} class
+     */
+    Translator<I, O> newInstance(Map<String, Object> arguments);
+}
