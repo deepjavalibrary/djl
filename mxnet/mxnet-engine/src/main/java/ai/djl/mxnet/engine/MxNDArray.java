@@ -15,7 +15,6 @@ package ai.djl.mxnet.engine;
 import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.NativeResource;
-import ai.djl.ndarray.Matrix;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -203,15 +202,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
         // TODO support copy
         return duplicate(getManager(), getShape(), dataType, getDevice(), getName());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Matrix toMatrix() {
-        if (!shape.isMatrix()) {
-            throw new IllegalStateException("NDArray is not a matrix");
-        }
-        return new MxMatrix(this);
     }
 
     /**

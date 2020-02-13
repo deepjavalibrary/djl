@@ -13,7 +13,6 @@
 package ai.djl.tensorflow.engine;
 
 import ai.djl.Device;
-import ai.djl.ndarray.Matrix;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -145,12 +144,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Matrix toMatrix() {
         return null;
     }
 

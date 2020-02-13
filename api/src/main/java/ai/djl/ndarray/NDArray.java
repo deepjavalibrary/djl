@@ -167,14 +167,6 @@ public interface NDArray extends AutoCloseable {
     NDArray toType(DataType dataType, boolean copy);
 
     /**
-     * Converts this {@code NDArray} into a 2-D {@link Matrix}.
-     *
-     * @return this {@code NDArray} as {@link Matrix}
-     * @throws IllegalStateException thrown if this {@code NDArray} is not a 2-D {@link Matrix}
-     */
-    Matrix toMatrix();
-
-    /**
      * Attaches a gradient {@code NDArray} to this {@code NDArray} and marks it so {@link
      * ai.djl.training.GradientCollector#backward(NDArray)} can compute the gradient with respect to
      * it.

@@ -13,7 +13,6 @@
 package ai.djl.pytorch.engine;
 
 import ai.djl.Device;
-import ai.djl.ndarray.Matrix;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -145,12 +144,6 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public PtNDArray toType(DataType dataType, boolean copy) {
         return JniUtils.to(this, dataType, getDevice(), copy);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Matrix toMatrix() {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
