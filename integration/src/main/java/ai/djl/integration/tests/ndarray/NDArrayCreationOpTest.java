@@ -104,6 +104,39 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
+    public void testDuplicate() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.zeros(new Shape(5));
+            NDArray expected = manager.create(new float[] {0f, 0f, 0f, 0f, 0f});
+            NDArray duplicate = array.duplicate();
+            Assert.assertEquals(duplicate, expected);
+            Assert.assertNotSame(duplicate, expected);
+
+            // test multi-dim
+            array = manager.ones(new Shape(2, 3));
+            expected = manager.create(new float[] {1f, 1f, 1f, 1f, 1f, 1f}, new Shape(2, 3));
+            Assert.assertEquals(array, expected);
+            duplicate = array.duplicate();
+            Assert.assertEquals(duplicate, expected);
+            Assert.assertNotSame(duplicate, expected);
+
+            // test scalar
+            array = manager.zeros(new Shape());
+            expected = manager.create(0f);
+            duplicate = array.duplicate();
+            Assert.assertEquals(duplicate, expected);
+            Assert.assertNotSame(duplicate, expected);
+
+            // test zero-dim
+            array = manager.zeros(new Shape(0, 1));
+            expected = manager.create(new Shape(0, 1));
+            duplicate = array.duplicate();
+            Assert.assertEquals(duplicate, expected);
+            Assert.assertNotSame(duplicate, expected);
+        }
+    }
+
+    @Test
     public void testZeros() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.zeros(new Shape(5));

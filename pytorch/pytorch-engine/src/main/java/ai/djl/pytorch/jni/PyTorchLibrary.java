@@ -38,6 +38,8 @@ public final class PyTorchLibrary {
 
     public native Pointer torchTo(Pointer handle, int dType, int[] device, boolean copy);
 
+    public native Pointer tensorClone(Pointer handle);
+
     public native Pointer torchEmpty(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 

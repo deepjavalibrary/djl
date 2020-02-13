@@ -28,8 +28,14 @@ import ai.djl.pytorch.jni.NativeResource;
 import ai.djl.pytorch.jni.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /** {@code PtNDArray} is the PyTorch implementation of {@link NDArray}. */
 public class PtNDArray extends NativeResource implements NDArray {
@@ -201,6 +207,12 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public void copyTo(NDArray array) {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray duplicate() {
+        return JniUtils.clone(this);
     }
 
     /** {@inheritDoc} */
@@ -787,8 +799,30 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray squeeze(int[] axes) {
-        // TODO: add workaround for PyTorch
-        throw new UnsupportedOperationException("Not implemented");
+        if (isScalar()) {
+            if (axes.length > 1 || axes[0] != 0) {
+                throw new IllegalArgumentException(
+                        "axis " + axes[0] + "is out of bounds for array of dimension 0");
+            }
+            return (PtNDArray) duplicate();
+        }
+        long[] shapeArr = getShape().getShape();
+        List<Long> newShape = new ArrayList<>();
+        Set<Integer> set =
+                IntStream.of(axes).boxed().collect(Collectors.toCollection(HashSet::new));
+        // check input
+        for (int axis : axes) {
+            if (shapeArr[axis] != 1) {
+                throw new IllegalArgumentException(
+                        "cannot select an axis to squeeze out which has size not equal to one");
+            }
+        }
+        for (int i = 0; i < shapeArr.length; i++) {
+            if (!set.contains(i)) {
+                newShape.add(shapeArr[i]);
+            }
+        }
+        return (PtNDArray) reshape(newShape.stream().mapToLong(i -> i).toArray());
     }
 
     /** {@inheritDoc} */
@@ -956,18 +990,17 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray transpose() {
-        long[] shapeArray = getShape().getShape();
-        int[] reversedShape = new int[shapeArray.length];
-        // reverse the long array in-place
-        for (int i = 0; i < shapeArray.length; i++) {
-            reversedShape[shapeArray.length - i - 1] = Math.toIntExact(shapeArray[i]);
-        }
+        int dim = getShape().dimension();
+        int[] reversedShape = IntStream.range(0, dim).map(i -> dim - i - 1).toArray();
         return transpose(reversedShape);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray transpose(int... axes) {
+        if (isScalar() && axes.length > 0) {
+            throw new IllegalArgumentException("axes don't match NDArray");
+        }
         return JniUtils.permute(this, Arrays.stream(axes).mapToLong(i -> i).toArray());
     }
 

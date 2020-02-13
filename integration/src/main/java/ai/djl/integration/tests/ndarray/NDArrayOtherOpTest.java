@@ -606,6 +606,7 @@ public class NDArrayOtherOpTest {
             // scalar
             original = manager.create(5f);
             Assert.assertEquals(original.transpose(), original);
+            // throw exception
             original.transpose(0);
 
             // zero-dim

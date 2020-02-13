@@ -14,6 +14,7 @@ package ai.djl.pytorch.engine;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -427,10 +428,12 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray concat(NDList arrays, int axis) {
-        NDArray[] srcArray = new NDArray[arrays.size() + 1];
+    public PtNDArray concat(NDList list, int axis) {
+        NDUtils.checkConcatInput(list);
+
+        NDArray[] srcArray = new NDArray[list.size() + 1];
         srcArray[0] = array;
-        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
+        System.arraycopy(list.toArray(new NDArray[0]), 0, srcArray, 1, list.size());
         return JniUtils.cat(srcArray, axis);
     }
 

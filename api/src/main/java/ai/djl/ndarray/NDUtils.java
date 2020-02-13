@@ -14,6 +14,7 @@ package ai.djl.ndarray;
 
 import ai.djl.ndarray.types.Shape;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /** A class containing utility methods for NDArray operations. */
 public final class NDUtils {
@@ -38,5 +39,32 @@ public final class NDUtils {
                         .mapToLong(i -> shapeArr[i])
                         .toArray();
         return new Shape(newShape);
+    }
+
+    /**
+     * Check two critieria of concat input: 1. no scalar 2. dimensions of all the array must be the
+     * same.
+     *
+     * @param list input {@link NDList}
+     */
+    public static void checkConcatInput(NDList list) {
+        NDArray[] arrays = list.toArray(new NDArray[0]);
+        if (Stream.of(arrays).allMatch(array -> array.getShape().dimension() == 0)) {
+            throw new IllegalArgumentException(
+                    "scalar(zero-dimensional) arrays cannot be concatenated");
+        }
+        int dimension = arrays[0].getShape().dimension();
+        for (int i = 1; i < arrays.length; i++) {
+            if (arrays[i].getShape().dimension() != dimension) {
+                throw new IllegalArgumentException(
+                        "all the input arrays must have same number of dimensions, but the array at index 0 has "
+                                + dimension
+                                + " dimension(s) and the array at index "
+                                + i
+                                + " has "
+                                + arrays[i].getShape().dimension()
+                                + " dimension(s)");
+            }
+        }
     }
 }
