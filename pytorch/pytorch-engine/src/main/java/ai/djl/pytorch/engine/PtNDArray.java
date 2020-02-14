@@ -223,7 +223,10 @@ public class PtNDArray extends NativeResource implements NDArray {
                     continue;
                 }
                 PtNDArray indicesNd =
-                        (PtNDArray) this.getManager().arange(min[dim], max[dim], step[dim]);
+                        (PtNDArray)
+                                this.getManager()
+                                        .arange(min[dim], max[dim], step[dim])
+                                        .toType(DataType.INT64, false);
                 afterSlice = JniUtils.get(afterSlice, dim, indicesNd);
             }
             return afterSlice.squeeze(fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
@@ -510,24 +513,38 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray maximum(Number n) {
-        return JniUtils.max(this, (PtNDArray) manager.create(n));
+        return maximum(manager.create(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray maximum(NDArray other) {
+        if (!other.getDataType().equals(getDataType())) {
+            throw new IllegalArgumentException(
+                    "DataType mismatch, expected "
+                            + getDataType()
+                            + " Actual "
+                            + other.getDataType());
+        }
         return JniUtils.max(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray minimum(Number n) {
-        return JniUtils.min(this, (PtNDArray) manager.create(n));
+        return minimum(manager.create(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray minimum(NDArray other) {
+        if (!other.getDataType().equals(getDataType())) {
+            throw new IllegalArgumentException(
+                    "DataType mismatch, expected "
+                            + getDataType()
+                            + " Actual "
+                            + other.getDataType());
+        }
         return JniUtils.min(this, (PtNDArray) other);
     }
 

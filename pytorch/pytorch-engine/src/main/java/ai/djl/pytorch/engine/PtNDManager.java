@@ -138,7 +138,8 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
         if (k != 0) {
-            throw new IllegalArgumentException("index of the diagonal is not supported in PyTorch");
+            throw new UnsupportedOperationException(
+                    "index of the diagonal is not supported in PyTorch");
         }
         return JniUtils.eye(this, rows, cols, dataType, device, SparseFormat.DENSE);
     }
@@ -147,7 +148,7 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public NDArray linspace(double start, double stop, int num, boolean endpoint, Device device) {
         if (!endpoint) {
-            throw new IllegalArgumentException("endpoint only support true");
+            throw new UnsupportedOperationException("endpoint only support true");
         }
         return JniUtils.linspace(
                 this, start, stop, num, DataType.FLOAT32, device, SparseFormat.DENSE);

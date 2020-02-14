@@ -445,10 +445,10 @@ public class NDArrayElementComparisonOpTest {
     public void testMaximumScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10.0);
-            NDArray result = array.maximum(4);
+            NDArray result = array.maximum(4.0f);
             NDArray expected = manager.create(new float[] {4f, 4f, 4f, 4f, 4f, 5f, 6f, 7f, 8f, 9f});
             Assert.assertEquals(result, expected);
-            result = NDArrays.maximum(array, 4);
+            result = NDArrays.maximum(array, 4f);
             Assert.assertEquals(result, expected);
 
             array = manager.create(new float[] {0.1f, 0.2f, 0.3f, 0.4f}, new Shape(2, 2, 1));
@@ -460,10 +460,10 @@ public class NDArrayElementComparisonOpTest {
 
             // test scalar
             array = manager.create(3.9999f);
-            result = array.maximum(4);
+            result = array.maximum(4.0f);
             expected = manager.create(4f);
             Assert.assertEquals(result, expected);
-            result = NDArrays.maximum(array, 4);
+            result = NDArrays.maximum(array, 4f);
             Assert.assertEquals(result, expected);
 
             // test zero-dim
@@ -530,10 +530,10 @@ public class NDArrayElementComparisonOpTest {
     public void testMinimumScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(10.0);
-            NDArray result = array.minimum(4);
+            NDArray result = array.minimum(4f);
             NDArray expected = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 4f, 4f, 4f, 4f, 4f});
             Assert.assertEquals(result, expected);
-            result = NDArrays.minimum(array, 4);
+            result = NDArrays.minimum(array, 4f);
             Assert.assertEquals(result, expected);
 
             array = manager.create(new float[] {0.1f, 0.2f, 0.3f, 0.4f}, new Shape(2, 2, 1));
@@ -545,10 +545,10 @@ public class NDArrayElementComparisonOpTest {
 
             // test scalar
             array = manager.create(3.9999f);
-            result = array.minimum(4);
+            result = array.minimum(4f);
             expected = manager.create(3.9999f);
             Assert.assertEquals(result, expected);
-            result = NDArrays.minimum(array, 4);
+            result = NDArrays.minimum(array, 4f);
             Assert.assertEquals(result, expected);
 
             // test zero-dim

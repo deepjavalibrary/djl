@@ -17,6 +17,7 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.BasicModelZoo;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.MultiBoxDetection;
@@ -48,6 +49,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class SingleShotDetectionTest {
@@ -128,6 +130,9 @@ public class SingleShotDetectionTest {
 
     private ZooModel<BufferedImage, DetectedObjects> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
+        if (!Engine.getInstance().getEngineName().equals("MXNet")) {
+            throw new SkipException("Model not supported");
+        }
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("flavor", "tiny");
         criteria.put("dataset", "pikachu");

@@ -49,6 +49,10 @@ public final class JniUtils {
         }
     }
 
+    public static void setSeed(long seed) {
+        PyTorchLibrary.LIB.torchManualSeed(seed);
+    }
+
     // TODO: Unchecked Datatype and device mapping
     public static PtNDArray createNdFromByteBuffer(
             PtNDManager manager,
@@ -539,6 +543,10 @@ public final class JniUtils {
     }
 
     public static PtNDArray neg(PtNDArray self, boolean inplace) {
+        PyTorchLibrary.LIB.torchNeg(self.getHandle(), inplace);
+        if (inplace) {
+            return self;
+        }
         return new PtNDArray(
                 self.getManager(), PyTorchLibrary.LIB.torchNeg(self.getHandle(), inplace));
     }

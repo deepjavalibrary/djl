@@ -16,6 +16,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.integration.util.Assertions;
 import ai.djl.modality.Classifications;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ResnetTest {
@@ -129,6 +131,9 @@ public class ResnetTest {
 
     private ZooModel<BufferedImage, Classifications> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
+        if (!Engine.getInstance().getEngineName().equals("MXNet")) {
+            throw new SkipException("Model not supported");
+        }
         Map<String, String> criteria = new ConcurrentHashMap<>();
         criteria.put("layers", "50");
         criteria.put("dataset", "cifar10");

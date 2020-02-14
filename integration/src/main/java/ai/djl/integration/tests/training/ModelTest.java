@@ -14,6 +14,7 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -25,12 +26,16 @@ import ai.djl.training.initializer.XavierInitializer;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ModelTest {
 
     @Test
     public void testModelSaveAndLoad() throws IOException, MalformedModelException {
+        if (!Engine.getInstance().getEngineName().equals("MXNet")) {
+            throw new SkipException("Model not supported");
+        }
         SequentialBlock block = new SequentialBlock();
         block.add(new Conv2D.Builder().setKernel(new Shape(1, 1)).setNumFilters(10).build());
         block.add(new BatchNorm.Builder().build());

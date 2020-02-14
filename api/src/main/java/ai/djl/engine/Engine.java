@@ -66,7 +66,6 @@ public abstract class Engine {
         } else if (!ALL_ENGINES.containsKey(defaultEngine)) {
             throw new EngineException("Unknown default engine: " + defaultEngine);
         }
-
         logger.debug("Found default engine: {}", defaultEngine);
         return defaultEngine;
     }

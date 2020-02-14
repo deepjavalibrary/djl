@@ -8,6 +8,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 set(SOURCE_FILES
     build/include/ai_djl_pytorch_jni_PyTorchLibrary.h
     "src/djl_pytorch_jni_utils.h"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_system.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_nn_functional.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_inference.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_comparison.cc"
