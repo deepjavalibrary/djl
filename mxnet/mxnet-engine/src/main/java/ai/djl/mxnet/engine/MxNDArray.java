@@ -476,13 +476,17 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray zerosLike() {
-        return manager.invoke("_np_zeros_like", this, null);
+        MxOpParams params = new MxOpParams();
+        params.addParam("fill_value", 0);
+        return manager.invoke("_npi_full_like", this, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray onesLike() {
-        return manager.invoke("_np_ones_like", this, null);
+        MxOpParams params = new MxOpParams();
+        params.addParam("fill_value", 1);
+        return manager.invoke("_npi_full_like", this, params);
     }
 
     /** {@inheritDoc} */
@@ -1477,7 +1481,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     public NDArray broadcast(Shape shape) {
         MxOpParams params = new MxOpParams();
         params.setShape(shape);
-        return manager.invoke("_np_broadcast_to", this, params);
+        return manager.invoke("_npi_broadcast_to", this, params);
     }
 
     /** {@inheritDoc} */

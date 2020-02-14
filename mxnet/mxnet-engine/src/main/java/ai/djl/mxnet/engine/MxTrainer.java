@@ -120,14 +120,11 @@ public class MxTrainer implements Trainer {
                 NDList data = split.getData();
                 NDList labels = split.getLabels();
                 NDList preds = forward(data);
-
                 long time = System.nanoTime();
                 NDArray lossValue = loss.evaluate(labels, preds);
-
                 collector.backward(lossValue);
                 addMetric("backward", time);
                 time = System.nanoTime();
-
                 batchData.getLabels().put(labels.get(0).getDevice(), labels);
                 batchData.getPredictions().put(preds.get(0).getDevice(), preds);
                 addMetric("training-metrics", time);

@@ -87,4 +87,3 @@ configure(javaProjects()) {
 apply from: file("${rootProject.projectDir}/tools/gradle/publish.gradle")
 apply from: file("${rootProject.projectDir}/tools/gradle/jacoco.gradle")
 apply from: file("${rootProject.projectDir}/tools/gradle/release.gradle")
-

@@ -577,11 +577,10 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("num_layers", numStackedLayers);
         params.addParam("use_sequence_length", useSequenceLength);
         params.addParam("bidirectional", useBidirectional);
-        params.addParam("mode", mode);
         params.addParam("state_outputs", stateOutputs);
+        params.addParam("mode", mode);
         params.addAll(additional);
-
-        return getManager().invoke("RNN", inputs, params);
+        return getManager().invoke("_npx_rnn", inputs, params);
     }
 
     /** {@inheritDoc} */
@@ -610,7 +609,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("lstm_state_clip_max", lstmStateClipMax);
         params.addAll(additional);
 
-        return getManager().invoke("RNN", inputs, params);
+        return getManager().invoke("_npx_rnn", inputs, params);
     }
 
     ////////////////////////////////////////
