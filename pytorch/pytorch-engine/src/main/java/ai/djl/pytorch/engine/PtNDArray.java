@@ -21,7 +21,6 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.NDIndexBooleans;
 import ai.djl.ndarray.index.NDIndexElement;
 import ai.djl.ndarray.index.NDIndexFullSlice;
-import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -1171,23 +1170,10 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
-    }
-
-    /**
-     * Runs the debug string representation of this {@code NDArray}.
-     *
-     * @param maxSize the maximum elements to print out
-     * @param maxDepth the maximum depth to print out
-     * @param maxRows the maximum rows to print out
-     * @param maxColumns the maximum columns to print out
-     * @return the debug string representation of this {@code NDArray}
-     */
-    public String toDebugString(int maxSize, int maxDepth, int maxRows, int maxColumns) {
         if (isReleased()) {
             return "This array is already closed";
         }
-        return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns);
+        return toDebugString(this, MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
     }
 
     /** {@inheritDoc} */
