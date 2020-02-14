@@ -113,9 +113,9 @@ public final class JniUtils {
 
     public static PtNDArray arange(
             PtNDManager manager,
-            PtNDArray start,
-            PtNDArray stop,
-            PtNDArray step,
+            double start,
+            double stop,
+            double step,
             DataType dType,
             Device device,
             SparseFormat fmt) {
@@ -123,9 +123,30 @@ public final class JniUtils {
         return new PtNDArray(
                 manager,
                 PyTorchLibrary.LIB.torchArange(
-                        start.getHandle(),
-                        stop.getHandle(),
-                        step.getHandle(),
+                        start,
+                        stop,
+                        step,
+                        dType.ordinal(),
+                        layoutVal,
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        false));
+    }
+
+    public static PtNDArray linspace(
+            PtNDManager manager,
+            double start,
+            double stop,
+            int step,
+            DataType dType,
+            Device device,
+            SparseFormat fmt) {
+        int layoutVal = layoutMapper(fmt);
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchLinspace(
+                        start,
+                        stop,
+                        step,
                         dType.ordinal(),
                         layoutVal,
                         new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
@@ -561,14 +582,14 @@ public final class JniUtils {
     }
 
     public static PtNDArray eye(
-            PtNDManager manager, int n, int m, DataType dataType, Device device) {
+            PtNDManager manager, int n, int m, DataType dataType, Device device, SparseFormat fmt) {
         return new PtNDArray(
                 manager,
                 PyTorchLibrary.LIB.torchEye(
                         n,
                         m,
                         dataType.ordinal(),
-                        layoutMapper(SparseFormat.DENSE),
+                        layoutMapper(fmt),
                         new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
                         false));
     }

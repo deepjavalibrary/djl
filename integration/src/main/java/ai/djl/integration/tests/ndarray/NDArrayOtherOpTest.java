@@ -102,7 +102,7 @@ public class NDArrayOtherOpTest {
             array1.copyTo(array2);
             Assert.assertEquals(array2, array1, "CopyTo NDArray failed");
             // test multi-dim
-            array1 = manager.arange(100).reshape(2, 5, 5, 2);
+            array1 = manager.arange(100.0).reshape(2, 5, 5, 2);
             array2 = manager.create(new Shape(2, 5, 5, 2));
             array1.copyTo(array2);
             Assert.assertEquals(array2, array1, "CopyTo NDArray failed");
@@ -285,16 +285,16 @@ public class NDArrayOtherOpTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testBooleanMask() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.arange(4);
+            NDArray array = manager.arange(4.0);
             NDArray index = manager.create(new boolean[] {true, false, true, false});
             NDArray expected = manager.create(new float[] {0f, 2f});
             Assert.assertEquals(array.booleanMask(index), expected);
             Assert.assertEquals(NDArrays.booleanMask(array, index), expected);
 
             // test multi-dim
-            array = manager.arange(10).reshape(2, 1, 5);
+            array = manager.arange(10.0).reshape(2, 1, 5);
             index = manager.create(new boolean[] {true, false});
-            expected = manager.arange(5).reshape(1, 1, 5);
+            expected = manager.arange(5.0).reshape(1, 1, 5);
             Assert.assertEquals(array.booleanMask(index), expected);
             Assert.assertEquals(NDArrays.booleanMask(array, index), expected);
 
@@ -417,7 +417,7 @@ public class NDArrayOtherOpTest {
     @Test
     public void testCumsum() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.arange(10);
+            NDArray array = manager.arange(10.0);
             NDArray expected =
                     manager.create(new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f});
             Assert.assertEquals(array.cumSum(), expected);
@@ -427,28 +427,28 @@ public class NDArrayOtherOpTest {
             Assert.assertEquals(array.cumSum(0), expected);
 
             // test multi-dim
-            array = manager.arange(10).reshape(2, 1, 5, 1);
+            array = manager.arange(10.0).reshape(2, 1, 5, 1);
             expected =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 7f, 9f, 11f, 13f},
                             new Shape(2, 1, 5, 1));
             Assert.assertEquals(array.cumSum(0), expected);
 
-            array = manager.arange(10).reshape(2, 1, 5, 1);
+            array = manager.arange(10.0).reshape(2, 1, 5, 1);
             expected =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},
                             new Shape(2, 1, 5, 1));
             Assert.assertEquals(array.cumSum(1), expected);
 
-            array = manager.arange(10).reshape(2, 1, 5, 1);
+            array = manager.arange(10.0).reshape(2, 1, 5, 1);
             expected =
                     manager.create(
                             new float[] {0f, 1f, 3f, 6f, 10f, 5f, 11f, 18f, 26f, 35f},
                             new Shape(2, 1, 5, 1));
             Assert.assertEquals(array.cumSum(2), expected);
 
-            array = manager.arange(10).reshape(2, 1, 5, 1);
+            array = manager.arange(10.0).reshape(2, 1, 5, 1);
             expected =
                     manager.create(
                             new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f},

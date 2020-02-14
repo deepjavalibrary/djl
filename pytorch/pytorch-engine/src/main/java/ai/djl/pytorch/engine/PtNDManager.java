@@ -120,16 +120,18 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
+        return arange((double) start, (double) stop, (double) step, dataType, device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray arange(
-            Number start, Number stop, Number step, DataType dataType, Device device) {
-        return JniUtils.arange(
-                this,
-                (PtNDArray) create(start),
-                (PtNDArray) create(stop),
-                (PtNDArray) create(step),
-                dataType,
-                device,
-                SparseFormat.DENSE);
+            double start, double stop, double step, DataType dataType, Device device) {
+        if (Math.signum(stop - start) != Math.signum(step)) {
+            return create(new Shape(0), dataType, device);
+        }
+        return JniUtils.arange(this, start, stop, step, dataType, device, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
@@ -138,29 +140,31 @@ public class PtNDManager extends BaseNDManager {
         if (k != 0) {
             throw new IllegalArgumentException("index of the diagonal is not supported in PyTorch");
         }
-        return JniUtils.eye(this, rows, cols, dataType, device);
+        return JniUtils.eye(this, rows, cols, dataType, device, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(Number start, Number stop, int num, boolean endpoint, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+    public NDArray linspace(double start, double stop, int num, boolean endpoint, Device device) {
+        if (!endpoint) {
+            throw new IllegalArgumentException("endpoint only support true");
+        }
+        return JniUtils.linspace(
+                this, start, stop, num, DataType.FLOAT32, device, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            Number low, Number high, Shape shape, DataType dataType, Device device) {
-        return JniUtils.uniform(
-                this, low.doubleValue(), high.doubleValue(), shape, dataType, device);
+            double low, double high, Shape shape, DataType dataType, Device device) {
+        return JniUtils.uniform(this, low, high, shape, dataType, device);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            Number loc, Number scale, Shape shape, DataType dataType, Device device) {
-        return JniUtils.normal(
-                this, loc.doubleValue(), scale.doubleValue(), shape, dataType, device);
+            double loc, double scale, Shape shape, DataType dataType, Device device) {
+        return JniUtils.normal(this, loc, scale, shape, dataType, device);
     }
 
     /** {@inheritDoc} */

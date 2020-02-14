@@ -798,7 +798,13 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDList split(long[] indices, int axis) {
-        return JniUtils.split(this, indices, axis);
+        List<Long> ptIndex = new ArrayList<>();
+        ptIndex.add(indices[0]);
+        for (int i = 1; i < indices.length; i++) {
+            ptIndex.add(indices[i] - indices[i - 1]);
+        }
+        ptIndex.add(size(axis) - indices[indices.length - 1]);
+        return JniUtils.split(this, ptIndex.stream().mapToLong(i -> i).toArray(), axis);
     }
 
     /** {@inheritDoc} */

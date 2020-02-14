@@ -164,10 +164,10 @@ public class NDArrayReductionOpTest {
     @Test
     public void testTrace() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray original = manager.arange(8).reshape(new Shape(2, 2, 2)).trace();
+            NDArray original = manager.arange(8.0).reshape(new Shape(2, 2, 2)).trace();
             NDArray expect = manager.create(new float[] {6f, 8f});
             Assert.assertEquals(original, expect);
-            original = manager.arange(24).reshape(new Shape(2, 2, 2, 3)).trace();
+            original = manager.arange(24.0).reshape(new Shape(2, 2, 2, 3)).trace();
             Assert.assertEquals(original.getShape(), new Shape(2, 3));
         }
     }

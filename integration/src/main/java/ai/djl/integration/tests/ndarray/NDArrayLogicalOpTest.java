@@ -31,8 +31,8 @@ public class NDArrayLogicalOpTest {
             NDArray expected = manager.create(new boolean[] {false, false});
             Assert.assertEquals(array1.logicalAnd(array2), expected);
             Assert.assertEquals(NDArrays.logicalAnd(array1, array2), expected);
-            array1 = manager.arange(10);
-            array2 = manager.arange(10);
+            array1 = manager.arange(10.0);
+            array2 = manager.arange(10.0);
             expected =
                     manager.create(
                             new boolean[] {
@@ -47,8 +47,8 @@ public class NDArrayLogicalOpTest {
             expected = manager.create(new boolean[] {false, false, false, false}, new Shape(2, 2));
             Assert.assertEquals(array1.logicalAnd(array2), expected);
             Assert.assertEquals(NDArrays.logicalAnd(array1, array2), expected);
-            array1 = manager.arange(-5, 5).reshape(2, 5);
-            array2 = manager.arange(5, -5, -1).reshape(2, 5);
+            array1 = manager.arange(-5.0, 5.0).reshape(2, 5);
+            array2 = manager.arange(5.0, -5.0, -1.0).reshape(2, 5);
             expected =
                     manager.create(
                             new boolean[] {
@@ -85,8 +85,8 @@ public class NDArrayLogicalOpTest {
             NDArray expected = manager.create(new boolean[] {true, true, true, true});
             Assert.assertEquals(array1.logicalOr(array2), expected);
             Assert.assertEquals(NDArrays.logicalOr(array1, array2), expected);
-            array1 = manager.arange(10);
-            array2 = manager.arange(10);
+            array1 = manager.arange(10.0);
+            array2 = manager.arange(10.0);
             expected =
                     manager.create(
                             new boolean[] {
@@ -100,8 +100,8 @@ public class NDArrayLogicalOpTest {
             expected = manager.create(new boolean[] {true, true, true, true}, new Shape(4, 1));
             Assert.assertEquals(array1.logicalOr(array2), expected);
             Assert.assertEquals(NDArrays.logicalOr(array1, array2), expected);
-            array1 = manager.arange(-5, 5).reshape(5, 2);
-            array2 = manager.arange(5, -5, -1).reshape(5, 2);
+            array1 = manager.arange(-5.0, 5.0).reshape(5, 2);
+            array2 = manager.arange(5.0, -5.0, -1.0).reshape(5, 2);
             expected =
                     manager.create(
                             new boolean[] {
@@ -133,8 +133,8 @@ public class NDArrayLogicalOpTest {
             NDArray expected = manager.create(new boolean[] {false, true, true, false});
             Assert.assertEquals(array1.logicalXor(array2), expected);
             Assert.assertEquals(NDArrays.logicalXor(array1, array2), expected);
-            array1 = manager.arange(10);
-            array2 = manager.arange(10);
+            array1 = manager.arange(10.0);
+            array2 = manager.arange(10.0);
             expected = manager.zeros(new Shape(10)).toType(DataType.BOOLEAN, false);
             Assert.assertEquals(array1.logicalXor(array2), expected);
             Assert.assertEquals(NDArrays.logicalXor(array1, array2), expected);
@@ -145,8 +145,8 @@ public class NDArrayLogicalOpTest {
             expected = manager.create(new boolean[] {false, true, true, false}, new Shape(1, 4));
             Assert.assertEquals(array1.logicalXor(array2), expected);
             Assert.assertEquals(NDArrays.logicalXor(array1, array2), expected);
-            array1 = manager.arange(-5, 5).reshape(2, 1, 5);
-            array2 = manager.arange(5, -5, -1).reshape(2, 1, 5);
+            array1 = manager.arange(-5.0, 5.0).reshape(2, 1, 5);
+            array2 = manager.arange(5.0, -5.0, -1.0).reshape(2, 1, 5);
             expected = manager.zeros(new Shape(2, 1, 5)).toType(DataType.BOOLEAN, false);
             Assert.assertEquals(array1.logicalXor(array2), expected);
             Assert.assertEquals(NDArrays.logicalXor(array1, array2), expected);

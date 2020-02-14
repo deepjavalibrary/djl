@@ -76,8 +76,8 @@ JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2_3JJ
   (JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jindices, jlong jdim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  auto indices = env->GetLongArrayElements(jindices, JNI_FALSE);
-  auto tensors = tensor_ptr->split_with_sizes(c10::IntArrayRef(*indices), jdim);
+  const std::vector<int64_t> indices = utils::GetVecFromJLongArray(env, jindices);
+  auto tensors = tensor_ptr->split_with_sizes(indices, jdim);
   jobjectArray jarray = env->NewObjectArray(tensors.size(), env->FindClass(utils::POINTER_CLASS), nullptr);
   for (size_t i = 0; i < tensors.size(); ++i) {
     const auto* element_ptr = new torch::Tensor(tensors.at(i));

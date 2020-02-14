@@ -357,7 +357,7 @@ public class BlockCoreTest {
                 trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.arange(0, 48, 1).reshape(inputShape);
+                NDArray data = manager.arange(0.0, 48.0).reshape(inputShape);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assertions.assertAlmostEquals(result, manager.ones(new Shape(3, 4, 5)));
 
@@ -387,7 +387,7 @@ public class BlockCoreTest {
                 trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
+                NDArray data = manager.arange(0.0, 8.0).reshape(inputShape);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 NDArray expected =
                         manager.create(
@@ -416,7 +416,7 @@ public class BlockCoreTest {
                 trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
+                NDArray data = manager.arange(0.0, 8.0).reshape(inputShape);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 NDArray expected =
                         manager.create(
@@ -448,7 +448,7 @@ public class BlockCoreTest {
                 trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.arange(0, 8, 1).reshape(inputShape);
+                NDArray data = manager.arange(0.0, 8.0).reshape(inputShape);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 NDArray expected =
                         manager.create(
